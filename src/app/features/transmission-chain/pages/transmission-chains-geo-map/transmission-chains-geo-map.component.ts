@@ -203,6 +203,7 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                     this.lines = [];
 
                     // add valid address to marked
+                    const markerCircleRadius: number = 7;
                     const addValidAddressToMarker = (
                         address: AddressModel,
                         entity: EntityModel,
@@ -225,11 +226,15 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                                 address.geoLocation.lng
                             ),
                             type: WorldMapMarkerType.CIRCLE,
+                            radius: markerCircleRadius,
                             color: typeToColorMap[entity.type] ? typeToColorMap[entity.type] : Constants.DEFAULT_COLOR_CHAINS,
                             label: gNode.data.name,
                             labelColor: (entity.model as CaseModel).classification && caseClassificationToColorMap[(entity.model as CaseModel).classification] ?
                                 caseClassificationToColorMap[(entity.model as CaseModel).classification] :
                                 Constants.DEFAULT_COLOR_CHAINS,
+                            click: (mark: WorldMapMarker) => {
+                                console.log(mark);
+                            }
                         });
 
                         // add marker
@@ -309,7 +314,12 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                                     markersMap[gEdge.data.target].point
                                 ],
                                 color: certaintyLevelToColorMap[relationship.certaintyLevelId] ? certaintyLevelToColorMap[relationship.certaintyLevelId] : Constants.DEFAULT_COLOR_CHAINS,
-                                type: WorldMapPathType.ARROW
+                                type: WorldMapPathType.ARROW,
+                                lineWidth: 5,
+                                offsetX: -markerCircleRadius * 2,
+                                click: (path: WorldMapPath) => {
+                                    console.log(path);
+                                }
                             }));
                         }
                     });

@@ -40,6 +40,7 @@ export class WorldMapMarker {
     radius: number = 5;
     color: string = '#000';
     layer: WorldMapMarkerLayer = WorldMapMarkerLayer.OVERLAY;
+    click: (data: WorldMapMarker) => void;
 
     constructor(data: {
         // required
@@ -51,7 +52,8 @@ export class WorldMapMarker {
         type?: WorldMapMarkerType,
         radius?: number,
         color?: string,
-        layer?: WorldMapMarkerLayer
+        layer?: WorldMapMarkerLayer,
+        click?: (data: WorldMapMarker) => void
     }) {
         // assign properties
         Object.assign(
@@ -70,6 +72,10 @@ export class WorldMapPath {
     points: WorldMapPoint[];
     type: WorldMapPathType = WorldMapPathType.LINE;
     color: string = '#000';
+    click: (data: WorldMapPath) => void;
+    lineWidth: number = 3;
+    offsetX: number = 0;
+    offsetY: number = 0;
 
     constructor(data: {
         // required
@@ -77,7 +83,11 @@ export class WorldMapPath {
 
         // optional
         type?: WorldMapPathType,
-        color?: string
+        color?: string,
+        lineWidth?: number,
+        offsetX?: number,
+        offsetY?: number,
+        click?: (data: WorldMapPath) => void
     }) {
         // assign properties
         Object.assign(
@@ -398,6 +408,11 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                 ))
             );
 
+            // keep marker data
+            marker.setProperties({
+                dataForClick: markerData
+            });
+
             // create icons style for marker
             const style: {
                 image?: Icon | CircleStyle,
@@ -481,8 +496,8 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                     arrow.setStyle(new Style({
                         text: new Text({
                             text: '>',
-                            offsetX: 0,
-                            offsetY: 2,
+                            offsetX: path.offsetX,
+                            offsetY: path.offsetY + 2,
                             font: 'bold 30px Arial',
                             fill: new Fill({
                                 color: path.color
@@ -508,9 +523,14 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             featurePath.setStyle(new Style({
                 stroke: new Stroke({
                     color: path.color,
-                    width: 3
+                    width: path.lineWidth
                 })
             }));
+
+            // keep line data
+            featurePath.setProperties({
+                dataForClick: path
+            });
 
             // add path to overlay
             this.mapOverlayLayerSource.addFeature(featurePath);
@@ -612,6 +632,23 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             layers: this.layers,
             target: 'worldMap',
             view: this.mapView
+        });
+
+        // listen for clicks
+        this.map.on('click', (e) => {
+            // check if we need to trigger click events
+            // (feature, layer)
+            this.map.forEachFeatureAtPixel(e.pixel, (feature: Feature) => {
+                // trigger click if necessary
+                if (
+                    feature.getProperties() &&
+                    feature.getProperties().dataForClick &&
+                    feature.getProperties().dataForClick.click
+                ) {
+                    // trigger click
+                    feature.getProperties().dataForClick.click(feature.getProperties().dataForClick);
+                }
+            });
         });
 
         // initialize map overlay
