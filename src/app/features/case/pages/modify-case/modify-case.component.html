@@ -227,7 +227,6 @@
                                 required="true"
                                 [dateSameOrBefore]="[
                                     serverToday,
-                                    'dateDeceased',
                                     'dateOfOutcome'
                                 ]"
                                 [dateSameOrAfter]="dateOnsetSameOrAfterDates()">
@@ -262,7 +261,7 @@
                                 app-date-validator
                                 [dateSameOrBefore]="[
                                     serverToday,
-                                    'dateDeceased',
+                                    'dateOfOutcome',
                                     'dateOfOnset'
                                 ]">
                             </app-form-datepicker>
