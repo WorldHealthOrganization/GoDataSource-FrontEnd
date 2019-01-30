@@ -291,6 +291,11 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * If we click in a location where we have two features / markers under cursor should we trigger click for both of them or only first one ( the one that is on top )
+     */
+    @Input() triggerOnlyFirstClicked: boolean = true;
+
+    /**
      * Constructor
      */
     constructor(
@@ -638,7 +643,13 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         this.map.on('click', (e) => {
             // check if we need to trigger click events
             // (feature, layer)
+            let stop: boolean = false;
             this.map.forEachFeatureAtPixel(e.pixel, (feature: Feature) => {
+                // stop
+                if (stop) {
+                    return;
+                }
+
                 // trigger click if necessary
                 if (
                     feature.getProperties() &&
@@ -647,6 +658,11 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                 ) {
                     // trigger click
                     feature.getProperties().dataForClick.click(feature.getProperties().dataForClick);
+
+                    // stop ?
+                    if (this.triggerOnlyFirstClicked) {
+                        stop = true;
+                    }
                 }
             });
         });

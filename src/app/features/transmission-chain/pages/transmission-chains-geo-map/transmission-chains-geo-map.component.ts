@@ -316,7 +316,7 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                                 color: certaintyLevelToColorMap[relationship.certaintyLevelId] ? certaintyLevelToColorMap[relationship.certaintyLevelId] : Constants.DEFAULT_COLOR_CHAINS,
                                 type: WorldMapPathType.ARROW,
                                 lineWidth: 5,
-                                offsetX: -markerCircleRadius * 2,
+                                offsetX: -(markerCircleRadius * 2 + 3),
                                 click: (path: WorldMapPath) => {
                                     console.log(path);
                                 }
