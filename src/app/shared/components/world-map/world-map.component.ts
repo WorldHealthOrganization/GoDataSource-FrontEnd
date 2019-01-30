@@ -266,6 +266,21 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     outbreakSubscriber: Subscription;
 
     /**
+     * Display / Hide marker labels
+     */
+    private _displayLabels: boolean = true;
+    @Input() set displayLabels(displayLabels: boolean) {
+        // set value
+        this._displayLabels = displayLabels;
+
+        // init map markers
+        this.reinitializeOverlay();
+    }
+    get displayLabels(): boolean {
+        return this._displayLabels;
+    }
+
+    /**
      * Constructor
      */
     constructor(
@@ -411,7 +426,10 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             }
 
             // if label provided attach it
-            if (markerData.label) {
+            if (
+                this.displayLabels &&
+                markerData.label
+            ) {
                 style.text = new Text({
                     text: markerData.label,
                     offsetY: -24,

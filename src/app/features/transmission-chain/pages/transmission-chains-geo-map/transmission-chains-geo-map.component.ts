@@ -60,6 +60,12 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
     // subscribers
     outbreakSubscriber: Subscription;
 
+    // display labels
+    displayLabels: boolean = true;
+
+    /**
+     * Constructor
+     */
     constructor(
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
@@ -67,6 +73,9 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
         private referenceDataDataService: ReferenceDataDataService
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakSubscriber = this.outbreakDataService
@@ -79,6 +88,9 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
             });
     }
 
+    /**
+     * Component removed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -99,11 +111,22 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
             return Observable.forkJoin([
                 this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE),
                 this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CERTAINTY_LEVEL),
+                this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION),
                 this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id)
             ]).catch((err) => {
                 this.snackbarService.showError(err.message);
                 return ErrorObservable.create(err);
-            }).subscribe(([personTypes, certaintyLevels, chainsData]: [ReferenceDataCategoryModel, ReferenceDataCategoryModel, TransmissionChainModel[]]) => {
+            }).subscribe(([
+                personTypes,
+                certaintyLevels,
+                caseClassification,
+                chainsData
+            ]: [
+                ReferenceDataCategoryModel,
+                ReferenceDataCategoryModel,
+                ReferenceDataCategoryModel,
+                TransmissionChainModel[]
+            ]) => {
                 // retrieve graph data
                 const graphData = this.transmissionChainDataService.convertChainToGraphElements(
                     chainsData, {
@@ -130,6 +153,12 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                         certaintyLevelToColorMap[entry.id] = entry.colorCode;
                     });
 
+                    // map case classification to color
+                    const caseClassificationToColorMap = {};
+                    _.each(caseClassification.entries, (entry: ReferenceDataEntryModel) => {
+                        caseClassificationToColorMap[entry.id] = entry.colorCode;
+                    });
+
                     // reset data
                     const markersMap: {
                         [idEntityModel: string]: WorldMapMarker
@@ -140,8 +169,8 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                     // add valid address to marked
                     const addValidAddressToMarker = (
                         address: AddressModel,
-                        markerId: string,
-                        type: string
+                        entity: EntityModel,
+                        gNode: { data: GraphNodeModel }
                     ) => {
                         // validate address
                         if (
@@ -160,14 +189,18 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                                 address.geoLocation.lng
                             ),
                             type: WorldMapMarkerType.CIRCLE,
-                            color: typeToColorMap[type] ? typeToColorMap[type] : Constants.DEFAULT_COLOR_CHAINS
+                            color: typeToColorMap[entity.type] ? typeToColorMap[entity.type] : Constants.DEFAULT_COLOR_CHAINS,
+                            label: gNode.data.name,
+                            labelColor: (entity.model as CaseModel).classification && caseClassificationToColorMap[(entity.model as CaseModel).classification] ?
+                                caseClassificationToColorMap[(entity.model as CaseModel).classification] :
+                                Constants.DEFAULT_COLOR_CHAINS,
                         });
 
                         // add marker
                         this.markers.push(marker);
 
                         // add marker to map list
-                        markersMap[markerId] = marker;
+                        markersMap[entity.model.id] = marker;
                     };
 
                     // go through nodes that are rendered on COT graph and determine what we can render on geo-map
@@ -181,8 +214,8 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                                 case EntityType.EVENT:
                                     addValidAddressToMarker(
                                         (entity.model as EventModel).address,
-                                        entity.model.id,
-                                        entity.type
+                                        entity,
+                                        gNode
                                     );
                                     break;
 
@@ -195,8 +228,8 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                                                 typeId: AddressType.CURRENT_ADDRESS
                                             }
                                         ),
-                                        entity.model.id,
-                                        entity.type
+                                        entity,
+                                        gNode
                                     );
                                     break;
 
@@ -209,8 +242,8 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                                                 typeId: AddressType.CURRENT_ADDRESS
                                             }
                                         ),
-                                        entity.model.id,
-                                        entity.type
+                                        entity,
+                                        gNode
                                     );
                                     break;
                             }
