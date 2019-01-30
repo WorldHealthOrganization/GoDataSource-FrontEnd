@@ -145,8 +145,8 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
             this.elementRef
         ) {
             const bounding: HoverRowActionsRect = this.elementRef.nativeElement.getBoundingClientRect();
-            const leftDistance = this.mouseEvent.screenX - bounding.left;
-            const rightDistance = bounding.left + bounding.width - this.mouseEvent.screenX;
+            const leftDistance = this.mouseEvent.clientX - bounding.left;
+            const rightDistance = bounding.left + bounding.width - this.mouseEvent.clientX;
             if (leftDistance < rightDistance) {
                 // left
                 position = HoverRowActionsPosition.LEFT;
