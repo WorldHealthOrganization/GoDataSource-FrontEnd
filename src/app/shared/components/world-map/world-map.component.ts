@@ -5,6 +5,7 @@ import View from 'ol/View';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { TileArcGISRest, Vector as VectorSource, Cluster } from 'ol/source';
 import { transform } from 'ol/proj';
+import { Select as InteractionSelect } from 'ol/interaction';
 import Feature from 'ol/Feature';
 import { Point, LineString } from 'ol/geom';
 import { Icon, Style, Text, Fill, Stroke, Circle as CircleStyle } from 'ol/style';
@@ -40,7 +41,7 @@ export class WorldMapMarker {
     radius: number = 5;
     color: string = '#000';
     layer: WorldMapMarkerLayer = WorldMapMarkerLayer.OVERLAY;
-    click: (data: WorldMapMarker) => void;
+    selected: (map: WorldMapComponent, data: WorldMapMarker) => void;
 
     constructor(data: {
         // required
@@ -53,7 +54,7 @@ export class WorldMapMarker {
         radius?: number,
         color?: string,
         layer?: WorldMapMarkerLayer,
-        click?: (data: WorldMapMarker) => void
+        selected?: (map: WorldMapComponent, data: WorldMapMarker) => void
     }) {
         // assign properties
         Object.assign(
@@ -72,7 +73,7 @@ export class WorldMapPath {
     points: WorldMapPoint[];
     type: WorldMapPathType = WorldMapPathType.LINE;
     color: string = '#000';
-    click: (data: WorldMapPath) => void;
+    selected: (map: WorldMapComponent, data: WorldMapPath) => void;
     lineWidth: number = 3;
     offsetX: number = 0;
     offsetY: number = 0;
@@ -87,7 +88,7 @@ export class WorldMapPath {
         lineWidth?: number,
         offsetX?: number,
         offsetY?: number,
-        click?: (data: WorldMapPath) => void
+        selected?: (map: WorldMapComponent, data: WorldMapPath) => void
     }) {
         // assign properties
         Object.assign(
@@ -291,9 +292,9 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * If we click in a location where we have two features / markers under cursor should we trigger click for both of them or only first one ( the one that is on top )
+     * Select map features handler
      */
-    @Input() triggerOnlyFirstClicked: boolean = true;
+    private _clickSelect: InteractionSelect;
 
     /**
      * Constructor
@@ -415,7 +416,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
 
             // keep marker data
             marker.setProperties({
-                dataForClick: markerData
+                dataForEventListeners: markerData
             });
 
             // create icons style for marker
@@ -534,7 +535,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
 
             // keep line data
             featurePath.setProperties({
-                dataForClick: path
+                dataForEventListeners: path
             });
 
             // add path to overlay
@@ -639,33 +640,34 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             view: this.mapView
         });
 
-        // listen for clicks
-        this.map.on('click', (e) => {
-            // check if we need to trigger click events
-            // (feature, layer)
-            let stop: boolean = false;
-            this.map.forEachFeatureAtPixel(e.pixel, (feature: Feature) => {
-                // stop
-                if (stop) {
-                    return;
-                }
-
-                // trigger click if necessary
-                if (
+        // EVENTS LISTENERS
+        // create click listener
+        this._clickSelect = new InteractionSelect({
+            multi: false,
+            filter: (feature) => {
+                return feature.getProperties &&
                     feature.getProperties() &&
-                    feature.getProperties().dataForClick &&
-                    feature.getProperties().dataForClick.click
-                ) {
-                    // trigger click
-                    feature.getProperties().dataForClick.click(feature.getProperties().dataForClick);
-
-                    // stop ?
-                    if (this.triggerOnlyFirstClicked) {
-                        stop = true;
-                    }
-                }
+                    feature.getProperties().dataForEventListeners &&
+                    feature.getProperties().dataForEventListeners.selected;
+            }
+        });
+        this._clickSelect.on('select', (data: {
+            deselected: any[],
+            selected: any[],
+            mapBrowserEvent: any
+        }) => {
+            // trigger select
+            _.each(data.selected, (feature: Feature | any) => {
+                feature.getProperties().dataForEventListeners.selected(
+                    this,
+                    feature.getProperties().dataForEventListeners
+                );
             });
         });
+
+        // add events listeners
+        this.map.addInteraction(this._clickSelect);
+        // END OF EVENTS LISTENERS
 
         // initialize map overlay
         this.reinitializeOverlay();
@@ -723,5 +725,12 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                 observer.complete();
             }
         });
+    }
+
+    /**
+     * Clear Selected items
+     */
+    clearSelectedItems() {
+        this._clickSelect.getFeatures().clear();
     }
 }

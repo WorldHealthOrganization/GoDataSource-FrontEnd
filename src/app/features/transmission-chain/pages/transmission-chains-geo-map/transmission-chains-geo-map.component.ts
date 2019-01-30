@@ -13,6 +13,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import {
+    WorldMapComponent,
     WorldMapMarker,
     WorldMapMarkerType,
     WorldMapPath,
@@ -232,7 +233,10 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                             labelColor: (entity.model as CaseModel).classification && caseClassificationToColorMap[(entity.model as CaseModel).classification] ?
                                 caseClassificationToColorMap[(entity.model as CaseModel).classification] :
                                 Constants.DEFAULT_COLOR_CHAINS,
-                            click: (mark: WorldMapMarker) => {
+                            selected: (map: WorldMapComponent, mark: WorldMapMarker) => {
+                                // clear selected
+                                map.clearSelectedItems();
+
                                 console.log(mark);
                             }
                         });
@@ -317,7 +321,10 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                                 type: WorldMapPathType.ARROW,
                                 lineWidth: 5,
                                 offsetX: -(markerCircleRadius * 2 + 3),
-                                click: (path: WorldMapPath) => {
+                                selected: (map: WorldMapComponent, path: WorldMapPath) => {
+                                    // clear selected
+                                    map.clearSelectedItems();
+
                                     console.log(path);
                                 }
                             }));
