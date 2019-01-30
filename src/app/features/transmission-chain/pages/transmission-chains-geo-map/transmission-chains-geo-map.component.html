@@ -39,57 +39,72 @@
 
 <mat-card
     class="page-section page-content">
+    <!-- Legend & Filters -->
     <div
-        fxLayout="row wrap" fxLayoutGap="20px"
-        class="top-section-wrapper">
-        <!-- Entity Type -->
-        <div fxFlex>
-            <app-color-list-legend
-                [title]="'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ENTITY_TYPE_LABEL' | translate"
-                [referenceDataCategory]="ReferenceDataCategory.PERSON_TYPE">
-            </app-color-list-legend>
+        #topHeaderDiv>
+        <!-- Legend -->
+        <div
+            fxLayout="row wrap" fxLayoutGap="10px">
+            <!-- Entity Type -->
+            <div
+                fxFlex
+                class="top-section-wrapper">
+                <app-color-list-legend
+                    [title]="'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ENTITY_TYPE_LABEL' | translate"
+                    [referenceDataCategory]="ReferenceDataCategory.PERSON_TYPE">
+                </app-color-list-legend>
+            </div>
+
+            <!-- Case Classification -->
+            <div
+                fxFlex
+                class="top-section-wrapper">
+                <app-color-list-legend
+                    [title]="'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_CERTAINTY_LEVEL_LABEL' | translate"
+                    [referenceDataCategory]="ReferenceDataCategory.CERTAINTY_LEVEL">
+                </app-color-list-legend>
+            </div>
+
+            <!-- Certainty Level -->
+            <div
+                fxFlex
+                class="top-section-wrapper">
+                <app-color-list-legend
+                    [title]="'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_CASE_CLASSIFICATION_LABEL' | translate"
+                    [referenceDataCategory]="ReferenceDataCategory.CASE_CLASSIFICATION">
+                </app-color-list-legend>
+            </div>
         </div>
 
-        <!-- Case Classification -->
-        <div fxFlex>
-            <app-color-list-legend
-                [title]="'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_CERTAINTY_LEVEL_LABEL' | translate"
-                [referenceDataCategory]="ReferenceDataCategory.CERTAINTY_LEVEL">
-            </app-color-list-legend>
-        </div>
-
-        <!-- Certainty Level -->
-        <div fxFlex>
-            <app-color-list-legend
-                [title]="'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_CASE_CLASSIFICATION_LABEL' | translate"
-                [referenceDataCategory]="ReferenceDataCategory.CASE_CLASSIFICATION">
-            </app-color-list-legend>
+        <!-- Filter -->
+        <div
+            fxFlex>
+            <app-form-slide-toggle
+                name="displayLabels"
+                [(ngModel)]="displayLabels"
+                [label]="'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_DISPLAY_MARKER_LABELS_LABEL' | translate">
+            </app-form-slide-toggle>
         </div>
     </div>
 
+    <!-- Map  -->
     <div
-        fxLayout="row wrap" fxLayoutGap="20px">
-        <app-form-slide-toggle
-            name="displayLabels"
-            [(ngModel)]="displayLabels"
-            [label]="'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_DISPLAY_MARKER_LABELS_LABEL' | translate">
-        </app-form-slide-toggle>
-    </div>
-
-    <app-world-map
         *ngIf="markers.length > 0 || displayLoading"
-        width="100%"
-        height="calc(100% - 60px)"
-        [markers]="markers"
-        [lines]="lines"
-        [displayLabels]="displayLabels"
-        [fitMapOnMarkersChange]="true"
-        [displayLoading]="displayLoading">
-    </app-world-map>
+        [style.height]="headerHeight">
+        <app-world-map
+            width="100%"
+            height="100%"
+            [markers]="markers"
+            [lines]="lines"
+            [displayLabels]="displayLabels"
+            [fitMapOnMarkersChange]="true"
+            [displayLoading]="displayLoading">
+        </app-world-map>
+    </div>
 
+    <!-- Loading spinner -->
     <div
         *ngIf="markers.length < 1 && !displayLoading"
-        fxFlex
         class="geo-map-no-data">
         <span>
             {{ 'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_NO_DATA' | translate }}

@@ -1,4 +1,10 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+    Component, ElementRef,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+    ViewEncapsulation
+} from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
@@ -63,6 +69,12 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
     // display labels
     displayLabels: boolean = true;
 
+    // row header
+    @ViewChild('topHeaderDiv') topHeaderDiv: ElementRef;
+
+    // header height
+    headerHeight: string;
+
     /**
      * Constructor
      */
@@ -86,6 +98,30 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                 // re-load the list when the Selected Outbreak is changed
                 this.reloadChains();
             });
+
+        // check header height
+        setTimeout(() => {
+            this.checkForRowHeightChanges();
+        });
+    }
+
+    /**
+     * Check for row height changes
+     */
+    checkForRowHeightChanges() {
+        setTimeout(() => {
+            // do we have the header div
+            if (this.topHeaderDiv) {
+                // determine height
+                const headerHeight: string = `calc(100% - ${this.topHeaderDiv.nativeElement.getBoundingClientRect().height}px)`;
+                if (this.headerHeight !== headerHeight) {
+                    this.headerHeight = headerHeight;
+                }
+            }
+
+            // check again later
+            this.checkForRowHeightChanges();
+        }, 300);
     }
 
     /**
