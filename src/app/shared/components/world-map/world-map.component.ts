@@ -112,8 +112,28 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     /**
      * Map fill size ( Default w: 100%, h: 400px )
      */
-    @Input() width: string = '100%';
-    @Input() height: string = '400px';
+    private _width: string = '100%';
+    private _height: string = '400px';
+    @Input() set width(width: string) {
+        // set value
+        this._width = width;
+
+        // update map size
+        this.updateMapSize();
+    }
+    get width(): string {
+        return this._width;
+    }
+    @Input() set height(height: string) {
+        // set value
+        this._height = height;
+
+        // update map size
+        this.updateMapSize();
+    }
+    get height(): string {
+        return this._height;
+    }
 
     /**
      * Display spinner instead of map ?
@@ -546,6 +566,9 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         this.markerBounds = this.fitLayer === WorldMapMarkerLayer.CLUSTER ?
             this.mapClusterLayerSource.getExtent() :
             this.mapOverlayLayerSource.getExtent();
+
+        // update map size
+        this.updateMapSize();
     }
 
     /**
@@ -645,7 +668,6 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         this._clickSelect = new InteractionSelect({
             multi: true,
             filter: (feature) => {
-                console.log(feature);
                 return feature.getProperties &&
                     feature.getProperties() &&
                     feature.getProperties().dataForEventListeners &&
@@ -692,6 +714,25 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             // center location if we have something to center
             this.refreshMapCenter();
         }
+
+        // update map size
+        this.updateMapSize();
+    }
+
+    /**
+     * Update map size
+     */
+    public updateMapSize() {
+        // check if map was initialized
+        if (_.isEmpty(this.map)) {
+            // finished
+            return;
+        }
+
+        // update map size
+        setTimeout(() => {
+            this.map.updateSize();
+        });
     }
 
     /**
