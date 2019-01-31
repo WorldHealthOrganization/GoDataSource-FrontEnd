@@ -45,6 +45,8 @@ import { ViewCotEdgeDialogComponent } from './view-cot-edge-dialog/view-cot-edge
 import { ViewHelpDialogComponent } from './view-help-dialog/view-help-dialog.component';
 import { ViewHelpDetailsDialogComponent } from './view-help-details-dialog/view-help-details-dialog.component';
 import { FormModifyQuestionnaireComponent } from './form-modify-questionnaire/form-modify-questionnaire.component';
+import { FormLocationIdentifierListComponent } from './form-location-identifier-list/form-location-identifier-list.component';
+import { FormLocationIdentifierComponent } from './form-location-identifier/form-location-identifier.component';
 import { FormCaseQuickComponent } from './form-case-quick/form-case-quick.component';
 import { FormEventQuickComponent } from './form-event-quick/form-event-quick.component';
 
@@ -102,6 +104,8 @@ export const components: any[] = [
     FormContactQuickComponent,
     FormCaseQuickComponent,
     FormEventQuickComponent,
+    FormLocationIdentifierListComponent,
+    FormLocationIdentifierComponent,
 
     // display information
     CountedItemsListComponent,

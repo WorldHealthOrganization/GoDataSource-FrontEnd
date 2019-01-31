@@ -356,6 +356,14 @@ export const EnglishUsLang = {
         'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES': 'Coordinates are accurate',
         'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES_DESCRIPTION': '',
 
+        /**
+         * uiLocationFields
+         */
+        'LNG_LOCATION_FIELD_LABEL_IDENTIFIERS': 'Identifiers',
+        'LNG_LOCATION_FIELD_LABEL_IDENTIFIER_CODE': 'Code',
+        'LNG_LOCATION_FIELD_LABEL_IDENTIFIER_CODE_DESCRIPTION': '',
+        'LNG_LOCATION_FIELD_LABEL_IDENTIFIER_DESCRIPTION': 'Description',
+        'LNG_LOCATION_FIELD_LABEL_IDENTIFIER_DESCRIPTION_DESCRIPTION': '',
 
         // some tokens might need to be removed
         // - create & modify outbreak & outbreak template => case investigation, contact follow-up, lab results tab tokens etc..since these won't be used anymore
