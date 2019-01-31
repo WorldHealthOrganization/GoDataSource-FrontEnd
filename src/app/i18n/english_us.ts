@@ -13,6 +13,14 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value',
 
         /**
+         * uiTransmissionChainsGeoMap
+         */
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ENTITY_TYPE_LABEL': 'Entity Type: ',
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_CERTAINTY_LEVEL_LABEL': 'Certainty level: ',
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_CASE_CLASSIFICATION_LABEL': 'Case classification: ',
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_DISPLAY_MARKER_LABELS_LABEL': 'Display labels',
+
+        /**
          * uiFormCaseQuick
          */
         'LNG_FORM_CASE_QUICK_LABEL_PERSONAL': 'Personal',

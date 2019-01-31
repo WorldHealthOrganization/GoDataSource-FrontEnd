@@ -524,23 +524,23 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.legend.nodeIconKeys = [];
         // set legend entries
         const nodeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].refDataCateg], 'entries', []);
-        _.forEach(nodeColorReferenceDataEntries, (value, key) => {
+        _.forEach(nodeColorReferenceDataEntries, (value) => {
             this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
         });
         this.legend.nodeColorKeys = Object.keys(this.legend.nodeColor);
         const nodeNameColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeNameColorCriteria].refDataCateg], 'entries', []);
-        _.forEach(nodeNameColorReferenceDataEntries, (value, key) => {
+        _.forEach(nodeNameColorReferenceDataEntries, (value) => {
             this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
         });
         this.legend.nodeNameColorKeys = Object.keys(this.legend.nodeNameColor);
         const edgeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].refDataCateg], 'entries', []);
-        _.forEach(edgeColorReferenceDataEntries, (value, key) => {
+        _.forEach(edgeColorReferenceDataEntries, (value) => {
             this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
         });
         this.legend.edgeColorKeys = Object.keys(this.legend.edgeColor);
         if (this.colorCriteria.nodeIconCriteria !== Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS.NONE.value) {
             const nodeIconReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria].refDataCateg], 'entries', []);
-            _.forEach(nodeIconReferenceDataEntries, (value, key) => {
+            _.forEach(nodeIconReferenceDataEntries, (value) => {
                 this.legend.nodeIcon[value.value] = value.iconUrl ? value.iconUrl : '';
             });
             this.legend.nodeIconKeys = Object.keys(this.legend.nodeIcon);
@@ -551,7 +551,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
             this.legend.nodeLabelValues = [];
             const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
-            _.forEach(nodeLabelValues, (value, key) => {
+            _.forEach(nodeLabelValues, (value) => {
                 // get gender transcriptions
                 this.legend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
             });
@@ -560,7 +560,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.OCCUPATION.value) {
             this.legend.nodeLabelValues = [];
             const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.OCCUPATION], 'entries', []);
-            _.forEach(nodeLabelValues, (value, key) => {
+            _.forEach(nodeLabelValues, (value) => {
                 // get gender transcriptions
                 this.legend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
             });
@@ -569,21 +569,21 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
             this.legend.genderValues = [];
             const genderValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
-            _.forEach(genderValues, (value, key) => {
+            _.forEach(genderValues, (value) => {
                 // get gender transcriptions
                 this.legend.genderValues[value.value] = this.i18nService.instant(value.value);
             });
 
             this.legend.classificationValues = [];
             const classificationValues = _.get(this.referenceDataEntries[ReferenceDataCategory.CASE_CLASSIFICATION], 'entries', []);
-            _.forEach(classificationValues, (value, key) => {
+            _.forEach(classificationValues, (value) => {
                 // get classification transcriptions
                 this.legend.classificationValues[value.value] = this.i18nService.instant(value.value);
             });
 
             this.legend.outcomeValues = [];
             const outcomeValues = _.get(this.referenceDataEntries[ReferenceDataCategory.OUTCOME], 'entries', []);
-            _.forEach(outcomeValues, (value, key) => {
+            _.forEach(outcomeValues, (value) => {
                 // get outcome values transcriptions
                 this.legend.outcomeValues[value.value] = this.i18nService.instant(value.value);
             });
