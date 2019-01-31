@@ -439,10 +439,7 @@ export class TransmissionChainDataService {
                             graphEdge.targetType = relationship.persons[0].type;
                         }
                         // set colors
-                        if (
-                            !_.isEmpty(colorCriteria.edgeColor) &&
-                            Object.keys(colorCriteria.edgeColor).length
-                        ) {
+                        if (!_.isEmpty(colorCriteria.edgeColor)) {
                             if (colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]]) {
                                 graphEdge.edgeColor = colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]];
                             }
