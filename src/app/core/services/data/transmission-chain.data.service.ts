@@ -266,28 +266,19 @@ export class TransmissionChainDataService {
                         const nodeData = new GraphNodeModel(nodeProps);
                         nodeData.type = node.type;
                         // set node color
-                        if (
-                            !_.isEmpty(colorCriteria.nodeColor) &&
-                            Object.keys(colorCriteria.nodeColor).length
-                        ) {
+                        if (!_.isEmpty(colorCriteria.nodeColor)) {
                             if (colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]]) {
                                 nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
                             }
                         }
                         // set node label color
-                        if (
-                            !_.isEmpty(colorCriteria.nodeNameColor) &&
-                            Object.keys(colorCriteria.nodeNameColor).length
-                        ) {
+                        if (!_.isEmpty(colorCriteria.nodeNameColor)) {
                             if (colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]]) {
                                 nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
                             }
                         }
                         // set node icon
-                        if (
-                            !_.isEmpty(colorCriteria.nodeIcon) &&
-                            Object.keys(colorCriteria.nodeIcon).length
-                        ) {
+                        if (!_.isEmpty(colorCriteria.nodeIcon)) {
                             if (colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]]) {
                                 nodeData.picture = colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]];
                             }
