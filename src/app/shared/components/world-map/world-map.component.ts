@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import * as _ from 'lodash';
 import Map from 'ol/Map';
 import View from 'ol/View';
@@ -42,6 +42,7 @@ export class WorldMapMarker {
     color: string = '#000';
     layer: WorldMapMarkerLayer = WorldMapMarkerLayer.OVERLAY;
     selected: (map: WorldMapComponent, data: WorldMapMarker) => void;
+    data: any;
 
     constructor(data: {
         // required
@@ -54,7 +55,8 @@ export class WorldMapMarker {
         radius?: number,
         color?: string,
         layer?: WorldMapMarkerLayer,
-        selected?: (map: WorldMapComponent, data: WorldMapMarker) => void
+        selected?: (map: WorldMapComponent, data: WorldMapMarker) => void,
+        data?: any
     }) {
         // assign properties
         Object.assign(
@@ -77,6 +79,7 @@ export class WorldMapPath {
     lineWidth: number = 3;
     offsetX: number = 0;
     offsetY: number = 0;
+    data: any;
 
     constructor(data: {
         // required
@@ -88,7 +91,8 @@ export class WorldMapPath {
         lineWidth?: number,
         offsetX?: number,
         offsetY?: number,
-        selected?: (map: WorldMapComponent, data: WorldMapPath) => void
+        selected?: (map: WorldMapComponent, data: WorldMapPath) => void,
+        data?: any
     }) {
         // assign properties
         Object.assign(
@@ -786,5 +790,13 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      */
     clearSelectedItems() {
         this._clickSelect.getFeatures().clear();
+    }
+
+    /**
+     * Update map size
+     */
+    @HostListener('window:resize')
+    private updateMapSizeOnWindowResize() {
+        this.updateMapSize();
     }
 }

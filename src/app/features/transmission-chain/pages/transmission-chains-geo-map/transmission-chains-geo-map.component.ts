@@ -40,6 +40,14 @@ import { Constants } from '../../../../core/models/constants';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
+import { EntityDataService } from '../../../../core/services/data/entity.data.service';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import {
+    LoadingDialogModel,
+    ViewCotEdgeDialogComponent,
+    ViewCotNodeDialogComponent
+} from '../../../../shared/components';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 
 @Component({
     selector: 'app-transmission-chains-geo-map',
@@ -83,7 +91,10 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private transmissionChainDataService: TransmissionChainDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private entityDataService: EntityDataService,
+        private dialogService: DialogService,
+        private relationshipDataService: RelationshipDataService
     ) {}
 
     /**
@@ -233,11 +244,38 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                             labelColor: (entity.model as CaseModel).classification && caseClassificationToColorMap[(entity.model as CaseModel).classification] ?
                                 caseClassificationToColorMap[(entity.model as CaseModel).classification] :
                                 Constants.DEFAULT_COLOR_CHAINS,
+                            data: entity,
                             selected: (map: WorldMapComponent, mark: WorldMapMarker) => {
                                 // clear selected
                                 map.clearSelectedItems();
 
-                                console.log(mark);
+                                // display entity information ( case / contact / event )
+                                const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+                                const localEntity: EntityModel = mark.data;
+                                this.entityDataService
+                                    .getEntity(localEntity.type, this.selectedOutbreak.id, localEntity.model.id)
+                                    .catch((err) => {
+                                        this.snackbarService.showApiError(err);
+                                        loadingDialog.close();
+                                        return ErrorObservable.create(err);
+                                    })
+                                    .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
+                                        // hide loading dialog
+                                        loadingDialog.close();
+
+                                        // show node information
+                                        this.dialogService.showCustomDialog(
+                                            ViewCotNodeDialogComponent,
+                                            {
+                                                ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
+                                                ...{
+                                                    data: {
+                                                        entity: entityData
+                                                    }
+                                                }
+                                            }
+                                        );
+                                    });
                             }
                         });
 
@@ -321,11 +359,42 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                                 type: WorldMapPathType.ARROW,
                                 lineWidth: 5,
                                 offsetX: -(markerCircleRadius * 2 + 3),
+                                data: relationship,
                                 selected: (map: WorldMapComponent, path: WorldMapPath) => {
                                     // clear selected
                                     map.clearSelectedItems();
 
-                                    console.log(path);
+                                    // display relationship information
+                                    const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+                                    const localRelationship: RelationshipModel = path.data;
+                                    this.relationshipDataService
+                                        .getEntityRelationship(
+                                            this.selectedOutbreak.id,
+                                            localRelationship.sourcePerson.type,
+                                            localRelationship.sourcePerson.id,
+                                            localRelationship.id
+                                        ).catch((err) => {
+                                            this.snackbarService.showError(err.message);
+                                            loadingDialog.close();
+                                            return ErrorObservable.create(err);
+                                        })
+                                        .subscribe((relationshipData) => {
+                                            // hide loading dialog
+                                            loadingDialog.close();
+
+                                            // show edge information
+                                            this.dialogService.showCustomDialog(
+                                                ViewCotEdgeDialogComponent,
+                                                {
+                                                    ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+                                                    ...{
+                                                        data: {
+                                                            relationship: relationshipData
+                                                        }
+                                                    }
+                                                }
+                                            );
+                                        });
                                 }
                             }));
                         }
