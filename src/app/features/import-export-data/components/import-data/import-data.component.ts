@@ -370,7 +370,7 @@ export class ImportDataComponent implements OnInit {
         this.uploader.onErrorItem = (file, err: any) => {
             // display toast
             try {
-                err = _.isObject(err) ? err : JSON.parse(err)
+                err = _.isObject(err) ? err : JSON.parse(err);
                 err = err.error ? err.error : err;
                 this.snackbarService.showApiError(err);
 
