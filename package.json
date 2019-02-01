@@ -8,6 +8,7 @@
         "build": "ng build --prod --aot --build-optimizer",
         "build-high-memory": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build --prod --aot --build-optimizer",
         "test": "ng test",
+        "test-dev": "ng test --config karma.conf.dev.js",
         "lint": "ng lint",
         "e2e": "ng e2e"
     },
@@ -66,7 +67,7 @@
         "karma-coverage-istanbul-reporter": "1.4.3",
         "karma-jasmine": "1.1.2",
         "karma-jasmine-html-reporter": "0.2.2",
-        "karma-phantomjs-launcher": "^1.0.4",
+        "karma-phantomjs-launcher": "1.0.4",
         "protractor": "5.1.2",
         "ts-node": "4.1.0",
         "tslint": "5.9.1",
