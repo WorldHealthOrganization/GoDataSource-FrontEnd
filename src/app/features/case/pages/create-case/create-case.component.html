@@ -340,24 +340,13 @@
                 <div class="section-title">{{'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES' | translate}}</div>
                 <!-- Hospitalization Dates section -->
                 <app-form-case-center-daterange-list
-                    name="hospitalizationDates"
-                    [ngModel]="caseData.hospitalizationDates"
+                    name="dateRanges"
+                    [(ngModel)]="caseData.dateRanges"
                     fromTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_FROM_DESCRIPTION"
                     toTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_TO_DESCRIPTION"
+                    [componentTitle]="'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES' | translate"
                     centerNameLabel="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_CENTER_NAME"
                     centerNameTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_CENTER_NAME_DESCRIPTION"
-                ></app-form-case-center-daterange-list>
-
-                <div class="section-title">{{'LNG_CASE_FIELD_LABEL_ISOLATION_DATES' | translate}}</div>
-                <!-- Isolation Dates section -->
-                <app-form-case-center-daterange-list
-                    name="isolationDates"
-                    [ngModel]="caseData.isolationDates"
-                    fromTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_FROM_DESCRIPTION"
-                    toTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION"
-                    centerNameLabel="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_CENTER_NAME"
-                    centerNameTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_CENTER_NAME_DESCRIPTION"
-                    [minDate]="caseData.dateOfOnset"
                 ></app-form-case-center-daterange-list>
 
                 <div class="stepper-wrapper">

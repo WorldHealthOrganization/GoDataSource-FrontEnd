@@ -132,6 +132,10 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
             options: LabelValuePair[],
             value: any
         },
+        dateRanges: {
+            option: LabelValuePair[],
+            value: any
+        },
         deceased: {
             options: LabelValuePair[],
             value: any
@@ -290,6 +294,10 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
                 options: [],
                 value: undefined
             },
+            dateRanges: {
+                option: [],
+                value: undefined
+            },
             deceased: {
                 options: [],
                 value: undefined
@@ -334,6 +342,7 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
             this.uniqueOptions.dateOfInfection = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateOfInfection');
             this.uniqueOptions.outcome = EntityModel.uniqueStringOptions(this.mergeRecords, 'outcome');
             this.uniqueOptions.dateOfOutcome = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateOfOutcome');
+            // this.uniqueOptions.dateRanges = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateRanges');
             this.uniqueOptions.deceased = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'deceased');
             this.uniqueOptions.safeBurial = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'safeBurial');
             this.uniqueOptions.dateDeceased = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateDeceased');
@@ -344,11 +353,11 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
             // merge all addresses, keep just one current address
             this.determineAddresses();
 
-            // merge all hospitalization dates
-            this.determineHospitalizationDates();
+            // merge all dates
+            this.determineDateRanges();
 
-            // merge all isolation dates
-            this.determineIsolationDates();
+            // // merge all isolation dates
+            // this.determineIsolationDates();
 
             // determine questionnaire answers
             this.determineQuestionnaireAnswers();
@@ -373,32 +382,33 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
     /**
      * Determine hospitalization dates
      */
-    private determineHospitalizationDates() {
+    private determineDateRanges() {
         // merge all hospitalization dates
-        this.caseData.hospitalizationDates = [];
+        this.caseData.dateRanges = [];
         _.each(this.mergeRecords, (ent: EntityModel) => {
-            _.each((ent.model as CaseModel).hospitalizationDates, (date: CaseCenterDateRangeModel) => {
+            _.each((ent.model as CaseModel).dateRanges, (date: CaseCenterDateRangeModel) => {
                 if (date.startDate || date.endDate) {
-                    this.caseData.hospitalizationDates.push(date);
+                    this.caseData.dateRanges.push(date);
+                    console.log(this.caseData.dateRanges);
                 }
             });
         });
     }
 
-    /**
-     * Determine isolation dates
-     */
-    private determineIsolationDates() {
-        // merge all isolation dates
-        this.caseData.isolationDates = [];
-        _.each(this.mergeRecords, (ent: EntityModel) => {
-            _.each((ent.model as CaseModel).isolationDates, (date: CaseCenterDateRangeModel) => {
-                if (date.startDate || date.endDate) {
-                    this.caseData.isolationDates.push(date);
-                }
-            });
-        });
-    }
+    // /**
+    //  * Determine isolation dates
+    //  */
+    // private determineIsolationDates() {
+    //     // merge all isolation dates
+    //     this.caseData.isolationDates = [];
+    //     _.each(this.mergeRecords, (ent: EntityModel) => {
+    //         _.each((ent.model as CaseModel).isolationDates, (date: CaseCenterDateRangeModel) => {
+    //             if (date.startDate || date.endDate) {
+    //                 this.caseData.isolationDates.push(date);
+    //             }
+    //         });
+    //     });
+    // }
 
     /**
      * Determine addresses

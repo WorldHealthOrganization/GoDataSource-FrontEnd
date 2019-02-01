@@ -348,6 +348,22 @@ export const EnglishUsLang = {
         'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES': 'Coordinates are accurate',
         'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES_DESCRIPTION': '',
 
+        /**
+         * referenceDataCategoryDateRangeType
+         */
+        'LNG_REFERENCE_DATA_CATEGORY_DATE_RANGE_TYPE': 'Date range type',
+        'LNG_REFERENCE_DATA_CATEGORY_DATE_RANGE_TYPE_DESCRIPTION': '',
+        'LNG_REFERENCE_DATA_CATEGORY_DATE_RANGE_TYPE_HOSPITALIZATION': 'Hospitalization date',
+        'LNG_REFERENCE_DATA_CATEGORY_DATE_RANGE_TYPE_HOSPITALIZATION_DESCRIPTION': '',
+        'LNG_REFERENCE_DATA_CATEGORY_DATE_RANGE_TYPE_ISOLATION': 'Isolation date',
+        'LNG_REFERENCE_DATA_CATEGORY_DATE_RANGE_TYPE_ISOLATION_DESCRIPTION': '',
+        'LNG_REFERENCE_DATA_CATEGORY_DATE_RANGE_TYPE_OTHER': 'Other',
+        'LNG_REFERENCE_DATA_CATEGORY_DATE_RANGE_TYPE_OTHER_DESCRIPTION': '',
+
+        /**
+         * uiCaseFields
+         */
+        'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES': 'Dates'
 
         // some tokens might need to be removed
         // - create & modify outbreak & outbreak template => case investigation, contact follow-up, lab results tab tokens etc..since these won't be used anymore

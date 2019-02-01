@@ -3,6 +3,10 @@ import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer
 import { GroupBase, GroupFilteredValue } from '../../xt-forms/core';
 import { CaseCenterDateRangeModel } from '../../../core/models/case-center-date-range.model';
 import { Moment } from 'moment';
+import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
+import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
+import { Observable } from 'rxjs/Observable';
+import { DateTypes } from '../../../core/enums/date-types.enum';
 
 @Component({
     selector: 'app-form-case-center-daterange',
@@ -16,6 +20,9 @@ import { Moment } from 'moment';
     }]
 })
 export class FormCaseCenterDaterangeComponent extends GroupBase<CaseCenterDateRangeModel> implements OnInit, GroupFilteredValue<any> {
+    dateTypeList$: Observable<any>;
+    DATE_TYPES = DateTypes;
+
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
     @Input() minDate: Moment;
@@ -29,6 +36,7 @@ export class FormCaseCenterDaterangeComponent extends GroupBase<CaseCenterDateRa
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+        private referenceDataDataService: ReferenceDataDataService,
     ) {
         super(controlContainer, validators, asyncValidators);
     }
@@ -39,6 +47,7 @@ export class FormCaseCenterDaterangeComponent extends GroupBase<CaseCenterDateRa
     ngOnInit() {
         // init value
         this.value = new CaseCenterDateRangeModel(this.value);
+        this.dateTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PERSON_DATE_TYPE);
     }
 
     /**

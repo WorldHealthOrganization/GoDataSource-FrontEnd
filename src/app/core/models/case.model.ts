@@ -32,6 +32,7 @@ export class CaseModel {
     hospitalizationDates: CaseCenterDateRangeModel[];
     isolationDates: CaseCenterDateRangeModel[];
     incubationDates: DateRangeModel[];
+    dateRanges: CaseCenterDateRangeModel[];
     questionnaireAnswers: {};
     type: EntityType = EntityType.CASE;
     dateOfReporting: string;
@@ -130,6 +131,7 @@ export class CaseModel {
             });
 
         this.incubationDates = _.get(data, 'incubationDates', []);
+        this.dateRanges = _.get(data, 'dateRanges', []);
         this.dateOfReporting = _.get(data, 'dateOfReporting');
         this.dateOfLastContact = _.get(data, 'dateOfLastContact');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');

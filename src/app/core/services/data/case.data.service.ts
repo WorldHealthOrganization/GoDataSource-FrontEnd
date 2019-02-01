@@ -36,8 +36,8 @@ export class CaseDataService {
     ): Observable<CaseModel[]> {
         // include some relations by default
         const qb = new RequestQueryBuilder();
-        qb.include('hospitalizationLocations', true);
-        qb.include('isolationLocations', true);
+        // qb.include('hospitalizationLocations', true);
+        // qb.include('isolationLocations', true);
         qb.merge(queryBuilder);
 
         const filter = qb.buildQuery();
