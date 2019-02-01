@@ -367,12 +367,24 @@ export class ImportDataComponent implements OnInit {
         };
 
         // handle server errors
-        this.uploader.onErrorItem = () => {
-            // display error
-            this.displayError(
-                'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSING_FILE',
-                true
-            );
+        this.uploader.onErrorItem = (file, err: any) => {
+            // display toast
+            try {
+                err = _.isObject(err) ? err : JSON.parse(err)
+                err = err.error ? err.error : err;
+                this.snackbarService.showApiError(err);
+
+                // hide loading
+                this._displayLoading = false;
+                this._displayLoadingLocked = false;
+                this.progress = null;
+            } catch (e) {
+                // display error
+                this.displayError(
+                    'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSING_FILE',
+                    true
+                );
+            }
         };
 
         // handle before upload preparation
@@ -980,7 +992,7 @@ export class ImportDataComponent implements OnInit {
                         // display error
                         this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
                     } else {
-                        this.snackbarService.showError(err.message);
+                        this.snackbarService.showApiError(err);
                     }
 
                     // reset loading
