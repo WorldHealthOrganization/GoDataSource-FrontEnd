@@ -59,6 +59,8 @@
             'menu': '&#xe90a;',
             'home': '&#xe901;',
             'lab': '&#xe9aa;',
+            'arrowADown': '&#xe922;',
+            'arrowAUp': '&#xe921;',
           '0': 0
         };
         delete icons['0'];
