@@ -9,7 +9,13 @@ import { TransmissionChainsDashletComponent } from '../../components/transmissio
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswer, DialogAnswerButton, ViewCotEdgeDialogComponent, ViewCotNodeDialogComponent } from '../../../../shared/components';
+import {
+    DialogAnswer,
+    DialogAnswerButton,
+    LoadingDialogModel,
+    ViewCotEdgeDialogComponent,
+    ViewCotNodeDialogComponent
+} from '../../../../shared/components';
 import { DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -175,13 +181,18 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
     onNodeTap(entity: GraphNodeModel) {
         // retrieve entity info
+        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
         this.entityDataService
             .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
             .catch((err) => {
                 this.snackbarService.showApiError(err);
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
             .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
+                // hide loading dialog
+                loadingDialog.close();
+
                 if (this.editMode) {
                     // add node to selected persons list
                     this.selectedNodes.addNode(entityData);
@@ -211,13 +222,18 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
     onEdgeTap(relationship: GraphEdgeModel) {
         // retrieve relationship info
+        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
         this.relationshipDataService
             .getEntityRelationship(this.selectedOutbreak.id, relationship.sourceType, relationship.source, relationship.id)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
             .subscribe((relationshipData) => {
+                // hide loading dialog
+                loadingDialog.close();
+
                 // show edge information
                 this.dialogService.showCustomDialog(
                     ViewCotEdgeDialogComponent,

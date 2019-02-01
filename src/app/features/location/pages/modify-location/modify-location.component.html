@@ -127,6 +127,19 @@
                     [unique]="true"
                     [disabled]="viewOnly">
                 </app-form-input-list>
+
+                <!--Identifiers section-->
+                <div class="section-title">
+                    {{ 'LNG_LOCATION_FIELD_LABEL_IDENTIFIERS' | translate}}
+                </div>
+                <app-form-location-identifier-list
+                    name="identifiers"
+                    [ngModel]="locationData.identifiers"
+                    [required]="true"
+                    codePlaceholder="LNG_LOCATION_FIELD_LABEL_IDENTIFIER_CODE"
+                    descriptionPlaceholder="LNG_LOCATION_FIELD_LABEL_IDENTIFIER_DESCRIPTION"
+                    [disabled]="viewOnly">
+                </app-form-location-identifier-list>
             </mat-tab>
 
         </mat-tab-group>

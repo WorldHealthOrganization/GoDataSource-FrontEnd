@@ -1,0 +1,20 @@
+<div fxFlex fxLayout="row" fxLayoutGap="20px">
+    <app-form-input
+        [name]="name + '[code]'"
+        [(ngModel)]="identifierModel.code"
+        [placeholder]="'LNG_LOCATION_FIELD_LABEL_IDENTIFIER_CODE' | translate"
+        [disabled]="disabled"
+        [required]="required"
+        (optionChanged)="onChange()">
+    </app-form-input>
+
+    <app-form-input
+        [name]="name + '[description]'"
+        [(ngModel)]="identifierModel.description"
+        [placeholder]="'LNG_LOCATION_FIELD_LABEL_IDENTIFIER_DESCRIPTION' | translate"
+        [disabled]="disabled"
+        required="false"
+        (optionChanged)="onChange()">
+    </app-form-input>
+</div>
+

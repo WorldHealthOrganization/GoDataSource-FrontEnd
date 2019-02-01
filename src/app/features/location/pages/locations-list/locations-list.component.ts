@@ -125,6 +125,10 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                 label: 'LNG_LOCATION_FIELD_LABEL_SYNONYMS'
             }),
             new VisibleColumnModel({
+                field: 'identifiers',
+                label: 'LNG_LOCATION_FIELD_LABEL_IDENTIFIERS'
+            }),
+            new VisibleColumnModel({
                 field: 'latLng',
                 label: 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION'
             }),

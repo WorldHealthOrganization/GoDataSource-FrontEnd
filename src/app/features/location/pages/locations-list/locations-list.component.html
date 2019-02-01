@@ -157,6 +157,29 @@
                     </mat-cell>
                 </ng-container>
 
+                <!-- Identifiers -->
+                <ng-container matColumnDef="identifiers">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div class="column-header">{{ 'LNG_LOCATION_FIELD_LABEL_IDENTIFIERS' | translate}}</div>
+                            <div class="column-filter">
+                                <app-form-input
+                                    name="identifiersFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    (optionChanged)="filterByTextContainingField('identifiers.code', $event)"
+                                    app-reset-input-on-side-filter
+                                    [displayFilterIcon]="true">
+                                </app-form-input>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item">
+                        {{ item.identifiersAsString }}
+                    </mat-cell>
+                </ng-container>
+
                 <!-- Lat / Lng -->
                 <ng-container matColumnDef="latLng">
                     <mat-header-cell *matHeaderCellDef>
