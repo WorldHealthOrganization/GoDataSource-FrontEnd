@@ -88,19 +88,16 @@
     </div>
 
     <!-- Map  -->
-    <div
+    <app-world-map
         *ngIf="markers.length > 0 || displayLoading"
-        [style.height]="headerHeight">
-        <app-world-map
-            width="100%"
-            height="100%"
-            [markers]="markers"
-            [lines]="lines"
-            [displayLabels]="displayLabels"
-            [fitMapOnMarkersChange]="true"
-            [displayLoading]="displayLoading">
-        </app-world-map>
-    </div>
+        width="100%"
+        [height]="headerHeight"
+        [markers]="markers"
+        [lines]="lines"
+        [displayLabels]="displayLabels"
+        [fitMapOnMarkersChange]="true"
+        [displayLoading]="displayLoading">
+    </app-world-map>
 
     <!-- Loading spinner -->
     <div
