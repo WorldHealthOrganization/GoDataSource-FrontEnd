@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -30,6 +30,8 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
     styleUrls: ['./create-case.component.less']
 })
 export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit {
+    @ViewChild('personalForm') personalForm: NgForm;
+    @ViewChild('infectionForm') infectionForm: NgForm;
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),

@@ -7,7 +7,7 @@
         "start": "ng serve --host 0.0.0.0 --port 4550",
         "build": "ng build --prod --aot --build-optimizer",
         "build-high-memory": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build --prod --aot --build-optimizer",
-        "test": "ng test --no-watch --disable-gpu",
+        "test": "ng test",
         "lint": "ng lint",
         "e2e": "ng e2e"
     },
@@ -59,7 +59,7 @@
         "@types/jasminewd2": "2.0.3",
         "@types/node": "6.0.109",
         "codelyzer": "4.3.0",
-        "jasmine-core": "2.8.0",
+        "jasmine-core": "2.5.2",
         "jasmine-spec-reporter": "4.2.1",
         "karma": "2.0.5",
         "karma-chrome-launcher": "2.2.0",
