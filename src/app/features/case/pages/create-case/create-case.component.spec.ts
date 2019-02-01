@@ -116,8 +116,7 @@ describe('CreateCaseComponent', () => {
                 comp.infectionForm.controls['dateOfInfection'].setValue('2019-01-01');
                 comp.infectionForm.controls['dateOfOnset'].setValue('2019-01-01');
                 expect(comp.infectionForm.controls['dateOfInfection'].invalid).toBeFalsy();
-                // expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeFalsy();
-                expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeTruthy();
+                expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeFalsy();
 
                 // lower than
                 comp.infectionForm.controls['dateOfInfection'].setValue('2019-01-01');
