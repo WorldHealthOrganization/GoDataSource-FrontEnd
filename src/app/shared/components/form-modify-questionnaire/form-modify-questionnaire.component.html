@@ -102,22 +102,26 @@
             class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
             {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate }}
         </div>
-
-        <!-- Actions -->
-        <div
-            *ngIf="hasWriteAccess()"
-            fxFlex="120px"
-            class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
-            <!-- placeholder -->
-        </div>
     </div>
 
     <!-- Question Data -->
     <div
         fxFlex fxLayout="column">
+
+        <!-- Hover question effects / actions -->
+        <app-hover-row-actions
+            #hoverRowQuestion
+            [active]="!savingData && questionIndexInEditMode === null">
+        </app-hover-row-actions>
+
+        <!-- Question data -->
         <div
             *ngFor="let question of questionnaireData; let questionIndex = index"
-            [class.question-in-edit-mode]="questionIndex === questionIndexInEditMode">
+            [class.question-in-edit-mode]="questionIndex === questionIndexInEditMode"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRowQuestion"
+            [hoverRowActions]="questionActions"
+            [hoverRowActionData]="questionIndex">
 
             <!-- Question Row Data -->
             <div
@@ -163,69 +167,6 @@
                     fxFlex="100px"
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
                     {{ (question.required ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
-                </div>
-
-                <!-- Actions -->
-                <div
-                    *ngIf="hasWriteAccess()"
-                    fxFlex="120px"
-                    class="modify-questionnaire-cell-style">
-                    <button
-                        mat-icon-button
-                        type="button"
-                        [matMenuTriggerFor]="actionsMenu"
-                        [disabled]="savingData || questionIndexInEditMode !== null">
-                        <span class="xt-icon">moreVertical</span>
-                    </button>
-
-                    <mat-menu
-                        #actionsMenu="matMenu"
-                        class="table-max-sized-menu">
-                        <button
-                            mat-menu-item
-                            type="button"
-                            (click)="moveQuestionAbove(questionIndex)">
-                            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_UP' | translate }}
-                        </button>
-
-                        <button
-                            mat-menu-item
-                            type="button"
-                            (click)="addMoveQuestionPosition(questionIndex)">
-                            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_TO_POSITION_X' | translate }}
-                        </button>
-
-                        <button
-                            mat-menu-item
-                            type="button"
-                            (click)="moveQuestionBellow(questionIndex)">
-                            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_DOWN' | translate }}
-                        </button>
-
-                        <mat-divider></mat-divider>
-
-                        <button
-                            mat-menu-item
-                            type="button"
-                            (click)="modifyQuestion(questionIndex)">
-                            {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
-                        </button>
-
-                        <button
-                            mat-menu-item
-                            type="button"
-                            (click)="cloneQuestion(questionIndex)">
-                            {{ 'LNG_PAGE_ACTION_CLONE' | translate }}
-                        </button>
-
-                        <button
-                            mat-menu-item
-                            type="button"
-                            class="mat-menu-item-delete"
-                            (click)="deleteQuestion(questionIndex)">
-                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
-                        </button>
-                    </mat-menu>
                 </div>
             </div>
 
@@ -453,20 +394,23 @@
                                     class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
                                     {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT' | translate }}
                                 </div>
-
-                                <!-- Actions -->
-                                <div
-                                    *ngIf="hasWriteAccess()"
-                                    fxFlex="120px"
-                                    class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
-                                    <!-- placeholder -->
-                                </div>
                             </div>
+
+                            <!-- Hover Answer effects / actions -->
+                            <app-hover-row-actions
+                                #hoverRowAnswers
+                                [active]="!savingData && questionAnswerIndexInEditMode === null">
+                            </app-hover-row-actions>
 
                             <!-- Answer Data -->
                             <div
                                 *ngFor="let answer of questionInEditModeClone.answers; let answerIndex = index"
-                                [class.answer-in-edit-mode]="answerIndex === questionAnswerIndexInEditMode">
+                                [class.answer-in-edit-mode]="answerIndex === questionAnswerIndexInEditMode"
+                                app-hover-row-actions
+                                [hoverRowActionsComponent]="hoverRowAnswers"
+                                [hoverRowActions]="answerActions"
+                                [hoverRowActionData]="answerIndex">
+
                                 <!-- Answer Row Data -->
                                 <div
                                     fxFlex fxLayout="row"
@@ -504,69 +448,6 @@
                                         fxFlex="100px"
                                         class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
                                         {{ (answer.alert ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
-                                    </div>
-
-                                    <!-- Actions -->
-                                    <div
-                                        *ngIf="hasWriteAccess()"
-                                        fxFlex="120px"
-                                        class="modify-questionnaire-cell-style">
-                                        <button
-                                            mat-icon-button
-                                            type="button"
-                                            [matMenuTriggerFor]="actionsMenu"
-                                            [disabled]="savingData || questionAnswerIndexInEditMode !== null">
-                                            <span class="xt-icon">moreVertical</span>
-                                        </button>
-
-                                        <mat-menu
-                                            #actionsMenu="matMenu"
-                                            class="table-max-sized-menu">
-                                            <button
-                                                mat-menu-item
-                                                type="button"
-                                                (click)="moveAnswerAbove(answerIndex)">
-                                                {{ 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_ANSWER_UP' | translate }}
-                                            </button>
-
-                                            <button
-                                                mat-menu-item
-                                                type="button"
-                                                (click)="addMoveQuestionAnswerPosition(answerIndex)">
-                                                {{ 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_ANSWER_TO_POSITION_X' | translate }}
-                                            </button>
-
-                                            <button
-                                                mat-menu-item
-                                                type="button"
-                                                (click)="moveAnswerBellow(answerIndex)">
-                                                {{ 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_ANSWER_DOWN' | translate }}
-                                            </button>
-
-                                            <mat-divider></mat-divider>
-
-                                            <button
-                                                mat-menu-item
-                                                type="button"
-                                                (click)="modifyAnswer(answerIndex)">
-                                                {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
-                                            </button>
-
-                                            <button
-                                                mat-menu-item
-                                                type="button"
-                                                (click)="cloneAnswer(answerIndex)">
-                                                {{ 'LNG_PAGE_ACTION_CLONE' | translate }}
-                                            </button>
-
-                                            <button
-                                                mat-menu-item
-                                                type="button"
-                                                class="mat-menu-item-delete"
-                                                (click)="deleteAnswer(answerIndex)">
-                                                {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
-                                            </button>
-                                        </mat-menu>
                                     </div>
                                 </div>
 
