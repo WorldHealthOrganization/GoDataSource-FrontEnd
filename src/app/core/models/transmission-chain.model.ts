@@ -102,7 +102,7 @@ export class TransmissionChainModel {
      */
     get noAliveCases() {
         return _.filter(Object.values(this.casesMap), (caseData: CaseModel) => {
-            return caseData.outcomeId === Constants.OUTCOME_STATUS.DECEASED;
+            return caseData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
         }).length;
     }
 
