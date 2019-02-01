@@ -326,7 +326,7 @@
                     <!-- Hospitalization Dates section -->
                     <app-form-case-center-daterange-list
                         name="dateRanges"
-                        [(ngModel)]="uniqueOptions?.dateRanges.value"
+                        [(ngModel)]="caseData.dateRanges"
                         fromTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_FROM_DESCRIPTION"
                         toTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_TO_DESCRIPTION"
                         [componentTitle]="'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES' | translate"

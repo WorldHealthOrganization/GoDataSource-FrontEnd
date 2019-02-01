@@ -380,7 +380,7 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
     }
 
     /**
-     * Determine hospitalization dates
+     * Determine date ranges
      */
     private determineDateRanges() {
         // merge all hospitalization dates
@@ -394,21 +394,6 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
             });
         });
     }
-
-    // /**
-    //  * Determine isolation dates
-    //  */
-    // private determineIsolationDates() {
-    //     // merge all isolation dates
-    //     this.caseData.isolationDates = [];
-    //     _.each(this.mergeRecords, (ent: EntityModel) => {
-    //         _.each((ent.model as CaseModel).isolationDates, (date: CaseCenterDateRangeModel) => {
-    //             if (date.startDate || date.endDate) {
-    //                 this.caseData.isolationDates.push(date);
-    //             }
-    //         });
-    //     });
-    // }
 
     /**
      * Determine addresses
