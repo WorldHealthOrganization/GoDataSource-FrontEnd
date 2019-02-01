@@ -26,6 +26,7 @@ import { FormInputComponent } from '../../xt-forms/components/form-input/form-in
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import 'rxjs/add/observable/forkJoin';
 import { Observable } from 'rxjs/Observable';
+import { HoverRowActions, HoverRowActionsType } from '../hover-row-actions/hover-row-actions.component';
 
 /**
  * Used to initialize breadcrumbs
@@ -165,6 +166,16 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     childQuestionIsInEditMode: boolean = false;
 
     /**
+     * Question Actions
+     */
+    questionActions: HoverRowActions[] = [];
+
+    /**
+     * Question Answer Actions
+     */
+    answerActions: HoverRowActions[] = [];
+
+    /**
      * Allow question variable change
      */
     @Input() allowQuestionVariableChange: boolean = false;
@@ -283,6 +294,136 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     }
 
     /**
+     * Initialize question actions
+     */
+    private initQuestionActions() {
+        // init question actions
+        this.questionActions = [];
+
+        // add question actions that require write permissions
+        if (this.hasWriteAccess()) {
+            // question settings
+            this.questionActions.push(new HoverRowActions({
+                icon: 'settings',
+                click: (questionIndex) => {
+                    this.modifyQuestion(questionIndex);
+                }
+            }));
+
+            // move question above
+            this.questionActions.push(new HoverRowActions({
+                icon: 'arrowAUp',
+                click: (questionIndex) => {
+                    this.moveQuestionAbove(questionIndex);
+                }
+            }));
+
+            // move question bellow
+            this.questionActions.push(new HoverRowActions({
+                icon: 'arrowADown',
+                click: (questionIndex) => {
+                    this.moveQuestionBellow(questionIndex);
+                }
+            }));
+
+            // other options
+            this.questionActions.push(new HoverRowActions({
+                type: HoverRowActionsType.MENU,
+                icon: 'moreVertical',
+                menuOptions: [
+                    new HoverRowActions({
+                        menuOptionLabel: 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_TO_POSITION_X',
+                        click: (questionIndex) => {
+                            this.addMoveQuestionPosition(questionIndex);
+                        }
+                    }),
+                    new HoverRowActions({
+                        type: HoverRowActionsType.DIVIDER
+                    }),
+                    new HoverRowActions({
+                        menuOptionLabel: 'LNG_PAGE_ACTION_CLONE',
+                        click: (questionIndex) => {
+                            this.cloneQuestion(questionIndex);
+                        }
+                    }),
+                    new HoverRowActions({
+                        menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
+                        click: (questionIndex) => {
+                            this.deleteQuestion(questionIndex);
+                        },
+                        class: 'mat-menu-item-delete'
+                    })
+                ]
+            }));
+        }
+    }
+
+    /**
+     * Initialize question answer actions
+     */
+    private initQuestionAnswerActions() {
+        // init question actions
+        this.answerActions = [];
+
+        // add answer actions that require write permissions
+        if (this.hasWriteAccess()) {
+            // answer settings
+            this.answerActions.push(new HoverRowActions({
+                icon: 'settings',
+                click: (answerIndex) => {
+                    this.modifyAnswer(answerIndex);
+                }
+            }));
+
+            // move answer above
+            this.answerActions.push(new HoverRowActions({
+                icon: 'arrowAUp',
+                click: (answerIndex) => {
+                    this.moveAnswerAbove(answerIndex);
+                }
+            }));
+
+            // move answer bellow
+            this.answerActions.push(new HoverRowActions({
+                icon: 'arrowADown',
+                click: (answerIndex) => {
+                    this.moveAnswerBellow(answerIndex);
+                }
+            }));
+
+            // other options
+            this.answerActions.push(new HoverRowActions({
+                type: HoverRowActionsType.MENU,
+                icon: 'moreVertical',
+                menuOptions: [
+                    new HoverRowActions({
+                        menuOptionLabel: 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_ANSWER_TO_POSITION_X',
+                        click: (answerIndex) => {
+                            this.addMoveQuestionAnswerPosition(answerIndex);
+                        }
+                    }),
+                    new HoverRowActions({
+                        type: HoverRowActionsType.DIVIDER
+                    }),
+                    new HoverRowActions({
+                        menuOptionLabel: 'LNG_PAGE_ACTION_CLONE',
+                        click: (answerIndex) => {
+                            this.cloneAnswer(answerIndex);
+                        }
+                    }),
+                    new HoverRowActions({
+                        menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
+                        click: (answerIndex) => {
+                            this.deleteAnswer(answerIndex);
+                        },
+                        class: 'mat-menu-item-delete'
+                    })
+                ]
+            }));
+        }
+    }
+
+    /**
      * Emit breadcrumbs init event
      */
     private emitBreadcrumbEvent() {
@@ -324,6 +465,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
             // format data
             this.sanitizeQuestionnaireData();
+
+            // init question actions
+            this.initQuestionActions();
+
+            // init question answer actions
+            this.initQuestionAnswerActions();
         }
     }
 

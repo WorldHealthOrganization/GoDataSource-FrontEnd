@@ -45,6 +45,9 @@ import { ViewCotEdgeDialogComponent } from './view-cot-edge-dialog/view-cot-edge
 import { ViewHelpDialogComponent } from './view-help-dialog/view-help-dialog.component';
 import { ViewHelpDetailsDialogComponent } from './view-help-details-dialog/view-help-details-dialog.component';
 import { FormModifyQuestionnaireComponent } from './form-modify-questionnaire/form-modify-questionnaire.component';
+import { HoverRowActionsComponent } from './hover-row-actions/hover-row-actions.component';
+import { FormLocationIdentifierListComponent } from './form-location-identifier-list/form-location-identifier-list.component';
+import { FormLocationIdentifierComponent } from './form-location-identifier/form-location-identifier.component';
 import { FormCaseQuickComponent } from './form-case-quick/form-case-quick.component';
 import { FormEventQuickComponent } from './form-event-quick/form-event-quick.component';
 
@@ -59,6 +62,7 @@ export * from './view-cot-edge-dialog/view-cot-edge-dialog.component';
 export * from './view-help-dialog/view-help-dialog.component';
 export * from './view-help-details-dialog/view-help-details-dialog.component';
 export * from './form-modify-questionnaire/form-modify-questionnaire.component';
+export * from './hover-row-actions/hover-row-actions.component';
 
 // export the list of all components
 export const components: any[] = [
@@ -102,6 +106,8 @@ export const components: any[] = [
     FormContactQuickComponent,
     FormCaseQuickComponent,
     FormEventQuickComponent,
+    FormLocationIdentifierListComponent,
+    FormLocationIdentifierComponent,
 
     // display information
     CountedItemsListComponent,
@@ -127,4 +133,7 @@ export const components: any[] = [
     NumberOfItemsLabelComponent,
     FormCaseCenterDaterangeComponent,
     FormCaseCenterDaterangeListComponent,
+
+    // layout extensions
+    HoverRowActionsComponent
 ];
