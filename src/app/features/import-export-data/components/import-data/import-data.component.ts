@@ -1025,4 +1025,36 @@ export class ImportDataComponent implements OnInit {
         this.mappedFields = [];
         this.decryptPassword = null;
     }
+
+    /**
+     * Set Map Field property value and add options if necessary
+     */
+    setSourceDestinationValueAndDetermineOptions(
+        item: ImportableMapField,
+        property: string,
+        value: any
+    ) {
+        // set value
+        item[property] = value ? value.value : value;
+
+        // add options if necessary
+        this.addMapOptionsIfNecessary(item);
+    }
+
+    /**
+     * Set destination level
+     */
+    setDestinationLevel(
+        item: ImportableMapField,
+        levelIndex: number,
+        value: any,
+        sourceControl: FormSelectChangeDetectionPushComponent
+    ) {
+        // set level
+        item.sourceDestinationLevel[levelIndex] = value ? value.value : value;
+
+        // validate control and mark for change detection
+        sourceControl.validateAndMarkForCheck();
+    }
+
 }

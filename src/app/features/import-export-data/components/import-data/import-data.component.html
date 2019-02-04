@@ -119,7 +119,7 @@
                         [ngModel]="item.sourceField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                         [options]="importableObject.fileHeadersKeyValue"
-                        (optionChanged)="item.sourceField = $event ? $event.value : $event; addMapOptionsIfNecessary(item);">
+                        (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'sourceField', $event)">
                     </app-form-select-change-detection-push>
 
                     <app-form-select-change-detection-push
@@ -128,7 +128,7 @@
                         [ngModel]="item.destinationField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                         [options]="importableObject.modelPropertiesKeyValue"
-                        (optionChanged)="item.destinationField = $event ? $event.value : $event; addMapOptionsIfNecessary(item);"
+                        (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'destinationField', $event)"
                         [disabled]="item.readonly">
                     </app-form-select-change-detection-push>
 
@@ -144,7 +144,7 @@
                                 [ngModel]="item.sourceDestinationLevel[levelIndex]"
                                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
                                 [options]="possibleSourceDestinationLevels"
-                                (optionChanged)="item.sourceDestinationLevel[levelIndex] = $event ? $event.value : $event; sourceControl.control.updateValueAndValidity();">
+                                (optionChanged)="setDestinationLevel(item, levelIndex, $event, sourceControl)">
                             </app-form-select-change-detection-push>
                         </div>
                     </div>

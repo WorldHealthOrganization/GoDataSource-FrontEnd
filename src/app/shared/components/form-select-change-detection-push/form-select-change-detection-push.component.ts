@@ -67,6 +67,17 @@ export class FormSelectChangeDetectionPushComponent extends ElementBase<string |
     }
 
     /**
+     * Validate & check for changes
+     */
+    validateAndMarkForCheck() {
+        // detect changes
+        this.validate();
+        setTimeout(() => {
+            this.markForCheck();
+        });
+    }
+
+    /**
      * Trigger the 'touch' action on the custom form control
      */
     onBlur() {
@@ -119,9 +130,6 @@ export class FormSelectChangeDetectionPushComponent extends ElementBase<string |
         });
 
         // detect changes
-        this.validate();
-        setTimeout(() => {
-            this.markForCheck();
-        });
+        this.validateAndMarkForCheck();
     }
 }
