@@ -1,0 +1,39 @@
+<div class="form-select-container form-element"
+     [ngClass]="{ invalid: invalid }">
+
+    <mat-form-field
+        [class.clearable]="clearable && !multiple && !disabled">
+
+        <mat-select
+            [(ngModel)]="value"
+            [attr.name]="name"
+            [required]="required"
+            [placeholder]="placeholder"
+            [multiple]="multiple"
+            (blur)="onBlur()"
+            [disabled]="disabled"
+            (selectionChange)="onChange()">
+            <mat-option
+                *ngIf="clearable && !multiple"
+                [value]="null">
+                {{ noneLabel | translate }}
+            </mat-option>
+            <mat-option
+                *ngFor="let option of options"
+                [value]="option[optionValueKey]">
+                <!-- Prefix -->
+                {{ optionLabelPrefixKey && option[optionLabelPrefixKey] ? (option[optionLabelPrefixKey] | translate) + ' => ' : '' }}
+
+                <!-- Label -->
+                {{ option[optionLabelKey] | translate }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <app-form-validation
+        *ngIf="invalid"
+        [controlContainer]="controlContainer"
+        [controlName]="name"
+        [messages]="failures">
+    </app-form-validation>
+</div>

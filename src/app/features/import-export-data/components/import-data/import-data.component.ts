@@ -14,7 +14,7 @@ import { ImportExportDataService } from '../../../../core/services/data/import-e
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { v4 as uuid } from 'uuid';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { FormSelectChangeDetectionPushComponent } from '../../../../shared/xt-forms/components/form-select/form-select-change-detection-push.component';
+import { FormSelectChangeDetectionPushComponent } from '../../../../shared/components/form-select-change-detection-push/form-select-change-detection-push.component';
 
 export enum ImportDataExtension {
     CSV = '.csv',
