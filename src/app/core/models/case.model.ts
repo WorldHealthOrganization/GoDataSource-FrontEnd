@@ -7,6 +7,7 @@ import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { CaseCenterDateRangeModel } from './case-center-date-range.model';
 import * as moment from 'moment';
+import { DateTypes } from '../enums/date-types.enum';
 
 export class CaseModel {
     id: string;
@@ -115,23 +116,32 @@ export class CaseModel {
         this.dateDeceased = _.get(data, 'dateDeceased');
         this.safeBurial = _.get(data, 'safeBurial');
         this.isDateOfOnsetApproximate = _.get(data, 'isDateOfOnsetApproximate');
+        this.dateRanges = _.get(data, 'dateRanges', []);
 
         // hospitalization
-        const hospitalizationLocations = _.get(data, 'hospitalizationLocations');
-        this.hospitalizationDates = _.get(data, 'hospitalizationDates', [])
-            .map((hospitalizationData) => {
-                return new CaseCenterDateRangeModel(hospitalizationData, hospitalizationLocations);
-            });
+        this.hospitalizationDates = _.map(this.dateRanges, (dateRange: CaseCenterDateRangeModel) => {
+            if (dateRange.typeId === DateTypes.HOSPITALIZATION_DATE) {
+                return dateRange;
+            }
+        });
+        this.hospitalizationDates = _.without(this.hospitalizationDates, undefined);
 
         // isolation
-        const isolationLocations = _.get(data, 'isolationLocations');
-        this.isolationDates = _.get(data, 'isolationDates', [])
-            .map((isolationData) => {
-                return new CaseCenterDateRangeModel(isolationData, isolationLocations);
-            });
+        this.isolationDates = _.map(this.dateRanges, (dateRange: CaseCenterDateRangeModel) => {
+            if (dateRange.typeId === DateTypes.ISOLATION_DATE) {
+                return dateRange;
+            }
+        });
+        this.isolationDates = _.without(this.isolationDates, undefined);
 
-        this.incubationDates = _.get(data, 'incubationDates', []);
-        this.dateRanges = _.get(data, 'dateRanges', []);
+        // incubation
+        this.incubationDates = _.map(this.dateRanges, (dateRange: CaseCenterDateRangeModel) => {
+            if (dateRange.typeId === DateTypes.INCUBATION_DATE) {
+                return dateRange;
+            }
+        });
+        this.incubationDates = _.without(this.incubationDates, undefined);
+
         this.dateOfReporting = _.get(data, 'dateOfReporting');
         this.dateOfLastContact = _.get(data, 'dateOfLastContact');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');

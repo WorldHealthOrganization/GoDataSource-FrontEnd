@@ -42,6 +42,18 @@
                         [disabled]="disabled">
                     </app-form-input>
                 </div>
+
+                <app-form-location-dropdown
+                    [name]="name + '[locationId]'"
+                    [(ngModel)]="centerDateRange.locationId"
+                    [useOutbreakLocations]="true"
+                    (changed)="onChange()"
+                    [placeholder]="'LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION' | translate"
+                    tooltip="LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION_DESCRIPTION"
+                    [required]="false"
+                    [disabled]="disabled">
+                </app-form-location-dropdown>
+
             </div>
 
             <div fxLayout="row" fxFlex>
