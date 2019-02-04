@@ -27,6 +27,13 @@ export const EnglishUsLang = {
         /**
          * uiCaseFields
          */
-        'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES': 'Dates'
+        'LNG_CASE_FIELD_LABEL_DATE_RANGES': 'Dates',
+
+        /**
+         * TO DELETE
+         */
+        // 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES',
+        // 'LNG_CASE_FIELD_LABEL_ISOLATION_DATES',
+        // 'LNG_CASE_FIELD_LABEL_INCUBATION_DATES',
     }
 };

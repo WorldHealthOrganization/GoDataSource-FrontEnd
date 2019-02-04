@@ -342,7 +342,6 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
             this.uniqueOptions.dateOfInfection = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateOfInfection');
             this.uniqueOptions.outcome = EntityModel.uniqueStringOptions(this.mergeRecords, 'outcome');
             this.uniqueOptions.dateOfOutcome = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateOfOutcome');
-            // this.uniqueOptions.dateRanges = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateRanges');
             this.uniqueOptions.deceased = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'deceased');
             this.uniqueOptions.safeBurial = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'safeBurial');
             this.uniqueOptions.dateDeceased = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateDeceased');
@@ -355,9 +354,6 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
 
             // merge all dates
             this.determineDateRanges();
-
-            // // merge all isolation dates
-            // this.determineIsolationDates();
 
             // determine questionnaire answers
             this.determineQuestionnaireAnswers();

@@ -311,7 +311,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
         // retrieve dirty fields
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
-        console.log(dirtyFields);
 
         // add age & dob information
         if (dirtyFields.ageDob) {
