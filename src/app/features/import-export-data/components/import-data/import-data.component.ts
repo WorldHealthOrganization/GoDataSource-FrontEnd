@@ -876,145 +876,144 @@ export class ImportDataComponent implements OnInit {
             return;
         }
 
-        // validate form
-        if (!this.formHelper.validateForm(
-            form,
-            false
-        )) {
-            // make items invalid
+        // display loading
+        const loadingDialog = this.dialogService.showLoadingDialog();
+
+        // validate items & import data
+        setTimeout(() => {
+            // validate item
             _.each((form as any)._directives, (model: NgModel) => {
                 if (
                     model.valueAccessor &&
                     model.valueAccessor instanceof FormSelectChangeDetectionPushComponent
                 ) {
+                    // touch, validate & detect changes
                     model.valueAccessor.touch();
-                    model.valueAccessor.markForCheck();
+                    model.valueAccessor.control.updateValueAndValidity();
+                    model.valueAccessor.validateAndMarkForCheck();
                 }
             });
 
-            // display error messages
+            // check valid fields & import data if we don't have any errors
             setTimeout(() => {
-                // trigger change detection
-                _.each((form as any)._directives, (model: NgModel) => {
-                    if (
-                        model.valueAccessor &&
-                        model.valueAccessor instanceof FormSelectChangeDetectionPushComponent
-                    ) {
-                        model.valueAccessor.markForCheck();
-                    }
+                // do we have invalid fields ?
+                if (!this.formHelper.validateForm(
+                    form,
+                    false
+                )) {
+                    // invalid form
+                    loadingDialog.close();
+                    return;
+                }
+
+                // import data
+                // display loading
+                const allFields: any = this.formHelper.getFields(form);
+                this._displayLoading = true;
+                this._displayLoadingLocked = true;
+                loadingDialog.close();
+                setTimeout(() => {
+                    // nothing to import - this is handled above, when we convert JSON to importable object
+                    // NO NEED for further checks
+
+                    // construct import JSON
+                    const importJSON = {
+                        fileId: this.importableObject.id,
+                        map: {},
+                        valuesMap: {}
+                    };
+                    _.each(
+                        allFields.mapObject,
+                        (item: {
+                            source: string,
+                            destination: string,
+                            sourceDestinationLevel?: number[],
+                            options: {
+                                sourceOption: string,
+                                destinationOption: string
+                            }[]
+                        }) => {
+                            // forge the almighty source & destination
+                            let source: string = item.source;
+                            let destination: string = item.destination;
+
+                            // add indexes to source arrays
+                            source = this.addIndexesToArrays(
+                                source,
+                                item.sourceDestinationLevel
+                            );
+
+                            // add indexes to destination arrays
+                            destination = this.addIndexesToArrays(
+                                destination,
+                                item.sourceDestinationLevel
+                            );
+
+                            // map main properties
+                            importJSON.map[source] = destination;
+
+                            // map drop-down values
+                            if (
+                                item.options &&
+                                !_.isEmpty(item.options)
+                            ) {
+                                // here we don't need to add indexes, so we keep the arrays just as they are
+                                // also, we need to merge value Maps with the previous ones
+                                const properSource = item.source.replace(/\[\d+\]/g, '[]');
+                                importJSON.valuesMap[properSource] = {
+                                    ...importJSON.valuesMap[properSource],
+                                    ..._.transform(
+                                        item.options,
+                                        (result, option: {
+                                            sourceOption: string,
+                                            destinationOption: string
+                                        }) => {
+                                            result[option.sourceOption] = option.destinationOption;
+                                        },
+                                        {}
+                                    )
+                                };
+                            }
+                        }
+                    );
+
+                    // import data
+                    this.progress = null;
+                    this.importExportDataService.importData(
+                        this.importDataUrl,
+                        importJSON
+                    )
+                        .catch((err) => {
+                            // display error message
+                            if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
+                                // construct custom message
+                                this.errMsgDetails = err;
+
+                                // display error
+                                this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
+                            } else {
+                                this.snackbarService.showApiError(err);
+                            }
+
+                            // reset loading
+                            this._displayLoading = false;
+                            this._displayLoadingLocked = false;
+
+                            // propagate err
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            // display success
+                            this.snackbarService.showSuccess(
+                                this.importSuccessMessage,
+                                this.translationData
+                            );
+
+                            // emit finished event - event should handle redirect
+                            this.finished.emit();
+                        });
                 });
             });
-
-            // invalid form
-            return;
-        }
-
-        // display fields with data
-        const allFields: any = this.formHelper.getFields(form);
-
-        // display loading
-        this._displayLoading = true;
-        this._displayLoadingLocked = true;
-        setTimeout(() => {
-            // nothing to import - this is handled above, when we convert JSON to importable object
-            // NO NEED for further checks
-
-            // construct import JSON
-            const importJSON = {
-                fileId: this.importableObject.id,
-                map: {},
-                valuesMap: {}
-            };
-            _.each(
-                allFields.mapObject,
-                (item: {
-                    source: string,
-                    destination: string,
-                    sourceDestinationLevel?: number[],
-                    options: {
-                        sourceOption: string,
-                        destinationOption: string
-                    }[]
-                }) => {
-                    // forge the almighty source & destination
-                    let source: string = item.source;
-                    let destination: string = item.destination;
-
-                    // add indexes to source arrays
-                    source = this.addIndexesToArrays(
-                        source,
-                        item.sourceDestinationLevel
-                    );
-
-                    // add indexes to destination arrays
-                    destination = this.addIndexesToArrays(
-                        destination,
-                        item.sourceDestinationLevel
-                    );
-
-                    // map main properties
-                    importJSON.map[source] = destination;
-
-                    // map drop-down values
-                    if (
-                        item.options &&
-                        !_.isEmpty(item.options)
-                    ) {
-                        // here we don't need to add indexes, so we keep the arrays just as they are
-                        // also, we need to merge value Maps with the previous ones
-                        const properSource = item.source.replace(/\[\d+\]/g, '[]');
-                        importJSON.valuesMap[properSource] = {
-                            ...importJSON.valuesMap[properSource],
-                            ..._.transform(
-                                item.options,
-                                (result, option: {
-                                    sourceOption: string,
-                                    destinationOption: string
-                                }) => {
-                                    result[option.sourceOption] = option.destinationOption;
-                                },
-                                {}
-                            )
-                        };
-                    }
-                }
-            );
-
-            // import data
-            this.progress = null;
-            this.importExportDataService.importData(
-                this.importDataUrl,
-                importJSON
-            )
-                .catch((err) => {
-                    // display error message
-                    if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
-                        // construct custom message
-                        this.errMsgDetails = err;
-
-                        // display error
-                        this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
-                    } else {
-                        this.snackbarService.showApiError(err);
-                    }
-
-                    // reset loading
-                    this._displayLoading = false;
-                    this._displayLoadingLocked = false;
-
-                    // propagate err
-                    return ErrorObservable.create(err);
-                })
-                .subscribe(() => {
-                    // display success
-                    this.snackbarService.showSuccess(
-                        this.importSuccessMessage,
-                        this.translationData
-                    );
-
-                    // emit finished event - event should handle redirect
-                    this.finished.emit();
-                });
         });
     }
 
