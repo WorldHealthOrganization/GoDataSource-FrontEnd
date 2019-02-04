@@ -11,5 +11,10 @@ export const EnglishUsLang = {
          * Example group
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
+
+        /**
+         * uiCaseFields
+         */
+        'LNG_CASE_FIELD_LABEL_DATE_RANGES': 'Dates'
     }
 };
