@@ -21,9 +21,6 @@
             <mat-option
                 *ngFor="let option of options"
                 [value]="option[optionValueKey]">
-                <!-- Prefix -->
-                {{ optionLabelPrefixKey && option[optionLabelPrefixKey] ? (option[optionLabelPrefixKey] | translate) + ' => ' : '' }}
-
                 <!-- Label -->
                 {{ option[optionLabelKey] | translate }}
             </mat-option>

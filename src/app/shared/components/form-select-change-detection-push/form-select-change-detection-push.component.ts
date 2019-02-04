@@ -38,7 +38,6 @@ export class FormSelectChangeDetectionPushComponent extends ElementBase<string |
     @Input() multiple: boolean = false;
     @Input() options: any[];
     @Input() optionLabelKey: string = 'label';
-    @Input() optionLabelPrefixKey: string = null;
     @Input() optionValueKey: string = 'value';
     @Input() clearable: boolean = true;
     @Input() noneLabel: string = 'LNG_COMMON_LABEL_NONE';
