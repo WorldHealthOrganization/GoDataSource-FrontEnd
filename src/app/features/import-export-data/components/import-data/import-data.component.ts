@@ -660,7 +660,10 @@ export class ImportDataComponent implements OnInit {
             if (_.find(
                 this.mappedFields,
                 (item: ImportableMapField): boolean => {
-                    if (item.sourceFieldWithoutIndexes !== importableItem.sourceFieldWithoutIndexes) {
+                    if (
+                        item.sourceFieldWithoutIndexes !== importableItem.sourceFieldWithoutIndexes ||
+                        item.destinationField !== importableItem.destinationField
+                    ) {
                         return false;
                     } else {
                         return _.find(
