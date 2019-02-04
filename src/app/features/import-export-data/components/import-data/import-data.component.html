@@ -257,7 +257,7 @@
         <div
             *ngFor="let err of errMsgDetails.details && errMsgDetails.details.failed ? errMsgDetails.details.failed : []"
             class="import-data-errors-err">
-            <ng-container [ngSwitch]="err.error.code">
+            <ng-container [ngSwitch]="err.error?.code">
                 <span *ngSwitchCase="ImportServerErrorCodes.DUPLICATE_RECORD">
                     {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_DUPLICATE' | translate:{ recordNo: err.recordNo } }}
                 </span>

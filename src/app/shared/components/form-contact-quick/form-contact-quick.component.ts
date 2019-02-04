@@ -23,6 +23,9 @@ import { ContactModel } from '../../../core/models/contact.model';
 })
 export class FormContactQuickComponent extends GroupBase<ContactModel> implements OnInit, GroupDirtyFields {
     genderList$: Observable<any[]>;
+    riskLevelsList$: Observable<any[]>;
+    occupationsList$: Observable<any[]>;
+    finalFollowUpStatus$: Observable<any[]>;
 
     currentDate = Constants.getCurrentDate();
 
@@ -48,6 +51,9 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
 
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
+        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+        this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService

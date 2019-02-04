@@ -5,6 +5,7 @@ import { EventModel } from '../../../../core/models/event.model';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityModel } from '../../../../core/models/entity.model';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-person-summary',
@@ -16,10 +17,16 @@ export class PersonSummaryComponent implements OnInit {
     @Input() person: (CaseModel | ContactModel | EventModel);
 
     @Output() remove = new EventEmitter<void>();
+    @Output() modifyPerson = new EventEmitter<(CaseModel | ContactModel | EventModel)>();
+    @Output() deletePerson = new EventEmitter<(CaseModel | ContactModel | EventModel)>();
+    @Output() createContact = new EventEmitter<(CaseModel | ContactModel | EventModel)>();
 
     personData: LabelValuePair[] = [];
     personLink: string;
     personChainLink: string;
+
+    // provide constants to template
+    EntityType = EntityType;
 
     constructor(
         private entityDataService: EntityDataService
@@ -44,6 +51,18 @@ export class PersonSummaryComponent implements OnInit {
 
     onRemove() {
         this.remove.emit();
+    }
+
+    onModifyPerson() {
+        this.modifyPerson.emit(this.person);
+    }
+
+    onCreateContact() {
+        this.createContact.emit(this.person);
+    }
+
+    onDeletePerson() {
+        this.deletePerson.emit(this.person);
     }
 }
 
