@@ -6,7 +6,6 @@ import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { SVGGantt, CanvasGantt, StrGantt } from 'gantt';
-import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../../../core/models/metrics/metric-cases-delay-between-onset-lab-test.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs/Subscription';
@@ -14,6 +13,8 @@ import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs/Subscriber';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/index';
+import { MetricCasesDelayBetweenOnsetHospitalizationModel } from '../../../../core/models/metrics/metric-cases-delay-between-onset-hospitalization.model';
+import moment = require('moment');
 
 @Component({
     selector: 'app-gantt-chart-delay-onset-hospitalization-dashlet',
@@ -158,7 +159,7 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
     /**
      * format the data in the desired format
      */
-    formatData(metricResults: MetricCasesDelayBetweenOnsetLabTestModel[]) {
+    formatData(metricResults: MetricCasesDelayBetweenOnsetHospitalizationModel[]) {
         // initialize
         this.ganttData = [];
         const chartDataItem: any = {};
@@ -168,19 +169,26 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
 
         // add data
         _.forEach(metricResults, (result) => {
+            console.log(result);
+
+            result.hospitalizationIsolationDate = moment(result.dateOfOnset).add(1, 'M').format( 'YYYY-MM-DD');
+            result.delay = Math.random() * 10;
+
             if (
                 !_.isEmpty(result.dateOfOnset) &&
-                !_.isEmpty(result.dateOfFirstLabTest)
+                !_.isEmpty(result.hospitalizationIsolationDate)
                 && result.delay > 0
             ) {
                 const chartDataItemChild: any = {};
                 chartDataItemChild.id = result.case.id;
                 chartDataItemChild.name = result.case.firstName + ' ' + result.case.lastName;
                 chartDataItemChild.from = new Date(Date.parse(result.dateOfOnset));
-                chartDataItemChild.to = new Date(Date.parse(result.dateOfFirstLabTest));
+                chartDataItemChild.to = new Date(Date.parse(result.hospitalizationIsolationDate));
                 chartDataItem.children.push(chartDataItemChild);
             }
         });
+
+        console.log(chartDataItem);
 
         // finished
         this.ganttData.push(chartDataItem);
@@ -236,7 +244,7 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
             // load data and display chart
             this.displayLoading = true;
             this.previousSubscriber = this.caseDataService
-                .getDelayBetweenOnsetAndLabTesting(this.outbreakId, qb)
+                .getDelayBetweenOnsetAndHospitalization(this.outbreakId, qb)
                 .subscribe((results) => {
                     // configure data
                     this.formatData(results);
