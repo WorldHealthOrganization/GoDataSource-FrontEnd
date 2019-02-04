@@ -14,7 +14,6 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { Subscriber } from 'rxjs/Subscriber';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/index';
 import { MetricCasesDelayBetweenOnsetHospitalizationModel } from '../../../../core/models/metrics/metric-cases-delay-between-onset-hospitalization.model';
-import moment = require('moment');
 
 @Component({
     selector: 'app-gantt-chart-delay-onset-hospitalization-dashlet',
