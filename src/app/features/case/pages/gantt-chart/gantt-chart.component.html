@@ -36,19 +36,28 @@
 <div class="page-content">
 
     <mat-card class="page-section">
-        <div class="other-kpi-header">{{'LNG_PAGE_GANTT_CHART_TITLE' | translate}}</div>
 
-        <!-- gantt chart -->
+        <!-- dropdown with view types -->
+        <app-form-select
+            name="ganttChartType"
+            [(ngModel)]="ganttChartType"
+            required="true"
+            [options]="ganttChartTypes | async"
+            (optionChanged)="updateChartType($event)"
+            [clearable]="false">
+        </app-form-select>
+
+        <!-- gantt chart - lab test -->
         <app-gantt-chart-delay-onset-dashlet
+            *ngIf="ganttChartType == Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value"
             #ganttChart
             [globalFilterDate]="globalFilterDate"
             [globalFilterLocationId]="globalFilterLocationId">
         </app-gantt-chart-delay-onset-dashlet>
 
-
-        <div class="other-kpi-header">{{'LNG_PAGE_GANTT_CHART_TITLE' | translate}}</div>
         <!-- gantt chart - hospitalization -->
         <app-gantt-chart-delay-onset-hospitalization-dashlet
+            *ngIf="ganttChartType == Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_INFECTION.value"
             #ganttChart
             [globalFilterDate]="globalFilterDate"
             [globalFilterLocationId]="globalFilterLocationId">

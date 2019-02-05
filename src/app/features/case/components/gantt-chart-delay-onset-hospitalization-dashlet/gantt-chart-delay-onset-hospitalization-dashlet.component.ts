@@ -168,11 +168,6 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
 
         // add data
         _.forEach(metricResults, (result) => {
-            console.log(result);
-
-            result.hospitalizationIsolationDate = moment(result.dateOfOnset).add(1, 'M').format( 'YYYY-MM-DD');
-            result.delay = Math.random() * 10;
-
             if (
                 !_.isEmpty(result.dateOfOnset) &&
                 !_.isEmpty(result.hospitalizationIsolationDate)
@@ -186,8 +181,6 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
                 chartDataItem.children.push(chartDataItemChild);
             }
         });
-
-        console.log(chartDataItem);
 
         // finished
         this.ganttData.push(chartDataItem);
