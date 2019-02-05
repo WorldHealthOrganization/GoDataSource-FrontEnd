@@ -4,7 +4,6 @@ import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { CaseModel } from '../../models/case.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { GenericDataService } from './generic.data.service';
 import { ListFilterDataService } from './list-filter.data.service';
 import { MetricCasesCountStratified } from '../../models/metrics/metric-cases-count-stratified.model';
 import { MetricCasesPerLocationCountsModel } from '../../models/metrics/metric-cases-per-location-counts.model';
@@ -21,7 +20,6 @@ export class CaseDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
-        private genericDataService: GenericDataService,
         private listFilterDataService: ListFilterDataService
     ) {}
 
@@ -35,8 +33,10 @@ export class CaseDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<CaseModel[]> {
-
-        const filter = queryBuilder.buildQuery();
+        const qb: RequestQueryBuilder = new RequestQueryBuilder();
+        qb.include(`dateRangeLocations`, true);
+        qb.merge(queryBuilder);
+        const filter = qb.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/cases?filter=${filter}`),
             CaseModel

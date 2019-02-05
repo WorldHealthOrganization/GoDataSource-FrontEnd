@@ -29,9 +29,6 @@ export class CaseModel {
     dateBecomeCase: string;
     safeBurial: boolean;
     dateOfBurial: string;
-    hospitalizationDates: CaseCenterDateRangeModel[];
-    isolationDates: CaseCenterDateRangeModel[];
-    incubationDates: DateRangeModel[];
     dateRanges: CaseCenterDateRangeModel[];
     questionnaireAnswers: {};
     type: EntityType = EntityType.CASE;
@@ -114,31 +111,13 @@ export class CaseModel {
         this.dateOfBurial = _.get(data, 'dateOfBurial');
         this.safeBurial = _.get(data, 'safeBurial');
         this.isDateOfOnsetApproximate = _.get(data, 'isDateOfOnsetApproximate');
-        this.dateRanges = _.get(data, 'dateRanges', []);
 
-        // hospitalization
-        this.hospitalizationDates = _.map(this.dateRanges, (dateRange: CaseCenterDateRangeModel) => {
-            if (dateRange.typeId === DateTypes.HOSPITALIZATION_DATE) {
-                return dateRange;
-            }
-        });
-        this.hospitalizationDates = _.without(this.hospitalizationDates, undefined);
-
-        // isolation
-        this.isolationDates = _.map(this.dateRanges, (dateRange: CaseCenterDateRangeModel) => {
-            if (dateRange.typeId === DateTypes.ISOLATION_DATE) {
-                return dateRange;
-            }
-        });
-        this.isolationDates = _.without(this.isolationDates, undefined);
-
-        // incubation
-        this.incubationDates = _.map(this.dateRanges, (dateRange: CaseCenterDateRangeModel) => {
-            if (dateRange.typeId === DateTypes.INCUBATION_DATE) {
-                return dateRange;
-            }
-        });
-        this.incubationDates = _.without(this.incubationDates, undefined);
+        // date ranges locations(hospitalization/isolation/incubation)
+        const dateRangeLocations = _.get(data, 'dateRangeLocations');
+        this.dateRanges = _.get(data, 'dateRanges', [])
+            .map((dateRangeData) => {
+                return new CaseCenterDateRangeModel(dateRangeData, dateRangeLocations);
+            });
 
         this.dateOfReporting = _.get(data, 'dateOfReporting');
         this.dateOfLastContact = _.get(data, 'dateOfLastContact');
