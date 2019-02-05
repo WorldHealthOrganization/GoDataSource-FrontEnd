@@ -84,14 +84,6 @@ export class ViewChronologyCaseComponent implements OnInit {
                                 }));
                             }
 
-                            // date deceased
-                            if (!_.isEmpty(this.caseData.dateDeceased)) {
-                                chronologyEntries.push(new ChronologyItem({
-                                    date: this.caseData.dateDeceased,
-                                    label: 'LNG_CASE_FIELD_LABEL_DATE_DECEASED'
-                                }));
-                            }
-
                             // date contact become case
                             if (!_.isEmpty(this.caseData.dateBecomeCase)) {
                                 chronologyEntries.push(new ChronologyItem({

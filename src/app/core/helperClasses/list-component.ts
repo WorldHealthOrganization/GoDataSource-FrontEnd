@@ -715,7 +715,7 @@ export abstract class ListComponent {
                 // date
                 if (globalFilters.date) {
                     this.appliedListFilterQueryBuilder.filter.byDateRange(
-                        'dateDeceased', {
+                        'dateOfOutcome', {
                             endDate: globalFilters.date.endOf('day').format()
                         }
                     );
@@ -723,7 +723,7 @@ export abstract class ListComponent {
 
                 // deceased
                 this.appliedListFilterQueryBuilder.filter.where({
-                    deceased: true
+                    outcomeId: Constants.OUTCOME_STATUS.DECEASED
                 }, true);
 
                 // merge query builder

@@ -57,6 +57,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
     // provide constants to template
     EntityType = EntityType;
+    Constants = Constants;
 
     serverToday: Moment = null;
 
