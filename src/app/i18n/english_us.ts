@@ -8,9 +8,23 @@ export const EnglishUsLang = {
          */
 
         /**
+         * uiModifyFollowUpListPage
+         */
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up successfully modified',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups successfully modified'
+
+        /**
          * Example group
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
+
+        /**
+         * uiCaseFields
+         */
+
+        'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL': 'Date of burial',
+        'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_DATE_RANGES': 'Dates',
 
         /**
          * referenceDataCategoryDateRangeType
@@ -25,13 +39,14 @@ export const EnglishUsLang = {
         'LNG_REFERENCE_DATA_CATEGORY_DATE_RANGE_TYPE_OTHER_DESCRIPTION': '',
 
         /**
-         * uiCaseFields
+         * REMOVE
          */
-        'LNG_CASE_FIELD_LABEL_DATE_RANGES': 'Dates',
 
-        /**
-         * TO DELETE
-         */
+        // 'LNG_CASE_FIELD_LABEL_DECEASED',
+        // 'LNG_CASE_FIELD_LABEL_DECEASED_DESCRIPTION',
+        // 'LNG_CASE_FIELD_LABEL_DATE_DECEASED',
+        // 'LNG_CASE_FIELD_LABEL_DATE_DECEASED_DESCRIPTION',
+        // 'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED',
         // 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES',
         // 'LNG_CASE_FIELD_LABEL_ISOLATION_DATES',
         // 'LNG_CASE_FIELD_LABEL_INCUBATION_DATES',

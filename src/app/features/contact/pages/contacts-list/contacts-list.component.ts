@@ -119,7 +119,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_TYPE', 'type'),
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_DECEASED', 'dateDeceased')
     ];
 
     loadingDialog: LoadingDialogModel;

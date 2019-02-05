@@ -22,6 +22,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-create-case',
@@ -47,6 +48,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
     serverToday: Moment = null;
+    Constants = Constants;
 
     visualIDTranslateData: {
         mask: string
