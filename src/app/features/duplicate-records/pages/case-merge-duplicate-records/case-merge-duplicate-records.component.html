@@ -274,11 +274,11 @@
 
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-select
-                                name="outcome"
-                                [(ngModel)]="uniqueOptions?.outcome.value"
+                                name="outcomeId"
+                                [(ngModel)]="uniqueOptions?.outcomeId.value"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_OUTCOME' | translate"
                                 tooltip="LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION"
-                                [options]="uniqueOptions?.outcome.options">
+                                [options]="uniqueOptions?.outcomeId.options">
                             </app-form-select>
 
                             <app-form-select
@@ -294,13 +294,6 @@
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-select
-                                name="deceased"
-                                [(ngModel)]="uniqueOptions?.deceased.value"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DECEASED' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_DECEASED_DESCRIPTION"
-                                [options]="uniqueOptions?.deceased.options">
-                            </app-form-select>
 
                             <app-form-select
                                 name="safeBurial"
@@ -311,13 +304,14 @@
                             </app-form-select>
 
                             <app-form-select
-                                name="dateDeceased"
-                                [(ngModel)]="uniqueOptions?.dateDeceased.value"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_DATE_DECEASED_DESCRIPTION"
-                                [options]="uniqueOptions?.dateDeceased.options">
+                                name="dateOfBurial"
+                                [(ngModel)]="uniqueOptions?.dateOfBurial.value"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION"
+                                [options]="uniqueOptions?.dateOfBurial.options">
                             </app-form-select>
 
+                            <div fxFlex><!-- placeholder --></div>
                             <div fxFlex><!-- placeholder --></div>
                         </div>
                     </mat-card>

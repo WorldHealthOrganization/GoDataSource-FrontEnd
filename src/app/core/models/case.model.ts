@@ -26,9 +26,8 @@ export class CaseModel {
     isDateOfOnsetApproximate: boolean;
     dateOfOutcome: string;
     dateBecomeCase: string;
-    deceased: boolean;
     safeBurial: boolean;
-    dateDeceased: string;
+    dateOfBurial: string;
     hospitalizationDates: CaseCenterDateRangeModel[];
     isolationDates: CaseCenterDateRangeModel[];
     incubationDates: DateRangeModel[];
@@ -110,8 +109,7 @@ export class CaseModel {
         this.dateOfOnset = _.get(data, 'dateOfOnset');
         this.dateOfOutcome = _.get(data, 'dateOfOutcome');
         this.dateBecomeCase = _.get(data, 'dateBecomeCase');
-        this.deceased = _.get(data, 'deceased');
-        this.dateDeceased = _.get(data, 'dateDeceased');
+        this.dateOfBurial = _.get(data, 'dateOfBurial');
         this.safeBurial = _.get(data, 'safeBurial');
         this.isDateOfOnsetApproximate = _.get(data, 'isDateOfOnsetApproximate');
 

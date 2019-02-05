@@ -11,5 +11,22 @@ export const EnglishUsLang = {
          * Example group
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
+
+        /**
+         * uiCaseFields
+         */
+
+        'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL': 'Date of burial',
+        'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION': ''
+
+        /**
+         * REMOVE
+         */
+
+        // 'LNG_CASE_FIELD_LABEL_DECEASED',
+        // 'LNG_CASE_FIELD_LABEL_DECEASED_DESCRIPTION',
+        // 'LNG_CASE_FIELD_LABEL_DATE_DECEASED',
+        // 'LNG_CASE_FIELD_LABEL_DATE_DECEASED_DESCRIPTION',
+        // 'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED',
     }
 };

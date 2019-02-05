@@ -228,12 +228,6 @@ export class EntityDataService {
                         moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                         ''
             ));
-            lightObject.push(new LabelValuePair(
-                'LNG_CASE_FIELD_LABEL_DATE_DECEASED',
-                entity.dateDeceased ?
-                        moment(entity.dateDeceased).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-                        ''
-            ));
         }
 
         // entity type = Contact

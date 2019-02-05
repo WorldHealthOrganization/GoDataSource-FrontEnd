@@ -80,7 +80,7 @@ export class CasesDeceasedDashletComponent extends DashletComponent implements O
             // date
             if (this.globalFilterDate) {
                 qb.filter.byDateRange(
-                    'dateDeceased', {
+                    'dateOfOutcome', {
                         endDate: this.globalFilterDate.endOf('day').format()
                     }
                 );
