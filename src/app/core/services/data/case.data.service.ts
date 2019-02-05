@@ -339,7 +339,7 @@ export class CaseDataService {
     }
 
     /**
-     * get delay between date of onset and date of first lab testing - gantt chart
+     * get delay between date of onset and date of hospitalization / isolation - first - gantt chart
      * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<MetricCasesDelayBetweenOnsetHospitalizationModel[]>}

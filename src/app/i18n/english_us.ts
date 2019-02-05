@@ -15,7 +15,7 @@ export const EnglishUsLang = {
         //uiGanttChartDashlet
         // LNG_PAGE_GANTT_CHART_TITLE needs to be replaced with LNG_PAGE_GANTT_CHART_LAB_TEST_TITLE
         'LNG_PAGE_GANTT_CHART_LAB_TEST_TITLE': 'Delay between symptom onset and date of lab testing',
-        'LNG_PAGE_GANTT_CHART_HOSPITALIZATION_INFECTION_TITLE': 'Delay between symptom onset and date of hospitalization / infection'
+        'LNG_PAGE_GANTT_CHART_HOSPITALIZATION_ISOLATION_TITLE': 'Delay between symptom onset and date of hospitalization / isolation'
 
 
 

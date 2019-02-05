@@ -118,7 +118,7 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
         } else {
             this.showLoadingDialog();
             let ganttChartName = 'app-gantt-chart-delay-onset-dashlet svg';
-            if (this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_INFECTION.value) {
+            if (this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value) {
                 ganttChartName = 'app-gantt-chart-delay-onset-hospitalization-dashlet svg';
             }
 
