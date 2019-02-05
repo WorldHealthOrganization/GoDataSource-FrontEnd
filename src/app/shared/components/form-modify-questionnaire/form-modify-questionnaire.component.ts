@@ -458,7 +458,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 _.transform(
                     this.parent[this.questionnaireType],
                     (accumulator: QuestionModel[], question: QuestionModel) => {
-                        accumulator.push(new QuestionModel(question));
+                        accumulator.push(new QuestionModel(question, true));
                     },
                     []
                 );
@@ -636,7 +636,9 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         _.each(questions, (question: QuestionModel) => {
             // translate question
             question.text = this.i18nService.instant(question.text);
-            question.uuid = uuid();
+            if (!question.uuid) {
+                question.uuid = uuid();
+            }
 
             // translate answers & sub questions
             _.each(question.answers, (answer: AnswerModel) => {
