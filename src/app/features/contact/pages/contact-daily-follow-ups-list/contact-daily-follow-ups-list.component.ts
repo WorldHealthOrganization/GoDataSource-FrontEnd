@@ -670,21 +670,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                         childQueryBuilderKey: 'case'
                     }),
                     new FilterModel({
-                        fieldName: 'deceased',
-                        fieldLabel: 'LNG_CASE_FIELD_LABEL_DECEASED',
-                        type: FilterType.SELECT,
-                        options$: yesNoOptionsWithoutAllList$,
-                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-                        childQueryBuilderKey: 'case'
-                    }),
-                    new FilterModel({
-                        fieldName: 'dateDeceased',
-                        fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_DECEASED',
-                        type: FilterType.RANGE_DATE,
-                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-                        childQueryBuilderKey: 'case'
-                    }),
-                    new FilterModel({
                         fieldName: 'safeBurial',
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
                         type: FilterType.SELECT,

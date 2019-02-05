@@ -15,6 +15,7 @@ import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import * as _ from 'lodash';
 import { MetricCasesDelayBetweenOnsetHospitalizationModel } from '../../models/metrics/metric-cases-delay-between-onset-hospitalization.model';
+import { Constants } from '../../models/constants';
 
 @Injectable()
 export class CaseDataService {
@@ -171,7 +172,7 @@ export class CaseDataService {
 
         // deceased condition
         filterQueryBuilder.filter.where({
-            deceased: true
+            outcomeId: Constants.OUTCOME_STATUS.DECEASED
         }, true);
 
         // generate a query builder for deceased

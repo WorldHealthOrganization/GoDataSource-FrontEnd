@@ -63,14 +63,6 @@ export class ViewChronologyContactComponent implements OnInit {
                                 }));
                             }
 
-                            // date deceased
-                            if (!_.isEmpty(this.contactData.dateDeceased)) {
-                                chronologyEntries.push(new ChronologyItem({
-                                    date: this.contactData.dateDeceased,
-                                    label: 'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED'
-                                }));
-                            }
-
                             // date become contact
                             if (!_.isEmpty(this.contactData.dateBecomeContact)) {
                                 chronologyEntries.push(new ChronologyItem({
