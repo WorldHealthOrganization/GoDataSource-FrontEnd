@@ -22,7 +22,6 @@ export class ContactModel {
     dateOfReporting: string;
     dateOfLastContact: string;
     isDateOfReportingApproximate: boolean;
-    dateDeceased: string;
     outbreakId: string;
     deleted: boolean;
     dateBecomeContact: string;
@@ -88,7 +87,6 @@ export class ContactModel {
         this.riskReason = _.get(data, 'riskReason');
         this.dateOfReporting = _.get(data, 'dateOfReporting');
         this.dateOfLastContact = _.get(data, 'dateOfLastContact');
-        this.dateDeceased = _.get(data, 'dateDeceased');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.deleted = _.get(data, 'deleted');
         this.dateBecomeContact = _.get(data, 'dateBecomeContact');

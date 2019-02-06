@@ -227,7 +227,6 @@
                                 required="true"
                                 [dateSameOrBefore]="[
                                     serverToday,
-                                    'dateDeceased',
                                     'dateOfOutcome'
                                 ]"
                                 [dateSameOrAfter]="dateOnsetSameOrAfterDates()">
@@ -262,7 +261,7 @@
                                 app-date-validator
                                 [dateSameOrBefore]="[
                                     serverToday,
-                                    'dateDeceased',
+                                    'dateOfOutcome',
                                     'dateOfOnset'
                                 ]">
                             </app-form-datepicker>
@@ -300,40 +299,32 @@
                         <div fxFlex><!-- placeholder --></div>
                     </div>
 
-                    <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                        <app-form-slide-toggle
-                            name="deceased"
-                            [(ngModel)]="caseData.deceased"
-                            [label]="'LNG_CASE_FIELD_LABEL_DECEASED' | translate"
-                            tooltip="LNG_CASE_FIELD_LABEL_DECEASED_DESCRIPTION"
-                            [disabled]="viewOnly">
-                        </app-form-slide-toggle>
-
+                    <div fxLayout="row" fxLayoutGap="20px" fxFlex *ngIf="caseData.outcomeId === Constants.OUTCOME_STATUS.DECEASED">
                         <app-form-slide-toggle
                             name="safeBurial"
                             [(ngModel)]="caseData.safeBurial"
                             [label]="'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL' | translate"
                             tooltip="LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION"
-                            [disabled]="!caseData.deceased || viewOnly">
+                            [disabled]="viewOnly">
                         </app-form-slide-toggle>
 
                         <div fxFlex>
                             <app-form-datepicker
-                                name="dateDeceased"
-                                [(ngModel)]="caseData.dateDeceased"
-                                [disabled]="!caseData.deceased || viewOnly"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_DATE_DECEASED_DESCRIPTION"
+                                name="dateOfBurial"
+                                [(ngModel)]="caseData.dateOfBurial"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION"
                                 [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="serverToday"
                                 [dateSameOrAfter]="[
-                                    'dateOfInfection',
-                                    'dateOfOnset'
-                                ]">
+                                    'dateOfOutcome'
+                                ]"
+                                [disabled]="viewOnly">
                             </app-form-datepicker>
                         </div>
 
+                        <div fxFlex><!-- placeholder --></div>
                         <div fxFlex><!-- placeholder --></div>
                     </div>
                 </mat-card>
