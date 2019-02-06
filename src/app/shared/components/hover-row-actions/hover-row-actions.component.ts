@@ -181,6 +181,13 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
 
         // show / hide
         this.determineVisibleValue();
+
+        // determine row bounding
+        if (this.active) {
+            setTimeout(() => {
+                this.determineBounding();
+            });
+        }
     }
     get active(): boolean {
         return this._active;
