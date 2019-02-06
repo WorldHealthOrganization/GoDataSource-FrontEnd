@@ -22,10 +22,9 @@ export const EnglishUsLang = {
         /**
          * uiCaseFields
          */
-
+        'LNG_CASE_FIELD_LABEL_DATE_RANGES': 'Dates',
         'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL': 'Date of burial',
         'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION': '',
-        'LNG_CASE_FIELD_LABEL_DATE_RANGES': 'Dates',
         'LNG_CASE_FIELD_LABEL_DATE_RANGE_FROM_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DATE_RANGE_TO_DESCRIPTION': '',
 
@@ -38,7 +37,6 @@ export const EnglishUsLang = {
         /**
          * REMOVE
          */
-
         // 'LNG_CASE_FIELD_LABEL_DECEASED',
         // 'LNG_CASE_FIELD_LABEL_DECEASED_DESCRIPTION',
         // 'LNG_CASE_FIELD_LABEL_DATE_DECEASED',
