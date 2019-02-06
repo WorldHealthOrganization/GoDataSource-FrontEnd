@@ -1,13 +1,11 @@
 import * as _ from 'lodash';
 import { AddressModel, AddressType } from './address.model';
 import { DocumentModel } from './document.model';
-import { DateRangeModel } from './date-range.model';
 import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { CaseCenterDateRangeModel } from './case-center-date-range.model';
 import * as moment from 'moment';
-import { DateTypes } from '../enums/date-types.enum';
 
 export class CaseModel {
     id: string;
@@ -112,7 +110,7 @@ export class CaseModel {
         this.safeBurial = _.get(data, 'safeBurial');
         this.isDateOfOnsetApproximate = _.get(data, 'isDateOfOnsetApproximate');
 
-        // date ranges locations(hospitalization/isolation/incubation)
+        // date ranges locations
         const dateRangeLocations = _.get(data, 'dateRangeLocations');
         this.dateRanges = _.get(data, 'dateRanges', [])
             .map((dateRangeData) => {

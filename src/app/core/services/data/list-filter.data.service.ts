@@ -13,7 +13,7 @@ import * as _ from 'lodash';
 import { RequestFilterOperator } from '../../helperClasses/request-query-builder/request-filter';
 import { Moment } from 'moment';
 import { ContactDataService } from './contact.data.service';
-import { DateTypes } from '../../enums/date-types.enum';
+import { DateType } from '../../enums/date-types.enum';
 
 @Injectable()
 export class ListFilterDataService {
@@ -154,7 +154,7 @@ export class ListFilterDataService {
         filterQueryBuilder.filter.where({
             [RequestFilterOperator.AND]: [
                 {
-                    'dateRanges.typeId': DateTypes.HOSPITALIZATION_DATE
+                    'dateRanges.typeId': DateType.HOSPITALIZATION_DATE
                 }, {
                     'dateRanges.startDate': {
                         lte: moment(date).endOf('day').toISOString()
@@ -189,7 +189,7 @@ export class ListFilterDataService {
         filterQueryBuilder.filter.where({
             [RequestFilterOperator.AND]: [
                 {
-                    'dateRanges.typeId': DateTypes.ISOLATION_DATE
+                    'dateRanges.typeId': DateType.ISOLATION_DATE
                 },
                 {
                     'dateRanges.startDate': {

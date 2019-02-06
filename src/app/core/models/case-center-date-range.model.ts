@@ -1,10 +1,9 @@
 import * as _ from 'lodash';
 import { Moment } from 'moment';
 import { LocationModel } from './location.model';
-import { DateTypes } from '../enums/date-types.enum';
 
 export class CaseCenterDateRangeModel {
-    typeId: DateTypes;
+    typeId: string;
     startDate: string | Moment;
     endDate: string | Moment;
     centerName: string;

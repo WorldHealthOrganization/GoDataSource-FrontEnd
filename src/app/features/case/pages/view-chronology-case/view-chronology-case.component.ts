@@ -10,8 +10,6 @@ import { LabResultDataService } from '../../../../core/services/data/lab-result.
 import { ChronologyItem } from '../../../../shared/components/chronology/chronology.component';
 import 'rxjs/add/observable/forkJoin';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
-import { DateTypes } from '../../../../core/enums/date-types.enum';
 
 @Component({
     selector: 'app-view-chronology-case',
@@ -94,52 +92,41 @@ export class ViewChronologyCaseComponent implements OnInit {
                                 }));
                             }
 
-                            _.forEach(this.caseData.dateRanges, (dateRange: CaseCenterDateRangeModel) => {
-                                if (!_.isEmpty(dateRange.startDate)) {
-                                    switch (dateRange.typeId) {
-                                        case DateTypes.HOSPITALIZATION_DATE:
-                                            chronologyEntries.push(new ChronologyItem({
-                                                label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_HOSPITALISATION_START_DATE',
-                                                date: dateRange.startDate
-                                            }));
-                                            break;
-                                        case DateTypes.INCUBATION_DATE:
-                                            chronologyEntries.push(new ChronologyItem({
-                                                label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_INCUBATION_START_DATE',
-                                                date: dateRange.startDate
-                                            }));
-                                            break;
-                                        case DateTypes.ISOLATION_DATE:
-                                            chronologyEntries.push(new ChronologyItem({
-                                                label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_ISOLATION_START_DATE',
-                                                date: dateRange.startDate
-                                            }));
-                                            break;
-                                    }
-                                }
-                                if (!_.isEmpty(dateRange.endDate)) {
-                                   switch (dateRange.typeId) {
-                                       case DateTypes.HOSPITALIZATION_DATE:
-                                           chronologyEntries.push(new ChronologyItem({
-                                               label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_HOSPITALISATION_END_DATE',
-                                               date: dateRange.endDate
-                                           }));
-                                           break;
-                                       case DateTypes.INCUBATION_DATE:
-                                           chronologyEntries.push(new ChronologyItem({
-                                               label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_INCUBATION_END_DATE',
-                                               date: dateRange.endDate
-                                           }));
-                                           break;
-                                       case DateTypes.ISOLATION_DATE:
-                                           chronologyEntries.push(new ChronologyItem({
-                                               label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_ISOLATION_END_DATE',
-                                               date: dateRange.endDate
-                                           }));
-                                           break;
-                                   }
-                                }
-                            });
+                            // add date range start dates
+                            chronologyEntries.push.apply(
+                                chronologyEntries,
+                                this.caseData.dateRanges
+                                    // keep only start dates
+                                    .filter((dateRange) => !_.isEmpty(dateRange.startDate))
+                                    // transform date ranges to ChronologyItem structure
+                                    .map((dateRange) => {
+                                        // get the label for the date range type
+                                        const typeLabel = this.i18nService.instant(dateRange.typeId);
+                                        // create the ChronologyItem
+                                        return new ChronologyItem({
+                                            label: this.i18nService.instant('LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_START_DATE', {type: typeLabel}),
+                                            date: dateRange.startDate
+                                        });
+                                    })
+                            );
+
+                            // add date range end dates
+                            chronologyEntries.push.apply(
+                                chronologyEntries,
+                                this.caseData.dateRanges
+                                    // keep only end dates
+                                    .filter((dateRange) => !_.isEmpty(dateRange.endDate))
+                                    // transform date ranges to ChronologyItem structure
+                                    .map((dateRange) => {
+                                        // get the label for the date range type
+                                        const typeLabel = this.i18nService.instant(dateRange.typeId);
+                                        // create the ChronologyItem
+                                        return new ChronologyItem({
+                                              label: this.i18nService.instant('LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_END_DATE', {type: typeLabel}),
+                                              date: dateRange.endDate
+                                        });
+                                    })
+                            );
 
                             // classification dates
                             if (!_.isEmpty(this.caseData.classificationHistory)) {

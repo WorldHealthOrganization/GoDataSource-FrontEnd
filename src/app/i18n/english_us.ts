@@ -30,6 +30,12 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_DATE_RANGE_TO_DESCRIPTION': '',
 
         /**
+         * uiChronologyCasePage
+         */
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_START_DATE': '{{type}} start date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_END_DATE': '{{type}} end date',
+
+        /**
          * REMOVE
          */
 
