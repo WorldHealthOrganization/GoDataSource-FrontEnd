@@ -13,6 +13,7 @@ import * as _ from 'lodash';
 import { RequestFilterOperator } from '../../helperClasses/request-query-builder/request-filter';
 import { Moment } from 'moment';
 import { ContactDataService } from './contact.data.service';
+import { DateType } from '../../enums/date-types.enum';
 
 @Injectable()
 export class ListFilterDataService {
@@ -153,16 +154,18 @@ export class ListFilterDataService {
         filterQueryBuilder.filter.where({
             [RequestFilterOperator.AND]: [
                 {
-                    'hospitalizationDates.startDate': {
+                    'dateRanges.typeId': DateType.HOSPITALIZATION_DATE
+                }, {
+                    'dateRanges.startDate': {
                         lte: moment(date).endOf('day').toISOString()
                     }
                 }, {
                     [RequestFilterOperator.OR]: [{
-                        'hospitalizationDates.endDate': {
+                        'dateRanges.endDate': {
                             eq: null
                         }
                     }, {
-                        'hospitalizationDates.endDate': {
+                        'dateRanges.endDate': {
                             gte: moment(date).startOf('day').toISOString()
                         }
                     }]
@@ -186,16 +189,19 @@ export class ListFilterDataService {
         filterQueryBuilder.filter.where({
             [RequestFilterOperator.AND]: [
                 {
-                    'isolationDates.startDate': {
+                    'dateRanges.typeId': DateType.ISOLATION_DATE
+                },
+                {
+                    'dateRanges.startDate': {
                         lte: moment(date).endOf('day').toISOString()
                     }
                 }, {
                     [RequestFilterOperator.OR]: [{
-                        'isolationDates.endDate': {
+                        'dateRanges.endDate': {
                             eq: null
                         }
                     }, {
-                        'isolationDates.endDate': {
+                        'dateRanges.endDate': {
                             gte: moment(date).startOf('day').toISOString()
                         }
                     }]

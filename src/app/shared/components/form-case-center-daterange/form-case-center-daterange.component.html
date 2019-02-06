@@ -4,6 +4,17 @@
     <form #groupForm="ngForm">
         <div fxLayout="column" fxFlex>
             <div fxFlex fxLayout="row" fxLayoutGap="20px">
+
+                <app-form-select
+                    [name]="name + '[typeId]'"
+                    [(ngModel)]="centerDateRange.typeId"
+                    [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID' | translate"
+                    [options]="dateTypeList$ | async"
+                    optionLabelKey="label"
+                    optionValueKey="value"
+                    (optionChanged)="onChange()">
+                </app-form-select>
+
                 <div fxFlex fxLayout="row">
                     <app-form-daterange
                         [name]="name"
@@ -18,7 +29,9 @@
                     </app-form-daterange>
                 </div>
 
-                <div fxFlex fxLayout="row" fxLayoutGap="20px">
+                <div fxFlex fxLayout="row" fxLayoutGap="20px"
+                     *ngIf="centerDateRange.typeId === DATE_TYPES.HOSPITALIZATION_DATE ||
+                            centerDateRange.typeId === DATE_TYPES.ISOLATION_DATE">
                     <app-form-input
                         [name]="name + '[centerName]'"
                         [(ngModel)]="centerDateRange.centerName"
@@ -28,18 +41,19 @@
                         required="false"
                         [disabled]="disabled">
                     </app-form-input>
-
-                    <app-form-location-dropdown
-                        [name]="name + '[locationId]'"
-                        [(ngModel)]="centerDateRange.locationId"
-                        [useOutbreakLocations]="true"
-                        (changed)="onChange()"
-                        [placeholder]="'LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION' | translate"
-                        tooltip="LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION_DESCRIPTION"
-                        [required]="false"
-                        [disabled]="disabled">
-                    </app-form-location-dropdown>
                 </div>
+
+                <app-form-location-dropdown
+                    [name]="name + '[locationId]'"
+                    [(ngModel)]="centerDateRange.locationId"
+                    [useOutbreakLocations]="true"
+                    (changed)="onChange()"
+                    [placeholder]="'LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION' | translate"
+                    tooltip="LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION_DESCRIPTION"
+                    [required]="false"
+                    [disabled]="disabled">
+                </app-form-location-dropdown>
+
             </div>
 
             <div fxLayout="row" fxFlex>
