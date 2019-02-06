@@ -1,0 +1,34 @@
+<div class="form-date-slider form-element {{ tooltip ? 'form-date-slider-tooltip' : '' }}"
+     [id]="identifier">
+
+    <mat-form-field>
+
+
+        <input
+            matInput
+            [(ngModel)]="value"
+            [attr.name]="name"
+            [required]="required"
+            [placeholder]="placeholder"
+            [matDatepicker]="pickerStartDate"
+            [disabled]="disabled"
+            (blur)="onBlur()"
+            (input)="onChange()"
+            (click)="showDatePickerDialog(pickerStartDate)"
+            (focus)="showDatePickerDialog(pickerStartDate)"
+            [max]="maxDate"
+            [min]="minDate"/>
+
+        <mat-datepicker-toggle matSuffix [for]="pickerStartDate"></mat-datepicker-toggle>
+        <mat-datepicker #pickerStartDate (selectedChanged)="onChange()"></mat-datepicker>
+
+        <span
+            *ngIf="tooltip"
+            #tooltipCtrl="matTooltip"
+            [matTooltip]="tooltip"
+            class="xt-icon form-icon"
+            (click)="displayTooltip($event, tooltipCtrl)">
+            help
+        </span>
+    </mat-form-field>
+</div>
