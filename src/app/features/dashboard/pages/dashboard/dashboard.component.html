@@ -73,6 +73,24 @@
         <!-- Dashboard items -->
         <div class="page-content">
 
+            <!-- Dashboard filters -->
+            <div>
+                <div>
+                    Filters..bla bla
+                </div>
+                <div>
+                    <app-form-date-slider
+                        name="aaaa"
+                        ngModel
+                        [label]="'Test...'"
+                        [tooltip]="'Bla bla'"
+                        [minDate]="'2019-01-01'"
+                        [maxDate]="'2019-01-31'">
+                    </app-form-date-slider>
+                </div>
+            </div>
+
+            <!-- Dashlets -->
             <div
                 fxFlex fxLayout="row" fxLayoutAlign="space-between">
 
