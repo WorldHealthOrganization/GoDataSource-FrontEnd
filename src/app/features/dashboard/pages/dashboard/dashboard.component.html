@@ -85,8 +85,8 @@
                         name="filterByDate"
                         fxFlex
                         [ngModel]="globalFilterDate"
-                        [label]="'LNG_PAGE_DASHBOARD_FILTERS_LABEL_DATE' | translate"
-                        tooltip="LNG_PAGE_DASHBOARD_FILTERS_LABEL_DATE_DESCRIPTION"
+                        [label]="'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE' | translate"
+                        tooltip="LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE_DESCRIPTION"
                         [minDate]="globalFilterDateMin"
                         [maxDate]="globalFilterDateMax"
                         (optionChanged)="globalFilterDate = $event">
@@ -97,8 +97,8 @@
                         name="filterByLocation"
                         fxFlex
                         [ngModel]="globalFilterLocationId"
-                        [placeholder]="'LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION' | translate"
-                        tooltip="LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION_DESCRIPTION"
+                        [placeholder]="'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION' | translate"
+                        tooltip="LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION_DESCRIPTION"
                         (changed)="globalFilterLocationId = $event">
                     </app-form-location-dropdown>
                 </div>

@@ -22,8 +22,8 @@ export const EnglishUsLang = {
          * uiDashboardPage
          */
         'LNG_PAGE_DASHBOARD_FILTERS_TITLE': 'Filters',
-        'LNG_PAGE_DASHBOARD_FILTERS_LABEL_DATE': 'Date',
-        'LNG_PAGE_DASHBOARD_FILTERS_LABEL_DATE_DESCRIPTION': '',
+        'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE_DESCRIPTION': '',
+        'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION_DESCRIPTION': '',
 
         /**
          * uiModifyFollowUpListPage
