@@ -25,6 +25,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups successfully modified',
 
         /**
+         * uiFollowUpfields
+         */
+        'LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION': '',
+
+        /**
          * uiCaseFields
          */
         'LNG_CASE_FIELD_LABEL_DATE_RANGES': 'Dates',

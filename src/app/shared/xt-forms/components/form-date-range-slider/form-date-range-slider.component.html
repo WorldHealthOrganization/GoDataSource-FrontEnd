@@ -1,0 +1,32 @@
+<div
+    [id]="identifier"
+    class="form-date-range-slider form-element"
+    fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
+
+    <!-- Label -->
+    <div
+        fxFlex fxGrow="0"
+        *ngIf="label">
+        {{ label | translate }}
+    </div>
+
+    <!-- Slider -->
+    <ng5-slider
+        fxFlex
+        [value]="sliderValue.low"
+        [highValue]="sliderValue.high"
+        [options]="sliderOptions"
+        (userChange)="onChange($event)">
+    </ng5-slider>
+
+    <!-- Tooltip -->
+    <span
+        *ngIf="tooltip"
+        fxFlex="24px"
+        #tooltipCtrl="matTooltip"
+        [matTooltip]="tooltip"
+        class="xt-icon form-icon"
+        (click)="displayTooltip($event, tooltipCtrl)">
+        help
+    </span>
+</div>
