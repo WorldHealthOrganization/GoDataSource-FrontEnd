@@ -8,7 +8,6 @@ import { FormCheckboxComponent } from './form-checkbox/form-checkbox.component';
 import { FormDaterangeComponent } from './form-daterange/form-daterange.component';
 import { FormDaterangeListComponent } from './form-daterange-list/form-daterange-list.component';
 import { FormRadioComponent } from './form-radio/form-radio.component';
-import { FormSelectChangeDetectionPushComponent } from './form-select/form-select-change-detection-push.component';
 
 export const components: any[] = [
     FormValidationComponent,
@@ -20,8 +19,5 @@ export const components: any[] = [
     FormCheckboxComponent,
     FormDaterangeComponent,
     FormDaterangeListComponent,
-    FormRadioComponent,
-
-    // change detection => OnPush
-    FormSelectChangeDetectionPushComponent
+    FormRadioComponent
 ];

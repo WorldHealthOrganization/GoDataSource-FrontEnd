@@ -1,9 +1,10 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import * as _ from 'lodash';
+import { Moment } from 'moment';
 
 export class ChronologyItem {
     public label: string;
-    public date: string;
+    public date: string | Moment;
     public translateData: {
         [key: string]: string
     } = {};
@@ -11,7 +12,7 @@ export class ChronologyItem {
     constructor(data: {
         // required
         label: string,
-        date: string,
+        date: string | Moment,
 
         // optional
         translateData?: {
