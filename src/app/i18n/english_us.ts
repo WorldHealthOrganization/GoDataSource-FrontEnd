@@ -26,6 +26,13 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION': '',
 
         /**
+         * uiGanttChartDashlet
+         */
+        'LNG_PAGE_GANTT_CHART_TITLE': 'Gantt Chart',
+        'LNG_PAGE_GANTT_CHART_LAB_TEST_TITLE': 'Delay between symptom onset and date of lab testing',
+        'LNG_PAGE_GANTT_CHART_HOSPITALIZATION_ISOLATION_TITLE': 'Delay between symptom onset and date of hospitalization / isolation'
+
+        /**
          * REMOVE
          */
 
@@ -34,15 +41,6 @@ export const EnglishUsLang = {
         // 'LNG_CASE_FIELD_LABEL_DATE_DECEASED',
         // 'LNG_CASE_FIELD_LABEL_DATE_DECEASED_DESCRIPTION',
         // 'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED',
-
-        /**
-         * uiGanttChartDashlet
-         */
-        'LNG_PAGE_GANTT_CHART_TITLE': 'Gantt Chart',
-        'LNG_PAGE_GANTT_CHART_LAB_TEST_TITLE': 'Delay between symptom onset and date of lab testing',
-        'LNG_PAGE_GANTT_CHART_HOSPITALIZATION_ISOLATION_TITLE': 'Delay between symptom onset and date of hospitalization / isolation'
-
-
 
     }
 };
