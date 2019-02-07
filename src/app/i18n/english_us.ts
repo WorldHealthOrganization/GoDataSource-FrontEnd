@@ -12,6 +12,10 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
+        /**
+         * Form Date Slider
+         */
+        'LNG_FORM_DATE_SLIDER_FIELD_LABEL_VALUE': 'Date: {{date}}',
 
         /**
          * uiModifyFollowUpListPage

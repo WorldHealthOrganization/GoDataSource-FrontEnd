@@ -1,15 +1,44 @@
 <div
-    class="form-date-slider form-element {{ tooltip ? 'form-date-slider-tooltip' : '' }}"
-    [id]="identifier">
+    [id]="identifier"
+    class="form-date-slider form-element"
+    fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
 
-    <mat-slider
-        [value]="5"
-        [min]="0"
-        [max]="10"
-        [disabled]="disabled"></mat-slider>
+    <!-- Label -->
+    <div
+        fxFlex fxGrow="0"
+        *ngIf="label">
+        {{ 'label' | translate }}
+    </div>
 
+    <!-- Slider Data -->
+    <div
+        fxFlex fxLayout="column">
+        <!-- Slider Value -->
+        <div
+            fxFlex fxLayoutAlign="center">
+            {{ displayValue | translate:sliderDateData }}
+        </div>
+
+        <!-- Slider -->
+        <mat-slider
+            fxFlex
+            [value]="sliderValue"
+            min="0"
+            [max]="maxValue"
+            step="1"
+            thumbLabel="false"
+            tickInterval="auto"
+            [disabled]="disabled"
+            (input)="onInput($event)"
+            (change)="onChange($event)"
+            (blur)="onBlur()">
+        </mat-slider>
+    </div>
+
+    <!-- Tooltip -->
     <span
         *ngIf="tooltip"
+        fxFlex="24px"
         #tooltipCtrl="matTooltip"
         [matTooltip]="tooltip"
         class="xt-icon form-icon"

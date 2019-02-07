@@ -15,6 +15,8 @@ import { ElementBase } from '../../core/index';
 import { Moment } from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as moment from 'moment';
+import { MatSliderChange } from '@angular/material';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-form-date-slider',
@@ -27,7 +29,7 @@ import * as moment from 'moment';
         multi: true
     }]
 })
-export class FormDateSliderComponent extends ElementBase<string> {
+export class FormDateSliderComponent extends ElementBase<Moment> {
     /**
      * Component identifier
      */
@@ -54,13 +56,22 @@ export class FormDateSliderComponent extends ElementBase<string> {
     @Input() name: string;
 
     /**
+     * Display date
+     */
+    @Input() displayValue: string = 'LNG_FORM_DATE_SLIDER_FIELD_LABEL_VALUE';
+
+    /**
      * Min Date
      */
     private _minDate: Moment;
     @Input() set minDate(minDate: Moment) {
+        // set min date
         this._minDate = !minDate ? null : (
             minDate instanceof moment ? minDate : moment(minDate)
         ) as Moment;
+
+        // determine min & max
+        this.determineMinMax();
     }
     get minDate(): Moment {
         return this._minDate;
@@ -70,10 +81,15 @@ export class FormDateSliderComponent extends ElementBase<string> {
      * Max Date
      */
     private _maxDate: Moment;
+    maxValue: number = 0;
     @Input() set maxDate(maxDate: Moment) {
+        // set max date
         this._maxDate = !maxDate ? null : (
             maxDate instanceof moment ? maxDate : moment(maxDate)
         ) as Moment;
+
+        // determine min & max
+        this.determineMinMax();
     }
     get maxDate(): Moment {
         return this._maxDate;
@@ -103,6 +119,18 @@ export class FormDateSliderComponent extends ElementBase<string> {
     @Output() optionChanged = new EventEmitter<any>();
 
     /**
+     * Slider value
+     */
+    public sliderValue: number = 0;
+
+    /**
+     * Slider date value
+     */
+    public sliderDateData: {
+        date: string
+    };
+
+    /**
      * Constructor
      */
     constructor(
@@ -117,6 +145,11 @@ export class FormDateSliderComponent extends ElementBase<string> {
         this.i18nService.languageChangedEvent.subscribe(() => {
             this.tooltip = this._tooltipToken;
         });
+
+        // handle value changes
+        this.registerOnChange(() => {
+            this.determineSliderValue();
+        });
     }
 
     /**
@@ -129,11 +162,90 @@ export class FormDateSliderComponent extends ElementBase<string> {
     /**
      * Function triggered when the input value is changed
      */
-    onChange() {
+    onInput(sliderChange: MatSliderChange) {
+        // we need to have minDate to determine date
+        if (!this.minDate) {
+            return;
+        }
+
+        // determine date accordingly to the new slider value
+        // we need to clone minDate since add alters the object
+        this.value = moment(this.minDate).add(sliderChange.value, 'days');
+    }
+
+    /**
+     * Function triggered when the input value is changed
+     */
+    onChange(sliderChange: MatSliderChange) {
+        // trigger on input to determine value
+        this.onInput(sliderChange);
+
         // emit the current value
-        // wait for binding to occur
-        setTimeout(() => {
-            this.optionChanged.emit(this.value);
-        });
+        this.optionChanged.emit(this.value);
+    }
+
+    /**
+     * Determine min & max
+     */
+    private determineMinMax() {
+        // we can do this only if we have min & max dates
+        if (
+            !this.minDate ||
+            !this.maxDate ||
+            this.maxDate.isSameOrBefore(this.minDate)
+        ) {
+            // set max value to zero since we can't determine the proper number of days between max & min dates
+            this.maxValue = 0;
+
+            // finished
+            return;
+        }
+
+        // determine min & max
+        // min should always be zero
+        // we need to clone minDate since add alters the object
+        this.maxValue = moment(this.maxDate).diff(this.minDate, 'days');
+    }
+
+    /**
+     * Write value
+     * @param value
+     */
+    writeValue(value: Moment) {
+        // write value
+        value = !value ? null : (
+            value instanceof moment ? value : moment(value)
+        ) as Moment;
+        super.writeValue(value);
+
+        // determine slider value
+        this.determineSliderValue();
+    }
+
+    /**
+     * Determine slider value
+     */
+    private determineSliderValue() {
+        // determine slider value
+        if (
+            this.value &&
+            this.minDate &&
+            this.maxDate &&
+            this.maxDate.isAfter(this.minDate) &&
+            this.value.isBetween(this.minDate, this.maxDate, null, '[]')
+        ) {
+            // we need min & max dates to determine slider value
+            this.sliderValue = moment(this.value).diff(this.minDate, 'days');
+        } else {
+            // value not set
+            this.sliderValue = 0;
+        }
+
+        // set date label
+        if (this.value) {
+            this.sliderDateData = {
+                date: this.value.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+            };
+        }
     }
 }
