@@ -64,11 +64,15 @@ export class FormDateSliderComponent extends ElementBase<Moment> {
      * Min Date
      */
     private _minDate: Moment;
+    public minDateLabel: string;
     @Input() set minDate(minDate: Moment) {
         // set min date
         this._minDate = !minDate ? null : (
             minDate instanceof moment ? minDate : moment(minDate)
         ) as Moment;
+
+        // set label
+        this.minDateLabel = minDate ? minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '';
 
         // determine min & max
         this.determineMinMax();
@@ -81,12 +85,16 @@ export class FormDateSliderComponent extends ElementBase<Moment> {
      * Max Date
      */
     private _maxDate: Moment;
-    maxValue: number = 0;
+    public maxDateLabel: string;
+    public maxValue: number = 0;
     @Input() set maxDate(maxDate: Moment) {
         // set max date
         this._maxDate = !maxDate ? null : (
             maxDate instanceof moment ? maxDate : moment(maxDate)
         ) as Moment;
+
+        // set label
+        this.maxDateLabel = maxDate ? maxDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '';
 
         // determine min & max
         this.determineMinMax();

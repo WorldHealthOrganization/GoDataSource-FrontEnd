@@ -63,30 +63,44 @@
     </ng-container>
 
     <ng-container *ngIf="!noOutbreaksInSystem">
-        <!-- Side filters -->
-        <app-side-filters
-            [filterOptions]="availableSideFilters"
-            (filtersCollected)="applySideFilters($event)"
-            [fixedFilters]="true">
-        </app-side-filters>
-
         <!-- Dashboard items -->
         <div class="page-content">
 
             <!-- Dashboard filters -->
-            <div>
-                <div>
-                    Filters..bla bla
+            <div
+                class="dashboard-filters">
+                <!-- Filters title -->
+                <div
+                    class="dashboard-filters-title">
+                    {{ 'LNG_PAGE_DASHBOARD_FILTERS_TITLE' | translate }}
                 </div>
-                <div>
+
+                <!-- Filters -->
+                <div
+                    class="dashboard-filters-inputs"
+                    fxFlex fxLayout="row" fxLayoutGap="20px">
+
+                    <!-- Date -->
                     <app-form-date-slider
-                        name="aaaa"
-                        ngModel
-                        [label]="'Test...'"
-                        [tooltip]="'Bla bla'"
-                        [minDate]="'2019-01-01'"
-                        [maxDate]="'2019-01-31'">
+                        name="filterByDate"
+                        fxFlex
+                        [ngModel]="globalFilterDate"
+                        [label]="'LNG_PAGE_DASHBOARD_FILTERS_LABEL_DATE' | translate"
+                        tooltip="LNG_PAGE_DASHBOARD_FILTERS_LABEL_DATE_DESCRIPTION"
+                        [minDate]="globalFilterDateMin"
+                        [maxDate]="globalFilterDateMax"
+                        (optionChanged)="globalFilterDate = $event">
                     </app-form-date-slider>
+
+                    <!-- Location -->
+                    <app-form-location-dropdown
+                        name="filterByLocation"
+                        fxFlex
+                        [ngModel]="globalFilterLocationId"
+                        [placeholder]="'LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION' | translate"
+                        tooltip="LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION_DESCRIPTION"
+                        (changed)="globalFilterLocationId = $event">
+                    </app-form-location-dropdown>
                 </div>
             </div>
 

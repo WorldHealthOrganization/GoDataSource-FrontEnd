@@ -13,9 +13,17 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * NEW GROUP
          * Form Date Slider
          */
-        'LNG_FORM_DATE_SLIDER_FIELD_LABEL_VALUE': 'Date: {{date}}',
+        'LNG_FORM_DATE_SLIDER_FIELD_LABEL_VALUE': 'Selected: {{date}}',
+
+        /**
+         * uiDashboardPage
+         */
+        'LNG_PAGE_DASHBOARD_FILTERS_TITLE': 'Filters',
+        'LNG_PAGE_DASHBOARD_FILTERS_LABEL_DATE': 'Date',
+        'LNG_PAGE_DASHBOARD_FILTERS_LABEL_DATE_DESCRIPTION': '',
 
         /**
          * uiModifyFollowUpListPage

@@ -7,7 +7,7 @@
     <div
         fxFlex fxGrow="0"
         *ngIf="label">
-        {{ 'label' | translate }}
+        {{ label | translate }}
     </div>
 
     <!-- Slider Data -->
@@ -15,8 +15,24 @@
         fxFlex fxLayout="column">
         <!-- Slider Value -->
         <div
-            fxFlex fxLayoutAlign="center">
-            {{ displayValue | translate:sliderDateData }}
+            fxFlex fxLayout="row">
+            <!-- Min -->
+            <div
+                fxFlex fxLayoutAlign="start">
+                {{ minDateLabel }}
+            </div>
+
+            <!-- Value -->
+            <div
+                fxFlex fxLayoutAlign="center">
+                {{ displayValue | translate:sliderDateData }}
+            </div>
+
+            <!-- Max -->
+            <div
+                fxFlex fxLayoutAlign="end">
+                {{ maxDateLabel }}
+            </div>
         </div>
 
         <!-- Slider -->
