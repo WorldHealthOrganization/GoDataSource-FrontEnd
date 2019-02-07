@@ -1,6 +1,6 @@
 <!-- Chart -->
 <ng-container
-    *ngIf="!displayLoading && ganttData[0]?.children?.length > 0">
+    *ngIf="!displayLoading && ganttData[0]?.children?.length">
     <div
         fxLayout="column" fxFlex fxLayoutAlign="center"
         class="has-data-wait-for-bind">
@@ -28,7 +28,7 @@
         </div>
 
         <div
-            *ngIf="!loading && ganttData[0]?.children?.length < 1">
+            *ngIf="!loading && !ganttData[0]?.children?.length">
             {{ '' | translate }}
         </div>
     </div>
@@ -36,7 +36,7 @@
 
 <!-- No data -->
 <ng-container
-    *ngIf="!displayLoading && ganttData[0]?.children?.length < 1">
+    *ngIf="!displayLoading && !ganttData[0]?.children?.length">
     <div
         fxFlex fxLayout="column" fxFlexAlign="center"
         class="dashlet-no-data">
