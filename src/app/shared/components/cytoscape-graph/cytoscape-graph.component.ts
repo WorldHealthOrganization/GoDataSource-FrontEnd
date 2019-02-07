@@ -325,10 +325,18 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 // rank
 
                 if (this.timelineDatesRanks[node.data.dateTimeline]) {
-                    const timelineDateRank: any = {};
-                    timelineDateRank.nodeId = node.data.id;
-                    timelineDateRank.rank = 1;
-                    this.timelineDatesRanks[node.data.dateTimeline].push(timelineDateRank);
+                    // check if node rank was already calculated
+                    if (!this.timelineDatesRanks[node.data.dateTimeline][node.data.id]) {
+                        // get max rank for that date
+                        const maxRankDate = _.max(this.timelineDatesRanks[node.data.dateTimeline]);
+                        // set rank to max +_1
+                        this.timelineDatesRanks[node.data.dateTimeline][node.data.id] = maxRankDate + 1;
+                        // check if the node has related nodes and assign ranks to those as well.
+
+                    }
+
+
+                    this.timelineDatesRanks[node.data.dateTimeline][node.data.id]=1;
                     const relatedNodes = this.getRelatedNodes(node.data.id);
                     console.log(relatedNodes);
            //         if (this.timelineDates[node.data.dateTimeline].length > this.maxTimelineIndex) {
@@ -339,7 +347,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                     timelineDateRank.nodeId = node.data.id;
                     timelineDateRank.rank = 1;
                     this.timelineDatesRanks[node.data.dateTimeline] = [];
-                    this.timelineDatesRanks[node.data.dateTimeline].push(timelineDateRank);
+                    this.timelineDatesRanks[node.data.dateTimeline][node.data.id] = 0;
 
                     // loop through its neighbours
                     const relatedNodes = this.getRelatedNodes(node.data.id);
@@ -642,12 +650,12 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     getRelatedNodes(nodeId) {
         const relatedNodes = [];
         _.forEach(this.elements.edges, (edge, key) => {
-            if (edge.source === nodeId) {
-                const node = this.getNode(edge.target);
+            if (edge.data.source === nodeId) {
+                const node = this.getNode(edge.data.target);
                 relatedNodes.push(node);
             }
-            if (edge.target === nodeId) {
-                const node = this.getNode(edge.source);
+            if (edge.data.target === nodeId) {
+                const node = this.getNode(edge.data.source);
                 relatedNodes.push(node);
             }
         });
@@ -655,12 +663,13 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     }
 
     getNode(nodeId) {
+        let foundNode = null;
         _.forEach(this.elements.nodes, (node, key) => {
            if (node.data.id === nodeId) {
-               return node;
+               foundNode = node;
            }
         });
-        return null;
+        return foundNode;
     }
 
 }
