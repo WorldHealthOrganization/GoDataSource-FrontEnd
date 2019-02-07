@@ -19,13 +19,6 @@ export const EnglishUsLang = {
         'LNG_FORM_DATE_SLIDER_FIELD_LABEL_VALUE': 'Selected: {{date}}',
 
         /**
-         * uiDashboardPage
-         */
-        'LNG_PAGE_DASHBOARD_FILTERS_TITLE': 'Filters',
-        'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE_DESCRIPTION': '',
-        'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION_DESCRIPTION': '',
-
-        /**
          * uiModifyFollowUpListPage
          */
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up successfully modified',

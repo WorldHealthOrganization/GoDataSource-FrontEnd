@@ -63,48 +63,16 @@
     </ng-container>
 
     <ng-container *ngIf="!noOutbreaksInSystem">
+        <!-- Side filters -->
+        <app-side-filters
+            [filterOptions]="availableSideFilters"
+            (filtersCollected)="applySideFilters($event)"
+            [fixedFilters]="true">
+        </app-side-filters>
+
         <!-- Dashboard items -->
         <div class="page-content">
 
-            <!-- Dashboard filters -->
-            <div
-                class="dashboard-filters">
-                <!-- Filters title -->
-                <div
-                    class="dashboard-filters-title">
-                    {{ 'LNG_PAGE_DASHBOARD_FILTERS_TITLE' | translate }}
-                </div>
-
-                <!-- Filters -->
-                <div
-                    class="dashboard-filters-inputs"
-                    fxFlex fxLayout="row" fxLayoutGap="20px">
-
-                    <!-- Date -->
-                    <app-form-date-slider
-                        name="filterByDate"
-                        fxFlex
-                        [ngModel]="globalFilterDate"
-                        [label]="'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE' | translate"
-                        tooltip="LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE_DESCRIPTION"
-                        [minDate]="globalFilterDateMin"
-                        [maxDate]="globalFilterDateMax"
-                        (optionChanged)="globalFilterDate = $event">
-                    </app-form-date-slider>
-
-                    <!-- Location -->
-                    <app-form-location-dropdown
-                        name="filterByLocation"
-                        fxFlex
-                        [ngModel]="globalFilterLocationId"
-                        [placeholder]="'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION' | translate"
-                        tooltip="LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION_DESCRIPTION"
-                        (changed)="globalFilterLocationId = $event">
-                    </app-form-location-dropdown>
-                </div>
-            </div>
-
-            <!-- Dashlets -->
             <div
                 fxFlex fxLayout="row" fxLayoutAlign="space-between">
 

@@ -96,11 +96,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     loadingDialog: LoadingDialogModel;
 
-    // filters
-    globalFilterDate: Moment = moment();
+    // available side filters
+    availableSideFilters: FilterModel[] = [];
+
+    globalFilterDate: Moment;
     globalFilterLocationId: string;
-    globalFilterDateMin: Moment = moment().add(-60, 'days').startOf('day');
-    globalFilterDateMax: Moment = moment().endOf('day');
 
     @ViewChild('kpiSection') private kpiSection: ElementRef;
 
@@ -137,6 +137,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
                     this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
                 }
             });
+
+        // initialize Side Filters
+        this.initializeSideFilters();
     }
 
     ngOnDestroy() {
@@ -145,6 +148,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
+    }
+
+    /**
+     * Initialize Side Filters
+     */
+    private initializeSideFilters() {
+        // set available side filters
+        this.availableSideFilters = [
+            new FilterModel({
+                fieldName: 'locationId',
+                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
+                type: FilterType.LOCATION,
+                required: true,
+                multipleOptions: false
+            }),
+            new FilterModel({
+                fieldName: 'date',
+                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
+                type: FilterType.DATE,
+                required: true,
+                maxDate: moment()
+            })
+        ];
     }
 
     private initializeDashlets() {
@@ -279,7 +305,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
                     .subscribe((blob) => {
                         this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
-                });
+                    });
             });
     }
 
@@ -315,6 +341,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
             `${fileName}.${extension}`
         );
         this.closeLoadingDialog();
+    }
+
+    /**
+     * Apply side filters
+     * @param data
+     */
+    applySideFilters(filters: AppliedFilterModel[]) {
+        // retrieve date & location filters
+        // retrieve location filter
+        const dateFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'date' } });
+        const locationFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'locationId' } });
+
+        // set filters
+        this.globalFilterDate = _.isEmpty(dateFilter.value) ? undefined : moment(dateFilter.value);
+        this.globalFilterLocationId = _.isEmpty(locationFilter.value) ? undefined : locationFilter.value;
     }
 
     /**
