@@ -727,6 +727,18 @@ export class Constants {
         }
     };
 
+    //  gantt chart types
+    static GANTT_CHART_TYPES = {
+        GANTT_CHART_LAB_TEST: {
+            label: 'LNG_PAGE_GANTT_CHART_LAB_TEST_TITLE',
+            value: 'GANTT_CHART_LAB_TEST'
+        },
+        GANTT_CHART_HOSPITALIZATION_ISOLATION: {
+            label: 'LNG_PAGE_GANTT_CHART_HOSPITALIZATION_ISOLATION_TITLE',
+            value: 'GANTT_CHART_HOSPITALIZATION_ISOLATION'
+        }
+    };
+
     /**
      * Today date
      */

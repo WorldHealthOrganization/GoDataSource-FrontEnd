@@ -29,10 +29,17 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_DATE_RANGE_TO_DESCRIPTION': '',
 
         /**
+         * uiGanttChartDashlet
+         */
+        'LNG_PAGE_GANTT_CHART_TITLE': 'Gantt Chart',
+        'LNG_PAGE_GANTT_CHART_LAB_TEST_TITLE': 'Delay between symptom onset and date of lab testing',
+        'LNG_PAGE_GANTT_CHART_HOSPITALIZATION_ISOLATION_TITLE': 'Delay between symptom onset and date of hospitalization / isolation',
+
+        /**
          * uiChronologyCasePage
          */
         'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_START_DATE': '{{type}} start date',
-        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_END_DATE': '{{type}} end date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_END_DATE': '{{type}} end date'
 
         /**
          * REMOVE
@@ -70,5 +77,6 @@ export const EnglishUsLang = {
         // "LNG_CASE_FIELD_LABEL_ISOLATION_DATES_LOCATION_DESCRIPTION": "",
         // "LNG_CASE_FIELD_LABEL_ISOLATION_DATES_START_DATE": "Isolation Start Date",
         // "LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION": "",
+
     }
 };

@@ -220,5 +220,13 @@ export class GenericDataService {
         }
         return Observable.of(Object.values(options));
     }
+
+    /**
+     * Retrieve the list of gantt chart types
+     * @returns {Observable<any[]>}
+     */
+    getGanttChartTypes(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.GANTT_CHART_TYPES));
+    }
 }
 

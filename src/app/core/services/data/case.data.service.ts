@@ -13,6 +13,7 @@ import * as moment from 'moment';
 import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import * as _ from 'lodash';
+import { MetricCasesDelayBetweenOnsetHospitalizationModel } from '../../models/metrics/metric-cases-delay-between-onset-hospitalization.model';
 import { Constants } from '../../models/constants';
 
 @Injectable()
@@ -330,6 +331,23 @@ export class CaseDataService {
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/cases/delay-onset-lab-testing?filter=${filter}`),
             MetricCasesDelayBetweenOnsetLabTestModel
+        );
+    }
+
+    /**
+     * get delay between date of onset and date of hospitalization / isolation - first - gantt chart
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<MetricCasesDelayBetweenOnsetHospitalizationModel[]>}
+     */
+    getDelayBetweenOnsetAndHospitalization(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricCasesDelayBetweenOnsetHospitalizationModel[]> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/cases/delay-onset-hospitalization?filter=${filter}`),
+            MetricCasesDelayBetweenOnsetHospitalizationModel
         );
     }
 
