@@ -205,6 +205,9 @@ export class FormDateSliderComponent extends ElementBase<Moment> {
             // set max value to zero since we can't determine the proper number of days between max & min dates
             this.maxValue = 0;
 
+            // determine slider value
+            this.determineSliderValue();
+
             // finished
             return;
         }
@@ -213,6 +216,9 @@ export class FormDateSliderComponent extends ElementBase<Moment> {
         // min should always be zero
         // we need to clone minDate since add alters the object
         this.maxValue = moment(this.maxDate).diff(this.minDate, 'days');
+
+        // determine slider value
+        this.determineSliderValue();
     }
 
     /**

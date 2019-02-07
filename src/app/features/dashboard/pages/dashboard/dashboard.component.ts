@@ -99,8 +99,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // filters
     globalFilterDate: Moment = moment();
     globalFilterLocationId: string;
-    globalFilterDateMin: Moment = moment().add(-60, 'days');
-    globalFilterDateMax: Moment = moment();
+    globalFilterDateMin: Moment = moment().add(-60, 'days').startOf('day');
+    globalFilterDateMax: Moment = moment().endOf('day');
 
     @ViewChild('kpiSection') private kpiSection: ElementRef;
 
