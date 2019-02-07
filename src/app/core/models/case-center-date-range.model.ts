@@ -3,6 +3,7 @@ import { Moment } from 'moment';
 import { LocationModel } from './location.model';
 
 export class CaseCenterDateRangeModel {
+    typeId: string;
     startDate: string | Moment;
     endDate: string | Moment;
     centerName: string;
@@ -11,6 +12,7 @@ export class CaseCenterDateRangeModel {
     comments: string;
 
     constructor(data = null, locationsList = []) {
+        this.typeId = _.get(data, 'typeId');
         this.startDate = _.get(data, 'startDate');
         this.endDate = _.get(data, 'endDate');
         this.centerName = _.get(data, 'centerName');
