@@ -120,7 +120,6 @@ export class Constants {
         }
     };
 
-
     /**
      * FollowUp status
      */
