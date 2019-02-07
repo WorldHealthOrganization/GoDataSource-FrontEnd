@@ -227,10 +227,12 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     showLoading: boolean = true;
     datesArray: string[] = [];
     timelineDates: any = {};
+    timelineDatesRanks: any = {};
 
     timelineNodes: any = [];
 
     timelineNodesIndexes: any = [];
+
 
     constructor(
         private genericDataService: GenericDataService,
@@ -298,9 +300,11 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
      * Generate the array of dates to be used on the timeline view
      */
     calculateTimelineDates() {
+        console.log(this.elements.nodes);
         // empty the already set timeline and dates arrays
         this.timelineDates = {};
         this.datesArray = [];
+        this.timelineDatesRanks = {};
 
         this.timelineNodes = [];
         // loop through nodes to extract the dates ( dateTimeline)
@@ -317,11 +321,44 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                     this.timelineNodesIndexes[node.data.dateTimeline] = [];
                 }
                 this.datesArray.push(node.data.dateTimeline);
+
+// rank
+
+                if (this.timelineDatesRanks[node.data.dateTimeline]) {
+                    const timelineDateRank: any = {};
+                    timelineDateRank.nodeId = node.data.id;
+                    timelineDateRank.rank = 1;
+                    this.timelineDatesRanks[node.data.dateTimeline].push(timelineDateRank);
+                    const relatedNodes = this.getRelatedNodes(node.data.id);
+                    console.log(relatedNodes);
+           //         if (this.timelineDates[node.data.dateTimeline].length > this.maxTimelineIndex) {
+           //            this.maxTimelineIndex = this.timelineDates[node.data.dateTimeline].length;
+           //        }
+                } else {
+                    const timelineDateRank: any = {};
+                    timelineDateRank.nodeId = node.data.id;
+                    timelineDateRank.rank = 1;
+                    this.timelineDatesRanks[node.data.dateTimeline] = [];
+                    this.timelineDatesRanks[node.data.dateTimeline].push(timelineDateRank);
+
+                    // loop through its neighbours
+                    const relatedNodes = this.getRelatedNodes(node.data.id);
+                    console.log(relatedNodes);
+
+        //            this.timelineNodesIndexes[node.data.dateTimeline] = [];
+                }
+                this.datesArray.push(node.data.dateTimeline);
+
+
+
             }
 
         });
         this.datesArray = _.uniq(this.datesArray);
         this.datesArray = _.sortBy(this.datesArray);
+
+        console.log(this.timelineDates);
+        console.log(this.timelineDatesRanks);
     }
 
     /**
@@ -600,6 +637,30 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
         }
         return filter;
+    }
+
+    getRelatedNodes(nodeId) {
+        const relatedNodes = [];
+        _.forEach(this.elements.edges, (edge, key) => {
+            if (edge.source === nodeId) {
+                const node = this.getNode(edge.target);
+                relatedNodes.push(node);
+            }
+            if (edge.target === nodeId) {
+                const node = this.getNode(edge.source);
+                relatedNodes.push(node);
+            }
+        });
+        return relatedNodes;
+    }
+
+    getNode(nodeId) {
+        _.forEach(this.elements.nodes, (node, key) => {
+           if (node.data.id === nodeId) {
+               return node;
+           }
+        });
+        return null;
     }
 
 }
