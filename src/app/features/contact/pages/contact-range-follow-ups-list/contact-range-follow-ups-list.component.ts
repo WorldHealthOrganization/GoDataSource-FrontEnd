@@ -159,8 +159,8 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     initializeSideFilters() {
         // set available side filters
         const dateFilterValue = {
-            startDate: moment().add(-1, 'days').startOf('day').format(),
-            endDate: moment().add(10, 'days').endOf('day').format()
+            startDate: moment().add(-14, 'days').startOf('day').format(),
+            endDate: moment().startOf('day').format()
         };
         this.availableSideFilters = [
             new FilterModel({
