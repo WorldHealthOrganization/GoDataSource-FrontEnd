@@ -99,19 +99,31 @@ export class SidenavComponent implements OnInit {
             ]
         ),
         new NavItem(
-            'cases-group',
+            'cases',
             'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
             'addFolder',
+            [
+                PERMISSION.READ_OUTBREAK,
+                PERMISSION.READ_CASE
+            ],
+            [],
+            '/cases',
+            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+        ),
+        new NavItem(
+            `lab-results`,
+            'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
+            'lab',
             [],
             [
                 new ChildNavItem(
-                    'cases',
-                    'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
+                    'lab-results',
+                    'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
                     [
                         PERMISSION.READ_OUTBREAK,
                         PERMISSION.READ_CASE
                     ],
-                    '/cases',
+                    '/cases/lab-results',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 ),
                 new ChildNavItem(
@@ -126,15 +138,6 @@ export class SidenavComponent implements OnInit {
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 )
             ]
-        ),
-        new NavItem(
-            `lab-results`,
-            'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
-            'lab',
-            [PERMISSION.READ_CASE],
-            [],
-            '/cases/lab-results',
-            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
         ),
         new NavItem(
             'contacts-group',
