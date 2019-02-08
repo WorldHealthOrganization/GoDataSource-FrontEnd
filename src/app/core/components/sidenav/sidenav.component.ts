@@ -111,7 +111,7 @@ export class SidenavComponent implements OnInit {
             () => this.hasOutbreak.apply(this) // provide context to keep this functionality
         ),
         new NavItem(
-            `lab-results`,
+            `lab-results-group`,
             'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
             'lab',
             [],
