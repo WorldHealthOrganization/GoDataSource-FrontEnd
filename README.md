@@ -80,7 +80,8 @@ Use the IDE of your choice (Webstorm recommended).
     - If the changes are good to be merged in master, the Reviewer will Approve the PR and then merge it in master
     - If the PR requires any changes, the Reviewer will add the comments and will inform the dev when the code review is finished
         - Dev must address all the comments in his PR, fix the code where necessary and REPLY to all comments, so the Reviewer knows that none of the comments were missed
-  
+4. Before assigning the ticket to QA, the developer must close the branch(es) that were merged and are not needed anymore.
+
 ### Managing Language Translations
 
 1. Go.Data supports multiple languages, the base language being English-US.

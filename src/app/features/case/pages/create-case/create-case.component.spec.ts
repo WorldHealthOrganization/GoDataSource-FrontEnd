@@ -1,4 +1,4 @@
-import { TestBed, async, ComponentFixture, inject } from '@angular/core/testing';
+import { TestBed, async, ComponentFixture, inject, fakeAsync } from '@angular/core/testing';
 import { CreateCaseComponent } from './create-case.component';
 import { SharedModule } from '../../../../shared/shared.module';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -18,7 +18,7 @@ describe('CreateCaseComponent', () => {
     let comp: CreateCaseComponent;
     let fixture: ComponentFixture<CreateCaseComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(fakeAsync(() => {
         TestBed.configureTestingModule({
             declarations: [
                 CreateCaseComponent
