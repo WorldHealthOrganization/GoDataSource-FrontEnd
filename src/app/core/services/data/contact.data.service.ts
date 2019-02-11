@@ -12,6 +12,7 @@ import { EntityType } from '../../models/entity-type';
 import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import * as _ from 'lodash';
+import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Injectable()
 export class ContactDataService {
@@ -231,20 +232,31 @@ export class ContactDataService {
     /**
      * Check if visual ID is valid
      * @param outbreakId
+     * @param visualIdRealMask
      * @param visualIdMask
      * @param personId Optional
      */
     checkContactVisualIDValidity(
         outbreakId: string,
+        visualIdRealMask: string,
         visualIdMask: string,
         personId?: string
-    ): Observable<boolean> {
+    ): Observable<boolean | IGeneralAsyncValidatorResponse> {
         return this.generateContactVisualID(
             outbreakId,
             visualIdMask,
             personId
         ).map((visualID: string | VisualIdErrorModel) => {
-            return _.isString(visualID);
+            return _.isString(visualID) ?
+                true : {
+                    isValid: false,
+                    errMsg: (visualID as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ?
+                        'LNG_API_ERROR_CODE_INVALID_VISUAL_ID_MASK' :
+                        'LNG_API_ERROR_CODE_DUPLICATE_VISUAL_ID',
+                    errMsgData: {
+                        mask: visualIdRealMask
+                    }
+                };
         });
     }
 }

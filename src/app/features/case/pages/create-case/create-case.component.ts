@@ -23,6 +23,7 @@ import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType }
 import { EntityModel } from '../../../../core/models/entity.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
     selector: 'app-create-case',
@@ -107,8 +108,9 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                 this.caseIdMaskValidator = Observable.create((observer) => {
                     this.caseDataService.checkCaseVisualIDValidity(
                         this.selectedOutbreak.id,
+                        this.visualIDTranslateData.mask,
                         this.caseData.visualId
-                    ).subscribe((isValid: boolean) => {
+                    ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
                         observer.next(isValid);
                         observer.complete();
                     });

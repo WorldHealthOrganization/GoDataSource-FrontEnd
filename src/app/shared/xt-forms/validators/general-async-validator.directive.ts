@@ -8,8 +8,8 @@ import { Constants } from '../../../core/models/constants';
 
 export interface IGeneralAsyncValidatorResponse {
     isValid: boolean;
-    errMsg: string;
-    errMsgData: any;
+    errMsg?: string;
+    errMsgData?: any;
 }
 
 /**

@@ -151,6 +151,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                         this.contactIdMaskValidator = Observable.create((observer) => {
                             this.contactDataService.checkContactVisualIDValidity(
                                 selectedOutbreak.id,
+                                this.visualIDTranslateData.mask,
                                 this.contactData.visualId
                             ).subscribe((isValid: boolean) => {
                                 observer.next(isValid);
