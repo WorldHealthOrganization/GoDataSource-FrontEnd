@@ -44,7 +44,8 @@ export const EnglishUsLang = {
         /**
          * uiAPIErrors
          */
-        'LNG_API_ERROR_CODE_REFERENCE_DATA_ENTRY_IN_USE' : '{{entryValue}} is in use and cannot be deleted'
+        'LNG_API_ERROR_CODE_REFERENCE_DATA_ENTRY_IN_USE' : '{{entryValue}} is in use and cannot be deleted',
+
         /**
          * REMOVE
          */
