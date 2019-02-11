@@ -390,7 +390,8 @@ export class CaseDataService {
                     personId: personId
                 }
             ).catch((response: Error | VisualIdErrorModel) => {
-                return (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ?
+                return (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ||
+                (response as VisualIdErrorModel).code === VisualIdErrorModelCode.DUPLICATE_VISUAL_ID ?
                     Observable.of(
                         this.modelHelper.getModelInstance(
                             VisualIdErrorModel,
