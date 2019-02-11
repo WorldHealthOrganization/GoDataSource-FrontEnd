@@ -39,7 +39,12 @@ export const EnglishUsLang = {
          * uiChronologyCasePage
          */
         'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_START_DATE': '{{type}} start date',
-        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_END_DATE': '{{type}} end date'
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_END_DATE': '{{type}} end date',
+
+        /**
+         * uiCommonButtons
+         */
+        'LNG_COMMON_BUTTON_BACK_TO_LOGIN': 'Back to login',
 
         /**
          * REMOVE
