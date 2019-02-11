@@ -8,7 +8,7 @@
         "build": "ng build --prod --aot --build-optimizer",
         "build-high-memory": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build --prod --aot --build-optimizer",
         "test": "ng test",
-        "test-dev": "ng test --config karma.conf.dev.js",
+        "test-debug": "ng test --config karma.conf.dev.js",
         "lint": "ng lint",
         "e2e": "ng e2e"
     },
