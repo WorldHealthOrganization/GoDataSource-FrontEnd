@@ -1,4 +1,4 @@
-import { TestBed, async, ComponentFixture, inject, fakeAsync } from '@angular/core/testing';
+import { TestBed, async, ComponentFixture, fakeAsync } from '@angular/core/testing';
 import { CreateCaseComponent } from './create-case.component';
 import { SharedModule } from '../../../../shared/shared.module';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -40,13 +40,11 @@ describe('CreateCaseComponent', () => {
             .compileComponents()
             .then(() => {
                 fixture = TestBed.createComponent(CreateCaseComponent);
-
                 comp = fixture.componentInstance;
             });
     }));
 
-    it(`personal form should be valid with mandatory fields only`, async(inject(
-        [],
+    it(`personal form should be valid with mandatory fields only`, async(
         () => {
             fixture.detectChanges();
             fixture.whenStable().then(() => {
@@ -55,10 +53,9 @@ describe('CreateCaseComponent', () => {
                 expect(comp.personalForm.invalid).toBeFalsy();
             });
         }
-    )));
+    ));
 
-    it(`personal form should have mandatory fields: first name, date of reporting`, async(inject(
-        [],
+    it(`personal form should have mandatory fields: first name, date of reporting`, async(
         () => {
             fixture.detectChanges();
             fixture.whenStable().then(() => {
@@ -74,10 +71,9 @@ describe('CreateCaseComponent', () => {
                 }
             });
         }
-    )));
+    ));
 
-    it(`infection form should be valid with mandatory fields only`, async(inject(
-        [],
+    it(`infection form should be valid with mandatory fields only`, async(
         () => {
             fixture.detectChanges();
             fixture.whenStable().then(() => {
@@ -86,10 +82,9 @@ describe('CreateCaseComponent', () => {
                 expect(comp.infectionForm.invalid).toBeFalsy();
             });
         }
-    )));
+    ));
 
-    it(`infection form should have mandatory fields: classification, date of onset`, async(inject(
-        [],
+    it(`infection form should have mandatory fields: classification, date of onset`, async(
         () => {
             fixture.detectChanges();
             fixture.whenStable().then(() => {
@@ -105,10 +100,9 @@ describe('CreateCaseComponent', () => {
                 }
             });
         }
-    )));
+    ));
 
-    it(`date of onset should be equal to or greater than date of infection`, async(inject(
-        [],
+    it(`date of onset should be equal to or greater than date of infection`, async(
         () => {
             fixture.detectChanges();
             fixture.whenStable().then(() => {
@@ -131,10 +125,9 @@ describe('CreateCaseComponent', () => {
                 expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeTruthy();
             });
         }
-    )));
+    ));
 
-    it(`date of infection should be equal to or lower than date of onset`, async(inject(
-        [],
+    it(`date of infection should be equal to or lower than date of onset`, async(
         () => {
             fixture.detectChanges();
             fixture.whenStable().then(() => {
@@ -157,10 +150,9 @@ describe('CreateCaseComponent', () => {
                 expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeFalsy();
             });
         }
-    )));
+    ));
 
-    it(`date of onset should be equal to or lower than date of outcome`, async(inject(
-        [],
+    it(`date of onset should be equal to or lower than date of outcome`, async(
         () => {
             fixture.detectChanges();
             fixture.whenStable().then(() => {
@@ -183,10 +175,9 @@ describe('CreateCaseComponent', () => {
                 expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeTruthy();
             });
         }
-    )));
+    ));
 
-    it(`date of outcome should be equal to or greater than date of onset`, async(inject(
-        [],
+    it(`date of outcome should be equal to or greater than date of onset`, async(
         () => {
             fixture.detectChanges();
             fixture.whenStable().then(() => {
@@ -209,5 +200,5 @@ describe('CreateCaseComponent', () => {
                 expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeFalsy();
             });
         }
-    )));
+    ));
 });
