@@ -59,6 +59,9 @@ describe('CreateCaseComponent', () => {
         () => {
             fixture.detectChanges();
             fixture.whenStable().then(() => {
+                // form should be invalid
+                expect(comp.personalForm.invalid).toBeTruthy();
+
                 for (const fieldName in comp.personalForm.controls) {
                     const control = comp.personalForm.controls[fieldName];
 
@@ -88,6 +91,9 @@ describe('CreateCaseComponent', () => {
         () => {
             fixture.detectChanges();
             fixture.whenStable().then(() => {
+                // form should be invalid
+                expect(comp.infectionForm.invalid).toBeTruthy();
+
                 for (const fieldName in comp.infectionForm.controls) {
                     const control = comp.infectionForm.controls[fieldName];
 
@@ -106,23 +112,30 @@ describe('CreateCaseComponent', () => {
         () => {
             fixture.detectChanges();
             fixture.whenStable().then(() => {
+                jasmine.clock().install();
+
                 // equal
                 comp.infectionForm.controls['dateOfInfection'].setValue('2019-01-01');
                 comp.infectionForm.controls['dateOfOnset'].setValue('2019-01-01');
+                jasmine.clock().tick(500);
                 expect(comp.infectionForm.controls['dateOfInfection'].invalid).toBeFalsy();
                 expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeFalsy();
 
                 // lower than
                 comp.infectionForm.controls['dateOfInfection'].setValue('2019-01-01');
                 comp.infectionForm.controls['dateOfOnset'].setValue('2019-01-02');
+                jasmine.clock().tick(500);
                 expect(comp.infectionForm.controls['dateOfInfection'].invalid).toBeFalsy();
                 expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeFalsy();
 
                 // greater than
                 comp.infectionForm.controls['dateOfInfection'].setValue('2019-01-02');
                 comp.infectionForm.controls['dateOfOnset'].setValue('2019-01-01');
-                expect(comp.infectionForm.controls['dateOfInfection'].invalid).toBeFalsy();
+                jasmine.clock().tick(500);
+                expect(comp.infectionForm.controls['dateOfInfection'].invalid).toBeTruthy();
                 expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeTruthy();
+
+                jasmine.clock().uninstall();
             });
         }
     ));
@@ -131,23 +144,30 @@ describe('CreateCaseComponent', () => {
         () => {
             fixture.detectChanges();
             fixture.whenStable().then(() => {
+                jasmine.clock().install();
+
                 // equal
                 comp.infectionForm.controls['dateOfOnset'].setValue('2019-01-01');
                 comp.infectionForm.controls['dateOfInfection'].setValue('2019-01-01');
+                jasmine.clock().tick(500);
                 expect(comp.infectionForm.controls['dateOfInfection'].invalid).toBeFalsy();
                 expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeFalsy();
 
                 // lower than
                 comp.infectionForm.controls['dateOfOnset'].setValue('2019-01-02');
                 comp.infectionForm.controls['dateOfInfection'].setValue('2019-01-01');
+                jasmine.clock().tick(500);
                 expect(comp.infectionForm.controls['dateOfInfection'].invalid).toBeFalsy();
                 expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeFalsy();
 
                 // greater than
                 comp.infectionForm.controls['dateOfOnset'].setValue('2019-01-01');
                 comp.infectionForm.controls['dateOfInfection'].setValue('2019-01-02');
+                jasmine.clock().tick(500);
                 expect(comp.infectionForm.controls['dateOfInfection'].invalid).toBeTruthy();
-                expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeFalsy();
+                expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeTruthy();
+
+                jasmine.clock().uninstall();
             });
         }
     ));
@@ -156,23 +176,30 @@ describe('CreateCaseComponent', () => {
         () => {
             fixture.detectChanges();
             fixture.whenStable().then(() => {
+                jasmine.clock().install();
+
                 // equal
                 comp.infectionForm.controls['dateOfOutcome'].setValue('2019-01-01');
                 comp.infectionForm.controls['dateOfOnset'].setValue('2019-01-01');
+                jasmine.clock().tick(500);
                 expect(comp.infectionForm.controls['dateOfOutcome'].invalid).toBeFalsy();
                 expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeFalsy();
 
                 // lower than
                 comp.infectionForm.controls['dateOfOutcome'].setValue('2019-01-02');
                 comp.infectionForm.controls['dateOfOnset'].setValue('2019-01-01');
+                jasmine.clock().tick(500);
                 expect(comp.infectionForm.controls['dateOfOutcome'].invalid).toBeFalsy();
                 expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeFalsy();
 
                 // greater than
                 comp.infectionForm.controls['dateOfOutcome'].setValue('2019-01-01');
                 comp.infectionForm.controls['dateOfOnset'].setValue('2019-01-02');
-                expect(comp.infectionForm.controls['dateOfOutcome'].invalid).toBeFalsy();
+                jasmine.clock().tick(500);
+                expect(comp.infectionForm.controls['dateOfOutcome'].invalid).toBeTruthy();
                 expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeTruthy();
+
+                jasmine.clock().uninstall();
             });
         }
     ));
@@ -181,23 +208,30 @@ describe('CreateCaseComponent', () => {
         () => {
             fixture.detectChanges();
             fixture.whenStable().then(() => {
+                jasmine.clock().install();
+
                 // equal
                 comp.infectionForm.controls['dateOfOnset'].setValue('2019-01-01');
                 comp.infectionForm.controls['dateOfOutcome'].setValue('2019-01-01');
+                jasmine.clock().tick(500);
                 expect(comp.infectionForm.controls['dateOfOutcome'].invalid).toBeFalsy();
                 expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeFalsy();
 
                 // lower than
                 comp.infectionForm.controls['dateOfOnset'].setValue('2019-01-01');
                 comp.infectionForm.controls['dateOfOutcome'].setValue('2019-01-02');
+                jasmine.clock().tick(500);
                 expect(comp.infectionForm.controls['dateOfOutcome'].invalid).toBeFalsy();
                 expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeFalsy();
 
                 // greater than
                 comp.infectionForm.controls['dateOfOnset'].setValue('2019-01-02');
                 comp.infectionForm.controls['dateOfOutcome'].setValue('2019-01-01');
+                jasmine.clock().tick(500);
                 expect(comp.infectionForm.controls['dateOfOutcome'].invalid).toBeTruthy();
-                expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeFalsy();
+                expect(comp.infectionForm.controls['dateOfOnset'].invalid).toBeTruthy();
+
+                jasmine.clock().uninstall();
             });
         }
     ));
