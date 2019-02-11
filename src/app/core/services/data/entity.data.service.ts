@@ -266,6 +266,10 @@ export class EntityDataService {
                 entity.occupation
             ));
             lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+                entity.visualId
+            ));
+            lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
                 entity.dateOfReporting ?
                         moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
