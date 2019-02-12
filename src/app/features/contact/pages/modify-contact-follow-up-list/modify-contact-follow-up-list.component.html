@@ -87,7 +87,7 @@
                                             type="button"
                                             mat-icon-button
                                             [title]="'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_COPY_BUTTON_TITLE' | translate"
-                                            (click)="copyValueToEmptyFields('statusId', followUpData)">
+                                            (click)="copyValueToEmptyFields('statusId', followUpData, undefined, checkIfStatusIsEmpty)">
                                             <span class="xt-icon">fileCopy</span>
                                         </button>
                                     </div>

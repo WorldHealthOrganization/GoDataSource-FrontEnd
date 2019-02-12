@@ -3,7 +3,7 @@ import { Subscriber } from 'rxjs/Subscriber';
 
 export class DebounceTimeCaller {
     // The ID value of the timer
-    protected refreshTimeoutID: number = null;
+    protected refreshTimeoutID: any = null;
 
     // initialize
     constructor(

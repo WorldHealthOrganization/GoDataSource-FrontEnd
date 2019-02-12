@@ -121,6 +121,16 @@ export class Constants {
     };
 
     /**
+     * FollowUp status
+     */
+    static FOLLOW_UP_STATUS = {
+        NO_DATA : {
+            label: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED',
+            value: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED'
+        }
+    };
+
+    /**
      * System settings backup modules
      */
     static SYSTEM_BACKUP_MODULES = {
