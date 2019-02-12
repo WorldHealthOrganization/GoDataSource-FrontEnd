@@ -77,8 +77,8 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                <a *ngIf="item.firstCase" [routerLink]="['/transmission-chains']" [queryParams]="{ personId: item.firstCase.id, selectedEntityType: EntityType.CASE }">
-                    {{ item.firstCase.name }}
+                <a *ngIf="item.rootPerson" [routerLink]="['/transmission-chains']" [queryParams]="{ personId: item.rootPerson.id, selectedEntityType: item.rootPerson.type }">
+                    {{ item.rootPerson.name }}
                 </a>
             </mat-cell>
         </ng-container>
