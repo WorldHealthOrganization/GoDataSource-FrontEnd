@@ -95,9 +95,7 @@
                                 [tooltipTranslateData]="visualIDTranslateData"
                                 [maxlength]="255"
                                 app-general-async-validator
-                                [asyncValidatorObservable]="contactIdMaskValidator"
-                                asyncValidatorErrMsg="LNG_PAGE_CREATE_CONTACT_INVALID_CASE_ID"
-                                [asyncValidatorErrMsgTranslateData]="visualIDTranslateData">
+                                [asyncValidatorObservable]="contactIdMaskValidator">
                             </app-form-input>
 
                             <app-form-datepicker
