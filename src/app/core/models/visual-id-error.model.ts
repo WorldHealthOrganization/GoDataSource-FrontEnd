@@ -1,7 +1,8 @@
 import * as _ from 'lodash';
 
 export enum VisualIdErrorModelCode {
-    INVALID_VISUAL_ID_MASK = 'INVALID_VISUAL_ID_MASK'
+    INVALID_VISUAL_ID_MASK = 'INVALID_VISUAL_ID_MASK',
+    DUPLICATE_VISUAL_ID = 'DUPLICATE_VISUAL_ID'
 }
 
 export class VisualIdErrorModel {

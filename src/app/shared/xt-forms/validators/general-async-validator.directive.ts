@@ -6,6 +6,15 @@ import 'rxjs/add/observable/timer';
 import 'rxjs/add/operator/switchMap';
 import { Constants } from '../../../core/models/constants';
 
+export interface IGeneralAsyncValidatorResponse {
+    isValid: boolean;
+    errMsg?: string;
+    errMsgData?: any;
+}
+
+/**
+ * Async validator
+ */
 @Directive({
     selector: '[app-general-async-validator][ngModel]',
     providers: [
@@ -16,12 +25,8 @@ import { Constants } from '../../../core/models/constants';
         }
     ]
 })
-
-/**
- * Async validator
- */
 export class GeneralAsyncValidatorDirective implements AsyncValidator {
-    @Input() asyncValidatorObservable: Observable<boolean>;
+    @Input() asyncValidatorObservable: Observable<boolean | IGeneralAsyncValidatorResponse>;
     @Input() asyncValidatorErrMsg: string = 'LNG_FORM_VALIDATION_ERROR_GENERAL_ASYNC';
     @Input() asyncValidatorErrMsgTranslateData: {
         [key: string]: any
@@ -36,14 +41,25 @@ export class GeneralAsyncValidatorDirective implements AsyncValidator {
         } else {
             return Observable.timer(Constants.DEFAULT_DEBOUNCE_TIME_MILLISECONDS).switchMap(() => {
                 return this.asyncValidatorObservable
-                    .map((isValid: boolean) => {
-                        return isValid ?
-                            null : {
-                                generalAsyncValidatorDirective: {
-                                    err: this.asyncValidatorErrMsg,
-                                    details: this.asyncValidatorErrMsgTranslateData
-                                }
-                            };
+                    .map((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                        if (_.isBoolean(isValid)) {
+                            return isValid ?
+                                null : {
+                                    generalAsyncValidatorDirective: {
+                                        err: this.asyncValidatorErrMsg,
+                                        details: this.asyncValidatorErrMsgTranslateData
+                                    }
+                                };
+                        } else {
+                            const data: IGeneralAsyncValidatorResponse = isValid as IGeneralAsyncValidatorResponse;
+                            return data.isValid ?
+                                null : {
+                                    generalAsyncValidatorDirective: {
+                                        err: data.errMsg ? data.errMsg : this.asyncValidatorErrMsg,
+                                        details: data.errMsgData ? data.errMsgData : this.asyncValidatorErrMsgTranslateData
+                                    }
+                                };
+                        }
                     });
             });
         }

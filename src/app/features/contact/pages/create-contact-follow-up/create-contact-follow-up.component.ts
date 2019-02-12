@@ -18,6 +18,7 @@ import { Observable } from 'rxjs/Observable';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-create-follow-up',
@@ -59,7 +60,7 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
     ngOnInit() {
         // daily status types
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
-
+        this.followUpData.statusId = Constants.FOLLOW_UP_STATUS.NO_DATA.value;
         // retrieve query params
         this.route.params
             .subscribe((params: {contactId}) => {

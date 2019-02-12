@@ -197,6 +197,10 @@ export class EntityDataService {
                 entity.classification
             ));
             lightObject.push(new LabelValuePair(
+                'LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID',
+                entity.visualId
+            ));
+            lightObject.push(new LabelValuePair(
                 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
                 entity.riskLevel
             ));
@@ -260,6 +264,10 @@ export class EntityDataService {
             lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
                 entity.occupation
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+                entity.visualId
             ));
             lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',

@@ -121,6 +121,16 @@ export class Constants {
     };
 
     /**
+     * FollowUp status
+     */
+    static FOLLOW_UP_STATUS = {
+        NO_DATA : {
+            label: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED',
+            value: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED'
+        }
+    };
+
+    /**
      * System settings backup modules
      */
     static SYSTEM_BACKUP_MODULES = {
@@ -724,6 +734,18 @@ export class Constants {
         RISK: {
             label: 'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_RISK',
             value: 'riskLevel'
+        }
+    };
+
+    //  gantt chart types
+    static GANTT_CHART_TYPES = {
+        GANTT_CHART_LAB_TEST: {
+            label: 'LNG_PAGE_GANTT_CHART_LAB_TEST_TITLE',
+            value: 'GANTT_CHART_LAB_TEST'
+        },
+        GANTT_CHART_HOSPITALIZATION_ISOLATION: {
+            label: 'LNG_PAGE_GANTT_CHART_HOSPITALIZATION_ISOLATION_TITLE',
+            value: 'GANTT_CHART_HOSPITALIZATION_ISOLATION'
         }
     };
 
