@@ -13,7 +13,9 @@ import * as moment from 'moment';
 import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import * as _ from 'lodash';
+import { MetricCasesDelayBetweenOnsetHospitalizationModel } from '../../models/metrics/metric-cases-delay-between-onset-hospitalization.model';
 import { Constants } from '../../models/constants';
+import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Injectable()
 export class CaseDataService {
@@ -334,6 +336,23 @@ export class CaseDataService {
     }
 
     /**
+     * get delay between date of onset and date of hospitalization / isolation - first - gantt chart
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<MetricCasesDelayBetweenOnsetHospitalizationModel[]>}
+     */
+    getDelayBetweenOnsetAndHospitalization(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricCasesDelayBetweenOnsetHospitalizationModel[]> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/cases/delay-onset-hospitalization?filter=${filter}`),
+            MetricCasesDelayBetweenOnsetHospitalizationModel
+        );
+    }
+
+    /**
      *  Restore a case that was deleted
      * @param {string} outbreakId
      * @param {string} caseId
@@ -372,7 +391,8 @@ export class CaseDataService {
                     personId: personId
                 }
             ).catch((response: Error | VisualIdErrorModel) => {
-                return (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ?
+                return (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ||
+                (response as VisualIdErrorModel).code === VisualIdErrorModelCode.DUPLICATE_VISUAL_ID ?
                     Observable.of(
                         this.modelHelper.getModelInstance(
                             VisualIdErrorModel,
@@ -386,20 +406,31 @@ export class CaseDataService {
     /**
      * Check if visual ID is valid
      * @param outbreakId
+     * @param visualIdRealMask
      * @param visualIdMask
      * @param personId Optional
      */
     checkCaseVisualIDValidity(
         outbreakId: string,
+        visualIdRealMask: string,
         visualIdMask: string,
         personId?: string
-    ): Observable<boolean> {
+    ): Observable<boolean | IGeneralAsyncValidatorResponse> {
         return this.generateCaseVisualID(
             outbreakId,
             visualIdMask,
             personId
         ).map((visualID: string | VisualIdErrorModel) => {
-            return _.isString(visualID);
+            return _.isString(visualID) ?
+                true : {
+                    isValid: false,
+                    errMsg: (visualID as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ?
+                        'LNG_API_ERROR_CODE_INVALID_VISUAL_ID_MASK' :
+                        'LNG_API_ERROR_CODE_DUPLICATE_VISUAL_ID',
+                    errMsgData: {
+                        mask: visualIdRealMask
+                    }
+                };
         });
     }
 }

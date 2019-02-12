@@ -86,7 +86,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                     this.referenceDataDataService
                         .deleteEntry(entry.id)
                         .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err, {entryValue: entry.value});
                             return ErrorObservable.create(err);
                         })
                         .switchMap(() => {

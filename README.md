@@ -80,7 +80,18 @@ Use the IDE of your choice (Webstorm recommended).
     - If the changes are good to be merged in master, the Reviewer will Approve the PR and then merge it in master
     - If the PR requires any changes, the Reviewer will add the comments and will inform the dev when the code review is finished
         - Dev must address all the comments in his PR, fix the code where necessary and REPLY to all comments, so the Reviewer knows that none of the comments were missed
-  
+4. Before assigning the ticket to QA, the developer must close the branch(es) that were merged and are not needed anymore.
+
+### Running unit tests
+
+Run the following command to check if the unit tests are passing:
+
+    npm run test
+    
+If you want to debug or run the unit tests one by one, run the following command and use Chrome browser and Developer Tools for debugging (as usual):
+
+    npm run test-debug
+     
 ### Managing Language Translations
 
 1. Go.Data supports multiple languages, the base language being English-US.

@@ -14,6 +14,9 @@ import { LoadingDialogModel } from '../../../../shared/components/index';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { GanttChartDelayOnsetDashletComponent } from '../../components/gantt-chart-delay-onset-dashlet/gantt-chart-delay-onset-dashlet.component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { Observable } from 'rxjs/Observable';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-gantt-chart',
@@ -39,12 +42,19 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
 
     @ViewChild('ganttChart') private ganttChart: GanttChartDelayOnsetDashletComponent;
 
+    ganttChartTypes: Observable<any[]>;
+
+    ganttChartType: any = Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value;
+
+    Constants = Constants;
+
     constructor(
         private router: Router,
         private domService: DomService,
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService,
         private dialogService: DialogService,
+        private genericDataService: GenericDataService,
         protected snackbarService: SnackbarService
     ) {
         super();
@@ -53,6 +63,8 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
     ngOnInit() {
         // initialize Side Filters
         this.initializeSideFilters();
+        // load gantt types
+        this.ganttChartTypes = this.genericDataService.getGanttChartTypes();
     }
 
     /**
@@ -105,8 +117,13 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
             this.snackbarService.showError('LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL');
         } else {
             this.showLoadingDialog();
+            let ganttChartName = 'app-gantt-chart-delay-onset-dashlet svg';
+            if (this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value) {
+                ganttChartName = 'app-gantt-chart-delay-onset-hospitalization-dashlet svg';
+            }
+
             this.domService
-                .getPNGBase64('app-gantt-chart-delay-onset-dashlet svg', '#tempCanvas')
+                .getPNGBase64(ganttChartName, '#tempCanvas')
                 .subscribe((pngBase64) => {
                     this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
                         .subscribe((blob) => {
@@ -149,5 +166,12 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
             this.loadingDialog.close();
             this.loadingDialog = null;
         }
+    }
+
+    /**
+     * Switch between gantt types
+     */
+    updateChartType($event) {
+        this.ganttChartType = $event.value;
     }
 }

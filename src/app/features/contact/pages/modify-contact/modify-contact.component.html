@@ -101,9 +101,7 @@
                                 [maxlength]="255"
                                 [disabled]="viewOnly"
                                 app-general-async-validator
-                                [asyncValidatorObservable]="contactIdMaskValidator"
-                                asyncValidatorErrMsg="LNG_PAGE_MODIFY_CONTACT_INVALID_CONTACT_ID"
-                                [asyncValidatorErrMsgTranslateData]="visualIDTranslateData">
+                                [asyncValidatorObservable]="contactIdMaskValidator">
                             </app-form-input>
 
                             <app-form-datepicker

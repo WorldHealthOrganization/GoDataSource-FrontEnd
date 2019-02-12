@@ -26,23 +26,21 @@ export class ReferenceDataDataService {
         // retrieve categories
         this.referenceDataListMap$ = this.getCategoriesList()
             .mergeMap((categories: ReferenceDataCategoryModel[]) => {
-                return this.modelHelper.mapObservableListToModel(
-                    this.http.get(`reference-data`),
-                    ReferenceDataEntryModel
-                ).map((referenceData: ReferenceDataEntryModel[]) => {
-                    // map entries by category id
-                    const entriesMap = _.groupBy(referenceData, 'categoryId');
+                return this.getEntries()
+                    .map((referenceData: ReferenceDataEntryModel[]) => {
+                        // map entries by category id
+                        const entriesMap = _.groupBy(referenceData, 'categoryId');
 
-                    // group entries by category
-                    return _.map(categories, (category: ReferenceDataCategoryModel) => {
-                        // find all entries for current category
-                        category.entries = entriesMap[category.id];
+                        // group entries by category
+                        return _.map(categories, (category: ReferenceDataCategoryModel) => {
+                            // find all entries for current category
+                            category.entries = entriesMap[category.id];
 
-                        return category;
+                            return category;
+                        });
+                    }).do((referenceDataResult) => {
+                        this.cacheService.set(CacheKey.REFERENCE_DATA, referenceDataResult);
                     });
-                }).do((referenceDataResult) => {
-                    this.cacheService.set(CacheKey.REFERENCE_DATA, referenceDataResult);
-                });
             }).share();
     }
 
@@ -94,7 +92,7 @@ export class ReferenceDataDataService {
     getReferenceDataByCategoryAsLabelValue(categoryId: ReferenceDataCategory): Observable<LabelValuePair[]> {
         return this.getReferenceDataByCategory(categoryId)
             .map((data: ReferenceDataCategoryModel) => {
-                return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
+                return _.map(_.get(data, 'entries'), (entry: ReferenceDataEntryModel) =>
                     new LabelValuePair(
                         entry.value,
                         entry.id,
@@ -104,6 +102,13 @@ export class ReferenceDataDataService {
                     )
                 );
             });
+    }
+
+    getEntries(): Observable<ReferenceDataEntryModel[]> {
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`reference-data`),
+            ReferenceDataEntryModel
+        );
     }
 
     /**
