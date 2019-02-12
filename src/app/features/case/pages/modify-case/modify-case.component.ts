@@ -31,6 +31,7 @@ import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, Dialog
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { MatDialogRef } from '@angular/material';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
     selector: 'app-modify-case',
@@ -274,9 +275,10 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                     this.caseIdMaskValidator = Observable.create((observer) => {
                         this.caseDataService.checkCaseVisualIDValidity(
                             this.selectedOutbreak.id,
+                            this.visualIDTranslateData.mask,
                             this.caseData.visualId,
                             this.caseData.id
-                        ).subscribe((isValid: boolean) => {
+                        ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
                             observer.next(isValid);
                             observer.complete();
                         });

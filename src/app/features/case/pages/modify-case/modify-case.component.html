@@ -102,9 +102,7 @@
                                 [maxlength]="255"
                                 [disabled]="viewOnly"
                                 app-general-async-validator
-                                [asyncValidatorObservable]="caseIdMaskValidator"
-                                asyncValidatorErrMsg="LNG_PAGE_MODIFY_CASE_INVALID_CASE_ID"
-                                [asyncValidatorErrMsgTranslateData]="visualIDTranslateData">
+                                [asyncValidatorObservable]="caseIdMaskValidator">
                             </app-form-input>
 
                             <div fxFlex><!-- placeholder --></div>

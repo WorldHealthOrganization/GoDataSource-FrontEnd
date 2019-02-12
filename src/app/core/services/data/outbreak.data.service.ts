@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/takeUntil';
+import 'rxjs/add/operator/catch';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { UserRoleModel } from '../../models/user-role.model';
 import { StorageKey, StorageService } from '../helper/storage.service';
