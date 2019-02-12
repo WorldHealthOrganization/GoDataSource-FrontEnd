@@ -7,6 +7,7 @@ import * as _ from 'lodash';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { ChronologyItem } from '../../../../shared/components/chronology/chronology.component';
+import moment = require('moment');
 
 @Component({
     selector: 'app-view-chronology-contact',
@@ -51,6 +52,7 @@ export class ViewChronologyContactComponent implements OnInit {
                                     this.contactData
                                 )
                             );
+                            console.log(this.contactData);
 
                             // create entries array.
                             const chronologyEntries: ChronologyItem[] = [];
@@ -68,6 +70,27 @@ export class ViewChronologyContactComponent implements OnInit {
                                 chronologyEntries.push(new ChronologyItem({
                                     date: this.contactData.dateBecomeContact,
                                     label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT'
+                                }));
+                            }
+
+                            if (!_.isEmpty(this.contactData.followUp.startDate)) {
+                                chronologyEntries.push(new ChronologyItem({
+                                    date: this.contactData.followUp.startDate,
+                                    label: 'followupSTART date'
+                                }));
+                            }
+
+                            if (!_.isEmpty(this.contactData.followUp.endDate)) {
+                                chronologyEntries.push(new ChronologyItem({
+                                    date: this.contactData.followUp.endDate,
+                                    label: 'followupEND date'
+                                }));
+                            }
+
+                            if (!_.isEmpty(this.contactData.followUp.status)) {
+                                chronologyEntries.push(new ChronologyItem({
+                                    date: moment(),
+                                    label: this.contactData.followUp.status
                                 }));
                             }
 
