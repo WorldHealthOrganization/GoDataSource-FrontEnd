@@ -52,6 +52,12 @@ export const EnglishUsLang = {
          * uiCommonButtons
          */
         'LNG_COMMON_BUTTON_BACK_TO_LOGIN': 'Back to login',
+
+        /**
+         * uiContactFields
+         */
+        'LNG_CONTACT_FIELD_LABEL_DATE_OF_START_OF_FOLLOWUP': 'Follow-up start date',
+
         /**
          * REMOVE
          */

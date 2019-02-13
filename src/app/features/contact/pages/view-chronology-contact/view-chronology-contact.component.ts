@@ -7,7 +7,9 @@ import * as _ from 'lodash';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { ChronologyItem } from '../../../../shared/components/chronology/chronology.component';
-import moment = require('moment');
+import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
 
 @Component({
     selector: 'app-view-chronology-contact',
@@ -26,7 +28,8 @@ export class ViewChronologyContactComponent implements OnInit {
     constructor(
         protected route: ActivatedRoute,
         private contactDataService: ContactDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private followUpsDataService: FollowUpsDataService,
     ) {}
 
     ngOnInit() {
@@ -52,54 +55,74 @@ export class ViewChronologyContactComponent implements OnInit {
                                     this.contactData
                                 )
                             );
-                            console.log(this.contactData);
 
                             // create entries array.
                             const chronologyEntries: ChronologyItem[] = [];
 
-                            // date of onset
-                            if (!_.isEmpty(this.contactData.dateOfReporting)) {
-                                chronologyEntries.push(new ChronologyItem({
-                                    date: this.contactData.dateOfReporting,
-                                    label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'
-                                }));
-                            }
+                            // build query to get the followUps for specified contact
+                            const qb = new RequestQueryBuilder;
+                            qb.filter.byEquality(
+                                'personId',
+                                this.contactData.id
+                            );
+                            // get followUps for specified contact
+                            this.followUpsDataService
+                                .getFollowUpsList(selectedOutbreak.id, qb)
+                                .subscribe((followUps: FollowUpModel[]) => {
+                                    // build chronology items from followUp
+                                    _.forEach(followUps, (followUp: FollowUpModel) => {
+                                        if (!_.isEmpty(followUp.date)) {
+                                            chronologyEntries.push(new ChronologyItem({
+                                                date: followUp.date,
+                                                label: followUp.statusId
+                                            }));
+                                        }
+                                    });
 
-                            // date become contact
-                            if (!_.isEmpty(this.contactData.dateBecomeContact)) {
-                                chronologyEntries.push(new ChronologyItem({
-                                    date: this.contactData.dateBecomeContact,
-                                    label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT'
-                                }));
-                            }
+                                    // date of onset
+                                    if (!_.isEmpty(this.contactData.dateOfReporting)) {
+                                        chronologyEntries.push(new ChronologyItem({
+                                            date: this.contactData.dateOfReporting,
+                                            label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'
+                                        }));
+                                    }
 
-                            if (!_.isEmpty(this.contactData.followUp.startDate)) {
-                                chronologyEntries.push(new ChronologyItem({
-                                    date: this.contactData.followUp.startDate,
-                                    label: 'followupSTART date'
-                                }));
-                            }
+                                    // date become contact
+                                    if (!_.isEmpty(this.contactData.dateBecomeContact)) {
+                                        chronologyEntries.push(new ChronologyItem({
+                                            date: this.contactData.dateBecomeContact,
+                                            label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT'
+                                        }));
+                                    }
 
-                            if (!_.isEmpty(this.contactData.followUp.endDate)) {
-                                chronologyEntries.push(new ChronologyItem({
-                                    date: this.contactData.followUp.endDate,
-                                    label: 'followupEND date'
-                                }));
-                            }
+                                    // follow-up start date
+                                    if (!_.isEmpty(this.contactData.followUp.startDate)) {
+                                        chronologyEntries.push(new ChronologyItem({
+                                            date: this.contactData.followUp.startDate,
+                                            label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_START_OF_FOLLOWUP'
+                                        }));
+                                    }
 
-                            if (!_.isEmpty(this.contactData.followUp.status)) {
-                                chronologyEntries.push(new ChronologyItem({
-                                    date: moment(),
-                                    label: this.contactData.followUp.status
-                                }));
-                            }
+                                    // follow-up end date
+                                    if (!_.isEmpty(this.contactData.followUp.endDate)) {
+                                        chronologyEntries.push(new ChronologyItem({
+                                            date: this.contactData.followUp.endDate,
+                                            label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP'
+                                        }));
+                                    }
 
-                            // set data
-                            this.chronologyEntries = chronologyEntries;
+                                    if (!_.isEmpty(this.contactData.dateOfLastContact)) {
+                                        chronologyEntries.push(new ChronologyItem({
+                                            date: this.contactData.dateOfLastContact,
+                                            label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
+                                        }));
+                                    }
+
+                                    // set data
+                                    this.chronologyEntries = chronologyEntries;
+                            });
                         });
                 });
-
-
         });
     }
 }
