@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
 import { Constants } from '../../../core/models/constants';
 import * as _ from 'lodash';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -25,15 +26,11 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     @Output() viewTypeChanged = new EventEmitter<any>();
     @Output() changeEditMode = new EventEmitter<boolean>();
 
+    Constants = Constants;
     cy: any;
     container: string = 'cy';
-
-    Constants = Constants;
-
     transmissionChainViewTypes$: Observable<any[]>;
     timelineViewType: string = 'horizontal';
-    maxTimelineIndex: number = 0;
-
     // show/hide legend?
     showLegend: boolean = true;
     // toggle edit mode
@@ -119,30 +116,19 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
             // calculate position on y axis based on the index of the node from that respective date
             if (!_.isEmpty(nodeData.dateTimeline)) {
-                const nodesArray = this.timelineDates[nodeData.dateTimeline];
-                let nodeIndex = 1;
-                if (nodesArray.length > 1) {
-                    nodeIndex = _.findIndex(
-                        nodesArray,
-                        function (n) {
-                            return n === nodeData.id;
-                        });
+                let nodeIndex = -1;
+                if (nodeData.nodeType === 'checkpoint') {
+                    nodeIndex = -1;
+                } else {
+                    nodeIndex = this.timelineDatesRanks[nodeData.dateTimeline][nodeData.id];
                 }
                 if (this.timelineViewType === 'horizontal') {
                     // using 100 px as it looks fine
-                    if (nodeData.nodeType === 'checkpoint') {
-                        posY = -100;
-                    } else {
-                        posY = (nodeIndex) * 100;
-                    }
+                    posY = (nodeIndex) * 100;
                 } else {
                     // timeline vertical view
                     // using 200 px as it looks fine
-                    if (nodeData.nodeType === 'checkpoint') {
-                        posX = -200;
-                    } else {
-                        posX = (nodeIndex) * 200;
-                    }
+                    posX = (nodeIndex) * 200;
                 }
                 return {x: posX, y: posY};
             }
@@ -151,7 +137,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     // selected layout
     layout: any;
-
     defaultZoom: any = {
         min: 0.02,
         max: 4
@@ -226,11 +211,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     showLoading: boolean = true;
     datesArray: string[] = [];
-    timelineDates: any = {};
-
-    timelineNodes: any = [];
-
-    timelineNodesIndexes: any = [];
+    timelineDatesRanks: any = {};
 
     constructor(
         private genericDataService: GenericDataService,
@@ -295,33 +276,191 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     }
 
     /**
-     * Generate the array of dates to be used on the timeline view
+     * Generate the array of dates to be used on the timeline views
      */
     calculateTimelineDates() {
         // empty the already set timeline and dates arrays
-        this.timelineDates = {};
         this.datesArray = [];
-
-        this.timelineNodes = [];
-        // loop through nodes to extract the dates ( dateTimeline)
-        _.forEach(this.elements.nodes, (node, key) => {
+        this.timelineDatesRanks = {};
+        const nodes = _.sortBy(this.elements.nodes, 'data.dateTimeline');
+        // loop through all the nodes to set their position based on date and relations
+        _.forEach(nodes, (node, key) => {
+            // check if the node has a date to be taken into consideration
             if (!_.isEmpty(node.data.dateTimeline)) {
-                if (this.timelineDates[node.data.dateTimeline]) {
-                    this.timelineDates[node.data.dateTimeline].push(node.data.id);
-                    if (this.timelineDates[node.data.dateTimeline].length > this.maxTimelineIndex) {
-                        this.maxTimelineIndex = this.timelineDates[node.data.dateTimeline].length;
+                // check if there is already a node added to that date
+                if (this.timelineDatesRanks[node.data.dateTimeline]) {
+                    // check if the node was not already processed - rank / position set
+                    if (!this.timelineDatesRanks[node.data.dateTimeline][node.data.id] &&
+                        this.timelineDatesRanks[node.data.dateTimeline][node.data.id] !== 0) {
+                        this.setNodeRankDate(node);
                     }
                 } else {
-                    this.timelineDates[node.data.dateTimeline] = [];
-                    this.timelineDates[node.data.dateTimeline].push(node.data.id);
-                    this.timelineNodesIndexes[node.data.dateTimeline] = [];
+                    // the node is the first one on the date
+                    this.setFirstNodeOnDate(node);
                 }
+                // check related nodes
+                this.setRelatedNodesRank(node);
                 this.datesArray.push(node.data.dateTimeline);
             }
-
         });
         this.datesArray = _.uniq(this.datesArray);
         this.datesArray = _.sortBy(this.datesArray);
+    }
+
+    /**
+     * return an array with the related nodes
+     * @param nodeId
+     * @returns {any[]}
+     */
+    getRelatedNodes(nodeId) {
+        const relatedNodes = [];
+        _.forEach(this.elements.edges, (edge, key) => {
+            if (edge.data.source === nodeId) {
+                const node = this.getNode(edge.data.target);
+                relatedNodes.push(node);
+            }
+            if (edge.data.target === nodeId) {
+                const node = this.getNode(edge.data.source);
+                relatedNodes.push(node);
+            }
+        });
+        return relatedNodes;
+    }
+
+    /**
+     * Return the node object
+     * @param nodeId
+     * @returns {any}
+     */
+    getNode(nodeId) {
+        let foundNode = null;
+        _.forEach(this.elements.nodes, (node, key) => {
+            if (node.data.id === nodeId) {
+                foundNode = node;
+            }
+        });
+        return foundNode;
+    }
+
+    /**
+     * return the maximum occupied position (rank) on a specific date
+     * @param dateRanks
+     * @returns {number}
+     */
+    getMaxRankDate(dateRanks) {
+        let maxRank = -1;
+        if (dateRanks) {
+            _.forEach(Object.keys(dateRanks), (dateRank) => {
+                if (dateRanks[dateRank] > maxRank) {
+                    maxRank = dateRanks[dateRank];
+                }
+            });
+        }
+        return maxRank;
+    }
+
+    /**
+     * get maximum position between 2 dates
+     * @param startDate
+     * @param endDate
+     * @returns {number}
+     */
+    getMaxRankDateInterval(startDate, endDate) {
+        let maxRank = -1;
+        let sDate = moment(startDate);
+        const eDate = moment(endDate);
+        while (sDate < eDate) {
+            sDate = sDate.add(1, 'days');
+            const maxRankDate = this.getMaxRankDate(this.timelineDatesRanks[sDate.format('YYYY-MM-DD')]);
+            if (maxRankDate > maxRank) {
+                maxRank = maxRankDate;
+            }
+        }
+        return maxRank;
+    }
+
+    /**
+     * determine and set the position of a node on its date - if it's not the first node on the date
+     * @param node
+     */
+    setNodeRankDate(node) {
+        // if the node is checkpoint, then display it on -1 rank
+        if (node.data.nodeType === 'checkpoint') {
+            this.timelineDatesRanks[node.data.dateTimeline][node.data.id] = -1;
+        } else {
+            // get max rank for that date
+            const maxRankDate = this.getMaxRankDate(this.timelineDatesRanks[node.data.dateTimeline]);
+            // set rank to max +_1
+            this.timelineDatesRanks[node.data.dateTimeline][node.data.id] = maxRankDate + 1;
+        }
+    }
+
+    /**
+     * determine and set the position of a node on its date - if it's the first node on the date
+     * @param node
+     */
+    setFirstNodeOnDate(node) {
+        this.timelineDatesRanks[node.data.dateTimeline] = [];
+        if (node.data.nodeType === 'checkpoint') {
+            this.timelineDatesRanks[node.data.dateTimeline][node.data.id] = -1;
+        } else {
+            this.timelineDatesRanks[node.data.dateTimeline][node.data.id] = 0;
+        }
+    }
+
+    /**
+     * determine and set the position for the related nodes.
+     * also block position betwene the initial node and the related node
+     * @param node
+     */
+    setRelatedNodesRank(node) {
+        // check if the node has related nodes and assign ranks to those as well.
+        let maxRankPerParentNode = -1;
+        const relatedNodes = this.getRelatedNodes(node.data.id);
+        if (!_.isEmpty(relatedNodes)) {
+            _.forEach(relatedNodes, (relatedNode, relatedKey) => {
+                // get max rank from the date interval
+                const maxRankPerDateInterval = this.getMaxRankDateInterval(node.data.dateTimeline, relatedNode.data.dateTimeline);
+                let maxRankToBlock = -1;
+                if (this.timelineDatesRanks[relatedNode.data.dateTimeline]) {
+                    // check if node rank was already calculated
+                    if (!this.timelineDatesRanks[relatedNode.data.dateTimeline][relatedNode.data.id]
+                        && this.timelineDatesRanks[relatedNode.data.dateTimeline][relatedNode.data.id] !== 0) {
+                        if (relatedNode.data.nodeType === 'checkpoint') {
+                            this.timelineDatesRanks[relatedNode.data.dateTimeline][relatedNode.data.id] = -1;
+                        } else {
+                            // position of the node should be the maximum between:
+                            // max position from the siblings
+                            // max position from the date interval between the parent node and the related node
+                            // max position from the date
+                            let maxRankDateRelatedNode = this.getMaxRankDate(this.timelineDatesRanks[relatedNode.data.dateTimeline]);
+                            maxRankDateRelatedNode = Math.max(maxRankPerParentNode, maxRankPerDateInterval, maxRankDateRelatedNode);
+                            maxRankToBlock = maxRankDateRelatedNode + 1;
+                            maxRankPerParentNode = maxRankDateRelatedNode + 1;
+                            this.timelineDatesRanks[relatedNode.data.dateTimeline][relatedNode.data.id] = maxRankDateRelatedNode + 1;
+                        }
+                    }
+                } else {
+                    this.timelineDatesRanks[relatedNode.data.dateTimeline] = [];
+                    const maxRankRelatedNode = Math.max(maxRankPerParentNode, maxRankPerDateInterval);
+                    // set the position to max position from its siblings + 1
+                    this.timelineDatesRanks[relatedNode.data.dateTimeline][relatedNode.data.id] = maxRankRelatedNode + 1;
+                    maxRankToBlock = maxRankRelatedNode + 1;
+                    maxRankPerParentNode = maxRankRelatedNode + 1;
+                }
+                // block rank on previous dates
+                let startDate = moment(node.data.dateTimeline);
+                const endDate = moment(relatedNode.data.dateTimeline);
+                // add an entry called maxRank on all the dates between the nodes
+                while (startDate < endDate) {
+                    startDate = startDate.add(1, 'days');
+                    if (!this.timelineDatesRanks[startDate.format('YYYY-MM-DD')]) {
+                        this.timelineDatesRanks[startDate.format('YYYY-MM-DD')] = [];
+                    }
+                    this.timelineDatesRanks[startDate.format('YYYY-MM-DD')]['maxRank'] = maxRankToBlock;
+                }
+            });
+        }
     }
 
     /**
@@ -361,7 +500,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
      */
     showCaseNodesWithoutDates() {
         return (
-            ( this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+            (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
                 || this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
                 || this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value)
             && this.elements
@@ -375,7 +514,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
      */
     showContactNodesWithoutDates() {
         return (
-            ( this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+            (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
                 || this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
                 || this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value)
             && this.elements
@@ -389,7 +528,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
      */
     showEventNodesWithoutDates() {
         return (
-            ( this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+            (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
                 || this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
                 || this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value)
             && this.elements
@@ -438,9 +577,9 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
             || this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
             || this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value) {
-           png64 = this.cy.png({bg: 'white', full: true});
+            png64 = this.cy.png({bg: 'white', full: true});
         } else {
-           png64 = this.cy.png({bg: 'white', scale: scale});
+            png64 = this.cy.png({bg: 'white', scale: scale});
         }
 
         return png64;
