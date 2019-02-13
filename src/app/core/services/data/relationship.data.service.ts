@@ -219,18 +219,18 @@ export class RelationshipDataService {
     }
 
     /**
-     * Get count of cases in known transmission chains
+     * Get count of cases outside the transmission chains
      * @param {string} outbreakId
      * @param {number} noDaysInChains
      * @returns {Observable<MetricCasesTransmissionChainsModel>}
      */
-    getCountOfCasesInKnownTransmissionChains(
+    getCountOfCasesOutsideTheTransmissionChains(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<MetricCasesTransmissionChainsModel> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/relationships/new-cases-in-transmission-chains/count?filter=${filter}`),
+            this.http.get(`outbreaks/${outbreakId}/relationships/new-cases-outside-transmission-chains/count?filter=${filter}`),
             MetricCasesTransmissionChainsModel
         );
     }

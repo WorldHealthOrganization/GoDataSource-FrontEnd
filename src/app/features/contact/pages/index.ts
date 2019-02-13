@@ -10,6 +10,7 @@ import { ModifyContactFollowUpListComponent } from './modify-contact-follow-up-l
 import { BulkCreateContactsComponent } from './bulk-create-contacts/bulk-create-contacts.component';
 import { ContactDailyFollowUpsListComponent } from './contact-daily-follow-ups-list/contact-daily-follow-ups-list.component';
 import { ContactRangeFollowUpsListComponent } from './contact-range-follow-ups-list/contact-range-follow-ups-list.component';
+import { IndividualContactFollowUpsListComponent } from './individual-contact-follow-ups-list/individual-contact-follow-ups-list.component';
 
 // export each page component individually
 export * from './contacts-list/contacts-list.component';
@@ -23,6 +24,7 @@ export * from './modify-contact-follow-up-list/modify-contact-follow-up-list.com
 export * from './bulk-create-contacts/bulk-create-contacts.component';
 export * from './contact-daily-follow-ups-list/contact-daily-follow-ups-list.component';
 export * from './contact-range-follow-ups-list/contact-range-follow-ups-list.component';
+export * from './individual-contact-follow-ups-list/individual-contact-follow-ups-list.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
@@ -38,6 +40,7 @@ export const pageComponents: any[] = [
     CreateContactFollowUpComponent,
     ModifyContactFollowUpComponent,
     ModifyContactFollowUpListComponent,
+    IndividualContactFollowUpsListComponent,
 
     ViewChronologyContactComponent
 ];
