@@ -25,6 +25,8 @@ import { ContactDataService } from '../../../../core/services/data/contact.data.
 import { Subscription } from 'rxjs/Subscription';
 import { tap } from 'rxjs/operators';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
+import { DialogField, DialogFieldType } from '../../../../shared/components';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-individual-contact-follow-ups-list',
@@ -91,6 +93,18 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         // dropdowns options
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+
+        // print options
+        this.printFollowUpsDialogFields = [
+            new DialogField({
+                name: 'groupBy',
+                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
+                inputOptions: [(Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE) as any],
+                value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
+                required: true,
+                disabled: true
+            })
+        ];
 
         this.route.params
             .subscribe((params: { contactId }) => {
