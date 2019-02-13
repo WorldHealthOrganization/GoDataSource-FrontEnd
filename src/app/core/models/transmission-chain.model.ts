@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
 import { EntityModel } from './entity.model';
 import { CaseModel } from './case.model';
-import { RelationshipModel, RelationshipPersonModel } from './relationship.model';
+import { RelationshipModel } from './relationship.model';
 import { EntityType } from './entity-type';
 import * as moment from 'moment';
 import { Constants } from './constants';
-
+import { EventModel } from './event.model';
 
 export class TransmissionChainRelation {
 
@@ -17,6 +17,9 @@ export class TransmissionChainRelation {
 export class TransmissionChainModel {
     // all Cases from Chain, mapped by Case ID
     casesMap: {}|{string: CaseModel} = {};
+    // all events related to chain
+    eventsMap: {}|{string: EventModel} = {};
+
     // all relations between Cases
     chainRelations: TransmissionChainRelation[] = [];
     // all entities related to Chain (Cases, Contacts and Events)
@@ -32,7 +35,7 @@ export class TransmissionChainModel {
     // earliest date of onset
     earliestDateOfOnset: string;
     // root case
-    rootCaseOnset: CaseModel;
+    rootPerson: CaseModel | EventModel;
 
     constructor(chainData = null, nodesData = {}, relationshipsData = []) {
         this.active = _.get(chainData, 'active', false);
@@ -44,21 +47,27 @@ export class TransmissionChainModel {
         // go through all chain relations
         _.each(chainRelationsData, (relation: string[]) => {
 
-            // go through all Case IDs from relation
-            _.each(relation, (caseId) => {
+            // go through all Person(case or event) IDs from relation
+            _.each(relation, (personId) => {
                 if (
                     // if we didn't already collect this Case info
-                    _.isEmpty(this.casesMap[caseId]) &&
+                    _.isEmpty(this.casesMap[personId]) &&
+                    _.isEmpty(this.eventsMap[personId]) &&
                     // and if we have Case info
-                    !_.isEmpty(nodesData[caseId])
+                    !_.isEmpty(nodesData[personId])
                 ) {
-                    // collect Case info, mapped by Case ID
-                    this.casesMap[caseId] = new CaseModel(nodesData[caseId]);
-                    // compare with earliest date of onset and update
-                    if (!_.isEmpty(nodesData[caseId].dateOfOnset)) {
-                        if (moment(nodesData[caseId].dateOfOnset).isBefore(this.earliestDateOfOnset) || _.isEmpty(this.earliestDateOfOnset)) {
-                            this.earliestDateOfOnset = moment(nodesData[caseId].dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                            this.rootCaseOnset = new CaseModel(nodesData[caseId]);
+                    // collect Case or Event info, mapped by personID
+                    if (nodesData[personId].type === EntityType.EVENT) {
+                        this.eventsMap[personId] = new EventModel(nodesData[personId]);
+                        if (moment(nodesData[personId].date).isBefore(this.earliestDateOfOnset) || _.isEmpty(this.earliestDateOfOnset)) {
+                            this.earliestDateOfOnset = moment(nodesData[personId].date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                            this.rootPerson = this.eventsMap[personId];
+                        }
+                    } else {
+                        this.casesMap[personId] = new CaseModel(nodesData[personId]);
+                        if (moment(nodesData[personId].dateOfOnset).isBefore(this.earliestDateOfOnset) || _.isEmpty(this.earliestDateOfOnset)) {
+                            this.earliestDateOfOnset = moment(nodesData[personId].dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                            this.rootPerson = this.casesMap[personId];
                         }
                     }
                 }
@@ -104,39 +113,5 @@ export class TransmissionChainModel {
         return _.filter(Object.values(this.casesMap), (caseData: CaseModel) => {
             return caseData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
         }).length;
-    }
-
-    /**
-     * Find the first Case-Case Relationship, based on the 'contactDate'
-     * Note: Relationships are ordered by 'contactDate' ASC by default
-     * @returns {RelationshipModel}
-     */
-    get firstRelationship() {
-        return _.find(this.relationships, (relationship: RelationshipModel) => {
-            const persons = relationship.persons;
-
-            // verify the 2 persons to be cases and at least one of them to be in the list of cases for this specific chain.
-            return (
-                persons.length === 2 &&
-                persons[0].type === EntityType.CASE &&
-                persons[1].type === EntityType.CASE &&
-                this.casesMap[persons[0].id]
-            );
-        });
-    }
-
-    /**
-     * Find the first Case in Chain
-     * Return the node with the first date of onset is available. If not, return the node from the first relationship based on contactDate
-     * @returns {CaseModel | undefined} undefined if not found, otherwise CaseModel
-     */
-    get firstCase() {
-
-        // get the 'source' Case of the first Case-Case Relationship
-        const firstCasePerson: RelationshipPersonModel = _.find(_.get(this, 'firstRelationship.persons'), (person: RelationshipPersonModel) => {
-            return person.source;
-        });
-        // return the corresponding CaseModel
-        return this.rootCaseOnset ? this.rootCaseOnset : ( firstCasePerson ? this.casesMap[firstCasePerson.id] : undefined );
     }
 }
