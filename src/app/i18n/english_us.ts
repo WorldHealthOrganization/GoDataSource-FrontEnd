@@ -8,16 +8,15 @@ export const EnglishUsLang = {
          */
 
         /**
-         * uiModifyFollowUpListPage
-         */
-        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up successfully modified',
-        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups successfully modified',
-
-        /**
          * Example group
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
+        /**
+         * uiModifyFollowUpListPage
+         */
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up successfully modified',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups successfully modified',
 
         /**
          * uiCaseFields

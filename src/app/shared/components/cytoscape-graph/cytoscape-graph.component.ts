@@ -7,8 +7,6 @@ import { GenericDataService } from '../../../core/services/data/generic.data.ser
 import { Constants } from '../../../core/models/constants';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { start } from 'repl';
-
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -28,15 +26,11 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     @Output() viewTypeChanged = new EventEmitter<any>();
     @Output() changeEditMode = new EventEmitter<boolean>();
 
+    Constants = Constants;
     cy: any;
     container: string = 'cy';
-
-    Constants = Constants;
-
     transmissionChainViewTypes$: Observable<any[]>;
     timelineViewType: string = 'horizontal';
-    maxTimelineIndex: number = 0;
-
     // show/hide legend?
     showLegend: boolean = true;
     // toggle edit mode
@@ -143,7 +137,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     // selected layout
     layout: any;
-
     defaultZoom: any = {
         min: 0.02,
         max: 4
@@ -220,16 +213,10 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     datesArray: string[] = [];
     timelineDatesRanks: any = {};
 
-    timelineNodes: any = [];
-
-    timelineNodesIndexes: any = [];
-
-
     constructor(
         private genericDataService: GenericDataService,
         private el: ElementRef
-    ) {
-    }
+    ) {}
 
     ngOnInit() {
         // initialize style
@@ -289,14 +276,12 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     }
 
     /**
-     * Generate the array of dates to be used on the timeline view
+     * Generate the array of dates to be used on the timeline views
      */
     calculateTimelineDates() {
         // empty the already set timeline and dates arrays
         this.datesArray = [];
         this.timelineDatesRanks = {};
-
-        this.timelineNodes = [];
         const nodes = _.sortBy(this.elements.nodes, 'data.dateTimeline');
         // loop through all the nodes to set their position based on date and relations
         _.forEach(nodes, (node, key) => {
