@@ -93,18 +93,6 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
-        // print options
-        this.printFollowUpsDialogFields = [
-            new DialogField({
-                name: 'groupBy',
-                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
-                inputOptions: [(Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE) as any],
-                value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
-                required: true,
-                disabled: true
-            })
-        ];
-
         this.route.params
             .subscribe((params: { contactId }) => {
                 this.contactId = params.contactId;
@@ -165,6 +153,31 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 .getContact(this.selectedOutbreak.id, this.contactId)
                 .subscribe((contactData: ContactModel) => {
                     this.contactData = contactData;
+
+                    // initialize print options
+                    this.printFollowUpsDialogFields = [
+                        new DialogField({
+                            name: 'contactId',
+                            placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_CONTACT_BUTTON',
+                            inputOptions: [({
+                                label: contactData.name,
+                                value: this.contactId
+                            }) as any],
+                            value: this.contactId,
+                            required: true,
+                            disabled: true
+                        }),
+                        new DialogField({
+                            name: 'groupBy',
+                            placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
+                            inputOptions: [(Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE) as any],
+                            value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
+                            required: true,
+                            disabled: true
+                        })
+                    ];
+
+                    // initialize breadcrumbs
                     this.initializeBreadcrumbs();
                 });
         }

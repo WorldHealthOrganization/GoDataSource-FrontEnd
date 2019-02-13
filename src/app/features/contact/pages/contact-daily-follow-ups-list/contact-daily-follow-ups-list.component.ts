@@ -752,7 +752,8 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         name: 'date',
                         required: true,
                         value: value ? moment(value).toISOString() : value,
-                        fieldType: DialogFieldType.DATE
+                        fieldType: DialogFieldType.DATE,
+                        disabled: true
                     }),
                     new DialogField({
                         name: 'groupBy',
