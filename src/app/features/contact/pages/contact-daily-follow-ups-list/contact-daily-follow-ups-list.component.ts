@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -12,9 +11,8 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { DialogAnswerButton, DialogField, DialogFieldType, LoadingDialogModel, ModifyContactFollowUpQuestionnaireData, ModifyContactFollowUpQuestionnaireDialogComponent } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, DialogFieldType } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { ContactModel } from '../../../../core/models/contact.model';
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as moment from 'moment';
@@ -28,16 +26,14 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { Moment } from 'moment';
-import { MatTable } from '@angular/material';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { NgModel } from '@angular/forms';
 import { Subscription } from 'rxjs/Subscription';
-import { TeamModel } from '../../../../core/models/team.model';
 import { tap } from 'rxjs/operators';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
+import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -45,13 +41,8 @@ import { CountedItemsListItem } from '../../../../shared/components/counted-item
     templateUrl: './contact-daily-follow-ups-list.component.html',
     styleUrls: ['./contact-daily-follow-ups-list.component.less']
 })
-export class ContactDailyFollowUpsListComponent extends ListComponent implements OnInit, OnDestroy {
+export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [];
-
-    // import constants into template
-    Constants = Constants;
-    UserSettings = UserSettings;
-    ExportDataExtension = ExportDataExtension;
 
     // authenticated user
     authUser: UserModel;
@@ -65,50 +56,22 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     // Daily follow ups grouped by teams
     countedFollowUpsGroupedByTeams$: Observable<any>;
 
-    // yes / no / all options
+    // dropdowns values
     yesNoOptionsList$: Observable<any[]>;
-
-    ReferenceDataCategory = ReferenceDataCategory;
     dailyStatusTypeOptions$: Observable<any[]>;
+
+    // provide constants to template
+    Constants = Constants;
+    UserSettings = UserSettings;
+    ExportDataExtension = ExportDataExtension;
+    ReferenceDataCategory = ReferenceDataCategory;
 
     availableSideFilters: FilterModel[];
 
     dateFilterDefaultValue: Moment;
 
-    teamsList$: Observable<TeamModel[]>;
-    teamsListLoaded: TeamModel[];
-    teamsListLoadedForHeaderSearch: LabelValuePair[];
-    teamIdFilterValue: string = 'all';
-
-    // export Follow-ups
-    exportFollowUpsUrl: string;
-    followUpsDataExportFileName: string = moment().format('YYYY-MM-DD');
-    allowedExportTypes: ExportDataExtension[] = [
-        ExportDataExtension.CSV,
-        ExportDataExtension.XML,
-        ExportDataExtension.PDF
-    ];
-    anonymizeFields: LabelValuePair[] = [
-        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ID', 'id'),
-        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_DATE', 'date'),
-        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_TARGETED', 'targeted'),
-        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID', 'statusId'),
-        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS', 'address'),
-        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
-    ];
-
-    // print follow-ups
-    printFollowUpsUrl: string;
-    printFollowUpsFileName: string;
-    printFollowUpsDialogFields: DialogField[] = [];
-
     caseId: string;
     caseData: CaseModel;
-
-    contactId: string;
-    contactData: ContactModel;
-
-    loadingDialog: LoadingDialogModel;
 
     @ViewChild('followUpDate', {read: NgModel}) followUpDateElem: NgModel;
 
@@ -116,83 +79,45 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     outbreakSubscriber: Subscription;
 
     constructor(
+        protected snackbarService: SnackbarService,
+        protected dialogService: DialogService,
+        protected followUpsDataService: FollowUpsDataService,
+        protected router: Router,
+        protected i18nService: I18nService,
+        protected teamDataService: TeamDataService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
-        private followUpsDataService: FollowUpsDataService,
-        protected snackbarService: SnackbarService,
-        private dialogService: DialogService,
         private genericDataService: GenericDataService,
-        private router: Router,
-        private i18nService: I18nService,
         private referenceDataDataService: ReferenceDataDataService,
-        private teamDataService: TeamDataService,
-        protected route: ActivatedRoute,
-        private caseDataService: CaseDataService,
-        private contactDataService: ContactDataService
+        private route: ActivatedRoute,
+        private caseDataService: CaseDataService
     ) {
         super(
-            snackbarService
+            snackbarService, dialogService, followUpsDataService,
+            router, i18nService, teamDataService
         );
     }
 
     ngOnInit() {
-        // add page title
-        this.followUpsDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') +
-            ' - ' +
-            this.followUpsDataExportFileName;
+        super.ngOnInit();
 
-        // print follow-ups file name
-        this.printFollowUpsFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME') + '.pdf';
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // daily status types
-        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
+        // dropdowns options
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         // set default filter rules
         this.initializeHeaderFilters();
 
-        // load teams list
-        // using share does the job, but it takes a bit to see the changes in the list
-        // loading an array is instantaneous
-        this.teamsList$ = this.teamDataService.getTeamsList().share();
-        this.teamsList$.subscribe((teamsList) => {
-            // teams loaded used by quick team change
-            this.teamsListLoaded = teamsList;
-
-            // format search options
-            this.teamsListLoadedForHeaderSearch = _.map(this.teamsListLoaded, (team: TeamModel) => {
-                return new LabelValuePair(
-                    team.name,
-                    team.id
-                );
-            });
-
-            // add all option
-            this.teamsListLoadedForHeaderSearch = [
-                new LabelValuePair(
-                    'LNG_COMMON_LABEL_ALL',
-                    this.teamIdFilterValue
-                ),
-                ...this.teamsListLoadedForHeaderSearch
-            ];
-        });
-
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
-        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-
-        // get case id
         this.route.params
-            .subscribe((params: { caseId, contactId }) => {
+            .subscribe((params: { caseId }) => {
                 // case Id arrives only from cases list, view & modify pages
                 // coming directly to daily page doesn't provide us with a case id
                 this.caseId = params.caseId;
 
-                // contact Id arrives only from contacts list, view & modify pages
-                // coming directly to daily page doesn't provide us with a contact id
-                this.contactId = params.contactId;
-
                 // no need to retrieve any data? then we can initialize breadcrumbs
-                if (!this.caseId && !this.contactId) {
+                if (!this.caseId) {
                     this.initializeBreadcrumbs();
                 }
 
@@ -209,28 +134,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                         // selected outbreak
                         this.selectedOutbreak = selectedOutbreak;
 
-                        // export url
-                        this.exportFollowUpsUrl = null;
-                        this.printFollowUpsUrl = null;
-
-                        if (
-                            this.selectedOutbreak &&
-                            this.selectedOutbreak.id
-                        ) {
-                            this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`;
-                            this.printFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts/daily-followup-form/export`;
-
-                            // retrieve case data
-                            if (this.caseId) {
-                                this.retrieveCaseData();
-                            }
-
-                            // retrieve contact data
-                            if (this.contactId) {
-                                this.retrieveContactData();
-                            }
-
+                        // retrieve case data
+                        if (this.caseId) {
+                            this.retrieveCaseData();
                         }
+
+                        // initialize print and export
+                        this.initializeFollowUpsExport();
+                        this.initializeFollowUpsPrint();
 
                         // initialize pagination
                         this.initPaginator();
@@ -258,32 +169,25 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
      * Retrieve case data
      */
     retrieveCaseData() {
-        // retrieve case data
-        this.caseDataService
-            .getCase(this.selectedOutbreak.id, this.caseId)
-            .subscribe((caseData: CaseModel) => {
-                this.caseData = caseData;
-                this.initializeBreadcrumbs();
-            });
-    }
-
-    /**
-     * Retrieve contact data
-     */
-    retrieveContactData() {
-        // retrieve case data
-        this.contactDataService
-            .getContact(this.selectedOutbreak.id, this.contactId)
-            .subscribe((contactData: ContactModel) => {
-                this.contactData = contactData;
-                this.initializeBreadcrumbs();
-            });
+        if (
+            this.selectedOutbreak &&
+            this.selectedOutbreak.id &&
+            this.caseId
+        ) {
+            // retrieve case data
+            this.caseDataService
+                .getCase(this.selectedOutbreak.id, this.caseId)
+                .subscribe((caseData: CaseModel) => {
+                    this.caseData = caseData;
+                    this.initializeBreadcrumbs();
+                });
+        }
     }
 
     /**
      * Initialize breadcrumbs
      */
-    initializeBreadcrumbs() {
+    private initializeBreadcrumbs() {
         // init
         this.breadcrumbs = [];
 
@@ -304,14 +208,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             ));
         }
 
-        // add contact data ?
-        if (this.contactData) {
-            this.breadcrumbs.push(new BreadcrumbItemModel(
-                this.contactData.name,
-                `/contacts/${this.contactData.id}/view`
-            ));
-        }
-
         // add follow-ups breadcrumbs
         this.breadcrumbs.push(new BreadcrumbItemModel(
             'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
@@ -321,24 +217,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     }
 
     /**
-     * Initialize header filters
-     */
-    initializeHeaderFilters() {
-        this.dateFilterDefaultValue = moment().startOf('day');
-        this.filterByFollowUpDate(this.dateFilterDefaultValue);
-    }
-
-    /**
-     * Add search criteria
-     */
-    resetFiltersAddDefault() {
-        this.initializeHeaderFilters();
-    }
-
-    /**
      * Initialize Side Table Columns
      */
-    initializeSideTableColumns() {
+    private initializeSideTableColumns() {
         // default table columns
         this.tableColumns = [
             new VisibleColumnModel({
@@ -408,7 +289,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     /**
      * Initialize Side Filters
      */
-    initializeSideFilters() {
+    private initializeSideFilters() {
         // filter options
         const genderOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
@@ -737,6 +618,21 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     }
 
     /**
+     * Initialize header filters
+     */
+    initializeHeaderFilters() {
+        this.dateFilterDefaultValue = moment().startOf('day');
+        this.filterByFollowUpDate(this.dateFilterDefaultValue);
+    }
+
+    /**
+     * Add search criteria
+     */
+    resetFiltersAddDefault() {
+        this.initializeHeaderFilters();
+    }
+
+    /**
      * Refresh list
      */
     refreshList() {
@@ -747,14 +643,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             // add case id
             if (this.caseId) {
                 this.queryBuilder.addChildQueryBuilder('case').filter.byEquality('id', this.caseId);
-            }
-
-            // add contact id
-            if (this.contactId) {
-                this.queryBuilder.filter.byEquality(
-                    'personId',
-                    this.contactId
-                );
             }
 
             // retrieve the list of Follow Ups
@@ -774,75 +662,22 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
      */
     refreshListCount() {
         if (this.selectedOutbreak) {
+            // include related people in response
+            const qb = new RequestQueryBuilder();
+            qb.merge(this.queryBuilder);
+
+            // add case id
+            if (this.caseId) {
+                qb.addChildQueryBuilder('case').filter.byEquality('id', this.caseId);
+            }
+
             // remove paginator from query builder
-            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            const countQueryBuilder = _.cloneDeep(qb);
             countQueryBuilder.paginator.clear();
             this.followUpsListCount$ = this.followUpsDataService
                 .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
                 .share();
         }
-    }
-
-    /**
-     * Check if we have access to create / generate follow-ups
-     * @returns {boolean}
-     */
-    hasFollowUpsWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
-    }
-
-    /**
-     * Delete specific follow-up
-     * @param {FollowUpModel} followUp
-     */
-    deleteFollowUp(followUp: FollowUpModel) {
-        // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP', new ContactModel(followUp.contact))
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    // delete follow up
-                    this.followUpsDataService
-                        .deleteFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                            // reload data
-                            this.needsRefreshList(true);
-                        });
-                }
-            });
-    }
-
-    /**
-     * Restore specific follow-up
-     * @param {FollowUpModel} followUp
-     */
-    restoreFollowUp(followUp: FollowUpModel) {
-        // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP', new ContactModel(followUp.contact))
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    // delete follow up
-                    this.followUpsDataService
-                        .restoreFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
-
-                            // reload data
-                            this.needsRefreshList(true);
-                        });
-                }
-            });
     }
 
     /**
@@ -901,203 +736,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     }
 
     /**
-     * Modify selected follow-ups
-     */
-    modifySelectedFollowUps(table: MatTable<any>) {
-        // get list of follow-ups that we want to modify
-        const selectedRecords: false | string[] = this.validateCheckedRecords();
-        if (!selectedRecords) {
-            return;
-        }
-
-        // check if we have future records
-        let hasFutureFollowUps: boolean = false;
-        _.each(
-            table.dataSource,
-            (item: FollowUpModel) => {
-                if (
-                    selectedRecords.indexOf(item.id) > -1 &&
-                    this.dateInTheFuture(item.date)
-                ) {
-                    // found record that is in the future
-                    hasFutureFollowUps = true;
-
-                    // stop each
-                    return false;
-                }
-            }
-        );
-
-        // we aren't allowed to continue to modify follow-ups if in our list we have future follow-ups
-        if (hasFutureFollowUps) {
-            this.snackbarService.showError('LNG_PAGE_LIST_FOLLOW_UPS_MODIFY_FUTURE_FOLLOW_UPS');
-            return;
-        }
-
-        // redirect to next step
-        this.router.navigate(
-            ['/contacts/follow-ups/modify-list'],
-            {
-                queryParams: {
-                    followUpsIds: JSON.stringify(selectedRecords)
-                }
-            }
-        );
-    }
-
-    /**
-     * Export selected follow-ups
-     */
-    exportSelectedFollowUps() {
-        // get list of follow-ups that we want to modify
-        const selectedRecords: false | string[] = this.validateCheckedRecords();
-        if (!selectedRecords) {
-            return;
-        }
-
-        // construct query builder
-        const qb = new RequestQueryBuilder();
-        qb.filter.bySelect(
-            'id',
-            selectedRecords,
-            true,
-            null
-        );
-
-        // display export dialog
-        this.dialogService.showExportDialog({
-            // required
-            message: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE',
-            url: this.exportFollowUpsUrl,
-            fileName: this.followUpsDataExportFileName,
-
-            // // optional
-            allowedExportTypes: this.allowedExportTypes,
-            queryBuilder: qb,
-            displayEncrypt: true,
-            displayAnonymize: true,
-            anonymizeFields: this.anonymizeFields,
-            exportStart: () => { this.showLoadingDialog(); },
-            exportFinished: () => { this.closeLoadingDialog(); }
-        });
-    }
-
-    /**
-     * Check if date is in future to know if we show "Missed to follow-up" option or not
-     */
-    dateInTheFuture(followUpDate): boolean {
-        const date = followUpDate ? moment(followUpDate) : null;
-        return !!(date && date.startOf('day').isAfter(Constants.getCurrentDate()));
-    }
-
-    /**
-     * Modify follow-up questionnaire
-     * @param followUp
-     */
-    modifyQuestionnaire(followUp: FollowUpModel) {
-        this.dialogService.showCustomDialog(
-            ModifyContactFollowUpQuestionnaireDialogComponent, {
-                ...ModifyContactFollowUpQuestionnaireDialogComponent.DEFAULT_CONFIG,
-                ...{
-                    data: new ModifyContactFollowUpQuestionnaireData(
-                        followUp,
-                        this.selectedOutbreak
-                    )
-                }
-            }
-        ).subscribe(() => {
-            // NOTHING TO DO HERE
-            // not even to refresh list of follow-ups since we don't want to display this information, and it would be a waste of time to refresh the list, loose page etc...
-        });
-    }
-
-    /**
-     * Change FollowUp Team
-     */
-    changeFollowUpTeam(
-        followUp: FollowUpModel,
-        team: TeamModel
-    ) {
-        // modify follow-up
-        this.followUpsDataService
-            .modifyFollowUp(
-                this.selectedOutbreak.id,
-                followUp.personId,
-                followUp.id, {
-                    teamId: team ? team.id : null
-                }
-            ).catch((err) => {
-                this.snackbarService.showApiError(err);
-                return ErrorObservable.create(err);
-            }).subscribe(() => {
-                // update loaded follow-up data
-                followUp.teamId = team.id;
-
-                // show success ?
-                // this might not be the best idea...maybe we can replace / remove it
-                this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_FOLLOW_UP_TEAM_SUCCESS_MESSAGE');
-            });
-    }
-
-    /**
-     * Change FollowUp "targeted" status
-     * @param {FollowUpModel} followUp
-     * @param {boolean} targeted
-     */
-    setTargetedItem(followUp: FollowUpModel, targeted: boolean) {
-        this.followUpsDataService
-            .modifyFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id, { targeted: targeted})
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                return ErrorObservable.create(err);
-            })
-            .subscribe(() => {
-                this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_TARGETED_STATUS_SUCCESS_MESSAGE');
-            });
-    }
-
-    /**
-     * Filter by team
-     */
-    filterByTeam(data: LabelValuePair) {
-        // nothing to retrieve ?
-        if (!data) {
-            // no team
-            this.queryBuilder.filter.where({
-                teamId: {
-                    eq: null
-                }
-            });
-
-            // refresh list
-            this.needsRefreshList();
-        } else {
-            // retrieve everything?
-            if (data.value === this.teamIdFilterValue) {
-                this.filterBySelectField('teamId', []);
-            } else {
-                this.filterBySelectField('teamId', data);
-            }
-        }
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
-    }
-
-    /**
      * Filter by follow-up date
      * @param value
      */
@@ -1114,7 +752,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                         name: 'date',
                         required: true,
                         value: value ? moment(value).toISOString() : value,
-                        fieldType: DialogFieldType.DATE
+                        fieldType: DialogFieldType.DATE,
+                        disabled: true
                     }),
                     new DialogField({
                         name: 'groupBy',

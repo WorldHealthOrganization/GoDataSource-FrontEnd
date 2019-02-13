@@ -757,6 +757,14 @@ export class Constants {
     }
 
     /**
+     * Check if a given date is in the future
+     */
+    static isDateInTheFuture(date): boolean {
+        const dateMoment = date ? moment(date) : null;
+        return !!(dateMoment && dateMoment.startOf('day').isAfter(Constants.getCurrentDate()));
+    }
+
+    /**
      * Generate random string
      * @param alphabet
      */

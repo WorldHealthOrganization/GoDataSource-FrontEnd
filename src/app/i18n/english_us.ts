@@ -13,6 +13,16 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiFollowUpfields
+         */
+        'LNG_FOLLOW_UP_FIELD_LABEL_DATE': 'Follow-up date',
+
+        /**
+         * uiFollowUpsListPage
+         */
+        'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_CONTACT_BUTTON': 'Contact',
+
+        /**
          * uiModifyFollowUpListPage
          */
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up successfully modified',
