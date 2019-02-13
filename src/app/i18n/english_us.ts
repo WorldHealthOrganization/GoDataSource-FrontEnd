@@ -12,6 +12,10 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
+        /**
+         * uiFollowUpfields
+         */
+        'LNG_FOLLOW_UP_FIELD_LABEL_DATE': 'Follow-up date',
 
         /**
          * uiModifyFollowUpListPage

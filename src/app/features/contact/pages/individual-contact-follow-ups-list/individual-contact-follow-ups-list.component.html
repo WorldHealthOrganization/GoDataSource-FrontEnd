@@ -1,4 +1,4 @@
-<app-topnav [activeOutbreakEditable]="!caseId && !contactId">
+<app-topnav [activeOutbreakEditable]="false">
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
@@ -9,15 +9,6 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
-                    <ng-container *app-selected-outbreak-is-active>
-                        <button
-                            *ngIf="hasFollowUpsWriteAccess()"
-                            mat-menu-item
-                            (click)="generateFollowUps()">
-                            {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_BUTTON' | translate }}
-                        </button>
-                    </ng-container>
-
                     <app-export-button
                         *ngIf="!appliedListFilter && printFollowUpsUrl"
                         [menuItem]="true"
@@ -67,13 +58,6 @@
         [value]="(followUpsListCount$ | async)?.count">
     </app-total-number-of-records>
 
-    <app-counted-items-list
-        *ngIf="!appliedListFilter"
-        fxFlex
-        [items]="countedFollowUpsGroupedByTeams$| async"
-        (optionChanged)="filterBySelectField('teamId', $event.ids, null)">
-    </app-counted-items-list>
-
 </div>
 
 <!-- Side filters -->
@@ -99,21 +83,6 @@
             (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
-    </div>
-
-    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="15px">
-        <span>{{'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_FOLLOW_UPS_FOR_DATE' | translate}}</span>
-        <div fxLayout="column">
-            <app-form-datepicker
-                #followUpDate
-                name="dateFilter"
-                [ngModel]="dateFilterDefaultValue"
-                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
-                (optionChanged)="filterByFollowUpDate($event)"
-                app-reset-input-on-side-filter
-                [resetToPristineValue]="false">
-            </app-form-datepicker>
-        </div>
     </div>
 
     <mat-table #table [dataSource]="followUpsList$ | async" matSort (matSortChange)="sortBy($event)">
@@ -183,74 +152,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Contact Last Name -->
-        <ng-container matColumnDef="contact.lastName">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell" fxLayout="column">
-                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME' | translate }}</div>
-                    <div class="column-filter">
-                        <app-form-input
-                            name="contactLastName"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByRelation('contact').byText('lastName', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.contact?.lastName }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Contact First Name -->
-        <ng-container matColumnDef="contact.firstName">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME' | translate }}</div>
-                    <div class="column-filter">
-                        <app-form-input
-                            name="contactFirstName"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByRelation('contact').byText('firstName', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.contact?.firstName }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Contact Visual ID -->
-        <ng-container matColumnDef="contact.visualId">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell" fxLayout="column">
-                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_VISUAL_ID' | translate }}</div>
-                    <div class="column-filter">
-                        <app-form-input
-                            name="contactVisualId"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByRelation('contact').byText('visualId', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.contact?.visualId }}
-            </mat-cell>
-        </ng-container>
-
         <!-- Date of Last Contact -->
         <ng-container matColumnDef="contact.dateOfLastContact">
             <mat-header-cell *matHeaderCellDef>
@@ -258,7 +159,7 @@
                     <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}</div>
                     <div class="column-filter">
                         <app-form-daterange
-                            name="dateFilter"
+                            name="dateOfLastContactFilter"
                             ngModel
                             (changed)="filterByRelation('contact').byDateRange('dateOfLastContact', $event)"
                             app-reset-input-on-side-filter>
@@ -268,6 +169,26 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.dateOfLastContact | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Follow-up date -->
+        <ng-container matColumnDef="date">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="dateFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('date', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                {{ item.date | dateDefault }}
             </mat-cell>
         </ng-container>
 

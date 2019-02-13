@@ -917,7 +917,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             (item: FollowUpModel) => {
                 if (
                     selectedRecords.indexOf(item.id) > -1 &&
-                    this.dateInTheFuture(item.date)
+                    Constants.isDateInTheFuture(item.date)
                 ) {
                     // found record that is in the future
                     hasFutureFollowUps = true;
@@ -980,14 +980,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
-    }
-
-    /**
-     * Check if date is in future to know if we show "Missed to follow-up" option or not
-     */
-    dateInTheFuture(followUpDate): boolean {
-        const date = followUpDate ? moment(followUpDate) : null;
-        return !!(date && date.startOf('day').isAfter(Constants.getCurrentDate()));
     }
 
     /**

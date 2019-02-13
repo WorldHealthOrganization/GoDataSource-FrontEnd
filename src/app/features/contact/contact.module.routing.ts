@@ -101,7 +101,7 @@ const routes: Routes = [
     // Follow-ups list from a contact
     {
         path: 'contact-related-follow-ups/:contactId',
-        component: fromPages.ContactDailyFollowUpsListComponent,
+        component: fromPages.IndividualContactFollowUpsListComponent,
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.READ_FOLLOWUP]
