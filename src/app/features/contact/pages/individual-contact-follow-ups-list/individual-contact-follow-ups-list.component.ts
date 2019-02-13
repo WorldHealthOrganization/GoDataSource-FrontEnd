@@ -25,8 +25,7 @@ import { ContactDataService } from '../../../../core/services/data/contact.data.
 import { Subscription } from 'rxjs/Subscription';
 import { tap } from 'rxjs/operators';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
-import { DialogField, DialogFieldType } from '../../../../shared/components';
-import * as moment from 'moment';
+import { DialogField } from '../../../../shared/components';
 
 @Component({
     selector: 'app-individual-contact-follow-ups-list',
@@ -75,7 +74,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        protected route: ActivatedRoute,
+        private route: ActivatedRoute,
         private contactDataService: ContactDataService
     ) {
         super(
