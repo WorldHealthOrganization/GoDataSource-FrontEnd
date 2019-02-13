@@ -39,8 +39,19 @@ export const EnglishUsLang = {
          * uiChronologyCasePage
          */
         'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_START_DATE': '{{type}} start date',
-        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_END_DATE': '{{type}} end date'
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_DATE_RANGE_END_DATE': '{{type}} end date',
 
+        /**
+         * uiAPIErrors
+         */
+        'LNG_API_ERROR_CODE_INVALID_VISUAL_ID_MASK': 'Invalid ID ( accepted: {{mask}} )',
+        'LNG_API_ERROR_CODE_DUPLICATE_VISUAL_ID': 'Duplicate ID',
+        'LNG_API_ERROR_CODE_REFERENCE_DATA_ENTRY_IN_USE' : '{{entryValue}} is in use and cannot be deleted',
+
+        /**
+         * uiCommonButtons
+         */
+        'LNG_COMMON_BUTTON_BACK_TO_LOGIN': 'Back to login',
         /**
          * REMOVE
          */
@@ -77,6 +88,9 @@ export const EnglishUsLang = {
         // "LNG_CASE_FIELD_LABEL_ISOLATION_DATES_LOCATION_DESCRIPTION": "",
         // "LNG_CASE_FIELD_LABEL_ISOLATION_DATES_START_DATE": "Isolation Start Date",
         // "LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION": "",
-
+        // LNG_PAGE_MODIFY_CASE_INVALID_CASE_ID
+        // LNG_PAGE_CREATE_CASE_INVALID_CASE_ID
+        // LNG_PAGE_MODIFY_CONTACT_INVALID_CONTACT_ID
+        // LNG_PAGE_CREATE_CONTACT_INVALID_CASE_ID
     }
 };

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -23,6 +23,7 @@ import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType }
 import { EntityModel } from '../../../../core/models/entity.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
     selector: 'app-create-case',
@@ -31,6 +32,8 @@ import { Constants } from '../../../../core/models/constants';
     styleUrls: ['./create-case.component.less']
 })
 export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit {
+    @ViewChild('personalForm') personalForm: NgForm;
+    @ViewChild('infectionForm') infectionForm: NgForm;
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
@@ -107,8 +110,9 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                 this.caseIdMaskValidator = Observable.create((observer) => {
                     this.caseDataService.checkCaseVisualIDValidity(
                         this.selectedOutbreak.id,
+                        this.visualIDTranslateData.mask,
                         this.caseData.visualId
-                    ).subscribe((isValid: boolean) => {
+                    ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
                         observer.next(isValid);
                         observer.complete();
                     });
