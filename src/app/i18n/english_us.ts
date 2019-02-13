@@ -61,6 +61,13 @@ export const EnglishUsLang = {
          * uiCommonButtons
          */
         'LNG_COMMON_BUTTON_BACK_TO_LOGIN': 'Back to login',
+
+        /**
+         * uiListFiltersPageTitles
+         */
+        'LNG_PAGE_LIST_FILTER_CASES_OUTSIDE_THE_TRANSMISSION_CHAINS': 'Cases in the previous {{x}} days outside the transmission chains',
+
+
         /**
          * REMOVE
          */
@@ -101,5 +108,6 @@ export const EnglishUsLang = {
         // LNG_PAGE_CREATE_CASE_INVALID_CASE_ID
         // LNG_PAGE_MODIFY_CONTACT_INVALID_CONTACT_ID
         // LNG_PAGE_CREATE_CONTACT_INVALID_CASE_ID
+        // LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS
     }
 };
