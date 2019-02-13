@@ -139,7 +139,7 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
             // retrieve data
             this.displayLoading = true;
             this.previousSubscriber = this.relationshipDataService
-                .getCountOfCasesInKnownTransmissionChains(this.outbreakId, qb)
+                .getCountOfCasesOutsideTheTransmissionChains(this.outbreakId, qb)
                 .subscribe((result) => {
                     this.casesKnownTransmissionChainsCount = result.newCases;
                     this.totalCases = result.total;

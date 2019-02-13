@@ -351,7 +351,7 @@ export class ListFilterDataService {
             }
 
             return this.relationshipDataService
-                .getCountOfCasesInKnownTransmissionChains(selectedOutbreak.id, qb)
+                .getCountOfCasesOutsideTheTransmissionChains(selectedOutbreak.id, qb)
                 .map((result) => {
                     // update queryBuilder filter with desired case ids
                     const filterQueryBuilder = new RequestQueryBuilder();
