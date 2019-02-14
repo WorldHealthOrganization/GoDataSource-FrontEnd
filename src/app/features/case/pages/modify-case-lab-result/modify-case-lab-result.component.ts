@@ -204,7 +204,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
                     this.caseData.name,
-                    `/cases/${this.caseData.id}/modify`
+                    `/cases/${this.caseData.id}/view`
                 )
             );
         }

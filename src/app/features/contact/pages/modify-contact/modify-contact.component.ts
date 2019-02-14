@@ -27,6 +27,9 @@ import { EntityModel } from '../../../../core/models/entity.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { MatDialogRef } from '@angular/material';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RelationshipPersonModel } from '../../../../core/models/relationship.model';
 
 @Component({
     selector: 'app-modify-contact',
@@ -41,7 +44,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     authUser: UserModel;
 
     contactId: string;
-    outbreakId: string;
+    selectedOutbreak: OutbreakModel;
+    contactExposure: RelationshipPersonModel;
 
     contactData: ContactModel = new ContactModel();
 
@@ -52,6 +56,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
 
     // provide constants to template
     EntityType = EntityType;
+    EntityModel = EntityModel;
 
     serverToday: Moment = null;
 
@@ -72,7 +77,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         private router: Router,
         private genericDataService: GenericDataService,
         private dialogService: DialogService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private relationshipDataService: RelationshipDataService,
     ) {
         super(route);
     }
@@ -102,36 +108,81 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                 this.outbreakDataService
                     .getSelectedOutbreak()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
-                        this.outbreakId = selectedOutbreak.id;
+                        this.selectedOutbreak = selectedOutbreak;
 
                         // get contact
-                        this.contactDataService
-                            .getContact(selectedOutbreak.id, this.contactId)
-                            .subscribe(contactDataReturned => {
-                                this.contactData = new ContactModel(contactDataReturned);
+                        this.retrieveContactData();
 
-                                // set visual ID translate data
-                                this.visualIDTranslateData = {
-                                    mask: ContactModel.generateContactIDMask(selectedOutbreak.contactIdMask)
-                                };
-
-                                // set visual ID validator
-                                this.contactIdMaskValidator = Observable.create((observer) => {
-                                    this.contactDataService.checkContactVisualIDValidity(
-                                        selectedOutbreak.id,
-                                        this.visualIDTranslateData.mask,
-                                        this.contactData.visualId,
-                                        this.contactData.id
-                                    ).subscribe((isValid: boolean) => {
-                                        observer.next(isValid);
-                                        observer.complete();
-                                    });
-                                });
-
-                                this.createBreadcrumbs();
-                            });
+                        // get contact's exposure
+                        this.retrieveContactExposure();
                     });
             });
+    }
+
+    /**
+     * Retrieve contact information
+     */
+    private retrieveContactData() {
+        if (
+            this.selectedOutbreak &&
+            this.selectedOutbreak.id &&
+            this.contactId
+        ) {
+            this.contactDataService
+                .getContact(this.selectedOutbreak.id, this.contactId)
+                .subscribe(contactDataReturned => {
+                    this.contactData = new ContactModel(contactDataReturned);
+
+                    // set visual ID translate data
+                    this.visualIDTranslateData = {
+                        mask: ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
+                    };
+
+                    // set visual ID validator
+                    this.contactIdMaskValidator = Observable.create((observer) => {
+                        this.contactDataService.checkContactVisualIDValidity(
+                            this.selectedOutbreak.id,
+                            this.visualIDTranslateData.mask,
+                            this.contactData.visualId,
+                            this.contactData.id
+                        ).subscribe((isValid: boolean) => {
+                            observer.next(isValid);
+                            observer.complete();
+                        });
+                    });
+
+                    this.createBreadcrumbs();
+                });
+        }
+    }
+
+    /**
+     * Retrieve Contact's exposure: the Case or the Event that the Contact is related to
+     * Note: If there are more than one relationships, then we don't know the main Exposure so we do nothing here
+     */
+    private retrieveContactExposure() {
+        if (
+            this.selectedOutbreak &&
+            this.selectedOutbreak.id &&
+            this.contactId
+        ) {
+            const qb = new RequestQueryBuilder();
+            qb.limit(2);
+            this.relationshipDataService.getEntityRelationships(
+                this.selectedOutbreak.id,
+                EntityType.CONTACT,
+                this.contactId,
+                qb
+            )
+                .subscribe((relationships) => {
+                    if (relationships.length === 1) {
+                        // we found the exposure
+                        this.contactExposure = new RelationshipPersonModel(
+                            _.find(relationships[0].persons, (person) => person.id !== this.contactId)
+                        );
+                    }
+                });
+        }
     }
 
     /**
@@ -161,7 +212,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         // check for duplicates
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.contactDataService
-            .findDuplicates(this.outbreakId, {
+            .findDuplicates(this.selectedOutbreak.id, {
                 ...this.contactData,
                 ...dirtyFields
             })
@@ -178,7 +229,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                 const runModifyContact = (finishCallBack?: () => void) => {
                     // modify the contact
                     this.contactDataService
-                        .modifyContact(this.outbreakId, this.contactId, dirtyFields)
+                        .modifyContact(this.selectedOutbreak.id, this.contactId, dirtyFields)
                         .catch((err) => {
                             this.snackbarService.showApiError(err);
                             loadingDialog.close();

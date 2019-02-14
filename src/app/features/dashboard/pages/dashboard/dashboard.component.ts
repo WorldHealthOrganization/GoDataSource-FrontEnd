@@ -45,7 +45,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS,
                 DashboardDashlet.SUSPECT_CASES_REFUSING_TO_BE_TRANSFERRED_TO_A_TREATMENT_UNIT,
                 DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_AMONG_KNOWN_CONTACTS,
-                DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_IN_KNOWN_TRANSMISSION_CHAINS,
+                DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_OUTSIDE_THE_TRANSMISSION_CHAINS,
                 DashboardDashlet.SUSPECT_CASES_WITH_PENDING_LAB_RESULT,
                 DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS
             ]

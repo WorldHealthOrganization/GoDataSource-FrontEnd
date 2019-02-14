@@ -20,7 +20,6 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Observable } from 'rxjs/Observable';
 import { Constants } from '../../../../core/models/constants';
-import * as moment from 'moment';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
@@ -44,6 +43,9 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
     followUpId: string;
 
     authUser: UserModel;
+
+    // provide constants to template
+    Constants = Constants;
 
     constructor(
         private router: Router,
@@ -174,13 +176,5 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
      */
     hasContactReadAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
-    }
-
-    /**
-     * Check if date is in future
-     */
-    dateInTheFuture(followUpDate): boolean {
-        const date = followUpDate ? moment(followUpDate) : null;
-        return !!(date && date.startOf('day').isAfter(Constants.getCurrentDate()));
     }
 }
