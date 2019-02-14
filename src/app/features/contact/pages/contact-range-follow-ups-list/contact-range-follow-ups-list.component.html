@@ -123,9 +123,10 @@
                 <div
                     *ngFor="let date of daysToDisplay"
                     fxFlex="64px" fxLayoutAlign="center end"
-                    class="follow-up-range-date-header follow-up-range-date-column-header">
-                    <div>
-                        {{ date | dateShort }}
+                    class="follow-up-range-date-header">
+                    <div
+                        class="follow-up-range-date-column-header">
+                        {{ date | dateDefault }}
                     </div>
                 </div>
 

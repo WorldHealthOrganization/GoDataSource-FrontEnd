@@ -13,7 +13,7 @@ import { ElementBase } from '../../core/index';
 import { Moment } from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as moment from 'moment';
-import { ChangeContext, LabelType, Options } from 'ng5-slider';
+import { ChangeContext, Options } from 'ng5-slider';
 import { Constants } from '../../../../core/models/constants';
 
 /**
@@ -185,14 +185,7 @@ export class FormDateRangeSliderComponent extends ElementBase<FormDateRangeSlide
         showTicks: true,
         tickStep: 14,
         showTicksValues: true,
-        translate: (value: number, label: LabelType): string => {
-            // ticks
-            if (label === LabelType.TickValue) {
-                return this.minDate ?
-                    moment(this.minDate).add(value, 'days').format(Constants.DEFAULT_DATE_SHORT_DISPLAY_FORMAT) :
-                    '';
-            }
-
+        translate: (value: number): string => {
             // others
             return this.minDate ?
                 moment(this.minDate).add(value, 'days').format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
