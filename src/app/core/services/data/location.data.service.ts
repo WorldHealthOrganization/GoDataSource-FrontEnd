@@ -226,5 +226,13 @@ export class LocationDataService {
             LocationUsageModel
         );
     }
+
+    /**
+     * Propagate lat/lng to all entities that are using specified location
+     * @param {string} locationId
+     */
+    propagateGeoLocation(locationId: string): Observable<any> {
+        return this.http.post(`locations/${locationId}/propagate-geo-location`, {});
+    }
 }
 

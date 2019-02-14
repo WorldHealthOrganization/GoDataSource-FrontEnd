@@ -142,6 +142,9 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                 // refresh location breadcrumbs
                 this.locationBreadcrumbs.refreshBreadcrumbs();
 
+                // propagate values to all the entities that have in use this location
+                this.locationDataService.propagateGeoLocation(modifiedLocation.id).subscribe();
+
                 // hide dialog
                 loadingDialog.close();
             });
