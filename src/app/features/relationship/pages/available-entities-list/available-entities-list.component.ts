@@ -166,7 +166,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(
                                         entityData.name,
-                                        `${this.entityMap[this.entityType].link}/${this.entityId}/modify`
+                                        `${this.entityMap[this.entityType].link}/${this.entityId}/view`
                                     )
                                 );
                                 // add new breadcrumb: Entity Relationships list

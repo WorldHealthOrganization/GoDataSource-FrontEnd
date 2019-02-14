@@ -207,10 +207,25 @@
             <div class="page-tabs-navbar-placeholder"></div>
         </ng-container>
 
-        <button *ngIf="viewOnly && hasContactWriteAccess()"
+        <ng-container *ngIf="viewOnly && hasContactWriteAccess()">
+            <button
                 mat-raised-button type="button" color="accent"
-                [routerLink]="['/contacts', contactData.id, 'modify']">
-            {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+                [routerLink]="['/contacts', contactData.id, 'modify']"
+            >
+                {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+            </button>
+
+            <div class="page-tabs-navbar-placeholder"></div>
+        </ng-container>
+
+        <button
+            *ngIf="contactExposure"
+            type="button"
+            mat-raised-button
+            color="primary"
+            [routerLink]="[EntityModel.getPersonLink(contactExposure)]"
+        >
+            {{ 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_EXPOSURE' | translate }}
         </button>
 
         <div class="page-tabs-navbar-placeholder"></div>
