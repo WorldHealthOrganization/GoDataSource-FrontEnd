@@ -101,7 +101,7 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
 
                                 // add new breadcrumb: Case Modify page
                                 this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/modify`),
+                                    new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/view`),
                                 );
                                 // add new breadcrumb: Lab Results list page
                                 this.breadcrumbs.push(

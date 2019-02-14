@@ -13,6 +13,11 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiModifyContactPage
+         */
+        'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_EXPOSURE': 'View exposure',
+
+        /**
          * uiFollowUpfields
          */
         'LNG_FOLLOW_UP_FIELD_LABEL_DATE': 'Follow-up date',
@@ -61,6 +66,11 @@ export const EnglishUsLang = {
          * uiCommonButtons
          */
         'LNG_COMMON_BUTTON_BACK_TO_LOGIN': 'Back to login',
+
+        /**
+         * uiContactFields
+         */
+        'LNG_CONTACT_FIELD_LABEL_DATE_OF_START_OF_FOLLOWUP': 'Follow-up start date',
 
         /**
          * uiListFiltersPageTitles
