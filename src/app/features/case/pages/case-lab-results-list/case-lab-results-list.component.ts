@@ -89,7 +89,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                             this.caseId = caseData.id;
 
                             // setup breadcrumbs
-                            this.breadcrumbs.push(new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/modify`));
+                            this.breadcrumbs.push(new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/view`));
                             this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', '.', true));
 
                             // initialize pagination
