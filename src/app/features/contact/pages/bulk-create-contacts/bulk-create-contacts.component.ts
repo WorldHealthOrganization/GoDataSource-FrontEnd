@@ -28,6 +28,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { GridSettings } from 'handsontable';
 import { NgModel } from '@angular/forms';
 import { ContactModel } from '../../../../core/models/contact.model';
+import 'rxjs/add/operator/mergeMap';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -512,8 +513,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                                 contactMask,
                                 contactMask
                             )
-                                .map((isValid: boolean) => {
-                                    if (isValid) {
+                                .map((isValid) => {
+                                    if (isValid === true) {
                                         // add mask on all contacts
                                         data = data.map((contactEntry) => {
                                             contactEntry.contact.visualId = contactMask;
