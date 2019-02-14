@@ -67,6 +67,10 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_FILTER_CASES_OUTSIDE_THE_TRANSMISSION_CHAINS': 'Cases in the previous {{x}} days outside the transmission chains',
 
+        /**
+         *uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_PROPAGATE_LAT_LNG' : 'This location is used in other entities. Do you want to propagate the lat/lng to all the entities that have this location in use?'
 
         /**
          * REMOVE

@@ -228,6 +228,14 @@ export class LocationDataService {
     }
 
     /**
+     * Retrieve location usage count
+     * @param {string} locationId
+     */
+    getLocationUsageCount(locationId: string): Observable<any> {
+        return this.http.get(`locations/${locationId}/usage/count`);
+    }
+
+    /**
      * Propagate lat/lng to all entities that are using specified location
      * @param {string} locationId
      */
