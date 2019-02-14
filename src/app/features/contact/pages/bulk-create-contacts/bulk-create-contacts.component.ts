@@ -27,6 +27,7 @@ import { EntityModel } from '../../../../core/models/entity.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { GridSettings } from 'handsontable';
 import { NgModel } from '@angular/forms';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -37,8 +38,8 @@ import { NgModel } from '@angular/forms';
 export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // selected outbreak ID
-    outbreakId: string;
+    // selected outbreak
+    selectedOutbreak: OutbreakModel;
     // related entity
     relatedEntityType: EntityType;
     relatedEntityId: string;
@@ -142,7 +143,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 return ErrorObservable.create(err);
             })
             .subscribe((selectedOutbreak: OutbreakModel) => {
-                this.outbreakId = selectedOutbreak.id;
+                this.selectedOutbreak = selectedOutbreak;
 
                 this.retrieveRelatedPerson();
             });
@@ -395,13 +396,14 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
      */
     private retrieveRelatedPerson() {
         if (
-            this.outbreakId &&
+            this.selectedOutbreak &&
+            this.selectedOutbreak.id &&
             this.relatedEntityType &&
             this.relatedEntityId
         ) {
             // retrieve related person information
             this.entityDataService
-                .getEntity(this.relatedEntityType, this.outbreakId, this.relatedEntityId)
+                .getEntity(this.relatedEntityType, this.selectedOutbreak.id, this.relatedEntityId)
                 .catch((err) => {
                     // show error message
                     this.snackbarService.showError(err.message);
@@ -501,6 +503,29 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 } else {
                     // collect data from table
                     this.bulkAddContactsService.getData(sheetCore, this.sheetColumns)
+                        .mergeMap((data) => {
+                            // get Contact mask configured on outbreak
+                            const contactMask = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);
+
+                            return this.contactDataService.checkContactVisualIDValidity(
+                                this.selectedOutbreak.id,
+                                contactMask,
+                                contactMask
+                            )
+                                .map((isValid: boolean) => {
+                                    if (isValid) {
+                                        // add mask on all contacts
+                                        data = data.map((contactEntry) => {
+                                            contactEntry.contact.visualId = contactMask;
+                                            return contactEntry;
+                                        });
+                                    } else {
+                                        // do nothing; the mask will be omitted and the contacts will be created without a visual ID
+                                    }
+
+                                    return data;
+                                });
+                        })
                         .subscribe((data) => {
                             // no data to save ?
                             if (_.isEmpty(data)) {
@@ -509,7 +534,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                                 this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_NO_DATA');
                             } else {
                                 // create contacts
-                                this.contactDataService.bulkAddContacts(this.outbreakId, this.relatedEntityType, this.relatedEntityId, data)
+                                this.contactDataService.bulkAddContacts(this.selectedOutbreak.id, this.relatedEntityType, this.relatedEntityId, data)
                                     .catch((err) => {
                                         loadingDialog.close();
                                         this.snackbarService.showError(err.message);
