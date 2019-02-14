@@ -19,6 +19,15 @@ export const EnglishUsLang = {
         'LNG_FORM_DATE_SLIDER_FIELD_LABEL_VALUE': 'Selected: {{date}}',
 
         /**
+         * NEW GROUP
+         * Form Date Range Slider
+         */
+        'LNG_FORM_DATE_RANGE_SLIDER_FIELD_LABEL_MIN': 'Min',
+        'LNG_FORM_DATE_RANGE_SLIDER_FIELD_LABEL_DESCRIPTION': '',
+        'LNG_FORM_DATE_RANGE_SLIDER_FIELD_LABEL_MAX': 'Max',
+        'LNG_FORM_DATE_RANGE_SLIDER_FIELD_LABEL_MAX_DESCRIPTION': '',
+
+        /**
          * uiModifyContactPage
          */
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_EXPOSURE': 'View exposure',

@@ -6,7 +6,7 @@ import {
     Inject,
     Host,
     SkipSelf,
-    HostBinding, Output, EventEmitter
+    HostBinding, Output, EventEmitter, ViewChild
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { ElementBase } from '../../core/index';
@@ -77,6 +77,17 @@ export class FormDateRangeSliderComponent extends ElementBase<FormDateRangeSlide
     }
 
     /**
+     * Min Range
+     */
+    @Input() set minRange(minRange: number) {
+        this.setSliderOptions({
+            minRange: minRange
+        });
+    }
+    get minRange(): number {
+        return this.sliderOptions.minRange;
+    }
+    /**
      * Max Range
      */
     @Input() set maxRange(maxRange: number) {
@@ -89,21 +100,14 @@ export class FormDateRangeSliderComponent extends ElementBase<FormDateRangeSlide
     }
 
     /**
-     * Min Range
-     */
-    @Input() set minRange(minRange: number) {
-        this.setSliderOptions({
-            minRange: minRange
-        });
-    }
-    get minRange(): number {
-        return this.sliderOptions.minRange;
-    }
-
-    /**
      * Name
      */
     @Input() name: string;
+
+    /**
+     * Allow Min & Max values of the slide to be changed
+     */
+    @Input() allowMinMaxToBeChanged: boolean = true;
 
     /**
      * Min Date
@@ -115,8 +119,21 @@ export class FormDateRangeSliderComponent extends ElementBase<FormDateRangeSlide
             minDate instanceof moment ? minDate : moment(minDate)
         ) as Moment;
 
+        // set max date if smaller
+        if (
+            this.minDate && (
+                !this.maxDate ||
+                this.maxDate.isBefore(this.minDate)
+            )
+        ) {
+            this.maxDate = moment(this.minDate);
+        }
+
         // determine min & max
         this.determineMinMax();
+
+        // trigger change value
+        this.triggerChangeValue();
     }
     get minDate(): Moment {
         return this._minDate;
@@ -132,12 +149,30 @@ export class FormDateRangeSliderComponent extends ElementBase<FormDateRangeSlide
             maxDate instanceof moment ? maxDate : moment(maxDate)
         ) as Moment;
 
+        // set min date if smaller
+        if (
+            this.maxDate && (
+                !this.minDate ||
+                this.minDate.isAfter(this.maxDate)
+            )
+        ) {
+            this.minDate = moment(this.maxDate);
+        }
+
         // determine min & max
         this.determineMinMax();
+
+        // trigger change value
+        this.triggerChangeValue();
     }
     get maxDate(): Moment {
         return this._maxDate;
     }
+
+    /**
+     * Slider Element
+     */
+    @ViewChild('sliderElement') sliderElement;
 
     /**
      * Tooltip
@@ -218,7 +253,10 @@ export class FormDateRangeSliderComponent extends ElementBase<FormDateRangeSlide
     /**
      * Function triggered when the input value is changed
      */
-    onChange(sliderChange: ChangeContext) {
+    onChange(
+        sliderChange: ChangeContext,
+        touch: boolean = true
+    ) {
         // we need to have minDate to determine date
         if (
             !this.value ||
@@ -228,7 +266,9 @@ export class FormDateRangeSliderComponent extends ElementBase<FormDateRangeSlide
         }
 
         // touched
-        this.touch();
+        if (touch) {
+            this.touch();
+        }
 
         // determine date accordingly to the new slider value
         // we need to clone minDate since add alters the object
@@ -335,5 +375,20 @@ export class FormDateRangeSliderComponent extends ElementBase<FormDateRangeSlide
             this.sliderValue.low = 0;
             this.sliderValue.high = 0;
         }
+    }
+
+    /**
+     * Trigger change value
+     */
+    private triggerChangeValue() {
+        setTimeout(() => {
+            // we need slider element to do this
+            if (this.sliderElement) {
+                const change = new ChangeContext();
+                change.value = this.sliderElement.value;
+                change.highValue = this.sliderElement.highValue;
+                this.onChange(change, false);
+            }
+        });
     }
 }

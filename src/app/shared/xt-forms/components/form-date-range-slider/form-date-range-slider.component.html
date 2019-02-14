@@ -11,10 +11,36 @@
     </div>
 
     <div
+        *ngIf="allowMinMaxToBeChanged"
+        fxFlex>
+        <form
+            fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+            <!-- Min Input -->
+            <app-form-datepicker
+                fxFlex="150px"
+                name="minRange"
+                [(ngModel)]="minDate"
+                [placeholder]="'LNG_FORM_DATE_RANGE_SLIDER_FIELD_LABEL_MIN'| translate"
+                tooltip="LNG_FORM_DATE_RANGE_SLIDER_FIELD_LABEL_DESCRIPTION">
+            </app-form-datepicker>
+
+            <!-- Max Input -->
+            <app-form-datepicker
+                fxFlex="150px"
+                name="maxRange"
+                [(ngModel)]="maxDate"
+                [placeholder]="'LNG_FORM_DATE_RANGE_SLIDER_FIELD_LABEL_MAX'| translate"
+                tooltip="LNG_FORM_DATE_RANGE_SLIDER_FIELD_LABEL_MAX_DESCRIPTION">
+            </app-form-datepicker>
+        </form>
+    </div>
+
+    <div
         fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
         <!-- Slider -->
         <ng5-slider
             fxFlex
+            #sliderElement
             [value]="sliderValue.low"
             [highValue]="sliderValue.high"
             [options]="sliderOptions"
