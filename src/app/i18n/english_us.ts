@@ -63,10 +63,14 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_BACK_TO_LOGIN': 'Back to login',
 
         /**
+         * uiContactFields
+         */
+        'LNG_CONTACT_FIELD_LABEL_DATE_OF_START_OF_FOLLOWUP': 'Follow-up start date',
+
+        /**
          * uiListFiltersPageTitles
          */
         'LNG_PAGE_LIST_FILTER_CASES_OUTSIDE_THE_TRANSMISSION_CHAINS': 'Cases in the previous {{x}} days outside the transmission chains',
-
 
         /**
          * REMOVE
