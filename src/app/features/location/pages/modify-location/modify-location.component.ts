@@ -142,19 +142,28 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
 
                 // refresh location breadcrumbs
                 this.locationBreadcrumbs.refreshBreadcrumbs();
+                if (dirtyFields.geoLocation) {
+                    this.locationDataService.getLocationUsageCount(modifiedLocation.id)
+                        .subscribe((usedEntitiesCount) => {
+                            if (usedEntitiesCount.count > 0) {
+                                this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_PROPAGATE_LAT_LNG')
+                                    .subscribe((answer: DialogAnswer) => {
+                                        if (answer.button === DialogAnswerButton.Yes) {
+                                            // propagate values to all the entities that have in use this location
+                                            this.locationDataService.propagateGeoLocation(modifiedLocation.id)
+                                                .catch((err) => {
+                                                    this.snackbarService.showError(err.message);
+                                                    loadingDialog.close();
+                                                    return ErrorObservable.create(err);
+                                                }).subscribe(() => {
+                                                    this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE');
+                                            });
+                                        }
+                                    });
+                            }
+                        });
+                }
 
-                this.locationDataService.getLocationUsageCount(modifiedLocation.id)
-                    .subscribe((usedEntitiesCount) => {
-                    if (usedEntitiesCount.count !== 0) {
-                        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_PROPAGATE_LAT_LNG')
-                            .subscribe((answer: DialogAnswer) => {
-                                if (answer.button === DialogAnswerButton.Yes) {
-                                    // propagate values to all the entities that have in use this location
-                                    this.locationDataService.propagateGeoLocation(modifiedLocation.id).subscribe();
-                                }
-                            });
-                        }
-                    });
 
                 // hide dialog
                 loadingDialog.close();

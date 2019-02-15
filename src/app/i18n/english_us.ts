@@ -80,7 +80,12 @@ export const EnglishUsLang = {
         /**
          *uiDialogs
          */
-        'LNG_DIALOG_CONFIRM_PROPAGATE_LAT_LNG' : 'This location is used in other entities. Do you want to propagate the lat/lng to all the entities that have this location in use?'
+        'LNG_DIALOG_CONFIRM_PROPAGATE_LAT_LNG' : 'This location is being used. Do you want to propagate the new latitude and longitude values to the addresses that are using this location?',
+
+        /**
+         *uiModifyLocationPage
+         */
+        'LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE': 'Location coordinates were propagate to all addresses that are using this location',
 
         /**
          * REMOVE
