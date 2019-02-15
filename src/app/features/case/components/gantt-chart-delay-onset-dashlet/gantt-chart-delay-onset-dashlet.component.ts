@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs/Subscriber';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/index';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-gantt-chart-delay-onset-dashlet',
@@ -170,14 +170,14 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
         _.forEach(metricResults, (result) => {
             if (
                 !_.isEmpty(result.dateOfOnset) &&
-                !_.isEmpty(result.dateOfFirstLabTest)
+                !_.isEmpty(result.dateSampleTaken)
                 && result.delay > 0
             ) {
                 const chartDataItemChild: any = {};
                 chartDataItemChild.id = result.case.id;
-                chartDataItemChild.name = result.case.firstName + ' ' + result.case.lastName;
+                chartDataItemChild.name = result.case.name;
                 chartDataItemChild.from = new Date(Date.parse(result.dateOfOnset));
-                chartDataItemChild.to = new Date(Date.parse(result.dateOfFirstLabTest));
+                chartDataItemChild.to = new Date(Date.parse(result.dateSampleTaken));
                 chartDataItem.children.push(chartDataItemChild);
             }
         });
