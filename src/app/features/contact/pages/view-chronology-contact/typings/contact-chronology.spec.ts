@@ -7,7 +7,12 @@ describe('ContactChronology', () => {
     const date = moment();
     const contact = new ContactModel({
         dateOfReporting: date,
-        dateBecomeContact: date
+        followUp : {
+            startDate: date,
+            endDate: date
+        },
+        dateBecomeContact: date,
+        dateOfLastContact: date,
     });
     const contactChronology = ContactChronology.getChronologyEntries(contact, []);
 
@@ -18,6 +23,21 @@ describe('ContactChronology', () => {
 
     it(`should show date of becoming a contact`, () => {
         const item = _.find(contactChronology, {label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT'});
+        expect(item).toBeTruthy();
+    });
+
+    it(`should show follow up start date`, () => {
+        const item = _.find(contactChronology, {label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_START_OF_FOLLOWUP'});
+        expect(item).toBeTruthy();
+    });
+
+    it(`should show follow up end date`, () => {
+        const item = _.find(contactChronology, {label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP'});
+        expect(item).toBeTruthy();
+    });
+
+    it(`should show date of last contact`, () => {
+        const item = _.find(contactChronology, {label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'});
         expect(item).toBeTruthy();
     });
 });
