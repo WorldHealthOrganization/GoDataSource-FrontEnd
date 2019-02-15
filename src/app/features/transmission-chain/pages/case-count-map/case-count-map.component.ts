@@ -12,6 +12,15 @@ import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Subscription } from 'rxjs/Subscription';
+import {
+    DialogAnswerButton, DialogConfiguration,
+    DialogField
+} from '../../../../shared/components/dialog/dialog.component';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import * as FileSaver from 'file-saver';
+
 
 @Component({
     selector: 'app-case-count-map',
@@ -46,7 +55,10 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
      */
     constructor(
         private caseDataService: CaseDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private dialogService: DialogService,
+        private importExportDataService: ImportExportDataService,
+        private i18nService: I18nService
     ) {}
 
     /**
@@ -72,6 +84,39 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
+    }
+
+    exportCaseCountMap() {
+        this.dialogService.showInput(
+            new DialogConfiguration({
+                message: 'LNG_DIALOG_CONFIRM_EXPORT_CHAINS_OF_TRANSMISSION',
+                yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_YES',
+                required: true,
+                fieldsList: [new DialogField({
+                    name: 'splitFactor',
+                    placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_SPLIT_FACTOR',
+                    required: true,
+                    type: 'number',
+                    value: '1'
+                })],
+            }), true)
+            .subscribe((answer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // get the chosen split factor
+                    const splitFactor = answer.inputValue.value.splitFactor;
+                    // get the base64 png
+                    const pngBase64 = this.worldMap.getPng64();
+                    // cal the api for the pdf
+                    this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: Number(splitFactor)})
+                        .subscribe((blob) => {
+                           const fileName = this.i18nService.instant('token');
+                           FileSaver.saveAs(
+                               blob,
+                               `${fileName}`
+                           );
+                        });
+                }
+            });
     }
 
     /**

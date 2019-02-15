@@ -1,6 +1,27 @@
 <app-topnav [activeOutbreakEditable]="false">
     <ng-container dynamic-section>
-        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+
+                <button mat-raised-button color="accent"
+                        [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <ng-container>
+                        <button
+                            mat-menu-item
+                            (click)="exportCaseCountMap()">
+                            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT' | translate}}
+                        </button>
+                    </ng-container>
+                </mat-menu>
+
+            </div>
+        </div>
     </ng-container>
 </app-topnav>
 

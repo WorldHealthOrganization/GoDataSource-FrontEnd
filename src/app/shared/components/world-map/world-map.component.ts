@@ -785,6 +785,10 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         });
     }
 
+    getPng64() {
+        return this
+    }
+
     /**
      * Clear Selected items
      */
