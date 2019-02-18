@@ -24,6 +24,7 @@ import { tap } from 'rxjs/operators';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { RequestFilter } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-locations-list',
@@ -253,5 +254,29 @@ export class LocationsListComponent extends ListComponent implements OnInit {
             this.loadingDialog.close();
             this.loadingDialog = null;
         }
+    }
+
+    filterByIdentifierCode(value: string) {
+        // remove previous condition
+        this.queryBuilder.filter.remove('identifiers');
+
+        if (!_.isEmpty(value)) {
+            // add new condition
+            this.queryBuilder.filter.where({
+                identifiers: {
+                    elemMatch: {
+                        code: {
+                            $regex: RequestFilter.escapeStringForRegex(value)
+                                    .replace(/%/g, '.*')
+                                    .replace(/\\\?/g, '.'),
+                            $options: 'i'
+                        }
+                    }
+                }
+            });
+        }
+
+        // refresh list
+        this.needsRefreshList();
     }
 }
