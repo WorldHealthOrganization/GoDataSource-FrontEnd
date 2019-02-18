@@ -95,7 +95,7 @@ export const EnglishUsLang = {
         /**
          * uiListFiltersPageTitles
          */
-        'LNG_PAGE_LIST_FILTER_CASES_OUTSIDE_THE_TRANSMISSION_CHAINS': 'Cases in the previous {{x}} days outside the transmission chains'
+        'LNG_PAGE_LIST_FILTER_CASES_OUTSIDE_THE_TRANSMISSION_CHAINS': 'Cases in the previous {{x}} days outside the transmission chains',
 
         /**
          *uiDialogs
