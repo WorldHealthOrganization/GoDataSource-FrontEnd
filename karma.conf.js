@@ -4,8 +4,9 @@
 module.exports = function (config) {
     config.set({
         basePath: '',
-        frameworks: ['jasmine', '@angular/cli'],
+        frameworks: ['parallel', 'jasmine', '@angular/cli'],
         plugins: [
+            require('karma-parallel'),
             require('karma-jasmine'),
             require('karma-phantomjs-launcher'),
             require('karma-jasmine-html-reporter'),
@@ -26,7 +27,13 @@ module.exports = function (config) {
         port: 9875,
         colors: true,
         logLevel: config.LOG_INFO,
-        browserNoActivityTimeout: 400000,
+        browserNoActivityTimeout: 30000,
+        browserDisconnectTimeout: 5000,
+        browserDisconnectTolerance: 2,
+        parallelOptions: {
+            executors: require('os').cpus().length,
+            shardStrategy: 'round-robin'
+        },
         autoWatch: true,
         browsers: ['PhantomJS'],
         singleRun: true

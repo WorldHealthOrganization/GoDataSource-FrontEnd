@@ -305,7 +305,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
                     .subscribe((blob) => {
                         this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
-                });
+                    });
             });
     }
 

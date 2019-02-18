@@ -8,6 +8,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { components } from './components';
 import { validatorDirectives } from './validators';
+import { Ng5SliderModule } from 'ng5-slider';
 
 @NgModule({
     imports: [
@@ -15,6 +16,7 @@ import { validatorDirectives } from './validators';
         FormsModule,
         FlexLayoutModule,
         AngularMaterialModule,
+        Ng5SliderModule,
         TranslateModule
     ],
     declarations: [
@@ -27,6 +29,7 @@ import { validatorDirectives } from './validators';
         FormsModule,
         FlexLayoutModule,
         AngularMaterialModule,
+        Ng5SliderModule,
         ...components,
         ...validatorDirectives
     ]
