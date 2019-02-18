@@ -98,6 +98,16 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CASES_OUTSIDE_THE_TRANSMISSION_CHAINS': 'Cases in the previous {{x}} days outside the transmission chains'
 
         /**
+         *uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_PROPAGATE_LAT_LNG' : 'This location is being used. Do you want to propagate the new latitude and longitude values to the addresses that are using this location?',
+
+        /**
+         *uiModifyLocationPage
+         */
+        'LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE': 'Location coordinates were propagated to all addresses that are using this location',
+
+        /**
          * REMOVE
          */
         // 'LNG_CASE_FIELD_LABEL_DECEASED',
