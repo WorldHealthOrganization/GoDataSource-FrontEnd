@@ -28,8 +28,9 @@ export class WorldMapMovementComponent {
     constructor (
         private dialogService: DialogService,
         private i18nService: I18nService
-    )
-    { }
+    ) {
+
+    }
 
     private _addresses: AddressModel[] = [];
     @Input() set addresses(items: AddressModel[]) {
