@@ -50,7 +50,6 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
         private dialogService: DialogService,
-        private importExportDataService: ImportExportDataService,
         private i18nService: I18nService
     ) {}
 

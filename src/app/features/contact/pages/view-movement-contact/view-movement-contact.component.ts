@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -8,6 +8,8 @@ import { ContactDataService } from '../../../../core/services/data/contact.data.
 import 'rxjs/add/observable/forkJoin';
 import { Observable } from 'rxjs/Observable';
 import { AddressModel } from '../../../../core/models/address.model';
+import { WorldMapMovementComponent } from '../../../../shared/components/world-map-movement/world-map-movement.component';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-view-movement-contact',
@@ -22,6 +24,8 @@ export class ViewMovementContactComponent implements OnInit {
 
     contactData: ContactModel = new ContactModel();
     movementAddresses: AddressModel[] = [];
+
+    @ViewChild('mapMovement') mapMovement: WorldMapMovementComponent;
 
     constructor(
         protected route: ActivatedRoute,
@@ -61,5 +65,12 @@ export class ViewMovementContactComponent implements OnInit {
                     });
                 });
         });
+    }
+
+    /**
+     * Export contact movement map
+     */
+    exportContactMovementMap() {
+        this.mapMovement.exportMovementMap(EntityType.CONTACT);
     }
 }

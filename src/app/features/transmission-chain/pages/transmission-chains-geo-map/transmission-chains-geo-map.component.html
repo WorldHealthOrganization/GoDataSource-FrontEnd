@@ -29,6 +29,13 @@
                             [routerLink]="['/transmission-chains', 'case-count-map']">
                             {{'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ACTION_CASE_COUNT_MAP_BUTTON' | translate}}
                         </button>
+
+                        <button
+                            mat-menu-item
+                            (click)="exportGeospatialMap()"
+                            [routerLink]="['/transmission-chains', 'case-count-map']">
+                            {{'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_EXPORT' | translate}}
+                        </button>
                     </ng-container>
                 </mat-menu>
 
@@ -89,6 +96,7 @@
 
     <!-- Map  -->
     <app-world-map
+        #worldMap
         *ngIf="markers.length > 0 || displayLoading"
         width="100%"
         [height]="headerHeight"

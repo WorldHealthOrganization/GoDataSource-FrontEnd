@@ -3,6 +3,10 @@ import { AddressModel, AddressType } from '../../../core/models/address.model';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { WorldMapComponent, WorldMapMarker, WorldMapPath, WorldMapPathType, WorldMapPoint } from '../world-map/world-map.component';
+import { DialogService } from '../../../core/services/helper/dialog.service';
+import { I18nService } from '../../../core/services/helper/i18n.service';
+import * as FileSaver from 'file-saver';
+import { EntityType } from '../../../core/models/entity-type';
 
 @Component({
     selector: 'app-world-map-movement',
@@ -20,6 +24,12 @@ export class WorldMapMovementComponent {
     arrowLines: WorldMapPath[] = [];
 
     selectedGeoPoint: WorldMapPoint;
+
+    constructor (
+        private dialogService: DialogService,
+        private i18nService: I18nService
+    )
+    { }
 
     private _addresses: AddressModel[] = [];
     @Input() set addresses(items: AddressModel[]) {
@@ -91,6 +101,28 @@ export class WorldMapMovementComponent {
     public fitMarkerBounds() {
         if (this.worldMapComponent) {
             this.worldMapComponent.fitMarkerBounds();
+        }
+    }
+
+    /**
+     * Export entity movement
+     */
+    exportMovementMap(entityType: EntityType) {
+        if (this.worldMapComponent) {
+            const loadingDialog = this.dialogService.showLoadingDialog();
+            this.worldMapComponent
+                .printToBlob()
+                .subscribe((blob) => {
+                    const fileName = this.i18nService.instant(
+                        entityType === EntityType.CASE ?
+                            'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE' :
+                            'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE');
+                    FileSaver.saveAs(
+                        blob,
+                        `${fileName}.png`
+                    );
+                    loadingDialog.close();
+                });
         }
     }
 }

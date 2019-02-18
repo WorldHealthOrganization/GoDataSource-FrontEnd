@@ -48,6 +48,8 @@ import {
     ViewCotNodeDialogComponent
 } from '../../../../shared/components';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import * as FileSaver from 'file-saver';
 
 @Component({
     selector: 'app-transmission-chains-geo-map',
@@ -80,6 +82,9 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
 
     // row header
     @ViewChild('topHeaderDiv') topHeaderDiv: ElementRef;
+    // map
+    @ViewChild('worldMap') worldMap: WorldMapComponent;
+
 
     // header height
     headerHeight: string;
@@ -94,7 +99,8 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
         private referenceDataDataService: ReferenceDataDataService,
         private entityDataService: EntityDataService,
         private dialogService: DialogService,
-        private relationshipDataService: RelationshipDataService
+        private relationshipDataService: RelationshipDataService,
+        private i18nService: I18nService
     ) {}
 
     /**
@@ -144,6 +150,25 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
+        }
+    }
+
+    /**
+     * Export geospatial map
+     */
+    exportGeospatialMap() {
+        if (this.worldMap) {
+            const loadingDialog = this.dialogService.showLoadingDialog();
+            this.worldMap
+                .printToBlob()
+                .subscribe((blob) => {
+                    const fileName = this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE');
+                    FileSaver.saveAs(
+                        blob,
+                        `${fileName}.png`
+                    );
+                    loadingDialog.close();
+                });
         }
     }
 

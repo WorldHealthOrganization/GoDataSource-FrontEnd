@@ -78,6 +78,21 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CASES_OUTSIDE_THE_TRANSMISSION_CHAINS': 'Cases in the previous {{x}} days outside the transmission chains',
 
         /**
+         * uiMovementCasePage
+         */
+        'LNG_PAGE_VIEW_MOVEMENT_CASE_EXPORT': 'Export Case Movement Map',
+
+        /**
+         * uiMovementContactPage
+         */
+        'LNG_PAGE_VIEW_MOVEMENT_CONTACT_EXPORT': 'Export Contact Movement Map',
+
+        /**
+         * uiTransmissionChainsGeoMap
+         */
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_EXPORT': 'Export Geospatial Map'
+
+        /**
          * REMOVE
          */
         // 'LNG_CASE_FIELD_LABEL_DECEASED',
