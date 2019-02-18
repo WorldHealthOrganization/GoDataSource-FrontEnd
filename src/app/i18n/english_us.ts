@@ -85,7 +85,7 @@ export const EnglishUsLang = {
         /**
          *uiModifyLocationPage
          */
-        'LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE': 'Location coordinates were propagate to all addresses that are using this location',
+        'LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE': 'Location coordinates were propagated to all addresses that are using this location',
 
         /**
          * REMOVE

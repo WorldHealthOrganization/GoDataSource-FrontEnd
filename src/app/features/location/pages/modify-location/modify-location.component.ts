@@ -152,8 +152,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                                             // propagate values to all the entities that have in use this location
                                             this.locationDataService.propagateGeoLocation(modifiedLocation.id)
                                                 .catch((err) => {
-                                                    this.snackbarService.showError(err.message);
-                                                    loadingDialog.close();
+                                                    this.snackbarService.showApiError(err);
                                                     return ErrorObservable.create(err);
                                                 }).subscribe(() => {
                                                     this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE');
@@ -163,7 +162,6 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                             }
                         });
                 }
-
 
                 // hide dialog
                 loadingDialog.close();
