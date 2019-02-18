@@ -294,16 +294,7 @@ export class EntityModel {
      * @param person
      * @returns {string}
      */
-    static getPersonLink(person) {
-        let entityTypeLink = '';
-        if (person instanceof CaseModel) {
-            entityTypeLink = EntityModel.getLinkForEntityType(EntityType.CASE);
-        } else if (person instanceof ContactModel) {
-            entityTypeLink = EntityModel.getLinkForEntityType(EntityType.CONTACT);
-        } else if (person instanceof EventModel) {
-            entityTypeLink = EntityModel.getLinkForEntityType(EntityType.EVENT);
-        }
-
-        return `/${entityTypeLink}/${person.id}/view`;
+    static getPersonLink(person): string {
+        return `/${EntityModel.getLinkForEntityType(person.type)}/${person.id}/view`;
     }
 }

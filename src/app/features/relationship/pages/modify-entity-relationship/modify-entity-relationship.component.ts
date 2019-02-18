@@ -140,7 +140,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             // add new breadcrumb: Entity Modify page
             new BreadcrumbItemModel(
                 this.entityData.name,
-                `${this.entityMap[this.entityType].link}/${this.entityId}/modify`
+                `${this.entityMap[this.entityType].link}/${this.entityId}/view`
             ),
 
             // add new breadcrumb: Relationships list page
