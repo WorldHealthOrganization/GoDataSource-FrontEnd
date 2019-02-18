@@ -32,13 +32,6 @@
     </ng-container>
 </app-topnav>
 
-<!-- Side filters -->
-<app-side-filters
-    [filterOptions]="availableSideFilters"
-    (filtersApplied)="applySideFilters($event)"
-    [fixedFilters]="true">
-</app-side-filters>
-
 <mat-card class="page-section page-content">
     <div
         fxFlex fxLayout="column" fxLayoutGap="5px">
@@ -56,11 +49,26 @@
         </div>
     </div>
 
+    <!-- Filters -->
+    <div>
+        <!-- Date range filter -->
+        <app-form-date-range-slider
+            *ngIf="selectedOutbreak"
+            name="dateRangeFilter"
+            [ngModel]="sliderDateFilterValue"
+            [minDate]="slideFilterData.minDate"
+            [maxDate]="slideFilterData.maxDate"
+            [maxRange]="slideFilterData.maxRange"
+            [label]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
+            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION"
+            (optionChanged)="filterByDateRange($event)">
+        </app-form-date-range-slider>
+    </div>
+
     <!-- Loading data -->
     <div
         *ngIf="displayLoading"
-        class="follow-up-range-loading"
-    >
+        class="follow-up-range-loading">
         <mat-spinner></mat-spinner>
     </div>
 
@@ -115,9 +123,10 @@
                 <div
                     *ngFor="let date of daysToDisplay"
                     fxFlex="64px" fxLayoutAlign="center end"
-                    class="follow-up-range-date-header follow-up-range-date-column-header">
-                    <div>
-                        {{ date | dateShort }}
+                    class="follow-up-range-date-header">
+                    <div
+                        class="follow-up-range-date-column-header">
+                        {{ date | dateDefault }}
                     </div>
                 </div>
 
