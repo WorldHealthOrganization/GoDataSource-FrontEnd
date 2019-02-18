@@ -68,7 +68,7 @@ export class ViewMovementContactComponent implements OnInit {
     }
 
     /**
-     * Export contact movement map
+     * Export movement map for contact
      */
     exportContactMovementMap() {
         this.mapMovement.exportMovementMap(EntityType.CONTACT);
