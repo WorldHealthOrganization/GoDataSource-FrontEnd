@@ -20,7 +20,6 @@
                         [name]="name"
                         [(ngModel)]="centerDateRange"
                         (changed)="onChange()"
-                        [required]="required"
                         (groupValidated)="validateGroup()"
                         [disabled]="disabled"
                         [fromTooltip]="fromTooltip"
@@ -29,9 +28,7 @@
                     </app-form-daterange>
                 </div>
 
-                <div fxFlex fxLayout="row" fxLayoutGap="20px"
-                     *ngIf="centerDateRange.typeId === DATE_TYPES.HOSPITALIZATION_DATE ||
-                            centerDateRange.typeId === DATE_TYPES.ISOLATION_DATE">
+                <div fxFlex fxLayout="row" fxLayoutGap="20px">
                     <app-form-input
                         [name]="name + '[centerName]'"
                         [(ngModel)]="centerDateRange.centerName"
