@@ -7,7 +7,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import * as _ from 'lodash';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
-import { ChronologyItem } from '../../../../shared/components/chronology/chronology.component';
+import { ChronologyItem } from '../../../../shared/components/chronology/typings/chronology-item';
 import 'rxjs/add/observable/forkJoin';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 
