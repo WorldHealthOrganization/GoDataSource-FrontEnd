@@ -13,6 +13,16 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiGlobalSearch
+         */
+        'LNG_GLOBAL_ENTITY_SEARCH_DIALOG_CREATE_CASE_WITH_UID_TITLE': 'Do you want to create a new Case with the given UID?',
+
+        /**
+         * uiCreateCasePage
+         */
+        'LNG_PAGE_CREATE_CASE_WITH_UID_TITLE': 'Create case with UID {{uid}}',
+
+        /**
          * uiCasesListPage
          */
         'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASE_INVESTIGATION_FORM': 'Export case investigation form',
