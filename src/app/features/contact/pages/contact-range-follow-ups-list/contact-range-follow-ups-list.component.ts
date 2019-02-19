@@ -8,7 +8,6 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -20,6 +19,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogField, LoadingDialogModel } from '../../../../shared/components';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { FormDateRangeSliderData } from '../../../../shared/xt-forms/components/form-date-range-slider/form-date-range-slider.component';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -62,9 +62,6 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     // loading flag - display spinner instead of table
     displayLoading: boolean = false;
 
-    // side filters
-    availableSideFilters: FilterModel[];
-
     // export
     exportRangeFollowUpsUrl: string;
     exportRangeFollowUpsFileName: string;
@@ -79,6 +76,27 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
     loadingDialog: LoadingDialogModel;
 
+    /**
+     * Filter slider data
+     */
+    slideFilterData: {
+        minDate: Moment,
+        maxDate: Moment,
+        maxRange: number
+    } = {
+        minDate: moment().startOf('day'),
+        maxDate: moment().endOf('day'),
+        maxRange: 0
+    };
+
+    /**
+     * Slider Date Filter Value
+     */
+    sliderDateFilterValue: FormDateRangeSliderData;
+
+    /**
+     * Constructor
+     */
     constructor(
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -102,9 +120,6 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         this.exportRangeFollowUpsFileName = this.i18nService.instant('LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE') +
             ' - ' +
             moment().format('YYYY-MM-DD');
-
-        // side filters
-        this.initializeSideFilters();
 
         // retrieve group by options
         this.genericDataService
@@ -130,11 +145,28 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
                 // export url
                 this.exportRangeFollowUpsUrl = null;
+                this.slideFilterData = {
+                    minDate: moment().startOf('day'),
+                    maxDate: moment().endOf('day'),
+                    maxRange: 0
+                };
                 if (
                     this.selectedOutbreak &&
                     this.selectedOutbreak.id
                 ) {
                     this.exportRangeFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts/range-list/export`;
+
+                    // set filter slider info
+                    this.slideFilterData.minDate = moment(this.selectedOutbreak.startDate).startOf('day');
+                    this.slideFilterData.maxDate = moment().add(this.selectedOutbreak.periodOfFollowup, 'days').endOf('day');
+                    this.slideFilterData.maxRange = this.selectedOutbreak.periodOfFollowup;
+                    this.sliderDateFilterValue = new FormDateRangeSliderData({
+                        low: moment(),
+                        high: moment().add(this.selectedOutbreak.periodOfFollowup, 'days')
+                    });
+
+                    // filter
+                    this.filterByDateRange(this.sliderDateFilterValue);
                 }
 
                 // daily status colors
@@ -151,38 +183,6 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                 this.needsRefreshList(true);
             });
 
-    }
-
-    /**
-     * Initialize Side Filters
-     */
-    initializeSideFilters() {
-        // set available side filters
-        const dateFilterValue = {
-            startDate: moment().add(-14, 'days').startOf('day').format(),
-            endDate: moment().endOf('day').format()
-        };
-        this.availableSideFilters = [
-            new FilterModel({
-                fieldName: 'date',
-                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
-                type: FilterType.RANGE_DATE,
-                required: true,
-                value: dateFilterValue
-            })
-        ];
-
-        // setup list query builder
-        this.queryBuilder.filter.byDateRange(
-            'date',
-            dateFilterValue
-        );
-
-        // set export data
-        this.exportRangeExtraAPIData = {
-            startDate: dateFilterValue.startDate,
-            endDate: dateFilterValue.endDate
-        };
     }
 
     /**
@@ -288,5 +288,30 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             this.loadingDialog.close();
             this.loadingDialog = null;
         }
+    }
+
+    /**
+     * Filter by slider value
+     */
+    filterByDateRange(value: FormDateRangeSliderData) {
+        // set the new value
+        this.sliderDateFilterValue = value;
+
+        // filter
+        this.queryBuilder.filter.byDateRange(
+            'date', {
+                startDate: moment(this.sliderDateFilterValue.low).startOf('day'),
+                endDate: moment(this.sliderDateFilterValue.high).endOf('day')
+            }
+        );
+
+        // set export data
+        this.exportRangeExtraAPIData = {
+            startDate: moment(this.sliderDateFilterValue.low).startOf('day'),
+            endDate: moment(this.sliderDateFilterValue.high).endOf('day')
+        };
+
+        // refresh list
+        this.needsRefreshList();
     }
 }

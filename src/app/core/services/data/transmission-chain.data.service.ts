@@ -224,7 +224,7 @@ export class TransmissionChainDataService {
                         allowAdd = true;
                         if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
                                 || selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value) {
-                            if (!_.isEmpty(node.model.data)) {
+                            if (!_.isEmpty(node.model.date)) {
                                 nodeProps.dateTimeline = node.model.date;
                             } else {
                                 graphData.eventNodesWithoutDates.push(node.model.id);

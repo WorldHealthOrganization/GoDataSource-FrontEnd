@@ -1,0 +1,31 @@
+@import '~styles/common';
+
+app-form-date-range-slider {
+    .form-date-range-slider {
+        margin: 20px 0px 100px 20px;
+
+        .ng5-slider {
+            .ng5-slider-ticks-values-under {
+                .ng5-slider-tick-value {
+                    transform: rotate(-60deg) translate(-80%, -190%);
+                    text-align: left;
+                    bottom: auto;
+                }
+            }
+
+            .ng5-slider-pointer,
+            .ng5-slider-selection,
+            .ng5-slider-tick.ng5-slider-selected {
+                background-color: @color-accent-main;
+            }
+
+            &[disabled] {
+                .ng5-slider-pointer,
+                .ng5-slider-selection,
+                .ng5-slider-tick.ng5-slider-selected {
+                    background-color: #d8e0f3;
+                }
+            }
+        }
+    }
+}
