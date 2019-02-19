@@ -57,6 +57,26 @@
             <div fxFlex><!-- placeholder --></div>
         </div>
 
+        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+
+            <app-form-input
+                name="visualId"
+                [(ngModel)]="contact.visualId"
+                [placeholder]="'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate"
+                tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                (optionChanged)="onChange()">
+            </app-form-input>
+
+            <div fxFlex fxLayout="row" fxLayoutGap="5px">
+
+                <app-form-age
+                    name="age"
+                    [(ngModel)]="contact.age"
+                    (optionChanged)="onChange()">
+                </app-form-age>
+            </div>
+        </div>
+
         <div fxLayout="row" fxLayoutGap="20px">
             <app-form-select
                 fxFlex="25"
