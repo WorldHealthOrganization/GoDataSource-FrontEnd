@@ -278,7 +278,12 @@
                     <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP' | translate }}</div>
                     <div class="column-filter">
                         <div class="column-filter">
-                            <!-- placeholder -->
+                            <app-form-daterange
+                                name="dateFilter"
+                                ngModel
+                                (changed)="filterByRelation('contact').byDateRange('followUp.endDate', $event)"
+                                app-reset-input-on-side-filter>
+                            </app-form-daterange>
                         </div>
                     </div>
                 </div>
@@ -295,7 +300,14 @@
                     <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP' | translate }}</div>
                     <div class="column-filter">
                         <div class="column-filter">
-                            <!-- placeholder -->
+                            <app-form-input
+                                name="dayOfFollowUpFilter"
+                                ngModel
+                                placeholder="Filter"
+                                (optionChanged)="filterByNumber('index', $event)"
+                                app-reset-input-on-side-filter
+                                [displayFilterIcon]="true">
+                            </app-form-input>
                         </div>
                     </div>
                 </div>

@@ -308,6 +308,24 @@ export abstract class ListComponent {
     }
 
     /**
+     * Filter the list by a number
+     * @param {string} property
+     * @param {number} value
+     */
+    filterByNumber(
+        property: string | string[],
+        value: number,
+    ) {
+        this.queryBuilder.filter.byEquality(
+            property as string,
+            value
+        );
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
      * Filter the list by a text field
      * @param {string} property
      * @param {string} value
