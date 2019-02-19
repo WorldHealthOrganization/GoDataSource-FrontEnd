@@ -32,6 +32,21 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_FIELD_COPIES': 'Number of forms',
 
         /**
+         * NEW GROUP
+         * Form Date Slider
+         */
+        'LNG_FORM_DATE_SLIDER_FIELD_LABEL_VALUE': 'Selected: {{date}}',
+
+        /**
+         * NEW GROUP
+         * Form Date Range Slider
+         */
+        'LNG_FORM_DATE_RANGE_SLIDER_FIELD_LABEL_MIN': 'Min',
+        'LNG_FORM_DATE_RANGE_SLIDER_FIELD_LABEL_DESCRIPTION': '',
+        'LNG_FORM_DATE_RANGE_SLIDER_FIELD_LABEL_MAX': 'Max',
+        'LNG_FORM_DATE_RANGE_SLIDER_FIELD_LABEL_MAX_DESCRIPTION': '',
+
+        /**
          * uiModifyContactPage
          */
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_EXPOSURE': 'View exposure',
@@ -51,6 +66,11 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up successfully modified',
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups successfully modified',
+
+        /**
+         * uiFollowUpfields
+         */
+        'LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION': '',
 
         /**
          * uiCaseFields
@@ -95,6 +115,16 @@ export const EnglishUsLang = {
          * uiListFiltersPageTitles
          */
         'LNG_PAGE_LIST_FILTER_CASES_OUTSIDE_THE_TRANSMISSION_CHAINS': 'Cases in the previous {{x}} days outside the transmission chains',
+
+        /**
+         *uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_PROPAGATE_LAT_LNG' : 'This location is being used. Do you want to propagate the new latitude and longitude values to the addresses that are using this location?',
+
+        /**
+         *uiModifyLocationPage
+         */
+        'LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE': 'Location coordinates were propagated to all addresses that are using this location',
 
         /**
          * REMOVE

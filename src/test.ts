@@ -15,6 +15,8 @@ getTestBed().initTestEnvironment(
   platformBrowserDynamicTesting()
 );
 // Then we find all the tests.
+    // should add logic to exclude "*-helpers.spec.ts"
+    // #TODO
 const context = require.context('./', true, /\.spec\.ts$/);
 // And load the modules.
 context.keys().map(context);

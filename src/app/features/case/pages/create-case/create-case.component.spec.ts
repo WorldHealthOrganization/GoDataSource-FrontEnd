@@ -1,48 +1,21 @@
-import { TestBed, async, ComponentFixture, fakeAsync } from '@angular/core/testing';
+import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { CreateCaseComponent } from './create-case.component';
-import { SharedModule } from '../../../../shared/shared.module';
-import { RouterTestingModule } from '@angular/router/testing';
-import { CoreModule } from '../../../../core/core.module';
-import { TranslateModule } from '@ngx-translate/core';
-import { AuthDataServiceMock } from '../../../../core/services/data/auth.data.service.spec';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { GenericDataServiceMock } from '../../../../core/services/data/generic.data.service.spec';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ReferenceDataDataServiceMock } from '../../../../core/services/data/reference-data.data.service.spec';
-import { LanguageDataServiceMock } from '../../../../core/services/data/language.data.service.spec';
-import { LanguageDataService } from '../../../../core/services/data/language.data.service';
+import { configureTestSuite, initializeFixture } from '../../../../../test-helpers.spec';
 
 describe('CreateCaseComponent', () => {
+    // we don't actually need to reset TestBed, so we can setup it just once
+    configureTestSuite();
+    initializeFixture([
+        CreateCaseComponent
+    ]);
+
+    // Handle fixture initialization
     let comp: CreateCaseComponent;
     let fixture: ComponentFixture<CreateCaseComponent>;
-
-    beforeEach(fakeAsync(() => {
-        TestBed.configureTestingModule({
-            declarations: [
-                CreateCaseComponent
-            ],
-            imports: [
-                NoopAnimationsModule,
-                CoreModule,
-                TranslateModule.forRoot(),
-                SharedModule,
-                RouterTestingModule
-            ],
-            providers: [
-                {provide: AuthDataService, useClass: AuthDataServiceMock},
-                {provide: GenericDataService, useClass: GenericDataServiceMock},
-                {provide: ReferenceDataDataService, useClass: ReferenceDataDataServiceMock},
-                {provide: LanguageDataService, useClass: LanguageDataServiceMock},
-            ]
-        })
-            .compileComponents()
-            .then(() => {
-                fixture = TestBed.createComponent(CreateCaseComponent);
-                comp = fixture.componentInstance;
-            });
-    }));
+    beforeEach((done) => (async () => {
+        fixture = TestBed.createComponent(CreateCaseComponent);
+        comp = fixture.componentInstance;
+    })().then(done).catch(done.fail));
 
     it(`personal form should be valid with mandatory fields only`, async(
         () => {

@@ -1,0 +1,64 @@
+<div
+    [id]="identifier"
+    class="form-date-slider form-element"
+    fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
+
+    <!-- Label -->
+    <div
+        fxFlex fxGrow="0"
+        *ngIf="label">
+        {{ label | translate }}
+    </div>
+
+    <!-- Slider Data -->
+    <div
+        fxFlex fxLayout="column">
+        <!-- Slider Value -->
+        <div
+            fxFlex fxLayout="row">
+            <!-- Min -->
+            <div
+                fxFlex fxLayoutAlign="start">
+                {{ minDateLabel }}
+            </div>
+
+            <!-- Value -->
+            <div
+                fxFlex fxLayoutAlign="center">
+                {{ displayValue | translate:sliderDateData }}
+            </div>
+
+            <!-- Max -->
+            <div
+                fxFlex fxLayoutAlign="end">
+                {{ maxDateLabel }}
+            </div>
+        </div>
+
+        <!-- Slider -->
+        <mat-slider
+            fxFlex
+            [value]="sliderValue"
+            min="0"
+            [max]="maxValue"
+            step="1"
+            thumbLabel="false"
+            tickInterval="auto"
+            [disabled]="disabled"
+            (input)="onInput($event)"
+            (change)="onChange($event)"
+            (blur)="onBlur()">
+        </mat-slider>
+    </div>
+
+    <!-- Tooltip -->
+    <span
+        *ngIf="tooltip"
+        fxFlex="24px"
+        #tooltipCtrl="matTooltip"
+        [matTooltip]="tooltip"
+        class="xt-icon form-icon"
+        (click)="displayTooltip($event, tooltipCtrl)">
+        help
+    </span>
+</div>
