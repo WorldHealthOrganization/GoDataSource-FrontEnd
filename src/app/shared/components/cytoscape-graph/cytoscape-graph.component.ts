@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import * as cytoscape from 'cytoscape';
 import * as cola from 'cytoscape-cola';
 import * as dagre from 'cytoscape-dagre';
@@ -7,6 +7,32 @@ import { GenericDataService } from '../../../core/services/data/generic.data.ser
 import { Constants } from '../../../core/models/constants';
 import * as _ from 'lodash';
 import * as moment from 'moment';
+import { WorldMapComponent, WorldMapMarker, WorldMapMarkerType, WorldMapPath, WorldMapPathType, WorldMapPoint } from '../world-map/world-map.component';
+import { IConvertChainToGraphElements } from '../../../core/services/data/transmission-chain.data.service';
+import { TransmissionChainModel } from '../../../core/models/transmission-chain.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../core/models/reference-data.model';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
+import 'rxjs/add/observable/forkJoin';
+import { AddressModel, AddressType } from '../../../core/models/address.model';
+import { EntityModel } from '../../../core/models/entity.model';
+import { GraphNodeModel } from '../../../core/models/graph-node.model';
+import { CaseModel } from '../../../core/models/case.model';
+import { ViewCotNodeDialogComponent } from '../view-cot-node-dialog/view-cot-node-dialog.component';
+import { ViewCotEdgeDialogComponent } from '../view-cot-edge-dialog/view-cot-edge-dialog.component';
+import { LoadingDialogModel } from '../loading-dialog/loading-dialog.component';
+import { DialogService } from '../../../core/services/helper/dialog.service';
+import { EntityDataService } from '../../../core/services/data/entity.data.service';
+import { OutbreakModel } from '../../../core/models/outbreak.model';
+import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
+import { Subscription } from 'rxjs/Subscription';
+import { SnackbarService } from '../../../core/services/helper/snackbar.service';
+import { EventModel } from '../../../core/models/event.model';
+import { ContactModel } from '../../../core/models/contact.model';
+import { EntityType } from '../../../core/models/entity-type';
+import { RelationshipModel } from '../../../core/models/relationship.model';
+import { GraphEdgeModel } from '../../../core/models/graph-edge.model';
+import { RelationshipDataService } from '../../../core/services/data/relationship.data.service';
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -14,12 +40,37 @@ import * as moment from 'moment';
     templateUrl: './cytoscape-graph.component.html',
     styleUrls: ['./cytoscape-graph.component.less']
 })
-export class CytoscapeGraphComponent implements OnChanges, OnInit {
+export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
+    private _elements: IConvertChainToGraphElements;
+    @Input() set elements(elements: IConvertChainToGraphElements) {
+        // set elements
+        this._elements = elements;
 
-    @Input() elements: any;
+        // init geospatial map data
+        this.initGeospatialMap();
+    }
+    get elements(): IConvertChainToGraphElements {
+        return this._elements;
+    }
+
+    private _chainElements: TransmissionChainModel[];
+    @Input() set chainElements(chainElements: TransmissionChainModel[]) {
+        // set data
+        this._chainElements = chainElements;
+
+        // init geospatial map data
+        this.initGeospatialMap();
+    }
+    get chainElements(): TransmissionChainModel[] {
+        return this._chainElements;
+    }
+
     @Input() style;
     @Input() transmissionChainViewType: string;
     @Input() legend: any;
+
+    markers: WorldMapMarker[] = [];
+    lines: WorldMapPath[] = [];
 
     @Output() nodeTapped = new EventEmitter<any>();
     @Output() edgeTapped = new EventEmitter<any>();
@@ -35,6 +86,9 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     showLegend: boolean = true;
     // toggle edit mode
     editMode: boolean = false;
+
+    // display labels
+    displayLabels: boolean = true;
 
     /**
      *  layout cola - bubble view
@@ -213,9 +267,21 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     datesArray: string[] = [];
     timelineDatesRanks: any = {};
 
+    // subscribers
+    outbreakSubscriber: Subscription;
+
+    // selected Outbreak
+    selectedOutbreak: OutbreakModel;
+
     constructor(
         private genericDataService: GenericDataService,
-        private el: ElementRef
+        private el: ElementRef,
+        private referenceDataDataService: ReferenceDataDataService,
+        private dialogService: DialogService,
+        private entityDataService: EntityDataService,
+        private outbreakDataService: OutbreakDataService,
+        private snackbarService: SnackbarService,
+        private relationshipDataService: RelationshipDataService
     ) {}
 
     ngOnInit() {
@@ -224,13 +290,35 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             this.style ?
                 this.style :
                 this.defaultStyle;
+
         // load view types
         this.transmissionChainViewTypes$ = this.genericDataService.getTransmissionChainViewTypes();
+
         // default to bubble
         if (!this.transmissionChainViewType) {
             this.transmissionChainViewType = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
         }
 
+        // subscribe to the Selected Outbreak Subject stream
+        this.outbreakSubscriber = this.outbreakDataService
+            .getSelectedOutbreakSubject()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+
+                // init geospatial map data
+                this.initGeospatialMap();
+            });
+    }
+
+    /**
+     * Component removed
+     */
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     public ngOnChanges(): any {
@@ -741,6 +829,246 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         return filter;
     }
 
+    /**
+     * Init geospatial map
+     */
+    initGeospatialMap() {
+        // reset data
+        this.markers = [];
+        this.lines = [];
+
+        // determine map nodes
+        if (
+            !_.isEmpty(this.chainElements) &&
+            !_.isEmpty(this.elements) &&
+            !_.isEmpty(this.selectedOutbreak)
+        ) {
+            Observable.forkJoin([
+                this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE),
+                this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CERTAINTY_LEVEL),
+                this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION)
+            ]).subscribe(([
+              personTypes,
+              certaintyLevels,
+              caseClassification
+            ]: [
+                ReferenceDataCategoryModel,
+                ReferenceDataCategoryModel,
+                ReferenceDataCategoryModel
+            ]) => {
+                // map colors to types
+                const typeToColorMap = {};
+                _.each(personTypes.entries, (entry: ReferenceDataEntryModel) => {
+                    typeToColorMap[entry.id] = entry.colorCode;
+                });
+
+                // map certainty level to color
+                const certaintyLevelToColorMap = {};
+                _.each(certaintyLevels.entries, (entry: ReferenceDataEntryModel) => {
+                    certaintyLevelToColorMap[entry.id] = entry.colorCode;
+                });
+
+                // map case classification to color
+                const caseClassificationToColorMap = {};
+                _.each(caseClassification.entries, (entry: ReferenceDataEntryModel) => {
+                    caseClassificationToColorMap[entry.id] = entry.colorCode;
+                });
+
+                // reset data
+                const markersMap: {
+                    [idEntityModel: string]: WorldMapMarker
+                } = {};
+                this.markers = [];
+                this.lines = [];
+
+                // add valid address to marked
+                const markerCircleRadius: number = 7;
+                const addValidAddressToMarker = (
+                    address: AddressModel,
+                    entity: EntityModel,
+                    gNode: { data: GraphNodeModel }
+                ) => {
+                    // validate address
+                    if (
+                        _.isEmpty(address) ||
+                        _.isEmpty(address.geoLocation) ||
+                        !_.isNumber(address.geoLocation.lat) ||
+                        !_.isNumber(address.geoLocation.lng)
+                    ) {
+                        return;
+                    }
+
+                    // create marker
+                    const marker: WorldMapMarker = new WorldMapMarker({
+                        point: new WorldMapPoint(
+                            address.geoLocation.lat,
+                            address.geoLocation.lng
+                        ),
+                        type: WorldMapMarkerType.CIRCLE,
+                        radius: markerCircleRadius,
+                        color: typeToColorMap[entity.type] ? typeToColorMap[entity.type] : Constants.DEFAULT_COLOR_CHAINS,
+                        label: gNode.data.name,
+                        labelColor: (entity.model as CaseModel).classification && caseClassificationToColorMap[(entity.model as CaseModel).classification] ?
+                            caseClassificationToColorMap[(entity.model as CaseModel).classification] :
+                            Constants.DEFAULT_COLOR_CHAINS,
+                        data: entity,
+                        selected: (map: WorldMapComponent, mark: WorldMapMarker) => {
+                            // clear selected
+                            map.clearSelectedItems();
+
+                            // display entity information ( case / contact / event )
+                            const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+                            const localEntity: EntityModel = mark.data;
+                            this.entityDataService
+                                .getEntity(localEntity.type, this.selectedOutbreak.id, localEntity.model.id)
+                                .catch((err) => {
+                                    this.snackbarService.showApiError(err);
+                                    loadingDialog.close();
+                                    return ErrorObservable.create(err);
+                                })
+                                .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
+                                    // hide loading dialog
+                                    loadingDialog.close();
+
+                                    // show node information
+                                    this.dialogService.showCustomDialog(
+                                        ViewCotNodeDialogComponent,
+                                        {
+                                            ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
+                                            ...{
+                                                data: {
+                                                    entity: entityData
+                                                }
+                                            }
+                                        }
+                                    );
+                                });
+                        }
+                    });
+
+                    // add marker
+                    this.markers.push(marker);
+
+                    // add marker to map list
+                    markersMap[entity.model.id] = marker;
+                };
+
+                // go through nodes that are rendered on COT graph and determine what we can render on geo-map
+                const firstChain: TransmissionChainModel = this.chainElements[0];
+                _.each(this.elements.nodes, (gNode: { data: GraphNodeModel }) => {
+                    // get case / contact / event ...
+                    const entity: EntityModel = firstChain.nodes[gNode.data.id];
+                    if (!_.isEmpty(entity)) {
+                        switch (entity.type) {
+                            // events
+                            case EntityType.EVENT:
+                                addValidAddressToMarker(
+                                    (entity.model as EventModel).address,
+                                    entity,
+                                    gNode
+                                );
+                                break;
+
+                            // contacts ( same as case )
+                            case EntityType.CONTACT:
+                                addValidAddressToMarker(
+                                    _.find(
+                                        (entity.model as ContactModel).addresses,
+                                        {
+                                            typeId: AddressType.CURRENT_ADDRESS
+                                        }
+                                    ),
+                                    entity,
+                                    gNode
+                                );
+                                break;
+
+                            // cases ( same as contact )
+                            case EntityType.CASE:
+                                addValidAddressToMarker(
+                                    _.find(
+                                        (entity.model as CaseModel).addresses,
+                                        {
+                                            typeId: AddressType.CURRENT_ADDRESS
+                                        }
+                                    ),
+                                    entity,
+                                    gNode
+                                );
+                                break;
+                        }
+                    }
+                });
+
+                // map relationships
+                const relationshipMap: {
+                    [idRelationship: string]: RelationshipModel
+                } = {};
+                _.each(firstChain.relationships, (relationship: RelationshipModel) => {
+                    relationshipMap[relationship.id] = relationship;
+                });
+
+                // render relationships
+                _.each(this.elements.edges, (gEdge: { data: GraphEdgeModel }) => {
+                    // render relation
+                    const relationship: RelationshipModel = relationshipMap[gEdge.data.id];
+                    if (
+                        !_.isEmpty(relationship) &&
+                        markersMap[gEdge.data.source] &&
+                        markersMap[gEdge.data.target]
+                    ) {
+                        this.lines.push(new WorldMapPath({
+                            points: [
+                                markersMap[gEdge.data.source].point,
+                                markersMap[gEdge.data.target].point
+                            ],
+                            color: certaintyLevelToColorMap[relationship.certaintyLevelId] ? certaintyLevelToColorMap[relationship.certaintyLevelId] : Constants.DEFAULT_COLOR_CHAINS,
+                            type: WorldMapPathType.ARROW,
+                            lineWidth: 5,
+                            offsetX: -(markerCircleRadius * 2 + 3),
+                            data: relationship,
+                            selected: (map: WorldMapComponent, path: WorldMapPath) => {
+                                // clear selected
+                                map.clearSelectedItems();
+
+                                // display relationship information
+                                const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+                                const localRelationship: RelationshipModel = path.data;
+                                this.relationshipDataService
+                                    .getEntityRelationship(
+                                        this.selectedOutbreak.id,
+                                        localRelationship.sourcePerson.type,
+                                        localRelationship.sourcePerson.id,
+                                        localRelationship.id
+                                    ).catch((err) => {
+                                    this.snackbarService.showError(err.message);
+                                    loadingDialog.close();
+                                    return ErrorObservable.create(err);
+                                })
+                                    .subscribe((relationshipData) => {
+                                        // hide loading dialog
+                                        loadingDialog.close();
+
+                                        // show edge information
+                                        this.dialogService.showCustomDialog(
+                                            ViewCotEdgeDialogComponent,
+                                            {
+                                                ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+                                                ...{
+                                                    data: {
+                                                        relationship: relationshipData
+                                                    }
+                                                }
+                                            }
+                                        );
+                                    });
+                            }
+                        }));
+                    }
+                });
+            });
+        }
+    }
 }
 
 

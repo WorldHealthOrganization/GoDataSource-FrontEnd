@@ -276,6 +276,10 @@ export class Constants {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW',
             value: 'BUBBLE_NETWORK'
         },
+        GEOSPATIAL_MAP: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GEOSPATIAL_MAP',
+            value: 'GEOSPATIAL_MAP'
+        },
         HIERARCHICAL_NETWORK: {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_HIERARCHICAL_NETWORK_VIEW',
             value: 'HIERARCHICAL_NETWORK'
