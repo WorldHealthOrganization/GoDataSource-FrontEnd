@@ -30,10 +30,7 @@ export enum ExportDataExtension {
 
 @Injectable()
 export class DialogService {
-    /**
-     * Constructor
-     * @param dialog
-     */
+
     constructor(
         private dialog: MatDialog,
         private importExportDataService: ImportExportDataService,
@@ -160,6 +157,7 @@ export class DialogService {
         }
         if (_.isEmpty(data.queryBuilderClearOthers)) {
             data.queryBuilderClearOthers = [
+                'childrenQueryBuilders',
                 'includedRelations',
                 'filter',
                 'sort',
