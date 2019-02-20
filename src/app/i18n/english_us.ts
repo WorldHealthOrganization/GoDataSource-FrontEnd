@@ -107,6 +107,12 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_BACK_TO_LOGIN': 'Back to login',
 
         /**
+         * uiCaseCountMap
+         */
+        'LNG_PAGE_CASE_COUNT_MAP_ACTION_GRAPH_BUTTON': 'Graph',
+        'LNG_PAGE_CASE_COUNT_MAP_ACTION_LIST_BUTTON': 'List',
+
+        /**
          * uiContactFields
          */
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_START_OF_FOLLOWUP': 'Follow-up start date',
@@ -151,7 +157,10 @@ export const EnglishUsLang = {
         // "LNG_CASE_FIELD_LABEL_INCUBATION_DATES": "Incubation dates",
         // "LNG_CASE_FIELD_LABEL_INCUBATION_DATES_END_DATE": "Incubation end Date",
         // "LNG_CASE_FIELD_LABEL_INCUBATION_DATES_START_DATE": "Incubation start Date",
+        // LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON
+        // LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_CASE_COUNT_MAP_BUTTON
         // "LNG_CASE_FIELD_LABEL_ISOLATION_DATES": "Isolation dates",
+        // LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ACTION_CASE_COUNT_MAP_BUTTON
         // "LNG_CASE_FIELD_LABEL_ISOLATION_DATES_CENTER_NAME": "Center Name",
         // "LNG_CASE_FIELD_LABEL_ISOLATION_DATES_CENTER_NAME_DESCRIPTION": "",
         // "LNG_CASE_FIELD_LABEL_ISOLATION_DATES_COMMENTS": "Comments",

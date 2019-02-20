@@ -19,21 +19,6 @@
                             {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GRAPH_BUTTON' | translate}}
                         </button>
 
-                        <ng-container
-                            *ngIf="hasCaseReadAccess()">
-                            <button
-                                mat-menu-item
-                                [routerLink]="['/transmission-chains', 'map']">
-                                {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON' | translate}}
-                            </button>
-
-                            <button
-                                mat-menu-item
-                                [routerLink]="['/transmission-chains', 'case-count-map']">
-                                {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_CASE_COUNT_MAP_BUTTON' | translate}}
-                            </button>
-                        </ng-container>
-
                     </ng-container>
                 </mat-menu>
 
