@@ -358,6 +358,7 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 <app-form-select
+                    *ngIf="hasFollowUpsWriteAccess()"
                     name="teamId"
                     [ngModel]="item.teamId"
                     [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate"
@@ -366,6 +367,10 @@
                     optionValueKey="id"
                     (optionChanged)="changeFollowUpTeam(item, $event)">
                 </app-form-select>
+                <div
+                    *ngIf="!hasFollowUpsWriteAccess()">
+                    {{ teamsListLoadedMap[item.teamId] ? teamsListLoadedMap[item.teamId].name : '' }}
+                </div>
             </mat-cell>
         </ng-container>
 
@@ -420,12 +425,17 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
                 <app-form-slide-toggle
+                    *ngIf="hasFollowUpsWriteAccess()"
                     name="targeted"
                     [(ngModel)]="item.targeted"
                     [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
                     tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
                     (optionChanged)="setTargetedItem(item, $event)">
                 </app-form-slide-toggle>
+                <app-yes-no-label
+                    *ngIf="!hasFollowUpsWriteAccess()"
+                    [value]="item.targeted">
+                </app-yes-no-label>
             </mat-cell>
         </ng-container>
 

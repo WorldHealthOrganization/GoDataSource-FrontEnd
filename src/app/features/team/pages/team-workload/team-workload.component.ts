@@ -1,18 +1,20 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { TeamFollowupsPerDayModel } from '../../../../core/models/team-followups-per-day.model';
 import { Constants } from '../../../../core/models/constants';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
-import { TeamModel } from '../../../../core/models/team.model';
 import * as moment from 'moment';
 import * as _ from 'lodash';
+import { Moment } from 'moment';
+import { FormDateRangeSliderData } from '../../../../shared/xt-forms/components/form-date-range-slider/form-date-range-slider.component';
+import { Subscription } from 'rxjs/Subscription';
+import { TeamModel } from '../../../../core/models/team.model';
 
 @Component({
     selector: 'app-team-workload',
@@ -20,7 +22,7 @@ import * as _ from 'lodash';
     templateUrl: './team-workload.component.html',
     styleUrls: ['./team-workload.component.less']
 })
-export class TeamWorkloadComponent extends ListComponent implements OnInit {
+export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
             'LNG_PAGE_LIST_TEAMS_TITLE',
@@ -34,17 +36,49 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit {
     ];
 
     selectedOutbreak: OutbreakModel;
-    metricTeamsFollowups: TeamFollowupsPerDayModel;
-    dates: string[] = [];
-    teams: TeamModel[];
-    teamsMap: any = [];
-    selectedTeamsIds: string[] = [];
 
+    dates: string[] = [];
+    teamsData: {
+        id: string,
+        name: string,
+        dates: {
+            [formattedDate: string]: {
+                totalFollowupsCount: number,
+                successfulFollowupsCount: number
+            }
+        }
+    }[];
+
+    // loading flag - display spinner instead of table
+    displayLoading: boolean = false;
+
+    /**
+     * Filter slider data
+     */
+    slideFilterData: {
+        minDate: Moment,
+        maxDate: Moment,
+        maxRange: number
+    } = {
+        minDate: moment().startOf('day'),
+        maxDate: moment().endOf('day'),
+        maxRange: 0
+    };
+
+    /**
+     * Slider Date Filter Value
+     */
+    sliderDateFilterValue: FormDateRangeSliderData;
+
+    getSelectedOutbreakSubject: Subscription;
+
+    /**
+     * Constructor
+     */
     constructor(
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
         protected snackbarService: SnackbarService,
-        private genericDataService: GenericDataService,
         private i18nService: I18nService,
         private teamDataService: TeamDataService
     ) {
@@ -53,117 +87,155 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit {
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
-        // subscribe to the Selected Outbreak
-        this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                // selected outbreak
-                this.selectedOutbreak = selectedOutbreak;
-                // get teams
-                this.teamDataService
-                    .getTeamsList()
-                    .subscribe((teams) => {
-                        this.teams = teams;
-                        _.forEach(this.teams, (team) => {
-                            const teamObj: any = {name: team.name, dates: []};
-                            this.teamsMap[team.id] = teamObj;
-                        });
-                        this.formatData();
+        // get teams
+        this.displayLoading = true;
+        this.teamDataService
+            .getTeamsList()
+            .subscribe((teams) => {
+                // map teams
+                this.teamsData = [];
+                _.forEach(teams, (team: TeamModel) => {
+                    this.teamsData.push({
+                        id: team.id,
+                        name: team.name,
+                        dates: {}
+                    });
+                });
 
-                        // ...and re-load the list
-                        this.needsRefreshList(true);
+                // retrieve outbreak data
+                this.getSelectedOutbreakSubject = this.outbreakDataService
+                    .getSelectedOutbreakSubject()
+                    .subscribe((selectedOutbreak: OutbreakModel) => {
+                        // selected outbreak
+                        this.selectedOutbreak = selectedOutbreak;
+                        if (
+                            this.selectedOutbreak &&
+                            this.selectedOutbreak.id
+                        ) {
+                            // set min & max dates
+                            this.slideFilterData.minDate = moment(this.selectedOutbreak.startDate).startOf('day');
+                            this.slideFilterData.maxDate = moment().add(this.selectedOutbreak.periodOfFollowup, 'days').endOf('day');
+                            this.slideFilterData.maxRange = this.selectedOutbreak.periodOfFollowup;
+                            this.sliderDateFilterValue = new FormDateRangeSliderData({
+                                low: moment(),
+                                high: moment().add(this.selectedOutbreak.periodOfFollowup, 'days')
+                            });
+                        }
                     });
             });
+    }
+
+    /**
+     * Remove component resources
+     */
+    ngOnDestroy() {
+        if (this.getSelectedOutbreakSubject) {
+            this.getSelectedOutbreakSubject.unsubscribe();
+            this.getSelectedOutbreakSubject = null;
+        }
     }
 
     /**
      * Refresh list
      */
     refreshList() {
-        if (this.selectedOutbreak) {
-            this.genericDataService
-                .getServerUTCToday()
-                .subscribe((currentDate) => {
-                    this.dates = [];
-                    const outbreakPeriod = this.selectedOutbreak.periodOfFollowup;
-                    this.dates.push(this.i18nService.instant('LNG_PAGE_TEAMS_WORKLOAD_TEAM_LABEL'));
-                    currentDate.subtract(1, 'days');
-                    this.dates.push(currentDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
-                    for (let i = 1; i <= outbreakPeriod; i++) {
-                        this.dates.push(currentDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
-                        currentDate.add(1, 'days');
-                    }
-                    if (this.dates) {
-                        // get first and last dates
-                        const firstDate = this.dates[1];
-                        const lastDate = _.last(this.dates);
-                        // retrieve the list of Follow Ups
-                        this.followUpsDataService
-                            .getFollowUpsPerDayTeam(this.selectedOutbreak.id, firstDate, lastDate, this.queryBuilder)
-                            .subscribe((metricTeamsFollowups: TeamFollowupsPerDayModel) => {
-                                this.metricTeamsFollowups = metricTeamsFollowups;
-                                this.formatData();
-                            });
-                    }
-                });
-        }
-    }
+        if (
+            this.selectedOutbreak &&
+            !_.isEmpty(this.teamsData)
+        ) {
+            // construct array of dates
+            this.displayLoading = true;
+            this.dates = [];
+            const dates = [
+                this.i18nService.instant('LNG_PAGE_TEAMS_WORKLOAD_TEAM_LABEL')
+            ];
+            const currentDate = moment(this.sliderDateFilterValue.low);
+            while (currentDate.isBefore(this.sliderDateFilterValue.high)) {
+                dates.push(currentDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+                currentDate.add(1, 'days');
+            }
 
-    /**
-     * format the data
-     */
-    formatData() {
-        // get data
-        if (this.metricTeamsFollowups) {
-            const teams = this.metricTeamsFollowups.teams;
-            if (teams) {
-                this.selectedTeamsIds = [];
-                _.forEach(teams, (team) => {
-                    if (team.id) {
-                        this.selectedTeamsIds.push(team.id);
-                        const dates = [];
-                        if (team.dates) {
-                            _.forEach(team.dates, (date) => {
-                                const dateObj: any = {};
-                                const formattedDate = moment(date.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                                dateObj.totalFollowupsCount = date.totalFollowupsCount;
-                                dateObj.successfulFollowupsCount = date.successfulFollowupsCount;
-                                dates[formattedDate] = (dateObj);
-                            });
-                        }
-                        if (this.teamsMap[team.id]) {
-                            this.teamsMap[team.id].dates = dates;
-                        }
+            // retrieve data
+            if (dates.length > 2) {
+                // add filter period
+                this.queryBuilder.filter.byDateRange(
+                    'date', {
+                        startDate: moment(this.sliderDateFilterValue.low).startOf('day'),
+                        endDate: moment(this.sliderDateFilterValue.high).endOf('day')
                     }
-                });
+                );
+
+                // retrieve the list of Follow Ups
+                this.followUpsDataService
+                    .getFollowUpsPerDayTeam(this.selectedOutbreak.id, this.queryBuilder)
+                    .subscribe((metricTeamsFollowups: TeamFollowupsPerDayModel) => {
+                        // set headers
+                        this.dates = dates;
+
+                        // format data
+                        this.formatData(metricTeamsFollowups);
+                    });
+            } else {
+                // hide loading
+                this.displayLoading = false;
             }
         }
     }
 
     /**
-     * Return value to display in the table
-     * @param {string} teamId
-     * @param {string} date
-     * @param {number} d
-     * @returns {string}
+     * Format the data
      */
-    getTotalFollowupsCount(teamId: string, date: string, d: number) {
-        let result = this.i18nService.instant('LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL', {done: '0', total: '0'});
-        // first column - show team name
-        if (d === 0) {
-            if (this.teamsMap[teamId]) {
-                result = this.teamsMap[teamId].name;
-            }
-        } else {
-            if (this.teamsMap[teamId]) {
-                if (this.teamsMap[teamId].dates[date]) {
-                    const total = this.teamsMap[teamId].dates[date].totalFollowupsCount;
-                    const successful = this.teamsMap[teamId].dates[date].successfulFollowupsCount;
-                    result = this.i18nService.instant('LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL', {done: successful, total: total});
+    formatData(metricTeamsFollowups: TeamFollowupsPerDayModel) {
+        // format received data
+        if (
+            !_.isEmpty(this.teamsData) &&
+            !_.isEmpty(metricTeamsFollowups)
+        ) {
+            // map teams for team search
+            const teamsMap = {};
+            this.teamsData.forEach((teamData) => {
+                teamsMap[teamData.id] = teamData;
+            });
+
+            // keep only teams with id
+            const teams = _.filter(metricTeamsFollowups.teams, (teamMetricData) => {
+                return teamMetricData.id && teamsMap[teamMetricData.id];
+            });
+
+            // go through teams and create list of date information
+            _.forEach(teams, (team) => {
+                // construct list of dates
+                const dates = {};
+                if (team.dates) {
+                    _.forEach(team.dates, (date) => {
+                        dates[moment(date.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)] = {
+                            totalFollowupsCount: date.totalFollowupsCount,
+                            successfulFollowupsCount: date.successfulFollowupsCount
+                        };
+                    });
                 }
-            }
+
+                // assign dates
+                teamsMap[team.id].dates = dates;
+            });
         }
-        return result;
+
+        // hide loading
+        this.displayLoading = false;
+    }
+
+    /**
+     * Filter by slider value
+     */
+    filterByDateRange(value: FormDateRangeSliderData) {
+        // set the new value
+        this.sliderDateFilterValue = value;
+
+        // refresh list
+        this.needsRefreshList();
     }
 }
