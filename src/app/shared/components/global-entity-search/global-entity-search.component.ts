@@ -12,7 +12,8 @@ import { OutbreakDataService } from '../../../core/services/data/outbreak.data.s
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { EntityModel } from '../../../core/models/entity.model';
 import { Router } from '@angular/router';
-import { LoadingDialogModel } from '../index';
+import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
+import { LoadingDialogModel } from '../loading-dialog/loading-dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 
 @Component({
@@ -110,12 +111,34 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                             this.closeSideNav();
                         } else {
                             this.snackbarService.showError('LNG_GLOBAL_ENTITY_SEARCH_NO_ENTITIES_MESSAGE');
+
+                            // did user enter a UID?
+                            if (fields.globalSearchValue.length === 36) {
+                                // ask user about creating a new case with the given UID
+                                this.askCreateCaseWithUID(fields.globalSearchValue);
+                            }
                         }
                         this.closeLoadingDialog();
                     });
 
             }
         }
+    }
+
+    /**
+     * Ask user about creating a new case with a given UID
+     */
+    askCreateCaseWithUID(uid: string) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_GLOBAL_ENTITY_SEARCH_DIALOG_CREATE_CASE_WITH_UID_TITLE')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.router.navigate([`/cases/create`], { queryParams: { uid: uid } });
+
+                    // close side nav
+                    this.closeSideNav();
+                }
+            });
     }
 
     /**

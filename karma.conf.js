@@ -27,7 +27,7 @@ module.exports = function (config) {
         port: 9875,
         colors: true,
         logLevel: config.LOG_INFO,
-        browserNoActivityTimeout: 30000,
+        browserNoActivityTimeout: 300000,
         browserDisconnectTimeout: 5000,
         browserDisconnectTolerance: 2,
         parallelOptions: {
