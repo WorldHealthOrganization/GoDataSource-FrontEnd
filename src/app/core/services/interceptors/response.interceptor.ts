@@ -8,6 +8,7 @@ import { LoggerService } from '../helper/logger.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Router } from '@angular/router';
 import { StorageKey, StorageService } from '../helper/storage.service';
+import { SnackbarService } from '../helper/snackbar.service';
 
 @Injectable()
 export class ResponseInterceptor implements HttpInterceptor {
@@ -15,7 +16,8 @@ export class ResponseInterceptor implements HttpInterceptor {
     constructor(
         private loggerService: LoggerService,
         private storageService: StorageService,
-        private router: Router
+        private router: Router,
+        private snackbarService: SnackbarService
     ) {
     }
 
@@ -52,6 +54,12 @@ export class ResponseInterceptor implements HttpInterceptor {
                         `Response Transaction ID: ${transactionId}`,
                         `Error:`, error.error
                     );
+                }
+
+                // for 0 response status, ask user to restart the app (the server is unreachable)
+                if (error.status === 0) {
+                    // we have to display a hardcoded message in this situation because we are not able to load the language
+                    this.snackbarService.showError('The server is unreachable. Please restart Go.Data.', {}, 0);
                 }
 
                 // for 401 response status, clear the Auth Data
