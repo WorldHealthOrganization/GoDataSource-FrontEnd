@@ -21,6 +21,7 @@
     <div fxLayout="column" fxLayoutGap="10px">
         <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
             <a
+                *ngIf="canModifyCase() || canModifyEvent() || canModifyContact()"
                 mat-raised-button
                 color="accent"
                 (click)="onModifyPerson()"
@@ -29,7 +30,7 @@
             </a>
 
             <a
-                *ngIf="person.type === EntityType.CASE || person.type === EntityType.EVENT"
+                *ngIf="canCreateContact()"
                 mat-raised-button
                 color="accent"
                 (click)="onCreateContact()"
@@ -38,6 +39,7 @@
             </a>
 
             <a
+                *ngIf="canModifyCase() || canModifyEvent() || canModifyContact()"
                 mat-raised-button
                 color="warn"
                 (click)="onDeletePerson()"

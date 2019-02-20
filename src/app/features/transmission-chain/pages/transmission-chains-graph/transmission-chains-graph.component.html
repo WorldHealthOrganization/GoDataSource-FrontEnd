@@ -71,7 +71,7 @@
 
     <!-- Create relationship between 2 nodes -->
     <mat-card
-        *ngIf="selectedNodes.canCreateRelationship"
+        *ngIf="selectedNodes.canCreateRelationship && hasCaseWriteAccess()"
         class="page-section quick-action create-relationship"
         fxFlex
     >
@@ -116,7 +116,7 @@
 
     <!-- Modify Person -->
     <mat-card
-        *ngIf="selectedNodes.canModifyPerson && currentNodeAction === NodeAction.MODIFY_PERSON"
+        *ngIf="selectedNodes.nodes.length === 1 && currentNodeAction === NodeAction.MODIFY_PERSON && canModifySelectedNode()"
         class="page-section quick-action modify-person"
         fxFlex
     >

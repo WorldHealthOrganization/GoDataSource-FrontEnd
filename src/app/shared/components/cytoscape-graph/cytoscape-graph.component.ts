@@ -33,6 +33,9 @@ import { EntityType } from '../../../core/models/entity-type';
 import { RelationshipModel } from '../../../core/models/relationship.model';
 import { GraphEdgeModel } from '../../../core/models/graph-edge.model';
 import { RelationshipDataService } from '../../../core/services/data/relationship.data.service';
+import { UserModel } from '../../../core/models/user.model';
+import { AuthDataService } from '../../../core/services/data/auth.data.service';
+import { PERMISSION } from '../../../core/models/permission.model';
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -76,6 +79,9 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     @Output() edgeTapped = new EventEmitter<any>();
     @Output() viewTypeChanged = new EventEmitter<any>();
     @Output() changeEditMode = new EventEmitter<boolean>();
+
+    // authenticated user
+    authUser: UserModel;
 
     Constants = Constants;
     cy: any;
@@ -274,6 +280,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     selectedOutbreak: OutbreakModel;
 
     constructor(
+        private authDataService: AuthDataService,
         private genericDataService: GenericDataService,
         private el: ElementRef,
         private referenceDataDataService: ReferenceDataDataService,
@@ -285,6 +292,9 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     ) {}
 
     ngOnInit() {
+        // authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // initialize style
         this.style =
             this.style ?
@@ -631,6 +641,12 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     switchTimelineView(timelineViewType) {
         this.timelineViewType = timelineViewType;
         this.render();
+    }
+
+    isEditModeAvailable() {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE) ||
+            this.authUser.hasPermissions(PERMISSION.WRITE_EVENT) ||
+            this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
     }
 
     toggleEditMode() {
