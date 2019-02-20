@@ -17,7 +17,7 @@
 
     <!-- legend -->
     <div class="graph-legend"
-         *ngIf="legend && showLegend">
+         *ngIf="legend && showLegend && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)">
         <!-- node color -->
         <div *ngIf="legend.nodeColorKeys && legend.nodeColorKeys.length"
              class="legend-name">
@@ -96,19 +96,54 @@
 
     <!-- cytoscape element -->
     <div class="cy" id="cy"
-         [fxShow]="!showLoading">
+         [fxShow]="!showLoading && transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
     </div>
 
-    <div class="graph-actions" fxLayout="row" fxLayoutGap="30px">
-        <!--  toggle Edit mode -->
+    <!-- Geospatial map -->
+    <div
+        *ngIf="!showLoading && transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
+        <!-- Geospatial map -->
+        <app-world-map
+            *ngIf="markers.length > 0"
+            width="100%"
+            height="500px"
+            [markers]="markers"
+            [lines]="lines"
+            [displayLabels]="displayLabels"
+            [fitMapOnMarkersChange]="true">
+        </app-world-map>
+
+        <!-- No data -->
+        <div
+            *ngIf="markers.length < 1"
+            class="geo-map-no-data">
+            <span>
+                {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NO_DATA' | translate }}
+            </span>
+        </div>
+    </div>
+
+    <div
+        *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0"
+        class="graph-actions" fxLayout="row" fxLayoutGap="30px">
+        <!-- Toggle Edit mode -->
         <app-form-slide-toggle
+            *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value"
             name="toggleEditMode"
             [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_EDIT_MODE_LABEL' | translate"
             [(ngModel)]="editMode"
             (optionChanged)="toggleEditMode()"
         ></app-form-slide-toggle>
 
-        <!--  show / hide legend -->
+        <!-- Display Labels -->
+        <app-form-slide-toggle
+            *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value"
+            name="displayLabels"
+            [(ngModel)]="displayLabels"
+            [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_DISPLAY_MARKER_LABELS_LABEL' | translate">
+        </app-form-slide-toggle>
+
+        <!-- Show / hide legend -->
         <app-form-slide-toggle
             name="showLegend"
             [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LEGEND_LABEL' | translate"
