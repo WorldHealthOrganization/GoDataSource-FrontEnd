@@ -38,6 +38,8 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
 
     newOutbreak: OutbreakModel = new OutbreakModel();
 
+    outbreakNameValidator: Observable<boolean>;
+
     constructor(
         private outbreakDataService: OutbreakDataService,
         private router: Router,
@@ -75,6 +77,13 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                         });
                 }
             });
+
+        this.outbreakNameValidator = Observable.create((observer) => {
+           this.outbreakDataService.checkOutbreakNameUniquenessValidity()
+               .subscribe((data) => {
+                    console.log(data);
+               });
+        });
     }
 
     /**
