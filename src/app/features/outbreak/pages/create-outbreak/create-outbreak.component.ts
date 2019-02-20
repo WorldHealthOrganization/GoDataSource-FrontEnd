@@ -17,6 +17,7 @@ import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 import 'rxjs/add/operator/switchMap';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
     selector: 'app-create-outbreak',
@@ -79,9 +80,10 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
             });
 
         this.outbreakNameValidator = Observable.create((observer) => {
-           this.outbreakDataService.checkOutbreakNameUniquenessValidity()
-               .subscribe((data) => {
-                    console.log(data);
+           this.outbreakDataService.checkOutbreakNameUniquenessValidity(this.newOutbreak.name)
+               .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                    observer.next(isValid);
+                    observer.complete();
                });
         });
     }

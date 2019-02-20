@@ -242,19 +242,19 @@ export class OutbreakDataService {
 
     /**
      * Check if the name of the new outbreak is unique
-     * @returns {Observable<OutbreakModel>}
+     * @returns {Observable<boolean | IGeneralAsyncValidatorResponse>}
      */
     checkOutbreakNameUniquenessValidity(newOutbreakName: string): Observable<boolean | IGeneralAsyncValidatorResponse> {
         const qb: RequestQueryBuilder = new RequestQueryBuilder();
         qb.filter
-            .where({
-                name: {
-                    'eq': newOutbreakName
-                }
-            }, true);
+            .byText('name', newOutbreakName);
         return this.getOutbreaksList(qb)
-            .map((data) => {
-                console.log(data);
+            .map((outbreakData: OutbreakModel[]) => {
+                return !outbreakData.length ?
+                    true : {
+                        isValid: false,
+                        errMsg: 'LNG_FORM_VALIDATION_ERROR_OUTBREAK_NAME_NOT_UNIQUE'
+                    };
             });
     }
 

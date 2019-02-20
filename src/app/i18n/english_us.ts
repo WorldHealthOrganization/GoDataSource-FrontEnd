@@ -127,6 +127,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE': 'Location coordinates were propagated to all addresses that are using this location',
 
         /**
+         * uiFormInputValidationErrors
+         */
+        'LNG_FORM_VALIDATION_ERROR_OUTBREAK_NAME_NOT_UNIQUE': 'This name is already in use'
+
+        /**
          * REMOVE
          */
         // 'LNG_CASE_FIELD_LABEL_DECEASED',
