@@ -11,7 +11,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, LoadingDialogModel } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
@@ -697,17 +697,44 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     }
 
     /**
-     * Export empty case investigation
+     * Export case investigation form for a Case
      */
-    exportEmptyCaseInvestigation(caseModel: CaseModel) {
+    exportCaseInvestigationForm(caseModel: CaseModel) {
         // display export only if we have a selected outbreak
         if (this.selectedOutbreak) {
             // display export dialog
             this.dialogService.showExportDialog({
-                message: 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_TITLE',
+                message: 'LNG_PAGE_LIST_CASES_EXPORT_CASE_INVESTIGATION_FORM_TITLE',
                 url: `outbreaks/${this.selectedOutbreak.id}/cases/${caseModel.id}/export-empty-case-investigation`,
                 fileName: this.casesDataExportFileName,
                 fileType: ExportDataExtension.ZIP,
+                exportStart: () => { this.showLoadingDialog(); },
+                exportFinished: () => { this.closeLoadingDialog(); }
+            });
+        }
+    }
+
+    /**
+     * Export a bunch of empty case investigation forms for new Cases
+     */
+    exportEmptyCaseInvestigationForms() {
+        // display export only if we have a selected outbreak
+        if (this.selectedOutbreak) {
+            // display export dialog
+            this.dialogService.showExportDialog({
+                message: 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_TITLE',
+                url: `outbreaks/${this.selectedOutbreak.id}/cases/export-investigation-template`,
+                fileName: this.casesDataExportFileName,
+                fileType: ExportDataExtension.ZIP,
+                extraDialogFields: [
+                    new DialogField({
+                        name: 'copies',
+                        type: 'number',
+                        placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_FIELD_COPIES',
+                        value: 5,
+                        required: true
+                    })
+                ],
                 exportStart: () => { this.showLoadingDialog(); },
                 exportFinished: () => { this.closeLoadingDialog(); }
             });

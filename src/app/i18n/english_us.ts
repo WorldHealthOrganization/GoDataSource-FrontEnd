@@ -13,6 +13,25 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiGlobalSearch
+         */
+        'LNG_GLOBAL_ENTITY_SEARCH_DIALOG_CREATE_CASE_WITH_UID_TITLE': 'Do you want to create a new Case with the given UID?',
+
+        /**
+         * uiCreateCasePage
+         */
+        'LNG_PAGE_CREATE_CASE_WITH_UID_TITLE': 'Create case with UID {{uid}}',
+
+        /**
+         * uiCasesListPage
+         */
+        'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASE_INVESTIGATION_FORM': 'Export case investigation form',
+        'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS': 'Export empty case investigation forms',
+        'LNG_PAGE_LIST_CASES_EXPORT_CASE_INVESTIGATION_FORM_TITLE': 'Export case investigation form',
+        'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_TITLE': 'Export empty case investigation forms for new cases',
+        'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_FIELD_COPIES': 'Number of forms',
+
+        /**
          * NEW GROUP
          * Form Date Slider
          */
@@ -148,6 +167,8 @@ export const EnglishUsLang = {
         // LNG_PAGE_MODIFY_CONTACT_INVALID_CONTACT_ID
         // LNG_PAGE_CREATE_CONTACT_INVALID_CASE_ID
         // LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS
+        // LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION
+        // LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_TITLE
         // LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_BUTTON
     }
 };

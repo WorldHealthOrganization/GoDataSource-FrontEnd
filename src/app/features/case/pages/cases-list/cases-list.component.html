@@ -75,6 +75,14 @@
                                 </button>
                             </ng-container>
                         </ng-container>
+
+                        <mat-divider></mat-divider>
+
+                        <button
+                            mat-menu-item
+                            (click)="exportEmptyCaseInvestigationForms()">
+                            {{ 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS' | translate }}
+                        </button>
                     </ng-container>
                 </mat-menu>
             </div>
@@ -557,8 +565,8 @@
 
                             <button
                                 mat-menu-item
-                                (click)="exportEmptyCaseInvestigation(item)">
-                                {{ 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION' | translate }}
+                                (click)="exportCaseInvestigationForm(item)">
+                                {{ 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASE_INVESTIGATION_FORM' | translate }}
                             </button>
                         </ng-container>
                     </ng-container>
