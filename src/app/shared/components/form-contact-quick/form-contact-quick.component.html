@@ -57,6 +57,20 @@
             <div fxFlex><!-- placeholder --></div>
         </div>
 
+        <div fxFlex fxLayout="row" fxLayoutGap="5px">
+            <app-form-age-dob
+                fxFlex
+                name="ageDob"
+                [(ngModel)]="contact.age"
+                (optionChanged)="onChange()"
+                ageButtonLabel="LNG_CONTACT_FIELD_LABEL_AGE_BUTTON"
+                dobButtonLabel="LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON"
+                dobPlaceholder="LNG_CONTACT_FIELD_LABEL_DOB"
+                dobTooltip="LNG_CONTACT_FIELD_LABEL_DOB_DESCRIPTION"
+                ageTooltip="LNG_CONTACT_FIELD_LABEL_AGE_DESCRIPTION">
+            </app-form-age-dob>
+        </div>
+
         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
 
             <app-form-input
@@ -67,14 +81,6 @@
                 (optionChanged)="onChange()">
             </app-form-input>
 
-            <div fxFlex fxLayout="row" fxLayoutGap="5px">
-
-                <app-form-age
-                    name="age"
-                    [(ngModel)]="contact.age"
-                    (optionChanged)="onChange()">
-                </app-form-age>
-            </div>
         </div>
 
         <div fxLayout="row" fxLayoutGap="20px">
