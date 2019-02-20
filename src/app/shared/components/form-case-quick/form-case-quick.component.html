@@ -61,7 +61,23 @@
                     [options]="occupationsList$ | async">
                 </app-form-select>
 
-                <div fxFlex><!-- placeholder --></div>
+                <div fxFlex>
+                    <app-form-input
+                        name="visualId"
+                        [(ngModel)]="case.visualId"
+                        [placeholder]="'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate"
+                        tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                        (optionChanged)="onChange()">
+                    </app-form-input></div>
+                </div>
+
+            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+
+                <app-form-age
+                    name="age"
+                    [(ngModel)]="case.age"
+                    (optionChanged)="onChange()">
+                </app-form-age>
             </div>
 
             <div fxLayout="row" fxLayoutGap="20px">
@@ -84,25 +100,6 @@
                 </app-form-textarea>
             </div>
 
-            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-
-                <app-form-input
-                    name="visualId"
-                    [(ngModel)]="case.visualId"
-                    [placeholder]="'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate"
-                    tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
-                    (optionChanged)="onChange()">
-                </app-form-input>
-
-                <div fxFlex fxLayout="row" fxLayoutGap="5px">
-
-                    <app-form-age
-                        name="age"
-                        [(ngModel)]="case.age"
-                        (optionChanged)="onChange()">
-                    </app-form-age>
-                </div>
-            </div>
         </div>
 
         <span class="section-title">
