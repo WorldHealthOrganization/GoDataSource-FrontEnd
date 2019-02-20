@@ -14,6 +14,18 @@
                     <ng-container>
                         <button
                             mat-menu-item
+                            [routerLink]="['/transmission-chains', 'list']">
+                            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_LIST_BUTTON' | translate}}
+                        </button>
+
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/transmission-chains', 'case-count-map']">
+                            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CASE_COUNT_MAP_BUTTON' | translate}}
+                        </button>
+
+                        <button
+                            mat-menu-item
                             (click)="exportChainsOfTransmission()">
                             {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT' | translate}}
                         </button>
