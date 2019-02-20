@@ -9,13 +9,7 @@ import { TransmissionChainsDashletComponent } from '../../components/transmissio
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import {
-    DialogAnswer,
-    DialogAnswerButton,
-    LoadingDialogModel,
-    ViewCotEdgeDialogComponent,
-    ViewCotNodeDialogComponent
-} from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, LoadingDialogModel, ViewCotEdgeDialogComponent, ViewCotNodeDialogComponent } from '../../../../shared/components';
 import { DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -125,8 +119,29 @@ export class TransmissionChainsGraphComponent implements OnInit {
             });
     }
 
-    hasCaseReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_CASE);
+    hasCaseWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
+    }
+
+    hasEventWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
+    }
+
+    hasContactWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
+    }
+
+    canModifySelectedNode(): boolean {
+        return (
+            this.selectedNodes.nodes[0].type === EntityType.CASE &&
+            this.hasCaseWriteAccess()
+        ) || (
+            this.selectedNodes.nodes[0].type === EntityType.EVENT &&
+            this.hasEventWriteAccess()
+        ) || (
+            this.selectedNodes.nodes[0].type === EntityType.CONTACT &&
+            this.hasContactWriteAccess()
+        );
     }
 
     /**

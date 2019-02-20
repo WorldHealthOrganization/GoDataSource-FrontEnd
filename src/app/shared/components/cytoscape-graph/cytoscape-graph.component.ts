@@ -7,6 +7,9 @@ import { GenericDataService } from '../../../core/services/data/generic.data.ser
 import { Constants } from '../../../core/models/constants';
 import * as _ from 'lodash';
 import * as moment from 'moment';
+import { UserModel } from '../../../core/models/user.model';
+import { AuthDataService } from '../../../core/services/data/auth.data.service';
+import { PERMISSION } from '../../../core/models/permission.model';
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -25,6 +28,9 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     @Output() edgeTapped = new EventEmitter<any>();
     @Output() viewTypeChanged = new EventEmitter<any>();
     @Output() changeEditMode = new EventEmitter<boolean>();
+
+    // authenticated user
+    authUser: UserModel;
 
     Constants = Constants;
     cy: any;
@@ -214,11 +220,15 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     timelineDatesRanks: any = {};
 
     constructor(
+        private authDataService: AuthDataService,
         private genericDataService: GenericDataService,
         private el: ElementRef
     ) {}
 
     ngOnInit() {
+        // authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // initialize style
         this.style =
             this.style ?
@@ -543,6 +553,12 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     switchTimelineView(timelineViewType) {
         this.timelineViewType = timelineViewType;
         this.render();
+    }
+
+    isEditModeAvailable() {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE) ||
+            this.authUser.hasPermissions(PERMISSION.WRITE_EVENT) ||
+            this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
     }
 
     toggleEditMode() {
