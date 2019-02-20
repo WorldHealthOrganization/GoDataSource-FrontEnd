@@ -77,7 +77,8 @@ export const EnglishUsLang = {
         /**
          * uiCaseFields
          */
-        'LNG_CASE_FIELD_LABEL_DATE_RANGES': 'Dates',
+        'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS': 'Hospitalization / Isolation details',
+        'LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID': 'Hospitalization / Isolation type',
         'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL': 'Date of burial',
         'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DATE_RANGE_FROM_DESCRIPTION': '',
@@ -171,5 +172,6 @@ export const EnglishUsLang = {
         // LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS
         // LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION
         // LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_TITLE
+        // 'LNG_CASE_FIELD_LABEL_DATE_RANGES': 'Dates',
     }
 };
