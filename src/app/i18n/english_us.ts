@@ -54,7 +54,14 @@ export const EnglishUsLang = {
         /**
          * uiFollowUpfields
          */
-        'LNG_FOLLOW_UP_FIELD_LABEL_DATE': 'Follow-up date',
+        'LNG_FOLLOW_UP_FIELD_LABEL_DATE': 'Date',
+        'LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION': '',
+
+        /**
+         * uiTeamsListPage
+         */
+        'LNG_PAGE_LIST_TEAMS_LABEL_DATE': 'Date range',
+        'LNG_PAGE_LIST_TEAMS_LABEL_DATE_DESCRIPTION': '',
 
         /**
          * uiFollowUpsListPage
@@ -66,11 +73,6 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up successfully modified',
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups successfully modified',
-
-        /**
-         * uiFollowUpfields
-         */
-        'LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION': '',
 
         /**
          * uiCaseFields
