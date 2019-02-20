@@ -31,6 +31,9 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
     // teams list
     teamsList$: Observable<TeamModel[]>;
     teamsListLoaded: TeamModel[];
+    teamsListLoadedMap: {
+        [teamId: string]: TeamModel
+    };
     teamsListLoadedForHeaderSearch: LabelValuePair[];
     teamIdFilterValue: string = 'all';
 
@@ -89,7 +92,14 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             this.teamsListLoaded = teamsList;
 
             // format search options
+            this.teamsListLoadedMap = {};
             this.teamsListLoadedForHeaderSearch = _.map(this.teamsListLoaded, (team: TeamModel) => {
+                // map for easy access if we don't have access to write data to follow-ups
+                if (!this.hasFollowUpsWriteAccess()) {
+                    this.teamsListLoadedMap[team.id] = team;
+                }
+
+                // header search
                 return new LabelValuePair(
                     team.name,
                     team.id

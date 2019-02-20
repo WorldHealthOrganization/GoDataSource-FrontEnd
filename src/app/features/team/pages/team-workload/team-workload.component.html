@@ -7,17 +7,50 @@
 </app-topnav>
 
 <mat-card class="page-section page-content">
+    <!-- Filters -->
+    <div>
+        <!-- Date range filter -->
+        <app-form-date-range-slider
+            *ngIf="selectedOutbreak"
+            name="dateRangeFilter"
+            [ngModel]="sliderDateFilterValue"
+            [minDate]="slideFilterData.minDate"
+            [maxDate]="slideFilterData.maxDate"
+            [maxRange]="slideFilterData.maxRange"
+            [label]="'LNG_PAGE_LIST_TEAMS_LABEL_DATE' | translate"
+            tooltip="LNG_PAGE_LIST_TEAMS_LABEL_DATE_DESCRIPTION"
+            (optionChanged)="filterByDateRange($event)">
+        </app-form-date-range-slider>
+    </div>
 
-    <div fxFlex fxLayout="row">
+    <!-- Loading data -->
+    <div
+        *ngIf="displayLoading"
+        class="team-workload-loading">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <!-- Team workload -->
+    <div
+        *ngIf="!displayLoading"
+        fxFlex fxLayout="row">
 
         <div class="workload-table-wrapper">
             <table class="team-workload-table">
                 <tr>
-                    <th *ngFor="let date of dates">{{date}}</th>
+                    <th *ngFor="let date of dates">
+                        {{ date }}
+                    </th>
                 </tr>
-                <tr *ngFor="let teamId of selectedTeamsIds; let j = index">
-                    <td *ngFor="let date of dates; let d = index">
-                        {{ getTotalFollowupsCount(teamId, date, d) }}
+                <tr *ngFor="let teamData of teamsData">
+                    <td *ngFor="let date of dates; let first = first">
+                        {{ first ?
+                            teamData.name : (
+                                teamData.dates[date] ?
+                                    ('LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL' | translate:{done: teamData.dates[date].successfulFollowupsCount, total: teamData.dates[date].totalFollowupsCount}) :
+                                    ('LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL' | translate:{done: 0, total: 0})
+                            )
+                        }}
                     </td>
                 </tr>
             </table>
