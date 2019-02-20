@@ -16,17 +16,6 @@ const routes: Routes = [
         path: 'list',
         component: fromPages.TransmissionChainsListComponent
     },
-    // Transmission Chains Geospacially map
-    {
-        path: 'map',
-        component: fromPages.TransmissionChainsGeoMapComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.READ_CASE
-            ]
-        }
-    },
     // Case Count Map
     {
         path: 'case-count-map',
