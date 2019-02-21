@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -41,6 +41,8 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
     ];
 
     caseData: CaseModel = new CaseModel();
+    // case UID (coming from query params, optionally)
+    caseUID: string;
 
     genderList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
@@ -61,6 +63,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
 
     constructor(
         private router: Router,
+        private route: ActivatedRoute,
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
@@ -79,6 +82,15 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
         this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+
+        this.route.queryParams
+            .subscribe((params: { uid }) => {
+                if (params.uid) {
+                    this.caseUID = params.uid;
+
+                    this.initializeBreadcrumbs();
+                }
+            });
 
         // get today time
         this.genericDataService
@@ -120,6 +132,22 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
             });
     }
 
+    private initializeBreadcrumbs() {
+        this.breadcrumbs = [
+            new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+        ];
+
+        if (this.caseUID) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_CREATE_CASE_WITH_UID_TITLE', '.', true, {}, {uid: this.caseUID})
+            );
+        } else {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_CREATE_CASE_TITLE', '.', true)
+            );
+        }
+    }
+
     /**
      * Create new Case
      * @param stepForms
@@ -127,11 +155,6 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
     createNewCase(stepForms: NgForm[]) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
-
-        // remove id if empty string since loopback doesn't know how to handle this
-        if (_.isEmpty(dirtyFields.id)) {
-            delete dirtyFields.id;
-        }
 
         // add age & dob information
         if (dirtyFields.ageDob) {
@@ -145,6 +168,11 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
         ) {
+            // add case UID
+            if (this.caseUID) {
+                dirtyFields.id = this.caseUID;
+            }
+
             // check for duplicates
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.caseDataService

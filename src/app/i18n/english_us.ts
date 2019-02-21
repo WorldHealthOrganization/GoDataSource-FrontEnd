@@ -13,6 +13,25 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiGlobalSearch
+         */
+        'LNG_GLOBAL_ENTITY_SEARCH_DIALOG_CREATE_CASE_WITH_UID_TITLE': 'Do you want to create a new Case with the given UID?',
+
+        /**
+         * uiCreateCasePage
+         */
+        'LNG_PAGE_CREATE_CASE_WITH_UID_TITLE': 'Create case with UID {{uid}}',
+
+        /**
+         * uiCasesListPage
+         */
+        'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASE_INVESTIGATION_FORM': 'Export case investigation form',
+        'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS': 'Export empty case investigation forms',
+        'LNG_PAGE_LIST_CASES_EXPORT_CASE_INVESTIGATION_FORM_TITLE': 'Export case investigation form',
+        'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_TITLE': 'Export empty case investigation forms for new cases',
+        'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_FIELD_COPIES': 'Number of forms',
+
+        /**
          * NEW GROUP
          * Form Date Slider
          */
@@ -35,7 +54,14 @@ export const EnglishUsLang = {
         /**
          * uiFollowUpfields
          */
-        'LNG_FOLLOW_UP_FIELD_LABEL_DATE': 'Follow-up date',
+        'LNG_FOLLOW_UP_FIELD_LABEL_DATE': 'Date',
+        'LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION': '',
+
+        /**
+         * uiTeamsListPage
+         */
+        'LNG_PAGE_LIST_TEAMS_LABEL_DATE': 'Date range',
+        'LNG_PAGE_LIST_TEAMS_LABEL_DATE_DESCRIPTION': '',
 
         /**
          * uiFollowUpsListPage
@@ -49,14 +75,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups successfully modified',
 
         /**
-         * uiFollowUpfields
-         */
-        'LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION': '',
-
-        /**
          * uiCaseFields
          */
-        'LNG_CASE_FIELD_LABEL_DATE_RANGES': 'Dates',
+        'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS': 'Hospitalization / Isolation details',
+        'LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID': 'Hospitalization / Isolation type',
         'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL': 'Date of burial',
         'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DATE_RANGE_FROM_DESCRIPTION': '',
@@ -86,6 +108,21 @@ export const EnglishUsLang = {
          * uiCommonButtons
          */
         'LNG_COMMON_BUTTON_BACK_TO_LOGIN': 'Back to login',
+
+        /**
+         * uiCaseCountMap
+         */
+        'LNG_PAGE_CASE_COUNT_MAP_ACTION_GRAPH_BUTTON': 'Graph',
+        'LNG_PAGE_CASE_COUNT_MAP_ACTION_LIST_BUTTON': 'List',
+
+        /**
+         * uiChainsOfTransmissionGraph
+         */
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GEOSPATIAL_MAP': 'Geospatial map',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_DISPLAY_MARKER_LABELS_LABEL': 'Display labels',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NO_DATA': 'No chains with geolocation provided',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_LIST_BUTTON': 'List',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CASE_COUNT_MAP_BUTTON': 'Case count map',
 
         /**
          * uiContactFields
@@ -147,7 +184,9 @@ export const EnglishUsLang = {
         // "LNG_CASE_FIELD_LABEL_INCUBATION_DATES": "Incubation dates",
         // "LNG_CASE_FIELD_LABEL_INCUBATION_DATES_END_DATE": "Incubation end Date",
         // "LNG_CASE_FIELD_LABEL_INCUBATION_DATES_START_DATE": "Incubation start Date",
+        // LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON
         // "LNG_CASE_FIELD_LABEL_ISOLATION_DATES": "Isolation dates",
+        // LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ACTION_CASE_COUNT_MAP_BUTTON
         // "LNG_CASE_FIELD_LABEL_ISOLATION_DATES_CENTER_NAME": "Center Name",
         // "LNG_CASE_FIELD_LABEL_ISOLATION_DATES_CENTER_NAME_DESCRIPTION": "",
         // "LNG_CASE_FIELD_LABEL_ISOLATION_DATES_COMMENTS": "Comments",
@@ -162,6 +201,19 @@ export const EnglishUsLang = {
         // LNG_PAGE_CREATE_CASE_INVALID_CASE_ID
         // LNG_PAGE_MODIFY_CONTACT_INVALID_CONTACT_ID
         // LNG_PAGE_CREATE_CONTACT_INVALID_CASE_ID
+        // LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_DISPLAY_MARKER_LABELS_LABEL
+        // LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ACTION_GRAPH_BUTTON
+        // LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ACTION_LIST_BUTTON
+        // LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ENTITY_TYPE_LABEL
+        // LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_CERTAINTY_LEVEL_LABEL
+        // LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_CASE_CLASSIFICATION_LABEL
+        // LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_NO_DATA
+        // LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE
+        // LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_GEO_MAP_LABEL
         // LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS
+        // LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION
+        // LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_TITLE
+        // 'LNG_CASE_FIELD_LABEL_DATE_RANGES': 'Dates',
+        // LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_BUTTON
     }
 };

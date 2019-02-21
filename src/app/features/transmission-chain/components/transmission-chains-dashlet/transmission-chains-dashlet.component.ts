@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Component, EventEmitter, Input, OnInit, ViewChild, Output, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
+import { IConvertChainToGraphElements, TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { Constants } from '../../../../core/models/constants';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -27,6 +27,7 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import { ActivatedRoute } from '@angular/router';
 import { Moment } from 'moment';
 import { Subscription } from 'rxjs/Subscription';
+import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -47,7 +48,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     @Output() changeEditMode = new EventEmitter<boolean>();
 
     selectedOutbreak: OutbreakModel;
-    graphElements: any;
+    chainElements: TransmissionChainModel[];
+    graphElements: IConvertChainToGraphElements;
     selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
     Constants = Constants;
     showSettings: boolean = false;
@@ -405,9 +407,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 .getIndependentTransmissionChainData(this.selectedOutbreak.id, requestQueryBuilder)
                 .subscribe((chains) => {
                     if (!_.isEmpty(chains)) {
-                       this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList, this.selectedViewType);
+                        this.chainElements = chains;
+                        this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList, this.selectedViewType);
                     } else {
-                        this.graphElements = [];
+                        this.chainElements = [];
+                        this.graphElements = {} as IConvertChainToGraphElements;
                     }
                 });
         }
