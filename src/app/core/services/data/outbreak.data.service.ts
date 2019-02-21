@@ -247,7 +247,7 @@ export class OutbreakDataService {
     checkOutbreakNameUniquenessValidity(newOutbreakName: string): Observable<boolean | IGeneralAsyncValidatorResponse> {
         const qb: RequestQueryBuilder = new RequestQueryBuilder();
         qb.filter
-            .byText('name', newOutbreakName);
+            .byEquality('name', newOutbreakName, true, true);
         return this.getOutbreaksList(qb)
             .map((outbreakData: OutbreakModel[]) => {
                 return !outbreakData.length ?
