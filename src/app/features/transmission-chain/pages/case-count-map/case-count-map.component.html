@@ -34,6 +34,57 @@
 
 <mat-card
     class="page-section page-content">
+
+    <div
+        class="app-case-count-map-filters">
+        <!-- panel toggle -->
+        <div
+            fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+            <!-- settings toggle -->
+            <button
+                mat-raised-button
+                (click)="showSettings = !showSettings">
+                {{ 'LNG_PAGE_CASE_COUNT_MAP_BUTTON_CONFIGURE_SETTINGS' | translate }}
+            </button>
+        </div>
+
+        <!-- settings panel -->
+        <div
+            *ngIf="showSettings"
+            fxFlex fxLayout="column">
+            <!-- Filters -->
+            <app-transmission-chain-filters
+                title="LNG_PAGE_CASE_COUNT_MAP_FILTERS_TITLE"
+                [filters]="filters"
+                [caseClassificationsList$]="caseClassificationsList$"
+                [occupationsList$]="occupationsList$"
+                [outcomeList$]="outcomeList$"
+                [genderList$]="genderList$">
+            </app-transmission-chain-filters>
+
+            <!-- Buttons -->
+            <div
+                fxFlex fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
+                <!-- Reset filters -->
+                <button
+                    fxFlex="150px"
+                    mat-raised-button
+                    (click)="resetFilters()">
+                    {{ 'LNG_PAGE_CASE_COUNT_MAP_BUTTON_RESET_FILTERS' | translate }}
+                </button>
+
+                <!-- Apply filters -->
+                <button
+                    fxFlex="150px"
+                    mat-raised-button
+                    color="accent"
+                    (click)="reloadCases()">
+                    {{ 'LNG_PAGE_CASE_COUNT_MAP_BUTTON_APPLY_SETTINGS' | translate }}
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div
         fxFlex fxLayout="row" fxLayoutGap="20px">
         <div fxFlex="200px">
@@ -48,15 +99,22 @@
         </mat-slider>
     </div>
 
+    <!-- Count map -->
     <app-world-map
-        *ngIf="markers.length > 0 || displayLoading"
+        *ngIf="markers.length > 0"
         #worldMap
         width="100%"
-        height="calc(100% - 50px)"
+        height="500px"
         [markers]="markers"
         [fitMapOnMarkersChange]="true"
         [displayLoading]="displayLoading"
         [fitLayer]="WorldMapMarkerLayer.CLUSTER"
         [clusterDistance]="clusterDistance">
     </app-world-map>
+
+    <!-- No data -->
+    <div
+        *ngIf="markers.length < 1">
+        {{ 'LNG_PAGE_CASE_COUNT_MAP_NO_DATA' | translate }}
+    </div>
 </mat-card>

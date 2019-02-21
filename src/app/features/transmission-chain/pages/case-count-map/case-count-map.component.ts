@@ -12,6 +12,10 @@ import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Subscription } from 'rxjs/Subscription';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { TransmissionChainFilters } from '../../components/transmission-chains-filters/transmission-chains-filters.component';
 
 @Component({
     selector: 'app-case-count-map',
@@ -34,6 +38,13 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
     // constants
     WorldMapMarkerLayer = WorldMapMarkerLayer;
 
+    showSettings: boolean = false;
+    filters: TransmissionChainFilters = new TransmissionChainFilters();
+    caseClassificationsList$: Observable<LabelValuePair[]>;
+    occupationsList$: Observable<LabelValuePair[]>;
+    outcomeList$: Observable<LabelValuePair[]>;
+    genderList$: Observable<LabelValuePair[]>;
+
     clusterDistance: number = 10;
 
     @ViewChild('worldMap') worldMap: WorldMapComponent;
@@ -46,7 +57,8 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
      */
     constructor(
         private caseDataService: CaseDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {}
 
     /**
@@ -64,6 +76,12 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
                     this.reloadCases();
                 }
             });
+
+        // other data
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+        this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
     }
 
     ngOnDestroy() {
@@ -79,6 +97,9 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
      */
     reloadCases() {
         if (this.outbreakId) {
+            // hide filters
+            this.showSettings = false;
+
             // display loading
             this.displayLoading = true;
 
@@ -99,6 +120,11 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
                     }
                 }
             });
+
+            // add custom filters
+            if (!_.isEmpty(this.filters)) {
+                this.filters.attachConditionsToRequestQueryBuilder(qb);
+            }
 
             // retrieve cases
             this.caseDataService
@@ -144,6 +170,16 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
                 observer.next(null);
                 observer.complete();
             }
+        });
+    }
+
+    /**
+     * Reset Filters
+     */
+    resetFilters() {
+        this.filters = new TransmissionChainFilters();
+        setTimeout(() => {
+            this.reloadCases();
         });
     }
 }

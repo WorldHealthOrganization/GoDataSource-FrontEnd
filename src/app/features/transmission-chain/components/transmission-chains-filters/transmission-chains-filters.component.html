@@ -1,0 +1,104 @@
+<mat-card
+    fxFlex fxLayout="column" fxLayoutGap="20px">
+    <div
+        fxFlex
+        class="app-transmission-chain-filters-title">
+        {{ title | translate }}
+    </div>
+
+    <div
+        fxFlex fxLayout="row" fxLayoutGap="20px">
+        <!-- case classification -->
+        <app-form-select
+            name="classification"
+            [(ngModel)]="filters.classification"
+            [placeholder]="'LNG_CASE_FIELD_LABEL_CLASSIFICATION' | translate"
+            [options]="caseClassificationsList$ | async">
+        </app-form-select>
+
+        <!-- occupation -->
+        <app-form-select
+            name="occupation"
+            [(ngModel)]="filters.occupation"
+            [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
+            [options]="occupationsList$ | async">
+        </app-form-select>
+
+        <!-- outcome -->
+        <app-form-select
+            name="outcomeId"
+            [(ngModel)]="filters.outcomeId"
+            [placeholder]="'LNG_CASE_FIELD_LABEL_OUTCOME' | translate"
+            [options]="outcomeList$ | async">
+        </app-form-select>
+    </div>
+
+    <div
+        fxFlex fxLayout="row" fxLayoutGap="20px">
+        <!-- first name -->
+        <app-form-input
+            name="firstName"
+            [(ngModel)]="filters.firstName"
+            [placeholder]="'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' | translate"
+            maxlength="100">
+        </app-form-input>
+
+        <!-- last name -->
+        <app-form-input
+            name="lastName"
+            [(ngModel)]="filters.lastName"
+            [placeholder]="'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
+            maxlength="100">
+        </app-form-input>
+    </div>
+
+    <div
+        fxFlex fxLayout="row" fxLayoutGap="20px">
+        <!-- gender -->
+        <app-form-select
+            name="gender"
+            [(ngModel)]="filters.gender"
+            [placeholder]="'LNG_CASE_FIELD_LABEL_GENDER' | translate"
+            [options]="genderList$ | async"
+            multiple="true">
+        </app-form-select>
+
+        <!-- location -->
+        <app-form-location-dropdown
+            name="locationId"
+            [(ngModel)]="filters.locationId"
+            [useOutbreakLocations]="true"
+            [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate">
+        </app-form-location-dropdown>
+    </div>
+
+    <!-- Age -->
+    <div
+        fxFlex fxLayout="column" fxLayoutGap="10px">
+        <div
+            fxFlex>
+            {{ 'LNG_ENTITY_FIELD_LABEL_AGE' | translate }}
+        </div>
+
+        <app-form-range
+            name="age"
+            [ngModel]="filters.age"
+            (changed)="filters.age = $event">
+        </app-form-range>
+    </div>
+
+    <!-- Date -->
+    <div
+        fxFlex fxLayout="column" fxLayoutGap="10px">
+        <div
+            fxFlex>
+            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_DATE' | translate }}
+        </div>
+
+        <app-form-daterange
+            name="date"
+            [ngModel]="filters.date"
+            (changed)="filters.date = $event">
+        </app-form-daterange>
+    </div>
+</mat-card>

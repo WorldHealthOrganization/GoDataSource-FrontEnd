@@ -114,13 +114,18 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_CASE_COUNT_MAP_ACTION_GRAPH_BUTTON': 'Graph',
         'LNG_PAGE_CASE_COUNT_MAP_ACTION_LIST_BUTTON': 'List',
+        'LNG_PAGE_CASE_COUNT_MAP_BUTTON_CONFIGURE_SETTINGS': 'Display Filters',
+        'LNG_PAGE_CASE_COUNT_MAP_BUTTON_APPLY_SETTINGS': 'Refresh Map',
+        'LNG_PAGE_CASE_COUNT_MAP_BUTTON_RESET_FILTERS': 'Reset Filters',
+        'LNG_PAGE_CASE_COUNT_MAP_FILTERS_TITLE': 'Filters',
+        'LNG_PAGE_CASE_COUNT_MAP_NO_DATA': 'There is no data with geolocation',
 
         /**
          * uiChainsOfTransmissionGraph
          */
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GEOSPATIAL_MAP': 'Geospatial map',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_DISPLAY_MARKER_LABELS_LABEL': 'Display labels',
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NO_DATA': 'No chains with geolocation provided',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NO_DATA': 'There are no chains with geolocation',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_LIST_BUTTON': 'List',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CASE_COUNT_MAP_BUTTON': 'Case count map',
 
