@@ -1,4 +1,7 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import {
+    Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild,
+    ViewEncapsulation
+} from '@angular/core';
 import * as cytoscape from 'cytoscape';
 import * as cola from 'cytoscape-cola';
 import * as dagre from 'cytoscape-dagre';
@@ -79,6 +82,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     @Output() edgeTapped = new EventEmitter<any>();
     @Output() viewTypeChanged = new EventEmitter<any>();
     @Output() changeEditMode = new EventEmitter<boolean>();
+
+    @ViewChild(WorldMapComponent) worldMap;
 
     // authenticated user
     authUser: UserModel;
