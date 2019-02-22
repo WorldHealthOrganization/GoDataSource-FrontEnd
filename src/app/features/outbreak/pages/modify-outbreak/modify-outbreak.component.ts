@@ -18,6 +18,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import 'rxjs/add/operator/switchMap';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -40,6 +41,8 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     countriesList$: Observable<any[]>;
     // list of geographical levels
     geographicalLevelsList$: Observable<any[]>;
+
+    outbreakNameValidator: Observable<boolean>;
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -74,6 +77,14 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
 
         // update breadcrumbs
         this.createBreadcrumbs();
+
+        this.outbreakNameValidator = Observable.create((observer) => {
+            this.outbreakDataService.checkOutbreakNameUniquenessValidity(this.outbreak.name, this.outbreakId)
+                .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                    observer.next(isValid);
+                    observer.complete();
+                });
+        });
     }
 
     /**

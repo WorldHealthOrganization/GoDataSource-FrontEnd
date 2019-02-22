@@ -244,10 +244,16 @@ export class OutbreakDataService {
      * Check if the name of the new outbreak is unique
      * @returns {Observable<boolean | IGeneralAsyncValidatorResponse>}
      */
-    checkOutbreakNameUniquenessValidity(newOutbreakName: string): Observable<boolean | IGeneralAsyncValidatorResponse> {
+    checkOutbreakNameUniquenessValidity(newOutbreakName: string, outbreakId?: string): Observable<boolean | IGeneralAsyncValidatorResponse> {
         const qb: RequestQueryBuilder = new RequestQueryBuilder();
         qb.filter
-            .byEquality('name', newOutbreakName, true, true);
+            .byEquality('name', newOutbreakName, true, true)
+            // condition for modify outbreak
+            .where({
+                'id' : {
+                    neq : outbreakId
+                }
+            });
         return this.getOutbreaksList(qb)
             .map((outbreakData: OutbreakModel[]) => {
                 return !outbreakData.length ?
