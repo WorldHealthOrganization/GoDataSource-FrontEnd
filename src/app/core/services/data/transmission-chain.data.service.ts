@@ -15,6 +15,20 @@ import * as _ from 'lodash';
 import { LocationModel } from '../../models/location.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
 
+export interface IConvertChainToGraphElements {
+    nodes: {
+        data: GraphNodeModel
+    }[];
+    edges: {
+        data: GraphEdgeModel
+    }[];
+    edgesHierarchical: any[];
+    caseNodesWithoutDates: any[];
+    contactNodesWithoutDates: any[];
+    eventNodesWithoutDates: any[];
+    timelineDateCheckpoints: any[];
+}
+
 @Injectable()
 export class TransmissionChainDataService {
     constructor(
@@ -161,20 +175,8 @@ export class TransmissionChainDataService {
         colorCriteria: any,
         locationsList: LocationModel[],
         selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value
-    ): {
-        nodes: {
-            data: GraphNodeModel
-        }[],
-        edges: {
-            data: GraphEdgeModel
-        }[],
-        edgesHierarchical: any[],
-        caseNodesWithoutDates: any[],
-        contactNodesWithoutDates: any[],
-        eventNodesWithoutDates: any[],
-        timelineDateCheckpoints: any[]
-    } {
-        const graphData: any = {
+    ): IConvertChainToGraphElements {
+        const graphData: IConvertChainToGraphElements = {
             nodes: [],
             edges: [],
             edgesHierarchical: [],

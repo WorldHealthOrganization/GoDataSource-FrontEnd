@@ -237,16 +237,6 @@ export class SidenavComponent implements OnInit {
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 ),
                 new ChildNavItem(
-                    'transmission-chains-geospatial-map',
-                    'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_GEO_MAP_LABEL',
-                    [
-                        PERMISSION.READ_OUTBREAK,
-                        PERMISSION.READ_CASE
-                    ],
-                    '/transmission-chains/map',
-                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-                ),
-                new ChildNavItem(
                     'cases-count-map',
                     'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_COUNT_MAP_LABEL',
                     [
