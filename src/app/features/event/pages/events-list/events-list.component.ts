@@ -67,31 +67,11 @@ export class EventsListComponent extends ListComponent implements OnInit {
     ];
 
     anonymizeFields: LabelValuePair[] = [
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_ID', 'id'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_FIRST_NAME', 'firstName'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_MIDDLE_NAME', 'middleName'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_LAST_NAME', 'lastName'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_GENDER', 'gender'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_PHONE_NUMBER', 'phoneNumber'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_OCCUPATION', 'occupation'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_DOB', 'dob'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_AGE', 'age'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_RISK_LEVEL', 'riskLevel'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_RISK_REASON', 'riskReason'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_DOCUMENTS', 'documents'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_ADDRESSES', 'addresses'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_CLASSIFICATION', 'classification'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION', 'dateOfInfection'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_ONSET', 'dateOfOnset'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE', 'isDateOfOnsetApproximate'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME', 'dateOfOutcome'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE', 'dateBecomeCase'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_RANGES', 'dateRanges'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_TYPE', 'type'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', 'transferRefused')
+        new LabelValuePair('LNG_EVENT_FIELD_LABEL_NAME', 'name'),
+        new LabelValuePair('LNG_EVENT_FIELD_LABEL_DATE', 'date'),
+        new LabelValuePair('LNG_EVENT_FIELD_LABEL_DESCRIPTION', 'description'),
+        new LabelValuePair('LNG_EVENT_FIELD_LABEL_ADDRESS', 'address'),
+        new LabelValuePair('LNG_EVENT_FIELD_LABEL_DELETED', 'deleted'),
     ];
 
     constructor(

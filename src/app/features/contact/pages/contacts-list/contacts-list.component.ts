@@ -689,7 +689,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         // display export dialog
         this.dialogService.showExportDialog({
             // required
-            message: 'LNG_PAGE_LIST_CONTACTS_EXPORT__RELATIONSHIPS_TITLE',
+            message: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIPS_TITLE',
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
             fileName: `LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME`,
 
