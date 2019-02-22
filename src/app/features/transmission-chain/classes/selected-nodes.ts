@@ -104,11 +104,4 @@ export class SelectedNodes {
             )
         );
     }
-
-    /**
-     * Check if we can modify the selected Node
-     */
-    get canModifyPerson(): boolean {
-        return this.nodes.length === 1;
-    }
 }

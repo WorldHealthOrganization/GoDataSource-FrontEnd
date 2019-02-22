@@ -250,13 +250,13 @@ export class FollowUpsDataService {
     /**
      * get team workload
      * @param {string} outbreakId
-     * @param {string} firstDate
-     * @param {string} lastDate
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<TeamFollowupsPerDayModel>}
      */
-    getFollowUpsPerDayTeam(outbreakId: string, firstDate: string, lastDate: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<TeamFollowupsPerDayModel> {
-        queryBuilder.filter.byRange('date', new FormRangeModel({from: firstDate, to: lastDate}));
+    getFollowUpsPerDayTeam(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<TeamFollowupsPerDayModel> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/per-team-per-day/count?filter=${filter}`),
