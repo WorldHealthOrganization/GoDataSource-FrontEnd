@@ -123,6 +123,20 @@ export class RequestQueryBuilder {
     }
 
     /**
+     * Check if all child query builders are empty
+     */
+    allChildQueryBuildersAreEmpty(): boolean {
+        let isEmpty: boolean = true;
+        _.each(this.childrenQueryBuilders, (qb: RequestQueryBuilder) => {
+            if (!qb.isEmpty()) {
+                isEmpty = false;
+                return false;
+            }
+        });
+        return isEmpty;
+    }
+
+    /**
      * Build the query to be applied on Loopback requests
      * @returns {string}
      */
@@ -265,7 +279,8 @@ export class RequestQueryBuilder {
             this.sort.isEmpty() &&
             _.isEmpty(this.limitResultsNumber) &&
             this.paginator.isEmpty() &&
-            _.isEmpty(this.fieldsInResponse);
+            _.isEmpty(this.fieldsInResponse) &&
+            this.allChildQueryBuildersAreEmpty();
     }
 
     /**
