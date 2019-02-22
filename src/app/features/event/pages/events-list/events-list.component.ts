@@ -10,7 +10,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
@@ -22,6 +22,9 @@ import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { tap } from 'rxjs/operators';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { LoadingDialogModel } from '../../../../shared/components/loading-dialog/loading-dialog.component';
 
 @Component({
     selector: 'app-events-list',
@@ -50,6 +53,46 @@ export class EventsListComponent extends ListComponent implements OnInit {
     Constants = Constants;
     EntityType = EntityType;
     UserSettings = UserSettings;
+
+    loadingDialog: LoadingDialogModel;
+
+
+    allowedExportTypes: ExportDataExtension[] = [
+        ExportDataExtension.CSV,
+        ExportDataExtension.XLS,
+        ExportDataExtension.XLSX,
+        ExportDataExtension.XML,
+        ExportDataExtension.JSON,
+        ExportDataExtension.ODS
+    ];
+
+    anonymizeFields: LabelValuePair[] = [
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_ID', 'id'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_FIRST_NAME', 'firstName'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_MIDDLE_NAME', 'middleName'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_LAST_NAME', 'lastName'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_GENDER', 'gender'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_PHONE_NUMBER', 'phoneNumber'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_OCCUPATION', 'occupation'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DOB', 'dob'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_AGE', 'age'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_RISK_LEVEL', 'riskLevel'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_RISK_REASON', 'riskReason'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DOCUMENTS', 'documents'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_ADDRESSES', 'addresses'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_CLASSIFICATION', 'classification'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION', 'dateOfInfection'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_ONSET', 'dateOfOnset'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE', 'isDateOfOnsetApproximate'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME', 'dateOfOutcome'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE', 'dateBecomeCase'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_RANGES', 'dateRanges'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_TYPE', 'type'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', 'transferRefused')
+    ];
 
     constructor(
         private eventDataService: EventDataService,
@@ -95,6 +138,11 @@ export class EventsListComponent extends ListComponent implements OnInit {
     initializeSideTableColumns() {
         // default table columns
         this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'checkbox',
+                required: true,
+                excludeFromSave: true
+            }),
             new VisibleColumnModel({
                 field: 'name',
                 label: 'LNG_EVENT_FIELD_LABEL_NAME'
@@ -212,5 +260,57 @@ export class EventsListComponent extends ListComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    /**
+     * Export relationships for selected events
+     */
+    exportSelectedEventsRelationship() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.where({
+            'persons.id': {
+                inq: selectedRecords
+            }
+        });
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIPS_TITLE',
+            url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+            fileName: `LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME`,
+
+            // // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
+        });
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
     }
 }

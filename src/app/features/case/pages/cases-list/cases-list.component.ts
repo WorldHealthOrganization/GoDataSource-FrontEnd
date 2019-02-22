@@ -697,6 +697,42 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     }
 
     /**
+     * Export relationship for selected cases
+     */
+    exportSelectedCasesRelationships() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.where({
+            'persons.id': {
+                inq: selectedRecords
+            }
+        });
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE',
+            url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+            fileName: `LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME`,
+
+            // // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
+        });
+    }
+
+    /**
      * Export case investigation form for a Case
      */
     exportCaseInvestigationForm(caseModel: CaseModel) {

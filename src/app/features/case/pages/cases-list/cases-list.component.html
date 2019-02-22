@@ -183,6 +183,12 @@
                                 (click)="exportSelectedCasesDossier()">
                                 {{ 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER' | translate }}
                             </button>
+
+                            <button
+                                mat-menu-item
+                                (click)="exportSelectedCasesRelationships()">
+                                {{ 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_RELATIONSHIPS' | translate }}
+                            </button>
                         </mat-menu>
                     </div>
                     <div class="column-filter">

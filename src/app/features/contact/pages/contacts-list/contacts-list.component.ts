@@ -669,6 +669,42 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     }
 
     /**
+     * Export relationships for selected contacts
+     */
+    exportSelectedContactsRelationship() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.where({
+            'persons.id': {
+                inq: selectedRecords
+            }
+        });
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_CONTACTS_EXPORT__RELATIONSHIPS_TITLE',
+            url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+            fileName: `LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME`,
+
+            // // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
+        });
+    }
+
+    /**
      * Display loading dialog
      */
     showLoadingDialog() {
