@@ -115,7 +115,7 @@
                         <app-form-select
                             name="rolesFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="availablePermissions$ | async"
                             multiple="true"
                             (optionChanged)="filterBySelectField('permissionIds', $event, 'id')"

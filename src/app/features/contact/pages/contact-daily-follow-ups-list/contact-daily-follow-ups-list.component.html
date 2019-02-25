@@ -253,7 +253,7 @@
 
         <!-- Date of Last Contact -->
         <ng-container matColumnDef="contact.dateOfLastContact">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}</div>
                     <div class="column-filter">
@@ -266,24 +266,27 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.dateOfLastContact | dateDefault }}
             </mat-cell>
         </ng-container>
 
         <!-- Date of the End of Follow-up -->
         <ng-container matColumnDef="dateOfFollowUpEnd">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP' | translate }}</div>
                     <div class="column-filter">
-                        <div class="column-filter">
-                            <!-- placeholder -->
-                        </div>
+                        <app-form-daterange
+                            name="dateFilter"
+                            ngModel
+                            (changed)="filterByRelation('contact').byDateRange('followUp.endDate', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.followUp.endDate | dateDefault }}
             </mat-cell>
         </ng-container>
@@ -292,11 +295,18 @@
         <ng-container matColumnDef="dayOfFollowUp">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP' | translate
+                        }}
+                    </div>
                     <div class="column-filter">
-                        <div class="column-filter">
-                            <!-- placeholder -->
-                        </div>
+                        <app-form-input
+                            name="dayOfFollowUpFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByEquality('index', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
                     </div>
                 </div>
             </mat-header-cell>
@@ -378,7 +388,8 @@
         <ng-container matColumnDef="statusId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="statusIdFilter"
@@ -407,7 +418,8 @@
         <ng-container matColumnDef="targeted">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="targetedFilter"
@@ -443,7 +455,8 @@
         <ng-container matColumnDef="deleted">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="deletedFilter"
@@ -474,7 +487,8 @@
                     </button>
 
                     <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-                        <button mat-menu-item [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'view' ]">
+                        <button mat-menu-item
+                                [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'view' ]">
                             {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_VIEW_FOLLOW_UP' | translate }}
                         </button>
 

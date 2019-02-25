@@ -32,6 +32,10 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
     // selected outbreak
     selectedOutbreak: OutbreakModel;
 
+    visualIDTranslateData: {
+        mask: string
+    };
+
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
@@ -60,6 +64,11 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+
+                // set visual ID translate data
+                this.visualIDTranslateData = {
+                    mask: ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
+                };
             });
     }
 

@@ -24,7 +24,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestRelationBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -666,6 +666,131 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 exportFinished: () => { this.closeLoadingDialog(); }
             });
         }
+    }
+
+    /**
+     * Export relationships for selected contacts
+     */
+    exportSelectedContactsRelationship() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.where({
+            'persons.id': {
+                inq: selectedRecords
+            }
+        });
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIPS_TITLE',
+            url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+            fileName: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // optional
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
+        });
+    }
+
+    /**
+     * Export Contact Relationships
+     */
+    exportFilteredContactsRelationships() {
+        // construct filter by case query builder
+        const qb = new RequestQueryBuilder();
+        const personsQb = qb.addChildQueryBuilder('person');
+
+        // merge query builder
+        personsQb.merge(this.queryBuilder);
+
+        // remove pagination
+        personsQb.paginator.clear();
+
+        // remove follow-ups filter
+        const followUps: RequestRelationBuilder = personsQb.include('followUps');
+        personsQb.removeRelation('followUps');
+
+        // check if we have anything to filter by follow-ups
+        if (!followUps.queryBuilder.isEmpty()) {
+            const followUpQb = qb.addChildQueryBuilder('followUp');
+            followUpQb.merge(followUps.queryBuilder);
+        }
+
+        // retrieve relationships conditions & remove them so we can check if we need to filter by contacts
+        const relationships: RequestRelationBuilder = personsQb.include('relationships');
+        personsQb.removeRelation('relationships');
+
+        // filter contacts
+        let removeFilter: boolean = false;
+        if (personsQb.isEmpty()) {
+            removeFilter = true;
+        } else {
+            personsQb.filter.byEquality(
+                'type',
+                EntityType.CONTACT
+            );
+        }
+
+        // relationships
+        if (!relationships.queryBuilder.isEmpty()) {
+            // filter by people
+            const people = relationships.queryBuilder.include('people');
+            if (!people.queryBuilder.isEmpty()) {
+                // do we need to merge conditions with case conditions ?
+                if (personsQb.isEmpty()) {
+                    personsQb.merge(people.queryBuilder);
+                } else {
+                    // merge contact & case conditions
+                    const contactConditions = personsQb.filter.generateCondition();
+                    personsQb.filter.clear();
+                    personsQb.filter.where({
+                        or: [
+                            contactConditions, {
+                                and: [
+                                    { type: EntityType.CASE },
+                                    people.queryBuilder.filter.generateCondition()
+                                ]
+                            }
+                        ]
+                    });
+                }
+
+                // don't remove filter anymore
+                removeFilter = false;
+            }
+        }
+
+        // remove filter
+        if (removeFilter) {
+            qb.removeChildQueryBuilder('person');
+        }
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIPS_TITLE',
+            url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+            fileName: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // optional
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
+        });
     }
 
     /**

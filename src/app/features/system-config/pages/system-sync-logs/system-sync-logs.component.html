@@ -104,7 +104,7 @@
 
         <!-- Action Start Date -->
         <ng-container matColumnDef="actionStartDate">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
                         {{'LNG_UPSTREAM_SERVER_FIELD_LABEL_ACTION_START_DATE' | translate}}
@@ -120,14 +120,14 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.actionStartDate | dateTimeDefault }}
             </mat-cell>
         </ng-container>
 
         <!-- Action Completion Date -->
         <ng-container matColumnDef="actionCompletionDate">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
                         {{'LNG_UPSTREAM_SERVER_FIELD_LABEL_ACTION_COMPLETION_DATE' | translate}}
@@ -143,7 +143,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.actionCompletionDate | dateTimeDefault }}
             </mat-cell>
         </ng-container>
@@ -216,7 +216,7 @@
 
         <!-- Information Start Date -->
         <ng-container matColumnDef="informationStartDate">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
                         {{'LNG_UPSTREAM_SERVER_FIELD_LABEL_INFORMATION_START_DATE' | translate}}
@@ -232,7 +232,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.informationStartDate | dateTimeDefault }}
             </mat-cell>
         </ng-container>

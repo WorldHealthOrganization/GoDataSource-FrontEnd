@@ -8,10 +8,12 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { AddressType } from '../../../../core/models/address.model';
 import { WorldMapComponent, WorldMapMarker, WorldMapMarkerLayer, WorldMapPoint } from '../../../../shared/components/world-map/world-map.component';
 import * as _ from 'lodash';
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Subscription } from 'rxjs/Subscription';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import * as FileSaver from 'file-saver';
 
 @Component({
     selector: 'app-case-count-map',
@@ -46,7 +48,9 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
      */
     constructor(
         private caseDataService: CaseDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private dialogService: DialogService,
+        private i18nService: I18nService
     ) {}
 
     /**
@@ -71,6 +75,25 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
+        }
+    }
+
+    /**
+     * Export case count map
+     */
+    exportCaseCountMap() {
+        if (this.worldMap) {
+            const loadingDialog = this.dialogService.showLoadingDialog();
+            this.worldMap
+                .printToBlob()
+                .subscribe((blob) => {
+                    const fileName = this.i18nService.instant('LNG_PAGE_CASE_COUNT_TITLE');
+                    FileSaver.saveAs(
+                        blob,
+                        `${fileName}.png`
+                    );
+                    loadingDialog.close();
+                });
         }
     }
 
@@ -126,24 +149,5 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
                     this.displayLoading = false;
                 });
         }
-    }
-
-    /**
-     * Print to blob
-     */
-    printToBlob(): Observable<Blob> {
-        return Observable.create((observer: Subscriber<Blob>) => {
-            if (this.worldMap) {
-                this.worldMap
-                    .printToBlob()
-                    .subscribe((blob) => {
-                        observer.next(blob);
-                        observer.complete();
-                    });
-            } else {
-                observer.next(null);
-                observer.complete();
-            }
-        });
     }
 }

@@ -117,7 +117,7 @@
 
         <!-- Time -->
         <ng-container matColumnDef="createdAt">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
                     <div mat-sort-header class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_CREATED_AT' | translate}}</div>
                     <div class="column-filter">
@@ -131,7 +131,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.createdAt | dateTimeDefault }}
             </mat-cell>
         </ng-container>

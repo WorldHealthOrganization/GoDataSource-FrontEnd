@@ -67,6 +67,7 @@
                         [(ngModel)]="case.visualId"
                         [placeholder]="'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate"
                         tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                        [tooltipTranslateData]="visualIDTranslateData"
                         (optionChanged)="onChange()">
                     </app-form-input></div>
                 </div>

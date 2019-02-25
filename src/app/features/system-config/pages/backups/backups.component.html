@@ -134,7 +134,7 @@
 
             <!-- Date -->
             <ng-container matColumnDef="date">
-                <mat-header-cell *matHeaderCellDef>
+                <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                     <div class="table-header-cell">
                         <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_DATE' | translate}}</div>
                         <div class="column-filter">
@@ -148,7 +148,7 @@
                     </div>
                 </mat-header-cell>
 
-                <mat-cell *matCellDef="let item">
+                <mat-cell class="has-date-range-filter" *matCellDef="let item">
                     {{ item.date | dateDefault }}
                 </mat-cell>
             </ng-container>

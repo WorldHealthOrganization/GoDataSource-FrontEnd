@@ -154,7 +154,7 @@
 
         <!-- Date of Last Contact -->
         <ng-container matColumnDef="contact.dateOfLastContact">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}</div>
                     <div class="column-filter">
@@ -167,14 +167,14 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.dateOfLastContact | dateDefault }}
             </mat-cell>
         </ng-container>
 
         <!-- Follow-up date -->
         <ng-container matColumnDef="date">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate }}</div>
                     <div class="column-filter">
@@ -187,7 +187,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.date | dateDefault }}
             </mat-cell>
         </ng-container>
