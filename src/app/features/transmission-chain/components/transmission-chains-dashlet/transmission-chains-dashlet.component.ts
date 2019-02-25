@@ -56,10 +56,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     showSettings: boolean = false;
     filters: any = {};
     resetFiltersData: any;
-    genderList$: Observable<any[]>;
-    caseClassificationsList$: Observable<any[]>;
-    occupationsList$: Observable<any[]>;
-    outcomeList$: Observable<any[]>;
     locationsList: LocationModel[];
     personName: string = '';
     dateGlobalFilter: string = moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
@@ -189,10 +185,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.filters.showContacts = false;
         this.filters.showEvents = true;
 
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
-        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
-        this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
-        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         const locationQueryBuilder = new RequestQueryBuilder();
         locationQueryBuilder.fieldsInResponse = ['id', 'name'];
         this.locationDataService.getLocationsList(locationQueryBuilder).subscribe((results) => {

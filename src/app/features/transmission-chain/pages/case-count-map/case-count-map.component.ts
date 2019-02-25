@@ -10,15 +10,10 @@ import { WorldMapComponent, WorldMapMarker, WorldMapMarkerLayer, WorldMapPoint }
 import * as _ from 'lodash';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Subscription } from 'rxjs/Subscription';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { TransmissionChainFilters } from '../../components/transmission-chains-filters/transmission-chains-filters.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as FileSaver from 'file-saver';
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
 
 @Component({
     selector: 'app-case-count-map',
@@ -43,10 +38,6 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
 
     showSettings: boolean = false;
     filters: TransmissionChainFilters = new TransmissionChainFilters();
-    caseClassificationsList$: Observable<LabelValuePair[]>;
-    occupationsList$: Observable<LabelValuePair[]>;
-    outcomeList$: Observable<LabelValuePair[]>;
-    genderList$: Observable<LabelValuePair[]>;
 
     clusterDistance: number = 10;
 
@@ -61,7 +52,6 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
-        private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
         private i18nService: I18nService
     ) {}
@@ -81,12 +71,6 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
                     this.reloadCases();
                 }
             });
-
-        // other data
-        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
-        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
-        this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
     }
 
     ngOnDestroy() {

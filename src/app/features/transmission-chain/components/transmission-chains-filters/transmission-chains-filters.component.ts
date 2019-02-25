@@ -1,10 +1,12 @@
-import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { Moment } from 'moment';
 import { AgeModel } from '../../../../core/models/age.model';
 import { Observable } from 'rxjs/Observable';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 export class TransmissionChainFilters {
     classification: string;
@@ -125,15 +127,28 @@ export class TransmissionChainFilters {
     templateUrl: './transmission-chains-filters.component.html',
     styleUrls: ['./transmission-chains-filters.component.less']
 })
-export class TransmissionChainsFiltersComponent {
+export class TransmissionChainsFiltersComponent implements OnInit {
     @Input() title: string;
     @Input() filters: TransmissionChainFilters = new TransmissionChainFilters();
-    @Input() caseClassificationsList$: Observable<LabelValuePair[]>;
-    @Input() occupationsList$: Observable<LabelValuePair[]>;
-    @Input() outcomeList$: Observable<LabelValuePair[]>;
-    @Input() genderList$: Observable<LabelValuePair[]>;
 
     @HostBinding('class.form-element-host') isFormElement = true;
+
+    caseClassificationsList$: Observable<LabelValuePair[]>;
+    occupationsList$: Observable<LabelValuePair[]>;
+    outcomeList$: Observable<LabelValuePair[]>;
+    genderList$: Observable<LabelValuePair[]>;
+
+    constructor(
+        private referenceDataDataService: ReferenceDataDataService
+    ) {}
+
+    ngOnInit(): void {
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+        this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
+    }
+
 }
 
 
