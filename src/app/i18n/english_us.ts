@@ -145,6 +145,21 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE': 'Location coordinates were propagated to all addresses that are using this location',
 
         /**
+         * uiMovementCasePage
+         */
+        'LNG_PAGE_VIEW_MOVEMENT_CASE_EXPORT': 'Export Case Movement Map',
+
+        /**
+         * uiMovementContactPage
+         */
+        'LNG_PAGE_VIEW_MOVEMENT_CONTACT_EXPORT': 'Export Contact Movement Map',
+
+        /**
+         * uiTransmissionChainsGeoMap
+         */
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_EXPORT': 'Export Geospatial Map'
+
+        /**
          * REMOVE
          */
         // 'LNG_CASE_FIELD_LABEL_DECEASED',
