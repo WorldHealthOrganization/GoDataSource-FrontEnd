@@ -203,7 +203,7 @@
                         <app-form-input
                             name="lastNameFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('lastName', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
@@ -226,7 +226,7 @@
                         <app-form-input
                             name="firstNameFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('firstName', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
@@ -248,7 +248,7 @@
                         <app-form-input
                             name="visualId"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('visualId', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
@@ -271,7 +271,7 @@
                         <app-form-select
                             name="classificationFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="caseClassificationsList$ | async"
                             (optionChanged)="filterByClassificationField($event)"
                             multiple="true"
@@ -349,7 +349,7 @@
                         <app-form-select
                             name="genderFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="genderList$ | async"
                             (optionChanged)="filterBySelectField('gender', $event)"
                             multiple="true"
@@ -368,7 +368,7 @@
 
         <!-- Date of onset -->
         <ng-container matColumnDef="dateOfOnset">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate }}</div>
                     <div class="column-filter">

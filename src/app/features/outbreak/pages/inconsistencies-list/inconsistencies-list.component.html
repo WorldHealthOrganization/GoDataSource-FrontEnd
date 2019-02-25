@@ -45,7 +45,7 @@
                         <app-form-input
                             name="firstNameFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField(['firstName', 'name'], $event)"
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -69,7 +69,7 @@
                         <app-form-input
                             name="lastNameFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('lastName', $event)"
                             [displayFilterIcon]="true">
                         </app-form-input>

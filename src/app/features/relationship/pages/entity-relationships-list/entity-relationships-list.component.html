@@ -158,7 +158,7 @@
 
         <!-- Contact Date -->
         <ng-container matColumnDef="contactDate">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE' | translate}}
@@ -190,7 +190,7 @@
                         <app-form-select
                             name="certaintyLevelFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="certaintyLevelList$ | async"
                             (optionChanged)="filterBySelectField('certaintyLevelId', $event)"
                             multiple="true"
