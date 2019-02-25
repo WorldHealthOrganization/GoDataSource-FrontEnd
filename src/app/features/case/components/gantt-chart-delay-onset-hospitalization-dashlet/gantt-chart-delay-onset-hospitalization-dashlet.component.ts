@@ -175,7 +175,7 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
             ) {
                 const chartDataItemChild: any = {};
                 chartDataItemChild.id = result.case.id;
-                chartDataItemChild.name = result.case.firstName + ' ' + result.case.lastName;
+                chartDataItemChild.name = result.case.name;
                 chartDataItemChild.from = new Date(Date.parse(result.dateOfOnset));
                 chartDataItemChild.to = new Date(Date.parse(result.hospitalizationIsolationDate));
                 chartDataItem.children.push(chartDataItemChild);

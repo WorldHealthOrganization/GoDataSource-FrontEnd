@@ -105,8 +105,8 @@ export class ContactModel {
      * @returns {string}
      */
     get name(): string {
-        const firstName = _.get(this, 'firstName', '');
-        const lastName = _.get(this, 'lastName', '');
+        const firstName = this.firstName ? this.firstName : '';
+        const lastName = this.lastName ? this.lastName : '';
         return _.trim(`${firstName} ${lastName}`);
     }
 
