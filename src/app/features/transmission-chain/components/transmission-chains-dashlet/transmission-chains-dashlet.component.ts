@@ -28,6 +28,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Moment } from 'moment';
 import { Subscription } from 'rxjs/Subscription';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
+import { TransmissionChainFilters } from '../transmission-chains-filters/transmission-chains-filters.component';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -55,10 +56,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     showSettings: boolean = false;
     filters: any = {};
     resetFiltersData: any;
-    genderList$: Observable<any[]>;
-    caseClassificationsList$: Observable<any[]>;
-    occupationsList$: Observable<any[]>;
-    outcomeList$: Observable<any[]>;
     locationsList: LocationModel[];
     personName: string = '';
     dateGlobalFilter: string = moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
@@ -188,10 +185,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.filters.showContacts = false;
         this.filters.showEvents = true;
 
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
-        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
-        this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
-        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         const locationQueryBuilder = new RequestQueryBuilder();
         locationQueryBuilder.fieldsInResponse = ['id', 'name'];
         this.locationDataService.getLocationsList(locationQueryBuilder).subscribe((results) => {
@@ -292,83 +285,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             requestQueryBuilder.filter.firstLevelConditions();
 
             // do we have person filters?
-            if (this.filters) {
+            if (!_.isEmpty(this.filters)) {
                 // include custom person builder that will handle these filters
                 const personRequestQueryBuilder: RequestQueryBuilder = requestQueryBuilder.addChildQueryBuilder('person');
-
-                // occupation
-                if (!_.isEmpty(this.filters.occupation)) {
-                    personRequestQueryBuilder.filter.byEquality(
-                        'occupation',
-                        this.filters.occupation
-                    );
-                }
-
-                // outcome
-                if (!_.isEmpty(this.filters.outcomeId)) {
-                    personRequestQueryBuilder.filter.byEquality(
-                        'outcomeId',
-                        this.filters.outcomeId
-                    );
-                }
-
-                // gender
-                if (!_.isEmpty(this.filters.gender)) {
-                    personRequestQueryBuilder.filter.bySelect(
-                        'gender',
-                        this.filters.gender,
-                        true,
-                        null
-                    );
-                }
-
-                // case classification
-                if (!_.isEmpty(this.filters.classification)) {
-                    personRequestQueryBuilder.filter.byEquality(
-                        'classification',
-                        this.filters.classification
-                    );
-                }
-
-                // case location
-                if (!_.isEmpty(this.filters.locationId)) {
-                    personRequestQueryBuilder.filter.byEquality(
-                        'addresses.parentLocationIdFilter',
-                        this.filters.locationId
-                    );
-                }
-
-                // firstName
-                if (!_.isEmpty(this.filters.firstName)) {
-                    personRequestQueryBuilder.filter.byText(
-                        'firstName',
-                        this.filters.firstName
-                    );
-                }
-
-                // lastName
-                if (!_.isEmpty(this.filters.lastName)) {
-                    personRequestQueryBuilder.filter.byText(
-                        'lastName',
-                        this.filters.lastName
-                    );
-                }
-
-                // age
-                if (!_.isEmpty(this.filters.age)) {
-                    personRequestQueryBuilder.filter.byAgeRange(
-                        'age',
-                        this.filters.age
-                    );
-                }
-
-                // date of reporting
-                if (!_.isEmpty(this.filters.date)) {
-                    personRequestQueryBuilder.filter.byDateRange(
-                        'dateOfReporting',
-                        this.filters.date
-                    );
-                }
+                const filterObject = new TransmissionChainFilters(this.filters);
+                filterObject.attachConditionsToRequestQueryBuilder(personRequestQueryBuilder);
             }
 
             // do we have chainIncludesPerson filters ?
@@ -476,22 +397,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         setTimeout(() => {
             this.refreshChain();
         });
-    }
-
-    /**
-     * set age filter at range update
-     * @param ageRange
-     */
-    setAgeFilter(ageRange) {
-        this.filters.age = ageRange;
-    }
-
-    /**
-     * set age filter at range update
-     * @param dateRange
-     */
-    setDateFilter(dateRange) {
-        this.filters.date = dateRange;
     }
 
     /**
