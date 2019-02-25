@@ -165,7 +165,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.date | dateDefault }}
             </mat-cell>
         </ng-container>

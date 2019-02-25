@@ -398,7 +398,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
                 {{ item.dateOfOnset | dateDefault }}
             </mat-cell>
         </ng-container>

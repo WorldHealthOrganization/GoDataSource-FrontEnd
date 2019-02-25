@@ -112,11 +112,6 @@ html, body, ul, li, div, span {
                 font-weight: bold !important;
                 padding-left: @cell-padding-left;
 
-                &.has-date-range-filter {
-                    // need some space to display the From - To Dates properly
-                    min-width: 220px;
-                }
-
                 .mat-sort-header-button {
                     text-align: left;
                 }
@@ -139,6 +134,14 @@ html, body, ul, li, div, span {
                         height: 56px;
                     }
                 }
+            }
+        }
+
+        .mat-header-cell,
+        .mat-cell {
+            &.has-date-range-filter {
+                // need some space to display the From - To Dates properly
+                min-width: 220px;
             }
         }
 
