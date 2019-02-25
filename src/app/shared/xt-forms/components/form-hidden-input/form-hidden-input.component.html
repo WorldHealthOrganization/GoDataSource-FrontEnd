@@ -1,0 +1,20 @@
+<div class="form-input-container form-element"
+     [id]="identifier"
+     [ngClass]="{ invalid: invalid }">
+
+    <!-- Hidden Input -->
+    <input
+        [name]="name"
+        [ngModel]="value"
+        type="hidden"
+        [required]="required"
+    />
+
+    <!-- Display Error -->
+    <app-form-validation
+        *ngIf="invalid"
+        [controlContainer]="controlContainer"
+        [controlName]="name"
+        [messages]="failures">
+    </app-form-validation>
+</div>

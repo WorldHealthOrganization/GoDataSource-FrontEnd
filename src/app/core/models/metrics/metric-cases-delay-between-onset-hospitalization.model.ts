@@ -11,6 +11,8 @@ export class MetricCasesDelayBetweenOnsetHospitalizationModel {
         this.dateOfOnset = _.get(data, 'dateOfOnset');
         this.hospitalizationIsolationDate = _.get(data, 'hospitalizationIsolationDate');
         this.delay = _.get(data, 'delay');
+
         this.case = _.get(data, 'case');
+        this.case = this.case ? new CaseModel(this.case) : this.case;
     }
 }
