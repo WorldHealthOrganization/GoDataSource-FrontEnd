@@ -304,7 +304,7 @@
                                 name="dayOfFollowUpFilter"
                                 ngModel
                                 [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'"
-                                (optionChanged)="filterByNumber('index', $event)"
+                                (optionChanged)="filterByEquality('index', $event)"
                                 app-reset-input-on-side-filter
                                 [displayFilterIcon]="true">
                             </app-form-input>

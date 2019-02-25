@@ -308,13 +308,13 @@ export abstract class ListComponent {
     }
 
     /**
-     * Filter the list by a number
+     * Filter the list by equality
      * @param {string} property
-     * @param {number} value
+     * @param {*} value
      */
-    filterByNumber(
+    filterByEquality(
         property: string | string[],
-        value: number,
+        value: any,
     ) {
         this.queryBuilder.filter.byEquality(
             property as string,
