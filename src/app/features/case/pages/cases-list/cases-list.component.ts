@@ -685,7 +685,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             url: this.exportCasesUrl,
             fileName: this.casesDataExportFileName,
 
-            // // optional
+            // optional
             allowedExportTypes: this.allowedExportTypes,
             queryBuilder: qb,
             displayEncrypt: true,
@@ -719,10 +719,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             // required
             message: 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE',
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
-            fileName: `LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME`,
+            fileName: this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME'),
 
-            // // optional
-            allowedExportTypes: this.allowedExportTypes,
+            // optional
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
@@ -732,20 +731,39 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         });
     }
 
+    /**
+     * Export Case Relationships
+     */
     exportFilteredCasesRelationships() {
+        // construct filter by case query builder
         const qb = new RequestQueryBuilder();
-        const personsQb = qb.addChildQueryBuilder(`persons`);
+        const personsQb = qb.addChildQueryBuilder('person');
+
+        // merge out query builder
         personsQb.merge(this.queryBuilder);
+
+        // remove pagination
+        personsQb.paginator.clear();
+
+        // remove child condition ?
+        if (personsQb.isEmpty()) {
+            qb.removeChildQueryBuilder('person');
+        } else {
+            // filter only cases
+            personsQb.filter.byEquality(
+                'type',
+                EntityType.CASE
+            );
+        }
 
         // display export dialog
         this.dialogService.showExportDialog({
             // required
             message: 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE',
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
-            fileName: `LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME`,
+            fileName: this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME'),
 
-            // // optional
-            allowedExportTypes: this.allowedExportTypes,
+            // optional
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,

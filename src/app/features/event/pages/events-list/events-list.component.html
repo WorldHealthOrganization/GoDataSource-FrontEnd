@@ -11,17 +11,26 @@
                     </button>
                 </ng-container>
 
-                <button mat-raised-button color="accent" [matMenuTriggerFor]="quickActionsMenu">
+                <button
+                    *ngIf="!appliedListFilter"
+                    mat-raised-button
+                    color="accent"
+                    [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <button
-                        *ngIf="!appliedListFilter"
                         mat-menu-item
                         [routerLink]="['/events']"
                         [queryParams]="{ applyListFilter: Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS }">
                         {{'LNG_PAGE_LIST_EVENTS_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        (click)="exportFilteredEventsRelationships()">
+                        {{ 'LNG_PAGE_LIST_EVENTS_ACTION_EXPORT_EVENTS_RELATIONSHIPS' | translate }}
                     </button>
                 </mat-menu>
             </div>

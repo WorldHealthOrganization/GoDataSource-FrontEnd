@@ -25,6 +25,7 @@ import { tap } from 'rxjs/operators';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { LoadingDialogModel } from '../../../../shared/components/loading-dialog/loading-dialog.component';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-events-list',
@@ -82,7 +83,8 @@ export class EventsListComponent extends ListComponent implements OnInit {
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
         private route: ActivatedRoute,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private i18nService: I18nService
     ) {
         super(
             snackbarService,
@@ -265,10 +267,51 @@ export class EventsListComponent extends ListComponent implements OnInit {
             // required
             message: 'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIPS_TITLE',
             url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
-            fileName: `LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME`,
+            fileName: this.i18nService.instant('LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME'),
 
-            // // optional
-            allowedExportTypes: this.allowedExportTypes,
+            // optional
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
+        });
+    }
+
+    /**
+     * Export Event Relationships
+     */
+    exportFilteredEventsRelationships() {
+        // construct filter by case query builder
+        const qb = new RequestQueryBuilder();
+        const personsQb = qb.addChildQueryBuilder('person');
+
+        // merge out query builder
+        personsQb.merge(this.queryBuilder);
+
+        // remove pagination
+        personsQb.paginator.clear();
+
+        // remove child condition ?
+        if (personsQb.isEmpty()) {
+            qb.removeChildQueryBuilder('person');
+        } else {
+            // filter only cases
+            personsQb.filter.byEquality(
+                'type',
+                EntityType.EVENT
+            );
+        }
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIPS_TITLE',
+            url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+            fileName: this.i18nService.instant('LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // optional
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,

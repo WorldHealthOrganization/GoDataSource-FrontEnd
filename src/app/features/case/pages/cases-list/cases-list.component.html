@@ -22,74 +22,71 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/cases']"
+                        [queryParams]="{ applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS }">
+                        {{'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
+                    </button>
+
+                    <mat-divider></mat-divider>
+
                     <ng-container
-                        *ngIf="!appliedListFilter">
+                        *ngIf="hasReportAccess()">
                         <button
                             mat-menu-item
-                            [routerLink]="['/cases']"
-                            [queryParams]="{ applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS }">
-                            {{'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
+                            [routerLink]="['/relationships/date-onset']">
+                            {{'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON' | translate}}
+                        </button>
+
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/relationships/long-period']">
+                            {{'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON' | translate}}
                         </button>
 
                         <mat-divider></mat-divider>
-
-                        <ng-container
-                            *ngIf="hasReportAccess()">
-                            <button
-                                mat-menu-item
-                                [routerLink]="['/relationships/date-onset']">
-                                {{'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON' | translate}}
-                            </button>
-
-                            <button
-                                mat-menu-item
-                                [routerLink]="['/relationships/long-period']">
-                                {{'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON' | translate}}
-                            </button>
-
-                            <mat-divider></mat-divider>
-                        </ng-container>
-
-                        <app-export-button
-                            *ngIf="exportCasesUrl"
-                            [menuItem]="true"
-                            [label]="'LNG_PAGE_LIST_CASES_EXPORT_BUTTON' | translate"
-                            [message]="'LNG_PAGE_LIST_CASES_EXPORT_TITLE' | translate"
-                            [url]="exportCasesUrl"
-                            [fileName]="casesDataExportFileName"
-                            [allowedExportTypes]="allowedExportTypes"
-                            [displayEncrypt]="true"
-                            [displayAnonymize]="true"
-                            [anonymizeFields]="anonymizeFields"
-                            [queryBuilder]="queryBuilder"
-                            (exportStart)="showLoadingDialog()"
-                            (exportFinished)="closeLoadingDialog()">
-                        </app-export-button>
-
-                        <ng-container *app-selected-outbreak-is-active>
-                            <ng-container *ngIf="hasCaseWriteAccess()">
-                                <button
-                                    mat-menu-item
-                                    [routerLink]="['/import-export-data', 'case-data', 'import']">
-                                    {{'LNG_PAGE_LIST_CASES_IMPORT_BUTTON' | translate}}
-                                </button>
-                            </ng-container>
-                        </ng-container>
-
-                        <mat-divider></mat-divider>
-
-                        <button
-                            mat-menu-item
-                            (click)="exportEmptyCaseInvestigationForms()">
-                            {{ 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS' | translate }}
-                        </button>
-
-                        <button
-                            mat-menu-item
-                            (click)="exportFilteredCasesRelationships()">
-                            {{ 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_sss_CASES_RELATIONSHIPS' | translate }}
-                        </button>
                     </ng-container>
+
+                    <app-export-button
+                        *ngIf="exportCasesUrl"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_CASES_EXPORT_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_CASES_EXPORT_TITLE' | translate"
+                        [url]="exportCasesUrl"
+                        [fileName]="casesDataExportFileName"
+                        [allowedExportTypes]="allowedExportTypes"
+                        [displayEncrypt]="true"
+                        [displayAnonymize]="true"
+                        [anonymizeFields]="anonymizeFields"
+                        [queryBuilder]="queryBuilder"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
+                    </app-export-button>
+
+                    <ng-container *app-selected-outbreak-is-active>
+                        <ng-container *ngIf="hasCaseWriteAccess()">
+                            <button
+                                mat-menu-item
+                                [routerLink]="['/import-export-data', 'case-data', 'import']">
+                                {{'LNG_PAGE_LIST_CASES_IMPORT_BUTTON' | translate}}
+                            </button>
+                        </ng-container>
+                    </ng-container>
+
+                    <mat-divider></mat-divider>
+
+                    <button
+                        mat-menu-item
+                        (click)="exportEmptyCaseInvestigationForms()">
+                        {{ 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS' | translate }}
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        (click)="exportFilteredCasesRelationships()">
+                        {{ 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASES_RELATIONSHIPS' | translate }}
+                    </button>
                 </mat-menu>
             </div>
         </div>

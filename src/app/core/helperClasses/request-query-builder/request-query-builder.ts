@@ -65,6 +65,14 @@ export class RequestQueryBuilder {
     }
 
     /**
+     * Remove relation
+     * @param relationName
+     */
+    removeRelation(relationName: string) {
+        delete this.includedRelations[relationName];
+    }
+
+    /**
      * Include fields to be retrieved in response
      * @param {string} fields
      * @returns {RequestQueryBuilder}
