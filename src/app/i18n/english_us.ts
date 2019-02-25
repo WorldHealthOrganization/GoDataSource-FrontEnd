@@ -103,6 +103,7 @@ export const EnglishUsLang = {
         'LNG_API_ERROR_CODE_INVALID_VISUAL_ID_MASK': 'Invalid ID ( accepted: {{mask}} )',
         'LNG_API_ERROR_CODE_DUPLICATE_VISUAL_ID': 'Duplicate ID',
         'LNG_API_ERROR_CODE_REFERENCE_DATA_ENTRY_IN_USE' : '{{entryValue}} is in use and cannot be deleted',
+        'LNG_API_ERROR_CODE_MODEL_IN_USE': 'Resource is in use and cannot be deleted',
 
         /**
          * uiCommonButtons
