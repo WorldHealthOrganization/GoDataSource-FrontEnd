@@ -1,5 +1,5 @@
 import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, NgModel } from '@angular/forms';
 import * as _ from 'lodash';
 import { GroupBase } from '../../xt-forms/core';
 import { AnswerModel, QuestionModel } from '../../../core/models/question.model';
@@ -402,15 +402,39 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
     /**
      * Remove attachment
      * @param questionVariable
+     * @param importDataBtn
+     * @param fileHiddenInput
      */
-    removeAttachment(questionVariable: string) {
+    removeAttachment(
+        questionVariable: string,
+        importDataBtn,
+        fileHiddenInput: NgModel
+    ) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REMOVE_ATTACHMENT')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     delete this.value[questionVariable];
                     this.uploadersData[questionVariable].uploader.clearQueue();
+                    importDataBtn.value = '';
+
+                    // touch control
+                    fileHiddenInput.control.markAsTouched();
                 }
             });
+    }
+
+    /**
+     * Import File - Browse
+     */
+    importAttachment(
+        importDataBtn,
+        fileHiddenInput: NgModel
+    ) {
+        // touch control
+        fileHiddenInput.control.markAsTouched();
+
+        // trigger open file
+        importDataBtn.click();
     }
 }
