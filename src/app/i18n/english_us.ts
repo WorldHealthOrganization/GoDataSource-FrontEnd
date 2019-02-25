@@ -30,6 +30,26 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_EXPORT_CASE_INVESTIGATION_FORM_TITLE': 'Export case investigation form',
         'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_TITLE': 'Export empty case investigation forms for new cases',
         'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_FIELD_COPIES': 'Number of forms',
+        'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE': 'Export case relationships',
+        'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_RELATIONSHIPS': 'Export case relationships',
+        'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME': 'Cases relationships',
+        'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASES_RELATIONSHIPS': 'Export case relationships',
+
+        /**
+         * uiContactsListPage
+         */
+        'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_RELATIONSHIPS': 'Export contacts relationships',
+        'LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME': 'Contacts relationships',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_EXPORT_CONTACTS_RELATIONSHIPS': 'Export contact relationships',
+        'LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIPS_TITLE': 'Export contact relationships',
+
+        /**
+         * uiEventsListPage
+         */
+        'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS_RELATIONSHIPS': 'Export events relationships',
+        'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIPS_TITLE': 'Export events relationships',
+        'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME': 'Events relationships',
+        'LNG_PAGE_LIST_EVENTS_ACTION_EXPORT_EVENTS_RELATIONSHIPS': 'Export event relationships',
 
         /**
          * NEW GROUP

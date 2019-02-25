@@ -65,6 +65,14 @@ export class RequestQueryBuilder {
     }
 
     /**
+     * Remove relation
+     * @param relationName
+     */
+    removeRelation(relationName: string) {
+        delete this.includedRelations[relationName];
+    }
+
+    /**
      * Include fields to be retrieved in response
      * @param {string} fields
      * @returns {RequestQueryBuilder}
@@ -120,6 +128,20 @@ export class RequestQueryBuilder {
 
         // finished
         return this.childrenQueryBuilders[qbFilterKey];
+    }
+
+    /**
+     * Check if all child query builders are empty
+     */
+    allChildQueryBuildersAreEmpty(): boolean {
+        let isEmpty: boolean = true;
+        _.each(this.childrenQueryBuilders, (qb: RequestQueryBuilder) => {
+            if (!qb.isEmpty()) {
+                isEmpty = false;
+                return false;
+            }
+        });
+        return isEmpty;
     }
 
     /**
@@ -265,7 +287,8 @@ export class RequestQueryBuilder {
             this.sort.isEmpty() &&
             _.isEmpty(this.limitResultsNumber) &&
             this.paginator.isEmpty() &&
-            _.isEmpty(this.fieldsInResponse);
+            _.isEmpty(this.fieldsInResponse) &&
+            this.allChildQueryBuildersAreEmpty();
     }
 
     /**

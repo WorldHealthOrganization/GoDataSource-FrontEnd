@@ -685,8 +685,85 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             url: this.exportCasesUrl,
             fileName: this.casesDataExportFileName,
 
-            // // optional
+            // optional
             allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
+        });
+    }
+
+    /**
+     * Export relationship for selected cases
+     */
+    exportSelectedCasesRelationships() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.where({
+            'persons.id': {
+                inq: selectedRecords
+            }
+        });
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE',
+            url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+            fileName: this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // optional
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
+        });
+    }
+
+    /**
+     * Export Case Relationships
+     */
+    exportFilteredCasesRelationships() {
+        // construct filter by case query builder
+        const qb = new RequestQueryBuilder();
+        const personsQb = qb.addChildQueryBuilder('person');
+
+        // merge out query builder
+        personsQb.merge(this.queryBuilder);
+
+        // remove pagination
+        personsQb.paginator.clear();
+
+        // remove child condition ?
+        if (personsQb.isEmpty()) {
+            qb.removeChildQueryBuilder('person');
+        } else {
+            // filter only cases
+            personsQb.filter.byEquality(
+                'type',
+                EntityType.CASE
+            );
+        }
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE',
+            url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+            fileName: this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // optional
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
