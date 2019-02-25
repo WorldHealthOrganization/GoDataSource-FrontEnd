@@ -184,6 +184,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
             }), true)
             .subscribe((answer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
+                    const loadingDialog = this.dialogService.showLoadingDialog();
                     // get the chosen split factor
                     const splitFactor = answer.inputValue.value.splitFactor;
                     // get the base64 png
@@ -196,6 +197,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
                                 blob,
                                 `${fileName}.pdf`
                             );
+                            loadingDialog.close();
                         });
                 }
             });
