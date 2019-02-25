@@ -42,7 +42,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     // list of geographical levels
     geographicalLevelsList$: Observable<any[]>;
 
-    outbreakNameValidator: Observable<boolean>;
+    outbreakNameValidator$: Observable<boolean>;
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -78,7 +78,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         // update breadcrumbs
         this.createBreadcrumbs();
 
-        this.outbreakNameValidator = Observable.create((observer) => {
+        this.outbreakNameValidator$ = Observable.create((observer) => {
             this.outbreakDataService.checkOutbreakNameUniquenessValidity(this.outbreak.name, this.outbreakId)
                 .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
                     observer.next(isValid);
