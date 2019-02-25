@@ -260,12 +260,12 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     /**
      * Minimum map zoom level ( >= 1 )
      */
-    @Input() minZoon: number = 2;
+    @Input() minZoom: number = 2;
 
     /**
      * Maximum map zoom level ( >= 1 )
      */
-    @Input() maxZoon: number = 8;
+    @Input() maxZoom: number = 8;
 
     /**
      * Zoom out / in map to fit markers whenever we set markers ?
@@ -628,8 +628,8 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         this.mapView = new View({
             center: [0, 0],
             zoom: 5,
-            minZoom: this.minZoon,
-            maxZoom: this.maxZoon
+            minZoom: this.minZoom,
+            maxZoom: this.maxZoom
         });
 
         // create overlay layer source
