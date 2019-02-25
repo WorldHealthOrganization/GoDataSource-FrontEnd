@@ -76,7 +76,7 @@
 
         <!-- Date sample taken -->
         <ng-container matColumnDef="dateSampleTaken">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN' | translate }}</div>
                     <div class="column-filter">
@@ -97,7 +97,7 @@
 
         <!-- Date sample delivered to lab -->
         <ng-container matColumnDef="dateSampleDelivered">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED' | translate}}</div>
                     <div class="column-filter">
@@ -118,7 +118,7 @@
 
         <!-- Date of the result -->
         <ng-container matColumnDef="dateOfResult">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT' | translate }}</div>
                     <div class="column-filter">
@@ -146,7 +146,7 @@
                         <app-form-select
                             name="labNameFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="labNamesList$ | async"
                             (optionChanged)="filterBySelectField('labName', $event)"
                             multiple="true"
@@ -175,7 +175,7 @@
                         <app-form-select
                             name="sampleTypeFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="sampleTypesList$ | async"
                             (optionChanged)="filterBySelectField('sampleType', $event)"
                             multiple="true"
@@ -204,7 +204,7 @@
                         <app-form-select
                             name="testTypeFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="testTypesList$ | async"
                             (optionChanged)="filterBySelectField('testType', $event)"
                             multiple="true"
@@ -233,7 +233,7 @@
                         <app-form-select
                             name="resultFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="labTestResultsList$ | async"
                             (optionChanged)="filterBySelectField('result', $event)"
                             multiple="true"

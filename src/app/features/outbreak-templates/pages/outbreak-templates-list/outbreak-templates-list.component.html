@@ -78,7 +78,7 @@
                         <app-form-select
                             name="diseaseFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="diseasesList$ | async"
                             multiple="true"
                             (optionChanged)="filterBySelectField('disease', $event)"

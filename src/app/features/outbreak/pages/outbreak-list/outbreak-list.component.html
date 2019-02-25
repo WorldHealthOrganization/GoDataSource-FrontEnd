@@ -49,7 +49,7 @@
                         <app-form-input
                             name="nameFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('name', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
@@ -72,7 +72,7 @@
                         <app-form-select
                             name="diseaseFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="diseasesList$ | async"
                             multiple="true"
                             (optionChanged)="filterBySelectField('disease', $event)"
@@ -102,7 +102,7 @@
                         <app-form-select
                             name="countriesFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="countriesList$ | async"
                             multiple="true"
                             (optionChanged)="filterBySelectField('countries', $event)"
@@ -131,7 +131,7 @@
                         <app-form-select
                             name="geographicalLevelFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="geographicalLevelsList$ | async"
                             multiple="true"
                             (optionChanged)="filterBySelectField('reportingGeographicalLevelId', $event)"
@@ -153,7 +153,7 @@
 
         <!-- Start Date -->
         <ng-container matColumnDef="startDate">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_START_DATE' | translate}}</div>
                     <div class="column-filter">
@@ -174,7 +174,7 @@
 
         <!-- End Date -->
         <ng-container matColumnDef="endDate">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_END_DATE' | translate}}</div>
                     <div class="column-filter">
@@ -202,7 +202,7 @@
                         <app-form-select
                             name="activeFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="activeOptionsList$ | async"
                             (optionChanged)="filterByActiveOutbreak('id', $event)"
                             app-reset-input-on-side-filter
@@ -228,7 +228,7 @@
                         <app-form-select
                             name="deletedFilter"
                             [ngModel]="false"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByDeletedField($event.value)"
                             app-reset-input-on-side-filter

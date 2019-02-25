@@ -106,6 +106,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
 
         // dropdowns options
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
 
         // set default filter rules
         this.initializeHeaderFilters();
