@@ -22,68 +22,71 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/cases']"
+                        [queryParams]="{ applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS }">
+                        {{'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
+                    </button>
+
+                    <mat-divider></mat-divider>
+
                     <ng-container
-                        *ngIf="!appliedListFilter">
+                        *ngIf="hasReportAccess()">
                         <button
                             mat-menu-item
-                            [routerLink]="['/cases']"
-                            [queryParams]="{ applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS }">
-                            {{'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
+                            [routerLink]="['/relationships/date-onset']">
+                            {{'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON' | translate}}
                         </button>
-
-                        <mat-divider></mat-divider>
-
-                        <ng-container
-                            *ngIf="hasReportAccess()">
-                            <button
-                                mat-menu-item
-                                [routerLink]="['/relationships/date-onset']">
-                                {{'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON' | translate}}
-                            </button>
-
-                            <button
-                                mat-menu-item
-                                [routerLink]="['/relationships/long-period']">
-                                {{'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON' | translate}}
-                            </button>
-
-                            <mat-divider></mat-divider>
-                        </ng-container>
-
-                        <app-export-button
-                            *ngIf="exportCasesUrl"
-                            [menuItem]="true"
-                            [label]="'LNG_PAGE_LIST_CASES_EXPORT_BUTTON' | translate"
-                            [message]="'LNG_PAGE_LIST_CASES_EXPORT_TITLE' | translate"
-                            [url]="exportCasesUrl"
-                            [fileName]="casesDataExportFileName"
-                            [allowedExportTypes]="allowedExportTypes"
-                            [displayEncrypt]="true"
-                            [displayAnonymize]="true"
-                            [anonymizeFields]="anonymizeFields"
-                            [queryBuilder]="queryBuilder"
-                            (exportStart)="showLoadingDialog()"
-                            (exportFinished)="closeLoadingDialog()">
-                        </app-export-button>
-
-                        <ng-container *app-selected-outbreak-is-active>
-                            <ng-container *ngIf="hasCaseWriteAccess()">
-                                <button
-                                    mat-menu-item
-                                    [routerLink]="['/import-export-data', 'case-data', 'import']">
-                                    {{'LNG_PAGE_LIST_CASES_IMPORT_BUTTON' | translate}}
-                                </button>
-                            </ng-container>
-                        </ng-container>
-
-                        <mat-divider></mat-divider>
 
                         <button
                             mat-menu-item
-                            (click)="exportEmptyCaseInvestigationForms()">
-                            {{ 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS' | translate }}
+                            [routerLink]="['/relationships/long-period']">
+                            {{'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON' | translate}}
                         </button>
+
+                        <mat-divider></mat-divider>
                     </ng-container>
+
+                    <app-export-button
+                        *ngIf="exportCasesUrl"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_CASES_EXPORT_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_CASES_EXPORT_TITLE' | translate"
+                        [url]="exportCasesUrl"
+                        [fileName]="casesDataExportFileName"
+                        [allowedExportTypes]="allowedExportTypes"
+                        [displayEncrypt]="true"
+                        [displayAnonymize]="true"
+                        [anonymizeFields]="anonymizeFields"
+                        [queryBuilder]="queryBuilder"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
+                    </app-export-button>
+
+                    <ng-container *app-selected-outbreak-is-active>
+                        <ng-container *ngIf="hasCaseWriteAccess()">
+                            <button
+                                mat-menu-item
+                                [routerLink]="['/import-export-data', 'case-data', 'import']">
+                                {{'LNG_PAGE_LIST_CASES_IMPORT_BUTTON' | translate}}
+                            </button>
+                        </ng-container>
+                    </ng-container>
+
+                    <mat-divider></mat-divider>
+
+                    <button
+                        mat-menu-item
+                        (click)="exportEmptyCaseInvestigationForms()">
+                        {{ 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS' | translate }}
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        (click)="exportFilteredCasesRelationships()">
+                        {{ 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASES_RELATIONSHIPS' | translate }}
+                    </button>
                 </mat-menu>
             </div>
         </div>
@@ -183,6 +186,12 @@
                                 (click)="exportSelectedCasesDossier()">
                                 {{ 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER' | translate }}
                             </button>
+
+                            <button
+                                mat-menu-item
+                                (click)="exportSelectedCasesRelationships()">
+                                {{ 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_RELATIONSHIPS' | translate }}
+                            </button>
                         </mat-menu>
                     </div>
                     <div class="column-filter">
@@ -211,7 +220,7 @@
                         <app-form-input
                             name="lastNameFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('lastName', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
@@ -234,7 +243,7 @@
                         <app-form-input
                             name="firstNameFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('firstName', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
@@ -256,7 +265,7 @@
                         <app-form-input
                             name="visualId"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('visualId', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
@@ -279,7 +288,7 @@
                         <app-form-select
                             name="classificationFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="caseClassificationsList$ | async"
                             (optionChanged)="filterByClassificationField($event)"
                             multiple="true"
@@ -357,7 +366,7 @@
                         <app-form-select
                             name="genderFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="genderList$ | async"
                             (optionChanged)="filterBySelectField('gender', $event)"
                             multiple="true"
@@ -376,7 +385,7 @@
 
         <!-- Date of onset -->
         <ng-container matColumnDef="dateOfOnset">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate }}</div>
                     <div class="column-filter">

@@ -33,6 +33,10 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
     // selected outbreak
     selectedOutbreak: OutbreakModel;
 
+    visualIDTranslateData: {
+        mask: string
+    };
+
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
@@ -62,6 +66,12 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+
+                // set visual ID translate data
+                this.visualIDTranslateData = {
+                    mask: CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
+                };
+
             });
     }
 

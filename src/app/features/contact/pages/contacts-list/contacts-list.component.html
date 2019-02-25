@@ -4,13 +4,17 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button mat-raised-button color="accent" [matMenuTriggerFor]="quickActionsMenu">
+                <button
+                    *ngIf="!appliedListFilter"
+                    mat-raised-button
+                    color="accent"
+                    [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <app-export-button
-                        *ngIf="!appliedListFilter && exportContactsUrl"
+                        *ngIf="exportContactsUrl"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE' | translate"
@@ -26,7 +30,7 @@
                     </app-export-button>
 
                     <app-export-button
-                        *ngIf="!appliedListFilter && exportContactsDailyFollowUpListUrl"
+                        *ngIf="exportContactsDailyFollowUpListUrl"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE' | translate"
@@ -40,10 +44,15 @@
                     </app-export-button>
 
                     <button
-                        *ngIf="!appliedListFilter"
                         mat-menu-item
                         [routerLink]="['/import-export-data', 'contact-data', 'import']">
                         {{'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON' | translate}}
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        (click)="exportFilteredContactsRelationships()">
+                        {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_EXPORT_CONTACTS_RELATIONSHIPS' | translate }}
                     </button>
                 </mat-menu>
             </div>
@@ -143,6 +152,12 @@
                                 mat-menu-item
                                 (click)="exportSelectedContactsDossier()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER' | translate }}
+                            </button>
+
+                            <button
+                                mat-menu-item
+                                (click)="exportSelectedContactsRelationship()">
+                                {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_RELATIONSHIPS' | translate }}
                             </button>
                         </mat-menu>
                     </div>

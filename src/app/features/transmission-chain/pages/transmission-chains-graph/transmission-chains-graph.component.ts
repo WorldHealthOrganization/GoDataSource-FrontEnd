@@ -145,7 +145,27 @@ export class TransmissionChainsGraphComponent implements OnInit {
     }
 
     /**
-     * export chains of transmission as pdf
+     * Determine export button text depends on what type transmission chain is
+     * @returns {string|string}
+     */
+    get buttonText() {
+        return this.cotDashletChild.cytoscapeChild.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ?
+            'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT' :
+            'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_EXPORT';
+    }
+    /**
+     *Export visualized map/graph seen in page
+     */
+    exportVisualizedMapOrGraph() {
+        if (this.cotDashletChild.cytoscapeChild.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
+            this.exportChainsOfTransmission();
+        } else {
+            this.exportGeospatialMap();
+        }
+    }
+
+    /**
+     * Export chains of transmission as pdf
      */
     exportChainsOfTransmission() {
         // open dialog to choose the split factor
@@ -179,6 +199,27 @@ export class TransmissionChainsGraphComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    /**
+     * Export geospatial map
+     */
+    exportGeospatialMap() {
+        const loadingDialog = this.dialogService.showLoadingDialog();
+        if (this.cotDashletChild.cytoscapeChild.worldMap) {
+            this.cotDashletChild.cytoscapeChild.worldMap
+                .printToBlob()
+                .subscribe((blob) => {
+                    const fileName = this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE');
+                    FileSaver.saveAs(
+                        blob,
+                        `${fileName}.png`
+                    );
+                    loadingDialog.close();
+                });
+        } else {
+            loadingDialog.close();
+        }
     }
 
     /**

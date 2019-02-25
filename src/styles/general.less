@@ -96,7 +96,7 @@ html, body, ul, li, div, span {
         .mat-row {
             align-items: center !important;
             padding: 2px 0 !important;
-            min-height: 40px auto !important;
+            min-height: 40px !important;
 
             .mat-cell {
                 font-size: 16px !important;
@@ -111,6 +111,11 @@ html, body, ul, li, div, span {
                 font-size: 14px !important;
                 font-weight: bold !important;
                 padding-left: @cell-padding-left;
+
+                &.has-date-range-filter {
+                    // need some space to display the From - To Dates properly
+                    min-width: 220px;
+                }
 
                 .mat-sort-header-button {
                     text-align: left;

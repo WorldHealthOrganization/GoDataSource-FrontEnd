@@ -18,7 +18,7 @@
         <app-form-input
             name="helpSearchFilter"
             [(ngModel)]="searchedTerm"
-            placeholder="Filter"
+            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
             (optionChanged)="filterByTextFieldHelpSearch($event)"
             [displayFilterIcon]="true">
         </app-form-input>
@@ -50,7 +50,7 @@
                         <app-form-select
                             name="categoryFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="helpCategoriesList$ | async"
                             (optionChanged)="filterBySelectField('categoryId', $event, 'id')"
                             optionLabelKey="name"
