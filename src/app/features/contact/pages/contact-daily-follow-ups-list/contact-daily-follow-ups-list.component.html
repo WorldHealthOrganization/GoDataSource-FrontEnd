@@ -266,7 +266,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.dateOfLastContact | dateDefault }}
             </mat-cell>
         </ng-container>
@@ -286,7 +286,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.followUp.endDate | dateDefault }}
             </mat-cell>
         </ng-container>

@@ -174,7 +174,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.relatedEntity(entityId)?.type)">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item" [style.color]="getPersonTypeColor(item.relatedEntity(entityId)?.type)">
                 {{ item.contactDate | dateDefault }}
             </mat-cell>
         </ng-container>

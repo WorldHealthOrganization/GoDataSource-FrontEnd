@@ -152,7 +152,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.dateSampleTaken | dateDefault }}
             </mat-cell>
         </ng-container>
@@ -173,7 +173,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.dateSampleDelivered | dateDefault }}
             </mat-cell>
         </ng-container>
@@ -194,7 +194,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.dateOfResult | dateDefault}}
             </mat-cell>
         </ng-container>
