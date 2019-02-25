@@ -26,6 +26,8 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
     public control: AbstractControl;
 
     public validationResult = null;
+    private validationResultIsInvalid: boolean = false;
+    private validationResultErrMsgs: ElementBaseFailure[];
 
     // alternative name used for specifying indexes for questionnaire inputs and other places
     @Input() alternativeName: string;
@@ -56,6 +58,14 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
                 .subscribe((res) => {
                     // cache the result
                     this.validationResult = res;
+
+                    // check if we have errors
+                    this.validationResultIsInvalid = Object.keys(this.validationResult || {}).length > 0;
+                    this.validationResultErrMsgs = Object.keys(this.validationResult || {}).map(k => {
+                        const errorMessage = new ErrorMessage(this.validationResult, k);
+                        return errorMessage.getMessage();
+                    });
+
                     return res;
                 });
         });
@@ -67,7 +77,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
      * @returns {boolean}
      */
     public get invalid(): boolean {
-        return Object.keys(this.validationResult || {}).length > 0;
+        return this.validationResultIsInvalid;
     }
 
     /**
@@ -75,11 +85,8 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
      * Returns a list of validation error messages for a custom form control.
      * @returns {Array<ElementBaseFailure>}
      */
-    protected get failures(): Array<ElementBaseFailure> {
-        return Object.keys(this.validationResult || {}).map(k => {
-            const errorMessage = new ErrorMessage(this.validationResult, k);
-            return errorMessage.getMessage();
-        });
+    protected get failures(): ElementBaseFailure[] {
+        return this.validationResultErrMsgs;
     }
 
     /**
