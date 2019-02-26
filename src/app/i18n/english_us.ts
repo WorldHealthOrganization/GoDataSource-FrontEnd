@@ -183,7 +183,12 @@ export const EnglishUsLang = {
         /**
          * uiTransmissionChainsGeoMap
          */
-        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_EXPORT': 'Export Geospatial Map'
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_EXPORT': 'Export Geospatial Map',
+
+        /**
+         * uiFormInputValidationErrors
+         */
+        'LNG_FORM_VALIDATION_ERROR_OUTBREAK_NAME_NOT_UNIQUE': 'This name is already in use'
 
         /**
          * REMOVE
