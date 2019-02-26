@@ -1,3 +1,10 @@
-<p>
-  saved-filters works!
-</p>
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="(savedFiltersListCount$ | async)?.count">
+</app-total-number-of-records>

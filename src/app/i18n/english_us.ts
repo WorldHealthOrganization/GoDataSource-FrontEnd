@@ -52,6 +52,19 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_EVENTS_ACTION_EXPORT_EVENTS_RELATIONSHIPS': 'Export event relationships',
 
         /**
+         * uiSavedFiltersListPage
+         */
+        'LNG_PAGE_LIST_SAVED_FILTERS_TITLE': 'Saved Filters',
+
+        /**
+         * uiGenericLayout
+         */
+        'LNG_LAYOUT_MENU_ITEM_SET_SECURITY_QUESTION_LABEL': 'Set security question',
+        'LNG_LAYOUT_MENU_ITEM_SAVED_FILTERS_LABEL': 'Saved filters',
+        'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP_LABEL': 'Cloud backup',
+        'LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE_LABEL': 'Terms of use',
+
+        /**
          * NEW GROUP
          * Form Date Slider
          */
@@ -241,5 +254,7 @@ export const EnglishUsLang = {
         // LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_TITLE
         // 'LNG_CASE_FIELD_LABEL_DATE_RANGES': 'Dates',
         // LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_BUTTON
+        // LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE
+        // LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP
     }
 };
