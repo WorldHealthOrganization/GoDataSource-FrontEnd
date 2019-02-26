@@ -167,7 +167,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let outbreak">
+            <mat-cell class="has-date-range-filter" *matCellDef="let outbreak">
                 {{outbreak.startDate | dateDefault }}
             </mat-cell>
         </ng-container>
@@ -188,7 +188,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let outbreak">
+            <mat-cell class="has-date-range-filter" *matCellDef="let outbreak">
                 {{outbreak.endDate | dateDefault }}
             </mat-cell>
         </ng-container>

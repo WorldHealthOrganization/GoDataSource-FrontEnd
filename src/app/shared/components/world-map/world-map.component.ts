@@ -145,11 +145,15 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     private _displayLoading: boolean = false;
     @Input() set displayLoading(displayLoading: boolean) {
         // display loading
+        const needToInitMap: boolean = this._displayLoading && !displayLoading;
         this._displayLoading = displayLoading;
 
         // wait for binding to take effect => ngIf
         setTimeout(() => {
-            this.initializeMap();
+            if (needToInitMap) {
+                this.map = null;
+                this.initializeMap();
+            }
         });
     }
     get displayLoading(): boolean {

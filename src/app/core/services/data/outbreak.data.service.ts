@@ -22,6 +22,7 @@ import 'rxjs/add/observable/throw';
 import { HierarchicalLocationModel } from '../../models/hierarchical-location.model';
 import { PeoplePossibleDuplicateModel } from '../../models/people-possible-duplicate.model';
 import { EntityType } from '../../models/entity-type';
+import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Injectable()
 export class OutbreakDataService {
@@ -237,6 +238,30 @@ export class OutbreakDataService {
 
         // emit the new value
         this.selectedOutbreakSubject.next(outbreak);
+    }
+
+    /**
+     * Check if the name of the new outbreak is unique
+     * @returns {Observable<boolean | IGeneralAsyncValidatorResponse>}
+     */
+    checkOutbreakNameUniquenessValidity(newOutbreakName: string, outbreakId?: string): Observable<boolean | IGeneralAsyncValidatorResponse> {
+        const qb: RequestQueryBuilder = new RequestQueryBuilder();
+        qb.filter
+            .byEquality('name', newOutbreakName, true, true)
+            // condition for modify outbreak
+            .where({
+                'id' : {
+                    neq : outbreakId
+                }
+            });
+        return this.getOutbreaksList(qb)
+            .map((outbreakData: OutbreakModel[]) => {
+                return !outbreakData.length ?
+                    true : {
+                        isValid: false,
+                        errMsg: 'LNG_FORM_VALIDATION_ERROR_OUTBREAK_NAME_NOT_UNIQUE'
+                    };
+            });
     }
 
     /**

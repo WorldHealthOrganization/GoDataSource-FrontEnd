@@ -10,8 +10,8 @@ import { WorldMapComponent, WorldMapMarker, WorldMapMarkerLayer, WorldMapPoint }
 import * as _ from 'lodash';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Subscription } from 'rxjs/Subscription';
+import { TransmissionChainFilters } from '../../components/transmission-chains-filters/transmission-chains-filters.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as FileSaver from 'file-saver';
 
@@ -35,6 +35,9 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
 
     // constants
     WorldMapMarkerLayer = WorldMapMarkerLayer;
+
+    showSettings: boolean = false;
+    filters: TransmissionChainFilters = new TransmissionChainFilters();
 
     clusterDistance: number = 10;
 
@@ -102,6 +105,9 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
      */
     reloadCases() {
         if (this.outbreakId) {
+            // hide filters
+            this.showSettings = false;
+
             // display loading
             this.displayLoading = true;
 
@@ -122,6 +128,11 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
                     }
                 }
             });
+
+            // add custom filters
+            if (!_.isEmpty(this.filters)) {
+                this.filters.attachConditionsToRequestQueryBuilder(qb);
+            }
 
             // retrieve cases
             this.caseDataService
@@ -149,5 +160,15 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
                     this.displayLoading = false;
                 });
         }
+    }
+
+    /**
+     * Reset Filters
+     */
+    resetFilters() {
+        this.filters = new TransmissionChainFilters();
+        setTimeout(() => {
+            this.reloadCases();
+        });
     }
 }
