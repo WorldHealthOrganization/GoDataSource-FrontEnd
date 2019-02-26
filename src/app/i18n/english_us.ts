@@ -82,7 +82,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_WORLD_MAP_DISCLAIMER_MAP_PRODUCTION_LABEL': 'Map production: ',
         'LNG_PAGE_WORLD_MAP_DISCLAIMER_MAP_PRODUCTION_TEXT': '(to be completed)',
         'LNG_PAGE_WORLD_MAP_DISCLAIMER_WHO_LABEL': 'World Health Organization',
-        'LNG_PAGE_WORLD_MAP_DISCLAIMER_WHO_RIGHTS_LABEL': '&copy; WHO 2014. All rights reserved',
 
         /**
          * uiFollowUpfields
