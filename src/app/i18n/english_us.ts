@@ -72,6 +72,19 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_EXPOSURE': 'View exposure',
 
         /**
+         * NEW GROUP
+         * uiWorldMap
+         */
+        'LNG_PAGE_WORLD_MAP_DISCLAIMER': 'Disclaimer',
+        'LNG_PAGE_WORLD_MAP_DISCLAIMER_TEXT': 'The boundaries and names shown and the designations used on this map do not imply the expression of any opinion whatsoever on the part of the World Health Organization concerning the legal status of any country, territory, city or area or of its authorities, or concerning the delimitation of its frontiers or boundaries. Dotted and dashed lines on maps represent approximate border lines for which there may not yet be full agreement.',
+        'LNG_PAGE_WORLD_MAP_DISCLAIMER_DATA_SOURCE_LABEL': 'Data source: ',
+        'LNG_PAGE_WORLD_MAP_DISCLAIMER_DATA_SOURCE_TEXT': '(to be completed)',
+        'LNG_PAGE_WORLD_MAP_DISCLAIMER_MAP_PRODUCTION_LABEL': 'Map production: ',
+        'LNG_PAGE_WORLD_MAP_DISCLAIMER_MAP_PRODUCTION_TEXT': '(to be completed)',
+        'LNG_PAGE_WORLD_MAP_DISCLAIMER_WHO_LABEL': 'World Health Organization',
+        'LNG_PAGE_WORLD_MAP_DISCLAIMER_WHO_RIGHTS_LABEL': '&copy; WHO 2014. All rights reserved',
+
+        /**
          * uiFollowUpfields
          */
         'LNG_FOLLOW_UP_FIELD_LABEL_DATE': 'Date',

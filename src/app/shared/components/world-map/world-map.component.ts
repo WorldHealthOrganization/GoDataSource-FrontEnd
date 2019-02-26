@@ -140,6 +140,16 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Display disclaimer
+     */
+    @Input() displayDisclaimer: boolean = true;
+
+    /**
+     * Display disclaimer content
+     */
+    displayDisclaimerContent: boolean = true;
+
+    /**
      * Display spinner instead of map ?
      */
     private _displayLoading: boolean = false;
