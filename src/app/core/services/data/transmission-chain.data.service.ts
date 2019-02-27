@@ -285,6 +285,27 @@ export class TransmissionChainDataService {
                                 nodeData.picture = colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]];
                             }
                         }
+                        // set node shape
+                        if (!_.isEmpty(colorCriteria.nodeShape)) {
+
+                            if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.TYPE.value ) {
+                               if (node.type === EntityType.CASE) {
+                                   nodeData.shape = 'ellipse';
+                               } else if (node.type === EntityType.CONTACT) {
+                                   nodeData.shape = 'pentagon';
+                               } else if (node.type === EntityType.EVENT) {
+                                   nodeData.shape = 'star';
+                               }
+                            } else if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.CLASSIFICATION.value) {
+                                if (node.model.classification === Constants.CASE_CLASSIFICATION.CONFIRMED) {
+                                    nodeData.shape = 'ellipse';
+                                } else if (node.model.classification === Constants.CASE_CLASSIFICATION.PROBABLE) {
+                                    nodeData.shape = 'rectangle';
+                                } else if (node.model.classification === Constants.CASE_CLASSIFICATION.SUSPECT) {
+                                    nodeData.shape = 'pentagon';
+                                }
+                            }
+                        }
                         // determine label
                         // name
                         if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value) {

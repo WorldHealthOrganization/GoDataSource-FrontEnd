@@ -125,6 +125,22 @@
                             [options]="nodeIconCriteriaOptions$ | async">
                         </app-form-radio>
                     </div>
+
+                    <!-- Node Shape -->
+                    <div
+                        fxFlex fxLayout="column">
+                        <div
+                            fxFlex>
+                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE' | translate }}
+                        </div>
+
+                        <app-form-radio
+                            name="nodeShapeCriteria"
+                            [(ngModel)]="colorCriteria.nodeShapeCriteria"
+                            [options]="nodeShapeCriteriaOptions$ | async">
+                        </app-form-radio>
+                    </div>
+
                 </mat-card>
 
                 <!-- Edge Settings -->

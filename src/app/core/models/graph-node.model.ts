@@ -36,7 +36,6 @@ export class GraphNodeModel {
         this.nodeType = _.get(data, 'nodeType', 'data');
         this.borderColor = this.nodeColor;
 
-
         if ( this.dateTimeline ) {
             this.dateTimeline = moment(this.dateTimeline).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
         } else {

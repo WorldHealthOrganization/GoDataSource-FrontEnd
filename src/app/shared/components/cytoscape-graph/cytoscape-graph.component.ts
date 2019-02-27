@@ -217,6 +217,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                 'background-fit': 'cover',
                 'border-color': 'data(nodeColor)',
                 'border-width': 3,
+                'shape': 'data(shape)',
                 'color': 'data(nodeNameColor)',
                 'label': 'data(label)',
                 'text-wrap': 'wrap',

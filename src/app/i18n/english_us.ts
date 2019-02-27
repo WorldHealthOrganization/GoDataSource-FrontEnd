@@ -188,7 +188,12 @@ export const EnglishUsLang = {
         /**
          * uiFormInputValidationErrors
          */
-        'LNG_FORM_VALIDATION_ERROR_OUTBREAK_NAME_NOT_UNIQUE': 'This name is already in use'
+        'LNG_FORM_VALIDATION_ERROR_OUTBREAK_NAME_NOT_UNIQUE': 'This name is already in use',
+
+        /**
+         * uiChainsOfTransmissionGraph
+         */
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE': 'Shape'
 
         /**
          * REMOVE

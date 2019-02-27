@@ -62,6 +62,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     nodeColorCriteriaOptions$: Observable<any[]>;
     nodeIconCriteriaOptions$: Observable<any[]>;
+    nodeShapeCriteriaOptions$: Observable<any[]>;
     nodeLabelCriteriaOptions$: Observable<any[]>;
     edgeColorCriteriaOptions$: Observable<any[]>;
     edgeLabelCriteriaOptions$: Observable<any[]>;
@@ -138,7 +139,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         nodeNameColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.CLASSIFICATION.value,
         edgeColorCriteria: Constants.TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS.CERTAINITY_LEVEL.value,
         edgeLabelCriteria: Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value,
-        nodeIconCriteria: Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS.NONE.value
+        nodeIconCriteria: Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS.NONE.value,
+        nodeShapeCriteria: Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.NONE.value
     };
     // default legend
     legend: any = {
@@ -195,6 +197,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.edgeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeColorCriteriaOptions();
         this.edgeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeLabelCriteriaOptions();
         this.nodeIconCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeIconCriteriaOptions();
+        this.nodeShapeCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeShapeCriteriaOptions();
         this.nodeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeLabelCriteriaOptions();
 
         // check if we have global filters set
@@ -417,6 +420,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             });
         }
         this.legend.nodeIconField = this.colorCriteria.nodeIconCriteria;
+        this.legend.nodeShapeField = this.colorCriteria.nodeShapeCriteria;
         // set legend labels
         this.legend.nodeColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].label;
         this.legend.nodeNameColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeNameColorCriteria].label;
@@ -431,6 +435,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.legend.edgeColorKeys = [];
         this.legend.nodeIcon = {};
         this.legend.nodeIconKeys = [];
+        this.legend.nodeShape = {};
+        this.legend.nodeShapeKeys = [];
         // set legend entries
         const nodeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].refDataCateg], 'entries', []);
         _.forEach(nodeColorReferenceDataEntries, (value) => {
@@ -453,6 +459,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 this.legend.nodeIcon[value.value] = value.iconUrl ? value.iconUrl : '';
             });
             this.legend.nodeIconKeys = Object.keys(this.legend.nodeIcon);
+        }
+        if (this.colorCriteria.nodeShapeCriteria !== Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.NONE.value) {
+            const nodeShapeReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeShapeCriteria].refDataCateg], 'entries', []);
+            _.forEach(nodeShapeReferenceDataEntries, (value) => {
+                this.legend.nodeShape[value.value] = value.iconUrl ? value.iconUrl : '';
+            });
+            this.legend.nodeShapeKeys = Object.keys(this.legend.nodeShape);
         }
         // set node label to be displayed
         this.legend.nodeLabel = this.colorCriteria.nodeLabelCriteria;
