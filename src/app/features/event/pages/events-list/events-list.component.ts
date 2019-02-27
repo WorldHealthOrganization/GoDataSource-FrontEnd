@@ -256,11 +256,16 @@ export class EventsListComponent extends ListComponent implements OnInit {
 
         // construct query builder
         const qb = new RequestQueryBuilder();
-        qb.filter.where({
-            'persons.id': {
-                inq: selectedRecords
-            }
-        });
+        const personsQb = qb.addChildQueryBuilder('person');
+
+        // id
+        personsQb.filter.bySelect('id', selectedRecords, true, null);
+
+        // type
+        personsQb.filter.byEquality(
+            'type',
+            EntityType.EVENT
+        );
 
         // display export dialog
         this.dialogService.showExportDialog({
@@ -293,16 +298,11 @@ export class EventsListComponent extends ListComponent implements OnInit {
         // remove pagination
         personsQb.paginator.clear();
 
-        // remove child condition ?
-        if (personsQb.isEmpty()) {
-            qb.removeChildQueryBuilder('person');
-        } else {
-            // filter only cases
-            personsQb.filter.byEquality(
-                'type',
-                EntityType.EVENT
-            );
-        }
+        // filter only events
+        personsQb.filter.byEquality(
+            'type',
+            EntityType.EVENT
+        );
 
         // display export dialog
         this.dialogService.showExportDialog({
