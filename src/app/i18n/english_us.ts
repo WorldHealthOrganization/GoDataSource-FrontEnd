@@ -196,7 +196,12 @@ export const EnglishUsLang = {
         /**
          * uiTransmissionChainsGeoMap
          */
-        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_EXPORT': 'Export Geospatial Map'
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_EXPORT': 'Export Geospatial Map',
+
+        /**
+         * uiSideFilter
+         */
+        'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON': 'Save filter',
 
         /**
          * REMOVE

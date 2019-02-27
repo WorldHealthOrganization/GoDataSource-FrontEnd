@@ -119,6 +119,21 @@ export class Constants {
         }
     };
 
+    static SAVED_FILTER_PAGE_TYPE = {
+        OUTBREAKS: {
+            label: 'LNG_FILTER_FOR_OUTBREAKS',
+            value: 'LNG_FILTER_FOR_OUTBREAKS'
+        },
+        CASES: {
+            label: 'LNG_FILTER_FOR_CASES',
+            value: 'LNG_FILTER_FOR_CASES'
+        },
+        CONTACTS: {
+            label: 'LNG_FILTER_FOR_CONTACTS',
+            value: 'LNG_FILTER_FOR_CONTACTS'
+        }
+    };
+
     /**
      * FollowUp status
      */

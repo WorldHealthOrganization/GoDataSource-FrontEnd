@@ -9,6 +9,10 @@ import { AddressModel } from '../../../core/models/address.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Constants } from '../../../core/models/constants';
 import * as moment from 'moment';
+import { SavedFiltersService } from '../../../core/services/data/saved-filters.service';
+import { DialogService } from '../../../core/services/helper/dialog.service';
+import { DialogAnswer, DialogConfiguration, DialogField, DialogFieldType } from '../dialog/dialog.component';
+import { SavedFilterModel } from '../../../core/models/saved-filters.model';
 
 @Component({
     selector: 'app-side-filters',
@@ -63,6 +67,10 @@ export class SideFiltersComponent {
      */
     @Input() fixedFilters: boolean = false;
 
+    // get saved filters type
+    @Input() savedFiltersType: string;
+    @Input() savedFilters: SavedFilterModel[];
+
     // applied filters
     appliedFilters: AppliedFilterModel[];
     // selected operator to be used between filters
@@ -90,7 +98,9 @@ export class SideFiltersComponent {
 
     constructor(
         private formHelper: FormHelperService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private savedFiltersService: SavedFiltersService,
+        private dialogService: DialogService
     ) {
         // initialize data
         this.clear();
@@ -110,6 +120,52 @@ export class SideFiltersComponent {
 
     deleteSort(index) {
         this.appliedSort.splice(index, 1);
+    }
+
+    saveFilter() {
+        console.log(this.getQueryBuilder());
+        console.log(this.savedFiltersType);
+
+        this.dialogService
+            .showInput(
+                new DialogConfiguration({
+                    message: 'How do you want to name this filter?',
+                    yesLabel: 'save filter',
+                    required: true,
+                    fieldsList: [
+                        new DialogField({
+                            name: 'filterName',
+                            placeholder: 'Filter name',
+                            required: true,
+                            fieldType: DialogFieldType.TEXT,
+                    }),
+                        new DialogField({
+                            name: 'isPublic',
+                            placeholder: 'Make this filter public?',
+                            required: true,
+                            fieldType: DialogFieldType.BOOLEAN
+                        })
+                    ]
+                }), true)
+            .subscribe((answer: DialogAnswer) => {
+                console.log(this.getQueryBuilder());
+                console.log(answer);
+                this.savedFiltersService.saveFilter(
+                    new SavedFilterModel({
+                        name: answer.inputValue.value.filterName,
+                        isPublic: answer.inputValue.value.isPublic,
+                        filterKey: this.savedFiltersType,
+                        filterData: this.filterOptions.filter
+                    })
+                ).subscribe((data) => {
+                    console.log(data);
+                });
+            });
+        // this.savedFiltersService.saveFilter(this.filterOptions)
+    }
+
+    applySavedFilter(event) {
+        console.log(event)
     }
 
     /**

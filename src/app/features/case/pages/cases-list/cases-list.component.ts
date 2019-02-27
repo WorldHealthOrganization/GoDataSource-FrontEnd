@@ -33,6 +33,8 @@ import { CountedItemsListItem } from '../../../../shared/components/counted-item
 import { Subscription } from 'rxjs/Subscription';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { tap } from 'rxjs/operators';
+import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
 
 @Component({
     selector: 'app-cases-list',
@@ -68,6 +70,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
     // available side filters
     availableSideFilters: FilterModel[] = [];
+    // saved filters type
+    savedFiltersType = Constants.SAVED_FILTER_PAGE_TYPE.CASES.value;
+    availableSavedFilters$: Observable<SavedFilterModel[]>;
 
     // provide constants to template
     Constants = Constants;
@@ -131,7 +136,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
         private genericDataService: GenericDataService,
-        private clusterDataService: ClusterDataService
+        private clusterDataService: ClusterDataService,
+        private savedFilterService: SavedFiltersService
     ) {
         super(
             snackbarService,
@@ -192,6 +198,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
                     // get cases grouped by classification
                     this.getCasesGroupedByClassification();
+
+                    // get available saved filters for side filters
+                    this.getAvailableSavedFilters();
 
                     // initialize side filters
                     this.initializeSideFilters();
@@ -501,6 +510,18 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             );
                         });
                     });
+            });
+    }
+
+    /**
+     * Get available saved side filters
+     */
+    getAvailableSavedFilters() {
+        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList()
+            .map((savedFilters: SavedFilterModel[]) => {
+                return _.map(savedFilters, (savedFilter) => {
+                    return savedFilter.filterKey === this.savedFiltersType;
+                });
             });
     }
 
