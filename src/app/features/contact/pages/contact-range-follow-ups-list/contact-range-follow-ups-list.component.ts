@@ -160,13 +160,12 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                     this.slideFilterData.minDate = moment(this.selectedOutbreak.startDate).startOf('day');
                     this.slideFilterData.maxDate = moment().add(this.selectedOutbreak.periodOfFollowup, 'days').endOf('day');
                     this.slideFilterData.maxRange = this.selectedOutbreak.periodOfFollowup;
-                    this.sliderDateFilterValue = new FormDateRangeSliderData({
-                        low: moment(),
-                        high: moment().add(this.selectedOutbreak.periodOfFollowup, 'days')
-                    });
 
                     // filter
-                    this.filterByDateRange(this.sliderDateFilterValue);
+                    this.filterByDateRange(new FormDateRangeSliderData({
+                        low: moment(),
+                        high: moment().add(this.selectedOutbreak.periodOfFollowup, 'days')
+                    }));
                 }
 
                 // daily status colors
@@ -246,18 +245,11 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                         .value();
 
                     // create dates array
-                    this.exportRangeExtraAPIData = undefined;
                     this.daysToDisplay = [];
                     if (
                         minDate &&
                         maxDate
                     ) {
-                        // set export data
-                        this.exportRangeExtraAPIData = {
-                            startDate: minDate.startOf('day').format(),
-                            endDate: maxDate.endOf('day').format()
-                        };
-
                         // push dates
                         while (minDate.isSameOrBefore(maxDate)) {
                             // add day to list

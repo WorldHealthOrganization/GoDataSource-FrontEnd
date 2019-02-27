@@ -8,6 +8,7 @@
         (optionChanged)="updateView($event)"
         [clearable]="false">
     </app-form-select>
+
     <!-- spinner -->
     <div class="spinner-graph"
          *ngIf="showLoading">
@@ -94,6 +95,35 @@
 
     </div>
 
+    <!-- Toggles -->
+    <div
+        *ngIf="!showLoading && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)"
+        class="graph-actions" fxLayout="row" fxLayoutGap="30px">
+        <!-- Toggle Edit mode -->
+        <app-form-slide-toggle
+            *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value && isEditModeAvailable()"
+            name="toggleEditMode"
+            [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_EDIT_MODE_LABEL' | translate"
+            [(ngModel)]="editMode"
+            (optionChanged)="toggleEditMode()"
+        ></app-form-slide-toggle>
+
+        <!-- Display Labels -->
+        <app-form-slide-toggle
+            *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value"
+            name="displayLabels"
+            [(ngModel)]="displayLabels"
+            [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_DISPLAY_MARKER_LABELS_LABEL' | translate">
+        </app-form-slide-toggle>
+
+        <!-- Show / hide legend -->
+        <app-form-slide-toggle
+            name="showLegend"
+            [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LEGEND_LABEL' | translate"
+            [(ngModel)]="showLegend">
+        </app-form-slide-toggle>
+    </div>
+
     <!-- cytoscape element -->
     <div class="cy" id="cy"
          [fxShow]="!showLoading && transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
@@ -122,35 +152,6 @@
             </span>
         </div>
     </div>
-
-    <div
-        *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0"
-        class="graph-actions" fxLayout="row" fxLayoutGap="30px">
-        <!-- Toggle Edit mode -->
-        <app-form-slide-toggle
-            *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value && isEditModeAvailable()"
-            name="toggleEditMode"
-            [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_EDIT_MODE_LABEL' | translate"
-            [(ngModel)]="editMode"
-            (optionChanged)="toggleEditMode()"
-        ></app-form-slide-toggle>
-
-        <!-- Display Labels -->
-        <app-form-slide-toggle
-            *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value"
-            name="displayLabels"
-            [(ngModel)]="displayLabels"
-            [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_DISPLAY_MARKER_LABELS_LABEL' | translate">
-        </app-form-slide-toggle>
-
-        <!-- Show / hide legend -->
-        <app-form-slide-toggle
-            name="showLegend"
-            [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LEGEND_LABEL' | translate"
-            [(ngModel)]="showLegend">
-        </app-form-slide-toggle>
-    </div>
-
 </div>
 
 <div *ngIf="showCaseNodesWithoutDates()"

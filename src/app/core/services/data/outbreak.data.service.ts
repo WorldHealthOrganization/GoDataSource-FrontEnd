@@ -54,6 +54,15 @@ export class OutbreakDataService {
     }
 
     /**
+     * Retrieve the number of Outbreaks
+     * @param {RequestQueryBuilder} queryBuilder
+     */
+    getOutbreaksCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`outbreaks/count?where=${whereFilter}`);
+    }
+
+    /**
      * Delete an existing Outbreak
      * @param {string} outbreakId
      * @returns {Observable<any>}
@@ -246,17 +255,21 @@ export class OutbreakDataService {
      */
     checkOutbreakNameUniquenessValidity(newOutbreakName: string, outbreakId?: string): Observable<boolean | IGeneralAsyncValidatorResponse> {
         const qb: RequestQueryBuilder = new RequestQueryBuilder();
-        qb.filter
-            .byEquality('name', newOutbreakName, true, true)
-            // condition for modify outbreak
-            .where({
+        qb.filter.byEquality('name', newOutbreakName, true, true);
+
+        // condition for modify outbreak
+        if (outbreakId) {
+            qb.filter.where({
                 'id' : {
                     neq : outbreakId
                 }
             });
-        return this.getOutbreaksList(qb)
-            .map((outbreakData: OutbreakModel[]) => {
-                return !outbreakData.length ?
+        }
+
+        // check if we have duplicates
+        return this.getOutbreaksCount(qb)
+            .map((countData: { count: number }) => {
+                return !countData.count ?
                     true : {
                         isValid: false,
                         errMsg: 'LNG_FORM_VALIDATION_ERROR_OUTBREAK_NAME_NOT_UNIQUE'
