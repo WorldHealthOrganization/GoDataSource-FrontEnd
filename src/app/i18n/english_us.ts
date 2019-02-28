@@ -11,5 +11,11 @@ export const EnglishUsLang = {
          * Example group
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
+
+        /**
+         * uiChainsOfTransmissionGraph
+         */
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE': 'Shape'
+
     }
 };

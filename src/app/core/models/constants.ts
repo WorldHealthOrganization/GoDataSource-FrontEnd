@@ -249,7 +249,8 @@ export class Constants {
     static CASE_CLASSIFICATION = {
         SUSPECT: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_SUSPECT',
         CONFIRMED: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_CONFIRMED',
-        NOT_A_CASE: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_NOT_A_CASE_DISCARDED'
+        NOT_A_CASE: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_NOT_A_CASE_DISCARDED',
+        PROBABLE: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_PROBABLE'
     };
 
     /**
@@ -403,6 +404,22 @@ export class Constants {
         OUTCOME: {
             label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
             value: 'outcomeId'
+        }
+    };
+
+    // used for the criteria radio buttons in the chains of transmission settings
+    static TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS = {
+        NONE: {
+            label: 'LNG_COMMON_LABEL_NONE',
+            value: 'none'
+        },
+        TYPE: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
+            value: 'type'
+        },
+        CLASSIFICATION: {
+            label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+            value: 'classification'
         }
     };
 
