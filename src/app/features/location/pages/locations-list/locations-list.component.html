@@ -24,7 +24,7 @@
                     [message]="'LNG_PAGE_LIST_LOCATIONS_EXPORT_TITLE' | translate"
                     url="locations/hierarchical/export"
                     [fileName]="hierarchicalLocationsDataExportFileName"
-                    [allowedExportTypes]="allowedExportTypes"
+                    [fileType]="ExportDataExtension.JSON"
                     (exportStart)="showLoadingDialog()"
                     (exportFinished)="closeLoadingDialog()">
                 </app-export-button>
