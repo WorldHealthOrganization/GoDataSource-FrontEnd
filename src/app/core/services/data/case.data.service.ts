@@ -16,6 +16,7 @@ import * as _ from 'lodash';
 import { MetricCasesDelayBetweenOnsetHospitalizationModel } from '../../models/metrics/metric-cases-delay-between-onset-hospitalization.model';
 import { Constants } from '../../models/constants';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
+import { MetricCasesCountStratifiedOutcome } from '../../models/metrics/metric-cases-count-stratified-outcome.model';
 
 @Injectable()
 export class CaseDataService {
@@ -294,6 +295,55 @@ export class CaseDataService {
                 const results = [];
                 Object.keys(listResult).forEach((key) => {
                     // const metricResult = new MetricCasesCountStratified(listResult[key]);
+                    const metricResult = listResult[key];
+                    results.push(metricResult);
+                });
+                return results;
+            }
+        );
+    }
+
+    /**
+     * Cases count stratified by classification over reporting time
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<MetricCasesCountStratified[]>}
+     */
+    getCasesStratifiedByClassificationOverReportingTime(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricCasesCountStratified[]> {
+        const filter = queryBuilder.buildQuery();
+        const obs = this.http.get(`outbreaks/${outbreakId}/cases/classification-over-reporting-time/count?filter=${filter}`);
+        return obs.map(
+            (listResult) => {
+                const results = [];
+                Object.keys(listResult).forEach((key) => {
+                    // const metricResult = new MetricCasesCountStratified(listResult[key]);
+                    const metricResult = listResult[key];
+                    results.push(metricResult);
+                });
+                return results;
+            }
+        );
+    }
+
+    /**
+     * Cases count stratified by outcome over time
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<MetricCasesCountStratifiedOutcome[]>}
+     */
+    getCasesStratifiedByOutcomeOverTime(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricCasesCountStratifiedOutcome[]> {
+        const filter = queryBuilder.buildQuery();
+        const obs = this.http.get(`outbreaks/${outbreakId}/cases/outcome-over-time/count?filter=${filter}`);
+        return obs.map(
+            (listResult) => {
+                const results = [];
+                Object.keys(listResult).forEach((key) => {
                     const metricResult = listResult[key];
                     results.push(metricResult);
                 });

@@ -117,6 +117,14 @@ export class GenericDataService {
     }
 
     /**
+     * Retrieve the list of transmission chain view types
+     * @returns {Observable<any[]>}
+     */
+    getEpiCurvesTypes(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.EPI_CURVE_TYPES));
+    }
+
+    /**
      * Retrieve backup module list
      */
     getBackupModuleList(): Observable<any[]> {

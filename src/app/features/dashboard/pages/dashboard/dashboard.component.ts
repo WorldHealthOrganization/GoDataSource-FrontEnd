@@ -22,6 +22,8 @@ import * as moment from 'moment';
 import { LoadingDialogModel } from '../../../../shared/components';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Subscription } from 'rxjs/Subscription';
+import { Constants } from '../../../../core/models/constants';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -107,6 +109,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // subscribers
     outbreakSubscriber: Subscription;
 
+    Constants = Constants;
+
+    epiCurveViewType = Constants.EPI_CURVE_TYPES.CLASSIFICATION.value;
+
+    epiCurveViewTypes$: Observable<any[]>;
+
     constructor(
         private authDataService: AuthDataService,
         private userDataService: UserDataService,
@@ -114,6 +122,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         private domService: DomService,
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService,
+        private genericDataService: GenericDataService,
         private dialogService: DialogService
     ) {}
 
@@ -137,6 +146,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
                     this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
                 }
             });
+
+        // load epi curves types
+        this.epiCurveViewTypes$ = this.genericDataService.getEpiCurvesTypes();
 
         // initialize Side Filters
         this.initializeSideFilters();
