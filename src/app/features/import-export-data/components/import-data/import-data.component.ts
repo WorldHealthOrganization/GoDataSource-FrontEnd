@@ -250,6 +250,7 @@ export class ImportDataComponent implements OnInit {
                 error: {
                     code: number,
                     message: string,
+                    errmsg: string,
                     details: {
                         codes: {
                             [property: string]: any
