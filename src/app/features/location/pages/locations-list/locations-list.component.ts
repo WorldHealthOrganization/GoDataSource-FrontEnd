@@ -41,6 +41,9 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         )
     ];
 
+    // constants
+    ExportDataExtension = ExportDataExtension;
+
     // parent location ID
     parentId: string;
 
@@ -58,9 +61,6 @@ export class LocationsListComponent extends ListComponent implements OnInit {
 
     // export
     hierarchicalLocationsDataExportFileName: string = moment().format('YYYY-MM-DD');
-    allowedExportTypes: ExportDataExtension[] = [
-        ExportDataExtension.JSON
-    ];
 
     loadingDialog: LoadingDialogModel;
 
