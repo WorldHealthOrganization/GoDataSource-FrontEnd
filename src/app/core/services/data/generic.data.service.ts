@@ -178,6 +178,14 @@ export class GenericDataService {
     }
 
     /**
+     * Retrieve the list of criteria used for node shape - radio button
+     * @returns {Observable<any[]>}
+     */
+    getTransmissionChainNodeShapeCriteriaOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS));
+    }
+
+    /**
      * Retrieve the list of criteria used for node label - radio button
      * @returns {Observable<any[]>}
      */

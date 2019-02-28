@@ -56,6 +56,7 @@
 
             <!-- Right Side => Node Settings & Edge Settings -->
             <div
+                *ngIf="selectedViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value"
                 fxFlex fxLayout="column" fxLayoutGap="20px">
                 <!-- Node Settings -->
                 <mat-card
@@ -125,6 +126,22 @@
                             [options]="nodeIconCriteriaOptions$ | async">
                         </app-form-radio>
                     </div>
+
+                    <!-- Node Shape -->
+                    <div
+                        fxFlex fxLayout="column">
+                        <div
+                            fxFlex>
+                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE' | translate }}
+                        </div>
+
+                        <app-form-radio
+                            name="nodeShapeCriteria"
+                            [(ngModel)]="colorCriteria.nodeShapeCriteria"
+                            [options]="nodeShapeCriteriaOptions$ | async">
+                        </app-form-radio>
+                    </div>
+
                 </mat-card>
 
                 <!-- Edge Settings -->

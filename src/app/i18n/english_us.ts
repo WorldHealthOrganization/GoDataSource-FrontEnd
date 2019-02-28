@@ -13,6 +13,12 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiChainsOfTransmissionGraph
+         */
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE': 'Shape',
+
+
+        /**
          * uiDashboardPage
          */
         'LNG_PAGE_DASHBOARD_EPI_CURVE_TITLE': 'Epi Curve',
