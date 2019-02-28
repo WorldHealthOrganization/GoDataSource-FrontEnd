@@ -274,7 +274,7 @@
                     {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE' | translate:{ recordNo: err.recordNo } }}
                 </span>
                 <span *ngSwitchDefault>
-                    {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_GENERAL' | translate:{ recordNo: err.recordNo, message: err.error ? err.error.message : err.message } }}
+                    {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_GENERAL' | translate:{ recordNo: err.recordNo, message: err.error ? ( err.error.errmsg ? err.error.errmsg : err.error.message ) : err.message } }}
                 </span>
             </ng-container>
         </div>
