@@ -63,30 +63,17 @@ const routes: Routes = [
             },
         ]
     },
-    // #TODO remove List available entities to be related with a given entity
-    {
-        path: ':entityType/:entityId/available-entities',
-        component: fromPages.AvailableEntitiesListComponent
-    },
-    // #TODO remove Create new Entity relationship(s)
-    {
-        path: ':entityType/:entityId/create',
-        component: fromPages.CreateEntityRelationshipComponent,
-        canDeactivate: [
-            PageChangeConfirmationGuard
-        ]
-    },
-    // Entity Relationships list - Share
+    // #TODO remove Entity Relationships list - Share
     {
         path: ':entityType/:entityId/share',
         component: fromPages.EntityRelationshipsListShareComponent
     },
-    // Entity Relationships list - Assign
+    // #TODO remove Entity Relationships list - Assign
     {
         path: ':entityType/:entityId/assign-to',
         component: fromPages.EntityRelationshipsListAssignComponent
     },
-    // Create new Entity relationship(s) - bulk
+    // #TODO remove Create new Entity relationship(s) - bulk
     {
         path: ':entityType/:entityId/create-bulk',
         component: fromPages.CreateEntityRelationshipBulkComponent,
@@ -94,7 +81,7 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
-    // View Entity Relationship
+    // #TODO remove View Entity Relationship
     {
         path: ':entityType/:entityId/:relationshipId/view',
         component: fromPages.ModifyEntityRelationshipComponent,
@@ -102,7 +89,7 @@ const routes: Routes = [
             action: ViewModifyComponentAction.VIEW
         }
     },
-    // Modify Entity Relationship
+    // #TODO remove Modify Entity Relationship
     {
         path: ':entityType/:entityId/:relationshipId/modify',
         component: fromPages.ModifyEntityRelationshipComponent,
