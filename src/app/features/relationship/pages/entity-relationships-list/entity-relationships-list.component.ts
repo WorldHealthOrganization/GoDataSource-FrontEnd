@@ -8,7 +8,6 @@ import { Observable } from 'rxjs/Observable';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Constants } from '../../../../core/models/constants';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -268,18 +267,13 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
             this.entityId &&
             this.selectedOutbreak
         ) {
-
-            // include related people in response
-            const qb = new RequestQueryBuilder();
-            qb.merge(this.queryBuilder);
-
             if (this.relationshipType === RelationshipType.EXPOSURE) {
                 // retrieve the list of exposures
                 this.relationshipsList$ = this.relationshipDataService.getEntityExposures(
                     this.selectedOutbreak.id,
                     this.entityType,
                     this.entityId,
-                    qb
+                    this.queryBuilder
                 )
                     .pipe(tap(this.checkEmptyList.bind(this)));
             } else {
@@ -288,7 +282,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                     this.selectedOutbreak.id,
                     this.entityType,
                     this.entityId,
-                    qb
+                    this.queryBuilder
                 )
                     .pipe(tap(this.checkEmptyList.bind(this)));
             }
@@ -305,19 +299,8 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
             this.entityId &&
             this.selectedOutbreak
         ) {
-            // include related people in response
-            const qb = new RequestQueryBuilder();
-            qb.merge(this.queryBuilder);
-
-            const peopleQueryBuilder = qb.include('people', false);
-            peopleQueryBuilder.queryBuilder.filter.where({
-                id: {
-                    neq: this.entityId
-                }
-            }, true);
-
             // remove paginator from query builder
-            const countQueryBuilder = _.cloneDeep(qb);
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
 
             if (this.relationshipType === RelationshipType.EXPOSURE) {

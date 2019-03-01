@@ -134,14 +134,14 @@
         <ng-container matColumnDef="contactDate">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">
+                    <div class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE' | translate}}
                     </div>
                     <div class="column-filter">
                         <app-form-daterange
                             name="dateFilter"
                             ngModel
-                            (changed)="filterByRelation('relationship').byDateRange('contactDate', $event)"
+                            (changed)="filterByChildQueryBuilder('relationship').byDateRange('contactDate', $event)"
                             app-reset-input-on-side-filter>
                         </app-form-daterange>
                     </div>
@@ -157,7 +157,7 @@
         <ng-container matColumnDef="certaintyLevelId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">
+                    <div class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL' | translate}}
                     </div>
                     <div class="column-filter">
@@ -166,7 +166,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="certaintyLevelList$ | async"
-                            (optionChanged)="filterByRelation('relationship').bySelect('certaintyLevelId', $event)"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('certaintyLevelId', $event)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
@@ -189,7 +189,7 @@
         <ng-container matColumnDef="exposureTypeId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">
+                    <div class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE' | translate}}
                     </div>
                     <div class="column-filter">
@@ -198,7 +198,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="exposureTypeList$ | async"
-                            (optionChanged)="filterByRelation('relationship').bySelect('exposureTypeId', $event)"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('exposureTypeId', $event)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
@@ -221,7 +221,7 @@
         <ng-container matColumnDef="exposureFrequencyId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">
+                    <div class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY' | translate}}
                     </div>
                     <div class="column-filter">
@@ -230,7 +230,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="exposuresFrequencyList$ | async"
-                            (optionChanged)="filterByRelation('relationship').bySelect('exposureFrequencyId', $event)"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('exposureFrequencyId', $event)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
@@ -253,7 +253,7 @@
         <ng-container matColumnDef="exposureDurationId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header" mat-sort-header>
+                    <div class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION' | translate}}
                     </div>
                     <div class="column-filter">
@@ -262,7 +262,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="exposureDurationList$ | async"
-                            (optionChanged)="filterByRelation('relationship').bySelect('exposureDurationId', $event)"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('exposureDurationId', $event)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
@@ -285,7 +285,7 @@
         <ng-container matColumnDef="socialRelationshipTypeId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">
+                    <div class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_RELATION' | translate}}
                     </div>
                     <div class="column-filter">
@@ -294,7 +294,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="relationshipTypeList$ | async"
-                            (optionChanged)="filterByRelation('relationship').bySelect('socialRelationshipTypeId', $event)"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('socialRelationshipTypeId', $event)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
