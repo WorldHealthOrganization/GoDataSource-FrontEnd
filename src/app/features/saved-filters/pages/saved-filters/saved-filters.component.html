@@ -34,7 +34,7 @@
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_SAVED_FILTERS_FIELD_LABEL_NAME' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="nameFilter"
@@ -57,7 +57,7 @@
         <ng-container matColumnDef="public">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header class="column-header">{{'LNG_SAVED_FILTERS_FIELD_LABEL_PUBLIC' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_PUBLIC' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="publicFilter"
@@ -71,7 +71,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.isPublic }}
+                <app-yes-no-label [value]="item.isPublic"></app-yes-no-label>
             </mat-cell>
         </ng-container>
 
@@ -79,7 +79,7 @@
         <ng-container matColumnDef="filter-keys">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header class="column-header">{{'LNG_SAVED_FILTERS_FIELD_LABEL_FILTER_KEYS' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_FOR_PAGE' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="filterKeysFilter"
@@ -93,43 +93,30 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.filterKey }}
+                {{ item.filterKey | translate}}
             </mat-cell>
         </ng-container>
 
          <!--Inline Actions-->
-        <!--<ng-container matColumnDef="actions">-->
-            <!--<mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>-->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
 
-            <!--<mat-cell *matCellDef="let item" fxFlex="70px">-->
-                <!--<button mat-icon-button [matMenuTriggerFor]="actionsMenu">-->
-                    <!--<span class="xt-icon">moreVertical</span>-->
-                <!--</button>-->
+            <mat-cell *matCellDef="let item" fxFlex="70px">
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
 
-                <!--<mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">-->
+                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
 
-                    <!--<button mat-menu-item [routerLink]="['.', item.id, 'view']">-->
-                        <!--{{ 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_CLUSTER' | translate }}-->
-                    <!--</button>-->
-
-                    <!--<button *ngIf="hasCaseReadAccess() || hasContactReadAccess()"-->
-                            <!--mat-menu-item [routerLink]="['.', item.id, 'people']">-->
-                        <!--{{ 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_PEOPLE' | translate }}-->
-                    <!--</button>-->
-
-                    <!--<ng-container *app-selected-outbreak-is-active>-->
-                        <!--<button *ngIf="hasOutbreakWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">-->
-                            <!--{{ 'LNG_PAGE_LIST_CLUSTERS_ACTION_MODIFY_CLUSTER' | translate }}-->
-                        <!--</button>-->
-
-                        <!--<button *ngIf="hasOutbreakWriteAccess()" mat-menu-item class="mat-menu-item-delete"-->
-                                <!--(click)="deleteCluster(item)">-->
-                            <!--{{ 'LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_CLUSTER' | translate }}-->
-                        <!--</button>-->
-                    <!--</ng-container>-->
-                <!--</mat-menu>-->
-            <!--</mat-cell>-->
-        <!--</ng-container>-->
+                    <button
+                        [disabled]="item.readonly"
+                        mat-menu-item
+                        (click)="deleteFilter(item.id)">
+                        {{ 'LNG_PAGE_SAVED_FILTERS_ACTION_DELETE_FILTER' | translate }}
+                    </button>
+                </mat-menu>
+            </mat-cell>
+        </ng-container>
 
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
         <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>

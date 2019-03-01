@@ -20,7 +20,7 @@
                             name="loadFilter"
                             [placeholder]="'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL'"
                             [options]="savedFilters"
-                            (optionChanged)="filterBySavedFilter($event)"
+                            (optionChanged)="loadSavedFilter($event)"
                             optionLabelKey="name"
                             optionValueKey="filterData">
                         </app-form-select>
@@ -314,11 +314,14 @@
 
                 </div>
 
-                <div class="buttons-container">
+                <div>
                     <button
+                        class="save-filter-button"
                         mat-raised-button
+                        color="primary"
                         type="button"
-                        (click)="saveFilter()">
+                         (click)="saveFilter()"
+                        [matTooltip]="'LNG_SIDE_FILTERS_BUTTON_SAVE_FILTER_ACTIONS_TOOLTIP' | translate">
                         {{ 'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON' | translate}}
                     </button>
                 </div>

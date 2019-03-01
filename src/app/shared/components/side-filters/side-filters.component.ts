@@ -164,7 +164,7 @@ export class SideFiltersComponent {
                     this.snackbarService.showApiError(err);
                     return ErrorObservable.create(err);
                 }).subscribe(() => {
-                    this.snackbarService.showSuccess(`filter saved successfully`);
+                    this.snackbarService.showSuccess(`LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE`);
                 });
             });
     }
@@ -186,7 +186,7 @@ export class SideFiltersComponent {
     /**
      * Apply a saved filter
      */
-    filterBySavedFilter(savedFilter: SavedFilterModel) {
+    loadSavedFilter(savedFilter: SavedFilterModel) {
         this.clear(false);
         this.appliedFilterOperator = savedFilter.filterData.appliedFilterOperator as RequestFilterOperator;
         _.each(savedFilter.filterData.appliedFilters, (filter: SavedFilterDataAppliedFilter) => {

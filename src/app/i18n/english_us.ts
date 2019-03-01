@@ -54,7 +54,12 @@ export const EnglishUsLang = {
         /**
          * uiSavedFiltersListPage
          */
+        'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_NAME': 'Name',
+        'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_PUBLIC': 'Public',
+        'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_FOR_PAGE': 'For page',
         'LNG_PAGE_LIST_SAVED_FILTERS_TITLE': 'Saved Filters',
+        'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE': 'Filter deleted successfully',
+        'LNG_PAGE_SAVED_FILTERS_ACTION_DELETE_FILTER': 'Delete filter',
 
         /**
          * uiGenericLayout
@@ -206,6 +211,8 @@ export const EnglishUsLang = {
          */
         'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON': 'Save filter',
         'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL': 'Load filter',
+        'LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE': 'Filter saved successfully',
+        'LNG_SIDE_FILTERS_BUTTON_SAVE_FILTER_ACTIONS_TOOLTIP': 'You have to apply a filter before saving it',
 
         /**
          * REMOVE

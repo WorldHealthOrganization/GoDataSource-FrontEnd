@@ -9,6 +9,7 @@ import { SavedFiltersService } from '../../../../core/services/data/saved-filter
 import * as _ from 'lodash';
 import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
 import { tap } from 'rxjs/operators';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 @Component({
     selector: 'app-saved-filters',
@@ -72,10 +73,26 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
         const columns = [
             'name',
             'public',
-            'filter-keys'
+            'filter-keys',
+            'actions'
         ];
 
         return columns;
+    }
+
+    deleteFilter(filterId: string) {
+        return this.savedFiltersService.deleteSavedFilter(filterId)
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
+
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE');
+
+                // reload data
+                this.needsRefreshList(true);
+            });
     }
 
 }
