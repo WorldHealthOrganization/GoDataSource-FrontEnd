@@ -9,33 +9,66 @@ import { PERMISSION } from '../../core/models/permission.model';
 import { RelationshipType } from '../../core/enums/relationship-type.enum';
 
 const routes: Routes = [
-    // Entity Exposure Relationships list
+    // Entity Exposure Relationships
     {
         path: ':entityType/:entityId/exposures',
-        component: fromPages.EntityRelationshipsListComponent,
         data: {
             relationshipType: RelationshipType.EXPOSURE
-        }
+        },
+        children: [
+            // Relationships list
+            {
+                path: '',
+                component: fromPages.EntityRelationshipsListComponent,
+            },
+            // Create relationships (1): List available persons to be selected for creating new relationships
+            {
+                path: 'available-entities',
+                component: fromPages.AvailableEntitiesListComponent
+            },
+            // Create relationships (2): Create relationships form
+            {
+                path: 'create',
+                component: fromPages.CreateEntityRelationshipComponent,
+                canDeactivate: [
+                    PageChangeConfirmationGuard
+                ]
+            },
+        ]
     },
-    // Entity Contact Relationships list
+    // Entity Contact Relationships
     {
         path: ':entityType/:entityId/contacts',
-        component: fromPages.EntityRelationshipsListComponent,
         data: {
             relationshipType: RelationshipType.CONTACT
-        }
+        },
+        children: [
+            // Relationships list
+            {
+                path: '',
+                component: fromPages.EntityRelationshipsListComponent,
+            },
+            // Create relationships (1): List available persons to be selected for creating new relationships
+            {
+                path: 'available-entities',
+                component: fromPages.AvailableEntitiesListComponent
+            },
+            // Create relationships (2): Create relationships form
+            {
+                path: 'create',
+                component: fromPages.CreateEntityRelationshipComponent,
+                canDeactivate: [
+                    PageChangeConfirmationGuard
+                ]
+            },
+        ]
     },
-    // Entity Relationships list
-    {
-        path: ':entityType/:entityId',
-        component: fromPages.EntityRelationshipsListComponent
-    },
-    // List available entities to be related with a given entity
+    // #TODO remove List available entities to be related with a given entity
     {
         path: ':entityType/:entityId/available-entities',
         component: fromPages.AvailableEntitiesListComponent
     },
-    // Create new Entity relationship(s)
+    // #TODO remove Create new Entity relationship(s)
     {
         path: ':entityType/:entityId/create',
         component: fromPages.CreateEntityRelationshipComponent,
@@ -50,12 +83,12 @@ const routes: Routes = [
     },
     // Entity Relationships list - Assign
     {
-        path: ':entityType/:entityId/assign',
+        path: ':entityType/:entityId/assign-to',
         component: fromPages.EntityRelationshipsListAssignComponent
     },
     // Create new Entity relationship(s) - bulk
     {
-        path: ':entityType/:entityId/createBulk',
+        path: ':entityType/:entityId/create-bulk',
         component: fromPages.CreateEntityRelationshipBulkComponent,
         canDeactivate: [
             PageChangeConfirmationGuard

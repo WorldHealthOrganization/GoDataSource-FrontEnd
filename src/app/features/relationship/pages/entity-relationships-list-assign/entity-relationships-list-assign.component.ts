@@ -352,7 +352,7 @@ export class EntityRelationshipsListAssignComponent extends ListComponent implem
 
         // redirect to next step
         this.router.navigate(
-            [`/relationships/${this.entityType}/${this.entityId}/createBulk`],
+            [`/relationships/${this.entityType}/${this.entityId}/create-bulk`],
             {
                 queryParams: {
                     selectedSourceIds: JSON.stringify(selectedRecords),

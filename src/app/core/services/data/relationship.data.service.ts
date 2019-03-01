@@ -61,19 +61,19 @@ export class RelationshipDataService {
      * @param {EntityType} entityType
      * @param {string} entityId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<RelationshipModel[]>}
+     * @returns {Observable<EntityModel[]>}
      */
     getEntityExposures(
         outbreakId: string,
         entityType: EntityType,
         entityId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ) {
+    ): Observable<EntityModel[]> {
         const filter = queryBuilder.buildQuery();
 
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/exposures?filter=${filter}`),
-            RelationshipModel
+            EntityModel
         );
     }
 
@@ -104,19 +104,19 @@ export class RelationshipDataService {
      * @param {EntityType} entityType
      * @param {string} entityId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<RelationshipModel[]>}
+     * @returns {Observable<EntityModel[]>}
      */
     getEntityContacts(
         outbreakId: string,
         entityType: EntityType,
         entityId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ) {
+    ): Observable<EntityModel[]> {
         const filter = queryBuilder.buildQuery();
 
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/contacts?filter=${filter}`),
-            RelationshipModel
+            EntityModel
         );
     }
 

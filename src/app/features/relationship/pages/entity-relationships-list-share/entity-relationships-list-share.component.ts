@@ -298,7 +298,7 @@ export class EntityRelationshipsListShareComponent extends ListComponent impleme
 
         // redirect to next step
         this.router.navigate(
-            [`/relationships/${this.entityType}/${this.entityId}/assign`],
+            [`/relationships/${this.entityType}/${this.entityId}/assign-to`],
             {
                 queryParams: {
                     selectedTargetIds: JSON.stringify(selectedRecords)

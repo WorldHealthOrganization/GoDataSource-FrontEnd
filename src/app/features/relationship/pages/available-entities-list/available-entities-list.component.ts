@@ -23,6 +23,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { tap } from 'rxjs/operators';
+import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -50,11 +51,15 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
         }
     };
 
-    // selected outbreak ID
-    outbreakId: string;
+    // selected outbreak
+    selectedOutbreak: OutbreakModel;
     // route params
     entityType: EntityType;
     entityId: string;
+    entity: CaseModel | ContactModel | EventModel;
+    // route data
+    relationshipType: RelationshipType;
+
     // entities list relationships
     entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
     entitiesListCount$: Observable<any>;
@@ -112,87 +117,122 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
             );
         });
 
-        // side filters
-        this.generateSideFilters();
+        // get relationship type
+        this.route.data.subscribe((routeData) => {
+            this.relationshipType = routeData.relationshipType;
 
+            this.initializeBreadcrumbs();
+        });
+
+        // get person type and ID from route params
         this.route.params
-            .subscribe((params: {entityType, entityId}) => {
+            .subscribe((params: { entityType, entityId }) => {
                 this.entityType = params.entityType;
                 this.entityId = params.entityId;
 
-                // exclude current Entity from the list
-                this.queryBuilder.filter.where({
-                    id: {
-                        'neq': this.entityId
-                    }
-                });
-                // retrieve only available entity types
-                const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(this.entityType);
-                this.queryBuilder.filter.where({
-                    type: {
-                        'inq': availableTypes
-                    }
-                });
-
-                // add new breadcrumb: Entity List page
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-                );
-
-                // get selected outbreak
-                this.outbreakDataService
-                    .getSelectedOutbreak()
-                    .subscribe((selectedOutbreak: OutbreakModel) => {
-                        this.outbreakId = selectedOutbreak.id;
-
-                        // initialize pagination
-                        this.initPaginator();
-                        // ...and load the list of items
-                        this.needsRefreshList(true);
-
-                        // get entity data
-                        this.entityDataService
-                            .getEntity(this.entityType, this.outbreakId, this.entityId)
-                            .catch((err) => {
-                                this.snackbarService.showError(err.message);
-
-                                // Entity not found; navigate back to Entities list
-                                this.router.navigate([this.entityMap[this.entityType].link]);
-
-                                return ErrorObservable.create(err);
-                            })
-                            .subscribe((entityData: CaseModel|ContactModel|EventModel) => {
-                                // add new breadcrumb: Entity Modify page
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        entityData.name,
-                                        `${this.entityMap[this.entityType].link}/${this.entityId}/view`
-                                    )
-                                );
-                                // add new breadcrumb: Entity Relationships list
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE',
-                                        `/relationships/${this.entityType}/${this.entityId}`
-                                    )
-                                );
-                                // add new breadcrumb: page title
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE', null, true)
-                                );
-                            });
-                    });
+                this.loadPerson();
             });
+
+        // get selected outbreak
+        this.outbreakDataService
+            .getSelectedOutbreak()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+
+                this.loadPerson();
+            });
+
+        // side filters
+        this.generateSideFilters();
+    }
+
+    private loadPerson() {
+        if (
+            this.entityType &&
+            this.entityId &&
+            this.selectedOutbreak
+        ) {
+            // initialize query builder
+            this.queryBuilder.filter.clear();
+            // exclude current person from the list
+            this.queryBuilder.filter.where({
+                id: {
+                    'neq': this.entityId
+                }
+            });
+            // retrieve only available entity types
+            const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(this.entityType, this.relationshipType);
+            this.queryBuilder.filter.where({
+                type: {
+                    'inq': availableTypes
+                }
+            });
+
+            // initialize pagination
+            this.initPaginator();
+            // ...and (re)load the list
+            this.needsRefreshList(true);
+
+            // get person data
+            this.entityDataService
+                .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
+
+                    // Entity not found; navigate back to Entities list
+                    this.router.navigate([this.entityMap[this.entityType].link]);
+
+                    return ErrorObservable.create(err);
+                })
+                .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
+                    this.entity = entityData;
+
+                    this.initializeBreadcrumbs();
+                });
+        }
+    }
+
+    private initializeBreadcrumbs() {
+        if (
+            this.relationshipType &&
+            this.entity
+        ) {
+            // add new breadcrumb: page title
+            const relationshipsListPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
+                'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
+                'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
+
+            this.breadcrumbs = [
+                new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
+                new BreadcrumbItemModel(
+                    this.entity.name,
+                    `${this.entityMap[this.entityType].link}/${this.entityId}/view`
+                ),
+                new BreadcrumbItemModel(
+                    relationshipsListPageTitle,
+                    `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
+                ),
+                new BreadcrumbItemModel('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE', null, true)
+            ];
+        }
+    }
+
+    get relationshipTypeRoutePath(): string {
+        return this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures';
     }
 
     /**
      * Re(load) the available Entities list, based on the applied filter, sort criterias
      */
     refreshList() {
-        if (this.outbreakId && this.entityType && this.entityId) {
+        if (
+            this.entityType &&
+            this.entityId &&
+            this.selectedOutbreak
+        ) {
             // retrieve the list of Relationships
             this.entitiesList$ = this.entityDataService.getEntitiesList(
-                this.outbreakId,
+                this.selectedOutbreak.id,
                 this.queryBuilder
             )
                 .pipe(tap(this.checkEmptyList.bind(this)));
@@ -203,11 +243,15 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
      * Get total number of items, based on the applied filters
      */
     refreshListCount() {
-        if (this.outbreakId && this.entityType && this.entityId) {
+        if (
+            this.entityType &&
+            this.entityId &&
+            this.selectedOutbreak
+        ) {
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.entitiesListCount$ = this.entityDataService.getEntitiesCount(this.outbreakId, countQueryBuilder).share();
+            this.entitiesListCount$ = this.entityDataService.getEntitiesCount(this.selectedOutbreak.id, countQueryBuilder).share();
         }
     }
 
@@ -354,7 +398,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
 
         // redirect to next step
         this.router.navigate(
-            [`/relationships/${this.entityType}/${this.entityId}/create`],
+            [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/create`],
             {
                 queryParams: {
                     selectedEntityIds: JSON.stringify(selectedRecords)

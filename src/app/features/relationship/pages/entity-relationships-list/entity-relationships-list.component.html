@@ -6,7 +6,7 @@
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
                     <button *ngIf="hasEntityWriteAccess()" mat-raised-button color="accent"
-                            [routerLink]="['/relationships', entityType, entityId, 'available-entities']">
+                            [routerLink]="['/relationships', entityType, entityId, relationshipTypeRoutePath, 'available-entities']">
                         {{'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP' | translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </ng-container>
@@ -56,10 +56,10 @@
     <mat-table #table [dataSource]="relationshipsList$ | async" matSort (matSortChange)="sortBy($event)">
 
         <!-- Last Name -->
-        <ng-container matColumnDef="people.lastName">
+        <ng-container matColumnDef="lastName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">
+                    <div mat-sort-header class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME' | translate}}
                     </div>
                     <div class="column-filter">
@@ -67,7 +67,7 @@
                             name="lastNameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByRelation('people').byTextMultipleProperties(['lastName', 'name'], $event)"
+                            (optionChanged)="filterByTextField(['lastName', 'name'], $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -75,20 +75,16 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.relatedEntity(entityId)?.type)">
-                {{
-                    item.relatedEntity(entityId)?.type === EntityType.EVENT ?
-                        '' :
-                        item.relatedEntity(entityId)?.model.lastName
-                }}
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                {{item.model.lastName}}
             </mat-cell>
         </ng-container>
 
         <!-- First Name -->
-        <ng-container matColumnDef="people.firstName">
+        <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">
+                    <div mat-sort-header class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME' | translate}}
                     </div>
                     <div class="column-filter">
@@ -96,7 +92,7 @@
                             name="firstNameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByRelation('people').byTextMultipleProperties(['firstName', 'name'], $event)"
+                            (optionChanged)="filterByTextField(['firstName', 'name'], $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -104,20 +100,16 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.relatedEntity(entityId)?.type)">
-                {{
-                item.relatedEntity(entityId)?.type === EntityType.EVENT ?
-                item.relatedEntity(entityId)?.model.name :
-                item.relatedEntity(entityId)?.model.firstName
-                }}
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                {{item.model.firstName}}
             </mat-cell>
         </ng-container>
 
         <!-- Case / Contact Visual ID -->
-        <ng-container matColumnDef="people.visualId">
+        <ng-container matColumnDef="visualId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">
+                    <div mat-sort-header class="column-header">
                         {{ 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_VISUAL_ID' | translate }}
                     </div>
                     <div class="column-filter">
@@ -125,7 +117,7 @@
                             name="visualIdFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByRelation('people').byText('visualId', $event)"
+                            (optionChanged)="filterByTextField('visualId', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -133,26 +125,8 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.relatedEntity(entityId)?.type)">
-                {{ item.relatedEntity(entityId)?.model.visualId }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Relation Type (Exposure or Contact) -->
-        <ng-container matColumnDef="type">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">
-                        {{'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_TYPE' | translate}}
-                    </div>
-                    <div class="column-filter">
-                        <!-- placeholder -->
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.relatedEntity(entityId)?.type)">
-                <app-relationship-type-label [isSource]="!item.isSource(entityId)"></app-relationship-type-label>
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                {{item.model.visualId}}
             </mat-cell>
         </ng-container>
 
@@ -167,15 +141,15 @@
                         <app-form-daterange
                             name="dateFilter"
                             ngModel
-                            (changed)="filterByDateRangeField('contactDate', $event)"
+                            (changed)="filterByRelation('relationship').byDateRange('contactDate', $event)"
                             app-reset-input-on-side-filter>
                         </app-form-daterange>
                     </div>
                 </div>
             </mat-header-cell>
 
-            <mat-cell class="has-date-range-filter" *matCellDef="let item" [style.color]="getPersonTypeColor(item.relatedEntity(entityId)?.type)">
-                {{ item.contactDate | dateDefault }}
+            <mat-cell class="has-date-range-filter" *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                {{ item.relationship.contactDate | dateDefault }}
             </mat-cell>
         </ng-container>
 
@@ -192,7 +166,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="certaintyLevelList$ | async"
-                            (optionChanged)="filterBySelectField('certaintyLevelId', $event)"
+                            (optionChanged)="filterByRelation('relationship').bySelect('certaintyLevelId', $event)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
@@ -203,10 +177,10 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.relatedEntity(entityId)?.type)">
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.CERTAINTY_LEVEL"
-                    [value]="item.certaintyLevelId">
+                    [value]="item.relationship.certaintyLevelId">
                 </app-reference-data-label>
             </mat-cell>
         </ng-container>
@@ -224,7 +198,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="exposureTypeList$ | async"
-                            (optionChanged)="filterBySelectField('exposureTypeId', $event)"
+                            (optionChanged)="filterByRelation('relationship').bySelect('exposureTypeId', $event)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
@@ -235,10 +209,10 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.relatedEntity(entityId)?.type)">
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.EXPOSURE_TYPE"
-                    [value]="item.exposureTypeId">
+                    [value]="item.relationship.exposureTypeId">
                 </app-reference-data-label>
             </mat-cell>
         </ng-container>
@@ -256,7 +230,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="exposuresFrequencyList$ | async"
-                            (optionChanged)="filterBySelectField('exposureFrequencyId', $event)"
+                            (optionChanged)="filterByRelation('relationship').bySelect('exposureFrequencyId', $event)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
@@ -267,10 +241,10 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.relatedEntity(entityId)?.type)">
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.EXPOSURE_FREQUENCY"
-                    [value]="item.exposureFrequencyId">
+                    [value]="item.relationship.exposureFrequencyId">
                 </app-reference-data-label>
             </mat-cell>
         </ng-container>
@@ -288,7 +262,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="exposureDurationList$ | async"
-                            (optionChanged)="filterBySelectField('exposureDurationId', $event)"
+                            (optionChanged)="filterByRelation('relationship').bySelect('exposureDurationId', $event)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
@@ -299,10 +273,10 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.relatedEntity(entityId)?.type)">
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.EXPOSURE_DURATION"
-                    [value]="item.exposureDurationId">
+                    [value]="item.relationship.exposureDurationId">
                 </app-reference-data-label>
             </mat-cell>
         </ng-container>
@@ -320,7 +294,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="relationshipTypeList$ | async"
-                            (optionChanged)="filterBySelectField('socialRelationshipTypeId', $event)"
+                            (optionChanged)="filterByRelation('relationship').bySelect('socialRelationshipTypeId', $event)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
@@ -331,10 +305,10 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.relatedEntity(entityId)?.type)">
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.CONTEXT_OF_TRANSMISSION"
-                    [value]="item.socialRelationshipTypeId">
+                    [value]="item.relationship.socialRelationshipTypeId">
                 </app-reference-data-label>
             </mat-cell>
         </ng-container>
@@ -350,12 +324,12 @@
 
                     <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
 
-                        <button mat-menu-item [routerLink]="['.', item.id, 'view']">
+                        <button mat-menu-item [routerLink]="['.', item.relationship.id, 'view']">
                             {{'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_VIEW_RELATIONSHIP' | translate}}
                         </button>
 
                         <ng-container *app-selected-outbreak-is-active>
-                            <button *ngIf="hasEntityWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                            <button *ngIf="hasEntityWriteAccess()" mat-menu-item [routerLink]="['.', item.relationship.id, 'modify']">
                                 {{'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_MODIFY_RELATIONSHIP' | translate}}
                             </button>
 
