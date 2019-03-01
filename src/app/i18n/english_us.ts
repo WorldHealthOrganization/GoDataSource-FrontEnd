@@ -177,6 +177,9 @@ export const EnglishUsLang = {
          *uiDialogs
          */
         'LNG_DIALOG_CONFIRM_PROPAGATE_LAT_LNG' : 'This location is being used. Do you want to propagate the new latitude and longitude values to the addresses that are using this location?',
+        'LNG_DIALOG_SAVE_FILTERS_TITLE': 'How do you want to name this filter?',
+        'LNG_DIALOG_SAVE_FILTERS_FILTER_NAME_LABEL': 'Filter name',
+        'LNG_DIALOG_SAVE_FILTERS_PUBLIC_FILTER_LABEL': 'Make this filter public?',
 
         /**
          *uiModifyLocationPage
@@ -202,6 +205,7 @@ export const EnglishUsLang = {
          * uiSideFilter
          */
         'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON': 'Save filter',
+        'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL': 'Load filter',
 
         /**
          * REMOVE

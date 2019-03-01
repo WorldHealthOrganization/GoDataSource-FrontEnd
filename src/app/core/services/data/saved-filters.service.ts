@@ -45,7 +45,14 @@ export class SavedFiltersService {
      * @returns {Observable<Object>}
      */
     saveFilter(filterData: SavedFilterModel) {
-        console.log(filterData);
         return this.http.post(`filter-mappings`, filterData);
+    }
+
+    /**
+     * Delete a saved filter
+     * @param {string} savedFilterId
+     */
+    deleteSavedFilter(savedFilterId: string) {
+        return this.http.delete(`filter-mappings/${savedFilterId}`);
     }
 }

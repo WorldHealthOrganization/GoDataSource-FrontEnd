@@ -520,7 +520,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList()
             .map((savedFilters: SavedFilterModel[]) => {
                 return _.map(savedFilters, (savedFilter) => {
-                    return savedFilter.filterKey === this.savedFiltersType;
+                    if (savedFilter.filterKey === this.savedFiltersType) {
+                        return savedFilter;
+                    }
                 });
             });
     }

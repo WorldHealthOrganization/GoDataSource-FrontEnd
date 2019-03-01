@@ -16,8 +16,13 @@
                 <div *ngIf="filterOptions.length > 0" class="section filters-section" fxLayout="column">
 
                     <div>
-                        <app-form-select>
-
+                        <app-form-select
+                            name="loadFilter"
+                            [placeholder]="'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL'"
+                            [options]="savedFilters"
+                            (optionChanged)="filterBySavedFilter($event)"
+                            optionLabelKey="name"
+                            optionValueKey="filterData">
                         </app-form-select>
                     </div>
 

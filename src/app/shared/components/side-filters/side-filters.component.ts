@@ -12,7 +12,12 @@ import * as moment from 'moment';
 import { SavedFiltersService } from '../../../core/services/data/saved-filters.service';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogConfiguration, DialogField, DialogFieldType } from '../dialog/dialog.component';
-import { SavedFilterModel } from '../../../core/models/saved-filters.model';
+import {
+    SavedFilterData, SavedFilterDataAppliedFilter, SavedFilterDataAppliedSort,
+    SavedFilterModel
+} from '../../../core/models/saved-filters.model';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 
 @Component({
     selector: 'app-side-filters',
@@ -100,7 +105,8 @@ export class SideFiltersComponent {
         private formHelper: FormHelperService,
         private i18nService: I18nService,
         private savedFiltersService: SavedFiltersService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private snackbarService: SnackbarService
     ) {
         // initialize data
         this.clear();
@@ -122,50 +128,88 @@ export class SideFiltersComponent {
         this.appliedSort.splice(index, 1);
     }
 
+    /**
+     * Save a filter after it was applied to the list
+     */
     saveFilter() {
-        console.log(this.getQueryBuilder());
-        console.log(this.savedFiltersType);
-
         this.dialogService
             .showInput(
                 new DialogConfiguration({
-                    message: 'How do you want to name this filter?',
-                    yesLabel: 'save filter',
+                    message: 'LNG_DIALOG_SAVE_FILTERS_TITLE',
+                    yesLabel: 'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON',
                     required: true,
                     fieldsList: [
                         new DialogField({
                             name: 'filterName',
-                            placeholder: 'Filter name',
+                            placeholder: 'LNG_DIALOG_SAVE_FILTERS_FILTER_NAME_LABEL',
                             required: true,
                             fieldType: DialogFieldType.TEXT,
                     }),
                         new DialogField({
                             name: 'isPublic',
-                            placeholder: 'Make this filter public?',
-                            required: true,
+                            placeholder: 'LNG_DIALOG_SAVE_FILTERS_PUBLIC_FILTER_LABEL',
                             fieldType: DialogFieldType.BOOLEAN
                         })
                     ]
                 }), true)
             .subscribe((answer: DialogAnswer) => {
-                console.log(this.getQueryBuilder());
-                console.log(answer);
                 this.savedFiltersService.saveFilter(
                     new SavedFilterModel({
                         name: answer.inputValue.value.filterName,
                         isPublic: answer.inputValue.value.isPublic,
                         filterKey: this.savedFiltersType,
-                        filterData: this.filterOptions.filter
+                        filterData: this.toSaveData()
                     })
-                ).subscribe((data) => {
-                    console.log(data);
+                ).catch((err) => {
+                    this.snackbarService.showApiError(err);
+                    return ErrorObservable.create(err);
+                }).subscribe(() => {
+                    this.snackbarService.showSuccess(`filter saved successfully`);
                 });
             });
-        // this.savedFiltersService.saveFilter(this.filterOptions)
     }
 
-    applySavedFilter(event) {
-        console.log(event)
+    /**
+     * Convert query builder to an object that we can save in db
+     */
+    toSaveData(): SavedFilterData {
+        // exclude required filters
+        this.appliedFilters = _.filter(this.appliedFilters, (appliedFilter) => { return !appliedFilter.filter.required; });
+
+        return new SavedFilterData({
+            appliedFilters: _.map(this.appliedFilters, (filter) => filter.sanitizeForSave()),
+            appliedFilterOperator: this.appliedFilterOperator,
+            appliedSort: _.map(this.appliedSort, (sort) => sort.sanitizeForSave()),
+        });
+    }
+
+    /**
+     * Apply a saved filter
+     */
+    filterBySavedFilter(savedFilter: SavedFilterModel) {
+        this.clear(false);
+        this.appliedFilterOperator = savedFilter.filterData.appliedFilterOperator as RequestFilterOperator;
+        _.each(savedFilter.filterData.appliedFilters, (filter: SavedFilterDataAppliedFilter) => {
+            // search through our current filters for our own filter
+            const ourFilter = _.find(this.filterOptions, (filterOption: FilterModel) => filterOption.uniqueKey === filter.filter.uniqueKey);
+            if (ourFilter) {
+                this.appliedFilters.push(new AppliedFilterModel({
+                    filter: ourFilter,
+                    comparator: filter.comparator as FilterComparator,
+                    value: filter.value
+                }));
+            }
+        });
+        _.each(savedFilter.filterData.appliedSort, (sortCriteria: SavedFilterDataAppliedSort) => {
+            // search through our current sort criterias for our own sort criteria
+            const ourSort = _.find(this.sortOptions, (sortOption: SortModel) => sortOption.uniqueKey === sortCriteria.sort.uniqueKey);
+            if (ourSort) {
+                this.appliedSort.push(new AppliedSortModel({
+                    sort: ourSort,
+                    direction: sortCriteria.direction as RequestSortDirection
+                }));
+            }
+        });
     }
 
     /**
@@ -199,10 +243,10 @@ export class SideFiltersComponent {
             null;
     }
 
-    clear() {
+    clear(addFirstItem: boolean = true) {
         this.appliedFilterOperator = RequestFilterOperator.AND;
         this.appliedSort = [];
-        this.addRequiredAndValueFilters();
+        this.addRequiredAndValueFilters(addFirstItem);
     }
 
     reset() {
@@ -215,7 +259,7 @@ export class SideFiltersComponent {
     /**
      * Add filters resulted from filter options
      */
-    private addRequiredAndValueFilters() {
+    private addRequiredAndValueFilters(addFirstItem: boolean = true) {
         // reinitialize applied filters
         this.appliedFilters = [];
 
@@ -238,7 +282,10 @@ export class SideFiltersComponent {
         });
 
         // if empty, then we need to add at least one empty applied field
-        if (this.appliedFilters.length < 1) {
+        if (
+            addFirstItem &&
+            this.appliedFilters.length < 1
+        ) {
             this.appliedFilters.push(new AppliedFilterModel());
         }
     }
