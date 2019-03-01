@@ -13,7 +13,7 @@ export enum ApplyListFilter {
     CONTACTS_SEEN = 'contacts_seen',
     CONTACTS_FOLLOWED_UP = 'contacts_followed_up',
     CASES_LESS_CONTACTS = 'cases_less_contacts',
-    CASES_IN_KNOWN_TRANSMISSION_CHAINS = 'cases_in_known_transmission_chains',
+    CASES_OUTSIDE_THE_TRANSMISSION_CHAINS = 'cases_outside_the_transmission_chains',
     CASES_PREVIOUS_DAYS_CONTACTS = 'cases_previous_days_contacts',
     CASES_NOT_IDENTIFIED_THROUGH_CONTACTS = 'cases-not-identified-through-contacts',
     CASES_PENDING_LAB_RESULT = 'cases_pending_lab_result',
@@ -24,8 +24,12 @@ export enum ApplyListFilter {
     CASES_WITHOUT_RELATIONSHIPS  = 'cases_without_relationships',
     EVENTS_WITHOUT_RELATIONSHIPS  = 'events_without_relationships',
     CASES_WITHOUT_DATE_OF_ONSET_CHAIN = 'cases_without_date_of_onset_chain',
+    CASES_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN = 'cases_without_date_of_last_contact_chain',
+    CASES_WITHOUT_DATE_OF_REPORTING_CHAIN = 'cases_without_date_of_reporting_chain',
     CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN = 'contacts_without_date_of_last_contact_chain',
+    CONTACTS_WITHOUT_DATE_OF_REPORTING_CHAIN = 'contacts_without_date_of_reporting_chain',
     EVENTS_WITHOUT_DATE_CHAIN = 'events_without_date_chain',
+    EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN = 'events_without_date_of_reporting_chain',
     CONTEXT_SENSITIVE_HELP_ITEMS = 'context_sensitive_help_items'
 }
 
@@ -33,7 +37,6 @@ export class Constants {
     // default display constants
     static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
     static DEFAULT_DATE_TIME_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm';
-    static DEFAULT_DATE_SHORT_DISPLAY_FORMAT = 'MM/DD';
 
     // default random configs
     static DEFAULT_RANDOM_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -66,6 +69,27 @@ export class Constants {
     // default color to be used in chains of transmission
     static DEFAULT_COLOR_CHAINS = '#A8A8A8';
 
+    // default color to be used in chains - timeline checkpoints
+    static DEFAULT_BACKGROUND_COLOR_NODES_CHAINS = '#fff';
+
+    // default color to be used in chains - timeline checkpoints - border
+    static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_BORDER = '#dcdcdc';
+
+    // default color to be used in chains - timeline checkpoints - text
+    static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_TEXT = '#727272';
+
+    // default color to be used in chains - timeline checkpoints - first day of week - border
+    static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_WEEK_BORDER = '#2A2A2A';
+
+    // default color to be used in chains - timeline checkpoints - first day of week - text
+    static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_WEEK_TEXT = '#2A2A2A';
+
+    // default color to be used in chains - timeline checkpoints - first day of month - border
+    static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_MONTH_BORDER = '#4DB0A0';
+
+    // default color to be used in chains - timeline checkpoints - first day of month - text
+    static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_MONTH_TEXT = '#3A9A8A';
+
     // these need to be hardcoded, this is why we don't pull them from reference data
     // they are in reference data only to disable some options or translate labels ( since answer type category is readonly )
     static ANSWER_TYPES = {
@@ -92,6 +116,16 @@ export class Constants {
         DATE_TIME: {
             label: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME',
             value: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME'
+        }
+    };
+
+    /**
+     * FollowUp status
+     */
+    static FOLLOW_UP_STATUS = {
+        NO_DATA : {
+            label: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED',
+            value: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED'
         }
     };
 
@@ -162,7 +196,7 @@ export class Constants {
         [Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_NOT_SEEN',
         [Constants.APPLY_LIST_FILTER.CONTACTS_SEEN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_SEEN',
         [Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP]: 'LNG_PAGE_LIST_FILTER_CONTACTS_FOLLOWED_UP',
-        [Constants.APPLY_LIST_FILTER.CASES_IN_KNOWN_TRANSMISSION_CHAINS]: 'LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS',
+        [Constants.APPLY_LIST_FILTER.CASES_OUTSIDE_THE_TRANSMISSION_CHAINS]: 'LNG_PAGE_LIST_FILTER_CASES_OUTSIDE_THE_TRANSMISSION_CHAINS',
         [Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS',
         [Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS',
         [Constants.APPLY_LIST_FILTER.CASES_PENDING_LAB_RESULT]: 'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT',
@@ -173,8 +207,12 @@ export class Constants {
         [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS]: 'LNG_PAGE_DASHBOARD_CASES_WITHOUT_RELATIONSHIPS',
         [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS]: 'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS',
         [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_ONSET_CHAIN]: 'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_ONSET_CHAIN',
+        [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN]: 'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN',
+        [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_REPORTING_CHAIN]: 'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_REPORTING_CHAIN',
         [Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN',
+        [Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_REPORTING_CHAIN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_WITHOUT_DATE_OF_REPORTING_CHAIN',
         [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_CHAIN]: 'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_CHAIN',
+        [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN]: 'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN',
         [Constants.APPLY_LIST_FILTER.CONTEXT_SENSITIVE_HELP_ITEMS]: 'LNG_PAGE_LIST_FILTER_HELP_CONTEXT_SENSITIVE'
     };
 
@@ -211,7 +249,8 @@ export class Constants {
     static CASE_CLASSIFICATION = {
         SUSPECT: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_SUSPECT',
         CONFIRMED: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_CONFIRMED',
-        NOT_A_CASE: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_NOT_A_CASE_DISCARDED'
+        NOT_A_CASE: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_NOT_A_CASE_DISCARDED',
+        PROBABLE: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_PROBABLE'
     };
 
     /**
@@ -223,19 +262,40 @@ export class Constants {
         HIGH: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_3_HIGH'
     };
 
+    /**
+     * Use to match outcome status in the logic
+     */
+    static OUTCOME_STATUS = {
+        DECEASED : 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME_DECEASED',
+        ALIVE : 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME_ALIVE',
+        RECOVERED : 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME_RECOVERED'
+    };
+
     //  transmission chain view types
     static TRANSMISSION_CHAIN_VIEW_TYPES = {
         BUBBLE_NETWORK: {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW',
             value: 'BUBBLE_NETWORK'
         },
+        GEOSPATIAL_MAP: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GEOSPATIAL_MAP',
+            value: 'GEOSPATIAL_MAP'
+        },
         HIERARCHICAL_NETWORK: {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_HIERARCHICAL_NETWORK_VIEW',
             value: 'HIERARCHICAL_NETWORK'
         },
         TIMELINE_NETWORK: {
-            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW',
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW_DATE_OF_ONSET',
             value: 'TIMELINE_NETWORK'
+        },
+        TIMELINE_NETWORK_LAST_CONTACT: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW_DATE_OF_LAST_CONTACT',
+            value: 'TIMELINE_NETWORK_LAST_CONTACT'
+        },
+        TIMELINE_NETWORK_REPORTING: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW_DATE_OF_REPORTING',
+            value: 'TIMELINE_NETWORK_REPORTING'
         }
     };
 
@@ -256,6 +316,14 @@ export class Constants {
         GENDER: {
             label: 'LNG_CASE_FIELD_LABEL_GENDER',
             value: 'gender'
+        },
+        OCCUPATION: {
+            label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+            value: 'occupation'
+        },
+        OUTCOME: {
+            label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+            value: 'outcomeId'
         }
     };
 
@@ -328,6 +396,30 @@ export class Constants {
         GENDER: {
             label: 'LNG_CASE_FIELD_LABEL_GENDER',
             value: 'gender'
+        },
+        OCCUPATION: {
+            label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+            value: 'occupation'
+        },
+        OUTCOME: {
+            label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+            value: 'outcomeId'
+        }
+    };
+
+    // used for the criteria radio buttons in the chains of transmission settings
+    static TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS = {
+        NONE: {
+            label: 'LNG_COMMON_LABEL_NONE',
+            value: 'none'
+        },
+        TYPE: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
+            value: 'type'
+        },
+        CLASSIFICATION: {
+            label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+            value: 'classification'
         }
     };
 
@@ -364,6 +456,10 @@ export class Constants {
         CONCATENATED_DETAILS: {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_CONCATENATED_DETAILS',
             value: 'concatenated_details'
+        },
+        OCCUPATION: {
+            label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+            value: 'occupation'
         }
     };
 
@@ -654,6 +750,22 @@ export class Constants {
         CASE: {
             label: 'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_CASE',
             value: 'case'
+        },
+        RISK: {
+            label: 'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_RISK',
+            value: 'riskLevel'
+        }
+    };
+
+    //  gantt chart types
+    static GANTT_CHART_TYPES = {
+        GANTT_CHART_LAB_TEST: {
+            label: 'LNG_PAGE_GANTT_CHART_LAB_TEST_TITLE',
+            value: 'GANTT_CHART_LAB_TEST'
+        },
+        GANTT_CHART_HOSPITALIZATION_ISOLATION: {
+            label: 'LNG_PAGE_GANTT_CHART_HOSPITALIZATION_ISOLATION_TITLE',
+            value: 'GANTT_CHART_HOSPITALIZATION_ISOLATION'
         }
     };
 
@@ -662,6 +774,14 @@ export class Constants {
      */
     static getCurrentDate(): Moment {
         return moment().startOf('day');
+    }
+
+    /**
+     * Check if a given date is in the future
+     */
+    static isDateInTheFuture(date): boolean {
+        const dateMoment = date ? moment(date) : null;
+        return !!(dateMoment && dateMoment.startOf('day').isAfter(Constants.getCurrentDate()));
     }
 
     /**

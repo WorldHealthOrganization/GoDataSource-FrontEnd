@@ -1,3 +1,5 @@
+@import '~styles/common';
+
 /* Angular Material overrides */
 @menu-item-height: 30px;
 .dashlet-menu-item {
@@ -5,8 +7,15 @@
     line-height: @menu-item-height !important;
 }
 
-app-dashboard-custom-metric-dashlet {
+@media @ie11-only {
+    .ie-header-class {
+        app-form-input {
+            min-width: 40px !important;
+        }
+    }
+}
 
+app-dashboard-custom-metric-dashlet {
     .dashboard-box {
         height: 170px;
         color: white;
@@ -110,7 +119,7 @@ app-dashboard-custom-metric-dashlet {
                 }
             }
             app-form-input {
-                max-width: 40px;
+                max-width: 50px;
                 text-align: center;
             }
 
@@ -130,6 +139,25 @@ app-dashboard-custom-metric-dashlet {
             font-size: 60px;
             font-weight: bold;
             min-height: 70px;
+
+            .dashlet-loading {
+                @mat-spinner-width: 32px;
+                @mat-spinner-height: 32px;
+                mat-spinner {
+                    display: inline-block;
+                    width: @mat-spinner-width !important;
+                    height: @mat-spinner-height !important;
+
+                    svg {
+                        width: @mat-spinner-width !important;
+                        height: @mat-spinner-height !important;
+
+                        circle {
+                            stroke: white;
+                        }
+                    }
+                }
+            }
 
             span[ng-reflect-router-link] {
                 cursor: pointer;

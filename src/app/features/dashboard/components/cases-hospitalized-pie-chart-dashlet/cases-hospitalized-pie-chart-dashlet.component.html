@@ -1,9 +1,32 @@
-<ngx-charts-pie-chart
-    [view]="[315,250]"
-    [scheme]="{ domain: ['#4DB0A0','#1DF0A0','#00FFE0'] }"
-    [results]="caseHospitalizationSummaryResults"
-    [doughnut]="true"
-    [legend]="false"
-    [labels]="true">
-</ngx-charts-pie-chart>
+<!-- Chart -->
+<ng-container
+    *ngIf="!displayLoading && caseHospitalizationSummaryResults?.length > 0">
+    <ngx-charts-pie-chart
+        [view]="[315,250]"
+        [scheme]="{ domain: ['#4DB0A0','#1DF0A0','#00FFE0'] }"
+        [results]="caseHospitalizationSummaryResults"
+        [doughnut]="true"
+        [legend]="false"
+        [trimLabels]="false"
+        [labels]="true">
+    </ngx-charts-pie-chart>
+</ng-container>
 
+<!-- No data -->
+<ng-container
+    *ngIf="!displayLoading && caseHospitalizationSummaryResults?.length < 1">
+    <div
+        fxFlex fxLayout="column" fxFlexAlign="center"
+        class="dashlet-no-data">
+        <div fxFlex>
+            {{ 'LNG_PAGE_DASHLET_HOSPITALIZATION_SUMMARY_NO_DATA_LABEL' | translate }}
+        </div>
+    </div>
+</ng-container>
+
+<!-- Loading data -->
+<div
+    *ngIf="displayLoading"
+    class="dashlet-loading">
+    <mat-spinner></mat-spinner>
+</div>

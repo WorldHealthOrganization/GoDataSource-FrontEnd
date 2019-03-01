@@ -11,10 +11,12 @@
         </div>
 
         <input
+            #inputElement
             [class.filter-icon-input]="displayFilterIcon"
             matInput
             [type]="type"
             [maxlength]="maxlength"
+            [minlength]="minlength"
             [(ngModel)]="value"
             [attr.name]="name"
             [required]="required"
@@ -27,7 +29,15 @@
             [min]="min"
             [max]="max"/>
 
-        <span *ngIf="tooltip" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>
+        <span
+            *ngIf="tooltip"
+            #tooltipCtrl="matTooltip"
+            [matTooltip]="tooltip"
+            class="xt-icon form-icon"
+            (click)="displayTooltip($event, tooltipCtrl)">
+            help
+        </span>
+
         <span *ngIf="type === 'password'" [matTooltip]="" class="xt-icon form-password-icon" (click)="togglePasswordDisplay()">visibility</span>
         <span *ngIf="tempTypeOverwritten === 'password'" [matTooltip]="" class="xt-icon form-password-icon" (click)="togglePasswordDisplay()">visibilityOf</span>
 

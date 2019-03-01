@@ -92,8 +92,8 @@
                                 <app-form-select
                                     name="visualId"
                                     [(ngModel)]="uniqueOptions?.visualId.value"
-                                    [placeholder]="'LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID' | translate"
-                                    tooltip="LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID_DESCRIPTION"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
                                     [options]="uniqueOptions?.visualId.options">
                                 </app-form-select>
 
@@ -162,8 +162,8 @@
                         [disabled]="true">
                     </app-form-document-list>
 
-                    <div>
-                        <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <div class="stepper-wrapper">
+                        <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                     </div>
                 </form>
             </mat-step>
@@ -201,9 +201,9 @@
                         [minItems]="0">
                     </app-form-address-list>
 
-                    <div>
-                        <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                        <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <div class="stepper-wrapper">
+                        <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                        <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                     </div>
                 </form>
             </mat-step>
@@ -238,7 +238,8 @@
                                     [(ngModel)]="uniqueOptions?.dateOfOnset.value"
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate"
                                     tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION"
-                                    [options]="uniqueOptions?.dateOfOnset.options">
+                                    [options]="uniqueOptions?.dateOfOnset.options"
+                                    required="true">
                                 </app-form-select>
 
                                 <app-form-select
@@ -273,11 +274,11 @@
 
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-select
-                                name="outcome"
-                                [(ngModel)]="uniqueOptions?.outcome.value"
+                                name="outcomeId"
+                                [(ngModel)]="uniqueOptions?.outcomeId.value"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_OUTCOME' | translate"
                                 tooltip="LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION"
-                                [options]="uniqueOptions?.outcome.options">
+                                [options]="uniqueOptions?.outcomeId.options">
                             </app-form-select>
 
                             <app-form-select
@@ -293,13 +294,6 @@
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-select
-                                name="deceased"
-                                [(ngModel)]="uniqueOptions?.deceased.value"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DECEASED' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_DECEASED_DESCRIPTION"
-                                [options]="uniqueOptions?.deceased.options">
-                            </app-form-select>
 
                             <app-form-select
                                 name="safeBurial"
@@ -310,40 +304,33 @@
                             </app-form-select>
 
                             <app-form-select
-                                name="dateDeceased"
-                                [(ngModel)]="uniqueOptions?.dateDeceased.value"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_DATE_DECEASED_DESCRIPTION"
-                                [options]="uniqueOptions?.dateDeceased.options">
+                                name="dateOfBurial"
+                                [(ngModel)]="uniqueOptions?.dateOfBurial.value"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION"
+                                [options]="uniqueOptions?.dateOfBurial.options">
                             </app-form-select>
 
+                            <div fxFlex><!-- placeholder --></div>
                             <div fxFlex><!-- placeholder --></div>
                         </div>
                     </mat-card>
 
-                    <!-- Hospitalization Dates section -->
-                    <div class="section-title">{{'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES' | translate}}</div>
-                    <app-form-daterange-list
-                        name="hospitalizationDates"
-                        [ngModel]="caseData.hospitalizationDates"
-                        fromTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_FROM_DESCRIPTION"
-                        toTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_TO_DESCRIPTION"
-                        [disabled]="true">
-                    </app-form-daterange-list>
+                    <div class="section-title">{{'LNG_CASE_FIELD_LABEL_DATE_RANGES' | translate}}</div>
+                    <!-- Dates section -->
+                    <app-form-case-center-daterange-list
+                        name="dateRanges"
+                        [(ngModel)]="caseData.dateRanges"
+                        fromTooltip="LNG_CASE_FIELD_LABEL_DATE_RANGE_FROM_DESCRIPTION"
+                        toTooltip="LNG_CASE_FIELD_LABEL_DATE_RANGE_TO_DESCRIPTION"
+                        [componentTitle]="'LNG_CASE_FIELD_LABEL_DATE_RANGES' | translate"
+                        centerNameLabel="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
+                        centerNameTooltip="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME_DESCRIPTION"
+                    ></app-form-case-center-daterange-list>
 
-                    <!-- Isolation Dates section -->
-                    <div class="section-title">{{'LNG_CASE_FIELD_LABEL_ISOLATION_DATES' | translate}}</div>
-                    <app-form-daterange-list
-                        name="isolationDates"
-                        [ngModel]="caseData.isolationDates"
-                        fromTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_FROM_DESCRIPTION"
-                        toTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION"
-                        [disabled]="true">
-                    </app-form-daterange-list>
-
-                    <div>
-                        <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                        <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <div class="stepper-wrapper">
+                        <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                        <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                     </div>
                 </form>
             </mat-step>
@@ -370,8 +357,8 @@
                         [disabled]="true">
                     </app-form-fill-questionnaire>
 
-                    <div>
-                        <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
+                    <div class="stepper-wrapper">
+                        <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
                     </div>
                 </form>
             </mat-step>
@@ -380,9 +367,9 @@
             <mat-step>
                 <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL'| translate}}</ng-template>
                 {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
-                <div>
-                    <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button *app-selected-outbreak-is-active type="button" mat-button (click)="createNewCase([personalForm, addressForm, infectionForm, questionnaireForm])">
+                <div class="stepper-wrapper">
+                    <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                    <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent" (click)="createNewCase([personalForm, addressForm, infectionForm, questionnaireForm])">
                         {{'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASE_BUTTON' | translate}}
                     </button>
                 </div>

@@ -67,16 +67,18 @@
             *ngIf="viewOnly">
             <button
                 *ngIf="hasTeamWriteAccess()"
-                mat-raised-button
-                color="primary"
-                class="button-primary"
+                mat-raised-button type="button"
+                color="accent"
                 [routerLink]="['/teams', teamId, 'modify']">
                 {{'LNG_COMMON_BUTTON_EDIT'| translate}}
             </button>
         </ng-container>
         <ng-container *ngIf="!viewOnly">
-            <button mat-raised-button color="primary" class="button-primary">
+            <button mat-raised-button color="accent">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+            </button>
+            <button type="button" [routerLink]="'/teams'" mat-raised-button>
+                {{'LNG_COMMON_BUTTON_CANCEL'| translate}}
             </button>
         </ng-container>
     </div>

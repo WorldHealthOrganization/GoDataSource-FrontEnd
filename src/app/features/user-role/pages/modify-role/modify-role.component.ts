@@ -2,13 +2,11 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Observable } from 'rxjs/Observable';
-
 import 'rxjs/add/operator/map';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
@@ -16,6 +14,7 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-modify-role',
@@ -24,10 +23,10 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
     styleUrls: ['./modify-role.component.less']
 })
 export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_USER_ROLES_TITLE', '/user-roles'),
     ];
+
     authUser: UserModel;
     userRoleId: string;
     userRole: UserRoleModel = new UserRoleModel();
@@ -39,7 +38,8 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
         private userRoleDataService: UserRoleDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private dialogService: DialogService
     ) {
         super(route);
         this.route.params.subscribe((params: {roleId}) => {
@@ -76,19 +76,26 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
         if (form.valid && !_.isEmpty(dirtyFields)) {
 
             // modify the role
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.userRoleDataService
                 .modifyRole(this.userRoleId, dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
-
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((modifiedRole: UserRoleModel) => {
+                    // update model
+                    this.userRole = modifiedRole;
+
+                    // mark form as pristine
+                    form.form.markAsPristine();
+
+                    // display message
                     this.snackbarService.showSuccess('LNG_PAGE_MODIFY_USER_ROLES_ACTION_MODIFY_USER_ROLES_SUCCESS_MESSAGE');
 
-                    // navigate to listing page
-                    this.disableDirtyConfirm();
-                    this.router.navigate(['/user-roles']);
+                    // hide dialog
+                    loadingDialog.close();
                 });
         }
     }

@@ -66,12 +66,12 @@ export class CreateTeamComponent extends ConfirmOnFormChanges implements OnInit 
                                 this.snackbarService.showError(err.message);
                                 return ErrorObservable.create(err);
                             })
-                            .subscribe(() => {
+                            .subscribe((newTeam: TeamModel) => {
                                 this.snackbarService.showSuccess('LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_SUCCESS_MESSAGE');
 
                                 // navigate to listing page
                                 this.disableDirtyConfirm();
-                                this.router.navigate(['/teams']);
+                                this.router.navigate([`/teams/${newTeam.id}/modify`]);
                             });
                     }
                 });

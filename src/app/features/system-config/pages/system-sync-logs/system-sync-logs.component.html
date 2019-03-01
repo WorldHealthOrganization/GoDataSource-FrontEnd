@@ -4,15 +4,29 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <!-- Delete sync logs -->
                 <button
-                    *ngIf="hasSysConfigWriteAccess()"
-                    class="button-primary"
                     mat-raised-button
-                    color="primary"
-                    (click)="deleteServerSyncLogs()">
-                    {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_LOGS_BUTTON' | translate }}
+                    color="accent"
+                    [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <ng-container *ngIf="hasSysConfigWriteAccess()">
+                        <!-- Sync general settings -->
+                        <button
+                            mat-menu-item
+                            (click)="configureSyncSettings()">
+                            {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_BUTTON' | translate }}
+                        </button>
+                        <!-- Delete sync logs -->
+                        <button
+                            mat-menu-item
+                            (click)="deleteServerSyncLogs()">
+                            {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_LOGS_BUTTON' | translate }}
+                        </button>
+                    </ng-container>
+                </mat-menu>
             </div>
         </div>
     </ng-container>
@@ -28,7 +42,11 @@
 <mat-card class="page-section page-content">
     <!-- Filters -->
     <div class="reset-filters">
-        <button type="button" mat-raised-button (click)="needsRefreshList(true)">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
     </div>
@@ -45,7 +63,7 @@
                         <app-form-input
                             name="syncServerUrl"
                             ngModel
-                            placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextContainingField('syncServerUrl', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
@@ -70,7 +88,7 @@
                         <app-form-input
                             name="syncClientId"
                             ngModel
-                            placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('syncClientId', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
@@ -86,7 +104,7 @@
 
         <!-- Action Start Date -->
         <ng-container matColumnDef="actionStartDate">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
                         {{'LNG_UPSTREAM_SERVER_FIELD_LABEL_ACTION_START_DATE' | translate}}
@@ -102,14 +120,14 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.actionStartDate | dateTimeDefault }}
             </mat-cell>
         </ng-container>
 
         <!-- Action Completion Date -->
         <ng-container matColumnDef="actionCompletionDate">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
                         {{'LNG_UPSTREAM_SERVER_FIELD_LABEL_ACTION_COMPLETION_DATE' | translate}}
@@ -125,7 +143,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.actionCompletionDate | dateTimeDefault }}
             </mat-cell>
         </ng-container>
@@ -198,7 +216,7 @@
 
         <!-- Information Start Date -->
         <ng-container matColumnDef="informationStartDate">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
                         {{'LNG_UPSTREAM_SERVER_FIELD_LABEL_INFORMATION_START_DATE' | translate}}
@@ -214,7 +232,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.informationStartDate | dateTimeDefault }}
             </mat-cell>
         </ng-container>
@@ -242,7 +260,7 @@
                             mat-menu-item
                             class="mat-menu-item-delete"
                             (click)="deleteSyncLog(item)">
-                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                            {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_LOG' | translate }}
                         </button>
                     </ng-container>
                 </mat-menu>
@@ -252,6 +270,17 @@
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
         <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
     </mat-table>
+
+    <div
+        *ngIf="isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
 
     <mat-paginator
         [length]="(syncLogsListCount$ | async)?.count"

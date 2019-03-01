@@ -12,6 +12,7 @@ import { CacheKey, CacheService } from '../../../../core/services/helper/cache.s
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-modify-language',
@@ -20,10 +21,7 @@ import { UserModel } from '../../../../core/models/user.model';
     styleUrls: ['./modify-language.component.less']
 })
 export class ModifyLanguageComponent extends ViewModifyComponent implements OnInit {
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '/languages')
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     languageId: string;
     languageData: LanguageModel = new LanguageModel();
@@ -38,7 +36,8 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
         private snackbarService: SnackbarService,
         private router: Router,
         private cacheService: CacheService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private dialogService: DialogService
     ) {
         super(route);
     }
@@ -54,16 +53,9 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
                 this.languageDataService
                     .getLanguage(this.languageId)
                     .subscribe((languageData: LanguageModel) => {
-                        this.languageData = languageData;
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                this.viewOnly ? 'LNG_PAGE_VIEW_LANGUAGE_TITLE' : 'LNG_PAGE_MODIFY_LANGUAGE_TITLE',
-                                '.',
-                                true,
-                                {},
-                                this.languageData
-                            )
-                        );
+                        // since this is cached we need to clone it because otherwise we modify the existing object and if we chose to discard changes...
+                        this.languageData = new LanguageModel(languageData);
+                        this.createBreadcrumbs();
                     });
             });
     }
@@ -84,21 +76,58 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
         }
 
         // modify the event
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.languageDataService
             .modifyLanguage(this.languageId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
-                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LANGUAGE_ACTION_MODIFY_LANGUAGE_SUCCESS_MESSAGE');
-
-                // clear cache
+            .switchMap((modifiedLanguage) => {
+                // remove help items from cache
                 this.cacheService.remove(CacheKey.LANGUAGES);
 
-                // navigate to listing page
-                this.disableDirtyConfirm();
-                this.router.navigate(['/languages']);
-            });
+                // update language tokens
+                return this.languageDataService.getLanguagesList()
+                    .catch((err) => {
+                        this.snackbarService.showApiError(err);
+                        loadingDialog.close();
+                        return ErrorObservable.create(err);
+                    })
+                    .map(() => modifiedLanguage);
+            })
+            .subscribe((modifiedLanguage: LanguageModel) => {
+                // update model
+                this.languageData = modifiedLanguage;
+
+                // mark form as pristine
+                form.form.markAsPristine();
+
+                // display message
+                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LANGUAGE_ACTION_MODIFY_LANGUAGE_SUCCESS_MESSAGE');
+
+                // update breadcrumb
+                this.createBreadcrumbs();
+
+                // hide dialog
+                loadingDialog.close();
+        });
+    }
+
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [
+            new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '/languages'),
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_LANGUAGE_TITLE' : 'LNG_PAGE_MODIFY_LANGUAGE_TITLE',
+                '.',
+                true,
+                {},
+                this.languageData
+            )
+        ];
     }
 }

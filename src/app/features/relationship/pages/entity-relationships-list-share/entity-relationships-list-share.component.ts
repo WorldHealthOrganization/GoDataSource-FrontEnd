@@ -17,7 +17,6 @@ import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryMo
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
@@ -25,6 +24,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { NgForm } from '@angular/forms';
 import * as _ from 'lodash';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-entity-relationships-list-share',
@@ -234,7 +234,7 @@ export class EntityRelationshipsListShareComponent extends ListComponent impleme
             const qb = new RequestQueryBuilder();
             qb.merge(this.queryBuilder);
 
-            const peopleQueryBuilder = qb.include('people');
+            const peopleQueryBuilder = qb.include('people', true);
             peopleQueryBuilder.queryBuilder.filter.where({
                 id: {
                     neq: this.entityId
@@ -247,7 +247,8 @@ export class EntityRelationshipsListShareComponent extends ListComponent impleme
                 this.entityType,
                 this.entityId,
                 qb
-            );
+            )
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 
@@ -261,7 +262,7 @@ export class EntityRelationshipsListShareComponent extends ListComponent impleme
             const qb = new RequestQueryBuilder();
             qb.merge(this.queryBuilder);
 
-            const peopleQueryBuilder = qb.include('people');
+            const peopleQueryBuilder = qb.include('people', false);
             peopleQueryBuilder.queryBuilder.filter.where({
                 id: {
                     neq: this.entityId

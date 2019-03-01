@@ -2,6 +2,7 @@
 
 // variables
 @topnav-height: 90px;
+@topnav-height-mobile: 65px;
 
 // styles
 .topnav {
@@ -13,6 +14,7 @@
     }
 
     .topnav-list {
+        position: relative;
         height: @topnav-height;
         padding-top: 0;
 
@@ -35,14 +37,35 @@
         .dynamic-section {
             padding: 0 20px;
         }
+    }
 
-        .add-new-item {
-            font-size: 30px;
-            color: @color-accent-main;
+    @media @mobile-devices {
+        &.mat-toolbar-single-row {
+            /* overriding Material behavior */
+            height: @topnav-height-mobile;
+        }
 
-            .mat-list-item-content {
-                padding: 0 8px;
+        .topnav-list {
+            height: @topnav-height-mobile;
+
+            .topnav-static-actions {
+                position: absolute;
+                right: 0;
+                top: 90px;
+
+                .mat-divider {
+                    display: none;
+                }
             }
         }
+    }
+}
+
+.topnav-static-actions-placeholder {
+    height: 75px;
+    display: none;
+
+    @media @mobile-devices {
+        display: block;
     }
 }

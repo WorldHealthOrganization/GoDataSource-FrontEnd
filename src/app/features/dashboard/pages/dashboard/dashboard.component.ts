@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 import { DashletSettingsModel, UserSettingsDashboardModel } from '../../../../core/models/user-settings-dashboard.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Observable } from 'rxjs/Observable';
-import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DomService } from '../../../../core/services/helper/dom.service';
@@ -16,6 +16,12 @@ import { ImportExportDataService } from '../../../../core/services/data/import-e
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as domtoimage from 'dom-to-image';
 import * as FileSaver from 'file-saver';
+import { AppliedFilterModel, FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import { Moment } from 'moment';
+import * as moment from 'moment';
+import { LoadingDialogModel } from '../../../../shared/components';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-dashboard',
@@ -23,8 +29,7 @@ import * as FileSaver from 'file-saver';
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.less']
 })
-export class DashboardComponent implements OnInit {
-
+export class DashboardComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_DASHBOARD_TITLE', '.', true)
     ];
@@ -40,7 +45,7 @@ export class DashboardComponent implements OnInit {
                 DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS,
                 DashboardDashlet.SUSPECT_CASES_REFUSING_TO_BE_TRANSFERRED_TO_A_TREATMENT_UNIT,
                 DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_AMONG_KNOWN_CONTACTS,
-                DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_IN_KNOWN_TRANSMISSION_CHAINS,
+                DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_OUTSIDE_THE_TRANSMISSION_CHAINS,
                 DashboardDashlet.SUSPECT_CASES_WITH_PENDING_LAB_RESULT,
                 DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS
             ]
@@ -80,14 +85,27 @@ export class DashboardComponent implements OnInit {
 
     selectedOutbreak: OutbreakModel;
 
-    allowedExportTypes: ExportDataExtension[] = [
-        ExportDataExtension.PDF
-    ];
+    // flag if there aren't any outbreaks in the system
+    noOutbreaksInSystem: boolean = false;
+
+    // constants
+    ExportDataExtension = ExportDataExtension;
 
     casesByClassificationAndLocationReportUrl: string = '';
     contactsFollowupSuccessRateReportUrl: string = '';
 
+    loadingDialog: LoadingDialogModel;
+
+    // available side filters
+    availableSideFilters: FilterModel[] = [];
+
+    globalFilterDate: Moment;
+    globalFilterLocationId: string;
+
     @ViewChild('kpiSection') private kpiSection: ElementRef;
+
+    // subscribers
+    outbreakSubscriber: Subscription;
 
     constructor(
         private authDataService: AuthDataService,
@@ -95,16 +113,22 @@ export class DashboardComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private domService: DomService,
         private importExportDataService: ImportExportDataService,
-        private i18nService: I18nService
-    ) {
-    }
+        private i18nService: I18nService,
+        private dialogService: DialogService
+    ) {}
 
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.initializeDashlets();
 
-        this.outbreakDataService
+        // get Outbreaks list to check if there are any in the system
+        this.outbreakDataService.getOutbreaksList()
+            .subscribe((outbreaksList) => {
+                this.noOutbreaksInSystem = outbreaksList.length === 0;
+            });
+
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
@@ -113,6 +137,40 @@ export class DashboardComponent implements OnInit {
                     this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
                 }
             });
+
+        // initialize Side Filters
+        this.initializeSideFilters();
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+    }
+
+    /**
+     * Initialize Side Filters
+     */
+    private initializeSideFilters() {
+        // set available side filters
+        this.availableSideFilters = [
+            new FilterModel({
+                fieldName: 'locationId',
+                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
+                type: FilterType.LOCATION,
+                required: true,
+                multipleOptions: false
+            }),
+            new FilterModel({
+                fieldName: 'date',
+                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
+                type: FilterType.DATE,
+                required: true,
+                maxDate: moment()
+            })
+        ];
     }
 
     private initializeDashlets() {
@@ -237,24 +295,17 @@ export class DashboardComponent implements OnInit {
     }
 
     /**
-     * Check if the user has read team permission
-     * @returns {boolean}
-     */
-    hasReadUserPermissions(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_TEAM);
-    }
-
-    /**
      * generate EPI curve report - image will be exported as pdf
      */
     generateEpiCurveReport() {
+        this.showLoadingDialog();
         this.domService
             .getPNGBase64('app-epi-curve-dashlet svg', '#tempCanvas')
             .subscribe((pngBase64) => {
                 this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
                     .subscribe((blob) => {
                         this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
-                });
+                    });
             });
     }
 
@@ -262,6 +313,7 @@ export class DashboardComponent implements OnInit {
      * Generate KPIs report
      */
     generateKpisReport() {
+        this.showLoadingDialog();
         domtoimage.toPng(this.kpiSection.nativeElement)
             .then((dataUrl) => {
                 const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
@@ -269,20 +321,6 @@ export class DashboardComponent implements OnInit {
                 this.importExportDataService.exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
                     .subscribe((blob) => {
                         this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL');
-                    });
-            });
-    }
-
-    /**
-     * generate Gantt chart report - image will be exported as pdf
-     */
-    generateGanttChartReport() {
-        this.domService
-            .getPNGBase64('app-gantt-chart-delay-onset-dashlet svg', '#tempCanvas')
-            .subscribe((pngBase64) => {
-                this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
-                    .subscribe((blob) => {
-                        this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL');
                     });
             });
     }
@@ -302,5 +340,94 @@ export class DashboardComponent implements OnInit {
             blob,
             `${fileName}.${extension}`
         );
+        this.closeLoadingDialog();
+    }
+
+    /**
+     * Apply side filters
+     * @param data
+     */
+    applySideFilters(filters: AppliedFilterModel[]) {
+        // retrieve date & location filters
+        // retrieve location filter
+        const dateFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'date' } });
+        const locationFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'locationId' } });
+
+        // set filters
+        this.globalFilterDate = _.isEmpty(dateFilter.value) ? undefined : moment(dateFilter.value);
+        this.globalFilterLocationId = _.isEmpty(locationFilter.value) ? undefined : locationFilter.value;
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
+    }
+
+    /**
+     * Cases by classification and location qb
+     */
+    qbCaseByClassification(): RequestQueryBuilder {
+        // initialization
+        const qb = new RequestQueryBuilder();
+
+        // date
+        if (this.globalFilterDate) {
+            qb.filter.byDateRange(
+                'dateOfOnset', {
+                    endDate: this.globalFilterDate.endOf('day').format()
+                }
+            );
+        }
+
+        // location
+        if (this.globalFilterLocationId) {
+            qb.filter.byEquality(
+                'addresses.parentLocationIdFilter',
+                this.globalFilterLocationId
+            );
+        }
+
+        // finished
+        return qb;
+    }
+
+    /**
+     * Contacts follow up success rate
+     */
+    qbContactsFollowUpSuccessRate(): RequestQueryBuilder {
+        // initialization
+        const qb = new RequestQueryBuilder();
+
+        // date
+        if (this.globalFilterDate) {
+            qb.filter.byDateRange(
+                'dateOfReporting', {
+                    endDate: this.globalFilterDate.endOf('day').format()
+                }
+            );
+        }
+
+        // location
+        if (this.globalFilterLocationId) {
+            qb.filter.byEquality(
+                'addresses.parentLocationIdFilter',
+                this.globalFilterLocationId
+            );
+        }
+
+        // finished
+        return qb;
     }
 }

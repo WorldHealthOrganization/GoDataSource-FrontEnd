@@ -4,6 +4,7 @@ import { DocumentModel } from './document.model';
 import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
+import * as moment from 'moment';
 
 export class ContactModel {
     id: string;
@@ -21,7 +22,6 @@ export class ContactModel {
     dateOfReporting: string;
     dateOfLastContact: string;
     isDateOfReportingApproximate: boolean;
-    dateDeceased: string;
     outbreakId: string;
     deleted: boolean;
     dateBecomeContact: string;
@@ -40,6 +40,24 @@ export class ContactModel {
     age: AgeModel;
 
     inconsistencies: InconsistencyModel[];
+
+    /**
+     * Return contact id mask with data replaced
+     * @param contactIdMask
+     */
+    static generateContactIDMask(contactIdMask: string): string {
+        // validate
+        if (_.isEmpty(contactIdMask)) {
+            return '';
+        }
+
+        // !!!!!!!!!!!!!!!
+        // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
+        // !!!!!!!!!!!!!!!
+        return contactIdMask
+            .replace(/YYYY/g, moment().format('YYYY'))
+            .replace(/\*/g, '');
+    }
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -69,13 +87,12 @@ export class ContactModel {
         this.riskReason = _.get(data, 'riskReason');
         this.dateOfReporting = _.get(data, 'dateOfReporting');
         this.dateOfLastContact = _.get(data, 'dateOfLastContact');
-        this.dateDeceased = _.get(data, 'dateDeceased');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.deleted = _.get(data, 'deleted');
         this.dateBecomeContact = _.get(data, 'dateBecomeContact');
         this.visualId = _.get(data, 'visualId', '');
 
-        this.followUp = _.get(data, 'followUp');
+        this.followUp = _.get(data, 'followUp', {});
 
         this.inconsistencies = _.get(data, 'inconsistencies', []);
         _.each(this.inconsistencies, (inconsistency, index) => {
@@ -88,8 +105,8 @@ export class ContactModel {
      * @returns {string}
      */
     get name(): string {
-        const firstName = _.get(this, 'firstName', '');
-        const lastName = _.get(this, 'lastName', '');
+        const firstName = this.firstName ? this.firstName : '';
+        const lastName = this.lastName ? this.lastName : '';
         return _.trim(`${firstName} ${lastName}`);
     }
 

@@ -1,33 +1,34 @@
+@import '~styles/common';
+
 app-counted-items-list {
-    .mat-card {
-        border: none !important;
-        box-shadow: none !important;
-        background-color: transparent;
-        padding-top: 0;
-        padding-bottom: 0;
+    margin: 0 15px;
+    padding-top: 15px;
 
-        .mat-chip-list-wrapper {
-            place-content: flex-end;
+    .mat-chip-list-wrapper {
+        place-content: flex-end;
 
-            @margin-left-right: 7px;
-            @margin-top-bottom: 12px;
-            @border-radius: 7px;
-            .mat-chip {
-                margin: @margin-left-right;
+        @margin-left-right: 7px;
+        @margin-top-bottom: 12px;
+        @border-radius: 7px;
+        .mat-chip {
+            margin: 3px 7px !important;
+            border-radius: @border-radius;
+            padding: 0px;
+            cursor: pointer;
+
+            .counted-items-list-count,
+            .counted-items-list-label {
+                padding: @margin-left-right @margin-top-bottom;
                 border-radius: @border-radius;
-                padding: 0px;
-                cursor: pointer;
+            }
 
-                .counted-items-list-count,
-                .counted-items-list-label {
-                    padding: @margin-left-right @margin-top-bottom;
-                    border-radius: @border-radius;
-                }
-
-                .counted-items-list-count {
-                    font-weight: bold;
-                }
+            .counted-items-list-count {
+                font-weight: bold;
             }
         }
+    }
+
+    @media @mobile-devices {
+        padding-top: 0;
     }
 }

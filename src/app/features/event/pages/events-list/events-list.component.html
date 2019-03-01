@@ -5,23 +5,32 @@
 
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
-                    <button *ngIf="hasEventWriteAccess()" class="button-primary" mat-raised-button color="primary"
+                    <button *ngIf="hasEventWriteAccess()" mat-raised-button color="accent"
                             [routerLink]="'./create'">
                         {{'LNG_COMMON_BUTTON_ADD'| translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </ng-container>
 
-                <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
+                <button
+                    *ngIf="!appliedListFilter"
+                    mat-raised-button
+                    color="accent"
+                    [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <button
-                        *ngIf="!appliedListFilter"
                         mat-menu-item
                         [routerLink]="['/events']"
                         [queryParams]="{ applyListFilter: Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS }">
                         {{'LNG_PAGE_LIST_EVENTS_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        (click)="exportFilteredEventsRelationships()">
+                        {{ 'LNG_PAGE_LIST_EVENTS_ACTION_EXPORT_EVENTS_RELATIONSHIPS' | translate }}
                     </button>
                 </mat-menu>
             </div>
@@ -44,16 +53,80 @@
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">
-        <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="resetFiltersToSideFilters()">
             {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
         </button>
-        <button type="button" mat-raised-button (click)="needsRefreshList(true)">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
     </div>
 
     <mat-table #table [dataSource]="eventsList$ | async" matSort (matSortChange)="sortBy($event)">
+        <!-- Checkbox -->
+        <ng-container matColumnDef="checkbox">
+            <mat-header-cell *matHeaderCellDef fxFlex="60px">
+                <div class="table-header-cell">
+                    <div>
+                        <button
+                            type="button"
+                            class="bulk-actions-button"
+                            mat-icon-button
+                            [disableRipple]="true"
+                            [matMenuTriggerFor]="actionsMenuMultipleRecords"
+                            color="accent"
+                            [matTooltip]="'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_TOOLTIP' | translate"
+                            [disabled]="isEmptyList"
+                        >
+                            <span class="xt-icon">arrowDropdownCircle</span>
+                        </button>
 
+                        <mat-menu #actionsMenuMultipleRecords="matMenu">
+                            <button
+                                *ngIf="!checkedAllRecords"
+                                mat-menu-item
+                                (click)="checkAllRecords()">
+                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}
+                            </button>
+                            <button
+                                *ngIf="checkedRecords.length > 0"
+                                mat-menu-item
+                                (click)="uncheckAllRecords()">
+                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
+                            </button>
+
+                            <mat-divider></mat-divider>
+
+                            <button
+                                mat-menu-item
+                                (click)="exportSelectedEventsRelationship()">
+                                {{ 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS_RELATIONSHIPS' | translate }}
+                            </button>
+                        </mat-menu>
+                    </div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item;" fxFlex="60px">
+                <app-form-checkbox
+                    #listCheckedIndividual
+                    [name]="'listCheckedIndividual[' + item.id + ']'"
+                    class="table-checkbox"
+                    ngModel
+                    (optionChanged)="checkedRecord(item.id, $event)"
+                    (afterInitialize)="checkedRecord(item.id, false)">
+                </app-form-checkbox>
+            </mat-cell>
+        </ng-container>
         <!-- Name -->
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
@@ -79,7 +152,7 @@
 
         <!-- Date -->
         <ng-container matColumnDef="date">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_EVENT_FIELD_LABEL_DATE' | translate}}</div>
                     <div class="column-filter">
@@ -92,7 +165,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.date | dateDefault }}
             </mat-cell>
         </ng-container>
@@ -160,58 +233,89 @@
         <!-- Inline Actions -->
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-            <mat-cell *matCellDef="let item" fxFlex="70px">
-                <div>
-                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                        <span class="xt-icon">moreVertical</span>
-                    </button>
 
-                    <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
+            <mat-cell *matCellDef="let item" fxFlex="70px">
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
+
+                    <ng-container *ngIf="!item.deleted">
+                        <button mat-menu-item [routerLink]="['.', item.id, 'view']">
+                            {{ 'LNG_PAGE_LIST_EVENTS_ACTION_VIEW_EVENT' | translate }}
+                        </button>
+
                         <ng-container *app-selected-outbreak-is-active>
-                            <button *ngIf="hasContactWriteAccess() && !item.deleted" mat-menu-item routerLink="/contacts/create"
+                            <ng-container *ngIf="hasEventWriteAccess()">
+                                <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                                    {{'LNG_PAGE_LIST_EVENTS_ACTION_MODIFY_EVENT' | translate}}
+                                </button>
+
+                                <button
+                                    mat-menu-item class="mat-menu-item-delete"
+                                    (click)="deleteEvent(item)">
+                                    {{'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_EVENT' | translate}}
+                                </button>
+                            </ng-container>
+                        </ng-container>
+
+                        <mat-divider></mat-divider>
+
+                        <ng-container *app-selected-outbreak-is-active>
+                            <ng-container *ngIf="hasContactWriteAccess()">
+                                <button
+                                    *ngIf="hasContactWriteAccess()"
+                                    mat-menu-item
+                                    routerLink="/contacts/create"
                                     [queryParams]="{ entityType: EntityType.EVENT, entityId: item.id }">
-                                {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
-                            </button>
+                                    {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
+                                </button>
+
+                                <button
+                                    mat-menu-item
+                                    routerLink="/contacts/create-bulk"
+                                    [queryParams]="{ entityType: EntityType.EVENT, entityId: item.id }">
+                                    {{'LNG_PAGE_ACTION_BULK_ADD_CONTACTS' | translate}}
+                                </button>
+                            </ng-container>
 
                             <mat-divider></mat-divider>
                         </ng-container>
 
-                        <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['/relationships', EntityType.EVENT, item.id]">
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/relationships', EntityType.EVENT, item.id]">
                             {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
                         </button>
+                    </ng-container>
 
-                        <mat-divider></mat-divider>
-
-                        <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'view']">
-                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                    <ng-container *app-selected-outbreak-is-active>
+                        <button
+                            *ngIf="item.deleted && hasEventWriteAccess()"
+                            mat-menu-item class="mat-menu-item-restore"
+                            (click)="restoreEvent(item)">
+                            {{'LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_EVENT' | translate}}
                         </button>
-
-                        <ng-container *app-selected-outbreak-is-active>
-                            <button *ngIf="hasEventWriteAccess() && !item.deleted" mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                                {{'LNG_PAGE_ACTION_MODIFY' | translate}}
-                            </button>
-
-                            <button
-                                *ngIf="hasEventWriteAccess() && !item.deleted"
-                                mat-menu-item class="mat-menu-item-delete"
-                                (click)="deleteEvent(item)">
-                                {{'LNG_PAGE_ACTION_DELETE' | translate}}
-                            </button>
-
-                            <button *ngIf="item.deleted && hasEventWriteAccess()" mat-menu-item class="mat-menu-item-restore"
-                                    (click)="restoreEvent(item)">
-                                {{'LNG_PAGE_ACTION_RESTORE' | translate}}
-                            </button>
-                        </ng-container>
-
-                    </mat-menu>
-                </div>
+                    </ng-container>
+                </mat-menu>
             </mat-cell>
         </ng-container>
 
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
         <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
     </mat-table>
+
+    <div
+        *ngIf="isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
 
     <mat-paginator
         [length]="(eventsListCount$ | async)?.count"

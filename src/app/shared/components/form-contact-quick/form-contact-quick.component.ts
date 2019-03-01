@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, AfterViewInit } from '@angular/core';
+import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, FormControl } from '@angular/forms';
 import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
 import { Observable } from 'rxjs/Observable';
@@ -23,11 +23,18 @@ import { ContactModel } from '../../../core/models/contact.model';
 })
 export class FormContactQuickComponent extends GroupBase<ContactModel> implements OnInit, GroupDirtyFields {
     genderList$: Observable<any[]>;
+    riskLevelsList$: Observable<any[]>;
+    occupationsList$: Observable<any[]>;
+    finalFollowUpStatus$: Observable<any[]>;
 
     currentDate = Constants.getCurrentDate();
 
     // selected outbreak
     selectedOutbreak: OutbreakModel;
+
+    visualIDTranslateData: {
+        mask: string
+    };
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -48,12 +55,20 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
 
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
+        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+        this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+
+                // set visual ID translate data
+                this.visualIDTranslateData = {
+                    mask: ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
+                };
             });
     }
 

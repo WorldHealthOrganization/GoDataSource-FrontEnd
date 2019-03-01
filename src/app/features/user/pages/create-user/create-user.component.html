@@ -96,7 +96,7 @@
                                 [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD' | translate"
                                 tooltip="LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD_DESCRIPTION"
                                 required="true"
-                                app-password-validator
+                                minlength="12"
                                 app-trigger-validation-for="passwordConfirm">
                             </app-form-input>
 
@@ -116,8 +116,8 @@
                     </div>
                 </mat-card>
 
-                <div>
-                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                <div class="stepper-wrapper">
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -129,13 +129,12 @@
 
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
 
-            <div>
-                <button mat-button matStepperPrevious>
+            <div class="stepper-wrapper">
+                <button mat-raised-button type="button" matStepperPrevious>
                     {{'LNG_STEPPER_BUTTON_BACK' | translate}}
                 </button>
                 <button
-                    type="button"
-                    mat-button
+                    type="button" mat-raised-button color="accent"
                     (click)="createNewUser(form)">
                     {{'LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_BUTTON' | translate}}
                 </button>

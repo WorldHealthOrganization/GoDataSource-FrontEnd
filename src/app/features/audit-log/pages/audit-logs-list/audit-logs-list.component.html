@@ -21,10 +21,18 @@
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">
-        <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="resetFiltersToSideFilters()">
             {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
         </button>
-        <button type="button" mat-raised-button (click)="needsRefreshList(true)">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
     </div>
@@ -109,7 +117,7 @@
 
         <!-- Time -->
         <ng-container matColumnDef="createdAt">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
                     <div mat-sort-header class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_CREATED_AT' | translate}}</div>
                     <div class="column-filter">
@@ -123,7 +131,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.createdAt | dateTimeDefault }}
             </mat-cell>
         </ng-container>
@@ -231,6 +239,17 @@
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
         <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
     </mat-table>
+
+    <div
+        *ngIf="isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
 
     <mat-paginator
         [length]="(auditLogsListCount$ | async)?.count"

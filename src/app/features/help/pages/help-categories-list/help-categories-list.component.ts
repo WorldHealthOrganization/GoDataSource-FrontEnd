@@ -16,6 +16,7 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-help-categories-list',
@@ -93,7 +94,8 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
      */
     refreshList() {
         // retrieve the list of Categories
-        this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList(this.queryBuilder);
+        this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList(this.queryBuilder)
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     /**

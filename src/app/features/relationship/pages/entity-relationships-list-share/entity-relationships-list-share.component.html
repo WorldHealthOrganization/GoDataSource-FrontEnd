@@ -30,10 +30,18 @@
                 </div>
                 <!-- Reset Filters -->
                 <div class="reset-filters">
-                    <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
+                    <button
+                        type="button"
+                        mat-raised-button
+                        color="accent"
+                        (click)="resetFiltersToSideFilters()">
                         {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
                     </button>
-                    <button type="button" mat-raised-button (click)="needsRefreshList(true)">
+                    <button
+                        type="button"
+                        mat-raised-button
+                        color="accent"
+                        (click)="needsRefreshList(true)">
                         {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
                     </button>
                 </div>
@@ -45,10 +53,39 @@
                 <ng-container matColumnDef="checkbox">
                     <mat-header-cell *matHeaderCellDef fxFlex="70px">
                         <div class="table-header-cell">
-                            <app-form-checkbox
-                                name="listCheckedAll"
-                                [(ngModel)]="checkedAllRecords">
-                            </app-form-checkbox>
+                            <div>
+                                <button
+                                    type="button"
+                                    class="bulk-actions-button"
+                                    mat-icon-button
+                                    [disableRipple]="true"
+                                    [matMenuTriggerFor]="actionsMenuMultipleRecords"
+                                    color="accent"
+                                    [matTooltip]="'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_TOOLTIP' | translate"
+                                    [disabled]="isEmptyList"
+                                >
+                                    <span class="xt-icon">arrowDropdownCircle</span>
+                                </button>
+
+                                <mat-menu #actionsMenuMultipleRecords="matMenu">
+                                    <button
+                                        *ngIf="!checkedAllRecords"
+                                        mat-menu-item
+                                        (click)="checkAllRecords()">
+                                        {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}
+                                    </button>
+                                    <button
+                                        *ngIf="checkedRecords.length > 0"
+                                        mat-menu-item
+                                        (click)="uncheckAllRecords()">
+                                        {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
+                                    </button>
+                                </mat-menu>
+                            </div>
+
+                            <div class="column-filter">
+                                <!-- placeholder -->
+                            </div>
                         </div>
                     </mat-header-cell>
                     <mat-cell *matCellDef="let item;" fxFlex="70px">
@@ -74,7 +111,7 @@
                                 <app-form-input
                                     name="lastNameFilter"
                                     ngModel
-                                    placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                     (optionChanged)="filterByRelation('people').byTextMultipleProperties(['lastName', 'name'], $event)"
                                     app-reset-input-on-side-filter
                                     [displayFilterIcon]="true">
@@ -104,7 +141,7 @@
                                 <app-form-input
                                     name="firstNameFilter"
                                     ngModel
-                                    placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                     (optionChanged)="filterByRelation('people').byTextMultipleProperties(['firstName', 'name'], $event)"
                                     app-reset-input-on-side-filter
                                     [displayFilterIcon]="true">
@@ -145,7 +182,7 @@
 
                 <!-- Contact Date -->
                 <ng-container matColumnDef="contactDate">
-                    <mat-header-cell *matHeaderCellDef>
+                    <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                         <div class="table-header-cell">
                             <div mat-sort-header class="column-header">
                                 {{'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE' | translate}}
@@ -161,7 +198,7 @@
                         </div>
                     </mat-header-cell>
 
-                    <mat-cell *matCellDef="let item"
+                    <mat-cell class="has-date-range-filter" *matCellDef="let item"
                               [style.color]="getPersonTypeColor(item.relatedEntity(entityId)?.type)">
                         {{ item.contactDate | dateDefault }}
                     </mat-cell>
@@ -178,7 +215,7 @@
                                 <app-form-select
                                     name="certaintyLevelFilter"
                                     ngModel
-                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                     [options]="certaintyLevelList$ | async"
                                     (optionChanged)="filterBySelectField('certaintyLevelId', $event)"
                                     multiple="true"
@@ -336,6 +373,17 @@
                 <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
             </mat-table>
 
+            <div
+                *ngIf="isEmptyList"
+                class="mat-table"
+            >
+                <div class="mat-row">
+                    <div class="mat-cell">
+                        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+                    </div>
+                </div>
+            </div>
+
             <mat-paginator
                 [length]="(relationshipsListCount$ | async)?.count"
                 [pageSize]="pageSize"
@@ -348,9 +396,8 @@
 
     <div class="form-actions">
         <button
-            class="button-primary"
             mat-raised-button
-            color="primary">
+            color="accent">
             {{'LNG_COMMON_BUTTON_ASSIGN_TO' | translate}}
         </button>
         <button type="button" [routerLink]="['/cases', this.entityId, 'view']" mat-raised-button>

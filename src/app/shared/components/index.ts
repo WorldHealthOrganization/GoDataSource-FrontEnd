@@ -26,10 +26,6 @@ import { SideColumnsComponent } from './side-columns/side-columns.component';
 import { FormAgeComponent } from './form-age/form-age.component';
 import { AgeLabelComponent } from './age-label/age-label.component';
 import { FormAgeDobComponent } from './form-age-dob/form-age-dob.component';
-import { FormSubQuestionListComponent } from './form-sub-question-list/form-sub-question-list.component';
-import { FormQuestionListComponent } from './form-question-list/form-question-list.component';
-import { FormSubAnswerListComponent } from './form-sub-answer-list/form-sub-answer-list.component';
-import { FormAnswerListComponent } from './form-answer-list/form-answer-list.component';
 import { C3StackedBarChartComponent } from './c3-stacked-bar-chart/c3-stacked-bar-chart.component';
 import { WorldMapComponent } from './world-map/world-map.component';
 import { WorldMapMovementComponent } from './world-map-movement/world-map-movement.component';
@@ -39,12 +35,35 @@ import { ModifyContactFollowUpQuestionnaireDialogComponent } from './modify-cont
 import { ColorListLegendComponent } from './color-list-legend/color-list-legend.component';
 import { FormContactQuickComponent } from './form-contact-quick/form-contact-quick.component';
 import { TotalNumberOfRecordsComponent } from './total-number-of-records/total-number-of-records.component';
+import { LoadingDialogComponent } from './loading-dialog/loading-dialog.component';
+import { GlobalEntitySearchComponent } from './global-entity-search/global-entity-search.component';
+import { NumberOfItemsLabelComponent } from './number-of-items-label/number-of-items-label.component';
+import { FormCaseCenterDaterangeComponent } from './form-case-center-daterange/form-case-center-daterange.component';
+import { FormCaseCenterDaterangeListComponent } from './form-case-center-daterange-list/form-case-center-daterange-list.component';
+import { ViewCotNodeDialogComponent } from './view-cot-node-dialog/view-cot-node-dialog.component';
+import { ViewCotEdgeDialogComponent } from './view-cot-edge-dialog/view-cot-edge-dialog.component';
+import { ViewHelpDialogComponent } from './view-help-dialog/view-help-dialog.component';
+import { ViewHelpDetailsDialogComponent } from './view-help-details-dialog/view-help-details-dialog.component';
+import { FormModifyQuestionnaireComponent } from './form-modify-questionnaire/form-modify-questionnaire.component';
+import { HoverRowActionsComponent } from './hover-row-actions/hover-row-actions.component';
+import { FormLocationIdentifierListComponent } from './form-location-identifier-list/form-location-identifier-list.component';
+import { FormLocationIdentifierComponent } from './form-location-identifier/form-location-identifier.component';
+import { FormCaseQuickComponent } from './form-case-quick/form-case-quick.component';
+import { FormEventQuickComponent } from './form-event-quick/form-event-quick.component';
+import { FormSelectChangeDetectionPushComponent } from './form-select-change-detection-push/form-select-change-detection-push.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
 export * from './dialog/dialog.component';
 export * from './modify-contact-follow-up-questionnaire-dialog/modify-contact-follow-up-questionnaire-dialog.component';
+export * from './loading-dialog/loading-dialog.component';
 export * from './counted-items-list/counted-items-list.component';
+export * from './view-cot-node-dialog/view-cot-node-dialog.component';
+export * from './view-cot-edge-dialog/view-cot-edge-dialog.component';
+export * from './view-help-dialog/view-help-dialog.component';
+export * from './view-help-details-dialog/view-help-details-dialog.component';
+export * from './form-modify-questionnaire/form-modify-questionnaire.component';
+export * from './hover-row-actions/hover-row-actions.component';
 
 // export the list of all components
 export const components: any[] = [
@@ -56,6 +75,7 @@ export const components: any[] = [
     BreadcrumbsComponent,
     SideFiltersComponent,
     SideColumnsComponent,
+    GlobalEntitySearchComponent,
 
     // dashboard
     DashboardCustomMetricDashletComponent,
@@ -79,17 +99,16 @@ export const components: any[] = [
     FormInputListComponent,
     FormNameUrlListComponent,
     FormLocationDropdownComponent,
+    FormModifyQuestionnaireComponent,
     FormFillQuestionnaireComponent,
     FormAgeComponent,
     FormAgeDobComponent,
     FormRelationshipQuickComponent,
     FormContactQuickComponent,
-
-    // answers/questions
-    FormAnswerListComponent,
-    FormSubAnswerListComponent,
-    FormQuestionListComponent,
-    FormSubQuestionListComponent,
+    FormCaseQuickComponent,
+    FormEventQuickComponent,
+    FormLocationIdentifierListComponent,
+    FormLocationIdentifierComponent,
 
     // display information
     CountedItemsListComponent,
@@ -104,7 +123,19 @@ export const components: any[] = [
     // dialogs
     DialogComponent,
     ModifyContactFollowUpQuestionnaireDialogComponent,
+    LoadingDialogComponent,
+    ViewCotNodeDialogComponent,
+    ViewCotEdgeDialogComponent,
+    ViewHelpDialogComponent,
+    ViewHelpDetailsDialogComponent,
 
     // general
-    ExportButtonComponent
+    ExportButtonComponent,
+    NumberOfItemsLabelComponent,
+    FormCaseCenterDaterangeComponent,
+    FormCaseCenterDaterangeListComponent,
+    FormSelectChangeDetectionPushComponent,
+
+    // layout extensions
+    HoverRowActionsComponent
 ];

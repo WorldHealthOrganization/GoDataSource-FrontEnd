@@ -1,10 +1,11 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import * as _ from 'lodash';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { TileArcGISRest, Vector as VectorSource, Cluster } from 'ol/source';
 import { transform } from 'ol/proj';
+import { Select as InteractionSelect } from 'ol/interaction';
 import Feature from 'ol/Feature';
 import { Point, LineString } from 'ol/geom';
 import { Icon, Style, Text, Fill, Stroke, Circle as CircleStyle } from 'ol/style';
@@ -13,6 +14,7 @@ import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { MapServerModel } from '../../../core/models/map-server.model';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
+import { Subscription } from 'rxjs/Subscription';
 
 export class WorldMapPoint {
     constructor(
@@ -39,6 +41,8 @@ export class WorldMapMarker {
     radius: number = 5;
     color: string = '#000';
     layer: WorldMapMarkerLayer = WorldMapMarkerLayer.OVERLAY;
+    selected: (map: WorldMapComponent, data: WorldMapMarker) => void;
+    data: any;
 
     constructor(data: {
         // required
@@ -50,7 +54,9 @@ export class WorldMapMarker {
         type?: WorldMapMarkerType,
         radius?: number,
         color?: string,
-        layer?: WorldMapMarkerLayer
+        layer?: WorldMapMarkerLayer,
+        selected?: (map: WorldMapComponent, data: WorldMapMarker) => void,
+        data?: any
     }) {
         // assign properties
         Object.assign(
@@ -69,6 +75,11 @@ export class WorldMapPath {
     points: WorldMapPoint[];
     type: WorldMapPathType = WorldMapPathType.LINE;
     color: string = '#000';
+    selected: (map: WorldMapComponent, data: WorldMapPath) => void;
+    lineWidth: number = 3;
+    offsetX: number = 0;
+    offsetY: number = 0;
+    data: any;
 
     constructor(data: {
         // required
@@ -76,7 +87,12 @@ export class WorldMapPath {
 
         // optional
         type?: WorldMapPathType,
-        color?: string
+        color?: string,
+        lineWidth?: number,
+        offsetX?: number,
+        offsetY?: number,
+        selected?: (map: WorldMapComponent, data: WorldMapPath) => void,
+        data?: any
     }) {
         // assign properties
         Object.assign(
@@ -96,12 +112,42 @@ export class WorldMapPath {
     templateUrl: './world-map.component.html',
     styleUrls: ['./world-map.component.less']
 })
-export class WorldMapComponent implements OnInit {
+export class WorldMapComponent implements OnInit, OnDestroy {
     /**
      * Map fill size ( Default w: 100%, h: 400px )
      */
-    @Input() width: string = '100%';
-    @Input() height: string = '400px';
+    private _width: string = '100%';
+    private _height: string = '400px';
+    @Input() set width(width: string) {
+        // set value
+        this._width = width;
+
+        // update map size
+        this.updateMapSize();
+    }
+    get width(): string {
+        return this._width;
+    }
+    @Input() set height(height: string) {
+        // set value
+        this._height = height;
+
+        // update map size
+        this.updateMapSize();
+    }
+    get height(): string {
+        return this._height;
+    }
+
+    /**
+     * Display disclaimer
+     */
+    @Input() displayDisclaimer: boolean = true;
+
+    /**
+     * Display disclaimer content
+     */
+    displayDisclaimerContent: boolean = true;
 
     /**
      * Display spinner instead of map ?
@@ -109,11 +155,15 @@ export class WorldMapComponent implements OnInit {
     private _displayLoading: boolean = false;
     @Input() set displayLoading(displayLoading: boolean) {
         // display loading
+        const needToInitMap: boolean = this._displayLoading && !displayLoading;
         this._displayLoading = displayLoading;
 
         // wait for binding to take effect => ngIf
         setTimeout(() => {
-            this.initializeMap();
+            if (needToInitMap) {
+                this.map = null;
+                this.initializeMap();
+            }
         });
     }
     get displayLoading(): boolean {
@@ -224,12 +274,12 @@ export class WorldMapComponent implements OnInit {
     /**
      * Minimum map zoom level ( >= 1 )
      */
-    @Input() minZoon: number = 2;
+    @Input() minZoom: number = 2;
 
     /**
      * Maximum map zoom level ( >= 1 )
      */
-    @Input() maxZoon: number = 8;
+    @Input() maxZoom: number = 8;
 
     /**
      * Zoom out / in map to fit markers whenever we set markers ?
@@ -261,6 +311,29 @@ export class WorldMapComponent implements OnInit {
      */
     @Input() centerLocationZoom: number = 10;
 
+    // subscribers
+    outbreakSubscriber: Subscription;
+
+    /**
+     * Display / Hide marker labels
+     */
+    private _displayLabels: boolean = true;
+    @Input() set displayLabels(displayLabels: boolean) {
+        // set value
+        this._displayLabels = displayLabels;
+
+        // init map markers
+        this.reinitializeOverlay();
+    }
+    get displayLabels(): boolean {
+        return this._displayLabels;
+    }
+
+    /**
+     * Select map features handler
+     */
+    private _clickSelect: InteractionSelect;
+
     /**
      * Constructor
      */
@@ -273,7 +346,7 @@ export class WorldMapComponent implements OnInit {
      */
     ngOnInit() {
         // subscribe to the Selected Outbreak Subject stream
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 // no outbreak yet ?
@@ -296,6 +369,14 @@ export class WorldMapComponent implements OnInit {
                     });
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
@@ -371,6 +452,11 @@ export class WorldMapComponent implements OnInit {
                 ))
             );
 
+            // keep marker data
+            marker.setProperties({
+                dataForEventListeners: markerData
+            });
+
             // create icons style for marker
             const style: {
                 image?: Icon | CircleStyle,
@@ -399,7 +485,10 @@ export class WorldMapComponent implements OnInit {
             }
 
             // if label provided attach it
-            if (markerData.label) {
+            if (
+                this.displayLabels &&
+                markerData.label
+            ) {
                 style.text = new Text({
                     text: markerData.label,
                     offsetY: -24,
@@ -451,8 +540,9 @@ export class WorldMapComponent implements OnInit {
                     arrow.setStyle(new Style({
                         text: new Text({
                             text: '>',
-                            offsetX: -5,
-                            font: 'bold 30px Roboto',
+                            offsetX: path.offsetX,
+                            offsetY: path.offsetY + 2,
+                            font: 'bold 30px Arial',
                             fill: new Fill({
                                 color: path.color
                             }),
@@ -477,9 +567,14 @@ export class WorldMapComponent implements OnInit {
             featurePath.setStyle(new Style({
                 stroke: new Stroke({
                     color: path.color,
-                    width: 3
+                    width: path.lineWidth
                 })
             }));
+
+            // keep line data
+            featurePath.setProperties({
+                dataForEventListeners: path
+            });
 
             // add path to overlay
             this.mapOverlayLayerSource.addFeature(featurePath);
@@ -489,6 +584,9 @@ export class WorldMapComponent implements OnInit {
         this.markerBounds = this.fitLayer === WorldMapMarkerLayer.CLUSTER ?
             this.mapClusterLayerSource.getExtent() :
             this.mapOverlayLayerSource.getExtent();
+
+        // update map size
+        this.updateMapSize();
     }
 
     /**
@@ -544,8 +642,8 @@ export class WorldMapComponent implements OnInit {
         this.mapView = new View({
             center: [0, 0],
             zoom: 5,
-            minZoom: this.minZoon,
-            maxZoom: this.maxZoon
+            minZoom: this.minZoom,
+            maxZoom: this.maxZoom
         });
 
         // create overlay layer source
@@ -583,6 +681,47 @@ export class WorldMapComponent implements OnInit {
             view: this.mapView
         });
 
+        // EVENTS LISTENERS
+        // create click listener
+        this._clickSelect = new InteractionSelect({
+            multi: true,
+            filter: (feature) => {
+                return feature.getProperties &&
+                    feature.getProperties() &&
+                    feature.getProperties().dataForEventListeners &&
+                    feature.getProperties().dataForEventListeners.selected;
+            }
+        });
+        this._clickSelect.on('select', (data: {
+            deselected: any[],
+            selected: any[],
+            mapBrowserEvent: any
+        }) => {
+            // determine feature with bigger priority
+            let selectFeature: Feature;
+            _.each(data.selected, (feature: Feature | any) => {
+                // line ?
+                if (feature.getProperties().dataForEventListeners instanceof WorldMapPath) {
+                    selectFeature = selectFeature ? selectFeature : feature;
+                } else {
+                    // anything else is more important than  a line
+                    selectFeature = feature;
+                }
+            });
+
+            // trigger select
+            if (selectFeature) {
+                selectFeature.getProperties().dataForEventListeners.selected(
+                    this,
+                    selectFeature.getProperties().dataForEventListeners
+                );
+            }
+        });
+
+        // add events listeners
+        this.map.addInteraction(this._clickSelect);
+        // END OF EVENTS LISTENERS
+
         // initialize map overlay
         this.reinitializeOverlay();
 
@@ -593,6 +732,25 @@ export class WorldMapComponent implements OnInit {
             // center location if we have something to center
             this.refreshMapCenter();
         }
+
+        // update map size
+        this.updateMapSize();
+    }
+
+    /**
+     * Update map size
+     */
+    public updateMapSize() {
+        // check if map was initialized
+        if (_.isEmpty(this.map)) {
+            // finished
+            return;
+        }
+
+        // update map size
+        setTimeout(() => {
+            this.map.updateSize();
+        });
     }
 
     /**
@@ -639,5 +797,20 @@ export class WorldMapComponent implements OnInit {
                 observer.complete();
             }
         });
+    }
+
+    /**
+     * Clear Selected items
+     */
+    clearSelectedItems() {
+        this._clickSelect.getFeatures().clear();
+    }
+
+    /**
+     * Update map size
+     */
+    @HostListener('window:resize')
+    private updateMapSizeOnWindowResize() {
+        this.updateMapSize();
     }
 }

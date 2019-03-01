@@ -17,6 +17,8 @@ import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { tap } from 'rxjs/operators';
+import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 
 @Component({
     selector: 'app-help-items-list',
@@ -46,7 +48,8 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
         private route: ActivatedRoute,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private cacheService: CacheService
     ) {
         super(
             snackbarService
@@ -131,7 +134,8 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
      */
     refreshList() {
         // retrieve the list of items
-        this.helpItemsList$ = this.helpDataService.getHelpItemsCategoryList(this.categoryId, this.queryBuilder);
+        this.helpItemsList$ = this.helpDataService.getHelpItemsCategoryList(this.categoryId, this.queryBuilder)
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     /**
@@ -175,7 +179,11 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
+                            // display success message
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_HELP_ITEMS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                            // remove help items from cache
+                            this.cacheService.remove(CacheKey.HELP_ITEMS);
 
                             // reload data
                             this.needsRefreshList(true);
@@ -202,7 +210,11 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
+                            // display success message
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_SUCCESS_MESSAGE');
+
+                            // remove help items from cache
+                            this.cacheService.remove(CacheKey.HELP_ITEMS);
 
                             // reload data
                             this.needsRefreshList(true);

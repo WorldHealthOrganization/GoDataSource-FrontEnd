@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CanvasGantt, StrGantt, SVGGantt } from 'gantt';
@@ -8,9 +8,12 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { AddressType } from '../../../../core/models/address.model';
 import { WorldMapComponent, WorldMapMarker, WorldMapMarkerLayer, WorldMapPoint } from '../../../../shared/components/world-map/world-map.component';
 import * as _ from 'lodash';
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Subscription } from 'rxjs/Subscription';
+import { TransmissionChainFilters } from '../../components/transmission-chains-filters/transmission-chains-filters.component';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import * as FileSaver from 'file-saver';
 
 @Component({
     selector: 'app-case-count-map',
@@ -18,7 +21,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
     templateUrl: './case-count-map.component.html',
     styleUrls: ['./case-count-map.component.less']
 })
-export class CaseCountMapComponent implements OnInit {
+export class CaseCountMapComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_CASE_COUNT_TITLE', '', true)
     ];
@@ -33,16 +36,24 @@ export class CaseCountMapComponent implements OnInit {
     // constants
     WorldMapMarkerLayer = WorldMapMarkerLayer;
 
+    showSettings: boolean = false;
+    filters: TransmissionChainFilters = new TransmissionChainFilters();
+
     clusterDistance: number = 10;
 
     @ViewChild('worldMap') worldMap: WorldMapComponent;
+
+    // subscribers
+    outbreakSubscriber: Subscription;
 
     /**
      * Constructor
      */
     constructor(
         private caseDataService: CaseDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private dialogService: DialogService,
+        private i18nService: I18nService
     ) {}
 
     /**
@@ -50,7 +61,7 @@ export class CaseCountMapComponent implements OnInit {
      */
     ngOnInit() {
         // subscribe to the Selected Outbreak Subject stream
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
@@ -62,11 +73,41 @@ export class CaseCountMapComponent implements OnInit {
             });
     }
 
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+    }
+
+    /**
+     * Export case count map
+     */
+    exportCaseCountMap() {
+        if (this.worldMap) {
+            const loadingDialog = this.dialogService.showLoadingDialog();
+            this.worldMap
+                .printToBlob()
+                .subscribe((blob) => {
+                    const fileName = this.i18nService.instant('LNG_PAGE_CASE_COUNT_TITLE');
+                    FileSaver.saveAs(
+                        blob,
+                        `${fileName}.png`
+                    );
+                    loadingDialog.close();
+                });
+        }
+    }
+
     /**
      * Reload case data
      */
     reloadCases() {
         if (this.outbreakId) {
+            // hide filters
+            this.showSettings = false;
+
             // display loading
             this.displayLoading = true;
 
@@ -87,6 +128,11 @@ export class CaseCountMapComponent implements OnInit {
                     }
                 }
             });
+
+            // add custom filters
+            if (!_.isEmpty(this.filters)) {
+                this.filters.attachConditionsToRequestQueryBuilder(qb);
+            }
 
             // retrieve cases
             this.caseDataService
@@ -117,21 +163,12 @@ export class CaseCountMapComponent implements OnInit {
     }
 
     /**
-     * Print to blob
+     * Reset Filters
      */
-    printToBlob(): Observable<Blob> {
-        return Observable.create((observer: Subscriber<Blob>) => {
-            if (this.worldMap) {
-                this.worldMap
-                    .printToBlob()
-                    .subscribe((blob) => {
-                        observer.next(blob);
-                        observer.complete();
-                    });
-            } else {
-                observer.next(null);
-                observer.complete();
-            }
+    resetFilters() {
+        this.filters = new TransmissionChainFilters();
+        setTimeout(() => {
+            this.reloadCases();
         });
     }
 }

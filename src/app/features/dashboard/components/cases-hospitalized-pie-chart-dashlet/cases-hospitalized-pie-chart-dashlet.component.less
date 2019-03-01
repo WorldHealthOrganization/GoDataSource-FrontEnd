@@ -3,4 +3,26 @@ app-cases-hospitalized-pie-chart-dashlet {
         font-size: 12px;
     }
 
+    .dashlet-no-data {
+        height: 250px;
+    }
+
+    .dashlet-loading {
+        height: 250px;
+
+        @mat-spinner-width: 32px;
+        @mat-spinner-height: 32px;
+        mat-spinner {
+            display: inline-block;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+            position: absolute;
+            top: ~'calc(50% - 16px)';
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+    }
 }

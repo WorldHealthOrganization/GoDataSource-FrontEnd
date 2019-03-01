@@ -24,6 +24,11 @@ import { BulkAddContactsService } from '../../../../core/services/helper/bulk-ad
 import { SheetCellValidator } from '../../../../core/models/sheet/sheet-cell-validator';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityModel } from '../../../../core/models/entity.model';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { GridSettings } from 'handsontable';
+import { NgModel } from '@angular/forms';
+import { ContactModel } from '../../../../core/models/contact.model';
+import 'rxjs/add/operator/mergeMap';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -32,15 +37,10 @@ import { EntityModel } from '../../../../core/models/entity.model';
     styleUrls: ['./bulk-create-contacts.component.less']
 })
 export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements OnInit {
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
-        new BreadcrumbItemModel('LNG_PAGE_BULK_ADD_CONTACTS_TITLE', '.', true)
-    ];
-
-    // selected outbreak ID
-    outbreakId: string;
+    // selected outbreak
+    selectedOutbreak: OutbreakModel;
     // related entity
     relatedEntityType: EntityType;
     relatedEntityId: string;
@@ -68,6 +68,21 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     Constants = Constants;
     SheetCellType = SheetCellType;
 
+    // error messages
+    errorMessages: {
+        message: string,
+        data: {
+            row: number,
+            columns: string
+        }
+    }[] = [];
+
+    afterChangeCallback: (
+        sheetCore: Handsontable,
+        changes: any[],
+        source: string
+    ) => void;
+
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -77,7 +92,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
         private i18nService: I18nService,
-        private bulkAddContactsService: BulkAddContactsService
+        private bulkAddContactsService: BulkAddContactsService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -110,6 +126,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                     return;
                 }
 
+                this.initBreadcrumbs();
+
                 // retrieve related person information
                 this.retrieveRelatedPerson();
             });
@@ -126,10 +144,30 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 return ErrorObservable.create(err);
             })
             .subscribe((selectedOutbreak: OutbreakModel) => {
-                this.outbreakId = selectedOutbreak.id;
+                this.selectedOutbreak = selectedOutbreak;
 
                 this.retrieveRelatedPerson();
             });
+    }
+
+    /**
+     * Init breadcrumbs
+     */
+    initBreadcrumbs() {
+        if (this.relatedEntityType === EntityType.EVENT) {
+            this.breadcrumbs = [
+                new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
+            ];
+        } else {
+            this.breadcrumbs = [
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
+            ];
+        }
+
+        this.breadcrumbs.push.apply(this.breadcrumbs, [
+            new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
+            new BreadcrumbItemModel('LNG_PAGE_BULK_ADD_CONTACTS_TITLE', '.', true)
+        ]);
     }
 
     /**
@@ -263,10 +301,12 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
      * 'Handsontable' hook before running validation on a cell
      */
     beforeValidateSheet(sheetCore: Handsontable, value: string, row: number, column: number) {
-        if (
-            value === null &&
-            sheetCore.isEmptyRow(row)
-        ) {
+        // determine if row is empty
+        const columnValues: any[] = sheetCore.getDataAtRow(row);
+        columnValues[column] = value;
+
+        // isEmptyRow doesn't work since values is changed after beforeValidateSheet
+        if (_.isEmpty(_.filter(columnValues, (v) => v !== null && v !== ''))) {
             // mark this cell as being on an empty row, so we skip validation for it
             return SheetCellValidator.EMPTY_ROW_CELL_VALUE;
         } else {
@@ -275,17 +315,96 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     }
 
     /**
+     * After removing row
+     */
+    afterRemoveRow(sheetCore: Handsontable, row: number) {
+        // determine if row is empty
+        const countedRows: number = sheetCore.countRows();
+        while (row < countedRows) {
+            // validate row
+            if (_.isEmpty(_.filter(sheetCore.getDataAtRow(row), (v) => v !== null && v !== ''))) {
+                _.each(
+                    sheetCore.getCellMetaAtRow(row),
+                    (column: {
+                        valid?: boolean
+                    }) => {
+                        if (column.valid === false) {
+                            column.valid = true;
+                        }
+                    }
+                );
+            }
+
+            // check next row
+            row++;
+        }
+    }
+
+    /**
+     * After changes
+     */
+    afterChange(
+        inputForMakingFormDirty: NgModel
+    ): (
+        sheetCore: Handsontable,
+        changes: any[],
+        source: string
+    ) => void {
+        // return cached function
+        if (this.afterChangeCallback) {
+            return this.afterChangeCallback;
+        }
+
+        // create functions
+        this.afterChangeCallback = (
+            sheetCore: Handsontable,
+            changes: any[],
+            source: string
+        ) => {
+            if (source === 'edit') {
+                // remove validations
+                const row: number = changes[0][0];
+                if (_.isEmpty(_.filter(sheetCore.getDataAtRow(row), (v) => v !== null && v !== ''))) {
+                    // remove validations
+                    _.each(
+                        sheetCore.getCellMetaAtRow(row),
+                        (column: {
+                            valid?: boolean
+                        }) => {
+                            if (column.valid === false) {
+                                column.valid = true;
+                            }
+                        }
+                    );
+
+                    // refresh
+                    sheetCore.render();
+                }
+
+                // make form dirty
+                if (!sheetCore.isEmptyRow(row)) {
+                    inputForMakingFormDirty.control.markAsDirty();
+                }
+            }
+        };
+
+        // return newly created function
+        return this.afterChangeCallback;
+    }
+
+    /**
      * Retrieve information of related person (Case or Event)
      */
     private retrieveRelatedPerson() {
         if (
-            this.outbreakId &&
+            this.selectedOutbreak &&
+            this.selectedOutbreak.id &&
             this.relatedEntityType &&
             this.relatedEntityId
         ) {
             // retrieve related person information
             this.entityDataService
-                .getEntity(this.relatedEntityType, this.outbreakId, this.relatedEntityId)
+                .getEntity(this.relatedEntityType, this.selectedOutbreak.id, this.relatedEntityId)
                 .catch((err) => {
                     // show error message
                     this.snackbarService.showError(err.message);
@@ -344,29 +463,93 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         const sheetCore: Handsontable = sheetTable.hotInstance;
 
         // validate sheet
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.bulkAddContactsService
             .validateTable(sheetCore)
-            .subscribe((isValid) => {
-                if (!isValid) {
+            .subscribe((response) => {
+                // we can't continue if we have errors
+                if (!response.isValid) {
+                    // map error messages if any?
+                    this.errorMessages = _.map(
+                        response.invalidColumns,
+                        (columns: GridSettings[], row: number) => {
+                            // initialize
+                            const data: {
+                                row: number,
+                                columns: string
+                            } = {
+                                row: _.parseInt(row) + 1,
+                                columns: ''
+                            };
+
+                            // merge columns into just one error message
+                            _.each(
+                                columns,
+                                (column: GridSettings) => {
+                                    data.columns += `${data.columns.length < 1 ? '' : ', '}${column.title}`;
+                                }
+                            );
+
+                            // finished
+                            return {
+                                message: 'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_ERROR_MSG',
+                                data: data
+                            };
+                        }
+                    );
+
                     // show error
+                    loadingDialog.close();
                     this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_INVALID_FIELDS');
                 } else {
                     // collect data from table
                     this.bulkAddContactsService.getData(sheetCore, this.sheetColumns)
-                        .subscribe((data) => {
-                            // create contacts
-                            this.contactDataService.bulkAddContacts(this.outbreakId, this.relatedEntityId, data)
-                                .catch((err) => {
-                                    this.snackbarService.showError(err.message);
+                        .mergeMap((data) => {
+                            // get Contact mask configured on outbreak
+                            const contactMask = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);
 
-                                    return ErrorObservable.create(err);
-                                })
-                                .subscribe(() => {
-                                    this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
+                            return this.contactDataService.checkContactVisualIDValidity(
+                                this.selectedOutbreak.id,
+                                contactMask,
+                                contactMask
+                            )
+                                .map((isValid) => {
+                                    if (isValid === true) {
+                                        // add mask on all contacts
+                                        data = data.map((contactEntry) => {
+                                            contactEntry.contact.visualId = contactMask;
+                                            return contactEntry;
+                                        });
+                                    } else {
+                                        // do nothing; the mask will be omitted and the contacts will be created without a visual ID
+                                    }
 
-                                    // navigate to listing page
-                                    this.router.navigate(['/' + EntityModel.getLinkForEntityType(this.relatedEntityType), this.relatedEntityId, 'view']);
+                                    return data;
                                 });
+                        })
+                        .subscribe((data) => {
+                            // no data to save ?
+                            if (_.isEmpty(data)) {
+                                // show error
+                                loadingDialog.close();
+                                this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_NO_DATA');
+                            } else {
+                                // create contacts
+                                this.contactDataService.bulkAddContacts(this.selectedOutbreak.id, this.relatedEntityType, this.relatedEntityId, data)
+                                    .catch((err) => {
+                                        loadingDialog.close();
+                                        this.snackbarService.showError(err.message);
+                                        return ErrorObservable.create(err);
+                                    })
+                                    .subscribe(() => {
+                                        this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
+
+                                        // navigate to listing page
+                                        this.disableDirtyConfirm();
+                                        loadingDialog.close();
+                                        this.router.navigate(['/' + EntityModel.getLinkForEntityType(this.relatedEntityType), this.relatedEntityId, 'view']);
+                                    });
+                            }
                         });
                 }
             });

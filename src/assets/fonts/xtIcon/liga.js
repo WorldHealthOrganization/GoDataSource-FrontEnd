@@ -25,6 +25,9 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'info': '&#xe923;',
+            'supervisor': '&#xe920;',
+            'arrowDropdownCircle': '&#xe91f;',
             'visibilityOf': '&#xe91d;',
             'visibility': '&#xe91e;',
             'swapVertical': '&#xe91c;',
@@ -56,6 +59,10 @@
             'add': '&#xe909;',
             'menu': '&#xe90a;',
             'home': '&#xe901;',
+            'lab': '&#xe9aa;',
+            'arrowAUp': '&#xe921;',
+            'arrowADown': '&#xe922;',
+            'arrowAUp': '&#xe921;',
           '0': 0
         };
         delete icons['0'];

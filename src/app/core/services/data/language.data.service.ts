@@ -5,6 +5,7 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { LanguageModel, LanguageTokenModel } from '../../models/language.model';
 import { CacheKey, CacheService } from '../helper/cache.service';
 import 'rxjs/add/operator/share';
+import 'rxjs/add/observable/of';
 import * as _ from 'lodash';
 import { localLanguages } from '../../../i18n';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
@@ -96,7 +97,7 @@ export class LanguageDataService {
             const localLanguageTokens = _.get(this.getLocalLanguageTokens(), lang.id, []);
 
             // merge local tokens with the tokens received from server
-            tokens = [...localLanguageTokens as any[], ...tokens];
+            tokens = [...tokens, ...localLanguageTokens as any[]];
 
             return tokens;
         });
@@ -124,10 +125,13 @@ export class LanguageDataService {
      * Modify Language
      * @param {string} languageId
      * @param languageData
-     * @returns {Observable<any>}
+     * @returns {Observable<LanguageModel>}
      */
-    modifyLanguage(languageId: string, languageData): Observable<any> {
-        return this.http.put(`languages/${languageId}`, languageData);
+    modifyLanguage(languageId: string, languageData): Observable<LanguageModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`languages/${languageId}`, languageData),
+            LanguageModel
+        );
     }
 }
 

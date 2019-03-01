@@ -7,7 +7,7 @@
         fxLayout="row">
         <div
             *ngIf="startDateVisible"
-            fxFlex>
+            fxFlex fxLayout="row">
                 <app-form-datepicker
                     [name]="name + '[startDate]'"
                     [(ngModel)]="dateRange.startDate"
@@ -17,7 +17,9 @@
                     [required]="required"
                     (optionChanged)="onChange()"
                     app-date-validator
-                    [dateSameOrBefore]="endDateVisible ? name + '[endDate]' : []">
+                    [dateSameOrBefore]="endDateVisible ? name + '[endDate]' : []"
+                    [dateSameOrAfter]="minDate"
+                    [minDate]="minDate">
                 </app-form-datepicker>
         </div>
 
@@ -31,7 +33,7 @@
 
         <div
             *ngIf="endDateVisible"
-            fxFlex>
+            fxFlex fxLayout="row">
             <app-form-datepicker
                 [name]="name + '[endDate]'"
                 [(ngModel)]="dateRange.endDate"
@@ -41,7 +43,9 @@
                 [required]="required"
                 (optionChanged)="onChange()"
                 app-date-validator
-                [dateSameOrAfter]="startDateVisible ? name + '[startDate]' : []">
+                [dateSameOrAfter]="startDateVisible ? name + '[startDate]' : []"
+                [dateSameOrAfter]="minDate"
+                [minDate]="minDate">
             </app-form-datepicker>
         </div>
     </form>

@@ -10,6 +10,8 @@ import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
+import 'rxjs/add/operator/switchMap';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-create-help-category',
@@ -31,7 +33,8 @@ export class CreateHelpCategoryComponent extends ConfirmOnFormChanges {
         private helpDataService: HelpDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -49,22 +52,33 @@ export class CreateHelpCategoryComponent extends ConfirmOnFormChanges {
             !_.isEmpty(dirtyFields)
         ) {
             // add the new category
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.helpDataService
                 .createHelpCategory(dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showApiError(err);
-
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .switchMap((newCategory) => {
+                    // update language tokens to get the translation of name and description
+                    return this.i18nService.loadUserLanguage()
+                        .catch((err) => {
+                            this.snackbarService.showApiError(err);
+                            loadingDialog.close();
+                            return ErrorObservable.create(err);
+                        })
+                        .map(() => newCategory);
+                })
+                .subscribe((newCategory) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_HELP_CATEGORY_ACTION_CREATE_HELP_CATEGORY_SUCCESS_MESSAGE');
 
-                    // navigate to listing page
+                    // hide dialog
+                    loadingDialog.close();
+
+                    // navigate to new category's modify page
                     this.disableDirtyConfirm();
-                    // update language tokens to get the translation of name and description
-                    this.i18nService.loadUserLanguage().subscribe();
-                    // navigate to categories list
-                    this.router.navigate(['/help/categories']);
+                    this.router.navigate([`/help/categories/${newCategory.id}/modify`]);
                 });
         }
     }

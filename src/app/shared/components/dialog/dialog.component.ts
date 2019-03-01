@@ -1,10 +1,12 @@
 import { Component, Inject, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
-
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { NgForm } from '@angular/forms';
 import { Constants } from '../../../core/models/constants';
+import * as moment from 'moment';
+import { Moment } from 'moment';
+import { Observable } from 'rxjs/Observable';
 
 export enum DialogAnswerButton {
     Yes = 'Yes',
@@ -63,7 +65,9 @@ export enum DialogFieldType {
     TEXT = 'text',
     DATE_RANGE = 'date-range',
     DATE = 'date',
-    BOOLEAN = 'boolean'
+    BOOLEAN = 'boolean',
+    LINK = 'link',
+    URL = 'url'
 }
 
 export class DialogField {
@@ -76,9 +80,22 @@ export class DialogField {
     public type: string = 'text';
     public requiredOneOfTwo: string;
     public value: any;
+    public visible: boolean | ((dialogFieldsValues: any) => boolean) = true;
     public disabled: boolean = false;
     public description: string;
     public fieldType: DialogFieldType = DialogFieldType.TEXT;
+
+    // links
+    public routerLink: string | string[];
+    public queryParams: {
+        [key: string]: any
+    };
+    public linkTarget: string;
+
+    // url
+    urlAsyncValidator: (url: string) => Observable<boolean>;
+    urlAsyncErrorMsg: string;
+    urlAsyncErrorMsgData: any;
 
     constructor(data: {
         name: string,
@@ -90,9 +107,22 @@ export class DialogField {
         type?: string,
         requiredOneOfTwo?: string,
         value?: any,
+        visible?: boolean | ((dialogFieldsValues: any) => boolean),
         disabled?: boolean,
         description?: string,
-        fieldType?: DialogFieldType
+        fieldType?: DialogFieldType,
+
+        // link
+        routerLink?: string | string[],
+        queryParams?: {
+            [key: string]: any
+        },
+        linkTarget?: string,
+
+        // url
+        urlAsyncValidator?: (url: string) => Observable<boolean>,
+        urlAsyncErrorMsg?: string,
+        urlAsyncErrorMsgData?: any
     }) {
         // set properties
         Object.assign(
@@ -104,6 +134,16 @@ export class DialogField {
         if (this.inputOptions !== undefined) {
             this.fieldType = DialogFieldType.SELECT;
         }
+    }
+
+    /**
+     * Check if dialog field is visible
+     * @returns {boolean|((dialogFieldsValues:any)=>boolean)}
+     */
+    public isVisible(dialogFieldsValues: any): boolean {
+        return _.isFunction(this.visible) ?
+            (this.visible as any)(dialogFieldsValues) :
+            this.visible;
     }
 }
 
@@ -119,7 +159,6 @@ export class DialogConfiguration {
     public customInputOptions: LabelValuePair[];
     public customInputOptionsMultiple: boolean = false;
     public required: boolean = false;
-    public data: LabelValuePair[];
     public fieldsList: DialogField[];
     public buttons: DialogButton[];
     public addDefaultButtons: boolean = false;
@@ -134,7 +173,6 @@ export class DialogConfiguration {
         customInputOptions?: LabelValuePair[],
         customInputOptionsMultiple?: boolean,
         required?: boolean,
-        data?: LabelValuePair[],
         fieldsList?: DialogField[],
         buttons?: DialogButton[],
         addDefaultButtons?: boolean,
@@ -284,4 +322,15 @@ export class DialogComponent {
         dialogHandler.close(new DialogAnswer(DialogAnswerButton.Yes, dialogAnswerClone));
     }
 
+    /**
+     * Set date value
+     * @param fieldName
+     * @param value
+     */
+    setDateValue(
+        fieldName: string,
+        value: Moment
+    ) {
+        this.dialogAnswerInputValue.value[fieldName] = value ? moment(value).toISOString() : value;
+    }
 }

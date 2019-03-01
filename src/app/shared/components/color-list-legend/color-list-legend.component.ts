@@ -12,8 +12,8 @@ import { LegendDot } from '../../../core/models/legend-dot.model';
     styleUrls: ['./color-list-legend.component.less']
 })
 export class ColorListLegendComponent implements OnInit {
-
     @Input() referenceDataCategory;
+    @Input() title: string;
 
     optionsList$: Observable<any[]>;
 
@@ -21,8 +21,7 @@ export class ColorListLegendComponent implements OnInit {
 
     constructor(
         private referenceDataDataService: ReferenceDataDataService
-    ) {
-    }
+    ) {}
 
     ngOnInit() {
         this.getDots();

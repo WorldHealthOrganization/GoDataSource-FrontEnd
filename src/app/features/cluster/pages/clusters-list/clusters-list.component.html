@@ -5,7 +5,7 @@
 
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
-                    <button *ngIf="hasOutbreakWriteAccess()" class="button-primary" mat-raised-button color="primary"
+                    <button *ngIf="hasOutbreakWriteAccess()" mat-raised-button color="accent"
                             [routerLink]="'./create'">
                         {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                     </button>
@@ -23,10 +23,18 @@
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">
-        <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="resetFiltersToSideFilters()">
             {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
         </button>
-        <button type="button" mat-raised-button (click)="needsRefreshList(true)">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
     </div>
@@ -42,7 +50,7 @@
                         <app-form-input
                             name="nameFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('name', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
@@ -65,7 +73,7 @@
                         <app-form-input
                             name="descriptionFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('description', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
@@ -90,7 +98,7 @@
                 <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
 
                     <button mat-menu-item [routerLink]="['.', item.id, 'view']">
-                        {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                        {{ 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_CLUSTER' | translate }}
                     </button>
 
                     <button *ngIf="hasCaseReadAccess() || hasContactReadAccess()"
@@ -100,12 +108,12 @@
 
                     <ng-container *app-selected-outbreak-is-active>
                         <button *ngIf="hasOutbreakWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                            {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
+                            {{ 'LNG_PAGE_LIST_CLUSTERS_ACTION_MODIFY_CLUSTER' | translate }}
                         </button>
 
                         <button *ngIf="hasOutbreakWriteAccess()" mat-menu-item class="mat-menu-item-delete"
                                 (click)="deleteCluster(item)">
-                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                            {{ 'LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_CLUSTER' | translate }}
                         </button>
                     </ng-container>
                 </mat-menu>
@@ -115,6 +123,17 @@
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
         <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
     </mat-table>
+
+    <div
+        *ngIf="isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
 
     <mat-paginator
         [length]="(clustersListCount$ | async)?.count"

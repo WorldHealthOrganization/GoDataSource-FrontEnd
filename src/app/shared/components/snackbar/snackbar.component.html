@@ -1,3 +1,10 @@
-<div class="snackbar {{theme}}">
+<div
+    *ngIf="!html"
+    class="snackbar {{theme}}">
     {{message}}
 </div>
+
+<div
+    *ngIf="html"
+    class="snackbar {{theme}}"
+    [innerHTML]="message"></div>

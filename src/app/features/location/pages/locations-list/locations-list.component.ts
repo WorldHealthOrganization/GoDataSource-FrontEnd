@@ -7,11 +7,11 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { Observable } from 'rxjs/Observable';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, LoadingDialogModel } from '../../../../shared/components';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -20,6 +20,11 @@ import { ErrorCodes } from '../../../../core/enums/error-codes.enum';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { FormLocationDropdownComponent, LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
+import { tap } from 'rxjs/operators';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { RequestFilter } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-locations-list',
@@ -36,25 +41,30 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         )
     ];
 
+    // constants
+    ExportDataExtension = ExportDataExtension;
+
     // parent location ID
     parentId: string;
 
     // list of existing locations
-    locationsList: LocationModel[];
+    locationsList$: Observable<LocationModel[]>;
     locationsListCount$: Observable<any>;
 
     yesNoOptionsList$: Observable<any[]>;
 
     // authenticated user
     authUser: UserModel;
+    UserSettings = UserSettings;
 
     @ViewChild('locationFilter') locationFilter: FormLocationDropdownComponent;
 
     // export
     hierarchicalLocationsDataExportFileName: string = moment().format('YYYY-MM-DD');
-    allowedExportTypes: ExportDataExtension[] = [
-        ExportDataExtension.JSON
-    ];
+
+    loadingDialog: LoadingDialogModel;
+
+    geographicalLevelsList$: Observable<any[]>;
 
     constructor(
         private authDataService: AuthDataService,
@@ -64,7 +74,8 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         private dialogService: DialogService,
         protected snackbarService: SnackbarService,
         private router: Router,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(
             snackbarService
@@ -81,6 +92,9 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         // lists
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
+        // geographical level list
+        this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
+
         // reload data
         this.route.params
             .subscribe((params: { parentId }) => {
@@ -92,17 +106,59 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                 // ...and re-load the list when parent location is changed
                 this.needsRefreshList(true);
             });
+
+        // initialize side table columns
+        this.initializeSideTableColumns();
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'name',
+                label: 'LNG_LOCATION_FIELD_LABEL_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'synonyms',
+                label: 'LNG_LOCATION_FIELD_LABEL_SYNONYMS'
+            }),
+            new VisibleColumnModel({
+                field: 'identifiers',
+                label: 'LNG_LOCATION_FIELD_LABEL_IDENTIFIERS'
+            }),
+            new VisibleColumnModel({
+                field: 'latLng',
+                label: 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION'
+            }),
+            new VisibleColumnModel({
+                field: 'active',
+                label: 'LNG_LOCATION_FIELD_LABEL_ACTIVE'
+            }),
+            new VisibleColumnModel({
+                field: 'populationDensity',
+                label: 'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY'
+            }),
+            new VisibleColumnModel({
+                field: 'geographicalLevelId',
+                label: 'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL'
+            }),
+            new VisibleColumnModel({
+                field: 'actions',
+                required: true,
+                excludeFromSave: true
+            })
+        ];
     }
 
     /**
      * Re(load) the list of Locations
      */
     refreshList() {
-        // retrieve the list of Locations
-        this.locationsList = null;
-        this.locationDataService.getLocationsListByParent(this.parentId, this.queryBuilder).subscribe((locationsList) => {
-            this.locationsList = locationsList;
-        });
+        this.locationsList$ = this.locationDataService.getLocationsListByParent(this.parentId, this.queryBuilder)
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     /**
@@ -113,25 +169,6 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         this.locationsListCount$ = this.locationDataService.getLocationsCountByParent(this.parentId, countQueryBuilder).share();
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        // default columns that we should display
-        const columns = [
-            'name',
-            'synonyms',
-            'latLng',
-            'active',
-            'populationDensity',
-            'actions'
-        ];
-
-        // finished
-        return columns;
     }
 
     /**
@@ -201,5 +238,45 @@ export class LocationsListComponent extends ListComponent implements OnInit {
             this.locationFilter.clear();
             this.router.navigate(['/locations', data.id, 'children']);
         }
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
+    }
+
+    filterByIdentifierCode(value: string) {
+        // remove previous condition
+        this.queryBuilder.filter.remove('identifiers');
+
+        if (!_.isEmpty(value)) {
+            // add new condition
+            this.queryBuilder.filter.where({
+                identifiers: {
+                    elemMatch: {
+                        code: {
+                            $regex: RequestFilter.escapeStringForRegex(value)
+                                    .replace(/%/g, '.*')
+                                    .replace(/\\\?/g, '.'),
+                            $options: 'i'
+                        }
+                    }
+                }
+            });
+        }
+
+        // refresh list
+        this.needsRefreshList();
     }
 }

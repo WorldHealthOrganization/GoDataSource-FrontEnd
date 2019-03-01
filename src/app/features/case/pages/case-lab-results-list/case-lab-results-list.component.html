@@ -5,7 +5,7 @@
 
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
-                    <button class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                    <button mat-raised-button color="accent" [routerLink]="'./create'">
                         {{'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_ADD_LAB_RESULT' | translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </ng-container>
@@ -34,10 +34,18 @@
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">
-        <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="resetFiltersToSideFilters()">
             {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
         </button>
-        <button type="button" mat-raised-button (click)="needsRefreshList(true)">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
     </div>
@@ -68,7 +76,7 @@
 
         <!-- Date sample taken -->
         <ng-container matColumnDef="dateSampleTaken">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN' | translate }}</div>
                     <div class="column-filter">
@@ -82,14 +90,14 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.dateSampleTaken | dateDefault }}
             </mat-cell>
         </ng-container>
 
         <!-- Date sample delivered to lab -->
         <ng-container matColumnDef="dateSampleDelivered">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED' | translate}}</div>
                     <div class="column-filter">
@@ -103,14 +111,14 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.dateSampleDelivered | dateDefault }}
             </mat-cell>
         </ng-container>
 
         <!-- Date of the result -->
         <ng-container matColumnDef="dateOfResult">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT' | translate }}</div>
                     <div class="column-filter">
@@ -124,7 +132,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.dateOfResult | dateDefault}}
             </mat-cell>
         </ng-container>
@@ -138,7 +146,7 @@
                         <app-form-select
                             name="labNameFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="labNamesList$ | async"
                             (optionChanged)="filterBySelectField('labName', $event)"
                             multiple="true"
@@ -167,7 +175,7 @@
                         <app-form-select
                             name="sampleTypeFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="sampleTypesList$ | async"
                             (optionChanged)="filterBySelectField('sampleType', $event)"
                             multiple="true"
@@ -196,7 +204,7 @@
                         <app-form-select
                             name="testTypeFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="testTypesList$ | async"
                             (optionChanged)="filterBySelectField('testType', $event)"
                             multiple="true"
@@ -225,7 +233,7 @@
                         <app-form-select
                             name="resultFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="labTestResultsList$ | async"
                             (optionChanged)="filterBySelectField('result', $event)"
                             multiple="true"
@@ -285,25 +293,25 @@
                         <button *ngIf="caseId && !item.deleted"
                                 mat-menu-item
                                 [routerLink]="['/cases', caseId, 'lab-results', item.id, 'view' ]">
-                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                            {{ 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_VIEW_LAB_RESULT' | translate }}
                         </button>
 
                         <ng-container *app-selected-outbreak-is-active>
                             <button *ngIf="caseId && !item.deleted"
                                     mat-menu-item
                                     [routerLink]="['/cases', caseId, 'lab-results', item.id, 'modify' ]">
-                                {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
+                                {{ 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT' | translate }}
                             </button>
                             <button *ngIf="!item.deleted"
                                     mat-menu-item class="mat-menu-item-delete"
                                     (click)="deleteLabResult(item)">
-                                {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                                {{ 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_LAB_RESULT' | translate }}
                             </button>
 
                             <button *ngIf="item.deleted"
                                     mat-menu-item class="mat-menu-item-restore"
                                     (click)="restoreLabResult(item)">
-                                {{ 'LNG_PAGE_ACTION_RESTORE' | translate}}
+                                {{ 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT' | translate}}
                             </button>
                         </ng-container>
 
@@ -315,6 +323,17 @@
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
         <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
     </mat-table>
+
+    <div
+        *ngIf="isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
 
     <mat-paginator
         [length]="(labResultsListCount$ | async)?.count"

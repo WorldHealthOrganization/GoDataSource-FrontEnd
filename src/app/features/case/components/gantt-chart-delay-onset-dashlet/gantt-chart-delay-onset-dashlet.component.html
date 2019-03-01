@@ -1,0 +1,54 @@
+<!-- Chart -->
+<ng-container
+    *ngIf="!displayLoading && ganttData[0]?.children?.length">
+    <div
+        fxLayout="column" fxFlex fxLayoutAlign="center"
+        class="has-data-wait-for-bind">
+        <div id="gantt-svg-root"></div>
+
+        <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px">
+            <button
+                mat-raised-button
+                *ngIf="viewType !== Constants.GANTT_CHART_VIEW_TYPE.MONTH.value"
+                (click)="changeView(Constants.GANTT_CHART_VIEW_TYPE.MONTH.value)">
+                {{Constants.GANTT_CHART_VIEW_TYPE.MONTH.label | translate}}
+            </button>
+            <button
+                mat-raised-button
+                *ngIf="viewType !== Constants.GANTT_CHART_VIEW_TYPE.WEEK.value"
+                (click)="changeView(Constants.GANTT_CHART_VIEW_TYPE.WEEK.value)">
+                {{Constants.GANTT_CHART_VIEW_TYPE.WEEK.label | translate}}
+            </button>
+            <button
+                mat-raised-button
+                *ngIf="viewType !== Constants.GANTT_CHART_VIEW_TYPE.DAY.value"
+                (click)="changeView(Constants.GANTT_CHART_VIEW_TYPE.DAY.value)">
+                {{Constants.GANTT_CHART_VIEW_TYPE.DAY.label | translate}}
+            </button>
+        </div>
+
+        <div
+            *ngIf="!loading && !ganttData[0]?.children?.length">
+            {{ '' | translate }}
+        </div>
+    </div>
+</ng-container>
+
+<!-- No data -->
+<ng-container
+    *ngIf="!displayLoading && !ganttData[0]?.children?.length">
+    <div
+        fxFlex fxLayout="column" fxFlexAlign="center"
+        class="dashlet-no-data">
+        <div fxFlex>
+            {{ 'LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL' | translate }}
+        </div>
+    </div>
+</ng-container>
+
+<!-- Loading data -->
+<div
+    *ngIf="displayLoading"
+    class="dashlet-loading">
+    <mat-spinner></mat-spinner>
+</div>

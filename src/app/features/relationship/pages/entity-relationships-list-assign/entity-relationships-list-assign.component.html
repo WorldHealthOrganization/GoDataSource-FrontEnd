@@ -30,11 +30,19 @@
                 </div>
                 <!--Reset Filters-->
                 <div class="reset-filters">
-                    <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
+                    <button
+                        type="button"
+                        mat-raised-button
+                        color="accent"
+                        (click)="resetFiltersToSideFilters()">
                         {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
                     </button>
 
-                    <button type="button" mat-raised-button (click)="needsRefreshList(true)">
+                    <button
+                        type="button"
+                        mat-raised-button
+                        color="accent"
+                        (click)="needsRefreshList(true)">
                         {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
                     </button>
                 </div>
@@ -46,10 +54,39 @@
                 <ng-container matColumnDef="checkbox">
                     <mat-header-cell *matHeaderCellDef fxFlex="70px">
                         <div class="table-header-cell">
-                            <app-form-checkbox
-                                name="listCheckedAll"
-                                [(ngModel)]="checkedAllRecords">
-                            </app-form-checkbox>
+                            <div>
+                                <button
+                                    type="button"
+                                    class="bulk-actions-button"
+                                    mat-icon-button
+                                    [disableRipple]="true"
+                                    [matMenuTriggerFor]="actionsMenuMultipleRecords"
+                                    color="accent"
+                                    [matTooltip]="'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_TOOLTIP' | translate"
+                                    [disabled]="isEmptyList"
+                                >
+                                    <span class="xt-icon">arrowDropdownCircle</span>
+                                </button>
+
+                                <mat-menu #actionsMenuMultipleRecords="matMenu">
+                                    <button
+                                        *ngIf="!checkedAllRecords"
+                                        mat-menu-item
+                                        (click)="checkAllRecords()">
+                                        {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}
+                                    </button>
+                                    <button
+                                        *ngIf="checkedRecords.length > 0"
+                                        mat-menu-item
+                                        (click)="uncheckAllRecords()">
+                                        {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
+                                    </button>
+                                </mat-menu>
+                            </div>
+
+                            <div class="column-filter">
+                                <!-- placeholder -->
+                            </div>
                         </div>
                     </mat-header-cell>
                     <mat-cell *matCellDef="let item;" fxFlex="70px">
@@ -75,7 +112,7 @@
                                 <app-form-input
                                     name="lastNameFilter"
                                     ngModel
-                                    placeholder="Filter"
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                     (optionChanged)="filterByTextField('lastName', $event)"
                                     [displayFilterIcon]="true">
                                 </app-form-input>
@@ -99,7 +136,7 @@
                                 <app-form-input
                                     name="firstNameFilter"
                                     ngModel
-                                    placeholder="Filter"
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                     (optionChanged)="filterByTextField(['firstName', 'name'], $event)"
                                     [displayFilterIcon]="true">
                                 </app-form-input>
@@ -149,7 +186,7 @@
                                 <app-form-select
                                     name="genderFilter"
                                     ngModel
-                                    placeholder="Filter"
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                     [options]="genderList$ | async"
                                     (optionChanged)="filterBySelectField('gender', $event)"
                                     multiple="true"
@@ -177,7 +214,7 @@
                                 <app-form-select
                                     name="riskLevelFilter"
                                     ngModel
-                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                     [options]="riskLevelsList$ | async"
                                     (optionChanged)="filterBySelectField('riskLevel', $event)"
                                     multiple="true"
@@ -286,6 +323,17 @@
                 <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
             </mat-table>
 
+            <div
+                *ngIf="isEmptyList"
+                class="mat-table"
+            >
+                <div class="mat-row">
+                    <div class="mat-cell">
+                        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+                    </div>
+                </div>
+            </div>
+
             <mat-paginator
                 [length]="(entitiesListCount$ | async)?.count"
                 [pageSize]="pageSize"
@@ -298,9 +346,8 @@
 
     <div class="form-actions">
         <button
-            class="button-primary"
             mat-raised-button
-            color="primary">
+            color="accent">
             {{'LNG_COMMON_BUTTON_SELECT' | translate}}
         </button>
         <button type="button" [routerLink]="['/relationships', entityType, this.entityId, 'share']" mat-raised-button>

@@ -21,6 +21,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-lab-results',
@@ -31,7 +32,6 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 export class LabResultsListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_LAB_RESULTS_TITLE', '.', true),
     ];
     // lab results list
@@ -165,52 +165,52 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
         this.availableSideFilters = [
             new FilterModel({
                 fieldName: 'sampleIdentifier',
-                fieldLabel: 'LNG_LAB_RESULTS_FIELD_LABEL_SAMPLE_LAB_ID',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
                 type: FilterType.TEXT,
                 sortable: true,
             }),
             new FilterModel({
                 fieldName: 'dateSampleTaken',
-                fieldLabel: 'LNG_LAB_RESULTS_FIELD_LABEL_DATE_SAMPLE_TAKEN',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
                 type: FilterType.RANGE_DATE,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'dateSampleDelivered',
-                fieldLabel: 'LNG_LAB_RESULTS_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
                 type: FilterType.RANGE_DATE,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'dateOfResult',
-                fieldLabel: 'LNG_LAB_RESULTS_FIELD_LABEL_DATE_OF_RESULT',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
                 type: FilterType.RANGE_DATE,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'labName',
-                fieldLabel: 'LNG_LAB_RESULTS_FIELD_LABEL_LAB_NAME',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME',
                 type: FilterType.SELECT,
                 options$: this.labNamesList$,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'sampleType',
-                fieldLabel: 'LNG_LAB_RESULTS_FIELD_LABEL_SAMPLE_TYPE',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
                 type: FilterType.SELECT,
                 options$: this.sampleTypesList$,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'testType',
-                fieldLabel: 'LNG_LAB_RESULTS_FIELD_LABEL_TEST_TYPE',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
                 type: FilterType.SELECT,
                 options$: this.testTypesList$,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'result',
-                fieldLabel: 'LNG_LAB_RESULTS_FIELD_LABEL_RESULT',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT',
                 type: FilterType.SELECT,
                 options$: this.labTestResultsList$,
             })
@@ -223,7 +223,8 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
     refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list of lab results
-            this.labResultsList$ = this.labResultDataService.getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder);
+            this.labResultsList$ = this.labResultDataService.getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder)
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 

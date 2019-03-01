@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material';
 import {
     DialogAnswer, DialogAnswerButton,
     DialogComponent,
@@ -13,6 +13,8 @@ import { SnackbarService } from './snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import * as FileSaver from 'file-saver';
+import { Subscriber } from 'rxjs/Subscriber';
+import { LoadingDialogComponent, LoadingDialogModel } from '../../../shared/components/loading-dialog/loading-dialog.component';
 
 export enum ExportDataExtension {
     CSV = 'csv',
@@ -29,10 +31,6 @@ export enum ExportDataExtension {
 @Injectable()
 export class DialogService {
 
-    /**
-     * Constructor
-     * @param dialog
-     */
     constructor(
         private dialog: MatDialog,
         private importExportDataService: ImportExportDataService,
@@ -99,26 +97,6 @@ export class DialogService {
     }
 
     /**
-     * Show a dialog containing data - array of objects with label and value
-     * @param {any[]} data
-     * @returns {Observable<DialogAnswer>}
-     */
-    showDataDialog(data: LabelValuePair[]): Observable<DialogAnswer> {
-        // construct dialog message data
-        const dialogConfig = new DialogConfiguration({
-            message: '',
-            data: data
-        });
-        const dialogComp = DialogComponent.defaultConfigWithData(dialogConfig);
-
-        // open dialog
-        return this.dialog.open(
-            DialogComponent,
-            dialogComp
-        ).afterClosed();
-    }
-
-    /**
      * Show export data dialog
      */
     showExportDialog(data: {
@@ -179,6 +157,7 @@ export class DialogService {
         }
         if (_.isEmpty(data.queryBuilderClearOthers)) {
             data.queryBuilderClearOthers = [
+                'childrenQueryBuilders',
                 'includedRelations',
                 'filter',
                 'sort',
@@ -285,7 +264,8 @@ export class DialogService {
                             _.merge(
                                 answer.inputValue.value,
                                 data.extraAPIData
-                            )
+                            ),
+                            qb
                         ) :
                         this.importExportDataService.exportData(
                             data.url,
@@ -338,5 +318,24 @@ export class DialogService {
             componentOrTemplateRef,
             config
         ).afterClosed();
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog(): LoadingDialogModel {
+        // display dialog
+        const dialog: MatDialogRef<LoadingDialogComponent> = this.dialog.open(
+            LoadingDialogComponent,
+            LoadingDialogComponent.DEFAULT_CONFIG
+        );
+
+        // finished creating dialog
+        return new LoadingDialogModel(
+            Subscriber.create(() => {
+                // close dialog
+                dialog.close();
+            })
+        );
     }
 }

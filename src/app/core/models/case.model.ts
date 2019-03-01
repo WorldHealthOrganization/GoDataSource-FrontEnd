@@ -1,10 +1,11 @@
 import * as _ from 'lodash';
 import { AddressModel, AddressType } from './address.model';
 import { DocumentModel } from './document.model';
-import { DateRangeModel } from './date-range.model';
 import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
+import { CaseCenterDateRangeModel } from './case-center-date-range.model';
+import * as moment from 'moment';
 
 export class CaseModel {
     id: string;
@@ -24,15 +25,13 @@ export class CaseModel {
     isDateOfOnsetApproximate: boolean;
     dateOfOutcome: string;
     dateBecomeCase: string;
-    deceased: boolean;
     safeBurial: boolean;
-    dateDeceased: string;
-    hospitalizationDates: DateRangeModel[];
-    isolationDates: DateRangeModel[];
-    incubationDates: DateRangeModel[];
+    dateOfBurial: string;
+    dateRanges: CaseCenterDateRangeModel[];
     questionnaireAnswers: {};
     type: EntityType = EntityType.CASE;
     dateOfReporting: string;
+    dateOfLastContact: string;
     isDateOfReportingApproximate: boolean;
     transferRefused: boolean;
     outbreakId: string;
@@ -57,6 +56,26 @@ export class CaseModel {
         startDate: string,
         endDate: string
     }[];
+
+    alerted: boolean = false;
+
+    /**
+     * Return case id mask with data replaced
+     * @param caseIdMask
+     */
+    static generateCaseIDMask(caseIdMask: string): string {
+        // validate
+        if (_.isEmpty(caseIdMask)) {
+            return '';
+        }
+
+        // !!!!!!!!!!!!!!!
+        // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
+        // !!!!!!!!!!!!!!!
+        return caseIdMask
+            .replace(/YYYY/g, moment().format('YYYY'))
+            .replace(/\*/g, '');
+    }
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -87,14 +106,19 @@ export class CaseModel {
         this.dateOfOnset = _.get(data, 'dateOfOnset');
         this.dateOfOutcome = _.get(data, 'dateOfOutcome');
         this.dateBecomeCase = _.get(data, 'dateBecomeCase');
-        this.deceased = _.get(data, 'deceased');
-        this.dateDeceased = _.get(data, 'dateDeceased');
+        this.dateOfBurial = _.get(data, 'dateOfBurial');
         this.safeBurial = _.get(data, 'safeBurial');
         this.isDateOfOnsetApproximate = _.get(data, 'isDateOfOnsetApproximate');
-        this.hospitalizationDates = _.get(data, 'hospitalizationDates', []);
-        this.isolationDates = _.get(data, 'isolationDates', []);
-        this.incubationDates = _.get(data, 'incubationDates', []);
+
+        // date ranges locations
+        const dateRangeLocations = _.get(data, 'dateRangeLocations');
+        this.dateRanges = _.get(data, 'dateRanges', [])
+            .map((dateRangeData) => {
+                return new CaseCenterDateRangeModel(dateRangeData, dateRangeLocations);
+            });
+
         this.dateOfReporting = _.get(data, 'dateOfReporting');
+        this.dateOfLastContact = _.get(data, 'dateOfLastContact');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.transferRefused = _.get(data, 'transferRefused');
         this.outbreakId = _.get(data, 'outbreakId');
@@ -120,8 +144,8 @@ export class CaseModel {
      * @returns {string}
      */
     get name(): string {
-        const firstName = _.get(this, 'firstName', '');
-        const lastName = _.get(this, 'lastName', '');
+        const firstName = this.firstName ? this.firstName : '';
+        const lastName = this.lastName ? this.lastName : '';
         return _.trim(`${firstName} ${lastName}`);
     }
 

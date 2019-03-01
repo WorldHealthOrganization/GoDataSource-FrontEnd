@@ -20,6 +20,7 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-modify-entity-relationship',
@@ -28,7 +29,6 @@ import { PERMISSION } from '../../../../core/models/permission.model';
     styleUrls: ['./modify-entity-relationship.component.less']
 })
 export class ModifyEntityRelationshipComponent extends ViewModifyComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // Entities Map for specific data
@@ -55,6 +55,8 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     relationshipId: string;
     authUser: UserModel;
 
+    entityData: CaseModel | ContactModel | EventModel;
+
     relationshipData: RelationshipModel = new RelationshipModel();
 
     constructor(
@@ -66,7 +68,8 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private dialogService: DialogService
     ) {
         super(route);
     }
@@ -79,11 +82,6 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                 this.entityType = params.entityType;
                 this.entityId = params.entityId;
                 this.relationshipId = params.relationshipId;
-
-                // add new breadcrumb: Entity List page
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-                );
 
                 // get selected outbreak
                 this.outbreakDataService
@@ -104,20 +102,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                                 return ErrorObservable.create(err);
                             })
                             .subscribe((entityData: CaseModel|ContactModel|EventModel) => {
-                                // add new breadcrumb: Entity Modify page
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        entityData.name,
-                                        `${this.entityMap[this.entityType].link}/${this.entityId}/modify`
-                                    )
-                                );
-                                // add new breadcrumb: Relationships list page
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE',
-                                        `/relationships/${this.entityType}/${this.entityId}`
-                                    )
-                                );
+                                this.entityData = entityData;
 
                                 // get relationship data
                                 this.relationshipDataService
@@ -134,24 +119,45 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                                     .subscribe((relationshipData) => {
                                         this.relationshipData = relationshipData;
 
-                                        // get related entity
-                                        const relatedEntityModel = _.get(relationshipData.relatedEntity(this.entityId), 'model', {});
-
-                                        // add new breadcrumb: page title
-                                        this.breadcrumbs.push(
-                                            new BreadcrumbItemModel(
-                                                this.viewOnly ? 'LNG_PAGE_VIEW_RELATIONSHIP_TITLE' : 'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE',
-                                                null,
-                                                true,
-                                                {},
-                                                relatedEntityModel
-                                            )
-                                        );
+                                        // refresh breadcrumbs
+                                        this.createBreadcrumbs();
                                     });
 
                             });
                     });
             });
+    }
+
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        // get related entity
+        const relatedEntityModel = _.get(this.relationshipData.relatedEntity(this.entityId), 'model', {});
+        this.breadcrumbs = [
+            new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
+
+            // add new breadcrumb: Entity Modify page
+            new BreadcrumbItemModel(
+                this.entityData.name,
+                `${this.entityMap[this.entityType].link}/${this.entityId}/view`
+            ),
+
+            // add new breadcrumb: Relationships list page
+            new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE',
+                `/relationships/${this.entityType}/${this.entityId}`
+            ),
+
+            // add new breadcrumb: page title
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_RELATIONSHIP_TITLE' : 'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE',
+                null,
+                true,
+                {},
+                relatedEntityModel
+            )
+        ];
     }
 
     modifyRelationship(form: NgForm) {
@@ -163,6 +169,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
         }
 
         // modify the relationship
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.relationshipDataService
             .modifyRelationship(
                 this.outbreakId,
@@ -173,15 +180,25 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             )
             .catch((err) => {
                 this.snackbarService.showError(err.message);
-
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .subscribe((relationshipData) => {
+                // update model
+                relationshipData.people = this.relationshipData.people;
+                this.relationshipData = relationshipData;
+
+                // mark form as pristine
+                form.form.markAsPristine();
+
+                // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
 
-                // navigate back to Entity Relationships list
-                this.disableDirtyConfirm();
-                this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
+                // update breadcrumb
+                this.createBreadcrumbs();
+
+                // hide dialog
+                loadingDialog.close();
             });
     }
 

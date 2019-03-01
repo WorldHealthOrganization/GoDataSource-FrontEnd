@@ -3,12 +3,14 @@ import 'rxjs/add/operator/map';
 import { AbstractControl, FormControl, NgForm } from '@angular/forms';
 import * as _ from 'lodash';
 import { SnackbarService } from './snackbar.service';
+import { I18nService } from './i18n.service';
 
 @Injectable()
 export class FormHelperService {
 
     constructor(
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private i18nService: I18nService
     ) {}
 
     /**
@@ -130,7 +132,129 @@ export class FormHelperService {
     ) {
         // display invalid error if form is invalid
         if (!form.valid) {
-            this.snackbarService.showError('LNG_FORM_ERROR_FORM_INVALID');
+            // determine fields that are invalid
+            let fields: string = '';
+            const checkControlsForInvalidStatus = (
+                controlsForm: NgForm,
+                prefixes: string[] = []
+            ) => {
+                // check controls validity
+                let lastControlRowIndexes: number[];
+                const mustCheckForms: {
+                    controlsForm: NgForm,
+                    prefixes: string[]
+                }[] = [];
+                _.each(controlsForm.controls, (ctrl: AbstractControl, name: string) => {
+                    // invalid controls
+                    if (
+                        ctrl.invalid &&
+                        !_.isEmpty(name)
+                    ) {
+                        // determine directive
+                        const directive = _.find((controlsForm as any)._directives, { name: name });
+                        if (
+                            directive &&
+                            directive.valueAccessor
+                        ) {
+                            // determine row indexes
+                            const nameWithIndexes: string = directive.valueAccessor.alternativeName ? directive.valueAccessor.alternativeName : name;
+                            const rowIndexes = _.chain(nameWithIndexes.match(/\[\d+\]/g))
+                                .map((v: string) => v.replace(/\[|\]/g, ''))
+                                .map((v: string) => _.parseInt(v) + 1)
+                                .value();
+
+                            // do we have placeholder ?
+                            if (directive.valueAccessor.placeholder) {
+                                // same row as previous one, if not we need to display data on a new row ?
+                                let firstField: boolean = false;
+                                if (!_.isEqual(rowIndexes, lastControlRowIndexes)) {
+                                    // add new error row
+                                    fields += '<br />- ';
+
+                                    // reset first field label for this row
+                                    firstField = true;
+
+                                    // add prefixes
+                                    let addedItemNo: boolean = false;
+                                    _.each(rowIndexes, (rowIndex: number, index: number) => {
+                                        // do we have a prefix for this item ?
+                                        let prefix: string = '';
+                                        if (!_.isEmpty(prefixes[index])) {
+                                            prefix = ` ${prefixes[index]}`;
+                                        }
+
+                                        // add prefix
+                                        fields += prefix + ' ' + this.i18nService.instant(
+                                            'LNG_FORM_ERROR_FORM_INVALID_WITH_FIELDS_ROW', {
+                                                item: rowIndex
+                                            }
+                                        );
+
+                                        // now we have item numbers
+                                        addedItemNo = true;
+                                    });
+
+                                    // do we need to add : after item numbers ?
+                                    if (addedItemNo) {
+                                        fields += ': ';
+                                    }
+                                }
+
+                                // determine field label
+                                const fieldLabel: string = this.i18nService.instant(directive.valueAccessor.placeholder);
+
+                                // add field label to list of errors
+                                fields += firstField ? fieldLabel : `, ${fieldLabel}`;
+
+                                // set the new rows
+                                lastControlRowIndexes = rowIndexes;
+                            } else if (
+                                directive.valueAccessor.groupForm &&
+                                directive.valueAccessor.groupForm.controls
+                            ) {
+                                // merge old & new prefixes
+                                const newPrefixes: string[] = _.clone(prefixes);
+                                if (directive.valueAccessor.componentTitle) {
+                                    newPrefixes.push(this.i18nService.instant(directive.valueAccessor.componentTitle));
+                                }
+
+                                // determine child fields that are invalid
+                                // using mustCheckForms to keep input order, otherwise addresses error messages will appear before firstname errors..
+                                mustCheckForms.push({
+                                    controlsForm: directive.valueAccessor.groupForm,
+                                    prefixes: newPrefixes
+                                });
+                            }
+                        }
+                    }
+                });
+
+                // validate remaining form children
+                _.each(mustCheckForms, (data: {
+                    controlsForm: NgForm,
+                    prefixes: string[]
+                }) => {
+                    checkControlsForInvalidStatus(
+                        data.controlsForm,
+                        data.prefixes
+                    );
+                });
+            };
+
+            // determine form invalid fields
+            checkControlsForInvalidStatus(form);
+
+            // display error message
+            this.snackbarService.showError(
+                _.isEmpty(fields) ? 'LNG_FORM_ERROR_FORM_INVALID' : 'LNG_FORM_ERROR_FORM_INVALID_WITH_FIELDS',
+                {
+                    fields: fields
+                },
+                _.isEmpty(fields) ? SnackbarService.DURATION : SnackbarService.DURATION_LONG,
+                true
+            );
+
+            // finished
             return false;
         }
 

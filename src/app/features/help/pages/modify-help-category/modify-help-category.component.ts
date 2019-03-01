@@ -12,6 +12,8 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import 'rxjs/add/operator/switchMap';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-modify-help-category',
@@ -20,10 +22,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
     styleUrls: ['./modify-help-category.component.less']
 })
 export class ModifyHelpCategoryComponent extends ViewModifyComponent implements OnInit {
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories')
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     helpCategoryData: HelpCategoryModel = new HelpCategoryModel();
     categoryId: string;
@@ -38,7 +37,8 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
         private snackbarService: SnackbarService,
         private router: Router,
         private authDataService: AuthDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private dialogService: DialogService
     ) {
         super(route);
     }
@@ -53,19 +53,30 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
                 // get category
                 this.helpDataService
                     .getHelpCategory(this.categoryId)
-                    .subscribe(helpCategoryData => {
-                        this.helpCategoryData = new HelpCategoryModel(helpCategoryData);
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                this.viewOnly ? 'LNG_PAGE_VIEW_HELP_CATEGORY_TITLE' : 'LNG_PAGE_MODIFY_HELP_CATEGORY_TITLE',
-                                '.',
-                                true,
-                                {},
-                                {}
-                            )
-                        );
+                    .subscribe((helpCategoryData) => {
+                        this.helpCategoryData = helpCategoryData;
+                        this.createBreadcrumbs();
                     });
             });
+    }
+
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [
+            new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_HELP_CATEGORIES_TITLE',
+                '/help/categories'
+            ),
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_HELP_CATEGORY_TITLE' : 'LNG_PAGE_MODIFY_HELP_CATEGORY_TITLE',
+                '.',
+                true,
+                {},
+                {}
+            )
+        ];
     }
 
     modifyHelpCategory(form: NgForm) {
@@ -76,22 +87,39 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
         }
 
         // modify the category
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.helpDataService
             .modifyHelpCategory(this.categoryId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showApiError(err);
-
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .switchMap((helpCategoryData) => {
+                // update language tokens to get the translation of name and description
+                return this.i18nService.loadUserLanguage()
+                    .catch((err) => {
+                        this.snackbarService.showApiError(err);
+                        loadingDialog.close();
+                        return ErrorObservable.create(err);
+                    })
+                    .map(() => helpCategoryData);
+            })
+            .subscribe((helpCategoryData) => {
+                // update model
+                this.helpCategoryData = helpCategoryData;
+
+                // mark form as pristine
+                form.form.markAsPristine();
+
+                // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_HELP_CATEGORY_ACTION_MODIFY_HELP_CATEGORY_SUCCESS_MESSAGE');
 
-                // navigate to listing page
-                this.disableDirtyConfirm();
-                // update language tokens to get the translation of name and description
-                this.i18nService.loadUserLanguage().subscribe();
-                // navigate to the list of categories
-                this.router.navigate(['/help/categories']);
+                // update breadcrumb
+                this.createBreadcrumbs();
+
+                // hide dialog
+                loadingDialog.close();
             });
     }
 

@@ -10,9 +10,10 @@ import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
-import { Observable } from 'rxjs/Observable';
 import * as _ from 'lodash';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
+import 'rxjs/add/operator/switchMap';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-create-help-item',
@@ -37,7 +38,8 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnI
         private formHelper: FormHelperService,
         private i18nService: I18nService,
         private route: ActivatedRoute,
-        private cacheService: CacheService
+        private cacheService: CacheService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -82,10 +84,10 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnI
     }
 
     /**
-     * Create Category
+     * Create Category Item
      * @param {NgForm[]} stepForms
      */
-    createNewCategory(stepForms: NgForm[]) {
+    createHelpCategoryItem(stepForms: NgForm[]) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
@@ -94,23 +96,38 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnI
             !_.isEmpty(dirtyFields)
         ) {
             // add the new category
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.helpDataService
                 .createHelpItem(this.categoryId, dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showApiError(err);
-
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
-                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_HELP_ITEM_SUCCESS_MESSAGE');
-                    // remove help items from cache
-                    this.cacheService.remove(CacheKey.HELP_ITEMS);
-                    // navigate to listing page
-                    this.disableDirtyConfirm();
+                .switchMap((newHelpItem) => {
                     // update language tokens to get the translation of name and description
-                    this.i18nService.loadUserLanguage().subscribe();
-                    // navigate to categories list
-                    this.router.navigate([`/help/categories/${this.categoryId}/items`]);
+                    return this.i18nService.loadUserLanguage()
+                        .catch((err) => {
+                            this.snackbarService.showApiError(err);
+                            loadingDialog.close();
+                            return ErrorObservable.create(err);
+                        })
+                        .map(() => newHelpItem);
+                })
+                .subscribe((newHelpItem) => {
+                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_HELP_ITEM_SUCCESS_MESSAGE');
+
+                    // remove help items from cache
+                    // this isn't really necessary since we retrieve & cache only approve items, and since default approve value is false..this won't be retrieved
+                    // but, we can keep it to prevent future changes that might introduce bugs
+                    this.cacheService.remove(CacheKey.HELP_ITEMS);
+
+                    // hide dialog
+                    loadingDialog.close();
+
+                    // navigate to new item's modify page
+                    this.disableDirtyConfirm();
+                    this.router.navigate([`/help/categories/${this.categoryId}/items/${newHelpItem.id}/modify`]);
                 });
         }
     }

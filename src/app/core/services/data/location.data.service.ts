@@ -190,13 +190,18 @@ export class LocationDataService {
      * Modify Location
      * @param {string} locationId
      * @param locationData
-     * @returns {Observable<any>}
+     * @returns {Observable<LocationModel>}
      */
-    modifyLocation(locationId: string, locationData): Observable<any> {
-        return this.http.put(`locations/${locationId}`, locationData).do(() => {
-            // refresh location cache
-            this.cacheService.remove(CacheKey.LOCATIONS);
-        });
+    modifyLocation(locationId: string, locationData): Observable<LocationModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http
+                .put(`locations/${locationId}`, locationData)
+                .do(() => {
+                    // refresh location cache
+                    this.cacheService.remove(CacheKey.LOCATIONS);
+                }),
+            LocationModel
+        );
     }
 
     /**
@@ -220,6 +225,22 @@ export class LocationDataService {
             this.http.get(`locations/${locationId}/usage`),
             LocationUsageModel
         );
+    }
+
+    /**
+     * Retrieve location usage count
+     * @param {string} locationId
+     */
+    getLocationUsageCount(locationId: string): Observable<any> {
+        return this.http.get(`locations/${locationId}/usage/count`);
+    }
+
+    /**
+     * Propagate lat/lng to all entities that are using specified location
+     * @param {string} locationId
+     */
+    propagateGeoLocation(locationId: string): Observable<any> {
+        return this.http.post(`locations/${locationId}/propagate-geo-location`, {});
     }
 }
 

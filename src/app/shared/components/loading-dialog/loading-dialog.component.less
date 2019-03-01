@@ -1,0 +1,30 @@
+.dialog-loading-progress {
+    .mat-dialog-container {
+        padding: 24px;
+    }
+}
+
+app-loading-dialog {
+    .app-loading-dialog {
+        height: 48px;
+        max-height: 48px;
+        width: 48px;
+        max-width: 48px;
+        overflow: hidden;
+
+        @mat-spinner-width: 32px;
+        @mat-spinner-height: 32px;
+        mat-spinner {
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+            margin-top: ~'calc(50% - 16px)';
+            margin-left: auto;
+            margin-right: auto;
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+    }
+}

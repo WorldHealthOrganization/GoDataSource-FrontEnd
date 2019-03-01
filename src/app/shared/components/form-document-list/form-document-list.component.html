@@ -12,7 +12,8 @@
                     [required]="required"
                     [disabled]="disabled"
                     (changed)="onChange(false)"
-                    (groupValidated)="validateGroup()">
+                    (groupValidated)="validateGroup()"
+                    [componentTitle]="'LNG_DOCUMENT_LABEL_DOCUMENTS' | translate">
                 </app-form-document>
             </mat-card>
 

@@ -1,4 +1,4 @@
-import { Component, Host, Inject, Input, Optional, SkipSelf, ViewEncapsulation } from '@angular/core';
+import { Component, Host, HostBinding, Inject, Input, Optional, SkipSelf, ViewEncapsulation } from '@angular/core';
 import { GroupBase } from '../../core';
 import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { DateRangeModel } from '../../../../core/models/date-range.model';
@@ -18,12 +18,15 @@ import { Moment } from 'moment';
 })
 
 export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
-
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
 
     @Input() fromTooltip: string;
     @Input() toTooltip: string;
+
+    @Input() minDate: Moment;
+
+    @HostBinding('class.form-element-host') isFormElement = true;
 
     // start date
     private _startDateVisible: boolean = true;

@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 import { AddressModel } from '../../../core/models/address.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Constants } from '../../../core/models/constants';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-side-filters',
@@ -19,7 +20,13 @@ export class SideFiltersComponent {
     // available filters to be applied
     _filterOptions: FilterModel[] = [];
     @Input() set filterOptions(values: FilterModel[]) {
+        // filter options
         this._filterOptions = values;
+
+        // required applied fields
+        this.addRequiredAndValueFilters();
+
+        // sort options
         this.updateSortFields();
     }
     get filterOptions(): FilterModel[] {
@@ -32,7 +39,10 @@ export class SideFiltersComponent {
     // extra sort options from the ones provided in the filters
     _extraSortOptions: SortModel[] = [];
     @Input() set extraSortOptions(values: SortModel[]) {
+        // extra options
         this._extraSortOptions = values;
+
+        // sort options
         this.updateSortFields();
     }
     get extraSortOptions(): SortModel[] {
@@ -41,9 +51,20 @@ export class SideFiltersComponent {
 
     // apply filters handler
     @Output() filtersApplied = new EventEmitter<RequestQueryBuilder>();
+    @Output() filtersCollected = new EventEmitter<AppliedFilterModel[]>();
+
+    /**
+     * Form
+     */
+    @ViewChild('form') form: NgForm;
+
+    /**
+     * Fixed filters ( can' add other filters, can't change operator..etc) ?
+     */
+    @Input() fixedFilters: boolean = false;
 
     // applied filters
-    @Input() appliedFilters: AppliedFilterModel[];
+    appliedFilters: AppliedFilterModel[];
     // selected operator to be used between filters
     appliedFilterOperator: RequestFilterOperator;
     // applied sorting criteria
@@ -53,6 +74,7 @@ export class SideFiltersComponent {
     RequestFilterOperator = RequestFilterOperator;
     FilterType = FilterType;
     FilterComparator = FilterComparator;
+    AppliedFilterModel = AppliedFilterModel;
     Constants = Constants;
 
     // keep query builder
@@ -122,17 +144,47 @@ export class SideFiltersComponent {
     }
 
     clear() {
-        this.appliedFilters = [new AppliedFilterModel()];
         this.appliedFilterOperator = RequestFilterOperator.AND;
         this.appliedSort = [];
+        this.addRequiredAndValueFilters();
     }
 
     reset() {
         this.clear();
-        this.queryBuilder = new RequestQueryBuilder();
-        this.filtersApplied.emit(this.getQueryBuilder());
+        setTimeout(() => {
+            this.apply(this.form);
+        });
+    }
 
-        this.closeSideNav();
+    /**
+     * Add filters resulted from filter options
+     */
+    private addRequiredAndValueFilters() {
+        // reinitialize applied filters
+        this.appliedFilters = [];
+
+        // go through filter options and add an applied filter for all required & value options
+        _.each(this.filterOptions, (option: FilterModel) => {
+            if (
+                option.required ||
+                option.value
+            ) {
+                // initialize filter
+                const filter: AppliedFilterModel = new AppliedFilterModel({
+                    readonly: option.required,
+                    filter: option,
+                    value: option.value
+                });
+
+                // add filter
+                this.appliedFilters.push(filter);
+            }
+        });
+
+        // if empty, then we need to add at least one empty applied field
+        if (this.appliedFilters.length < 1) {
+            this.appliedFilters.push(new AppliedFilterModel());
+        }
     }
 
     /**
@@ -185,7 +237,11 @@ export class SideFiltersComponent {
         queryBuilder.filter.setOperator(filterOperator);
 
         // set conditions
+        const appliedFilters: AppliedFilterModel[] = [];
         _.each(filters, (appliedFilter: AppliedFilterModel) => {
+            // construct list of applied filters
+            appliedFilters.push(new AppliedFilterModel(appliedFilter));
+
             // there is no point in adding a condition if no value is provided
             if (
                 appliedFilter.value === undefined ||
@@ -222,97 +278,167 @@ export class SideFiltersComponent {
                 qb.merge(_.cloneDeep(appliedFilter.filter.extraConditions));
             }
 
-            // filter
-            switch (filter.type) {
-                case FilterType.TEXT:
-                    switch (comparator) {
-                        case FilterComparator.IS:
-                            qb.filter.byEquality(filter.fieldName, appliedFilter.value, false, true);
-                            break;
-                        case FilterComparator.CONTAINS_TEXT:
-                            qb.filter.byContainingText(filter.fieldName, appliedFilter.value, false);
-                            break;
+            // check if we need to flag value
+            if (filter.flagIt) {
+                // value ?
+                let value;
+                switch (filter.type) {
+                    case FilterType.NUMBER:
+                        value = _.isString(appliedFilter.value) && !_.isEmpty(appliedFilter.value) ? parseFloat(appliedFilter.value) : appliedFilter.value;
+                        break;
 
-                        // FilterComparator.TEXT_STARTS_WITH
-                        default:
-                            qb.filter.byText(filter.fieldName, appliedFilter.value, false);
-                    }
-                    break;
+                    default:
+                        value = appliedFilter.value;
+                }
 
-                case FilterType.ADDRESS:
-                    // contains / within
-                    switch (comparator) {
-                        case FilterComparator.LOCATION:
-                            qb.filter.where({
-                                [`${filter.fieldName}.parentLocationIdFilter`]: {
-                                    inq: appliedFilter.value
-                                }
-                            });
-                            break;
-
-                        case FilterComparator.WITHIN:
-                            // retrieve location lat & lng
-                            const geoLocation = _.get(appliedFilter, 'extraValues.location.geoLocation', null);
-                            const lat: number = geoLocation && (geoLocation.lat || geoLocation.lat === 0) ? parseFloat(geoLocation.lat) : null;
-                            const lng: number = geoLocation && (geoLocation.lng || geoLocation.lng === 0) ? parseFloat(geoLocation.lng) : null;
-                            if (
-                                lat === null ||
-                                lng === null
-                            ) {
-                                break;
-                            }
-
-                            // construct near query
-                            const nearQuery = {
-                                near: {
-                                    lat: lat,
-                                    lng: lng
-                                }
-                            };
-
-                            // add max distance if provided
-                            const maxDistance: number = _.get(appliedFilter, 'extraValues.radius', null);
-                            if (maxDistance !== null) {
-                                // convert miles to meters
-                                (nearQuery as any).maxDistance = Math.round(maxDistance * 1609.34);
-                            }
-
-                            // add filter
-                            qb.filter.where({
-                                [`${filter.fieldName}.geoLocation`]: nearQuery
-                            });
-                            break;
-
-                        // FilterComparator.CONTAINS
-                        default:
-                            qb.merge(AddressModel.buildSearchFilter(appliedFilter.value, filter.fieldName));
-                    }
-                    break;
-
-                case FilterType.RANGE_NUMBER:
-                    // between / from / to
-                    qb.filter.byRange(filter.fieldName, appliedFilter.value, false);
-                    break;
-
-                case FilterType.RANGE_AGE:
-                    // between / from / to
-                    qb.filter.byAgeRange(filter.fieldName, appliedFilter.value, false);
-                    break;
-
-                case FilterType.RANGE_DATE:
-                    // between / before / after
-                    qb.filter.byDateRange(filter.fieldName, appliedFilter.value, false);
-                    break;
-
-                case FilterType.SELECT:
-                case FilterType.MULTISELECT:
-                    qb.filter.bySelect(
+                // add flag
+                if (
+                    !_.isEmpty(value) ||
+                    _.isNumber(value)
+                ) {
+                    qb.filter.flag(
                         filter.fieldName,
-                        appliedFilter.value,
-                        false,
-                        null
+                        value
                     );
-                    break;
+                }
+            } else {
+                // filter
+                switch (filter.type) {
+                    case FilterType.TEXT:
+                        switch (comparator) {
+                            case FilterComparator.IS:
+                                qb.filter.byEquality(filter.fieldName, appliedFilter.value, false, true);
+                                break;
+                            case FilterComparator.CONTAINS_TEXT:
+                                qb.filter.byContainingText(filter.fieldName, appliedFilter.value, false);
+                                break;
+
+                            // FilterComparator.TEXT_STARTS_WITH
+                            default:
+                                qb.filter.byText(filter.fieldName, appliedFilter.value, false);
+                        }
+                        break;
+
+                    case FilterType.NUMBER:
+                        switch (comparator) {
+                            case FilterComparator.BEFORE:
+                                qb.filter.where({
+                                    [filter.fieldName]: {
+                                        lte: _.isString(appliedFilter.value) ? parseFloat(appliedFilter.value) : appliedFilter.value
+                                    }
+                                });
+                                break;
+                            case FilterComparator.AFTER:
+                                qb.filter.where({
+                                    [filter.fieldName]: {
+                                        gte: _.isString(appliedFilter.value) ? parseFloat(appliedFilter.value) : appliedFilter.value
+                                    }
+                                });
+                                break;
+
+                            // case FilterComparator.IS:
+                            default:
+                                qb.filter.byEquality(
+                                    filter.fieldName,
+                                    _.isString(appliedFilter.value) ? parseFloat(appliedFilter.value) : appliedFilter.value
+                                );
+                                break;
+                        }
+                        break;
+
+                    case FilterType.ADDRESS:
+                    case FilterType.LOCATION:
+                        // contains / within
+                        switch (comparator) {
+                            case FilterComparator.LOCATION:
+                                qb.filter.where({
+                                    [`${filter.fieldName}.parentLocationIdFilter`]: {
+                                        inq: appliedFilter.value
+                                    }
+                                });
+                                break;
+
+                            case FilterComparator.WITHIN:
+                                // retrieve location lat & lng
+                                const geoLocation = _.get(appliedFilter, 'extraValues.location.geoLocation', null);
+                                const lat: number = geoLocation && (geoLocation.lat || geoLocation.lat === 0) ? parseFloat(geoLocation.lat) : null;
+                                const lng: number = geoLocation && (geoLocation.lng || geoLocation.lng === 0) ? parseFloat(geoLocation.lng) : null;
+                                if (
+                                    lat === null ||
+                                    lng === null
+                                ) {
+                                    break;
+                                }
+
+                                // construct near query
+                                const nearQuery = {
+                                    near: {
+                                        lat: lat,
+                                        lng: lng
+                                    }
+                                };
+
+                                // add max distance if provided
+                                const maxDistance: number = _.get(appliedFilter, 'extraValues.radius', null);
+                                if (maxDistance !== null) {
+                                    // convert miles to meters
+                                    (nearQuery as any).maxDistance = Math.round(maxDistance * 1609.34);
+                                }
+
+                                // add filter
+                                qb.filter.where({
+                                    [`${filter.fieldName}.geoLocation`]: nearQuery
+                                });
+                                break;
+
+                            // FilterComparator.CONTAINS
+                            default:
+                                qb.merge(AddressModel.buildSearchFilter(appliedFilter.value, filter.fieldName));
+                        }
+                        break;
+
+                    case FilterType.RANGE_NUMBER:
+                        // between / from / to
+                        qb.filter.byRange(filter.fieldName, appliedFilter.value, false);
+                        break;
+
+                    case FilterType.RANGE_AGE:
+                        // between / from / to
+                        qb.filter.byAgeRange(filter.fieldName, appliedFilter.value, false);
+                        break;
+
+                    case FilterType.RANGE_DATE:
+                        // between / before / after
+                        qb.filter.byDateRange(filter.fieldName, appliedFilter.value, false);
+                        break;
+
+                    case FilterType.DATE:
+                        // between
+                        const date = _.isEmpty(appliedFilter.value) ?
+                            null :
+                            moment(appliedFilter.value);
+                        qb.filter.byDateRange(
+                            filter.fieldName,
+                            date && date.isValid() ?
+                                {
+                                    startDate: date.startOf('day'),
+                                    endDate: date.endOf('day')
+                                } :
+                                null,
+                            false
+                        );
+                        break;
+
+                    case FilterType.SELECT:
+                    case FilterType.MULTISELECT:
+                        qb.filter.bySelect(
+                            filter.fieldName,
+                            appliedFilter.value,
+                            false,
+                            null
+                        );
+                        break;
+                }
             }
         });
 
@@ -352,6 +478,10 @@ export class SideFiltersComponent {
         this.queryBuilder = queryBuilder;
         this.filtersApplied.emit(this.getQueryBuilder());
 
+        // send filters
+        this.filtersCollected.emit(appliedFilters);
+
+        // close side nav
         this.closeSideNav();
     }
 }

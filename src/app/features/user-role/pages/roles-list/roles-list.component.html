@@ -4,7 +4,7 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button *ngIf="hasUserRoletWriteAccess()" class="button-primary" mat-raised-button color="primary"
+                <button *ngIf="hasUserRoletWriteAccess()" mat-raised-button color="accent"
                         [routerLink]="'./create'">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
@@ -16,10 +16,18 @@
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">
-        <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="resetFiltersToSideFilters()">
             {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
         </button>
-        <button type="button" mat-raised-button (click)="needsRefreshList(true)">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
     </div>
@@ -76,12 +84,38 @@
         <ng-container matColumnDef="permissions">
             <mat-header-cell *matHeaderCellDef fxFlex>
                 <div class="table-header-cell" fxLayout="column">
-                    <div class="column-header">{{'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate}}</div>
+                    <div class="column-header" fxLayout="row">
+                        <span>{{'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate}}</span>
+
+                        <button
+                            type="button"
+                            mat-icon-button
+                            class="column-actions-button"
+                            [disableRipple]="true"
+                            [matMenuTriggerFor]="columnActions"
+                            color="accent"
+                        >
+                            <span class="xt-icon">arrowDropdownCircle</span>
+                        </button>
+
+                        <mat-menu #columnActions="matMenu">
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('permissions', true)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL' | translate }}
+                            </button>
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('permissions', false)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL' | translate }}
+                            </button>
+                        </mat-menu>
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="rolesFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="availablePermissions$ | async"
                             multiple="true"
                             (optionChanged)="filterBySelectField('permissionIds', $event, 'id')"
@@ -95,11 +129,37 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex>
-                <mat-chip-list>
-                    <mat-chip *ngFor="let permission of item.permissions"
-                              [matTooltip]="permission.description | translate">{{ permission.label | translate }}
-                    </mat-chip>
-                </mat-chip-list>
+                <ng-container *ngIf="!isCellExpanded('permissions', item.id)">
+                    <app-number-of-items-label
+                        [value]="item.permissions?.length"
+                    ></app-number-of-items-label>
+
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('permissions', item.id, true)"
+                    >
+                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND' | translate}}
+                    </button>
+                </ng-container>
+
+                <ng-container *ngIf="isCellExpanded('permissions', item.id)">
+                    <mat-chip-list>
+                        <mat-chip *ngFor="let permission of item.permissions"
+                                  [matTooltip]="permission.description | translate">{{ permission.label | translate }}
+                        </mat-chip>
+                    </mat-chip-list>
+
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('permissions', item.id, false)"
+                    >
+                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate}}
+                    </button>
+                </ng-container>
             </mat-cell>
         </ng-container>
 
@@ -117,14 +177,14 @@
                     <button
                         mat-menu-item
                         [routerLink]="['.', item.id, 'view']">
-                        {{'LNG_PAGE_ACTION_VIEW' | translate}}
+                        {{'LNG_PAGE_LIST_USER_ROLES_ACTION_VIEW_ROLE' | translate}}
                     </button>
 
                     <span
                         [matTooltip]="(authUser.hasRole(item.id) ? 'You cannot modify the role that is assigned to you' : '')">
                         <button mat-menu-item [disabled]="authUser.hasRole(item.id)"
                                 [routerLink]="['.', item.id, 'modify']">
-                            {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                            {{'LNG_PAGE_LIST_USER_ROLES_ACTION_MODIFY_ROLE' | translate}}
                         </button>
                     </span>
 
@@ -132,7 +192,7 @@
                         [matTooltip]="(authUser.hasRole(item.id) ? 'You cannot delete the role that is assigned to you' : '')">
                         <button mat-menu-item [disabled]="authUser.hasRole(item.id)" (click)="deleteRole(item)"
                                 class="mat-menu-item-delete">
-                            {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                            {{'LNG_PAGE_LIST_USER_ROLES_ACTION_DELETE_ROLE' | translate}}
                         </button>
                     </span>
 
@@ -144,5 +204,16 @@
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
         <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
     </mat-table>
+
+    <div
+        *ngIf="isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
 
 </mat-card>

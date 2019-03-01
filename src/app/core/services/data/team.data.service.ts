@@ -22,8 +22,8 @@ export class TeamDataService {
     getTeamsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<TeamModel[]> {
         const qb = new RequestQueryBuilder();
         // include roles and permissions in response
-        qb.include('locations');
-        qb.include('members');
+        qb.include('locations', true);
+        qb.include('members', true);
 
         qb.merge(queryBuilder);
 
@@ -78,10 +78,13 @@ export class TeamDataService {
      * Modify an existing Team
      * @param {string} teamId
      * @param data
-     * @returns {Observable<any>}
+     * @returns {Observable<TeamModel>}
      */
-     modifyTeam(teamId: string, data: any): Observable<any> {
-        return this.http.patch(`teams/${teamId}`, data);
+     modifyTeam(teamId: string, data: any): Observable<TeamModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.patch(`teams/${teamId}`, data),
+            TeamModel
+        );
     }
 
     /**

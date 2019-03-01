@@ -5,7 +5,7 @@
 
             <div class="topnav-actions">
                 <ng-container>
-                    <button *ngIf="hasHelpWriteAccess()" class="button-primary" mat-raised-button color="primary"
+                    <button *ngIf="hasHelpWriteAccess()" mat-raised-button color="accent"
                             [routerLink]="['/help/categories', categoryId, 'items', 'create']">
                         {{'LNG_COMMON_BUTTON_ADD'| translate}} <span class="xt-icon">addCircle</span>
                     </button>
@@ -110,23 +110,23 @@
                             *ngIf="hasHelpApproveAccess() && !item.approved"
                             mat-menu-item
                             (click)="approveHelpItem(item)">
-                            {{'LNG_PAGE_ACTION_APPROVE' | translate}}
+                            {{'LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_ITEM' | translate}}
                         </button>
 
                         <button mat-menu-item [routerLink]="['/help/categories/', item.categoryId, 'items', item.id, 'view']">
-                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                            {{ 'LNG_PAGE_LIST_HELP_ITEMS_ACTION_VIEW_ITEM' | translate }}
                         </button>
 
                         <button *ngIf="hasHelpWriteAccess() && !item.deleted" mat-menu-item
                                 [routerLink]="['/help/categories', item.categoryId, 'items', item.id, 'modify']">
-                            {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                            {{'LNG_PAGE_LIST_HELP_ITEMS_ACTION_MODIFY_ITEM' | translate}}
                         </button>
 
                         <button
                             *ngIf="hasHelpWriteAccess() && !item.deleted"
                             mat-menu-item class="mat-menu-item-delete"
                             (click)="deleteHelpItem(item)">
-                            {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                            {{'LNG_PAGE_LIST_HELP_ITEMS_ACTION_DELETE_ITEM' | translate}}
                         </button>
 
                     </mat-menu>
@@ -137,5 +137,16 @@
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
         <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
     </mat-table>
+
+    <div
+        *ngIf="isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
 
 </mat-card>

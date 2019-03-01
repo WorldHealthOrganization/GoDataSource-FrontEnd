@@ -9,10 +9,11 @@ import { DialogService, ExportDataExtension } from '../../../../core/services/he
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
 import { LanguageModel } from '../../../../core/models/language.model';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, LoadingDialogModel } from '../../../../shared/components';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { TopnavComponent } from '../../../../shared/components/topnav/topnav.component';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-languages-list',
@@ -33,6 +34,8 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
     languagesList$: Observable<LanguageModel[]>;
 
     @ViewChild('topNav') topNav: TopnavComponent;
+
+    loadingDialog: LoadingDialogModel;
 
     constructor(
         private languageDataService: LanguageDataService,
@@ -69,7 +72,8 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
      */
     refreshList() {
         // retrieve the list of Languages
-        this.languagesList$ = this.languageDataService.getLanguagesList(this.queryBuilder);
+        this.languagesList$ = this.languageDataService.getLanguagesList(this.queryBuilder)
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     /**
@@ -120,7 +124,25 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
             message: 'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS_DIALOG_TITLE',
             url: `languages/${language.id}/language-tokens/export`,
             fileName: language.name,
-            fileType: ExportDataExtension.XLSX
+            fileType: ExportDataExtension.XLSX,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
         });
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
     }
 }

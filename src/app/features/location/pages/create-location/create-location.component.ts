@@ -12,6 +12,7 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Observable } from 'rxjs/Observable';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-create-location',
@@ -39,7 +40,8 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
         private snackbarService: SnackbarService,
         private route: ActivatedRoute,
         private formHelper: FormHelperService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -110,19 +112,23 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
             !_.isEmpty(dirtyFields)
         ) {
             // add the new Location
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.locationDataService
                 .createLocation(dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
-
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newLocation: LocationModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_SUCCESS_MESSAGE');
+
+                    // hide dialog
+                    loadingDialog.close();
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate(this.parentId ? ['/locations', this.parentId, 'children'] : ['/locations']);
+                    this.router.navigate([`/locations/${newLocation.id}/modify`]);
                 });
         }
     }

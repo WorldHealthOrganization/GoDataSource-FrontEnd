@@ -1,13 +1,35 @@
 <app-topnav [activeOutbreakEditable]="false">
     <ng-container dynamic-section>
-        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+
+                <button mat-raised-button color="accent"
+                        [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <ng-container>
+                        <button
+                            mat-menu-item
+                            (click)="exportCaseMovementMap()">
+                            {{'LNG_PAGE_VIEW_MOVEMENT_CASE_EXPORT' | translate}}
+                        </button>
+                    </ng-container>
+                </mat-menu>
+
+            </div>
+        </div>
     </ng-container>
 </app-topnav>
 
 <mat-card
     class="page-section page-content">
     <app-world-map-movement
-        height="100%"
+        #mapMovement
+        height="500px"
         [addresses]="movementAddresses">
     </app-world-map-movement>
 </mat-card>

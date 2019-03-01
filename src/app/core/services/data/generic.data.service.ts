@@ -170,6 +170,14 @@ export class GenericDataService {
     }
 
     /**
+     * Retrieve the list of criteria used for node shape - radio button
+     * @returns {Observable<any[]>}
+     */
+    getTransmissionChainNodeShapeCriteriaOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS));
+    }
+
+    /**
      * Retrieve the list of criteria used for node label - radio button
      * @returns {Observable<any[]>}
      */
@@ -213,8 +221,20 @@ export class GenericDataService {
      * Retrieve the list of range follow-up export group by values
      * @returns {Observable<any[]>}
      */
-    getRangeFollowUpGroupByOptions(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY));
+    getRangeFollowUpGroupByOptions(removeRisk: boolean = false): Observable<any[]> {
+        const options = _.cloneDeep(Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY);
+        if (removeRisk) {
+            delete options.RISK;
+        }
+        return Observable.of(Object.values(options));
+    }
+
+    /**
+     * Retrieve the list of gantt chart types
+     * @returns {Observable<any[]>}
+     */
+    getGanttChartTypes(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.GANTT_CHART_TYPES));
     }
 }
 

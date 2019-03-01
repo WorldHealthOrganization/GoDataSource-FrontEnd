@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'xtIcon';
   src:
-    url('fonts/xtIcon.ttf?5qofa') format('truetype'),
-    url('fonts/xtIcon.woff?5qofa') format('woff'),
-    url('fonts/xtIcon.svg?5qofa#xtIcon') format('svg');
+    url('fonts/xtIcon.ttf?gqutbi') format('truetype'),
+    url('fonts/xtIcon.woff?gqutbi') format('woff'),
+    url('fonts/xtIcon.svg?gqutbi#xtIcon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -33,6 +33,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.xtIconinfo:before {
+  content: "\e923";
+}
+.xtIconbaseline-supervised_user_circle-24px:before {
+  content: "\e920";
+}
+.xtIconround-arrow_drop_down_circle-24px:before {
+  content: "\e91f";
+}
 .xtIconbaseline-visibility_off-24px:before {
   content: "\e91d";
 }
@@ -126,4 +135,16 @@
 }
 .xtIconbaseline-home-24px:before {
   content: "\e901";
+}
+.xtIconlab:before {
+  content: "\e9aa";
+}
+.xtIconarrow-up:before {
+  content: "\e921";
+}
+.xtIconarrow-down:before {
+  content: "\e922";
+}
+.xtIconarrow-up:before {
+  content: "\e921";
 }

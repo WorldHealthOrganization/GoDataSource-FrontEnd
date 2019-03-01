@@ -12,7 +12,8 @@ import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
+import 'rxjs/add/operator/switchMap';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-create-outbreak-template',
@@ -36,7 +37,7 @@ export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implem
         private outbreakTemplateDataService: OutbreakTemplateDataService,
         private snackbarService: SnackbarService,
         private router: Router,
-        private i18nService: I18nService
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -55,19 +56,23 @@ export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implem
         ) {
             const outbreakTemplateData = new OutbreakTemplateModel(dirtyFields);
 
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.outbreakTemplateDataService
                 .createOutbreakTemplate(outbreakTemplateData)
                 .catch((err) => {
                     this.snackbarService.showError((err.message));
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newOutbreakTemplate) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_TEMPLATES_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
-                    // load language tokens so they will be available
-                    this.i18nService.loadUserLanguage().subscribe();
+
+                    // hide dialog
+                    loadingDialog.close();
+
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate(['/outbreak-templates']);
+                    this.router.navigate([`/outbreak-templates/${newOutbreakTemplate.id}/modify`]);
                 });
         }
     }

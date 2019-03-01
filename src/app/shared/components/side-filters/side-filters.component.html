@@ -19,8 +19,9 @@
                         {{'LNG_SIDE_FILTERS_TITLE' | translate}}
                     </div>
 
-                    <div class="actions">
-
+                    <div
+                        *ngIf="!fixedFilters"
+                        class="actions">
                         <div fxFlex fxLayout="row" class="switch-buttons">
                             <button fxFlex type="button" mat-raised-button
                                     [color]="isFilterOperator(RequestFilterOperator.AND) ? 'primary' : ''"
@@ -65,32 +66,54 @@
                                     [name]="'filter[filters][' + i + '][comparator]'"
                                     [(ngModel)]="filter.comparator"
                                     [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL' | translate"
-                                    [options]="filter.allowedComparators[filter.filter.type]"
+                                    [options]="filter.filter.allowedComparators ? filter.filter.allowedComparators : AppliedFilterModel.allowedComparators[filter.filter.type]"
                                     [clearable]="false">
                                 </app-form-select>
 
                                 <!-- TEXT Filter -->
                                 <app-form-input
                                     *ngIf="
-                                        filter.filter?.type === FilterType.TEXT || (
+                                        filter.filter?.type === FilterType.TEXT ||
+                                        filter.filter?.type === FilterType.NUMBER || (
                                             filter.filter?.type === FilterType.ADDRESS &&
                                             filter.comparator === FilterComparator.CONTAINS
                                         )"
                                     [name]="'filter[filters][' + i + '][value]'"
                                     [(ngModel)]="filter.value"
-                                    [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD' | translate">
+                                    [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD' | translate"
+                                    [type]="filter.filter?.type === FilterType.NUMBER ? 'number' : 'text'">
                                 </app-form-input>
 
-                                <!-- SELECT / MULTI-SELECT Filter -->
+                                <!-- SELECT Filter -->
+                                <!-- had to split these two selects into one select because we can't change multiple property after initialization -->
+                                <!-- so in case we switched from a multi select to a single select an exception was raised -->
                                 <app-form-select
-                                    *ngIf="filter.filter?.type === FilterType.SELECT || filter.filter?.type === FilterType.MULTISELECT"
+                                    *ngIf="filter.filter?.type === FilterType.SELECT"
                                     [name]="'filter[filters][' + i + '][value]'"
                                     [(ngModel)]="filter.value"
                                     [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                     [options]="filter.filter.options$ | async"
-                                    [multiple]="filter.filter.type === FilterType.MULTISELECT"
+                                    [multiple]="false"
                                     [allowSelectionOfDisabledItems]="true"
-                                    [displayInvisibleItems]="true">
+                                    [displayInvisibleItems]="true"
+                                    [optionValueKey]="filter.filter.optionsValueKey"
+                                    [optionLabelKey]="filter.filter.optionsLabelKey">
+                                </app-form-select>
+
+                                <!-- MULTI-SELECT Filter -->
+                                <!-- had to split these two selects into one select because we can't change multiple property after initialization -->
+                                <!-- so in case we switched from a multi select to a single select an exception was raised -->
+                                <app-form-select
+                                    *ngIf="filter.filter?.type === FilterType.MULTISELECT"
+                                    [name]="'filter[filters][' + i + '][value]'"
+                                    [(ngModel)]="filter.value"
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    [options]="filter.filter.options$ | async"
+                                    [multiple]="true"
+                                    [allowSelectionOfDisabledItems]="true"
+                                    [displayInvisibleItems]="true"
+                                    [optionValueKey]="filter.filter.optionsValueKey"
+                                    [optionLabelKey]="filter.filter.optionsLabelKey">
                                 </app-form-select>
 
                                 <!-- NUMBER / AGE RANGE Filter -->
@@ -112,6 +135,14 @@
                                     [toPlaceholder]="filter.filter?.type === FilterType.RANGE_AGE ? 'LNG_AGE_FIELD_FILTER_LABEL_TO' : 'LNG_FORM_RANGE_FIELD_LABEL_TO'">
                                 </app-form-range>
 
+                                <!-- DATE -->
+                                <app-form-datepicker
+                                    *ngIf="filter.filter?.type === FilterType.DATE"
+                                    [name]="'filter[filters][' + i + '][value]'"
+                                    [(ngModel)]="filter.value"
+                                    [maxDate]="filter.filter?.maxDate">
+                                </app-form-datepicker>
+
                                 <!-- DATE RANGE Filter-->
                                 <app-form-daterange
                                     *ngIf="filter.filter?.type === FilterType.RANGE_DATE"
@@ -122,13 +153,13 @@
                                     [endDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.BEFORE">
                                 </app-form-daterange>
 
-                                <!-- Address Location -->
+                                <!-- Address Location / Location -->
                                 <app-form-location-dropdown
-                                    *ngIf="filter.filter?.type === FilterType.ADDRESS && filter.comparator === FilterComparator.LOCATION"
+                                    *ngIf="(filter.filter?.type === FilterType.ADDRESS || filter.filter?.type === FilterType.LOCATION) && filter.comparator === FilterComparator.LOCATION"
                                     [name]="'filter[filters][' + i + '][value]'"
                                     [ngModel]="filter.value"
                                     [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION' | translate"
-                                    [multiple]="true"
+                                    [multiple]="filter.filter?.multipleOptions"
                                     [useOutbreakLocations]="true"
                                     (changed)="filter.value = $event;">
                                 </app-form-location-dropdown>
@@ -172,7 +203,13 @@
 
                     </div>
 
-                    <button type="button" mat-button color="primary" class="add-side-filter" (click)="addFilter()">
+                    <button
+                        *ngIf="!fixedFilters"
+                        type="button"
+                        mat-button
+                        color="primary"
+                        class="add-side-filter"
+                        (click)="addFilter()">
                         {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
                     </button>
 
@@ -235,6 +272,7 @@
                     </div>
 
                     <button
+                        *ngIf="!fixedFilters"
                         class="add-side-filter"
                         type="button"
                         mat-button
@@ -248,9 +286,9 @@
                 <div class="buttons-container">
                     <button
                         *ngIf="appliedFilters.length > 0 || appliedSort.length > 0"
-                        class="button-primary stretched-button"
+                        class="stretched-button"
                         mat-raised-button
-                        color="primary"
+                        color="accent"
                         type="submit">
                         {{'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON' | translate}}
                     </button>

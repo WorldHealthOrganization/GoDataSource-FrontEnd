@@ -12,7 +12,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, LoadingDialogModel } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -24,7 +24,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestRelationBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -33,6 +33,7 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import 'rxjs/add/operator/mergeMap';
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-contacts-list',
@@ -66,6 +67,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     countedContactsByRiskLevel$: Observable<any[]>;
 
     // risk level
+    riskLevelRefData$: Observable<ReferenceDataCategoryModel>;
     riskLevelsList$: Observable<any[]>;
     riskLevelsListMap: { [id: string]: ReferenceDataEntryModel };
 
@@ -82,6 +84,12 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
     // available side filters
     availableSideFilters: FilterModel[];
+
+    // print daily Follow-ups
+    exportContactsDailyFollowUpListUrl: string;
+    exportContactsDailyFollowUpListFileName: string;
+    exportContactsDailyFollowUpListFileType: ExportDataExtension = ExportDataExtension.PDF;
+    exportContactsDailyFollowUpListDialogFields: DialogField[];
 
     exportContactsUrl: string;
     contactsDataExportFileName: string = moment().format('YYYY-MM-DD');
@@ -111,8 +119,9 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_TYPE', 'type'),
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_DECEASED', 'dateDeceased')
     ];
+
+    loadingDialog: LoadingDialogModel;
 
     constructor(
         private contactDataService: ContactDataService,
@@ -139,19 +148,39 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             ' - ' +
             this.contactsDataExportFileName;
 
+        // file name
+        this.exportContactsDailyFollowUpListFileName = this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE') +
+            ' - ' +
+            moment().format('YYYY-MM-DD');
+
+        // dialog fields for daily follow-ups print
+        this.genericDataService
+            .getRangeFollowUpGroupByOptions(true)
+            .subscribe((options) => {
+                this.exportContactsDailyFollowUpListDialogFields = [
+                    new DialogField({
+                        name: 'groupBy',
+                        placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_FOLLOW_UPS_GROUP_BY_BUTTON',
+                        inputOptions: options,
+                        value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
+                        required: true
+                    })
+                ];
+            });
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
         this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
 
-        const riskLevel$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).share();
-        this.riskLevelsList$ = riskLevel$.map((data: ReferenceDataCategoryModel) => {
+        this.riskLevelRefData$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).share();
+        this.riskLevelsList$ = this.riskLevelRefData$.map((data: ReferenceDataCategoryModel) => {
             return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
                 new LabelValuePair(entry.value, entry.id, null, null, entry.iconUrl)
             );
         });
-        riskLevel$.subscribe((riskCategory: ReferenceDataCategoryModel) => {
+        this.riskLevelRefData$.subscribe((riskCategory: ReferenceDataCategoryModel) => {
             this.riskLevelsListMap = _.transform(
                 riskCategory.entries,
                 (result, entry: ReferenceDataEntryModel) => {
@@ -173,34 +202,16 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
                 // export contacts url
                 this.exportContactsUrl = null;
+                this.exportContactsDailyFollowUpListUrl = null;
                 if (
                     this.selectedOutbreak &&
                     this.selectedOutbreak.id
                 ) {
                     this.exportContactsUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/export`;
+                    this.exportContactsDailyFollowUpListUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/daily-list/export`;
                 }
-
-                // get grouped contacts by risk level
-                if (this.selectedOutbreak) {
-                    this.countedContactsByRiskLevel$ = riskLevel$
-                        .mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
-                            return this.contactDataService
-                                .getContactsGroupedByRiskLevel(this.selectedOutbreak.id)
-                                .map((data: RiskLevelGroupModel) => {
-                                    return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
-                                        const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId});
-                                        return new CountedItemsListItem(
-                                            item.count,
-                                            itemId,
-                                            item.contactIDs,
-                                            refItem ?
-                                                refItem.getColorCode() :
-                                                Constants.DEFAULT_COLOR_REF_DATA
-                                        );
-                                    });
-                                });
-                        });
-                }
+                // get contacts grouped by risk level
+                this.getContactsGroupedByRiskLevel();
 
                 // initialize pagination
                 this.initPaginator();
@@ -233,6 +244,10 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             new VisibleColumnModel({
                 field: 'firstName',
                 label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'visualId',
+                label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID'
             }),
             new VisibleColumnModel({
                 field: 'age',
@@ -323,6 +338,11 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
                 type: FilterType.RANGE_DATE,
                 sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'visualId',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+                type: FilterType.TEXT
             }),
             new FilterModel({
                 fieldName: 'addresses',
@@ -418,8 +438,11 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      */
     refreshList() {
         if (this.selectedOutbreak) {
+            // refresh list of contacts grouped by risk level
+            this.getContactsGroupedByRiskLevel();
             // retrieve the list of Contacts
-            this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder);
+            this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder)
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 
@@ -432,6 +455,32 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             this.contactsListCount$ = this.contactDataService.getContactsCount(this.selectedOutbreak.id, countQueryBuilder).share();
+        }
+    }
+
+    /**
+     * Get contacts grouped by risk level
+     */
+    getContactsGroupedByRiskLevel() {
+        if (this.selectedOutbreak) {
+            this.countedContactsByRiskLevel$ = this.riskLevelRefData$
+                .mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
+                    return this.contactDataService
+                        .getContactsGroupedByRiskLevel(this.selectedOutbreak.id, this.queryBuilder)
+                        .map((data: RiskLevelGroupModel) => {
+                            return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
+                                const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId});
+                                return new CountedItemsListItem(
+                                    item.count,
+                                    itemId,
+                                    item.contactIDs,
+                                    refItem ?
+                                        refItem.getColorCode() :
+                                        Constants.DEFAULT_COLOR_REF_DATA
+                                );
+                            });
+                        });
+                });
         }
     }
 
@@ -576,7 +625,9 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
-            anonymizeFields: this.anonymizeFields
+            anonymizeFields: this.anonymizeFields,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
         });
     }
 
@@ -600,18 +651,148 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
             // display export dialog
             this.dialogService.showExportDialog({
-                message: 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE',
-                url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
+                message: 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER_DIALOG_TITLE',
+                url: `outbreaks/${this.selectedOutbreak.id}/contacts/dossier`,
                 fileName: this.contactsDataExportFileName,
                 fileType: ExportDataExtension.ZIP,
                 displayAnonymize: true,
                 anonymizeFields: anonymizeFields,
                 anonymizeFieldsKey: 'data',
                 extraAPIData: {
-                    cases: selectedRecords
+                    contacts: selectedRecords
                 },
-                isPOST: true
+                isPOST: true,
+                exportStart: () => { this.showLoadingDialog(); },
+                exportFinished: () => { this.closeLoadingDialog(); }
             });
+        }
+    }
+
+    /**
+     * Export relationships for selected contacts
+     */
+    exportSelectedContactsRelationship() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        const personsQb = qb.addChildQueryBuilder('person');
+
+        // id
+        personsQb.filter.bySelect('id', selectedRecords, true, null);
+
+        // type
+        personsQb.filter.byEquality(
+            'type',
+            EntityType.CONTACT
+        );
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIPS_TITLE',
+            url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+            fileName: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // optional
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
+        });
+    }
+
+    /**
+     * Export Contact Relationships
+     */
+    exportFilteredContactsRelationships() {
+        // construct filter by case query builder
+        const qb = new RequestQueryBuilder();
+        const personsQb = qb.addChildQueryBuilder('person');
+
+        // merge query builder
+        personsQb.merge(this.queryBuilder);
+
+        // remove pagination
+        personsQb.paginator.clear();
+
+        // remove follow-ups filter
+        const followUps: RequestRelationBuilder = personsQb.include('followUps');
+        personsQb.removeRelation('followUps');
+
+        // check if we have anything to filter by follow-ups
+        if (!followUps.queryBuilder.isEmpty()) {
+            const followUpQb = qb.addChildQueryBuilder('followUp');
+            followUpQb.merge(followUps.queryBuilder);
+        }
+
+        // retrieve relationships conditions & remove them so we can check if we need to filter by contacts
+        const relationships: RequestRelationBuilder = personsQb.include('relationships');
+        personsQb.removeRelation('relationships');
+
+        // filter contacts
+        personsQb.filter.byEquality(
+            'type',
+            EntityType.CONTACT
+        );
+
+        // relationships
+        if (!relationships.queryBuilder.isEmpty()) {
+            // filter by people
+            const people = relationships.queryBuilder.include('people');
+            if (!people.queryBuilder.isEmpty()) {
+                // merge contact & case conditions
+                const contactConditions = personsQb.filter.generateCondition();
+                personsQb.filter.clear();
+                personsQb.filter.where({
+                    or: [
+                        contactConditions, {
+                            and: [
+                                { type: EntityType.CASE },
+                                people.queryBuilder.filter.generateCondition()
+                            ]
+                        }
+                    ]
+                });
+            }
+        }
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIPS_TITLE',
+            url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+            fileName: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // optional
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
+        });
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
         }
     }
 }

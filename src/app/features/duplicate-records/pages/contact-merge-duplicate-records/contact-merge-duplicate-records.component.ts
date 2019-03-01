@@ -74,6 +74,10 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
             options: LabelValuePair[],
             value: any
         },
+        visualId:  {
+            options: LabelValuePair[],
+            value: any
+        },
         dateOfReporting: {
             options: LabelValuePair[],
             value: any
@@ -172,6 +176,10 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
                 options: [],
                 value: undefined
             },
+            visualId: {
+                options: [],
+                value: undefined
+            },
             dateOfReporting: {
                 options: [],
                 value: undefined
@@ -199,6 +207,7 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
                 this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
                 this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
             );
+            this.uniqueOptions.visualId = EntityModel.uniqueStringOptions(this.mergeRecords, 'visualId');
             this.uniqueOptions.dateOfReporting = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateOfReporting');
             this.uniqueOptions.isDateOfReportingApproximate = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'isDateOfReportingApproximate');
 

@@ -7,7 +7,6 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { MetricContactsPerCaseModel } from '../../models/metrics/metric-contacts-per-case.model';
 import { EntityType } from '../../models/entity-type';
 import { MetricCasesWithContactsModel } from '../../models/metrics/metric-cases-contacts.model';
-import * as _ from 'lodash';
 import { MetricCasesTransmissionChainsModel } from '../../models/metrics/metric-cases-transmission-chains.model';
 import { MetricNewCasesWithContactsModel } from '../../models/metric-new-cases-contacts.model';
 import { ReportCasesWithOnsetModel } from '../../models/report-cases-with-onset.model';
@@ -15,10 +14,10 @@ import { LabelValuePair } from '../../models/label-value-pair';
 import { Constants } from '../../models/constants';
 import * as moment from 'moment';
 import { EntityModel } from '../../models/entity.model';
+import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
 
 @Injectable()
 export class RelationshipDataService {
-
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
@@ -206,7 +205,7 @@ export class RelationshipDataService {
 
         const qb = new RequestQueryBuilder();
         // include people in response
-        qb.include('people');
+        qb.include('people', true);
 
         qb.merge(queryBuilder);
 
@@ -246,7 +245,7 @@ export class RelationshipDataService {
      * @param {string} entityId
      * @param {string} relationshipId
      * @param relationshipData
-     * @returns {Observable<any>}
+     * @returns {Observable<RelationshipModel>}
      */
     modifyRelationship(
         outbreakId: string,
@@ -254,10 +253,13 @@ export class RelationshipDataService {
         entityId: string,
         relationshipId: string,
         relationshipData
-    ): Observable<any> {
-        return this.http.put(
-            `outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/${relationshipId}`,
-            relationshipData
+    ): Observable<RelationshipModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(
+                `outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/${relationshipId}`,
+                relationshipData
+            ),
+            RelationshipModel
         );
     }
 
@@ -266,28 +268,36 @@ export class RelationshipDataService {
      * @param {string} outbreakId
      * @returns {Observable<MetricContactsPerCaseModel>}
      */
-    getMetricsOfContactsPerCase(outbreakId: string): Observable<MetricContactsPerCaseModel> {
-        return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/relationships/contacts-per-case/count`),
-            MetricContactsPerCaseModel
+    getMetricsOfContactsPerCase(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricContactsPerCaseModel> {
+        // construct query
+        const filter = queryBuilder.buildQuery();
+
+        // check if we didn't create a request already
+        return FilteredRequestCache.get(
+            'getMetricsOfContactsPerCase',
+            filter,
+            () => {
+                return this.modelHelper.mapObservableToModel(
+                    this.http.get(`outbreaks/${outbreakId}/relationships/contacts-per-case/count?filter=${filter}`),
+                    MetricContactsPerCaseModel
+                );
+            }
         );
     }
 
     /**
      * Get count and ids of cases with less than x contacts
      * @param {string} outbreakId
-     * @param {number} noLessContacts
      * @returns {Observable<MetricCasesWithContactsModel>}
      */
-    getCountIdsOfCasesLessThanXContacts(outbreakId: string, noLessContacts: number = null): Observable<MetricCasesWithContactsModel> {
-        // convert noLessContacts to number as the API expects
-        noLessContacts = _.parseInt(noLessContacts);
-        // create filter for daysNotSeen
-        const filterQueryBuilder = new RequestQueryBuilder();
-        filterQueryBuilder.filter.where(
-            {noLessContacts: noLessContacts}
-        );
-        const filter = filterQueryBuilder.filter.generateFirstCondition(true, true);
+    getCountIdsOfCasesLessThanXContacts(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricCasesWithContactsModel> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/relationships/cases-with-less-than-x-contacts/count?filter=${filter}`),
             MetricCasesWithContactsModel
@@ -295,22 +305,18 @@ export class RelationshipDataService {
     }
 
     /**
-     * Get count of cases in known transmission chains
+     * Get count of cases outside the transmission chains
      * @param {string} outbreakId
      * @param {number} noDaysInChains
      * @returns {Observable<MetricCasesTransmissionChainsModel>}
      */
-    getCountOfCasesInKnownTransmissionChains(outbreakId: string, noDaysInChains: number = null): Observable<MetricCasesTransmissionChainsModel> {
-        // convert noLessContacts to number as the API expects
-        noDaysInChains = Number(noDaysInChains);
-        // create filter for daysNotSeen
-        const filterQueryBuilder = new RequestQueryBuilder();
-        filterQueryBuilder.filter.where(
-            {noDaysInChains: noDaysInChains}
-        );
-        const filter = filterQueryBuilder.filter.generateFirstCondition(true, true);
+    getCountOfCasesOutsideTheTransmissionChains(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricCasesTransmissionChainsModel> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/relationships/new-cases-in-transmission-chains/count?filter=${filter}`),
+            this.http.get(`outbreaks/${outbreakId}/relationships/new-cases-outside-transmission-chains/count?filter=${filter}`),
             MetricCasesTransmissionChainsModel
         );
     }
@@ -318,18 +324,13 @@ export class RelationshipDataService {
     /**
      * Get count and ids of new cases among known contacts
      * @param {string} outbreakId
-     * @param {number} noDaysAmongContacts
      * @returns {Observable<MetricNewCasesWithContactsModel>}
      */
-    getCountIdsOfCasesAmongKnownContacts(outbreakId: string, noDaysAmongContacts: number = null): Observable<MetricNewCasesWithContactsModel> {
-        // convert noLessContacts to number as the API expects
-        noDaysAmongContacts = Number(noDaysAmongContacts);
-        // create filter for daysNotSeen
-        const filterQueryBuilder = new RequestQueryBuilder();
-        filterQueryBuilder.filter.where(
-            {noDaysAmongContacts: noDaysAmongContacts}
-        );
-        const filter = filterQueryBuilder.filter.generateFirstCondition(true, true);
+    getCountIdsOfCasesAmongKnownContacts(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricNewCasesWithContactsModel> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/cases/new-among-known-contacts/count?filter=${filter}`),
             MetricNewCasesWithContactsModel
@@ -364,15 +365,10 @@ export class RelationshipDataService {
      * @returns {LabelValuePair[]}
      */
     getLightObjectDisplay(
-        relationship: any
+        relationship: RelationshipModel
     ): LabelValuePair[] {
 
         const lightObject = [];
-        // dialog title: Case Details
-        lightObject.push(new LabelValuePair(
-            'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RELATIONSHIP_DIALOG_TITLE',
-            ''
-        ));
 
         // dialog fields
         lightObject.push(new LabelValuePair(
@@ -408,11 +404,6 @@ export class RelationshipDataService {
         lightObject.push(new LabelValuePair(
             'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
             relationship.comment
-        ));
-        // insert link to full resource
-        lightObject.push(new LabelValuePair(
-            Constants.DIALOG.DATA_ITEM_TYPE.LINK,
-            `/relationships/${relationship.sourceType}/${relationship.source}/${relationship.id}/view`
         ));
 
         return lightObject;

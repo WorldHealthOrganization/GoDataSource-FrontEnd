@@ -6,46 +6,69 @@
     max-height: 95vh !important;
 }
 
-.dialog-main {
-    font-family: @font-roboto;
-    font-size: 14px;
-    color: #8e8e8e;
-
-    .dialog-main-msg {
-        font-size: 20px;
-        font-weight: 700;
-        margin-bottom: 25px;
+app-dialog {
+    .dialog-main {
         font-family: @font-roboto;
-        line-height: 1.2;
-        color: #000;
-    }
-    .dialog-button {
-        font-family: @font-roboto;
-        text-transform: uppercase;
-        color: #000;
-        font-weight: 700;
-        margin-top: 20px;
-
-        &.danger {
-            background-color: #FF3547;
-        }
-        &.primary {
-            background-color: #33B5E5;
-        }
-        &.success {
-            background-color: #00C851;
-        }
-    }
-    .ng-star-inserted .mat-button,
-    .ng-star-inserted .mat-flat-button,
-    .ng-star-inserted .mat-icon-button,
-    .ng-star-inserted .mat-stroked-button {
-        line-height: normal;
-        padding: 9px 16px;
-    }
-    .dialog-data-label {
-        font-weight: 400;
-        margin-right: 10px;
+        font-size: 14px;
         color: #8e8e8e;
+
+        a {
+            color: #0071e1;
+            margin: 3px;
+            font-weight: bold;
+            text-decoration: none;
+
+            &:active {
+                color: #0071e1;
+                text-decoration: none;
+            }
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        .dialog-main-msg {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            font-family: @font-roboto;
+            line-height: 1.2;
+            color: #000;
+        }
+
+        .dialog-button {
+            font-family: @font-roboto;
+            text-transform: uppercase;
+            color: #000;
+            font-weight: 700;
+            margin-top: 20px;
+
+            &.danger {
+                background-color: #FF3547;
+            }
+
+            &.primary {
+                background-color: #33B5E5;
+            }
+
+            &.success {
+                background-color: #00C851;
+            }
+        }
+
+        .ng-star-inserted .mat-button,
+        .ng-star-inserted .mat-flat-button,
+        .ng-star-inserted .mat-icon-button,
+        .ng-star-inserted .mat-stroked-button {
+            line-height: normal;
+            padding: 9px 16px;
+        }
+
+        .dialog-data-label {
+            font-weight: 400;
+            margin-right: 10px;
+            color: #8e8e8e;
+        }
     }
 }

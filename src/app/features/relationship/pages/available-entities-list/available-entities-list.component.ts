@@ -22,6 +22,7 @@ import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -165,7 +166,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(
                                         entityData.name,
-                                        `${this.entityMap[this.entityType].link}/${this.entityId}/modify`
+                                        `${this.entityMap[this.entityType].link}/${this.entityId}/view`
                                     )
                                 );
                                 // add new breadcrumb: Entity Relationships list
@@ -193,7 +194,8 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
             this.entitiesList$ = this.entityDataService.getEntitiesList(
                 this.outbreakId,
                 this.queryBuilder
-            );
+            )
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 
@@ -229,6 +231,11 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
                 fieldLabel: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
                 type: FilterType.TEXT,
                 sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'visualId',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
+                type: FilterType.TEXT
             }),
             new FilterModel({
                 fieldName: 'gender',
@@ -323,8 +330,16 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
      */
     getTableColumns(): string[] {
         const columns = [
-            'checkbox', 'lastName', 'firstName', 'age', 'gender', 'riskLevel', 'classification',
-            'place', 'address'
+            'checkbox',
+            'lastName',
+            'firstName',
+            'visualId',
+            'age',
+            'gender',
+            'riskLevel',
+            'classification',
+            'place',
+            'address'
         ];
 
         return columns;

@@ -12,12 +12,25 @@ import { Constants } from '../../models/constants';
 import { I18nService } from '../helper/i18n.service';
 import * as moment from 'moment';
 import * as _ from 'lodash';
-import { CaseModel } from '../../models/case.model';
 import { LocationModel } from '../../models/location.model';
+import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
+
+export interface IConvertChainToGraphElements {
+    nodes: {
+        data: GraphNodeModel
+    }[];
+    edges: {
+        data: GraphEdgeModel
+    }[];
+    edgesHierarchical: any[];
+    caseNodesWithoutDates: any[];
+    contactNodesWithoutDates: any[];
+    eventNodesWithoutDates: any[];
+    timelineDateCheckpoints: any[];
+}
 
 @Injectable()
 export class TransmissionChainDataService {
-
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
@@ -65,53 +78,10 @@ export class TransmissionChainDataService {
      */
     getIndependentTransmissionChainData(
         outbreakId: string,
-        size: number = null,
-        personId: string = null,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
-        dateGlobalFilter: string = null
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<TransmissionChainModel[]> {
-
-        // generate filter for person fields
-        let filter = queryBuilder.filter.generateFirstCondition(false, false);
-
-        // add filter for size ( under where )
-        if (size) {
-            const rQBSize = new RequestQueryBuilder();
-            rQBSize.filter.where({
-                size: Number(size)
-            });
-            filter.where = rQBSize.filter.generateFirstCondition(false, false);
-        }
-
-        // add filter for person ( under filter ) - view the chain of a person
-        if (personId) {
-            const rQBPersonId = new RequestQueryBuilder();
-            rQBPersonId.filter.where({
-                chainIncludesPerson: {
-                    where: {
-                        id: personId
-                    }
-                }
-            });
-            const filterPerson = rQBPersonId.filter.generateFirstCondition(false, false);
-            // merge conditions from person filter with those from chainInculdesPerson
-            filter = {...filter, ...filterPerson};
-        }
-
-        // global date - see state in time
-        if (dateGlobalFilter) {
-            const rQBGlobalDate = new RequestQueryBuilder();
-            rQBGlobalDate.filter.where({
-                where: {
-                    endDate: dateGlobalFilter
-                }
-            });
-            const filterDate = rQBGlobalDate.filter.generateFirstCondition(false, false);
-            filter.where = {...filter.where, ...filterDate.where};
-        }
-
-        filter = JSON.stringify(filter);
-
+        // generate filter
+        const filter = queryBuilder.buildQuery();
         return this.http.get(
             `outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`
         ).map(this.mapTransmissionChainDataToModel);
@@ -127,9 +97,7 @@ export class TransmissionChainDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<TransmissionChainModel[]> {
-
         const filter = queryBuilder.buildQuery();
-
         return this.http.get(
             `outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`
         ).map(this.mapTransmissionChainToModel);
@@ -146,9 +114,7 @@ export class TransmissionChainDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<TransmissionChainModel[]> {
-
         const filter = queryBuilder.buildQuery();
-
         return this.http.get(
             `outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases?filter=${filter}`
         ).map(this.mapTransmissionChainToModel);
@@ -159,10 +125,23 @@ export class TransmissionChainDataService {
      * @param {string} outbreakId
      * @returns {Observable<MetricIndependentTransmissionChainsModel>}
      */
-    getCountIndependentTransmissionChains(outbreakId: string): Observable<MetricIndependentTransmissionChainsModel> {
-        return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/relationships/independent-transmission-chains/filtered-count`),
-            MetricIndependentTransmissionChainsModel
+    getCountIndependentTransmissionChains(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricIndependentTransmissionChainsModel> {
+        // construct query
+        const filter = queryBuilder.buildQuery();
+
+        // check if we didn't create a request already
+        return FilteredRequestCache.get(
+            'getCountIndependentTransmissionChains',
+            filter,
+            () => {
+                return this.modelHelper.mapObservableToModel(
+                    this.http.get(`outbreaks/${outbreakId}/relationships/independent-transmission-chains/filtered-count?filter=${filter}`),
+                    MetricIndependentTransmissionChainsModel
+                );
+            }
         );
     }
 
@@ -171,9 +150,13 @@ export class TransmissionChainDataService {
      * @param {string} outbreakId
      * @returns {Observable<MetricIndependentTransmissionChainsModel>}
      */
-    getCountNewChainsOfTransmissionFromRegContactsWhoBecameCase(outbreakId: string): Observable<MetricIndependentTransmissionChainsModel> {
+    getCountNewChainsOfTransmissionFromRegContactsWhoBecameCase(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricIndependentTransmissionChainsModel> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`/outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases/filtered-count`),
+            this.http.get(`/outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases/filtered-count?filter=${filter}`),
             MetricIndependentTransmissionChainsModel);
     }
 
@@ -183,14 +166,33 @@ export class TransmissionChainDataService {
      * @param filters
      * @param colorCriteria
      * @param locationsList
+     * @param selectedViewType
      * @returns {any}
      */
-    convertChainToGraphElements(chains, filters: any, colorCriteria: any, locationsList: LocationModel[]): any {
-        const graphData: any = {nodes: [], edges: [], edgesHierarchical: [], caseNodesWithoutDates: [], contactNodesWithoutDates: [], eventNodesWithoutDates: []};
+    convertChainToGraphElements(
+        chains,
+        filters: any,
+        colorCriteria: any,
+        locationsList: LocationModel[],
+        selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value
+    ): IConvertChainToGraphElements {
+        const graphData: IConvertChainToGraphElements = {
+            nodes: [],
+            edges: [],
+            edgesHierarchical: [],
+            caseNodesWithoutDates: [],
+            contactNodesWithoutDates: [],
+            eventNodesWithoutDates: [],
+            timelineDateCheckpoints: []
+        };
         const selectedNodeIds: string[] = [];
-        // get labels for uears / months - age field
+        // get labels for years / months - age field
         const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
         const monthsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
+
+        let minTimelineDate: string = '';
+        let maxTimelineDate: string = '';
+
         const onsetLabel = this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ONSET_LABEL');
         const onsetApproximateLabel = this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ONSET_APRROXIMATE_LABEL');
 
@@ -198,51 +200,110 @@ export class TransmissionChainDataService {
             // will use firstChainData to load all the nodes
             const firstChain = chains[0];
             if (!_.isEmpty(firstChain.nodes)) {
-                _.forEach(firstChain.nodes, (node, key) => {
+                _.forEach(firstChain.nodes, (node) => {
                     let allowAdd = false;
                     const nodeProps = node.model;
                     // show nodes based on their type
                     if (node.type === EntityType.CONTACT && filters.showContacts) {
                         allowAdd = true;
-                        if (!_.isEmpty(node.model.dateOfLastContact)) {
-                            nodeProps.dateTimeline = node.model.dateOfLastContact;
+                        if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+                                || selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value ) {
+                            if (!_.isEmpty(node.model.dateOfLastContact)) {
+                                nodeProps.dateTimeline = node.model.dateOfLastContact;
+                            } else {
+                                graphData.contactNodesWithoutDates.push(node.model.id);
+                            }
+                        } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value) {
+                            if (!_.isEmpty(node.model.dateOfReporting)) {
+                                nodeProps.dateTimeline = node.model.dateOfReporting;
+                            } else {
+                                graphData.contactNodesWithoutDates.push(node.model.id);
+                            }
                         } else {
-                            graphData.contactNodesWithoutDates.push(node.model.id);
+                            nodeProps.dateTimeline = null;
                         }
                     } else if (node.type === EntityType.EVENT && filters.showEvents) {
                         allowAdd = true;
-                        if (!_.isEmpty(node.model.data)) {
-                            nodeProps.dateTimeline = node.model.date;
+                        if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+                                || selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value) {
+                            if (!_.isEmpty(node.model.date)) {
+                                nodeProps.dateTimeline = node.model.date;
+                            } else {
+                                graphData.eventNodesWithoutDates.push(node.model.id);
+                            }
+                        } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value) {
+                            if (!_.isEmpty(node.model.dateOfReporting)) {
+                                nodeProps.dateTimeline = node.model.dateOfReporting;
+                            } else {
+                                graphData.eventNodesWithoutDates.push(node.model.id);
+                            }
                         } else {
-                            graphData.eventNodesWithoutDates.push(node.model.id);
+                            nodeProps.dateTimeline = null;
                         }
                     } else if (node.type === EntityType.CASE) {
                         allowAdd = true;
-                        if (!_.isEmpty(node.model.dateOfOnset)) {
-                            nodeProps.dateTimeline = node.model.dateOfOnset;
+                        if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+                            if (!_.isEmpty(node.model.dateOfOnset)) {
+                                nodeProps.dateTimeline = node.model.dateOfOnset;
+                            } else {
+                                graphData.caseNodesWithoutDates.push(node.model.id);
+                            }
+                        } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value) {
+                            if (!_.isEmpty(node.model.dateOfLastContact)) {
+                                nodeProps.dateTimeline = node.model.dateOfLastContact;
+                            } else {
+                                graphData.caseNodesWithoutDates.push(node.model.id);
+                            }
+                        } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value) {
+                            if (!_.isEmpty(node.model.dateOfReporting)) {
+                                nodeProps.dateTimeline = node.model.dateOfReporting;
+                            } else {
+                                graphData.caseNodesWithoutDates.push(node.model.id);
+                            }
                         } else {
-                            graphData.caseNodesWithoutDates.push(node.model.id);
+                            nodeProps.dateTimeline = null;
                         }
                     }
                     if (allowAdd) {
                         const nodeData = new GraphNodeModel(nodeProps);
                         nodeData.type = node.type;
                         // set node color
-                        if (Object.keys(colorCriteria.nodeColor).length) {
+                        if (!_.isEmpty(colorCriteria.nodeColor)) {
                             if (colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]]) {
                                 nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
                             }
                         }
                         // set node label color
-                        if (Object.keys(colorCriteria.nodeNameColor).length) {
+                        if (!_.isEmpty(colorCriteria.nodeNameColor)) {
                             if (colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]]) {
                                 nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
                             }
                         }
                         // set node icon
-                        if (Object.keys(colorCriteria.nodeIcon).length) {
+                        if (!_.isEmpty(colorCriteria.nodeIcon)) {
                             if (colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]]) {
                                 nodeData.picture = colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]];
+                            }
+                        }
+                        // set node shape
+                        if (!_.isEmpty(colorCriteria.nodeShape)) {
+
+                            if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.TYPE.value ) {
+                               if (node.type === EntityType.CASE) {
+                                   nodeData.shape = 'ellipse';
+                               } else if (node.type === EntityType.CONTACT) {
+                                   nodeData.shape = 'pentagon';
+                               } else if (node.type === EntityType.EVENT) {
+                                   nodeData.shape = 'star';
+                               }
+                            } else if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.CLASSIFICATION.value) {
+                                if (node.model.classification === Constants.CASE_CLASSIFICATION.CONFIRMED) {
+                                    nodeData.shape = 'ellipse';
+                                } else if (node.model.classification === Constants.CASE_CLASSIFICATION.PROBABLE) {
+                                    nodeData.shape = 'rectangle';
+                                } else if (node.model.classification === Constants.CASE_CLASSIFICATION.SUSPECT) {
+                                    nodeData.shape = 'pentagon';
+                                }
                             }
                         }
                         // determine label
@@ -271,6 +332,13 @@ export class TransmissionChainDataService {
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
                             if (node.type !== EntityType.EVENT) {
                                 nodeData.label = colorCriteria.nodeLabelValues[node.model.gender];
+                            } else {
+                                nodeData.label = '';
+                            }
+                            // occupation
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.OCCUPATION.value) {
+                            if (node.type !== EntityType.EVENT) {
+                                nodeData.label = colorCriteria.nodeLabelValues[node.model.occupation];
                             } else {
                                 nodeData.label = '';
                             }
@@ -310,6 +378,7 @@ export class TransmissionChainDataService {
                                 const lastName = node.model.lastName ? node.model.lastName : '';
                                 const firstName = node.model.firstName ? node.model.firstName : '';
                                 const gender = colorCriteria.genderValues[node.model.gender] ? colorCriteria.genderValues[node.model.gender] : '';
+                                const outcome = colorCriteria.outcomeValues[node.model.outcomeId] ? colorCriteria.outcomeValues[node.model.outcomeId] : '';
                                 const visualId = node.model.visualId ? '\n' + node.model.visualId : '';
                                 const age = !_.isEmpty(node.model.age) ?
                                     node.model.age.months > 0 ?
@@ -333,15 +402,45 @@ export class TransmissionChainDataService {
                                     '\n' + onsetLabel + ' ' + moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) + ( node.model.isDateOfOnsetApproximate ? onsetApproximateLabel : '' ) :
                                     '';
                                 // concatenate results
-                                nodeData.label = lastName + ' ' + firstName + visualId + '\n' + age + ' - ' + gender + classification + locationName + onset;
+                                nodeData.label = lastName + ' ' + firstName + visualId + '\n' + age + ' - ' + gender + classification + '\n' + outcome + locationName + onset;
                             } else {
                                 nodeData.label = '';
+                            }
+                        }
+
+                        // check min / max dates
+                        if (!_.isEmpty(nodeData.dateTimeline)) {
+                            if (moment(nodeData.dateTimeline).isAfter(maxTimelineDate) || _.isEmpty(maxTimelineDate)) {
+                                maxTimelineDate = nodeData.dateTimeline;
+                            }
+                            if (moment(nodeData.dateTimeline).isBefore(minTimelineDate) || _.isEmpty(minTimelineDate)) {
+                                minTimelineDate = nodeData.dateTimeline;
                             }
                         }
                         graphData.nodes.push({data: nodeData});
                         selectedNodeIds.push(nodeData.id);
                     }
                 });
+
+                // generate checkpoint nodes
+                graphData.timelineDateCheckpoints = [];
+                const counterDate = moment(minTimelineDate);
+                counterDate.subtract(1, 'days');
+                graphData.timelineDateCheckpoints.push(counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+                while (counterDate.isBefore(moment(maxTimelineDate))) {
+                    counterDate.add(1, 'days');
+                    const counterDateFormatted = counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                    graphData.timelineDateCheckpoints.push(counterDateFormatted);
+                    // generate node
+                    const checkpointNode = new GraphNodeModel({
+                        dateTimeline: counterDateFormatted,
+                        id: counterDateFormatted,
+                        name: counterDateFormatted,
+                        nodeType: 'checkpoint'
+                    });
+                    graphData.nodes.push({data: checkpointNode});
+                }
+                graphData.timelineDateCheckpoints.push(counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
             }
 
             // generate edges based on the nodes included in the graph
@@ -363,7 +462,7 @@ export class TransmissionChainDataService {
                             graphEdge.targetType = relationship.persons[0].type;
                         }
                         // set colors
-                        if (Object.keys(colorCriteria.edgeColor).length) {
+                        if (!_.isEmpty(colorCriteria.edgeColor)) {
                             if (colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]]) {
                                 graphEdge.edgeColor = colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]];
                             }

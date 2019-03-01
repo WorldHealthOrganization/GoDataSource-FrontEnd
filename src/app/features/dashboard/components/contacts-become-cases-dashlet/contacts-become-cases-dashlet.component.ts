@@ -1,14 +1,13 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { Constants } from '../../../../core/models/constants';
-import * as _ from 'lodash';
-import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Subscriber } from 'rxjs/Subscriber';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
+import 'rxjs/add/observable/forkJoin';
+import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-contacts-become-cases-dashlet',
@@ -16,107 +15,110 @@ import { DashletComponent } from '../../helperClasses/dashlet-component';
     templateUrl: './contacts-become-cases-dashlet.component.html',
     styleUrls: ['./contacts-become-cases-dashlet.component.less']
 })
-export class ContactsBecomeCasesDashletComponent extends DashletComponent implements OnInit {
-
+export class ContactsBecomeCasesDashletComponent extends DashletComponent implements OnInit, OnDestroy {
     // number of contacts become cases over time and place
     contactsBecomeCasesCount: number;
 
     // number of cases ( total )
     casesCount: number;
 
-    // filter by Date Range
-    dateRange: DateRangeModel;
-
-    // filter by Locations
-    locationIds: string[];
-
+    // params
     queryParams: any = {
         applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES
     };
 
-    // selected outbreak
-    selectedOutbreak;
+    // outbreak
+    outbreakId: string;
 
-    // refresh only after we finish changing data
-    private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
-        this.updateValues();
-    }));
+    // loading data
+    displayLoading: boolean = false;
+
+    // subscribers
+    outbreakSubscriber: Subscription;
+    previousSubscriber: Subscription;
 
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
-        private listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
         // get contacts on followup list count
-        this.outbreakDataService
+        this.displayLoading = true;
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
-                    this.selectedOutbreak = selectedOutbreak;
-                    this.triggerUpdateValues.call(true);
+                    this.outbreakId = selectedOutbreak.id;
+                    this.refreshDataCaller.call();
                 }
             });
     }
 
-    onDateRangeChange(dateRange: DateRangeModel) {
-        this.dateRange = dateRange;
-
-        // update query params
-        if (
-            _.isEmpty(dateRange) || (
-                _.isEmpty(dateRange.startDate) &&
-                _.isEmpty(dateRange.endDate)
-            )
-        ) {
-            delete this.queryParams.dateRange;
-        } else {
-            this.queryParams.dateRange = JSON.stringify(dateRange);
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
         }
 
-        // update
-        this.triggerUpdateValues.call();
-    }
-
-    onLocationChange(locationIds: string[]) {
-        this.locationIds = locationIds;
-
-        // update query params
-        this.queryParams.locationIds = locationIds;
-
-        // update
-        this.triggerUpdateValues.call();
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
     /**
-     * Handles the call to the API to get the count
+     * Refresh data
      */
-    updateValues() {
-        // get the results for contacts not seen
-        if (
-            this.selectedOutbreak &&
-            this.selectedOutbreak.id
-        ) {
-            const qb = this.listFilterDataService.filterCasesFromContactsOvertimeAndPlace(
-                this.dateRange,
-                this.locationIds
+    refreshData() {
+        // get the results for contacts on the follow up list
+        if (this.outbreakId) {
+            // add global filters
+            const qb = this.getGlobalFilterQB(
+                null,
+                'addresses.parentLocationIdFilter'
             );
 
-            this.caseDataService
-                .getCasesCount(this.selectedOutbreak.id, qb)
-                .subscribe((result) => {
-                    this.contactsBecomeCasesCount = result.count;
-                });
+            // date
+            if (this.globalFilterDate) {
+                qb.filter.byDateRange(
+                    'dateBecomeCase', {
+                        endDate: this.globalFilterDate.endOf('day').format()
+                    }
+                );
+            }
 
-            this.caseDataService
-                .getCasesCount(this.selectedOutbreak.id)
-                .subscribe((result) => {
-                    this.casesCount = result.count;
+            // do we need to include default condition ?
+            if (!qb.filter.has('dateBecomeCase')) {
+                // any date
+                qb.filter.where({
+                    'dateBecomeCase': {
+                        neq: null
+                    }
                 });
+            }
+
+            // release previous subscriber
+            if (this.previousSubscriber) {
+                this.previousSubscriber.unsubscribe();
+                this.previousSubscriber = null;
+            }
+
+            // retrieve data
+            this.displayLoading = true;
+            this.previousSubscriber = Observable.forkJoin([
+                this.caseDataService.getCasesCount(this.outbreakId, qb),
+                this.caseDataService.getCasesCount(this.outbreakId)
+            ]).subscribe(([qbCountResult, countResult]) => {
+                this.contactsBecomeCasesCount = qbCountResult.count;
+                this.casesCount = countResult.count;
+                this.displayLoading = false;
+            });
         }
     }
-
 }

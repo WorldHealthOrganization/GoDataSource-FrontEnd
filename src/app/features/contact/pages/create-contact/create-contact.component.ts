@@ -23,6 +23,11 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
+import { EntityModel } from '../../../../core/models/entity.model';
 
 @Component({
     selector: 'app-create-contact',
@@ -31,10 +36,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
     styleUrls: ['./create-contact.component.less']
 })
 export class CreateContactComponent extends ConfirmOnFormChanges implements OnInit {
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // selected outbreak ID
     outbreakId: string;
@@ -47,10 +49,16 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
     genderList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
 
-    relatedEntityData: CaseModel|EventModel;
+    relatedEntityData: CaseModel | EventModel;
     relationship: RelationshipModel = new RelationshipModel();
 
     serverToday: Moment = null;
+
+    visualIDTranslateData: {
+        mask: string
+    };
+
+    contactIdMaskValidator: Observable<boolean>;
 
     constructor(
         private router: Router,
@@ -62,7 +70,9 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private dialogService: DialogService,
+        private i18nService: I18nService
     ) {
         super();
     }
@@ -108,9 +118,6 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                     return;
                 }
 
-                // update breadcrumbs
-                this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_TITLE', '.', true));
-
                 // get selected outbreak
                 this.outbreakDataService
                     .getSelectedOutbreak()
@@ -125,6 +132,26 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                     })
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.outbreakId = selectedOutbreak.id;
+
+                        // set visual ID translate data
+                        this.visualIDTranslateData = {
+                            mask: ContactModel.generateContactIDMask(selectedOutbreak.contactIdMask)
+                        };
+
+                        // set visual id for contact
+                        this.contactData.visualId = this.visualIDTranslateData.mask;
+
+                        // set visual ID validator
+                        this.contactIdMaskValidator = Observable.create((observer) => {
+                            this.contactDataService.checkContactVisualIDValidity(
+                                selectedOutbreak.id,
+                                this.visualIDTranslateData.mask,
+                                this.contactData.visualId
+                            ).subscribe((isValid: boolean) => {
+                                observer.next(isValid);
+                                observer.complete();
+                            });
+                        });
 
                         // retrieve Case/Event information
                         this.entityDataService
@@ -146,6 +173,10 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                             .subscribe((relatedEntityData: CaseModel|EventModel) => {
                                 // initialize Case/Event
                                 this.relatedEntityData = relatedEntityData;
+
+                                // initialize page breadcrumbs
+                                this.initializeBreadcrumbs();
+
                                 this.relationship.persons.push(
                                     new RelationshipPersonModel({
                                         id: this.entityId
@@ -154,6 +185,30 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                             });
                     });
             });
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        if (this.relatedEntityData) {
+            // case or event?
+            if (this.relatedEntityData.type === EntityType.CASE) {
+                // creating contact for a case
+                this.breadcrumbs = [
+                    new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
+                    new BreadcrumbItemModel(this.relatedEntityData.name, `/cases/${this.relatedEntityData.id}/view`),
+                    new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_TITLE', '.', true)
+                ];
+            } else {
+                // creating contact for an event
+                this.breadcrumbs = [
+                    new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
+                    new BreadcrumbItemModel(this.relatedEntityData.name, `/events/${this.relatedEntityData.id}/view`),
+                    new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_TITLE', '.', true)
+                ];
+            }
+        }
     }
 
     /**
@@ -179,44 +234,110 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
             !_.isEmpty(dirtyFields) &&
             !_.isEmpty(relationship)
         ) {
-            // add the new Contact
+            // check for duplicates
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.contactDataService
-                .createContact(this.outbreakId, dirtyFields)
+                .findDuplicates(this.outbreakId, dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showApiError(err);
 
+                    // hide dialog
+                    loadingDialog.close();
+
                     return ErrorObservable.create(err);
                 })
-                .subscribe((contactData: ContactModel) => {
-                    this.relationshipDataService
-                        .createRelationship(
-                            this.outbreakId,
-                            EntityType.CONTACT,
-                            contactData.id,
-                            relationship
-                        )
-                        .catch((err) => {
-                            // display error message
-                            this.snackbarService.showApiError(err);
+                .subscribe((contactDuplicates: EntityDuplicatesModel) => {
+                    // add the new Contact
+                    const runCreateContact = () => {
+                        // add the new Contact
+                        this.contactDataService
+                            .createContact(this.outbreakId, dirtyFields)
+                            .catch((err) => {
+                                this.snackbarService.showApiError(err);
 
-                            // remove contact
-                            this.contactDataService
-                                .deleteContact(this.outbreakId, contactData.id)
-                                .catch((errDC) => {
-                                    return ErrorObservable.create(errDC);
-                                })
-                                .subscribe();
+                                // hide dialog
+                                loadingDialog.close();
 
-                            // finished
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe((contactData: ContactModel) => {
+                                this.relationshipDataService
+                                    .createRelationship(
+                                        this.outbreakId,
+                                        EntityType.CONTACT,
+                                        contactData.id,
+                                        relationship
+                                    )
+                                    .catch((err) => {
+                                        // display error message
+                                        this.snackbarService.showApiError(err);
 
-                            // navigate to listing page
-                            this.disableDirtyConfirm();
-                            this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
+                                        // remove contact
+                                        this.contactDataService
+                                            .deleteContact(this.outbreakId, contactData.id)
+                                            .catch((errDC) => {
+                                                return ErrorObservable.create(errDC);
+                                            })
+                                            .subscribe();
+
+                                        // hide dialog
+                                        loadingDialog.close();
+
+                                        // finished
+                                        return ErrorObservable.create(err);
+                                    })
+                                    .subscribe(() => {
+                                        this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
+
+                                        // hide dialog
+                                        loadingDialog.close();
+
+                                        // navigate to listing page
+                                        this.disableDirtyConfirm();
+                                        this.router.navigate([`/contacts/${contactData.id}/modify`]);
+                                    });
+                            });
+                    };
+
+                    // do we have duplicates ?
+                    if (contactDuplicates.duplicates.length > 0) {
+                        // construct list of possible duplicates
+                        const possibleDuplicates: DialogField[] = [];
+                        _.each(contactDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
+                            // contact model
+                            const contactData: ContactModel = duplicate.model as ContactModel;
+
+                            // add link
+                            possibleDuplicates.push(new DialogField({
+                                name: 'link',
+                                placeholder: (index + 1 ) + '. ' + EntityModel.getNameWithDOBAge(
+                                    contactData,
+                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                ),
+                                fieldType: DialogFieldType.LINK,
+                                routerLink: ['/contacts', contactData.id, 'view'],
+                                linkTarget: '_blank'
+                            }));
                         });
+
+                        // display dialog
+                        this.dialogService.showConfirm(new DialogConfiguration({
+                            message: 'LNG_PAGE_CREATE_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
+                            customInput: true,
+                            fieldsList: possibleDuplicates,
+                        }))
+                            .subscribe((answer) => {
+                                if (answer.button === DialogAnswerButton.Yes) {
+                                    runCreateContact();
+                                } else {
+                                    // hide dialog
+                                    loadingDialog.close();
+                                }
+                            });
+                    } else {
+                        runCreateContact();
+                    }
                 });
         }
     }

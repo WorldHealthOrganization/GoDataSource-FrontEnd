@@ -21,7 +21,9 @@
                                 [(ngModel)]="newOutbreak.name"
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_NAME' | translate"
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_NAME_DESCRIPTION"
-                                required="true">
+                                required="true"
+                                app-general-async-validator
+                                [asyncValidatorObservable]="outbreakNameValidator$">
                             </app-form-input>
                             <app-form-select
                                 name="disease"
@@ -51,12 +53,14 @@
                             </app-form-location-dropdown>
                         </div>
 
-                        <app-form-textarea
-                            name="description"
-                            [(ngModel)]="newOutbreak.description"
-                            [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION' | translate"
-                            tooltip="LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
-                        </app-form-textarea>
+                        <div fxLayout="row">
+                            <app-form-textarea
+                                name="description"
+                                [(ngModel)]="newOutbreak.description"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
+                            </app-form-textarea>
+                        </div>
 
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-datepicker
@@ -83,9 +87,13 @@
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION"
                                 pattern="^(?:9*[^9()]*|[^9()]*9*[^9()]*|[^9()]*9*)$">
                             </app-form-input>
-
-                            <div fxFlex><!-- placeholder --></div>
-
+                            <app-form-input
+                                name="contactIdMask"
+                                [(ngModel)]="newOutbreak.contactIdMask"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_CONTACT_ID_MASK' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_CONTACT_ID_MASK_DESCRIPTION"
+                                pattern="^(?:9*[^9()]*|[^9()]*9*[^9()]*|[^9()]*9*)$">
+                            </app-form-input>
                         </div>
                     </div>
                 </mat-card>
@@ -183,8 +191,8 @@
                     </div>
                 </mat-card>
 
-                <div>
-                    <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                <div class="stepper-wrapper">
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
 
             </form>
@@ -208,53 +216,10 @@
                     urlTooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL_DESCRIPTION"
                     [required]="true">
                 </app-form-name-url-list>
-
-                <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
-            </form>
-        </mat-step>
-
-        <!-- step Case Investigation - questionnaire -->
-        <mat-step [stepControl]="caseInvestigationForm">
-            <form #caseInvestigationForm="ngForm">
-                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_OUTBREAK_TAB_CASE_INVESTIGATION' | translate}}</ng-template>
-                <!-- questions list -->
-                <app-form-question-list
-                    name="caseInvestigationTemplate"
-                    [ngModel]="newOutbreak.caseInvestigationTemplate"
-                    [autoSuggestVariable]="true">
-                </app-form-question-list>
-                <!-- btn save case investigation questionnaire -->
-                <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
-            </form>
-        </mat-step>
-
-        <!-- step Contact Follow-up - questionnaire -->
-        <mat-step [stepControl]="contactFollowUpForm">
-            <form #contactFollowUpForm="ngForm">
-                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_OUTBREAK_TAB_CONTACT_FOLLOWUP' | translate}}</ng-template>
-                <!-- questions list -->
-                <app-form-question-list
-                    name="contactFollowUpTemplate"
-                    [ngModel]="newOutbreak.contactFollowUpTemplate"
-                    [autoSuggestVariable]="true">
-                </app-form-question-list>
-                <!-- btn save contact followup questionnaire -->
-                <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
-            </form>
-        </mat-step>
-
-        <!-- step Lab Results - questionnaire -->
-        <mat-step [stepControl]="labResultsForm">
-            <form #labResultsForm="ngForm">
-                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_OUTBREAK_TAB_LAB_RESULTS' | translate}}</ng-template>
-                <!-- questions list -->
-                <app-form-question-list
-                    name="labResultsTemplate"
-                    [ngModel]="newOutbreak.labResultsTemplate"
-                    [autoSuggestVariable]="true">
-                </app-form-question-list>
-                <!-- btn save lab results questionnaire -->
-                <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                <div class="stepper-wrapper">
+                    <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                </div>
             </form>
         </mat-step>
 
@@ -266,10 +231,10 @@
                 {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
             </div>
             <br><br><br>
-            <div>
-                <button matStepperPrevious mat-raised-button>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                <button type="button" mat-raised-button color="primary" class="button-primary"
-                        (click)="createOutbreak([detailsForm, mapServersForm, caseInvestigationForm, contactFollowUpForm, labResultsForm ])">
+            <div class="stepper-wrapper">
+                <button matStepperPrevious mat-raised-button type="button">{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                <button type="button" mat-raised-button color="accent"
+                        (click)="createOutbreak([detailsForm, mapServersForm ])">
                     {{'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_BUTTON' | translate}}
                 </button>
             </div>

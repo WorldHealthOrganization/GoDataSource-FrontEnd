@@ -23,15 +23,21 @@ export class EntityDataService {
     entityMap = {
         [EntityType.CASE]: {
             dataService: this.caseDataService,
-            getMethod: 'getCase'
+            getMethod: 'getCase',
+            deleteMethod: 'deleteCase',
+            modifyMethod: 'modifyCase',
         },
         [EntityType.CONTACT]: {
             dataService: this.contactDataService,
-            getMethod: 'getContact'
+            getMethod: 'getContact',
+            deleteMethod: 'deleteContact',
+            modifyMethod: 'modifyContact',
         },
         [EntityType.EVENT]: {
             dataService: this.evenDataService,
-            getMethod: 'getEvent'
+            getMethod: 'getEvent',
+            deleteMethod: 'deleteEvent',
+            modifyMethod: 'modifyEvent',
         }
     };
 
@@ -57,9 +63,9 @@ export class EntityDataService {
 
         const qb = new RequestQueryBuilder();
         // include relation for Events
-        qb.include('location');
+        qb.include('location', true);
         // include relation for Cases / Contacts
-        qb.include('locations');
+        qb.include('locations', true);
 
         qb.merge(queryBuilder);
 
@@ -109,6 +115,42 @@ export class EntityDataService {
     }
 
     /**
+     * Delete a Person of an Outbreak
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @param {string} outbreakId
+     */
+    deleteEntity(
+        entityType: EntityType,
+        outbreakId: string,
+        entityId: string
+    ): Observable<any> {
+        const dataService = this.entityMap[entityType].dataService;
+        const method = this.entityMap[entityType].deleteMethod;
+
+        return dataService[method](outbreakId, entityId);
+    }
+
+    /**
+     * Modify a Person of an Outbreak
+     * @param {EntityType} entityType
+     * @param {string} outbreakId
+     * @param {string} entityId
+     * @param entityData
+     */
+    modifyEntity(
+        entityType: EntityType,
+        outbreakId: string,
+        entityId: string,
+        entityData
+    ): Observable<any> {
+        const dataService = this.entityMap[entityType].dataService;
+        const method = this.entityMap[entityType].modifyMethod;
+
+        return dataService[method](outbreakId, entityId, entityData);
+    }
+
+    /**
      * Return label - value pair of Entity objects
      * @param {EntityModel} entity
      * @returns {LabelValuePair[]}
@@ -155,6 +197,10 @@ export class EntityDataService {
                 entity.classification
             ));
             lightObject.push(new LabelValuePair(
+                'LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID',
+                entity.visualId
+            ));
+            lightObject.push(new LabelValuePair(
                 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
                 entity.riskLevel
             ));
@@ -186,12 +232,6 @@ export class EntityDataService {
                         moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                         ''
             ));
-            lightObject.push(new LabelValuePair(
-                'LNG_CASE_FIELD_LABEL_DATE_DECEASED',
-                entity.dateDeceased ?
-                        moment(entity.dateDeceased).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-                        ''
-            ));
         }
 
         // entity type = Contact
@@ -214,12 +254,20 @@ export class EntityDataService {
                 ageValue = ageMonths;
             }
             lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_FIELD_LABEL_AGE',
+                `${ageValue} ${ageUnit}`
+            ));
+            lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_FIELD_LABEL_GENDER',
                 entity.gender
             ));
             lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
                 entity.occupation
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+                entity.visualId
             ));
             lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',

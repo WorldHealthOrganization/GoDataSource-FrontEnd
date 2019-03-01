@@ -4,65 +4,75 @@ import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 
 const routes: Routes = [
+    // Backups
     {
-        path: '',
-        component: fromPages.SystemConfigComponent
+        path: 'backups',
+        component: fromPages.BackupsComponent
     },
-
-    // Sync upstream servers
+    // Upstream Servers
     {
-        path: 'system-upstream-sync',
-        component: fromPages.SystemUpstreamSyncComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.READ_SYS_CONFIG]
-        }
-    },
-    // Create System Upstream server
-    {
-        path: 'system-upstream-sync/create',
-        component: fromPages.CreateSystemUpstreamSyncComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG]
-        },
-        canDeactivate: [
-            PageChangeConfirmationGuard
+        path: 'upstream-servers',
+        children: [
+            {
+                path: '',
+                component: fromPages.UpstreamServersListComponent
+            },
+            {
+                path: 'create',
+                component: fromPages.CreateUpstreamServerComponent
+            }
         ]
     },
-
-    // Sync sync logs
+    // Client Applications
     {
-        path: 'system-sync-logs',
-        component: fromPages.SystemSyncLogsComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.READ_SYS_CONFIG]
-        }
-    },
-
-    // Client applications
-    {
-        path: 'system-client-applications',
-        component: fromPages.SystemClientApplicationsComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.READ_SYS_CONFIG]
-        }
-    },
-    // Create System Client application
-    {
-        path: 'system-client-applications/create',
-        component: fromPages.CreateSystemClientApplicationComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG]
-        },
-        canDeactivate: [
-            PageChangeConfirmationGuard
+        path: 'client-applications',
+        children: [
+            {
+                path: '',
+                component: fromPages.ClientApplicationsListComponent
+            },
+            {
+                path: 'create',
+                component: fromPages.CreateClientApplicationComponent
+            }
         ]
+    },
+    // System Devices
+    {
+        path: 'devices',
+        children: [
+            {
+                path: '',
+                component: fromPages.SystemDevicesComponent
+            },
+            {
+                path: ':deviceId/modify',
+                component: fromPages.ModifySystemDeviceComponent,
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [PERMISSION.WRITE_SYS_CONFIG],
+                    action: ViewModifyComponentAction.MODIFY
+                },
+                canDeactivate: [
+                    PageChangeConfirmationGuard
+                ]
+            },
+            {
+                path: ':deviceId/history',
+                component: fromPages.ViewHistorySystemDeviceComponent,
+                canDeactivate: [
+                    PageChangeConfirmationGuard
+                ]
+            }
+        ]
+    },
+    // Sync
+    {
+        path: 'sync-logs',
+        component: fromPages.SystemSyncLogsComponent
     }
 ];
 

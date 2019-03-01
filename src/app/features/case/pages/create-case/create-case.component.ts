@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -17,6 +17,13 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
 import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as _ from 'lodash';
+import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
+import { EntityModel } from '../../../../core/models/entity.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { Constants } from '../../../../core/models/constants';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
     selector: 'app-create-case',
@@ -25,6 +32,8 @@ import * as _ from 'lodash';
     styleUrls: ['./create-case.component.less']
 })
 export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit {
+    @ViewChild('personalForm') personalForm: NgForm;
+    @ViewChild('infectionForm') infectionForm: NgForm;
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
@@ -32,6 +41,8 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
     ];
 
     caseData: CaseModel = new CaseModel();
+    // case UID (coming from query params, optionally)
+    caseUID: string;
 
     genderList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
@@ -42,6 +53,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
     serverToday: Moment = null;
+    Constants = Constants;
 
     visualIDTranslateData: {
         mask: string
@@ -51,12 +63,15 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
 
     constructor(
         private router: Router,
+        private route: ActivatedRoute,
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private dialogService: DialogService,
+        private i18nService: I18nService
     ) {
         super();
     }
@@ -67,6 +82,15 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
         this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+
+        this.route.queryParams
+            .subscribe((params: { uid }) => {
+                if (params.uid) {
+                    this.caseUID = params.uid;
+
+                    this.initializeBreadcrumbs();
+                }
+            });
 
         // get today time
         this.genericDataService
@@ -88,15 +112,19 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
 
                 // set visual ID translate data
                 this.visualIDTranslateData = {
-                    mask: OutbreakModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
+                    mask: CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
                 };
+
+                // set visual id for case
+                this.caseData.visualId = this.visualIDTranslateData.mask;
 
                 // set visual ID validator
                 this.caseIdMaskValidator = Observable.create((observer) => {
-                    this.outbreakDataService.generateVisualIDCheckValidity(
+                    this.caseDataService.checkCaseVisualIDValidity(
                         this.selectedOutbreak.id,
+                        this.visualIDTranslateData.mask,
                         this.caseData.visualId
-                    ).subscribe((isValid: boolean) => {
+                    ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
                         observer.next(isValid);
                         observer.complete();
                     });
@@ -104,6 +132,26 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
             });
     }
 
+    private initializeBreadcrumbs() {
+        this.breadcrumbs = [
+            new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+        ];
+
+        if (this.caseUID) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_CREATE_CASE_WITH_UID_TITLE', '.', true, {}, {uid: this.caseUID})
+            );
+        } else {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_CREATE_CASE_TITLE', '.', true)
+            );
+        }
+    }
+
+    /**
+     * Create new Case
+     * @param stepForms
+     */
     createNewCase(stepForms: NgForm[]) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
@@ -120,20 +168,91 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
         ) {
-            // add the new Case
+            // add case UID
+            if (this.caseUID) {
+                dirtyFields.id = this.caseUID;
+            }
+
+            // check for duplicates
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.caseDataService
-                .createCase(this.selectedOutbreak.id, dirtyFields)
+                .findDuplicates(this.selectedOutbreak.id, dirtyFields)
                 .catch((err) => {
-                    this.snackbarService.showApiError(err);
+                    if (_.includes(_.get(err, 'details.codes.id'), `uniqueness`)) {
+                        this.snackbarService.showError('LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID');
+                    } else {
+                        this.snackbarService.showApiError(err);
+                    }
+
+                    // hide dialog
+                    loadingDialog.close();
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
-                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
+                .subscribe((caseDuplicates: EntityDuplicatesModel) => {
+                    // add the new Case
+                    const runCreateCase = () => {
+                        this.caseDataService
+                            .createCase(this.selectedOutbreak.id, dirtyFields)
+                            .catch((err) => {
+                                this.snackbarService.showApiError(err);
 
-                    // navigate to listing page
-                    this.disableDirtyConfirm();
-                    this.router.navigate(['/cases']);
+                                // hide dialog
+                                loadingDialog.close();
+
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe((newCase: CaseModel) => {
+                                this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
+
+                                // hide dialog
+                                loadingDialog.close();
+
+                                // navigate to listing page
+                                this.disableDirtyConfirm();
+                                this.router.navigate([`/cases/${newCase.id}/modify`]);
+                            });
+                    };
+
+                    // do we have duplicates ?
+                    if (caseDuplicates.duplicates.length > 0) {
+                        // construct list of possible duplicates
+                        const possibleDuplicates: DialogField[] = [];
+                        _.each(caseDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
+                            // case model
+                            const caseData: CaseModel = duplicate.model as CaseModel;
+
+                            // add link
+                            possibleDuplicates.push(new DialogField({
+                                name: 'link',
+                                placeholder: (index + 1 ) + '. ' + EntityModel.getNameWithDOBAge(
+                                    caseData,
+                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                ),
+                                fieldType: DialogFieldType.LINK,
+                                routerLink: ['/cases', caseData.id, 'view'],
+                                linkTarget: '_blank'
+                            }));
+                        });
+
+                        // display dialog
+                        this.dialogService.showConfirm(new DialogConfiguration({
+                            message: 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_CONFIRM_MSG',
+                            customInput: true,
+                            fieldsList: possibleDuplicates,
+                        }))
+                        .subscribe((answer) => {
+                            if (answer.button === DialogAnswerButton.Yes) {
+                                runCreateCase();
+                            } else {
+                                // hide dialog
+                                loadingDialog.close();
+                            }
+                        });
+                    } else {
+                        runCreateCase();
+                    }
                 });
         }
     }

@@ -10,7 +10,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
@@ -21,6 +21,11 @@ import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { tap } from 'rxjs/operators';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { LoadingDialogModel } from '../../../../shared/components/loading-dialog/loading-dialog.component';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-events-list',
@@ -50,6 +55,26 @@ export class EventsListComponent extends ListComponent implements OnInit {
     EntityType = EntityType;
     UserSettings = UserSettings;
 
+    loadingDialog: LoadingDialogModel;
+
+
+    allowedExportTypes: ExportDataExtension[] = [
+        ExportDataExtension.CSV,
+        ExportDataExtension.XLS,
+        ExportDataExtension.XLSX,
+        ExportDataExtension.XML,
+        ExportDataExtension.JSON,
+        ExportDataExtension.ODS
+    ];
+
+    anonymizeFields: LabelValuePair[] = [
+        new LabelValuePair('LNG_EVENT_FIELD_LABEL_NAME', 'name'),
+        new LabelValuePair('LNG_EVENT_FIELD_LABEL_DATE', 'date'),
+        new LabelValuePair('LNG_EVENT_FIELD_LABEL_DESCRIPTION', 'description'),
+        new LabelValuePair('LNG_EVENT_FIELD_LABEL_ADDRESS', 'address'),
+        new LabelValuePair('LNG_EVENT_FIELD_LABEL_DELETED', 'deleted'),
+    ];
+
     constructor(
         private eventDataService: EventDataService,
         private outbreakDataService: OutbreakDataService,
@@ -58,7 +83,8 @@ export class EventsListComponent extends ListComponent implements OnInit {
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
         private route: ActivatedRoute,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private i18nService: I18nService
     ) {
         super(
             snackbarService,
@@ -95,6 +121,11 @@ export class EventsListComponent extends ListComponent implements OnInit {
         // default table columns
         this.tableColumns = [
             new VisibleColumnModel({
+                field: 'checkbox',
+                required: true,
+                excludeFromSave: true
+            }),
+            new VisibleColumnModel({
                 field: 'name',
                 label: 'LNG_EVENT_FIELD_LABEL_NAME'
             }),
@@ -129,7 +160,8 @@ export class EventsListComponent extends ListComponent implements OnInit {
     refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list of Events
-            this.eventsList$ = this.eventDataService.getEventsList(this.selectedOutbreak.id, this.queryBuilder);
+            this.eventsList$ = this.eventDataService.getEventsList(this.selectedOutbreak.id, this.queryBuilder)
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 
@@ -210,5 +242,98 @@ export class EventsListComponent extends ListComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    /**
+     * Export relationships for selected events
+     */
+    exportSelectedEventsRelationship() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        const personsQb = qb.addChildQueryBuilder('person');
+
+        // id
+        personsQb.filter.bySelect('id', selectedRecords, true, null);
+
+        // type
+        personsQb.filter.byEquality(
+            'type',
+            EntityType.EVENT
+        );
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIPS_TITLE',
+            url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+            fileName: this.i18nService.instant('LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // optional
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
+        });
+    }
+
+    /**
+     * Export Event Relationships
+     */
+    exportFilteredEventsRelationships() {
+        // construct filter by case query builder
+        const qb = new RequestQueryBuilder();
+        const personsQb = qb.addChildQueryBuilder('person');
+
+        // merge out query builder
+        personsQb.merge(this.queryBuilder);
+
+        // remove pagination
+        personsQb.paginator.clear();
+
+        // filter only events
+        personsQb.filter.byEquality(
+            'type',
+            EntityType.EVENT
+        );
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIPS_TITLE',
+            url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
+            fileName: this.i18nService.instant('LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME'),
+
+            // optional
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
+        });
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
     }
 }

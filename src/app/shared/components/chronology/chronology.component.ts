@@ -1,30 +1,6 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import * as _ from 'lodash';
-
-export class ChronologyItem {
-    public label: string;
-    public date: string;
-    public translateData: {
-        [key: string]: string
-    } = {};
-
-    constructor(data: {
-        // required
-        label: string,
-        date: string,
-
-        // optional
-        translateData?: {
-            [key: string]: string
-        }
-    }) {
-        // assign properties
-        Object.assign(
-            this,
-            data
-        );
-    }
-}
+import { ChronologyItem } from './typings/chronology-item';
 
 @Component({
     selector: 'app-chronology',

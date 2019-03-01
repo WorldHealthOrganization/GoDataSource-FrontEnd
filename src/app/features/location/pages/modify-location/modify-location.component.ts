@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,6 +15,9 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Observable } from 'rxjs/Observable';
 import * as _ from 'lodash';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { LocationBreadcrumbsComponent } from '../../../../shared/components/location-breadcrumbs/location-breadcrumbs.component';
+import { DialogAnswer, DialogAnswerButton, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-modify-location',
@@ -24,14 +27,7 @@ import * as _ from 'lodash';
 })
 export class ModifyLocationComponent extends ViewModifyComponent implements OnInit {
     // breadcrumb header
-    public breadcrumbs: BreadcrumbItemModel[] =  [
-        new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_LOCATIONS_TITLE',
-            '/locations'
-        )
-    ];
-    // locations breadcrumbs
-    public locationBreadcrumbs: BreadcrumbItemModel[] = [];
+    public breadcrumbs: BreadcrumbItemModel[] =  [];
 
     locationId: string;
     locationData: LocationModel = new LocationModel();
@@ -41,6 +37,8 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
 
     backToCurrent: boolean = false;
 
+    @ViewChild('locationBreadcrumbs') locationBreadcrumbs: LocationBreadcrumbsComponent;
+
     constructor(
         private locationDataService: LocationDataService,
         private router: Router,
@@ -48,7 +46,8 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
         private formHelper: FormHelperService,
         protected route: ActivatedRoute,
         private authDataService: AuthDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private dialogService: DialogService
     ) {
         super(route);
     }
@@ -68,39 +67,20 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             .subscribe((params: { locationId }) => {
                 this.locationId = params.locationId;
 
-                // reset breadcrumbs
-                this.breadcrumbs = [
-                    new BreadcrumbItemModel(
-                        'LNG_PAGE_LIST_LOCATIONS_TITLE',
-                        '/locations'
-                    )
-                ];
-                this.locationBreadcrumbs = [];
+                this.locationDataService
+                    .getLocation(this.locationId)
+                    .catch((err) => {
+                        this.snackbarService.showError(err.message);
+                        this.disableDirtyConfirm();
+                        this.router.navigate(['/locations']);
+                        return ErrorObservable.create(err);
+                    })
+                    .subscribe((locationData: {}) => {
+                        // location data
+                        this.locationData = new LocationModel(locationData);
+                        this.createBreadcrumbs();
+                    });
             });
-
-        if (this.locationId) {
-            this.locationDataService
-                .getLocation(this.locationId)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    this.disableDirtyConfirm();
-                    this.router.navigate(['/locations']);
-                    return ErrorObservable.create(err);
-                })
-                .subscribe((locationData: {}) => {
-                    // location data
-                    this.locationData = new LocationModel(locationData);
-                    this.breadcrumbs.push(
-                        new BreadcrumbItemModel(
-                             this.viewOnly ? 'LNG_PAGE_VIEW_LOCATION_TITLE' : 'LNG_PAGE_MODIFY_LOCATION_TITLE',
-                            '.',
-                            true,
-                            {},
-                            this.locationData
-                        )
-                    );
-                });
-        }
     }
 
     modifyLocation(form: NgForm) {
@@ -139,23 +119,54 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             return;
         }
 
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.locationDataService
             .modifyLocation(this.locationId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
-
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .subscribe((modifiedLocation: LocationModel) => {
+                // update model
+                this.locationData = modifiedLocation;
+
+                // mark form as pristine
+                form.form.markAsPristine();
+
+                // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE');
 
-                // navigate to listing page
-                this.disableDirtyConfirm();
-                this.router.navigate(
-                    dirtyFields.parentLocationId ?
-                        ['/locations', dirtyFields.parentLocationId, 'children'] :
-                        ['/locations'])
-                ;
+                // update breadcrumb
+                this.createBreadcrumbs();
+
+                // refresh location breadcrumbs
+                this.locationBreadcrumbs.refreshBreadcrumbs();
+                if (dirtyFields.geoLocation) {
+                    this.locationDataService.getLocationUsageCount(modifiedLocation.id)
+                        .subscribe((usedEntitiesCount) => {
+                            if (usedEntitiesCount.count > 0) {
+                                this.dialogService.showConfirm(new DialogConfiguration({
+                                    message: 'LNG_DIALOG_CONFIRM_PROPAGATE_LAT_LNG',
+                                    cancelLabel: 'LNG_COMMON_LABEL_NO'
+                                })).subscribe((answer: DialogAnswer) => {
+                                    if (answer.button === DialogAnswerButton.Yes) {
+                                        // propagate values to all the entities that have in use this location
+                                        this.locationDataService.propagateGeoLocation(modifiedLocation.id)
+                                            .catch((err) => {
+                                                this.snackbarService.showApiError(err);
+                                                return ErrorObservable.create(err);
+                                            }).subscribe(() => {
+                                                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE');
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                }
+
+                // hide dialog
+                loadingDialog.close();
             });
     }
 
@@ -191,5 +202,25 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             value.length > 0 : (
                 value || value === 0
             );
+    }
+
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [
+            new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_LOCATIONS_TITLE',
+                '/locations'
+            ),
+
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_LOCATION_TITLE' : 'LNG_PAGE_MODIFY_LOCATION_TITLE',
+                '.',
+                true,
+                {},
+                this.locationData
+            )
+        ];
     }
 }

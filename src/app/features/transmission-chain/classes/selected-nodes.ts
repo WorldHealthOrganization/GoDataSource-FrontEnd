@@ -2,6 +2,7 @@ import { CaseModel } from '../../../core/models/case.model';
 import { ContactModel } from '../../../core/models/contact.model';
 import { EventModel } from '../../../core/models/event.model';
 import { EntityType } from '../../../core/models/entity-type';
+import * as _ from 'lodash';
 
 export class SelectedNodes {
     nodes: (CaseModel|ContactModel|EventModel)[] = [];
@@ -34,8 +35,18 @@ export class SelectedNodes {
      * Remove node from selected nodes list
      * @param index
      */
-    removeNode(index): void {
+    removeNodeAtIndex(index): void {
         this.nodes.splice(index, 1);
+    }
+
+    /**
+     * Keep only a single node on the selected nodes list
+     * @param node
+     */
+    keepNode(node: CaseModel | EventModel | ContactModel): void {
+        this.nodes = _.filter(this.nodes, (selectedNode) => {
+            return selectedNode.id === node.id;
+        });
     }
 
     /**

@@ -8,12 +8,13 @@ import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { NgForm } from '@angular/forms';
+import { NgForm, NgModel } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { v4 as uuid } from 'uuid';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { FormSelectChangeDetectionPushComponent } from '../../../../shared/components/form-select-change-detection-push/form-select-change-detection-push.component';
 
 export enum ImportDataExtension {
     CSV = '.csv',
@@ -37,6 +38,7 @@ export enum ImportServerModelNames {
 enum ImportServerErrorCodes {
     DUPLICATE_RECORD = 11000,
     INVALID_VISUAL_ID_MASK = 'INVALID_VISUAL_ID_MASK',
+    DUPLICATE_VISUAL_ID = 'DUPLICATE_VISUAL_ID',
     ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE = 'ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE',
     ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE = 'ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE',
     ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE = 'ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE'
@@ -244,8 +246,11 @@ export class ImportDataComponent implements OnInit {
         details: {
             failed: {
                 recordNo: number,
+                message: string,
                 error: {
                     code: number,
+                    message: string,
+                    errmsg: string,
                     details: {
                         codes: {
                             [property: string]: any
@@ -364,12 +369,24 @@ export class ImportDataComponent implements OnInit {
         };
 
         // handle server errors
-        this.uploader.onErrorItem = () => {
-            // display error
-            this.displayError(
-                'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSING_FILE',
-                true
-            );
+        this.uploader.onErrorItem = (file, err: any) => {
+            // display toast
+            try {
+                err = _.isObject(err) ? err : JSON.parse(err);
+                err = err.error ? err.error : err;
+                this.snackbarService.showApiError(err);
+
+                // hide loading
+                this._displayLoading = false;
+                this._displayLoadingLocked = false;
+                this.progress = null;
+            } catch (e) {
+                // display error
+                this.displayError(
+                    'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSING_FILE',
+                    true
+                );
+            }
         };
 
         // handle before upload preparation
@@ -498,8 +515,20 @@ export class ImportDataComponent implements OnInit {
                         const pushNewMapField = (
                             destination: string,
                             source: string
-                        ): ImportableMapField => {
-                            // allow duplicate maps that need to be solved by user
+                        ): ImportableMapField | null => {
+                            // check identical maps...
+                            const itemExistsAlready = _.find(this.mappedFields, {
+                                destinationField: destination,
+                                sourceField: source
+                            }) !== undefined;
+
+                            // ignore identical maps
+                            if (itemExistsAlready) {
+                                return null;
+                            }
+
+                            // allow other kinda.. duplicate maps that need to be solved by user
+                            // this should work for options mapping..in case you want to map different options from different properties
                             // NOTHING
 
                             // create new possible map item
@@ -550,10 +579,16 @@ export class ImportDataComponent implements OnInit {
                                         if (
                                             (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()])
                                         ) {
-                                            pushNewMapField(
+                                            // create object
+                                            const pushedItem = pushNewMapField(
                                                 `${parentPath}.${property}`,
                                                 mappedHeaderObj.value
-                                            ).sourceDestinationLevel[0] = supportedLevel.value;
+                                            );
+
+                                            // did we succeed in creating the new object?
+                                            if (pushedItem) {
+                                                pushedItem.sourceDestinationLevel[0] = supportedLevel.value;
+                                            }
                                         } else {
                                             // there is no point going further
                                             return false;
@@ -627,7 +662,10 @@ export class ImportDataComponent implements OnInit {
             if (_.find(
                 this.mappedFields,
                 (item: ImportableMapField): boolean => {
-                    if (item.sourceFieldWithoutIndexes !== importableItem.sourceFieldWithoutIndexes) {
+                    if (
+                        item.sourceFieldWithoutIndexes !== importableItem.sourceFieldWithoutIndexes ||
+                        item.destinationField !== importableItem.destinationField
+                    ) {
                         return false;
                     } else {
                         return _.find(
@@ -840,121 +878,144 @@ export class ImportDataComponent implements OnInit {
             return;
         }
 
-        // validate form
-        if (!this.formHelper.validateForm(
-            form,
-            false
-        )) {
-            // invalid form
-            return;
-        }
-
-        // display fields with data
-        const allFields: any = this.formHelper.getFields(form);
-
         // display loading
-        this._displayLoading = true;
-        this._displayLoadingLocked = true;
+        const loadingDialog = this.dialogService.showLoadingDialog();
+
+        // validate items & import data
         setTimeout(() => {
-            // nothing to import - this is handled above, when we convert JSON to importable object
-            // NO NEED for further checks
-
-            // construct import JSON
-            const importJSON = {
-                fileId: this.importableObject.id,
-                map: {},
-                valuesMap: {}
-            };
-            _.each(
-                allFields.mapObject,
-                (item: {
-                    source: string,
-                    destination: string,
-                    sourceDestinationLevel?: number[],
-                    options: {
-                        sourceOption: string,
-                        destinationOption: string
-                    }[]
-                }) => {
-                    // forge the almighty source & destination
-                    let source: string = item.source;
-                    let destination: string = item.destination;
-
-                    // add indexes to source arrays
-                    source = this.addIndexesToArrays(
-                        source,
-                        item.sourceDestinationLevel
-                    );
-
-                    // add indexes to destination arrays
-                    destination = this.addIndexesToArrays(
-                        destination,
-                        item.sourceDestinationLevel
-                    );
-
-                    // map main properties
-                    importJSON.map[source] = destination;
-
-                    // map drop-down values
-                    if (
-                        item.options &&
-                        !_.isEmpty(item.options)
-                    ) {
-                        // here we don't need to add indexes, so we keep the arrays just as they are
-                        // also, we need to merge value Maps with the previous ones
-                        const properSource = item.source.replace(/\[\d+\]/g, '[]');
-                        importJSON.valuesMap[properSource] = {
-                            ...importJSON.valuesMap[properSource],
-                            ..._.transform(
-                                item.options,
-                                (result, option: {
-                                    sourceOption: string,
-                                    destinationOption: string
-                                }) => {
-                                    result[option.sourceOption] = option.destinationOption;
-                                },
-                                {}
-                            )
-                        };
-                    }
+            // validate item
+            _.each((form as any)._directives, (model: NgModel) => {
+                if (
+                    model.valueAccessor &&
+                    model.valueAccessor instanceof FormSelectChangeDetectionPushComponent
+                ) {
+                    // touch, validate & detect changes
+                    model.valueAccessor.touch();
+                    model.valueAccessor.control.updateValueAndValidity();
+                    model.valueAccessor.validateAndMarkForCheck();
                 }
-            );
+            });
 
-            // import data
-            this.progress = null;
-            this.importExportDataService.importData(
-                this.importDataUrl,
-                importJSON
-            )
-                .catch((err) => {
-                    // display error message
-                    if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
-                        // construct custom message
-                        this.errMsgDetails = err;
+            // check valid fields & import data if we don't have any errors
+            setTimeout(() => {
+                // do we have invalid fields ?
+                if (!this.formHelper.validateForm(
+                    form,
+                    false
+                )) {
+                    // invalid form
+                    loadingDialog.close();
+                    return;
+                }
 
-                        // display error
-                        this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
-                    } else {
-                        this.snackbarService.showError(err.message);
-                    }
+                // import data
+                // display loading
+                const allFields: any = this.formHelper.getFields(form);
+                this._displayLoading = true;
+                this._displayLoadingLocked = true;
+                loadingDialog.close();
+                setTimeout(() => {
+                    // nothing to import - this is handled above, when we convert JSON to importable object
+                    // NO NEED for further checks
 
-                    // reset loading
-                    this._displayLoading = false;
-                    this._displayLoadingLocked = false;
+                    // construct import JSON
+                    const importJSON = {
+                        fileId: this.importableObject.id,
+                        map: {},
+                        valuesMap: {}
+                    };
+                    _.each(
+                        allFields.mapObject,
+                        (item: {
+                            source: string,
+                            destination: string,
+                            sourceDestinationLevel?: number[],
+                            options: {
+                                sourceOption: string,
+                                destinationOption: string
+                            }[]
+                        }) => {
+                            // forge the almighty source & destination
+                            let source: string = item.source;
+                            let destination: string = item.destination;
 
-                    // propagate err
-                    return ErrorObservable.create(err);
-                })
-                .subscribe(() => {
-                    // display success
-                    this.snackbarService.showSuccess(
-                        this.importSuccessMessage,
-                        this.translationData
+                            // add indexes to source arrays
+                            source = this.addIndexesToArrays(
+                                source,
+                                item.sourceDestinationLevel
+                            );
+
+                            // add indexes to destination arrays
+                            destination = this.addIndexesToArrays(
+                                destination,
+                                item.sourceDestinationLevel
+                            );
+
+                            // map main properties
+                            importJSON.map[source] = destination;
+
+                            // map drop-down values
+                            if (
+                                item.options &&
+                                !_.isEmpty(item.options)
+                            ) {
+                                // here we don't need to add indexes, so we keep the arrays just as they are
+                                // also, we need to merge value Maps with the previous ones
+                                const properSource = item.source.replace(/\[\d+\]/g, '[]');
+                                importJSON.valuesMap[properSource] = {
+                                    ...importJSON.valuesMap[properSource],
+                                    ..._.transform(
+                                        item.options,
+                                        (result, option: {
+                                            sourceOption: string,
+                                            destinationOption: string
+                                        }) => {
+                                            result[option.sourceOption] = option.destinationOption;
+                                        },
+                                        {}
+                                    )
+                                };
+                            }
+                        }
                     );
 
-                    // emit finished event - event should handle redirect
-                    this.finished.emit();
+                    // import data
+                    this.progress = null;
+                    this.importExportDataService.importData(
+                        this.importDataUrl,
+                        importJSON
+                    )
+                        .catch((err) => {
+                            // display error message
+                            if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
+                                // construct custom message
+                                this.errMsgDetails = err;
+
+                                // display error
+                                this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
+                            } else {
+                                this.snackbarService.showApiError(err);
+                            }
+
+                            // reset loading
+                            this._displayLoading = false;
+                            this._displayLoadingLocked = false;
+
+                            // propagate err
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            // display success
+                            this.snackbarService.showSuccess(
+                                this.importSuccessMessage,
+                                this.translationData
+                            );
+
+                            // emit finished event - event should handle redirect
+                            this.finished.emit();
+                        });
                 });
+            });
         });
     }
 
@@ -968,4 +1029,36 @@ export class ImportDataComponent implements OnInit {
         this.mappedFields = [];
         this.decryptPassword = null;
     }
+
+    /**
+     * Set Map Field property value and add options if necessary
+     */
+    setSourceDestinationValueAndDetermineOptions(
+        item: ImportableMapField,
+        property: string,
+        value: any
+    ) {
+        // set value
+        item[property] = value ? value.value : value;
+
+        // add options if necessary
+        this.addMapOptionsIfNecessary(item);
+    }
+
+    /**
+     * Set destination level
+     */
+    setDestinationLevel(
+        item: ImportableMapField,
+        levelIndex: number,
+        value: any,
+        sourceControl: FormSelectChangeDetectionPushComponent
+    ) {
+        // set level
+        item.sourceDestinationLevel[levelIndex] = value ? value.value : value;
+
+        // validate control and mark for change detection
+        sourceControl.validateAndMarkForCheck();
+    }
+
 }

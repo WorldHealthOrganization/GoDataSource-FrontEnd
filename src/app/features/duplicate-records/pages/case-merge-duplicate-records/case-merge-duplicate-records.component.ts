@@ -16,10 +16,10 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DocumentModel } from '../../../../core/models/document.model';
 import * as moment from 'moment';
 import { Constants } from '../../../../core/models/constants';
-import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { NgForm } from '@angular/forms';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
 
 @Component({
     selector: 'app-case-merge-duplicate-records',
@@ -124,7 +124,7 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
             options: LabelValuePair[],
             value: any
         },
-        outcome: {
+        outcomeId: {
             options: LabelValuePair[],
             value: any
         },
@@ -132,15 +132,15 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
             options: LabelValuePair[],
             value: any
         },
-        deceased: {
+        dateOfBurial: {
             options: LabelValuePair[],
+            value: any
+        },
+        dateRanges: {
+            option: LabelValuePair[],
             value: any
         },
         safeBurial: {
-            options: LabelValuePair[],
-            value: any
-        },
-        dateDeceased: {
             options: LabelValuePair[],
             value: any
         },
@@ -282,7 +282,7 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
                 options: [],
                 value: undefined
             },
-            outcome: {
+            outcomeId: {
                 options: [],
                 value: undefined
             },
@@ -290,15 +290,15 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
                 options: [],
                 value: undefined
             },
-            deceased: {
+            dateRanges: {
+                option: [],
+                value: undefined
+            },
+            dateOfBurial: {
                 options: [],
                 value: undefined
             },
             safeBurial: {
-                options: [],
-                value: undefined
-            },
-            dateDeceased: {
                 options: [],
                 value: undefined
             },
@@ -332,11 +332,10 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
             this.uniqueOptions.isDateOfOnsetApproximate = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'isDateOfOnsetApproximate');
             this.uniqueOptions.dateBecomeCase = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateBecomeCase');
             this.uniqueOptions.dateOfInfection = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateOfInfection');
-            this.uniqueOptions.outcome = EntityModel.uniqueStringOptions(this.mergeRecords, 'outcome');
+            this.uniqueOptions.outcomeId = EntityModel.uniqueStringOptions(this.mergeRecords, 'outcomeId');
             this.uniqueOptions.dateOfOutcome = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateOfOutcome');
-            this.uniqueOptions.deceased = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'deceased');
+            this.uniqueOptions.dateOfBurial = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateOfBurial');
             this.uniqueOptions.safeBurial = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'safeBurial');
-            this.uniqueOptions.dateDeceased = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateDeceased');
 
             // merge all documents
             this.determineDocuments();
@@ -344,11 +343,8 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
             // merge all addresses, keep just one current address
             this.determineAddresses();
 
-            // merge all hospitalization dates
-            this.determineHospitalizationDates();
-
-            // merge all isolation dates
-            this.determineIsolationDates();
+            // merge all dates
+            this.determineDateRanges();
 
             // determine questionnaire answers
             this.determineQuestionnaireAnswers();
@@ -371,30 +367,15 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
     }
 
     /**
-     * Determine hospitalization dates
+     * Determine date ranges
      */
-    private determineHospitalizationDates() {
+    private determineDateRanges() {
         // merge all hospitalization dates
-        this.caseData.hospitalizationDates = [];
+        this.caseData.dateRanges = [];
         _.each(this.mergeRecords, (ent: EntityModel) => {
-            _.each((ent.model as CaseModel).hospitalizationDates, (date: DateRangeModel) => {
+            _.each((ent.model as CaseModel).dateRanges, (date: CaseCenterDateRangeModel) => {
                 if (date.startDate || date.endDate) {
-                    this.caseData.hospitalizationDates.push(date);
-                }
-            });
-        });
-    }
-
-    /**
-     * Determine isolation dates
-     */
-    private determineIsolationDates() {
-        // merge all isolation dates
-        this.caseData.isolationDates = [];
-        _.each(this.mergeRecords, (ent: EntityModel) => {
-            _.each((ent.model as CaseModel).isolationDates, (date: DateRangeModel) => {
-                if (date.startDate || date.endDate) {
-                    this.caseData.isolationDates.push(date);
+                    this.caseData.dateRanges.push(date);
                 }
             });
         });

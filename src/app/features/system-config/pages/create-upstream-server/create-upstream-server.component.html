@@ -1,0 +1,134 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+    <mat-horizontal-stepper linear #stepper>
+
+        <!-- Details step -->
+        <mat-step [stepControl]="detailsForm">
+            <form #detailsForm="ngForm">
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_TAB_DETAILS_TITLE'| translate}}</ng-template>
+
+                <!-- Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                                <app-form-input
+                                    name="name"
+                                    [(ngModel)]="upstreamServerData.name"
+                                    [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_NAME' | translate"
+                                    tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_NAME_DESCRIPTION"
+                                    required="true">
+                                </app-form-input>
+
+                                <app-form-input
+                                    name="timeout"
+                                    [(ngModel)]="upstreamServerData.timeout"
+                                    [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_TIMEOUT' | translate"
+                                    tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_TIMEOUT_DESCRIPTION"
+                                    required="true"
+                                    type="number">
+                                </app-form-input>
+                            </div>
+
+                            <app-form-input
+                                name="url"
+                                [(ngModel)]="upstreamServerData.url"
+                                [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_URL' | translate"
+                                tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_URL_DESCRIPTION"
+                                required="true"
+                                app-unique-validator="url$"
+                                [additionalControlsToCheck]="duplicateUrls"
+                                (blur)="formatUrl($event)">
+                            </app-form-input>
+                        </div>
+
+                        <app-form-textarea
+                            name="description"
+                            [(ngModel)]="upstreamServerData.description"
+                            [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION' | translate"
+                            tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
+                        </app-form-textarea>
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
+                                name="syncInterval"
+                                [(ngModel)]="upstreamServerData.syncInterval"
+                                [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_INTERVAL' | translate"
+                                tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_INTERVAL_DESCRIPTION"
+                                type="number"
+                                required="true">
+                            </app-form-input>
+
+                            <app-form-slide-toggle
+                                name="syncOnEveryChange"
+                                [(ngModel)]="upstreamServerData.syncOnEveryChange"
+                                [label]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ON_EVERY_CHANGE' | translate"
+                                tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ON_EVERY_CHANGE_DESCRIPTION">
+                            </app-form-slide-toggle>
+
+                            <app-form-slide-toggle
+                                name="syncEnabled"
+                                [(ngModel)]="upstreamServerData.syncEnabled"
+                                [label]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ENABLED' | translate"
+                                tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ENABLED_DESCRIPTION">
+                            </app-form-slide-toggle>
+
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
+                                name="credentials[clientId]"
+                                [(ngModel)]="upstreamServerData.credentials.clientId"
+                                [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS_CLIENT_ID' | translate"
+                                tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS_CLIENT_ID_DESCRIPTION"
+                                required="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="credentials[clientSecret]"
+                                [(ngModel)]="upstreamServerData.credentials.clientSecret"
+                                [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS_CLIENT_SECRET' | translate"
+                                tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS_CLIENT_SECRET_DESCRIPTION"
+                                required="true">
+                            </app-form-input>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <div class="stepper-wrapper">
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>
+                {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
+            </ng-template>
+
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
+
+            <div class="stepper-wrapper">
+                <button mat-raised-button type="button" matStepperPrevious>
+                    {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+                </button>
+                <button
+                    type="button" mat-raised-button color="accent"
+                    (click)="createNewUpstreamServer([detailsForm])">
+                    {{'LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_ACTION_CREATE_UPSTREAM_SERVER_BUTTON' | translate}}
+                </button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+
+</div>

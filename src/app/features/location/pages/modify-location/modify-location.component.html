@@ -6,10 +6,13 @@
 
 <form class="page-content form-section" #form="ngForm" (submit)="modifyLocation(form)">
 
-    <div class="form-content">
+    <div
+        fxFlex fxLayout="column" fxLayoutGap="20px"
+        class="form-content">
 
         <!-- location breadcrumb -->
         <app-location-breadcrumbs
+            #locationBreadcrumbs
             [activeLocationBreadcrumb]="viewOnly ? 'LNG_PAGE_VIEW_LOCATION_NAME': 'LNG_PAGE_MODIFY_LOCATION_NAME'"></app-location-breadcrumbs>
 
         <mat-tab-group class="page-tabs-navbar">
@@ -79,6 +82,11 @@
                                     [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT' | translate"
                                     tooltip="LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT_DESCRIPTION"
                                     [required]="isLatLngRequired(lngInput.value)"
+                                    app-min-max-validator
+                                    [min]="-90"
+                                    [minNumber]="-90"
+                                    [max]="90"
+                                    [maxNumber]="90"
                                     [disabled]="viewOnly"
                                     type="number"
                                     (optionChanged)="onChangeLatLng('lat', $event)">
@@ -91,6 +99,11 @@
                                     [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG' | translate"
                                     tooltip="LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG_DESCRIPTION"
                                     [required]="isLatLngRequired(latInput.value)"
+                                    app-min-max-validator
+                                    [min]="-180"
+                                    [minNumber]="-180"
+                                    [max]="180"
+                                    [maxNumber]="180"
                                     [disabled]="viewOnly"
                                     type="number"
                                     (optionChanged)="onChangeLatLng('lng', $event)">
@@ -114,6 +127,19 @@
                     [unique]="true"
                     [disabled]="viewOnly">
                 </app-form-input-list>
+
+                <!--Identifiers section-->
+                <div class="section-title">
+                    {{ 'LNG_LOCATION_FIELD_LABEL_IDENTIFIERS' | translate}}
+                </div>
+                <app-form-location-identifier-list
+                    name="identifiers"
+                    [ngModel]="locationData.identifiers"
+                    [required]="true"
+                    codePlaceholder="LNG_LOCATION_FIELD_LABEL_IDENTIFIER_CODE"
+                    descriptionPlaceholder="LNG_LOCATION_FIELD_LABEL_IDENTIFIER_DESCRIPTION"
+                    [disabled]="viewOnly">
+                </app-form-location-identifier-list>
             </mat-tab>
 
         </mat-tab-group>
@@ -127,8 +153,8 @@
             <button
                 *ngIf="hasLocationWriteAccess()"
                 mat-raised-button
-                color="primary"
-                class="button-primary"
+                color="accent"
+                type="button"
                 [routerLink]="['/locations', locationId, 'modify']">
                 {{'LNG_COMMON_BUTTON_EDIT'| translate}}
             </button>
@@ -140,7 +166,7 @@
             </button>
         </ng-container>
         <ng-container *ngIf="!viewOnly">
-            <button mat-raised-button color="primary" class="button-primary">
+            <button mat-raised-button color="accent">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
             <button type="button"

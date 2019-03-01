@@ -40,9 +40,8 @@
 
         <button
             *ngIf="viewOnly && hasSysConfigWriteAccess()"
-            mat-raised-button
-            color="primary"
-            class="button-primary"
+            mat-raised-button type="button"
+            color="accent"
             [routerLink]="['/languages', languageId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT'| translate}}
         </button>
@@ -51,8 +50,7 @@
             *ngIf="!viewOnly">
             <button
                 mat-raised-button
-                color="primary"
-                class="button-primary">
+                color="accent">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
 

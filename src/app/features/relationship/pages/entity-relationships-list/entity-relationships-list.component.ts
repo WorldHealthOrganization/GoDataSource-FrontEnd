@@ -26,6 +26,7 @@ import { EventModel } from '../../../../core/models/event.model';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { tap } from 'rxjs/operators';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 
 @Component({
@@ -202,6 +203,10 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME'
             }),
             new VisibleColumnModel({
+                field: 'people.visualId',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_VISUAL_ID'
+            }),
+            new VisibleColumnModel({
                 field: 'type',
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_TYPE'
             }),
@@ -256,7 +261,8 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                     this.entityType,
                     this.entityId,
                     qb
-                );
+                )
+                    .pipe(tap(this.checkEmptyList.bind(this)));
             } else {
                 // retrieve the list of contacts
                 this.relationshipsList$ = this.relationshipDataService.getEntityContacts(
@@ -264,7 +270,8 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                     this.entityType,
                     this.entityId,
                     qb
-                );
+                )
+                    .pipe(tap(this.checkEmptyList.bind(this)));
             }
         }
     }
@@ -279,7 +286,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
             const qb = new RequestQueryBuilder();
             qb.merge(this.queryBuilder);
 
-            const peopleQueryBuilder = qb.include('people');
+            const peopleQueryBuilder = qb.include('people', false);
             peopleQueryBuilder.queryBuilder.filter.where({
                 id: {
                     neq: this.entityId

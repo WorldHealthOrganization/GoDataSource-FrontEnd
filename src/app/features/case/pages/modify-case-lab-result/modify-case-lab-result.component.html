@@ -180,7 +180,8 @@
                     name="questionnaireAnswers"
                     [ngModel]="labResultData.questionnaireAnswers"
                     [questions]="selectedOutbreak.labResultsTemplate"
-                    [disabled]="viewOnly">
+                    [disabled]="viewOnly"
+                    [componentTitle]="'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate">
                 </app-form-fill-questionnaire>
             </mat-tab>
 
@@ -191,13 +192,13 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button *ngIf="viewOnly && hasCaseWriteAccess()"
-                mat-raised-button color="primary" class="button-primary"
+                mat-raised-button type="button" color="accent"
                 [routerLink]=" ['/cases', caseData.id, 'lab-results', labResultId, 'modify' ]"
                 [queryParams]="{fromLabResultsList: fromLabResultsList}">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
         <ng-container *ngIf="!viewOnly">
-            <button mat-raised-button color="primary" class="button-primary">
+            <button mat-raised-button color="accent">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
             <button type="button"

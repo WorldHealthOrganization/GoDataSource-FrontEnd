@@ -1,4 +1,4 @@
-import { AfterViewInit } from '@angular/core';
+import { AfterViewInit, Input } from '@angular/core';
 import { AbstractControl, ControlContainer } from '@angular/forms';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
@@ -14,6 +14,7 @@ import {
 } from './validate';
 import { ErrorMessage } from './error-message';
 import { ElementBaseFailure } from './element-base-failure';
+import { MatTooltip } from '@angular/material';
 
 /**
  * Base class to be extended by custom form controls
@@ -25,6 +26,11 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
     public control: AbstractControl;
 
     public validationResult = null;
+    private validationResultIsInvalid: boolean = false;
+    private validationResultErrMsgs: ElementBaseFailure[];
+
+    // alternative name used for specifying indexes for questionnaire inputs and other places
+    @Input() alternativeName: string;
 
     protected constructor(
         protected controlContainer: ControlContainer,
@@ -52,6 +58,14 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
                 .subscribe((res) => {
                     // cache the result
                     this.validationResult = res;
+
+                    // check if we have errors
+                    this.validationResultIsInvalid = Object.keys(this.validationResult || {}).length > 0;
+                    this.validationResultErrMsgs = Object.keys(this.validationResult || {}).map(k => {
+                        const errorMessage = new ErrorMessage(this.validationResult, k);
+                        return errorMessage.getMessage();
+                    });
+
                     return res;
                 });
         });
@@ -63,7 +77,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
      * @returns {boolean}
      */
     public get invalid(): boolean {
-        return Object.keys(this.validationResult || {}).length > 0;
+        return this.validationResultIsInvalid;
     }
 
     /**
@@ -71,11 +85,8 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
      * Returns a list of validation error messages for a custom form control.
      * @returns {Array<ElementBaseFailure>}
      */
-    protected get failures(): Array<ElementBaseFailure> {
-        return Object.keys(this.validationResult || {}).map(k => {
-            const errorMessage = new ErrorMessage(this.validationResult, k);
-            return errorMessage.getMessage();
-        });
+    protected get failures(): ElementBaseFailure[] {
+        return this.validationResultErrMsgs;
     }
 
     /**
@@ -133,5 +144,21 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
         setTimeout(() => {
             this.getControl();
         });
+    }
+
+    /**
+     * Display tooltip on-click ( fix for mobile => matTooltip )
+     */
+    displayTooltip(
+        event: MouseEvent,
+        tooltip: MatTooltip
+    ) {
+        // don't propagate to parent
+        event.stopPropagation();
+
+        // display tooltip ( Devices - no hover ) - if not already visible from hover ( PC )
+        if (tooltip) {
+            tooltip.show();
+        }
     }
 }

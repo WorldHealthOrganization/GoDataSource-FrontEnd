@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
-import { Component, EventEmitter, Input, OnInit, ViewChild, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, ViewChild, Output, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
+import { IConvertChainToGraphElements, TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { Constants } from '../../../../core/models/constants';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -24,6 +24,11 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { CytoscapeGraphComponent } from '../../../../shared/components/cytoscape-graph/cytoscape-graph.component';
 import * as moment from 'moment';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { ActivatedRoute } from '@angular/router';
+import { Moment } from 'moment';
+import { Subscription } from 'rxjs/Subscription';
+import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
+import { TransmissionChainFilters } from '../transmission-chains-filters/transmission-chains-filters.component';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -31,7 +36,7 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
     templateUrl: './transmission-chains-dashlet.component.html',
     styleUrls: ['./transmission-chains-dashlet.component.less']
 })
-export class TransmissionChainsDashletComponent implements OnInit {
+export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     @ViewChild(CytoscapeGraphComponent) cytoscapeChild;
 
@@ -40,22 +45,24 @@ export class TransmissionChainsDashletComponent implements OnInit {
     @Input() selectedEntityType: EntityType = null;
 
     @Output() nodeTapped = new EventEmitter<GraphNodeModel>();
+    @Output() edgeTapped = new EventEmitter<GraphEdgeModel>();
+    @Output() changeEditMode = new EventEmitter<boolean>();
 
     selectedOutbreak: OutbreakModel;
-    graphElements: any;
+    chainElements: TransmissionChainModel[];
+    graphElements: IConvertChainToGraphElements;
     selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
     Constants = Constants;
     showSettings: boolean = false;
     filters: any = {};
-    genderList$: Observable<any[]>;
-    caseClassificationsList$: Observable<any[]>;
-    occupationsList$: Observable<any[]>;
+    resetFiltersData: any;
     locationsList: LocationModel[];
     personName: string = '';
     dateGlobalFilter: string = moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
     nodeColorCriteriaOptions$: Observable<any[]>;
     nodeIconCriteriaOptions$: Observable<any[]>;
+    nodeShapeCriteriaOptions$: Observable<any[]>;
     nodeLabelCriteriaOptions$: Observable<any[]>;
     edgeColorCriteriaOptions$: Observable<any[]>;
     edgeLabelCriteriaOptions$: Observable<any[]>;
@@ -70,7 +77,9 @@ export class TransmissionChainsDashletComponent implements OnInit {
         ReferenceDataCategory.CERTAINTY_LEVEL,
         ReferenceDataCategory.EXPOSURE_TYPE,
         ReferenceDataCategory.EXPOSURE_FREQUENCY,
-        ReferenceDataCategory.EXPOSURE_DURATION
+        ReferenceDataCategory.EXPOSURE_DURATION,
+        ReferenceDataCategory.OCCUPATION,
+        ReferenceDataCategory.OUTCOME
     ];
     // reference data entries per category
     referenceDataEntries: any = [];
@@ -111,17 +120,27 @@ export class TransmissionChainsDashletComponent implements OnInit {
         exposureDurationId: {
             label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
             refDataCateg: ReferenceDataCategory.EXPOSURE_DURATION
+        },
+        occupation: {
+            label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+            refDataCateg: ReferenceDataCategory.OCCUPATION
+        },
+        outcomeId: {
+            label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+            refDataCateg: ReferenceDataCategory.OUTCOME
         }
     };
 
     // default color criteria
+    resetColorCriteriaData: any;
     colorCriteria: any = {
         nodeLabelCriteria: Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value,
         nodeColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.TYPE.value,
         nodeNameColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.CLASSIFICATION.value,
         edgeColorCriteria: Constants.TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS.CERTAINITY_LEVEL.value,
         edgeLabelCriteria: Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value,
-        nodeIconCriteria: Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS.NONE.value
+        nodeIconCriteria: Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS.NONE.value,
+        nodeShapeCriteria: Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.NONE.value
     };
     // default legend
     legend: any = {
@@ -145,6 +164,9 @@ export class TransmissionChainsDashletComponent implements OnInit {
         nodeLabel: 'name'
     };
 
+    // subscribers
+    outbreakSubscriber: Subscription;
+
     constructor(
         private outbreakDataService: OutbreakDataService,
         private transmissionChainDataService: TransmissionChainDataService,
@@ -156,7 +178,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
         private relationshipDataService: RelationshipDataService,
         private i18nService: I18nService,
         private locationDataService: LocationDataService,
-        private clusterDataService: ClusterDataService
+        private clusterDataService: ClusterDataService,
+        protected route: ActivatedRoute
     ) {}
 
     ngOnInit() {
@@ -164,9 +187,6 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.filters.showContacts = false;
         this.filters.showEvents = true;
 
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
-        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
-        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         const locationQueryBuilder = new RequestQueryBuilder();
         locationQueryBuilder.fieldsInResponse = ['id', 'name'];
         this.locationDataService.getLocationsList(locationQueryBuilder).subscribe((results) => {
@@ -177,7 +197,37 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.edgeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeColorCriteriaOptions();
         this.edgeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeLabelCriteriaOptions();
         this.nodeIconCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeIconCriteriaOptions();
+        this.nodeShapeCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeShapeCriteriaOptions();
         this.nodeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeLabelCriteriaOptions();
+
+        // check if we have global filters set
+        this.route.queryParams.subscribe((queryParams: any) => {
+            // do we need to decode global filters ?
+            const global: {
+                date?: Moment,
+                locationId?: string
+            } = !queryParams.global ?
+                {} : (
+                    _.isString(queryParams.global) ?
+                        JSON.parse(queryParams.global as string) :
+                        queryParams.global
+                );
+
+            // parse date
+            if (global.date) {
+                global.date = moment(global.date);
+            }
+
+            // date
+            if (global.date) {
+                this.dateGlobalFilter = global.date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+            }
+
+            // location
+            if (global.locationId) {
+                this.filters.locationId = global.locationId;
+            }
+        });
 
         this.initializeReferenceData()
             .catch((err) => {
@@ -185,7 +235,13 @@ export class TransmissionChainsDashletComponent implements OnInit {
                 return ErrorObservable.create(err);
             })
             .subscribe(() => {
-                this.outbreakDataService
+                // outbreak subscriber
+                if (this.outbreakSubscriber) {
+                    this.outbreakSubscriber.unsubscribe();
+                    this.outbreakSubscriber = null;
+                }
+
+                this.outbreakSubscriber = this.outbreakDataService
                     .getSelectedOutbreakSubject()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.selectedOutbreak = selectedOutbreak;
@@ -206,10 +262,19 @@ export class TransmissionChainsDashletComponent implements OnInit {
                                     this.legend.clustersList[cluster.id] = cluster.name;
                                 });
                             });
+
                         // load chain
                         this.displayChainsOfTransmission();
                     });
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
@@ -220,93 +285,59 @@ export class TransmissionChainsDashletComponent implements OnInit {
         if (this.selectedOutbreak) {
             // create queryBuilder for filters
             const requestQueryBuilder = new RequestQueryBuilder();
-            if (this.filters) {
-                // occupation
-                if (!_.isEmpty(this.filters.occupation)) {
-                    requestQueryBuilder.filter.byEquality(
-                        'occupation',
-                        this.filters.occupation
-                    );
-                }
+            requestQueryBuilder.filter.firstLevelConditions();
 
-                // gender
-                if (!_.isEmpty(this.filters.gender)) {
-                    requestQueryBuilder.filter.bySelect(
-                        'gender',
-                        this.filters.gender,
-                        true,
-                        null
-                    );
-                }
-
-                // case classification
-                if (!_.isEmpty(this.filters.classification)) {
-                    requestQueryBuilder.filter.byEquality(
-                        'classification',
-                        this.filters.classification
-                    );
-                }
-
-                // case location
-                if (!_.isEmpty(this.filters.locationId)) {
-                    requestQueryBuilder.filter.byEquality(
-                        'addresses.locationId',
-                        this.filters.locationId
-                    );
-                }
-
-                // firstName
-                if (!_.isEmpty(this.filters.firstName)) {
-                    requestQueryBuilder.filter.byText(
-                        'firstName',
-                        this.filters.firstName
-                    );
-                }
-
-                // lastName
-                if (!_.isEmpty(this.filters.lastName)) {
-                    requestQueryBuilder.filter.byText(
-                        'lastName',
-                        this.filters.lastName
-                    );
-                }
-
-                // age
-                if (!_.isEmpty(this.filters.age)) {
-                    requestQueryBuilder.filter.byAgeRange(
-                        'age',
-                        this.filters.age
-                    );
-                }
-
-                // date of reporting
-                if (!_.isEmpty(this.filters.date)) {
-                    requestQueryBuilder.filter.byDateRange(
-                        'dateOfReporting',
-                        this.filters.date
-                    );
-                }
+            // do we have person filters?
+            if (!_.isEmpty(this.filters)) {
+                // include custom person builder that will handle these filters
+                const personRequestQueryBuilder: RequestQueryBuilder = requestQueryBuilder.addChildQueryBuilder('person');
+                const filterObject = new TransmissionChainFilters(this.filters);
+                filterObject.attachConditionsToRequestQueryBuilder(personRequestQueryBuilder);
             }
 
-            // configure
-            const rQB = new RequestQueryBuilder();
+            // do we have chainIncludesPerson filters ?
+            if (this.personId) {
+                // include custom person builder that will handle these filters
+                const chainIncludesPersonRequestQueryBuilder: RequestQueryBuilder = requestQueryBuilder.addChildQueryBuilder('chainIncludesPerson');
+                chainIncludesPersonRequestQueryBuilder.filter.byEquality(
+                    'id',
+                    this.personId
+                );
+            }
 
-            if (!requestQueryBuilder.filter.isEmpty()) {
-                rQB.filter.where({
-                    person: {
-                        where: requestQueryBuilder.filter.generateCondition()
-                    }
-                });
+            // add filter for size ( under where )
+            if (this.sizeOfChainsFilter) {
+                requestQueryBuilder.filter.byEquality(
+                    'size',
+                    _.parseInt(this.sizeOfChainsFilter)
+                );
+            }
+
+            // global date - see state in time
+            if (this.dateGlobalFilter) {
+                requestQueryBuilder.filter.byEquality(
+                    'endDate',
+                    moment(this.dateGlobalFilter).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+                );
+            }
+
+            // add flags
+            if (this.filters.showContacts) {
+                requestQueryBuilder.filter.flag('includeContacts', 1);
             }
 
             // get chain data and convert to graph nodes
-            this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, this.sizeOfChainsFilter, this.personId, rQB, this.dateGlobalFilter).subscribe((chains) => {
-                if (!_.isEmpty(chains)) {
-                    this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList);
-                } else {
-                    this.graphElements = [];
-                }
-            });
+            this.transmissionChainDataService
+                .getIndependentTransmissionChainData(this.selectedOutbreak.id, requestQueryBuilder)
+                .subscribe((chains) => {
+                    if (!_.isEmpty(chains)) {
+                        this.chainElements = chains;
+                        this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList, this.selectedViewType);
+                    } else {
+                        this.chainElements = [];
+                        this.graphElements = {} as IConvertChainToGraphElements;
+                    }
+                });
         }
     }
 
@@ -325,20 +356,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
      * @returns {IterableIterator<any>}
      */
     onEdgeTap(relationship: GraphEdgeModel) {
-        // retrieve relationship information
-        // get relationship data
-        this.relationshipDataService
-            .getEntityRelationship(this.selectedOutbreak.id, relationship.sourceType, relationship.source, relationship.id)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                return ErrorObservable.create(err);
-            })
-            .subscribe((relationshipData) => {
-                relationshipData.sourceType = relationship.sourceType;
-                relationshipData.source = relationship.source;
-                const dialogData = this.relationshipDataService.getLightObjectDisplay(relationshipData);
-                this.dialogService.showDataDialog(dialogData);
-            });
+        this.edgeTapped.emit(relationship);
     }
 
     /**
@@ -346,31 +364,42 @@ export class TransmissionChainsDashletComponent implements OnInit {
      */
     toggleSettings() {
         this.showSettings = !this.showSettings;
+
+        // get default filters
+        setTimeout(() => {
+            if (
+                this.showSettings &&
+                !this.resetFiltersData
+            ) {
+                this.resetFiltersData = _.cloneDeep(this.filters);
+                this.resetColorCriteriaData = _.cloneDeep(this.colorCriteria);
+            }
+        });
     }
 
     /**
      * refresh chain data based on filters
      */
     refreshChain() {
+        // refresh chart
         this.displayChainsOfTransmission();
+
         // close settings panel
         this.showSettings = false;
     }
 
     /**
-     * set age filter at range update
-     * @param ageRange
+     * reset filters
      */
-    setAgeFilter(ageRange) {
-        this.filters.age = ageRange;
-    }
+    resetFilters() {
+        // reset settings
+        this.filters = _.cloneDeep(this.resetFiltersData);
+        this.colorCriteria = _.cloneDeep(this.resetColorCriteriaData);
 
-    /**
-     * set age filter at range update
-     * @param dateRange
-     */
-    setDateFilter(dateRange) {
-        this.filters.date = dateRange;
+        // close settings panel
+        setTimeout(() => {
+            this.refreshChain();
+        });
     }
 
     /**
@@ -391,6 +420,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
             });
         }
         this.legend.nodeIconField = this.colorCriteria.nodeIconCriteria;
+        this.legend.nodeShapeField = this.colorCriteria.nodeShapeCriteria;
         // set legend labels
         this.legend.nodeColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].label;
         this.legend.nodeNameColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeNameColorCriteria].label;
@@ -405,53 +435,79 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.legend.edgeColorKeys = [];
         this.legend.nodeIcon = {};
         this.legend.nodeIconKeys = [];
+        this.legend.nodeShape = {};
+        this.legend.nodeShapeKeys = [];
         // set legend entries
         const nodeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].refDataCateg], 'entries', []);
-        _.forEach(nodeColorReferenceDataEntries, (value, key) => {
+        _.forEach(nodeColorReferenceDataEntries, (value) => {
             this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
         });
         this.legend.nodeColorKeys = Object.keys(this.legend.nodeColor);
         const nodeNameColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeNameColorCriteria].refDataCateg], 'entries', []);
-        _.forEach(nodeNameColorReferenceDataEntries, (value, key) => {
+        _.forEach(nodeNameColorReferenceDataEntries, (value) => {
             this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
         });
         this.legend.nodeNameColorKeys = Object.keys(this.legend.nodeNameColor);
         const edgeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].refDataCateg], 'entries', []);
-        _.forEach(edgeColorReferenceDataEntries, (value, key) => {
+        _.forEach(edgeColorReferenceDataEntries, (value) => {
             this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
         });
         this.legend.edgeColorKeys = Object.keys(this.legend.edgeColor);
         if (this.colorCriteria.nodeIconCriteria !== Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS.NONE.value) {
             const nodeIconReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria].refDataCateg], 'entries', []);
-            _.forEach(nodeIconReferenceDataEntries, (value, key) => {
+            _.forEach(nodeIconReferenceDataEntries, (value) => {
                 this.legend.nodeIcon[value.value] = value.iconUrl ? value.iconUrl : '';
             });
             this.legend.nodeIconKeys = Object.keys(this.legend.nodeIcon);
         }
+        if (this.colorCriteria.nodeShapeCriteria !== Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.NONE.value) {
+            const nodeShapeReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeShapeCriteria].refDataCateg], 'entries', []);
+            _.forEach(nodeShapeReferenceDataEntries, (value) => {
+                this.legend.nodeShape[value.value] = value.iconUrl ? value.iconUrl : '';
+            });
+            this.legend.nodeShapeKeys = Object.keys(this.legend.nodeShape);
+        }
         // set node label to be displayed
         this.legend.nodeLabel = this.colorCriteria.nodeLabelCriteria;
+        // gender translations
         if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
             this.legend.nodeLabelValues = [];
             const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
-            _.forEach(nodeLabelValues, (value, key) => {
+            _.forEach(nodeLabelValues, (value) => {
                 // get gender transcriptions
                 this.legend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
             });
         }
-        // populate nodeLabelValues with gender values as they need to be translated
+        // occupation translations
+        if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.OCCUPATION.value) {
+            this.legend.nodeLabelValues = [];
+            const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.OCCUPATION], 'entries', []);
+            _.forEach(nodeLabelValues, (value) => {
+                // get gender transcriptions
+                this.legend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
+            });
+        }
+        // populate nodeLabelValues with gender / classification / outcome values as they need to be translated
         if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
             this.legend.genderValues = [];
             const genderValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
-            _.forEach(genderValues, (value, key) => {
+            _.forEach(genderValues, (value) => {
                 // get gender transcriptions
                 this.legend.genderValues[value.value] = this.i18nService.instant(value.value);
             });
 
             this.legend.classificationValues = [];
             const classificationValues = _.get(this.referenceDataEntries[ReferenceDataCategory.CASE_CLASSIFICATION], 'entries', []);
-            _.forEach(classificationValues, (value, key) => {
+            _.forEach(classificationValues, (value) => {
                 // get classification transcriptions
                 this.legend.classificationValues[value.value] = this.i18nService.instant(value.value);
+            });
+
+            this.legend.outcomeValues = [];
+            const outcomeValues = _.get(this.referenceDataEntries[ReferenceDataCategory.OUTCOME], 'entries', []);
+            _.forEach(outcomeValues, (value) => {
+                // get outcome values transcriptions
+                this.legend.outcomeValues[value.value] = this.i18nService.instant(value.value);
             });
 
         }
@@ -482,25 +538,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
      */
     viewTypeChanged(viewType) {
         this.selectedViewType = viewType.value;
-        if (this.selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
-            // if node label criteria is already 'type' then do not reload the graph data.
-            if (this.colorCriteria.nodeNameColorCriteria !== 'type') {
-                this.colorCriteria.nodeNameColorCriteria = 'type';
-                // refresh chain to load the new criteria
-                this.displayChainsOfTransmission();
-            }
-        }
-    }
-
-    /**
-     * return the tooltip for criteria based on the selected view type
-     * @returns {string}
-     */
-    tooltipViewTimeline() {
-        return (this.selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-                ? 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP'
-                : null
-        );
+        // refresh chain to load the new criteria
+        this.displayChainsOfTransmission();
     }
 
     /**
@@ -519,6 +558,10 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.displayChainsOfTransmission();
     }
 
+    onEditModeChange(editMode: boolean) {
+        this.changeEditMode.emit(editMode);
+    }
+
     /**
      * return the png representation of the graph
      * @param {number} splitFactor
@@ -527,9 +570,6 @@ export class TransmissionChainsDashletComponent implements OnInit {
     getPng64(splitFactor: number) {
           return this.cytoscapeChild.getPng64(splitFactor);
     }
-
-
-
 }
 
 

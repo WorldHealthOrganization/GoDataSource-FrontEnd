@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute } from '@angular/router';
@@ -8,6 +8,8 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel } from '../../../../core/models/address.model';
 import 'rxjs/add/observable/forkJoin';
 import { Observable } from 'rxjs/Observable';
+import { WorldMapMovementComponent } from '../../../../shared/components/world-map-movement/world-map-movement.component';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-view-movement-case',
@@ -22,6 +24,8 @@ export class ViewMovementCaseComponent implements OnInit {
 
     caseData: CaseModel = new CaseModel();
     movementAddresses: AddressModel[] = [];
+
+    @ViewChild('mapMovement') mapMovement: WorldMapMovementComponent;
 
     constructor(
         protected route: ActivatedRoute,
@@ -60,5 +64,12 @@ export class ViewMovementCaseComponent implements OnInit {
                     });
                 });
         });
+    }
+
+    /**
+     * Export case movement map
+     */
+    exportCaseMovementMap() {
+        this.mapMovement.exportMovementMap(EntityType.CASE);
     }
 }

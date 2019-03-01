@@ -15,11 +15,19 @@
         </div>
         <!--Reset Filters-->
         <div class="reset-filters">
-            <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
+            <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="resetFiltersToSideFilters()">
                 {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
             </button>
 
-            <button type="button" mat-raised-button (click)="needsRefreshList(true)">
+            <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="needsRefreshList(true)">
                 {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
             </button>
         </div>
@@ -37,7 +45,7 @@
                         <app-form-input
                             name="firstNameFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField(['firstName', 'name'], $event)"
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -61,7 +69,7 @@
                         <app-form-input
                             name="lastNameFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('lastName', $event)"
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -123,4 +131,15 @@
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
         <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
     </mat-table>
+
+    <div
+        *ngIf="isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
 </mat-card>

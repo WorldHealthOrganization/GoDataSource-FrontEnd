@@ -23,7 +23,9 @@
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_NAME' | translate"
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_NAME_DESCRIPTION"
                                 required="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                app-general-async-validator
+                                [asyncValidatorObservable]="outbreakNameValidator$">
                             </app-form-input>
                             <app-form-select
                                 name="disease"
@@ -56,13 +58,15 @@
                             </app-form-location-dropdown>
                         </div>
 
-                        <app-form-textarea
-                            name="description"
-                            [(ngModel)]="outbreak.description"
-                            [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION' | translate"
-                            tooltip="LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
-                            [disabled]="viewOnly">
-                        </app-form-textarea>
+                        <div fxLayout="row">
+                            <app-form-textarea
+                                name="description"
+                                [(ngModel)]="outbreak.description"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-textarea>
+                        </div>
 
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-datepicker
@@ -93,7 +97,15 @@
                                 pattern="^(?:9*[^9()]*|[^9()]*9*[^9()]*|[^9()]*9*)$"
                                 required="true">
                             </app-form-input>
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-input
+                                name="contactIdMask"
+                                [(ngModel)]="outbreak.contactIdMask"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_CONTACT_ID_MASK' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_CONTACT_ID_MASK_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                pattern="^(?:9*[^9()]*|[^9()]*9*[^9()]*|[^9()]*9*)$"
+                                required="true">
+                            </app-form-input>
                         </div>
                     </div>
                 </mat-card>
@@ -199,7 +211,6 @@
                         </div>
                     </div>
                 </mat-card>
-
             </mat-tab>
 
             <!-- tab Map Servers -->
@@ -215,49 +226,10 @@
                     nameTooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME_DESCRIPTION"
                     [urlPlaceholder]="'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL' | translate"
                     urlTooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL_DESCRIPTION"
-                    [required]="true">
+                    [required]="true"
+                    [componentTitle]="'LNG_PAGE_MODIFY_OUTBREAK_TAB_MAP_SERVERS' | translate">
                 </app-form-name-url-list>
             </mat-tab>
-
-            <!-- tab Case Investigation -->
-            <mat-tab>
-                <ng-template mat-tab-label>
-                    {{'LNG_PAGE_MODIFY_OUTBREAK_TAB_CASE_INVESTIGATION' | translate}}
-                </ng-template>
-                <app-form-question-list
-                    name="caseInvestigationTemplate"
-                    [ngModel]="outbreak.caseInvestigationTemplate"
-                    [viewOnly]="viewOnly"
-                    [variableReadOnly]="true">
-                </app-form-question-list>
-            </mat-tab>
-
-            <!-- tab Contact Follow-up -->
-            <mat-tab>
-                <ng-template mat-tab-label>
-                    {{'LNG_PAGE_MODIFY_OUTBREAK_TAB_CONTACT_FOLLOWUP' | translate}}
-                </ng-template>
-                <app-form-question-list
-                    name="contactFollowUpTemplate"
-                    [ngModel]="outbreak.contactFollowUpTemplate"
-                    [viewOnly]="viewOnly"
-                    [variableReadOnly]="true">
-                </app-form-question-list>
-            </mat-tab>
-
-            <!-- tab Lab Results -->
-            <mat-tab>
-                <ng-template mat-tab-label>
-                    {{'LNG_PAGE_MODIFY_OUTBREAK_TAB_LAB_RESULTS' | translate}}
-                </ng-template>
-                <app-form-question-list
-                    name="labResultsTemplate"
-                    [ngModel]="outbreak.labResultsTemplate"
-                    [viewOnly]="viewOnly"
-                    [variableReadOnly]="true">
-                </app-form-question-list>
-            </mat-tab>
-
         </mat-tab-group>
     </div>
     <!-- outbreak form actions -->
@@ -266,16 +238,14 @@
         <button *ngIf="viewOnly && hasOutbreakWriteAccess()"
                 mat-raised-button
                 type="button"
-                color="primary"
-                class="button-primary"
+                color="accent"
                 [routerLink]="['/outbreaks', outbreakId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
         <ng-container *ngIf="!viewOnly">
             <button
                 mat-raised-button
-                color="primary"
-                class="button-primary">
+                color="accent">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
             <button type="button"
@@ -284,6 +254,29 @@
                 {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
             </button>
         </ng-container>
+
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            mat-raised-button
+            type="button"
+            [routerLink]="['/outbreaks', outbreakId, 'case-questionnaire']">
+            {{ 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE' | translate }}
+        </button>
+
+        <button
+            mat-raised-button
+            type="button"
+            [routerLink]="['/outbreaks', outbreakId, 'contact-follow-up-questionnaire']">
+            {{ 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE' | translate }}
+        </button>
+
+        <button
+            mat-raised-button
+            type="button"
+            [routerLink]="['/outbreaks', outbreakId, 'case-lab-results-questionnaire']">
+            {{ 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE' | translate }}
+        </button>
     </div>
 </form>
 

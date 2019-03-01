@@ -25,15 +25,15 @@ export class FollowUpsDataService {
 
     /**
      * Generate followups for contacts
-     * @returns {Observable<ContactFollowUpsModel[]>}
+     * @returns {Observable<ContactFollowUpsModel>}
      */
     generateFollowUps(
         outbreakId: string,
         startDate: any,
         endDate: any,
         targeted: boolean
-    ): Observable<ContactFollowUpsModel[]> {
-        return this.modelHelper.mapObservableListToModel(
+    ): Observable<ContactFollowUpsModel> {
+        return this.modelHelper.mapObservableToModel(
             this.http.post(
                 `outbreaks/${outbreakId}/generate-followups`, {
                     startDate: startDate,
@@ -50,10 +50,14 @@ export class FollowUpsDataService {
      * @param {string} outbreakId
      * @returns {Observable<FollowUpModel[]>}
      */
-    getFollowUpsList(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<FollowUpModel[]> {
+    getFollowUpsList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
+        needsContactData: boolean = true
+    ): Observable<FollowUpModel[]> {
         // include contact in response
         const qb = new RequestQueryBuilder();
-        qb.include('contact');
+        qb.include('contact', needsContactData);
         qb.merge(queryBuilder);
 
         // construct query
@@ -97,7 +101,7 @@ export class FollowUpsDataService {
     getFollowUp(outbreakId: string, contactId: string, followUpId: string): Observable<FollowUpModel> {
         // include contact in response
         const qb = new RequestQueryBuilder();
-        qb.include('contact');
+        qb.include('contact', true);
         qb.filter.where({
             id: followUpId
         });
@@ -144,10 +148,13 @@ export class FollowUpsDataService {
      * @param {string} contactId
      * @param {string} followUpId
      * @param followUpData
-     * @returns {Observable<any>}
+     * @returns {Observable<FollowUpModel>}
      */
-    modifyFollowUp(outbreakId: string, contactId: string, followUpId: string, followUpData): Observable<any> {
-        return this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups/${followUpId}`, followUpData);
+    modifyFollowUp(outbreakId: string, contactId: string, followUpId: string, followUpData): Observable<FollowUpModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups/${followUpId}`, followUpData),
+            FollowUpModel
+        );
     }
 
     /**
@@ -178,30 +185,14 @@ export class FollowUpsDataService {
      * @param {string} date
      * @returns {Observable<MetricContactsModel>}
      */
-    getCountIdsOfContactsOnTheFollowUpList(outbreakId: string, date: string): Observable<MetricContactsModel> {
-        const qb = new RequestQueryBuilder();
-        qb.filter.where(
-            {date: date}
-        );
-        const filter = qb.filter.generateFirstCondition(true, true);
+    getCountIdsOfContactsOnTheFollowUpList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricContactsModel> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts/count?filter=${filter}`),
+            this.http.get(`outbreaks/${outbreakId}/contacts/on-follow-up-list/count?filter=${filter}`),
             MetricContactsModel
-        );
-    }
-
-    /**
-     * Download the Daily Follow-Ups Form file
-     * @param {string} outbreakId
-     * @param {string} date
-     * @returns {Observable<any>}
-     */
-    downloadDailyFollowUpsForm(outbreakId: string, date: string): Observable<any> {
-        return this.http.get(
-            `outbreaks/${outbreakId}/contacts/daily-followup-form/export?date=${date}`,
-            {
-                responseType: 'blob'
-            }
         );
     }
 
@@ -211,15 +202,11 @@ export class FollowUpsDataService {
      * @param {number} daysNotSeen
      * @returns {Observable<MetricContactsModel>}
      */
-    getCountIdsOfContactsNotSeen(outbreakId: string, daysNotSeen: number): Observable<MetricContactsModel> {
-        // convert daysNotSeen to number as the API expects
-        daysNotSeen = Number(daysNotSeen);
-        // create filter for daysNotSeen
-        const filterQueryBuilder = new RequestQueryBuilder();
-        filterQueryBuilder.filter.where(
-            {noDaysNotSeen: daysNotSeen}
-        );
-        const filter = filterQueryBuilder.filter.generateFirstCondition(true, true);
+    getCountIdsOfContactsNotSeen(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricContactsModel> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-not-seen/count?filter=${filter}`),
             MetricContactsModel
@@ -232,12 +219,11 @@ export class FollowUpsDataService {
      * @param {string} date
      * @returns {Observable<Object>}
      */
-    getNumberOfContactsWhoAreLostToFollowUp(outbreakId: string, date: string): Observable<any> {
-        const qb = new RequestQueryBuilder();
-        qb.filter.where(
-            {date: date}
-        );
-        const filter = qb.filter.generateFirstCondition(true, true);
+    getNumberOfContactsWhoAreLostToFollowUp(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-lost-to-follow-up/count?filter=${filter}`),
             MetricContactsLostToFollowUpModel
@@ -250,7 +236,10 @@ export class FollowUpsDataService {
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<MetricContactsWithSuccessfulFollowUp>}
      */
-    getContactsWithSuccessfulFollowUp(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricContactsWithSuccessfulFollowUp> {
+    getContactsWithSuccessfulFollowUp(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricContactsWithSuccessfulFollowUp> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-with-successful-follow-ups/count?filter=${filter}`),
@@ -261,13 +250,13 @@ export class FollowUpsDataService {
     /**
      * get team workload
      * @param {string} outbreakId
-     * @param {string} firstDate
-     * @param {string} lastDate
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<TeamFollowupsPerDayModel>}
      */
-    getFollowUpsPerDayTeam(outbreakId: string, firstDate: string, lastDate: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<TeamFollowupsPerDayModel> {
-        queryBuilder.filter.byRange('date', new FormRangeModel({from: firstDate, to: lastDate}));
+    getFollowUpsPerDayTeam(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<TeamFollowupsPerDayModel> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/per-team-per-day/count?filter=${filter}`),
@@ -275,5 +264,15 @@ export class FollowUpsDataService {
         );
     }
 
+    /**
+     * Get counted followUps grouped by teams
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getCountedFollowUpsGroupedByTeams(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+        const filter = queryBuilder.buildQuery();
+        return this.http.get(`/outbreaks/${outbreakId}/follow-ups/per-team/count?filter=${filter}`, {});
+    }
 }
 

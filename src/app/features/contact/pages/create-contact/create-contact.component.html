@@ -85,6 +85,19 @@
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
+                            <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
+                            <!-- [maxlength]="255" -->
+                            <app-form-input
+                                name="visualId"
+                                [(ngModel)]="contactData.visualId"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                                [tooltipTranslateData]="visualIDTranslateData"
+                                [maxlength]="255"
+                                app-general-async-validator
+                                [asyncValidatorObservable]="contactIdMaskValidator">
+                            </app-form-input>
+
                             <app-form-datepicker
                                 fxFlex
                                 name="dateOfReporting"
@@ -106,7 +119,6 @@
                             </app-form-slide-toggle>
 
                             <div fxFlex><!-- placeholder --></div>
-                            <div fxFlex><!-- placeholder --></div>
                         </div>
 
                     </div>
@@ -122,8 +134,8 @@
                     [required]="true">
                 </app-form-document-list>
 
-                <div>
-                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                <div class="stepper-wrapper">
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -140,9 +152,9 @@
                     [(ngModel)]="contactData.addresses">
                 </app-form-address-list>
 
-                <div>
-                    <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                <div class="stepper-wrapper">
+                    <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -163,9 +175,9 @@
                     </app-form-relationship>
                 </mat-card>
 
-                <div>
-                    <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                <div class="stepper-wrapper">
+                    <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -178,9 +190,9 @@
 
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
 
-            <div>
-                <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                <button *app-selected-outbreak-is-active type="button" mat-button
+            <div class="stepper-wrapper">
+                <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent"
                         (click)="createNewContact([personalForm, addressForm, relationshipForm])">
                     {{'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_BUTTON' | translate}}
                 </button>

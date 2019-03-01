@@ -4,37 +4,10 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button *ngIf="hasOutbreakWriteAccess()" class="button-primary" mat-raised-button color="primary"
+                <button *ngIf="hasOutbreakWriteAccess()" mat-raised-button color="accent"
                         [routerLink]="'./create'">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
-
-                <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
-                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
-                </button>
-
-                <mat-menu #quickActionsMenu="matMenu">
-                    <ng-container *ngIf="!appliedListFilter">
-                        <app-export-button
-                            [menuItem]="true"
-                            [label]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_BUTTON' | translate"
-                            [message]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE' | translate"
-                            [url]="exportOutbreaksUrl"
-                            [fileName]="outbreaksDataExporFileName"
-                            [allowedExportTypes]="allowedExportTypes"
-                            [displayEncrypt]="true"
-                            [displayAnonymize]="true"
-                            [anonymizeFields]="anonymizeFields"
-                            [queryBuilder]="queryBuilder">
-                        </app-export-button>
-
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/import-export-data', 'outbreak-data', 'import']">
-                            {{'LNG_PAGE_LIST_OUTBREAKS_IMPORT_BUTTON' | translate}}
-                        </button>
-                    </ng-container>
-                </mat-menu>
             </div>
         </div>
     </ng-container>
@@ -50,55 +23,23 @@
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">
-        <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="resetFiltersToSideFilters()">
             {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
         </button>
-        <button type="button" mat-raised-button (click)="needsRefreshList(true)">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
     </div>
 
     <mat-table #table [dataSource]="outbreaksList$ | async" matSort (matSortChange)="sortBy($event)">
-        <!-- Checkbox -->
-        <ng-container matColumnDef="checkbox">
-            <mat-header-cell *matHeaderCellDef fxFlex="60px">
-                <div class="table-header-cell">
-                    <div>
-                        <app-form-checkbox
-                            class="table-checkbox"
-                            name="listCheckedAll"
-                            [(ngModel)]="checkedAllRecords">
-                        </app-form-checkbox>
-                    </div>
-                    <div class="column-filter">
-                        <button
-                            mat-icon-button
-                            [matMenuTriggerFor]="actionsMenuMultipleRecords">
-                            <span class="xt-icon">moreVertical</span>
-                        </button>
-
-                        <mat-menu #actionsMenuMultipleRecords="matMenu">
-                            <button
-                                mat-menu-item
-                                (click)="exportSelectedOutbreaks()">
-                                {{ 'LNG_PAGE_LIST_OUTBREAKS_GROUP_ACTION_EXPORT_SELECTED_OUTBREAKS' | translate }}
-                            </button>
-                        </mat-menu>
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item;" fxFlex="60px">
-                <app-form-checkbox
-                    #listCheckedIndividual
-                    [name]="'listCheckedIndividual[' + item.id + ']'"
-                    class="table-checkbox"
-                    ngModel
-                    (optionChanged)="checkedRecord(item.id, $event)"
-                    (afterInitialize)="checkedRecord(item.id, false)">
-                </app-form-checkbox>
-            </mat-cell>
-        </ng-container>
-
         <!-- Name -->
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
@@ -108,7 +49,7 @@
                         <app-form-input
                             name="nameFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('name', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
@@ -131,7 +72,7 @@
                         <app-form-select
                             name="diseaseFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="diseasesList$ | async"
                             multiple="true"
                             (optionChanged)="filterBySelectField('disease', $event)"
@@ -161,7 +102,7 @@
                         <app-form-select
                             name="countriesFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="countriesList$ | async"
                             multiple="true"
                             (optionChanged)="filterBySelectField('countries', $event)"
@@ -190,7 +131,7 @@
                         <app-form-select
                             name="geographicalLevelFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="geographicalLevelsList$ | async"
                             multiple="true"
                             (optionChanged)="filterBySelectField('reportingGeographicalLevelId', $event)"
@@ -212,7 +153,7 @@
 
         <!-- Start Date -->
         <ng-container matColumnDef="startDate">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_START_DATE' | translate}}</div>
                     <div class="column-filter">
@@ -226,14 +167,14 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let outbreak">
+            <mat-cell class="has-date-range-filter" *matCellDef="let outbreak">
                 {{outbreak.startDate | dateDefault }}
             </mat-cell>
         </ng-container>
 
         <!-- End Date -->
         <ng-container matColumnDef="endDate">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_END_DATE' | translate}}</div>
                     <div class="column-filter">
@@ -247,7 +188,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let outbreak">
+            <mat-cell class="has-date-range-filter" *matCellDef="let outbreak">
                 {{outbreak.endDate | dateDefault }}
             </mat-cell>
         </ng-container>
@@ -261,7 +202,7 @@
                         <app-form-select
                             name="activeFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="activeOptionsList$ | async"
                             (optionChanged)="filterByActiveOutbreak('id', $event)"
                             app-reset-input-on-side-filter
@@ -287,7 +228,7 @@
                         <app-form-select
                             name="deletedFilter"
                             [ngModel]="false"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByDeletedField($event.value)"
                             app-reset-input-on-side-filter
@@ -334,29 +275,47 @@
                             {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_INCONSISTENCIES' | translate }}
                         </button>
 
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/outbreaks', item.id, 'case-questionnaire']">
+                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE' | translate }}
+                        </button>
+
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/outbreaks', item.id, 'contact-follow-up-questionnaire']">
+                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE' | translate }}
+                        </button>
+
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/outbreaks', item.id, 'case-lab-results-questionnaire']">
+                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE' | translate }}
+                        </button>
+
                         <mat-divider></mat-divider>
                     </ng-container>
 
                     <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'view']">
-                        {{ 'LNG_PAGE_ACTION_VIEW' | translate}}
+                        {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_OUTBREAK' | translate}}
                     </button>
 
                     <ng-container *ngIf="hasOutbreakWriteAccess()">
                         <button *ngIf="!item.deleted" mat-menu-item class="mat-menu-item" (click)="cloneOutbreak(item)">
-                            {{ 'LNG_PAGE_ACTION_CLONE' | translate }}
+                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_OUTBREAK' | translate }}
                         </button>
 
                         <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                            {{ 'LNG_PAGE_ACTION_MODIFY' | translate}}
+                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_MODIFY_OUTBREAK' | translate}}
                         </button>
 
                         <button *ngIf="!item.deleted" mat-menu-item class="mat-menu-item-delete" (click)="delete(item)">
-                            {{ 'LNG_PAGE_ACTION_DELETE' | translate}}
+                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_OUTBREAK' | translate}}
                         </button>
 
                         <button *ngIf="item.deleted && hasOutbreakWriteAccess()" mat-menu-item class="mat-menu-item-restore"
                                 (click)="restoreOutbreak(item)">
-                            {{ 'LNG_PAGE_ACTION_RESTORE' | translate}}
+                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_RESTORE_OUTBREAK' | translate}}
                         </button>
                     </ng-container>
                 </mat-menu>
@@ -366,6 +325,17 @@
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
         <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
     </mat-table>
+
+    <div
+        *ngIf="isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
 </mat-card>
 
 

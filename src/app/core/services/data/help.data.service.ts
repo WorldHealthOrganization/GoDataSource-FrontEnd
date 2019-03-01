@@ -56,10 +56,13 @@ export class HelpDataService {
      * Modify an existing category
      * @param {string} categoryId
      * @param helpCategoryData
-     * @returns {Observable<any>}
+     * @returns {Observable<HelpCategoryModel>}
      */
-    modifyHelpCategory(categoryId: string, helpCategoryData): Observable<any> {
-        return this.http.put(`help-categories/${categoryId}`, helpCategoryData);
+    modifyHelpCategory(categoryId: string, helpCategoryData): Observable<HelpCategoryModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`help-categories/${categoryId}`, helpCategoryData),
+            HelpCategoryModel
+        );
     }
 
     /**
@@ -77,7 +80,7 @@ export class HelpDataService {
      * @returns {Observable<HelpItemModel[]>}
      */
     getHelpItemsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
-        queryBuilder.include('category');
+        queryBuilder.include('category', true);
         queryBuilder.filter.where({approved: true}, true);
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableListToModel(
@@ -91,9 +94,13 @@ export class HelpDataService {
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<HelpItemModel[]>}
      */
-    getHelpItemsListSearch(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
-        queryBuilder.include('category');
-        const filter = queryBuilder.buildQuery();
+    getHelpItemsListSearch(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(), searchedTerm: string): Observable<HelpItemModel[]> {
+        queryBuilder.include('category', true);
+        let filter = queryBuilder.buildQuery(false);
+        // add condition for search term - this needs to be on the first level of where (not in 'and')
+        const tokenFilter = { $text: { search: searchedTerm } };
+        filter.where.token = tokenFilter;
+        filter = JSON.stringify(filter);
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`help-categories/search-help-items?filter=${filter}`)
                 .map((res) => _.get(res, 'items', [])),
@@ -108,7 +115,7 @@ export class HelpDataService {
      * @returns {Observable<HelpItemModel[]>}
      */
     getHelpItemsCategoryList(categoryId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
-        queryBuilder.include('user');
+        queryBuilder.include('user', true);
         const filter = queryBuilder.buildQuery();
 
         return this.modelHelper.mapObservableListToModel(
@@ -145,10 +152,13 @@ export class HelpDataService {
      * @param {string} categoryId
      * @param {string} itemId
      * @param helpItemData
-     * @returns {Observable<any>}
+     * @returns {Observable<HelpItemModel>}
      */
-    modifyHelpItem(categoryId: string, itemId: string, helpItemData): Observable<any> {
-        return this.http.put(`help-categories/${categoryId}/help-items/${itemId}`, helpItemData);
+    modifyHelpItem(categoryId: string, itemId: string, helpItemData): Observable<HelpItemModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`help-categories/${categoryId}/help-items/${itemId}`, helpItemData),
+            HelpItemModel
+        );
     }
 
     /**
@@ -213,6 +223,5 @@ export class HelpDataService {
         }
         return helpItems;
     }
-
 }
 

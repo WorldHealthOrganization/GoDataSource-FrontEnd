@@ -21,6 +21,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-modify-contact-follow-ups-list',
@@ -85,9 +86,6 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
                             // configure follow-ups list query
                             const followUpsIds: string[] = JSON.parse(queryParams.followUpsIds);
                             const qb: RequestQueryBuilder = new RequestQueryBuilder();
-
-                            // bring contact information as well
-                            qb.include('contact');
 
                             // bring specific follow-ups
                             qb.filter.bySelect(
@@ -155,7 +153,8 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     copyValueToEmptyFields(
         property: string,
         sourceFollowUp: FollowUpModel,
-        form?: NgForm
+        form?: NgForm,
+        isEmpty: (value: any) => boolean = _.isEmpty
     ) {
         // handle remove item confirmation
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_COPY_VALUE')
@@ -171,7 +170,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
                             if (
                                 followUp.id !== sourceFollowUp.id &&
                                 !_.isNumber(value) && (
-                                    _.isEmpty(value) || (
+                                    isEmpty(value) || (
                                         _.isObject(value) &&
                                         this.isEmptyObject(value)
                                     )
@@ -201,6 +200,13 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
                     }
                 }
             });
+    }
+
+    /**
+     * Check if follow-up status has value "No data"
+     */
+    checkIfStatusIsEmpty(value: any): boolean {
+        return _.isEmpty(value) || value === Constants.FOLLOW_UP_STATUS.NO_DATA.value;
     }
 
     /**

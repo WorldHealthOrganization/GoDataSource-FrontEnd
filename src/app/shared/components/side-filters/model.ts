@@ -2,25 +2,31 @@
 import { Observable } from 'rxjs/Observable';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
+import { Moment } from 'moment';
 
 // value types
 enum ValueType {
     STRING = 'string',
+    NUMBER = 'number',
     SELECT = 'select',
     RANGE_NUMBER = 'range_number',
     RANGE_DATE = 'range_date',
+    DATE = 'date',
     LAT_LNG_WITHIN = 'address_within'
 }
 
 // filter types
 export enum FilterType {
     TEXT = 'text',
+    NUMBER = 'number',
     SELECT = 'select',
     MULTISELECT = 'multiselect',
     RANGE_NUMBER = 'range_number',
     RANGE_AGE = 'range_age',
     RANGE_DATE = 'range_date',
-    ADDRESS = 'address'
+    DATE = 'date',
+    ADDRESS = 'address',
+    LOCATION = 'location'
 }
 
 // comparator types
@@ -34,7 +40,8 @@ export enum FilterComparator {
     AFTER = 'after',
     CONTAINS = 'contains',
     LOCATION = 'location',
-    WITHIN = 'within'
+    WITHIN = 'within',
+    DATE = 'date'
 }
 
 // Model for Available Filter
@@ -79,6 +86,8 @@ export class FilterModel {
 
     // select options for SELECT and MULTISELECT filter types
     options$: Observable<any[]> = null;
+    optionsLabelKey: string = 'label';
+    optionsValueKey: string = 'value';
 
     // sortable field / relationship field ( default false )
     sortable: boolean = false;
@@ -91,6 +100,25 @@ export class FilterModel {
     // children query builders ( either main qb or relationship qb )
     childQueryBuilderKey: string;
 
+    // required ? - add filter from teh start, also you won't be able to remove it
+    required: boolean = false;
+    value: any;
+
+    maxDate: string | Moment;
+
+    // select multiple / single option(s)
+    multipleOptions: boolean = true;
+
+    // overwrite allowed comparators
+    allowedComparators: {
+        label?: string,
+        value: FilterComparator,
+        valueType: ValueType
+    }[];
+
+    // flag where property instead of creating specific rules...
+    flagIt: boolean;
+
     /**
      * Constructor
      * @param data ( fieldName / fieldLabel / type are required )
@@ -100,11 +128,23 @@ export class FilterModel {
         fieldLabel: string,
         type: FilterType,
         options$?: Observable<any[]>,
+        optionsLabelKey?: string,
+        optionsValueKey?: string,
         sortable?: boolean,
         relationshipPath?: string[],
         relationshipLabel?: string,
         extraConditions?: RequestQueryBuilder,
-        childQueryBuilderKey?: string
+        childQueryBuilderKey?: string,
+        required?: boolean,
+        value?: any,
+        multipleOptions?: boolean,
+        maxDate?: string | Moment,
+        allowedComparators?: {
+            label?: string,
+            value: FilterComparator,
+            valueType: ValueType
+        }[],
+        flagIt?: boolean
     }) {
         // set handler
         this.self = this;
@@ -119,11 +159,8 @@ export class FilterModel {
 
 // Model for Applied Filter
 export class AppliedFilterModel {
-    // can't remove filter
-    public readonly: boolean = false;
-
     // allowed comparators accordingly with filter type
-    public allowedComparators: {
+    public static allowedComparators: {
         [key: string]: {
             label?: string,
             value: FilterComparator,
@@ -143,6 +180,21 @@ export class AppliedFilterModel {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS_TEXT',
             value: FilterComparator.CONTAINS_TEXT,
             valueType: ValueType.STRING
+        }],
+
+        // number
+        [FilterType.NUMBER]: [{
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_IS',
+            value: FilterComparator.IS,
+            valueType: ValueType.NUMBER
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LESS_OR_EQUAL',
+            value: FilterComparator.BEFORE,
+            valueType: ValueType.NUMBER
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_GREATER_OR_EQUAL',
+            value: FilterComparator.AFTER,
+            valueType: ValueType.NUMBER
         }],
 
         // select
@@ -202,6 +254,13 @@ export class AppliedFilterModel {
             valueType: ValueType.RANGE_DATE
         }],
 
+        // date
+        [FilterType.DATE]: [{
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DAY_IS',
+            value: FilterComparator.DATE,
+            valueType: ValueType.DATE
+        }],
+
         // address
         [FilterType.ADDRESS]: [{
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS',
@@ -215,16 +274,29 @@ export class AppliedFilterModel {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN',
             value: FilterComparator.WITHIN,
             valueType: ValueType.LAT_LNG_WITHIN
+        }],
+
+        // location
+        [FilterType.LOCATION]: [{
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION',
+            value: FilterComparator.LOCATION,
+            valueType: ValueType.SELECT
         }]
     };
+
+    // can't remove filter
+    public readonly: boolean = false;
 
     // default comparators
     private defaultComparator = {
         [FilterType.TEXT]: FilterComparator.TEXT_STARTS_WITH,
+        [FilterType.NUMBER]: FilterComparator.IS,
         [FilterType.RANGE_NUMBER]: FilterComparator.BETWEEN,
         [FilterType.RANGE_AGE]: FilterComparator.BETWEEN,
         [FilterType.RANGE_DATE]: FilterComparator.BETWEEN,
-        [FilterType.ADDRESS]: FilterComparator.CONTAINS
+        [FilterType.DATE]: FilterComparator.DATE,
+        [FilterType.ADDRESS]: FilterComparator.CONTAINS,
+        [FilterType.LOCATION]: FilterComparator.LOCATION
     };
 
     // applied filter
@@ -240,9 +312,9 @@ export class AppliedFilterModel {
         // determine the default comparator
         this.comparator = this.defaultComparator[this.filter.type] ?
             this.defaultComparator[this.filter.type] : (
-                this.allowedComparators[this.filter.type] &&
-                this.allowedComparators[this.filter.type].length > 0 ?
-                    this.allowedComparators[this.filter.type][0].value :
+                AppliedFilterModel.allowedComparators[this.filter.type] &&
+                AppliedFilterModel.allowedComparators[this.filter.type].length > 0 ?
+                    AppliedFilterModel.allowedComparators[this.filter.type][0].value :
                     null
             );
 
@@ -269,6 +341,24 @@ export class AppliedFilterModel {
     }
 
     /**
+     * Constructor
+     * @param data
+     */
+    constructor(data?: {
+        readonly?: boolean,
+        filter?: FilterModel,
+        value?: any,
+        extraValues?: any,
+        comparator?: FilterComparator
+    }) {
+        // assign properties
+        Object.assign(
+            this,
+            data ? data : {}
+        );
+    }
+
+    /**
      * Reset value if necessary
      */
     private resetValueIfNecessary() {
@@ -281,8 +371,8 @@ export class AppliedFilterModel {
             this.filter &&
             this.comparator
         ) {
-            const prevVT = _.find(this.allowedComparators[this._previousFilter.type], { value: this._previousComparator });
-            const currentVT = _.find(this.allowedComparators[this.filter.type], { value: this.comparator });
+            const prevVT = _.find(AppliedFilterModel.allowedComparators[this._previousFilter.type], { value: this._previousComparator });
+            const currentVT = _.find(AppliedFilterModel.allowedComparators[this.filter.type], { value: this.comparator });
             if (
                 prevVT &&
                 currentVT &&
@@ -308,7 +398,10 @@ export class AppliedFilterModel {
      * Check to see if we have at least 2 comparators, to know if we need to display the comparators dropdown
      */
     public get hasMoreThanOneComparator(): boolean {
-        return this.allowedComparators[this.filter.type] &&
-            this.allowedComparators[this.filter.type].length > 1;
+        return this.filter.allowedComparators ?
+            this.filter.allowedComparators.length > 1 : (
+                AppliedFilterModel.allowedComparators[this.filter.type] &&
+                AppliedFilterModel.allowedComparators[this.filter.type].length > 1
+            );
     }
 }

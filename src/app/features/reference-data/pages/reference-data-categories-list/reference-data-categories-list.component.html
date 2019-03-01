@@ -4,7 +4,7 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
+                <button mat-raised-button color="accent" [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
@@ -30,7 +30,9 @@
                         [label]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON' | translate"
                         [message]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE' | translate"
                         url="reference-data/export"
-                        [fileName]="referenceDataExporFileName">
+                        [fileName]="referenceDataExporFileName"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
                     </app-export-button>
                 </mat-menu>
             </div>
@@ -59,21 +61,75 @@
         <ng-container matColumnDef="entries">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div class="column-header">{{'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_ENTRIES' | translate}}</div>
+                    <div class="column-header" fxLayout="row">
+                        <span>{{'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_ENTRIES' | translate}}</span>
+
+                        <button
+                            type="button"
+                            mat-icon-button
+                            class="column-actions-button"
+                            [disableRipple]="true"
+                            [matMenuTriggerFor]="columnActions"
+                            color="accent"
+                        >
+                            <span class="xt-icon">arrowDropdownCircle</span>
+                        </button>
+
+                        <mat-menu #columnActions="matMenu">
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('entries', true)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL' | translate }}
+                            </button>
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('entries', false)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL' | translate }}
+                            </button>
+                        </mat-menu>
+                    </div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item" fxFlex>
                 <mat-chip-list>
-                    <mat-chip
-                        *ngFor="let entry of item.entries"
-                        [matTooltip]="entry.description | translate">
-                        <div
-                            *ngIf="entry.colorCode"
-                            class="ref-data-chip-bg-color"
-                            [style.background-color]="entry.colorCode"></div>
-                        {{ entry.value | translate }}
-                    </mat-chip>
+                    <ng-container *ngIf="!isCellExpanded('entries', item.id)">
+                        <app-number-of-items-label
+                            [value]="item.entries?.length"
+                        ></app-number-of-items-label>
+
+                        <button
+                            type="button"
+                            mat-button
+                            color="accent"
+                            (click)="toggleCell('entries', item.id, true)"
+                        >
+                            {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND' | translate}}
+                        </button>
+                    </ng-container>
+
+                    <ng-container *ngIf="isCellExpanded('entries', item.id)">
+                        <ng-container *ngFor="let entry of item.entries">
+                            <mat-chip
+                                *ngIf="entry.active"
+                                [matTooltip]="entry.description | translate">
+                                <div
+                                    *ngIf="entry.colorCode"
+                                    class="ref-data-chip-bg-color"
+                                    [style.background-color]="entry.colorCode"></div>
+                                {{ entry.value | translate }}
+                            </mat-chip>
+                        </ng-container>
+
+                        <button
+                            type="button"
+                            mat-button
+                            color="accent"
+                            (click)="toggleCell('entries', item.id, false)"
+                        >
+                            {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate}}
+                        </button>
+                    </ng-container>
                 </mat-chip-list>
             </mat-cell>
         </ng-container>
@@ -90,7 +146,7 @@
                 <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
 
                     <button mat-menu-item [routerLink]="['.', item.id]">
-                        {{'LNG_PAGE_ACTION_VIEW' | translate}}
+                        {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_ACTION_VIEW_CATEGORY' | translate}}
                     </button>
 
                 </mat-menu>

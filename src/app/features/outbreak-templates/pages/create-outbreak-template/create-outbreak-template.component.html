@@ -111,52 +111,10 @@
                     </div>
                 </mat-card>
 
-                <div>
-                    <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                <div class="stepper-wrapper">
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
 
-            </form>
-        </mat-step>
-
-        <!-- step Case Investigation - questionnaire -->
-        <mat-step [stepControl]="caseInvestigationForm">
-            <form #caseInvestigationForm="ngForm">
-                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_CASE_INVESTIGATION' | translate}}</ng-template>
-                <!-- questions list -->
-                <app-form-question-list
-                    name="caseInvestigationTemplate"
-                    [ngModel]="newOutbreakTemplate.caseInvestigationTemplate">
-                </app-form-question-list>
-                <!-- btn save case investigation questionnaire -->
-                <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
-            </form>
-        </mat-step>
-
-        <!-- step Contact Follow-up - questionnaire -->
-        <mat-step [stepControl]="contactFollowUpForm">
-            <form #contactFollowUpForm="ngForm">
-                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_CONTACT_FOLLOWUP' | translate}}</ng-template>
-                <!-- questions list -->
-                <app-form-question-list
-                    name="contactFollowUpTemplate"
-                    [ngModel]="newOutbreakTemplate.contactFollowUpTemplate">
-                </app-form-question-list>
-                <!-- btn save contact followup questionnaire -->
-                <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
-            </form>
-        </mat-step>
-
-        <!-- step Lab Results - questionnaire -->
-        <mat-step [stepControl]="labResultsForm">
-            <form #labResultsForm="ngForm">
-                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_LAB_RESULTS' | translate}}</ng-template>
-                <!-- questions list -->
-                <app-form-question-list
-                    name="labResultsTemplate"
-                    [ngModel]="newOutbreakTemplate.labResultsTemplate">
-                </app-form-question-list>
-                <!-- btn save lab results questionnaire -->
-                <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
             </form>
         </mat-step>
 
@@ -168,10 +126,10 @@
                 {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
             </div>
             <br><br><br>
-            <div>
-                <button matStepperPrevious mat-raised-button>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                <button type="button" mat-raised-button color="primary" class="button-primary"
-                        (click)="createOutbreakTemplate([detailsForm, caseInvestigationForm, contactFollowUpForm, labResultsForm ])">
+            <div class="stepper-wrapper">
+                <button matStepperPrevious mat-raised-button type="button">{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                <button type="button" mat-raised-button color="accent"
+                        (click)="createOutbreakTemplate([detailsForm])">
                     {{'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_ACTION_CREATE_OUTBREAK_BUTTON' | translate}}
                 </button>
             </div>

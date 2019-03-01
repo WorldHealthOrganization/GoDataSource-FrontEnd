@@ -54,8 +54,8 @@
                     </div>
                 </mat-card>
 
-                <div>
-                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
+                <div class="stepper-wrapper">
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -72,8 +72,9 @@
                     [questions]="selectedOutbreak.contactFollowUpTemplate">
                 </app-form-fill-questionnaire>
 
-                <div>
-                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
+                <div class="stepper-wrapper">
+                    <button matStepperPrevious mat-raised-button type="button">{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -82,9 +83,9 @@
         <mat-step>
             <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL'| translate}}</ng-template>
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
-            <div>
-                <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK'| translate}}</button>
-                <button *app-selected-outbreak-is-active type="button" mat-button (click)="createNewFollowUp([detailsForm, questionnaireForm])">
+            <div class="stepper-wrapper">
+                <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK'| translate}}</button>
+                <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent" (click)="createNewFollowUp([detailsForm, questionnaireForm])">
                     {{'LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_BUTTON' | translate}}
                 </button>
             </div>

@@ -17,6 +17,8 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { Observable } from 'rxjs/Observable';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-create-follow-up',
@@ -49,7 +51,8 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private followUpsDataService: FollowUpsDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -57,7 +60,7 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
     ngOnInit() {
         // daily status types
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
-
+        this.followUpData.statusId = Constants.FOLLOW_UP_STATUS.NO_DATA.value;
         // retrieve query params
         this.route.params
             .subscribe((params: {contactId}) => {
@@ -112,19 +115,23 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
             !_.isEmpty(dirtyFields)
         ) {
             // add the new Follow-up
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.followUpsDataService
                 .createFollowUp(this.selectedOutbreak.id, this.contactData.id, dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
-
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newContactFollowup: FollowUpModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE');
+
+                    // hide dialog
+                    loadingDialog.close();
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate(['/contacts/follow-ups']);
+                    this.router.navigate([`/contacts/${newContactFollowup.personId}/follow-ups/${newContactFollowup.id}/modify`]);
                 });
         }
     }

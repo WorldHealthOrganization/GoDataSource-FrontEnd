@@ -8,7 +8,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { Observable } from 'rxjs/Observable';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
@@ -16,6 +15,9 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
+import 'rxjs/add/operator/switchMap';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
     selector: 'app-create-outbreak',
@@ -37,15 +39,17 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
 
     newOutbreak: OutbreakModel = new OutbreakModel();
 
+    outbreakNameValidator$: Observable<boolean>;
+
     constructor(
         private outbreakDataService: OutbreakDataService,
         private router: Router,
         private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
         private formHelper: FormHelperService,
-        private i18nService: I18nService,
         private route: ActivatedRoute,
-        private outbreakTemplateDataService: OutbreakTemplateDataService
+        private outbreakTemplateDataService: OutbreakTemplateDataService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -74,6 +78,14 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                         });
                 }
             });
+
+        this.outbreakNameValidator$ = Observable.create((observer) => {
+           this.outbreakDataService.checkOutbreakNameUniquenessValidity(this.newOutbreak.name)
+               .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                    observer.next(isValid);
+                    observer.complete();
+               });
+        });
     }
 
     /**
@@ -96,19 +108,23 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
         ) {
             const outbreakData = new OutbreakModel(dirtyFields);
 
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.outbreakDataService
                 .createOutbreak(outbreakData)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newOutbreak) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
-                    // load language tokens so they will be available
-                    this.i18nService.loadUserLanguage().subscribe();
-                    // navigate to listing page
+
+                    // hide dialog
+                    loadingDialog.close();
+
+                    // navigate to modify page of the new outbreak
                     this.disableDirtyConfirm();
-                    this.router.navigate(['/outbreaks']);
+                    this.router.navigate([`/outbreaks/${newOutbreak.id}/modify`]);
                 });
         }
     }

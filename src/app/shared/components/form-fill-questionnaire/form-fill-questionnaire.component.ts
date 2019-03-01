@@ -1,5 +1,5 @@
 import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, NgModel } from '@angular/forms';
 import * as _ from 'lodash';
 import { GroupBase } from '../../xt-forms/core';
 import { AnswerModel, QuestionModel } from '../../../core/models/question.model';
@@ -36,9 +36,12 @@ interface UploaderData {
 export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnInit {
     @Input() disabled: boolean = false;
 
+    @Input() componentTitle: string;
+
     questionsGroupedByCategory: {
         category: string,
-        questions: QuestionModel[]
+        questions: QuestionModel[],
+        startIndex: number
     }[];
 
     additionalQuestions: {
@@ -76,46 +79,79 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
         // reset additional questions
         this.additionalQuestions = {};
 
-        // group them by category
+        // make sure we have questions ordered - these are sorted by api, but it doesn't hurt to make sure they are...
+        questions = _.sortBy(questions, 'order');
+
+        // group them by category, keeping in mind the questions order
         this.uploadersData = {};
-        this.questionsGroupedByCategory = _.chain(questions)
-            .groupBy('category')
-            .transform((result, questionsData: QuestionModel[], category: string) => {
-                // map additional questions
-                _.each(questionsData, (question: QuestionModel) => {
-                    // add file upload handler if necessary
-                    if (question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value) {
-                        // create file uploader
-                        this.uploadersData[question.variable] = {
-                            uploader: new FileUploader({}),
-                            attachment: null,
-                            uploading: false
-                        };
+        this.questionsGroupedByCategory = [];
+        let currentCategory: {
+            category: string,
+            questions: QuestionModel[],
+            startIndex: number
+        } = null;
+        _.each(questions, (question: QuestionModel) => {
+            // add file upload handler if necessary
+            if (question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value) {
+                // create file uploader
+                this.uploadersData[question.variable] = {
+                    uploader: new FileUploader({}),
+                    attachment: null,
+                    uploading: false
+                };
+            }
+
+            // map answers
+            _.each(question.answers, (answer: AnswerModel) => {
+                if (!_.isEmpty(answer.additionalQuestions)) {
+                    // answer value should be unique
+                    // can't use _.set since we can have dots & square brackets inside strings
+                    if (!this.additionalQuestions[question.variable]) {
+                        this.additionalQuestions[question.variable] = {};
                     }
+                    this.additionalQuestions[question.variable][answer.value] = answer.additionalQuestions;
+                }
+            });
 
-                    // map answers
-                    _.each(question.answers, (answer: AnswerModel) => {
-                        if (!_.isEmpty(answer.additionalQuestions)) {
-                            // answer value should be unique
-                            // can't use _.set since we can have dots & square brackets inside strings
-                            if (!this.additionalQuestions[question.variable]) {
-                                this.additionalQuestions[question.variable] = {};
-                            }
-                            this.additionalQuestions[question.variable][answer.value] = answer.additionalQuestions;
-                        }
-                    });
-                });
+            // check if current question category is the same as question category, if not..add a new one
+            if (
+                currentCategory === null ||
+                currentCategory.category !== question.category
+            ) {
+                // add category
+                currentCategory = {
+                    category: question.category,
+                    questions: [],
+                    startIndex: currentCategory ? (
+                        currentCategory.startIndex + currentCategory.questions.length
+                    ) : 0
+                };
 
-                // sort & add root questions
-                result.push({
-                    category: category,
-                    questions: _.sortBy(questionsData, 'order')
-                });
-            }, [])
-            .value();
+                // add to list
+                this.questionsGroupedByCategory.push(currentCategory);
+            }
+
+            // add question
+            currentCategory.questions.push(question);
+        });
 
         // initialize uploader
         this.initializeUploader();
+    }
+
+    /**
+     * Alternative name
+     */
+    private _alternativeName: string;
+    @Input() set alternativeName(value: string) {
+        this._alternativeName = value;
+    }
+
+    /**
+     * Alternative name
+     */
+    get alternativeName(): string {
+        return this._alternativeName ? this._alternativeName : this.name;
     }
 
     /**
@@ -366,15 +402,39 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
     /**
      * Remove attachment
      * @param questionVariable
+     * @param importDataBtn
+     * @param fileHiddenInput
      */
-    removeAttachment(questionVariable: string) {
+    removeAttachment(
+        questionVariable: string,
+        importDataBtn,
+        fileHiddenInput: NgModel
+    ) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REMOVE_ATTACHMENT')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     delete this.value[questionVariable];
                     this.uploadersData[questionVariable].uploader.clearQueue();
+                    importDataBtn.value = '';
+
+                    // touch control
+                    fileHiddenInput.control.markAsTouched();
                 }
             });
+    }
+
+    /**
+     * Import File - Browse
+     */
+    importAttachment(
+        importDataBtn,
+        fileHiddenInput: NgModel
+    ) {
+        // touch control
+        fileHiddenInput.control.markAsTouched();
+
+        // trigger open file
+        importDataBtn.click();
     }
 }

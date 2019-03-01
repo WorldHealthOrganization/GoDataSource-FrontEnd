@@ -4,7 +4,7 @@
     </ng-container>
 </app-topnav>
 
-<form class="page-content form-section" #form="ngForm" (submit)="modifyContact(form)">
+<form class="page-content form-section" #form="ngForm" (submit)="modifyEvent(form)">
 
     <div class="form-content">
         <mat-tab-group class="page-tabs-navbar">
@@ -92,26 +92,32 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button *ngIf="hasEventWriteAccess() && viewOnly"
-                mat-raised-button color="primary" class="button-primary"
+                mat-raised-button type="button" color="accent"
                 [routerLink]="['/events', eventId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT'| translate}}
         </button>
 
         <ng-container *ngIf="!viewOnly">
-            <button mat-raised-button color="primary" class="button-primary">
+            <button mat-raised-button color="accent">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
 
             <button type="button" [routerLink]="'/events'" mat-raised-button>
                 {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
             </button>
-            <div class="page-tabs-navbar-placeholder"></div>
         </ng-container>
 
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            *ngIf="hasEventWriteAccess()"
+            type="button"
+            mat-raised-button color="accent"
+            [routerLink]="['/relationships', EntityType.EVENT, eventId, 'share']">
+            {{ 'LNG_COMMON_BUTTON_SHARE_RELATIONSHIPS' | translate }}
+        </button>
         <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.EVENT, eventData.id]">
             {{ 'LNG_COMMON_BUTTON_RELATIONSHIPS' | translate }}
         </button>
     </div>
-
-
 </form>

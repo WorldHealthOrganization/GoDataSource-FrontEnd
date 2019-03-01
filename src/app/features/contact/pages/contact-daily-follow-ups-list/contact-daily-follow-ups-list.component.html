@@ -1,10 +1,10 @@
-<app-topnav [activeOutbreakEditable]="!caseId && !contactId">
+<app-topnav [activeOutbreakEditable]="!caseId">
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
+                <button mat-raised-button color="accent" [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
@@ -19,23 +19,21 @@
                     </ng-container>
 
                     <app-export-button
-                        *ngIf="printDailyFollowUpsUrl"
+                        *ngIf="!appliedListFilter && printFollowUpsUrl"
                         [menuItem]="true"
-                        [label]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_BUTTON' | translate"
-                        [message]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE' | translate"
-                        [url]="printDailyFollowUpsUrl"
-                        [fileName]="followUpsPrintDailyFileName"
-                        [fileType]="printDailyFollowUpsFileType">
+                        [label]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_TITLE' | translate"
+                        [url]="printFollowUpsUrl"
+                        [fileName]="printFollowUpsFileName"
+                        [fileType]="ExportDataExtension.PDF"
+                        [extraDialogFields]="printFollowUpsDialogFields"
+                        [queryBuilder]="queryBuilder"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
                     </app-export-button>
 
-                    <button
-                        mat-menu-item
-                        (click)="downloadDailyFollowUpsForm()">
-                        {{'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_BUTTON' | translate}}
-                    </button>
-
                     <app-export-button
-                        *ngIf="exportFollowUpsUrl"
+                        *ngIf="!appliedListFilter && exportFollowUpsUrl"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE' | translate"
@@ -45,7 +43,9 @@
                         [displayEncrypt]="true"
                         [displayAnonymize]="true"
                         [anonymizeFields]="anonymizeFields"
-                        [queryBuilder]="queryBuilder">
+                        [queryBuilder]="queryBuilder"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
                     </app-export-button>
                 </mat-menu>
             </div>
@@ -60,24 +60,43 @@
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
 
+<div fxLayout fxLayoutAlign="space-between end">
+
+    <!--Total number of records from the list-->
+    <app-total-number-of-records
+        [value]="(followUpsListCount$ | async)?.count">
+    </app-total-number-of-records>
+
+    <app-counted-items-list
+        *ngIf="!appliedListFilter"
+        fxFlex
+        [items]="countedFollowUpsGroupedByTeams$| async"
+        (optionChanged)="filterBySelectField('teamId', $event.ids, null)">
+    </app-counted-items-list>
+
+</div>
+
 <!-- Side filters -->
 <app-side-filters
     [filterOptions]="availableSideFilters"
     (filtersApplied)="applySideFilters($event)">
 </app-side-filters>
 
-<!--Total number of records from the list-->
-<app-total-number-of-records
-    [value]="(followUpsListCount$ | async)?.count">
-</app-total-number-of-records>
-
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">
-        <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="resetFiltersToSideFilters()">
             {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
         </button>
-        <button type="button" mat-raised-button (click)="needsRefreshList(true)">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
     </div>
@@ -90,7 +109,7 @@
                 name="dateFilter"
                 [ngModel]="dateFilterDefaultValue"
                 [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
-                (optionChanged)="filterByDateField('date', $event)"
+                (optionChanged)="filterByFollowUpDate($event)"
                 app-reset-input-on-side-filter
                 [resetToPristineValue]="false">
             </app-form-datepicker>
@@ -103,20 +122,35 @@
             <mat-header-cell *matHeaderCellDef fxFlex="60px">
                 <div class="table-header-cell">
                     <div>
-                        <app-form-checkbox
-                            class="table-checkbox"
-                            name="listCheckedAll"
-                            [(ngModel)]="checkedAllRecords">
-                        </app-form-checkbox>
-                    </div>
-                    <div class="column-filter">
                         <button
+                            type="button"
+                            class="bulk-actions-button"
                             mat-icon-button
-                            [matMenuTriggerFor]="actionsMenuMultipleRecords">
-                            <span class="xt-icon">moreVertical</span>
+                            [disableRipple]="true"
+                            [matMenuTriggerFor]="actionsMenuMultipleRecords"
+                            color="accent"
+                            [matTooltip]="'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_TOOLTIP' | translate"
+                            [disabled]="isEmptyList"
+                        >
+                            <span class="xt-icon">arrowDropdownCircle</span>
                         </button>
 
                         <mat-menu #actionsMenuMultipleRecords="matMenu">
+                            <button
+                                *ngIf="!checkedAllRecords"
+                                mat-menu-item
+                                (click)="checkAllRecords()">
+                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}
+                            </button>
+                            <button
+                                *ngIf="checkedRecords.length > 0"
+                                mat-menu-item
+                                (click)="uncheckAllRecords()">
+                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
+                            </button>
+
+                            <mat-divider></mat-divider>
+
                             <button
                                 *ngIf="hasFollowUpsWriteAccess()"
                                 mat-menu-item
@@ -131,6 +165,9 @@
                                 {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS' | translate }}
                             </button>
                         </mat-menu>
+                    </div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
                     </div>
                 </div>
             </mat-header-cell>
@@ -153,9 +190,9 @@
                     <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME' | translate }}</div>
                     <div class="column-filter">
                         <app-form-input
-                            name="firstContactFirstName"
+                            name="contactLastName"
                             ngModel
-                            placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByRelation('contact').byText('lastName', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
@@ -164,7 +201,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.lastName }}
             </mat-cell>
         </ng-container>
@@ -176,9 +213,9 @@
                     <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME' | translate }}</div>
                     <div class="column-filter">
                         <app-form-input
-                            name="firstContactFirstName"
+                            name="contactFirstName"
                             ngModel
-                            placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByRelation('contact').byText('firstName', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
@@ -186,14 +223,37 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.firstName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Contact Visual ID -->
+        <ng-container matColumnDef="contact.visualId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_VISUAL_ID' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="contactVisualId"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByRelation('contact').byText('visualId', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                {{ item.contact?.visualId }}
             </mat-cell>
         </ng-container>
 
         <!-- Date of Last Contact -->
         <ng-container matColumnDef="contact.dateOfLastContact">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}</div>
                     <div class="column-filter">
@@ -206,8 +266,52 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell class="has-date-range-filter" *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.dateOfLastContact | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Date of the End of Follow-up -->
+        <ng-container matColumnDef="dateOfFollowUpEnd">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="dateFilter"
+                            ngModel
+                            (changed)="filterByRelation('contact').byDateRange('followUp.endDate', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell class="has-date-range-filter" *matCellDef="let item" [class.record-alert]="item.alerted">
+                {{ item.contact?.followUp.endDate | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!--Day of Follow-up -->
+        <ng-container matColumnDef="dayOfFollowUp">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP' | translate
+                        }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="dayOfFollowUpFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByEquality('index', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                {{ item.index }}
             </mat-cell>
         </ng-container>
 
@@ -221,7 +325,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.address?.location?.name }}
             </mat-cell>
         </ng-container>
@@ -236,7 +340,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.address?.fullAddress }}
             </mat-cell>
         </ng-container>
@@ -247,12 +351,36 @@
                 <div class="table-header-cell">
                     <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate }}</div>
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-select
+                            name="teamIdFilter"
+                            [ngModel]="teamIdFilterValue"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="teamsListLoadedForHeaderSearch"
+                            (optionChanged)="filterByTeam($event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true"
+                            [multiple]="false">
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
-                {{ teamsListMap[item.teamId] ? teamsListMap[item.teamId].name : '' }}
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                <app-form-select
+                    *ngIf="hasFollowUpsWriteAccess()"
+                    name="teamId"
+                    [ngModel]="item.teamId"
+                    [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate"
+                    [options]="teamsListLoaded"
+                    optionLabelKey="name"
+                    optionValueKey="id"
+                    (optionChanged)="changeFollowUpTeam(item, $event)">
+                </app-form-select>
+                <div
+                    *ngIf="!hasFollowUpsWriteAccess()">
+                    {{ teamsListLoadedMap[item.teamId] ? teamsListLoadedMap[item.teamId].name : '' }}
+                </div>
             </mat-cell>
         </ng-container>
 
@@ -260,7 +388,8 @@
         <ng-container matColumnDef="statusId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="statusIdFilter"
@@ -277,7 +406,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS"
                     [value]="item.statusId">
@@ -285,11 +414,49 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Targeted -->
+        <ng-container matColumnDef="targeted">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="targetedFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanField('targeted', $event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-form-slide-toggle
+                    *ngIf="hasFollowUpsWriteAccess()"
+                    name="targeted"
+                    [(ngModel)]="item.targeted"
+                    [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
+                    tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
+                    (optionChanged)="setTargetedItem(item, $event)">
+                </app-form-slide-toggle>
+                <app-yes-no-label
+                    *ngIf="!hasFollowUpsWriteAccess()"
+                    [value]="item.targeted">
+                </app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
         <!-- Deleted -->
         <ng-container matColumnDef="deleted">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="deletedFilter"
@@ -305,7 +472,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 <app-yes-no-label [value]="item.deleted"></app-yes-no-label>
             </mat-cell>
         </ng-container>
@@ -320,8 +487,9 @@
                     </button>
 
                     <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-                        <button mat-menu-item [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'view' ]">
-                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                        <button mat-menu-item
+                                [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'view' ]">
+                            {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_VIEW_FOLLOW_UP' | translate }}
                         </button>
 
                         <ng-container *app-selected-outbreak-is-active>
@@ -330,11 +498,11 @@
                                 <ng-container
                                     *ngIf="!item.deleted">
                                     <ng-container
-                                        *ngIf="item.personId && !dateInTheFuture(item.date)">
+                                        *ngIf="item.personId && !Constants.isDateInTheFuture(item.date)">
                                         <button
                                             mat-menu-item
                                             [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'modify']">
-                                            {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
+                                            {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_FOLLOW_UP' | translate }}
                                         </button>
 
                                         <button
@@ -348,7 +516,7 @@
                                         mat-menu-item
                                         class="mat-menu-item-delete"
                                         (click)="deleteFollowUp(item)">
-                                        {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                                        {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_FOLLOW_UP' | translate }}
                                     </button>
                                 </ng-container>
 
@@ -357,7 +525,7 @@
                                     mat-menu-item
                                     class="mat-menu-item-restore"
                                     (click)="restoreFollowUp(item)">
-                                    {{ 'LNG_PAGE_ACTION_RESTORE' | translate }}
+                                    {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_FOLLOW_UP' | translate }}
                                 </button>
                             </ng-container>
                         </ng-container>
@@ -369,6 +537,17 @@
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
         <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
     </mat-table>
+
+    <div
+        *ngIf="isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
 
     <mat-paginator
         [length]="(followUpsListCount$ | async)?.count"

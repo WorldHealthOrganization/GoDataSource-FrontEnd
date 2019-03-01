@@ -13,6 +13,8 @@ export class RequestFilter {
     private operator: RequestFilterOperator = RequestFilterOperator.AND;
     // flags
     private flags: { [key: string]: any } = {};
+    // migrate conditions to first level
+    private generateConditionsOnFirstLevel: boolean = false;
 
     /**
      * Escape string
@@ -44,6 +46,13 @@ export class RequestFilter {
     removeFlag(property: string) {
         delete this.flags[property];
         return this;
+    }
+
+    /**
+     * Get Flags
+     */
+    getFlags(): { [key: string]: any } {
+        return _.cloneDeep(this.flags);
     }
 
     /**
@@ -148,49 +157,41 @@ export class RequestFilter {
     /**
      * Filter by comparing a field if it is equal to the provided value
      * @param {string} property
-     * @param {string} value
+     * @param {string | number} value
      * @param {boolean} replace
      * @returns {RequestFilter}
      */
     byEquality(
         property: string,
-        value: string,
+        value: string | number,
         replace: boolean = true,
         caseInsensitive: boolean = false
     ) {
-        if (_.isEmpty(value)) {
+        if (
+            _.isEmpty(value) &&
+            !_.isNumber(value)
+        ) {
             // remove filter
             this.remove(property);
         } else {
-            // fix Loopback V3 "eq" comparator not working in some cases
-            // but we still need to use eq when comparing with null values
-            // use eq for null values
-            if (value === null) {
+            // use regexp for case insensitive compare
+            if (caseInsensitive) {
                 this.where({
                     [property]: {
-                        eq: null
+                        regexp: '/^' +
+                            RequestFilter.escapeStringForRegex(value as string)
+                                .replace(/%/g, '.*')
+                                .replace(/\\\?/g, '.') +
+                            '$/i'
                     }
                 }, replace);
             } else {
-                // use regexp for case insensitive compare
-                if (caseInsensitive) {
-                    this.where({
-                        [property]: {
-                            regexp: '/^' +
-                                RequestFilter.escapeStringForRegex(value)
-                                    .replace(/%/g, '.*')
-                                    .replace(/\\\?/g, '.') +
-                                '$/i'
-                        }
-                    }, replace);
-                } else {
-                    // case sensitive search
-                    // we don't use "regex" ( ? and % ) special characters in this case
-                    // !!! changing this to regex breaks a few things !!!
-                    this.where({
-                        [property]: value
-                    }, replace);
-                }
+                // case sensitive search
+                // we don't use "regex" ( ? and % ) special characters in this case
+                // !!! changing this to regex breaks a few things !!!
+                this.where({
+                    [property]: value
+                }, replace);
             }
         }
 
@@ -407,8 +408,15 @@ export class RequestFilter {
         }
 
         if (_.isEmpty(values)) {
-            // remove filter
-            this.remove(property);
+            if (replace) {
+                // remove filter
+                this.remove(property);
+            } else {
+                // remove only conditions with exact operator
+                this.removeExactCondition({
+                    [property]: {inq: []}
+                });
+            }
         } else {
             // filter with 'inq' criteria (aka "where in")
             this.where({
@@ -458,10 +466,23 @@ export class RequestFilter {
      * @param {string} property
      * @returns {RequestFilter}
      */
-    remove(property: string) {
+    remove(property: string, operator: string = null) {
         this.conditions = _.filter(this.conditions, (condition) => {
             const prop = Object.keys(condition)[0];
-            return prop !== property;
+
+            if (
+                prop.length > 0 &&
+                // remove only some conditions with a given operator?
+                operator !== null
+            ) {
+                // get the operator
+                const op = Object.keys(condition[property])[0];
+
+                return prop !== property || op !== operator;
+            } else {
+                // remove all conditions on property
+                return prop !== property;
+            }
         });
 
         return this;
@@ -496,6 +517,39 @@ export class RequestFilter {
         }
 
         return this;
+    }
+
+    /**
+     * Remove a specific condition with a specific operator on a property
+     * Note: Currently, This method could be applied on simple properties only
+     * @param condition
+     * @returns {RequestFilter}
+     */
+    removeExactCondition(condition: any) {
+        // sanitize condition
+        condition = condition || {};
+
+        // get the property that the condition applies to
+        const property = Object.keys(condition)[0];
+
+        if (property.length > 0) {
+            // get the operator
+            const operator = Object.keys(condition[property])[0];
+
+            if (operator) {
+                this.remove(property, operator);
+            }
+        }
+    }
+
+    /**
+     * Check if a key is used in a condition
+     * @param property
+     */
+    has(property: string): boolean {
+        return _.find(this.conditions, (condition) => {
+            return Object.keys(condition)[0] === property;
+        }) !== undefined;
     }
 
     /**
@@ -543,22 +597,54 @@ export class RequestFilter {
     }
 
     /**
+     * Generate conditions on first level
+     */
+    firstLevelConditions() {
+        this.generateConditionsOnFirstLevel = true;
+        return this;
+    }
+
+    /**
+     * Generate conditions on multilevel ( add operator, etc ... )
+     */
+    multiLevelConditions() {
+        this.generateConditionsOnFirstLevel = false;
+        return this;
+    }
+
+    /**
      * Generates a new "where" condition for Loopback API, applying the current filter type between all current conditions
      * @param {boolean} stringified
      * @returns {{}}
      */
-    generateCondition(stringified: boolean = false) {
-        let condition = this.conditions.length === 0 ?
-            {} :
-            {
-                [this.operator]: this.conditions
-            };
+    generateCondition(
+        stringified: boolean = false,
+        ignoreFlags: boolean = false
+    ) {
+        // first level conditions ?
+        let condition;
+        if (this.generateConditionsOnFirstLevel) {
+            condition = _.transform(this.conditions, (result, conditionData) => {
+                // this could overwrite other conditions with the same property, but since API isn't able to process multi level conditions in this case..it won't matter if we overwrite it...
+                _.each(conditionData, (data, property) => {
+                    result[property] = data;
+                });
+            }, {});
+        } else {
+            condition = this.conditions.length === 0 ?
+                {} :
+                {
+                    [this.operator]: this.conditions
+                };
+        }
 
         // append flags
-        condition = Object.assign(
-            condition,
-            this.flags
-        );
+        if (!ignoreFlags) {
+            condition = Object.assign(
+                condition,
+                this.flags
+            );
+        }
 
         return stringified ? JSON.stringify(condition) : condition;
     }
@@ -572,7 +658,7 @@ export class RequestFilter {
      */
     generateFirstCondition(stringified: boolean = false, includeWhere: boolean = false ) {
         let returnCondition: any;
-        const condition = this.isEmpty() ?
+        const condition = this.isEmpty() || this.conditions.length < 1 ?
             {} : this.conditions[0];
         // include or not the 'where' property
         if (includeWhere) {

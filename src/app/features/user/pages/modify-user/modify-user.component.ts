@@ -11,12 +11,12 @@ import { UserModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-
 import * as _ from 'lodash';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-modify-user',
@@ -25,10 +25,7 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
     styleUrls: ['./modify-user.component.less']
 })
 export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'),
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
@@ -47,7 +44,8 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private dialogService: DialogService
     ) {
         super(route);
     }
@@ -68,13 +66,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
                     this.user = user;
 
                     // update breadcrumbs
-                    this.breadcrumbs.push(
-                        new BreadcrumbItemModel(
-                            this.user.name,
-                            null,
-                            true
-                        )
-                    );
+                    this.createBreadcrumbs();
                 });
         });
 
@@ -95,23 +87,40 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
         if (form.valid && !_.isEmpty(dirtyFields)) {
 
             // modify the user
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.userDataService
                 .modifyUser(this.userId, dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
-
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((modifiedUser: UserModel) => {
+                    // update model
+                    this.user = modifiedUser;
+                    // reset password confirm model
+                    this.passwordConfirmModel = undefined;
 
-                    // reload user auth data in case he's changing the active outbreaqk
+                    // reload user auth data in case he's changing the active outbreak
                     this.authDataService
                         .reloadAndPersistAuthUser()
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            loadingDialog.close();
+                            return ErrorObservable.create(err);
+                        })
                         .subscribe(() => {
+                            // mark form as pristine
+                            form.form.markAsPristine();
+
+                            // display message
                             this.snackbarService.showSuccess('LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE');
-                            // navigate to listing page
-                            this.disableDirtyConfirm();
-                            this.router.navigate(['/users']);
+
+                            // update breadcrumbs
+                            this.createBreadcrumbs();
+
+                            // hide dialog
+                            loadingDialog.close();
                         });
                 });
         }
@@ -130,5 +139,20 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
      */
     hasUserWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_USER_ACCOUNT);
+    }
+
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [];
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'),
+            new BreadcrumbItemModel(
+                this.user.name,
+                null,
+                true
+            )
+        );
     }
 }

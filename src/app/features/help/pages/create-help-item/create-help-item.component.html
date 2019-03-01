@@ -47,11 +47,20 @@
                             </app-form-textarea>
                         </div>
 
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="page"
+                                [ngModel]="helpItemData.page"
+                                [placeholder]="'LNG_HELP_ITEM_FIELD_LABEL_PAGE' | translate"
+                                tooltip="LNG_HELP_ITEM_FIELD_LABEL_PAGE_DESCRIPTION"
+                                maxlength="200">
+                            </app-form-input>
+                        </div>
                     </div>
                 </mat-card>
 
-                <div>
-                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                <div class="stepper-wrapper">
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -60,10 +69,10 @@
         <mat-step>
             <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL'| translate}}</ng-template>
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
-            <div>
-                <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                <button *app-selected-outbreak-is-active type="button" mat-button
-                        (click)="createNewCategory([detailsForm])">
+            <div class="stepper-wrapper">
+                <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent"
+                        (click)="createHelpCategoryItem([detailsForm])">
                     {{'LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_ITEM_BUTTON' | translate}}
                 </button>
             </div>

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/takeUntil';
+import 'rxjs/add/operator/catch';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { UserRoleModel } from '../../models/user-role.model';
 import { StorageKey, StorageService } from '../helper/storage.service';
@@ -17,11 +18,11 @@ import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
 import * as _ from 'lodash';
-import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import 'rxjs/add/observable/throw';
 import { HierarchicalLocationModel } from '../../models/hierarchical-location.model';
 import { PeoplePossibleDuplicateModel } from '../../models/people-possible-duplicate.model';
 import { EntityType } from '../../models/entity-type';
+import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Injectable()
 export class OutbreakDataService {
@@ -50,6 +51,15 @@ export class OutbreakDataService {
             this.http.get(`outbreaks?filter=${filter}`),
             OutbreakModel
         );
+    }
+
+    /**
+     * Retrieve the number of Outbreaks
+     * @param {RequestQueryBuilder} queryBuilder
+     */
+    getOutbreaksCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`outbreaks/count?where=${whereFilter}`);
     }
 
     /**
@@ -110,18 +120,21 @@ export class OutbreakDataService {
     /**
      * Modify an existing Outbreak
      * @param {string} outbreakId
-     * @returns {Observable<any>}
+     * @returns {Observable<OutbreakModel>}
      */
-    modifyOutbreak(outbreakId: string, data: any): Observable<any> {
-        return this.http.patch(`outbreaks/${outbreakId}`, data)
-            .mergeMap((res) => {
-                // re-determine the selected Outbreak
-                return this.determineSelectedOutbreak()
-                    .map(() => {
-                        // preserve the output of the main request
-                        return res;
-                    });
-            });
+    modifyOutbreak(outbreakId: string, data: any): Observable<OutbreakModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.patch(`outbreaks/${outbreakId}`, data)
+                .mergeMap((res) => {
+                    // re-determine the selected Outbreak
+                    return this.determineSelectedOutbreak()
+                        .map(() => {
+                            // preserve the output of the main request
+                            return res;
+                        });
+                }),
+            OutbreakModel
+        );
     }
 
     /**
@@ -237,6 +250,34 @@ export class OutbreakDataService {
     }
 
     /**
+     * Check if the name of the new outbreak is unique
+     * @returns {Observable<boolean | IGeneralAsyncValidatorResponse>}
+     */
+    checkOutbreakNameUniquenessValidity(newOutbreakName: string, outbreakId?: string): Observable<boolean | IGeneralAsyncValidatorResponse> {
+        const qb: RequestQueryBuilder = new RequestQueryBuilder();
+        qb.filter.byEquality('name', newOutbreakName, true, true);
+
+        // condition for modify outbreak
+        if (outbreakId) {
+            qb.filter.where({
+                'id' : {
+                    neq : outbreakId
+                }
+            });
+        }
+
+        // check if we have duplicates
+        return this.getOutbreaksCount(qb)
+            .map((countData: { count: number }) => {
+                return !countData.count ?
+                    true : {
+                        isValid: false,
+                        errMsg: 'LNG_FORM_VALIDATION_ERROR_OUTBREAK_NAME_NOT_UNIQUE'
+                    };
+            });
+    }
+
+    /**
      *  Check if the active outbreak for the logged in user is the same as the selected one and display message if not
      */
     checkActiveSelectedOutbreak() {
@@ -279,56 +320,6 @@ export class OutbreakDataService {
                     return new EntityModel(entity).model;
                 });
             });
-    }
-
-    /**
-     * Generate Visual ID
-     * @param outbreakId
-     * @param visualIdMask
-     * @param personId Optional
-     */
-    generateVisualID(
-        outbreakId: string,
-        visualIdMask: string,
-        personId?: string
-    ): Observable<string | VisualIdErrorModel> {
-        return this.http
-            .post(
-                `outbreaks/${outbreakId}/generate-visual-id`,
-                {
-                    visualIdMask: visualIdMask,
-                    personId: personId
-                }
-            ).catch((response: Error | VisualIdErrorModel) => {
-                return (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ?
-                    Observable.of(
-                        this.modelHelper.getModelInstance(
-                            VisualIdErrorModel,
-                            response
-                        )
-                    ) :
-                    Observable.throw(response);
-            });
-    }
-
-    /**
-     * Check if visual ID is valid
-     * @param outbreakId
-     * @param visualIdMask
-     * @param personId Optional
-     */
-    generateVisualIDCheckValidity(
-        outbreakId: string,
-        visualIdMask: string,
-        personId?: string
-    ): Observable<boolean> {
-        return this.generateVisualID(
-            outbreakId,
-            visualIdMask,
-            personId
-        ).map((visualID: string | VisualIdErrorModel) => {
-            return _.isString(visualID);
-        });
     }
 
     /**

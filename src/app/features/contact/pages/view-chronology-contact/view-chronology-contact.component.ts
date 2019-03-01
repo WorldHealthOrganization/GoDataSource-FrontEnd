@@ -3,10 +3,13 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import * as _ from 'lodash';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { ChronologyItem } from '../../../../shared/components/chronology/chronology.component';
+import { ChronologyItem } from '../../../../shared/components/chronology/typings/chronology-item';
+import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
+import { ContactChronology } from './typings/contact-chronology';
 
 @Component({
     selector: 'app-view-chronology-contact',
@@ -25,7 +28,8 @@ export class ViewChronologyContactComponent implements OnInit {
     constructor(
         protected route: ActivatedRoute,
         private contactDataService: ContactDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private followUpsDataService: FollowUpsDataService,
     ) {}
 
     ngOnInit() {
@@ -52,39 +56,21 @@ export class ViewChronologyContactComponent implements OnInit {
                                 )
                             );
 
-                            // create entries array.
-                            const chronologyEntries: ChronologyItem[] = [];
-
-                            // date of onset
-                            if (!_.isEmpty(this.contactData.dateOfReporting)) {
-                                chronologyEntries.push(new ChronologyItem({
-                                    date: this.contactData.dateOfReporting,
-                                    label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'
-                                }));
-                            }
-
-                            // date deceased
-                            if (!_.isEmpty(this.contactData.dateDeceased)) {
-                                chronologyEntries.push(new ChronologyItem({
-                                    date: this.contactData.dateDeceased,
-                                    label: 'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED'
-                                }));
-                            }
-
-                            // date become contact
-                            if (!_.isEmpty(this.contactData.dateBecomeContact)) {
-                                chronologyEntries.push(new ChronologyItem({
-                                    date: this.contactData.dateBecomeContact,
-                                    label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT'
-                                }));
-                            }
-
-                            // set data
-                            this.chronologyEntries = chronologyEntries;
+                            // build query to get the followUps for specified contact
+                            const qb = new RequestQueryBuilder;
+                            qb.filter.byEquality(
+                                'personId',
+                                this.contactData.id
+                            );
+                            // get followUps for specified contact
+                            this.followUpsDataService
+                                .getFollowUpsList(selectedOutbreak.id, qb)
+                                .subscribe((followUps: FollowUpModel[]) => {
+                                    // set data
+                                    this.chronologyEntries = ContactChronology.getChronologyEntries(this.contactData, followUps);
+                            });
                         });
                 });
-
-
         });
     }
 }

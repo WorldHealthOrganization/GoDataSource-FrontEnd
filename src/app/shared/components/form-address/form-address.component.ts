@@ -27,6 +27,8 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
 
+    @Input() componentTitle: string;
+
     addressTypes$: Observable<any[]>;
 
     @Input() displayCopyField: boolean = false;
@@ -94,6 +96,7 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
      */
     locationChanged(data: LocationAutoItem) {
         if (
+            data &&
             data.geoLocation &&
             data.geoLocation.lat &&
             data.geoLocation.lng

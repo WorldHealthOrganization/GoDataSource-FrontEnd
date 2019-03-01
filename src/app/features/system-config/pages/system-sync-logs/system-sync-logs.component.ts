@@ -22,6 +22,7 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-system-sync-logs-list',
@@ -39,6 +40,9 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
 
     // authenticated user
     authUser: UserModel;
+
+    // settings
+    settings: SystemSettingsModel;
 
     // sync logs
     syncLogsList$: Observable<SystemSyncLogModel[]>;
@@ -88,6 +92,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
         this.systemSettingsDataService
             .getSystemSettings()
             .subscribe((settings: SystemSettingsModel) => {
+                this.settings = settings;
                 this.upstreamServerList = _.map(_.get(settings, 'upstreamServers', []), (upstreamServer: SystemUpstreamServerModel) => {
                     return new LabelValuePair(
                         upstreamServer.name,
@@ -188,7 +193,8 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                     // finished
                     return log;
                 });
-            });
+            })
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     /**
@@ -207,6 +213,52 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
      */
     hasSysConfigWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
+    }
+
+    /**
+     * Configure sync settings
+     */
+    configureSyncSettings() {
+        this.genericDataService
+            .getFilterYesNoOptions()
+            .subscribe((yesNoOptions: LabelValuePair[]) => {
+                const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
+                this.dialogService.showInput(new DialogConfiguration({
+                    message: 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_DIALOG_TITLE',
+                    yesLabel: 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_DIALOG_SAVE_BUTTON',
+                    fieldsList: [
+                        new DialogField({
+                            name: 'triggerBackupBeforeSync',
+                            placeholder: 'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC',
+                            description: 'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC_DESCRIPTION',
+                            inputOptions: yesNoOptionsFiltered,
+                            inputOptionsClearable: false,
+                            required: true,
+                            value: this.settings.sync.triggerBackupBeforeSync
+                        })
+                    ]
+                })).subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        this.systemSettingsDataService
+                            .modifySystemSettings({
+                                sync: answer.inputValue.value
+                            })
+                            .catch((err) => {
+                                this.snackbarService.showError(err.message);
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe((settings: SystemSettingsModel) => {
+                                this.settings = new SystemSettingsModel(settings);
+
+                                // display success message
+                                this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_DIALOG_SUCCESS_MESSAGE');
+
+                                // refresh settings
+                                this.needsRefreshList(true);
+                            });
+                    }
+                });
+            });
     }
 
     /**

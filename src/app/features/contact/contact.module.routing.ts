@@ -56,7 +56,6 @@ const routes: Routes = [
             permissions: [PERMISSION.WRITE_CONTACT]
         },
         canDeactivate: [
-            // #TODO it's not working right now because we don't have a form on this page
             PageChangeConfirmationGuard
         ]
     },
@@ -102,7 +101,7 @@ const routes: Routes = [
     // Follow-ups list from a contact
     {
         path: 'contact-related-follow-ups/:contactId',
-        component: fromPages.ContactDailyFollowUpsListComponent,
+        component: fromPages.IndividualContactFollowUpsListComponent,
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.READ_FOLLOWUP]

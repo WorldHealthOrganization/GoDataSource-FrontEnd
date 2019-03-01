@@ -90,6 +90,20 @@
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
+                            <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
+                            <!-- [maxlength]="255" -->
+                            <app-form-input
+                                name="visualId"
+                                [(ngModel)]="contactData.visualId"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                                [tooltipTranslateData]="visualIDTranslateData"
+                                [maxlength]="255"
+                                [disabled]="viewOnly"
+                                app-general-async-validator
+                                [asyncValidatorObservable]="contactIdMaskValidator">
+                            </app-form-input>
+
                             <app-form-datepicker
                                 fxFlex
                                 name="dateOfReporting"
@@ -113,7 +127,6 @@
                             </app-form-slide-toggle>
 
                             <app-form-select
-                                *ngIf="contactData.followUp?.status"
                                 name="followUp.status"
                                 [ngModel]="contactData.followUp?.status"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS' | translate"
@@ -121,11 +134,6 @@
                                 [options]="finalFollowUpStatus$ | async"
                                 [disabled]="viewOnly">
                             </app-form-select>
-                            <div
-                                *ngIf="!contactData.followUp?.status"
-                                fxFlex><!-- placeholder --></div>
-
-                            <div fxFlex><!-- placeholder --></div>
                         </div>
 
                     </div>
@@ -188,7 +196,7 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <ng-container *ngIf="!viewOnly">
-            <button mat-raised-button color="primary" class="button-primary">
+            <button mat-raised-button color="accent">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
 
@@ -199,10 +207,25 @@
             <div class="page-tabs-navbar-placeholder"></div>
         </ng-container>
 
-        <button *ngIf="viewOnly && hasContactWriteAccess()"
-                mat-raised-button color="primary" class="button-primary"
-                [routerLink]="['/contacts', contactData.id, 'modify']">
-            {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+        <ng-container *ngIf="viewOnly && hasContactWriteAccess()">
+            <button
+                mat-raised-button type="button" color="accent"
+                [routerLink]="['/contacts', contactData.id, 'modify']"
+            >
+                {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+            </button>
+
+            <div class="page-tabs-navbar-placeholder"></div>
+        </ng-container>
+
+        <button
+            *ngIf="contactExposure"
+            type="button"
+            mat-raised-button
+            color="primary"
+            [routerLink]="[EntityModel.getPersonLink(contactExposure)]"
+        >
+            {{ 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_EXPOSURE' | translate }}
         </button>
 
         <div class="page-tabs-navbar-placeholder"></div>

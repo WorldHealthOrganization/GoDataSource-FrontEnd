@@ -16,6 +16,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Moment } from 'moment';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-modify-event',
@@ -24,10 +25,7 @@ import { Moment } from 'moment';
     styleUrls: ['./modify-event.component.less']
 })
 export class ModifyEventComponent extends ViewModifyComponent implements OnInit {
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events')
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
@@ -50,7 +48,8 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
         private snackbarService: SnackbarService,
         private router: Router,
         private authDataService: AuthDataService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private dialogService: DialogService
     ) {
         super(route);
     }
@@ -81,21 +80,13 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
                             .getEvent(selectedOutbreak.id, this.eventId)
                             .subscribe(eventDataReturned => {
                                 this.eventData = new EventModel(eventDataReturned);
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        this.viewOnly ? 'LNG_PAGE_VIEW_EVENT_TITLE' : 'LNG_PAGE_MODIFY_EVENT_TITLE',
-                                        '.',
-                                        true,
-                                        {},
-                                        this.eventData
-                                    )
-                                );
+                                this.createBreadcrumbs();
                             });
                     });
             });
     }
 
-    modifyContact(form: NgForm) {
+    modifyEvent(form: NgForm) {
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
         if (!this.formHelper.validateForm(form)) {
@@ -103,19 +94,29 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
         }
 
         // modify the event
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.eventDataService
             .modifyEvent(this.outbreakId, this.eventId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
-
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .subscribe((modifiedEvent: EventModel) => {
+                // update model
+                this.eventData = modifiedEvent;
+
+                // mark form as pristine
+                form.form.markAsPristine();
+
+                // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE');
 
-                // navigate to listing page
-                this.disableDirtyConfirm();
-                this.router.navigate(['/events']);
+                // update breadcrumb
+                this.createBreadcrumbs();
+
+                // hide dialog
+                loadingDialog.close();
             });
     }
 
@@ -125,5 +126,21 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
      */
     hasEventWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
+    }
+
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [
+            new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_EVENT_TITLE' : 'LNG_PAGE_MODIFY_EVENT_TITLE',
+                '.',
+                true,
+                {},
+                this.eventData
+            )
+        ];
     }
 }

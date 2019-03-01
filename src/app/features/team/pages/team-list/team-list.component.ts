@@ -19,6 +19,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-team-list',
@@ -36,7 +37,7 @@ export class TeamListComponent extends ListComponent implements OnInit {
     ];
 
     // list of teams
-    teamsList: TeamModel[];
+    teamsList$: Observable<TeamModel[]>;
     teamsListCount$: Observable<any>;
 
     // authenticated user
@@ -76,9 +77,8 @@ export class TeamListComponent extends ListComponent implements OnInit {
      */
     refreshList() {
         // retrieve the list of Teams
-        this.teamDataService.getTeamsList().subscribe((teamsList) => {
-            this.teamsList = teamsList;
-        });
+        this.teamsList$ = this.teamDataService.getTeamsList(this.queryBuilder)
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     /**
@@ -137,7 +137,8 @@ export class TeamListComponent extends ListComponent implements OnInit {
                     // retrieve follow-ups + contact details
                     this.followUpsDataService.getFollowUpsList(
                         this.selectedOutbreak.id,
-                        qb
+                        qb,
+                        false
                     ).subscribe((followUps: FollowUpModel[]) => {
                         if (followUps.length > 0) {
                             this.snackbarService.showError('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_IN_USE_MESSAGE');

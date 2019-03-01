@@ -6,6 +6,7 @@ app-contact-range-follow-ups-list {
         @mat-spinner-width: 64px;
         @mat-spinner-height: 64px;
         mat-spinner {
+            z-index: 500;
             display: inline-block;
             position: absolute;
             top: 0;
@@ -28,21 +29,16 @@ app-contact-range-follow-ups-list {
 
     .follow-up-range-table-content {
         overflow-x: auto;
+        padding-top: 20px;
 
         .follow-up-range-date-header {
-            height: 48px;
             padding-top: 16px;
             margin-bottom: 2px;
             border-bottom: 2px solid #CCC;
 
-            .follow-up-range-date-header-text {
-                transform: rotate(-60deg);
-            }
-
             .follow-up-range-date-column-header {
-                border-right: 1px transparent;
-                padding-right: 2px;
-                padding-left: 2px;
+                transform: rotate(-60deg) translate(40%,-100%);
+                min-width: 100px;
             }
         }
 
@@ -63,8 +59,20 @@ app-contact-range-follow-ups-list {
                     padding-right: 2px;
                     padding-left: 2px;
 
-                    .follow-up-range-date-column-data-status {
-                        cursor: pointer;
+                    .follow-up-range-date-column-data-info {
+                        border: 1px solid transparent;
+
+                        &:hover {
+                            cursor: pointer;
+                            border-color: #CCC;
+                        }
+
+                        .follow-up-range-date-column-data-bell {
+                            max-width: 10px;
+                            max-height: 10px;
+                            width: 100%;
+                            margin: 0 auto 1px auto;
+                        }
                     }
                 }
             }

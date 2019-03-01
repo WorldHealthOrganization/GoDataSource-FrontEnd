@@ -13,11 +13,12 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges {
     @Input() chartDataColumns;
     @Input() chartDataCategories;
     @Input() showLabels: boolean = false;
-    @Input() maxTickCulling: number = 1;
     @Input() xLabel: string = '';
     @Input() yLabel: string = '';
     @Input() colorPattern: string[] = [];
     chart: any;
+
+    maxTickCulling: number = 1;
 
     ngOnInit() {
         // render c3 object
@@ -35,9 +36,19 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges {
     render() {
         this.chart = c3.generate({
             bindto: '#chart',
+            onrendered: () => {
+                this.configureNumberOfTicks(this.chartDataCategories.length);
+            },
             zoom: {
                 enabled: true,
-                rescale: false
+                rescale: false,
+                onzoom: (domain) => {
+                    // display the ticks based on the domain zoomed
+                    if (domain) {
+                        const domainDiff = domain[1] - domain[0];
+                        this.configureNumberOfTicks(domainDiff);
+                    }
+                }
             },
             interaction: {
                 enabled: false
@@ -69,14 +80,13 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges {
                     },
                     type: 'category',
                     categories: this.chartDataCategories,
-                    extent: [1, 10],
                     tick: {
                         width: 100,
                         culling: {
                             max: this.maxTickCulling
                         },
                         rotate: 70
-                    },
+                    }
                 },
                 y: {
                     inner: true,
@@ -107,5 +117,38 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges {
                 pattern: this.colorPattern
             }
         });
+
     }
+
+    /**
+     * configure the number of ticks to be displayed
+     * @param {number} elementsDisplayedNo
+     */
+    configureNumberOfTicks(elementsDisplayedNo: number) {
+        const elements: any = document.getElementsByClassName('c3-axis-x');
+        const element: any = elements[0];
+
+        if (elementsDisplayedNo < 70) {
+            element.classList.add('c3-axis-x-n');
+            element.classList.remove('c3-axis-x-2n');
+            element.classList.remove('c3-axis-x-3n');
+            element.classList.remove('c3-axis-x-5n');
+        } else if (elementsDisplayedNo < 150 ) {
+            element.classList.add('c3-axis-x-2n');
+            element.classList.remove('c3-axis-x-n');
+            element.classList.remove('c3-axis-x-3n');
+            element.classList.remove('c3-axis-x-5n');
+        } else if (elementsDisplayedNo < 250 ) {
+            element.classList.add('c3-axis-x-3n');
+            element.classList.remove('c3-axis-x-n');
+            element.classList.remove('c3-axis-x-2n');
+            element.classList.remove('c3-axis-x-5n');
+        } else {
+            element.classList.add('c3-axis-x-5n');
+            element.classList.remove('c3-axis-x-n');
+            element.classList.remove('c3-axis-x-2n');
+            element.classList.remove('c3-axis-x-3n');
+        }
+    }
+
 }

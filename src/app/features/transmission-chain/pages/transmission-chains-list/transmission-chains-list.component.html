@@ -5,35 +5,24 @@
 
             <div class="topnav-actions">
 
-                <button class="button-primary" mat-raised-button color="primary"
+                <button mat-raised-button color="accent"
                         [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <ng-container>
-
                         <button
                             mat-menu-item
                             [routerLink]="['/transmission-chains']">
                             {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GRAPH_BUTTON' | translate}}
                         </button>
 
-                        <ng-container
-                            *ngIf="hasCaseReadAccess()">
-                            <button
-                                mat-menu-item
-                                [routerLink]="['/transmission-chains', 'map']">
-                                {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON' | translate}}
-                            </button>
-
-                            <button
-                                mat-menu-item
-                                [routerLink]="['/transmission-chains', 'case-count-map']">
-                                {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_CASE_COUNT_MAP_BUTTON' | translate}}
-                            </button>
-                        </ng-container>
-
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/transmission-chains', 'case-count-map']">
+                            {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_CASE_COUNT_MAP_BUTTON' | translate}}
+                        </button>
                     </ng-container>
                 </mat-menu>
 
@@ -45,7 +34,11 @@
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">
-        <button type="button" mat-raised-button (click)="needsRefreshList(true)">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
     </div>
@@ -56,12 +49,12 @@
         <ng-container matColumnDef="firstContactDate">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_FIRST_CONTACT_DATE' | translate}}</div>
+                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_EARLIEST_DATE_OF_ONSET' | translate}}</div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.firstRelationship?.contactDate | dateDefault }}
+                {{ item.earliestDateOfOnset | dateDefault }}
             </mat-cell>
         </ng-container>
 
@@ -73,8 +66,8 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                <a *ngIf="item.firstCase" [routerLink]="['/transmission-chains']" [queryParams]="{ personId: item.firstCase.id, selectedEntityType: EntityType.CASE }">
-                    {{ item.firstCase.name }}
+                <a *ngIf="item.rootPerson" [routerLink]="['/transmission-chains']" [queryParams]="{ personId: item.rootPerson.id, selectedEntityType: item.rootPerson.type }">
+                    {{ item.rootPerson.name }}
                 </a>
             </mat-cell>
         </ng-container>
@@ -102,19 +95,6 @@
 
             <mat-cell *matCellDef="let item">
                 {{ item.noAliveCases }}
-            </mat-cell>
-        </ng-container>
-
-        <!--Length -->
-        <ng-container matColumnDef="length">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_LENGTH' | translate}}</div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                {{ item.length }}
             </mat-cell>
         </ng-container>
 
@@ -147,6 +127,17 @@
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
         <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
     </mat-table>
+
+    <div
+        *ngIf="isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
 
 </mat-card>
 

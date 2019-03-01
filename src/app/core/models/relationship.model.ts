@@ -1,9 +1,10 @@
 import * as _ from 'lodash';
 import { EntityModel } from './entity.model';
+import { EntityType } from './entity-type';
 
 export class RelationshipPersonModel {
     id: string;
-    type: string;
+    type: EntityType;
     source: boolean;
     target: boolean;
 
@@ -70,6 +71,14 @@ export class RelationshipModel {
         // find person information
         const personInfo = _.find(this.persons, {id: entityId});
         return _.get(personInfo, 'source', false);
+    }
+
+    /**
+     * Source Person
+     */
+    get sourcePerson(): RelationshipPersonModel {
+        const data = _.find(this.persons, { source: true });
+        return data ? new RelationshipPersonModel(data) : data;
     }
 }
 

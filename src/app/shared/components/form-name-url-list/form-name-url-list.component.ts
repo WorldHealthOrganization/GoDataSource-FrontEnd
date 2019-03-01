@@ -28,6 +28,7 @@ export class FormNameUrlListComponent extends ListBase<NameUrlModel> implements 
     @Input() urlPlaceholder: string = '';
     @Input() nameTooltip: string;
     @Input() urlTooltip: string;
+    @Input() componentTitle: string;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,

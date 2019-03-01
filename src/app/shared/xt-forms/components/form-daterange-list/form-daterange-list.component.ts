@@ -5,6 +5,7 @@ import { ListBase } from '../../core';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { Subscriber } from 'rxjs/Subscriber';
 import { DialogAnswer, DialogAnswerButton } from '../../../components/dialog/dialog.component';
+import { Moment } from 'moment';
 
 @Component({
     selector: 'app-form-daterange-list',
@@ -22,8 +23,12 @@ export class FormDaterangeListComponent extends ListBase<DateRangeModel> impleme
     @Input() required: boolean = false;
     @Input() readOnly: boolean = false;
 
+    @Input() componentTitle: string;
+
     @Input() fromTooltip: string;
     @Input() toTooltip: string;
+
+    @Input() minDate: Moment;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,

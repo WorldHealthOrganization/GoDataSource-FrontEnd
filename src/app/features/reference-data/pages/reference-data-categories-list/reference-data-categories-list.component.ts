@@ -9,6 +9,10 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { PERMISSION } from '../../../../core/models/permission.model';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LoadingDialogModel } from '../../../../shared/components';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 
 @Component({
     selector: 'app-reference-data-categories-list',
@@ -16,7 +20,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
     templateUrl: './reference-data-categories-list.component.html',
     styleUrls: ['./reference-data-categories-list.component.less']
 })
-export class ReferenceDataCategoriesListComponent implements OnInit {
+export class ReferenceDataCategoriesListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '..', true)
@@ -30,14 +34,19 @@ export class ReferenceDataCategoriesListComponent implements OnInit {
 
     referenceDataExporFileName: string = moment().format('YYYY-MM-DD');
 
+    loadingDialog: LoadingDialogModel;
+
     constructor(
         private router: Router,
         private referenceDataDataService: ReferenceDataDataService,
         private authDataService: AuthDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private dialogService: DialogService,
+        protected snackbarService: SnackbarService
     ) {
-        // load reference data
-        this.referenceData$ = this.referenceDataDataService.getReferenceData();
+        super(snackbarService);
+
+        this.refreshList();
 
         // add page title
         this.referenceDataExporFileName = this.i18nService.instant('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE') +
@@ -51,6 +60,14 @@ export class ReferenceDataCategoriesListComponent implements OnInit {
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+    }
+
+    /**
+     * Re(load) the Reference Data Categories list
+     */
+    refreshList() {
+        // load reference data
+        this.referenceData$ = this.referenceDataDataService.getReferenceData();
     }
 
     /**
@@ -71,5 +88,21 @@ export class ReferenceDataCategoriesListComponent implements OnInit {
      */
     hasReferenceDataWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_REFERENCE_DATA);
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
     }
 }

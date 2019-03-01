@@ -102,7 +102,7 @@
                                 [(ngModel)]="user.password"
                                 [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD' | translate"
                                 tooltip="LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD_DESCRIPTION"
-                                app-password-validator
+                                minlength="12"
                                 app-trigger-validation-for="passwordConfirm"
                                 [disabled]="viewOnly">
                             </app-form-input>
@@ -131,13 +131,13 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button *ngIf="viewOnly && hasUserWriteAccess()"
-                mat-raised-button color="primary" class="button-primary"
+                mat-raised-button type="button" color="accent"
                 [routerLink]="['/users', userId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
 
         <ng-container *ngIf="!viewOnly">
-            <button mat-raised-button color="primary" class="button-primary" type="submit">
+            <button mat-raised-button color="accent" type="submit">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
             <button type="button"

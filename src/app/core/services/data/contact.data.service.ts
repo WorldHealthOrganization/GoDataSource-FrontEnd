@@ -7,6 +7,12 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { MetricContactsSeenEachDays } from '../../models/metrics/metric-contacts-seen-each-days.model';
 import { AddressModel } from '../../models/address.model';
 import { RiskLevelGroupModel } from '../../models/risk-level-group.model';
+import { EntityModel } from '../../models/entity.model';
+import { EntityType } from '../../models/entity-type';
+import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
+import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
+import * as _ from 'lodash';
+import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Injectable()
 export class ContactDataService {
@@ -97,24 +103,50 @@ export class ContactDataService {
     }
 
     /**
+     * Find contact duplicates
+     * @param outbreakId
+     * @param contactData
+     */
+    findDuplicates(
+        outbreakId: string,
+        contactData: any,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<EntityDuplicatesModel> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableToModel(
+            this.http.post(
+                `outbreaks/${outbreakId}/contacts/duplicates/find?filter=${filter}`,
+                contactData
+            ),
+            EntityDuplicatesModel
+        );
+    }
+
+    /**
      * Modify an existing Contact of an Outbreak
      * @param {string} outbreakId
      * @param {string} contactId
      * @param contactData
-     * @returns {Observable<any>}
+     * @returns {Observable<ContactModel>}
      */
-    modifyContact(outbreakId: string, contactId: string, contactData): Observable<any> {
-        return this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}`, contactData);
+    modifyContact(outbreakId: string, contactId: string, contactData): Observable<ContactModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}`, contactData),
+            ContactModel
+        );
     }
 
     /**
-     * Add multiple Contacts for a Case
+     * Add multiple Contacts for a Case or Event
      * @param outbreakId
-     * @param caseId
+     * @param sourceEntityType
+     * @param sourceEntityId
      * @param contactsData
      */
-    bulkAddContacts(outbreakId: string, caseId: string, contactsData: any[]): Observable<any> {
-        return this.http.post(`outbreaks/${outbreakId}/cases/${caseId}/contacts`, contactsData);
+    bulkAddContacts(outbreakId: string, sourceEntityType: EntityType, sourceEntityId: string, contactsData: any[]): Observable<any> {
+        const entityTypeLinkPath = EntityModel.getLinkForEntityType(sourceEntityType);
+
+        return this.http.post(`outbreaks/${outbreakId}/${entityTypeLinkPath}/${sourceEntityId}/contacts`, contactsData);
     }
 
     /**
@@ -135,7 +167,10 @@ export class ContactDataService {
      * @param {string} outbreakId
      * @returns {Observable<MetricContactsSeenEachDays>}
      */
-    getNumberOfContactsSeenEachDay(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricContactsSeenEachDays> {
+    getNumberOfContactsSeenEachDay(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricContactsSeenEachDays> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-seen/count?filter=${filter}`),
@@ -161,6 +196,68 @@ export class ContactDataService {
      */
     convertContactToCase(outbreakId: string, contactId: string): Observable<any> {
        return this.http.post(`outbreaks/${outbreakId}/contacts/${contactId}/convert-to-case`, {});
+    }
+
+    /**
+     * Generate Contact Visual ID
+     * @param outbreakId
+     * @param visualIdMask
+     * @param personId Optional
+     */
+    generateContactVisualID(
+        outbreakId: string,
+        visualIdMask: string,
+        personId?: string
+    ): Observable<string | VisualIdErrorModel> {
+        return this.http
+            .post(
+                `outbreaks/${outbreakId}/contacts/generate-visual-id`,
+                {
+                    visualIdMask: visualIdMask,
+                    personId: personId
+                }
+            ).catch((response: Error | VisualIdErrorModel) => {
+                return (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ||
+                    (response as VisualIdErrorModel).code === VisualIdErrorModelCode.DUPLICATE_VISUAL_ID ?
+                    Observable.of(
+                        this.modelHelper.getModelInstance(
+                            VisualIdErrorModel,
+                            response
+                        )
+                    ) :
+                    Observable.throw(response);
+            });
+    }
+
+    /**
+     * Check if visual ID is valid
+     * @param outbreakId
+     * @param visualIdRealMask
+     * @param visualIdMask
+     * @param personId Optional
+     */
+    checkContactVisualIDValidity(
+        outbreakId: string,
+        visualIdRealMask: string,
+        visualIdMask: string,
+        personId?: string
+    ): Observable<boolean | IGeneralAsyncValidatorResponse> {
+        return this.generateContactVisualID(
+            outbreakId,
+            visualIdMask,
+            personId
+        ).map((visualID: string | VisualIdErrorModel) => {
+            return _.isString(visualID) ?
+                true : {
+                    isValid: false,
+                    errMsg: (visualID as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ?
+                        'LNG_API_ERROR_CODE_INVALID_VISUAL_ID_MASK' :
+                        'LNG_API_ERROR_CODE_DUPLICATE_VISUAL_ID',
+                    errMsgData: {
+                        mask: visualIdRealMask
+                    }
+                };
+        });
     }
 }
 

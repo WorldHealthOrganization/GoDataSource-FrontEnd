@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -15,6 +15,9 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { Observable } from 'rxjs/Observable';
 import { IconModel } from '../../../../core/models/icon.model';
 import { IconDataService } from '../../../../core/services/data/icon.data.service';
+import 'rxjs/add/operator/switchMap';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-modify-reference-data-entry',
@@ -23,15 +26,13 @@ import { IconDataService } from '../../../../core/services/data/icon.data.servic
     styleUrls: ['./modify-reference-data-entry.component.less']
 })
 export class ModifyReferenceDataEntryComponent extends ViewModifyComponent implements OnInit {
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     categoryId: string;
     entryId: string;
     // new Entry model
     entry: ReferenceDataEntryModel = new ReferenceDataEntryModel();
+    categoryName: string;
 
     authUser: UserModel;
 
@@ -40,13 +41,14 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
     changeIcon: boolean = false;
 
     constructor(
-        private router: Router,
         protected route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private authDataService: AuthDataService,
-        private iconDataService: IconDataService
+        private iconDataService: IconDataService,
+        private i18nService: I18nService,
+        private dialogService: DialogService
     ) {
         super(route);
     }
@@ -60,7 +62,7 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
 
         // get the route params
         this.route.params
-            .subscribe((params: {categoryId, entryId}) => {
+            .subscribe((params: { categoryId, entryId }) => {
                 this.categoryId = params.categoryId;
                 this.entryId = params.entryId;
 
@@ -69,20 +71,8 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
                     .getEntry(params.entryId)
                     .subscribe((entry: ReferenceDataEntryModel) => {
                         this.entry = entry;
-
-                        // add new breadcrumbs
-                        const categoryName = _.get(entry, 'category.name');
-                        if (categoryName) {
-                            // link to Category
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(categoryName, `/reference-data/${params.categoryId}`)
-                            );
-                        }
-                        // current page title
-                        this.breadcrumbs.push(
-                                new BreadcrumbItemModel(entry.value, '.', true)
-                        );
-
+                        this.categoryName = _.get(this.entry, 'category.name');
+                        this.createBreadcrumbs();
                     });
             });
     }
@@ -96,19 +86,39 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
         }
 
         // get selected outbreak
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.referenceDataDataService
             .modifyEntry(this.entryId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
-
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .switchMap((modifiedReferenceDataEntry) => {
+                // re-load language tokens
+                return this.i18nService.loadUserLanguage()
+                    .catch((err) => {
+                        this.snackbarService.showError(err.message);
+                        loadingDialog.close();
+                        return ErrorObservable.create(err);
+                    })
+                    .map(() => modifiedReferenceDataEntry);
+            })
+            .subscribe((modifiedReferenceDataEntry) => {
+                // update model
+                this.entry = modifiedReferenceDataEntry;
+
+                // mark form as pristine
+                form.form.markAsPristine();
+
+                // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_ACTION_MODIFY_ENTRY_SUCCESS_MESSAGE');
 
-                // navigate to listing page
-                this.disableDirtyConfirm();
-                this.router.navigate([`/reference-data/${this.categoryId}`]);
+                // update breadcrumb
+                this.createBreadcrumbs();
+
+                // hide dialog
+                loadingDialog.close();
             });
     }
 
@@ -119,4 +129,22 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
     hasReferenceDataWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
     }
+
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [];
+        this.route.params
+            .subscribe((params: { categoryId, entryId }) => {
+                this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data'));
+
+                if (this.categoryName) {
+                    this.breadcrumbs.push(new BreadcrumbItemModel(this.categoryName, `/reference-data/${params.categoryId}`));
+                }
+
+                this.breadcrumbs.push(new BreadcrumbItemModel(this.entry.value, '.', true));
+            });
+    }
+
 }

@@ -11,6 +11,7 @@ import * as _ from 'lodash';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-create-cluster',
@@ -34,7 +35,8 @@ export class CreateClusterComponent extends ConfirmOnFormChanges implements OnIn
         private clusterDataService: ClusterDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -58,19 +60,23 @@ export class CreateClusterComponent extends ConfirmOnFormChanges implements OnIn
             !_.isEmpty(dirtyFields)
         ) {
             // add the new Cluster
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.clusterDataService
                 .createCluster(this.selectedOutbreak.id, dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
-
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newCluser: ClusterModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_SUCCESS_MESSAGE');
+
+                    // hide dialog
+                    loadingDialog.close();
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate(['/clusters']);
+                    this.router.navigate([`/clusters/${newCluser.id}/modify`]);
                 });
         }
     }

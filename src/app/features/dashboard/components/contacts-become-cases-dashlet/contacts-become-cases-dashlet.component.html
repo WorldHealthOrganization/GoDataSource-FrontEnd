@@ -1,35 +1,12 @@
 <app-dashboard-custom-metric-dashlet
     [link]="['/cases']"
-    [params]="queryParams"
-    value="{{contactsBecomeCasesCount}} / {{casesCount}}"
+    [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
+    [value]="contactsBecomeCasesCount + ' / ' + casesCount"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
-    (moveAfter)="onMoveAfter()">
-
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
     <div fxLayout="row" fxLayoutGap="10px">
-        <div>
-            {{'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_BEFORE_TIME_PERIOD' | translate}}
-        </div>
-
-        <app-form-daterange
-            fxFlexOffset="5px"
-            name="dateRangeFilter"
-            [ngModel]="dateRange"
-            (changed)="onDateRangeChange($event)">
-        </app-form-daterange>
-
-        <div fxFlexOffset="5px">
-            {{'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_AFTER_TIME_PERIOD' | translate}}
-        </div>
-
-        <app-form-location-dropdown
-            fxFlexOffset="5px"
-            name="locationFilter"
-            [ngModel]="locationIds"
-            [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"
-            [multiple]="true"
-            [useOutbreakLocations]="true"
-            (changed)="onLocationChange($event)">
-        </app-form-location-dropdown>
+        {{ 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE' | translate }}
     </div>
 </app-dashboard-custom-metric-dashlet>

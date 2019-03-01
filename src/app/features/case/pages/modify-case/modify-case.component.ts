@@ -17,14 +17,21 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import * as moment from 'moment';
 import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import * as moment from 'moment';
 import { Constants } from '../../../../core/models/constants';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
+import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField } from '../../../../shared/components';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { EntityModel } from '../../../../core/models/entity.model';
+import { MatDialogRef } from '@angular/material';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
     selector: 'app-modify-case',
@@ -51,6 +58,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
     // provide constants to template
     EntityType = EntityType;
+    Constants = Constants;
 
     serverToday: Moment = null;
 
@@ -77,7 +85,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private genericDataService: GenericDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private dialogService: DialogService
     ) {
         super(route);
     }
@@ -181,7 +190,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             const qb = new RequestQueryBuilder();
 
             // parent case relations
-            const relations = qb.include('relationships');
+            const relations = qb.include('relationships', true);
             relations.filterParent = false;
 
             // keep only relationships for which the current case is the target ( child case )
@@ -202,7 +211,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             });
 
             // case data
-            const people = relations.queryBuilder.include('people');
+            const people = relations.queryBuilder.include('people', true);
             people.filterParent = false;
 
             // ID
@@ -259,16 +268,17 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                     // set visual ID translate data
                     this.visualIDTranslateData = {
-                        mask: OutbreakModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
+                        mask: CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
                     };
 
                     // set visual ID validator
                     this.caseIdMaskValidator = Observable.create((observer) => {
-                        this.outbreakDataService.generateVisualIDCheckValidity(
+                        this.caseDataService.checkCaseVisualIDValidity(
                             this.selectedOutbreak.id,
+                            this.visualIDTranslateData.mask,
                             this.caseData.visualId,
                             this.caseData.id
-                        ).subscribe((isValid: boolean) => {
+                        ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
                             observer.next(isValid);
                             observer.complete();
                         });
@@ -312,20 +322,143 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             delete dirtyFields.ageDob;
         }
 
-        // modify the Case
+        // check for duplicates
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.caseDataService
-            .modifyCase(this.selectedOutbreak.id, this.caseId, dirtyFields)
+            .findDuplicates(this.selectedOutbreak.id, {
+                ...this.caseData,
+                ...dirtyFields
+            })
             .catch((err) => {
                 this.snackbarService.showApiError(err);
 
+                // hide dialog
+                loadingDialog.close();
+
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
-                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
+            .subscribe((caseDuplicates: EntityDuplicatesModel) => {
+                // modify Case
+                const runModifyCase = (finishCallBack?: () => void) => {
+                    // modify the Case
+                    this.caseDataService
+                        .modifyCase(this.selectedOutbreak.id, this.caseId, dirtyFields)
+                        .catch((err) => {
+                            this.snackbarService.showApiError(err);
+                            loadingDialog.close();
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe((modifiedCase: CaseModel) => {
+                            // update model
+                            this.caseData = modifiedCase;
 
-                // navigate to listing page
-                this.disableDirtyConfirm();
-                this.router.navigate(['/cases']);
+                            // mark form as pristine
+                            form.form.markAsPristine();
+
+                            // display message
+                            if (!finishCallBack) {
+                                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
+
+                                // update breadcrumb
+                                this.retrieveCaseData();
+
+                                // hide dialog
+                                loadingDialog.close();
+                            } else {
+                                // finished
+                                finishCallBack();
+                            }
+                        });
+                };
+
+                // do we have duplicates ?
+                if (caseDuplicates.duplicates.length > 0) {
+                    // display dialog
+                    const showDialog = () => {
+                        this.dialogService.showConfirm(new DialogConfiguration({
+                            message: 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_CONFIRM_MSG',
+                            yesLabel: 'LNG_COMMON_BUTTON_MERGE',
+                            customInput: true,
+                            fieldsList: [new DialogField({
+                                name: 'mergeWith',
+                                placeholder: 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_MERGE_WITH',
+                                inputOptions: _.map(caseDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
+                                    // case model
+                                    const caseData: CaseModel = duplicate.model as CaseModel;
+
+                                    // map
+                                    return new LabelValuePair((index + 1) + '. ' +
+                                        EntityModel.getNameWithDOBAge(
+                                            caseData,
+                                            this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                                            this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                        ),
+                                        caseData.id
+                                    );
+                                }),
+                                inputOptionsMultiple: true,
+                                required: false
+                            })],
+                            addDefaultButtons: true,
+                            buttons: [
+                                new DialogButton({
+                                    label: 'LNG_COMMON_BUTTON_SAVE',
+                                    clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                                        dialogHandler.close(new DialogAnswer(DialogAnswerButton.Extra_1));
+                                    }
+                                })
+                            ]
+                        })).subscribe((answer) => {
+                            // just update ?
+                            if (answer.button === DialogAnswerButton.Yes) {
+                                // make sure we have at least two ids selected ( 1 is the current case )
+                                if (
+                                    !answer.inputValue.value.mergeWith
+                                ) {
+                                    // display need to select at least one record to merge with
+                                    this.snackbarService.showError('LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_ACTION_MERGE_AT_LEAST_ONE_ERROR_MESSAGE');
+
+                                    // display dialog again
+                                    showDialog();
+
+                                    // finished here
+                                    return;
+                                }
+
+                                // save data first, followed by redirecting to merge
+                                runModifyCase(() => {
+                                    // construct list of ids
+                                    const mergeIds: string[] = [
+                                        this.caseId,
+                                        ...answer.inputValue.value.mergeWith
+                                    ];
+
+                                    // hide dialog
+                                    loadingDialog.close();
+
+                                    // redirect to merge
+                                    this.router.navigate(
+                                        ['/duplicated-records', EntityModel.getLinkForEntityType(EntityType.CASE), 'merge'], {
+                                            queryParams: {
+                                                ids: JSON.stringify(mergeIds)
+                                            }
+                                        }
+                                    );
+                                });
+                            } else if (answer.button === DialogAnswerButton.Extra_1) {
+                                runModifyCase();
+                            } else {
+                                // hide dialog
+                                loadingDialog.close();
+                            }
+                        });
+                    };
+
+                    // display dialog
+                    showDialog();
+                } else {
+                    runModifyCase();
+                }
             });
     }
 

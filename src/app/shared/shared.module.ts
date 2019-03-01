@@ -56,7 +56,12 @@ import { NgxWigModule } from 'ngx-wig';
     entryComponents: [
         fromSharedComponents.SnackbarComponent,
         fromSharedComponents.DialogComponent,
-        fromSharedComponents.ModifyContactFollowUpQuestionnaireDialogComponent
+        fromSharedComponents.ModifyContactFollowUpQuestionnaireDialogComponent,
+        fromSharedComponents.LoadingDialogComponent,
+        fromSharedComponents.ViewCotNodeDialogComponent,
+        fromSharedComponents.ViewCotEdgeDialogComponent,
+        fromSharedComponents.ViewHelpDialogComponent,
+        fromSharedComponents.ViewHelpDetailsDialogComponent
     ]
 })
 export class SharedModule {

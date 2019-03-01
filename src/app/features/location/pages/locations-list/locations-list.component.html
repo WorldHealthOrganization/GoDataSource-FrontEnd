@@ -7,14 +7,13 @@
         <div class="topnav-actions">
             <button
                 *ngIf="hasLocationWriteAccess()"
-                class="button-primary"
                 mat-raised-button
-                color="primary"
+                color="accent"
                 [routerLink]="parentId ? ['/locations', parentId, 'create'] : ['/locations', 'create']">
                 {{( parentId ? 'LNG_PAGE_LIST_LOCATIONS_ADD_SUBLOCATION_BUTTON' : 'LNG_PAGE_LIST_LOCATIONS_ADD_LOCATION_BUTTON') | translate}} <span class="xt-icon">addCircle</span>
             </button>
 
-            <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
+            <button mat-raised-button color="accent" [matMenuTriggerFor]="quickActionsMenu">
                 {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
             </button>
 
@@ -25,7 +24,9 @@
                     [message]="'LNG_PAGE_LIST_LOCATIONS_EXPORT_TITLE' | translate"
                     url="locations/hierarchical/export"
                     [fileName]="hierarchicalLocationsDataExportFileName"
-                    [allowedExportTypes]="allowedExportTypes">
+                    [fileType]="ExportDataExtension.JSON"
+                    (exportStart)="showLoadingDialog()"
+                    (exportFinished)="closeLoadingDialog()">
                 </app-export-button>
 
                 <ng-container *ngIf="!parentId && !appliedListFilter && hasLocationWriteAccess()">
@@ -45,6 +46,12 @@
         </div>
     </ng-container>
 </app-topnav>
+
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.LOCATION_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
 
 <div
     fxLayout="row" fxFlex fxLayoutAlign="space-between center">
@@ -84,15 +91,23 @@
 
             <!-- Reset Filters -->
             <div class="reset-filters">
-                <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
+                <button
+                    type="button"
+                    mat-raised-button
+                    color="accent"
+                    (click)="resetFiltersToSideFilters()">
                     {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
                 </button>
-                <button type="button" mat-raised-button (click)="needsRefreshList(true)">
+                <button
+                    type="button"
+                    mat-raised-button
+                    color="accent"
+                    (click)="needsRefreshList(true)">
                     {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
                 </button>
             </div>
 
-            <mat-table #table [dataSource]="locationsList" matSort (matSortChange)="sortBy($event)">
+            <mat-table #table [dataSource]="locationsList$ | async" matSort (matSortChange)="sortBy($event)">
 
                 <!-- Name -->
                 <ng-container matColumnDef="name">
@@ -139,6 +154,29 @@
 
                     <mat-cell *matCellDef="let item">
                         {{ item.synonymsAsString }}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Identifiers -->
+                <ng-container matColumnDef="identifiers">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div class="column-header">{{ 'LNG_LOCATION_FIELD_LABEL_IDENTIFIERS' | translate}}</div>
+                            <div class="column-filter">
+                                <app-form-input
+                                    name="identifiersFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    (optionChanged)="filterByIdentifierCode($event)"
+                                    app-reset-input-on-side-filter
+                                    [displayFilterIcon]="true">
+                                </app-form-input>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item">
+                        {{ item.identifiersAsString }}
                     </mat-cell>
                 </ng-container>
 
@@ -203,6 +241,31 @@
                     </mat-cell>
                 </ng-container>
 
+                <!-- Geographical Level  -->
+                <ng-container matColumnDef="geographicalLevelId">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL" | translate }}</div>
+                            <div class="column-filter">
+                                <app-form-select
+                                    name="geographicalLevelFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    [options]="geographicalLevelsList$ | async"
+                                    multiple="true"
+                                    (optionChanged)="filterBySelectField('geographicalLevelId', $event)"
+                                    [allowSelectionOfDisabledItems]="true"
+                                    [displayInvisibleItems]="true"
+                                    [displayFilterIcon]="true">
+                                </app-form-select>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let item">
+                        {{ item.geographicalLevelId | translate }}
+                    </mat-cell>
+                </ng-container>
+
                 <!-- Inline Actions -->
                 <ng-container matColumnDef="actions">
                     <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
@@ -223,7 +286,7 @@
                             <mat-divider></mat-divider>
 
                             <button mat-menu-item [routerLink]="['/locations', item.id, 'view']">
-                                {{'LNG_PAGE_ACTION_VIEW'| translate}}
+                                {{'LNG_PAGE_LIST_LOCATIONS_ACTION_VIEW_LOCATION'| translate}}
                             </button>
 
                             <ng-container
@@ -231,22 +294,33 @@
                                 <button
                                     mat-menu-item
                                     [routerLink]="['/locations', item.id, 'modify']">
-                                    {{'LNG_PAGE_ACTION_MODIFY'| translate}}
+                                    {{'LNG_PAGE_LIST_LOCATIONS_ACTION_MODIFY_LOCATION'| translate}}
                                 </button>
 
                                 <button
                                     mat-menu-item class="mat-menu-item-delete"
                                     (click)="deleteLocation(item)">
-                                    {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                                    {{ 'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_LOCATION' | translate }}
                                 </button>
                             </ng-container>
                         </mat-menu>
                     </mat-cell>
                 </ng-container>
 
-                <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-                <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+                <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+                <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
             </mat-table>
+
+            <div
+                *ngIf="isEmptyList"
+                class="mat-table"
+            >
+                <div class="mat-row">
+                    <div class="mat-cell">
+                        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+                    </div>
+                </div>
+            </div>
 
             <mat-paginator
                 [length]="(locationsListCount$ | async)?.count"
@@ -254,12 +328,6 @@
                 [pageSizeOptions]="pageSizeOptions"
                 (page)="changePage($event)">
             </mat-paginator>
-
-            <div
-                *ngIf="locationsList && locationsList.length < 1"
-                class="no-records">
-                {{ 'LNG_PAGE_LIST_LOCATIONS_LABEL_NO_RECORDS' | translate }}
-            </div>
         </mat-card>
     </div>
 
@@ -267,9 +335,8 @@
         *ngIf="parentId"
         class="form-actions">
         <button
-            class="button-primary"
             mat-raised-button
-            color="primary"
+            color="accent"
             [routerLink]="['/locations', parentId, 'view']"
             [queryParams]="{ backToCurrent: true }">
             {{'LNG_COMMON_BUTTON_VIEW' | translate}}
@@ -277,9 +344,8 @@
 
         <button
             *ngIf="hasLocationWriteAccess()"
-            class="button-primary"
             mat-raised-button
-            color="primary"
+            color="accent"
             [routerLink]="['/locations', parentId, 'modify']"
             [queryParams]="{ backToCurrent: true }">
             {{'LNG_COMMON_BUTTON_MODIFY' | translate}}

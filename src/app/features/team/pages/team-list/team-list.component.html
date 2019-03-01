@@ -8,17 +8,15 @@
             <ng-container
                 *ngIf="hasTeamWriteAccess()">
                 <button
-                    class="button-primary"
                     mat-raised-button
-                    color="primary"
+                    color="accent"
                     [routerLink]="['/teams', 'create']">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
 
                 <button
-                    class="button-primary"
                     mat-raised-button
-                    color="primary"
+                    color="accent"
                     [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
@@ -43,7 +41,7 @@
     <div class="form-content">
         <mat-card class="page-section page-content">
 
-            <mat-table #table [dataSource]="teamsList" matSort (matSortChange)="sortBy($event)">
+            <mat-table #table [dataSource]="teamsList$" matSort (matSortChange)="sortBy($event)">
 
                 <!-- Name -->
                 <ng-container matColumnDef="name">
@@ -51,7 +49,14 @@
                         <div class="table-header-cell">
                             <div mat-sort-header class="column-header">{{ "LNG_TEAM_FIELD_LABEL_NAME" | translate}}</div>
                             <div class="column-filter">
-                                <!-- placeholder -->
+                                <app-form-input
+                                    name="nameFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    (optionChanged)="filterByTextField('name', $event)"
+                                    app-reset-input-on-side-filter
+                                    [displayFilterIcon]="true">
+                                </app-form-input>
                             </div>
                         </div>
                     </mat-header-cell>
@@ -65,7 +70,33 @@
                 <ng-container matColumnDef="users">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
-                            <div class="column-header">{{ "LNG_TEAM_FIELD_LABEL_USERS" | translate}}</div>
+                            <div class="column-header">
+                                <span>{{ "LNG_TEAM_FIELD_LABEL_USERS" | translate}}</span>
+
+                                <button
+                                    type="button"
+                                    mat-icon-button
+                                    class="column-actions-button"
+                                    [disableRipple]="true"
+                                    [matMenuTriggerFor]="columnActions"
+                                    color="accent"
+                                >
+                                    <span class="xt-icon">arrowDropdownCircle</span>
+                                </button>
+
+                                <mat-menu #columnActions="matMenu">
+                                    <button
+                                        mat-menu-item
+                                        (click)="toggleColumn('users', true)">
+                                        {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL' | translate }}
+                                    </button>
+                                    <button
+                                        mat-menu-item
+                                        (click)="toggleColumn('users', false)">
+                                        {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL' | translate }}
+                                    </button>
+                                </mat-menu>
+                            </div>
                             <div class="column-filter">
                                 <!-- placeholder -->
                             </div>
@@ -73,9 +104,35 @@
                     </mat-header-cell>
 
                     <mat-cell *matCellDef="let item">
-                        <mat-chip-list>
-                            <mat-chip *ngFor="let member of item.members" [matTooltip]="member.name">{{ member.name }}</mat-chip>
-                        </mat-chip-list>
+                        <ng-container *ngIf="!isCellExpanded('users', item.id)">
+                            <app-number-of-items-label
+                                [value]="item.members?.length"
+                            ></app-number-of-items-label>
+
+                            <button
+                                type="button"
+                                mat-button
+                                color="accent"
+                                (click)="toggleCell('users', item.id, true)"
+                            >
+                                {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND' | translate}}
+                            </button>
+                        </ng-container>
+
+                        <ng-container *ngIf="isCellExpanded('users', item.id)">
+                            <mat-chip-list>
+                                <mat-chip *ngFor="let member of item.members" [matTooltip]="member.name">{{ member.name }}</mat-chip>
+                            </mat-chip-list>
+
+                            <button
+                                type="button"
+                                mat-button
+                                color="accent"
+                                (click)="toggleCell('users', item.id, false)"
+                            >
+                                {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate}}
+                            </button>
+                        </ng-container>
                     </mat-cell>
                 </ng-container>
 
@@ -83,7 +140,33 @@
                 <ng-container matColumnDef="locations">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
-                            <div class="column-header">{{ "LNG_TEAM_FIELD_LABEL_LOCATIONS" | translate}}</div>
+                            <div class="column-header">
+                                <span>{{ "LNG_TEAM_FIELD_LABEL_LOCATIONS" | translate}}</span>
+
+                                <button
+                                    type="button"
+                                    mat-icon-button
+                                    class="column-actions-button"
+                                    [disableRipple]="true"
+                                    [matMenuTriggerFor]="columnActions"
+                                    color="accent"
+                                >
+                                    <span class="xt-icon">arrowDropdownCircle</span>
+                                </button>
+
+                                <mat-menu #columnActions="matMenu">
+                                    <button
+                                        mat-menu-item
+                                        (click)="toggleColumn('locations', true)">
+                                        {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL' | translate }}
+                                    </button>
+                                    <button
+                                        mat-menu-item
+                                        (click)="toggleColumn('locations', false)">
+                                        {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL' | translate }}
+                                    </button>
+                                </mat-menu>
+                            </div>
                             <div class="column-filter">
                                 <!-- placeholder -->
                             </div>
@@ -91,9 +174,35 @@
                     </mat-header-cell>
 
                     <mat-cell *matCellDef="let item">
-                        <mat-chip-list *ngIf="item.locationIds.length > 0">
-                            <mat-chip *ngFor="let location of item.locations" [matTooltip]="location.name">{{ location.name }}</mat-chip>
-                        </mat-chip-list>
+                        <ng-container *ngIf="!isCellExpanded('locations', item.id)">
+                            <app-number-of-items-label
+                                [value]="item.locationIds?.length"
+                            ></app-number-of-items-label>
+
+                            <button
+                                type="button"
+                                mat-button
+                                color="accent"
+                                (click)="toggleCell('locations', item.id, true)"
+                            >
+                                {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND' | translate}}
+                            </button>
+                        </ng-container>
+
+                        <ng-container *ngIf="isCellExpanded('locations', item.id)">
+                            <mat-chip-list *ngIf="item.locationIds.length > 0">
+                                <mat-chip *ngFor="let location of item.locations" [matTooltip]="location.name">{{ location.name }}</mat-chip>
+                            </mat-chip-list>
+
+                            <button
+                                type="button"
+                                mat-button
+                                color="accent"
+                                (click)="toggleCell('locations', item.id, false)"
+                            >
+                                {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate}}
+                            </button>
+                        </ng-container>
                     </mat-cell>
                 </ng-container>
 
@@ -107,7 +216,7 @@
 
                         <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
                             <button mat-menu-item [routerLink]="['/teams', item.id, 'view']">
-                                {{'LNG_PAGE_ACTION_VIEW'| translate}}
+                                {{'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAM'| translate}}
                             </button>
 
                             <ng-container
@@ -115,13 +224,13 @@
                                 <button
                                     mat-menu-item
                                     [routerLink]="['/teams', item.id, 'modify']">
-                                    {{'LNG_PAGE_ACTION_MODIFY'| translate}}
+                                    {{'LNG_PAGE_LIST_TEAMS_ACTION_MODIFY_TEAM'| translate}}
                                 </button>
 
                                 <button
                                     mat-menu-item class="mat-menu-item-delete"
                                     (click)="deleteTeam(item)">
-                                    {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                                    {{ 'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM' | translate }}
                                 </button>
                             </ng-container>
                         </mat-menu>
@@ -132,18 +241,23 @@
                 <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
             </mat-table>
 
+            <div
+                *ngIf="isEmptyList"
+                class="mat-table"
+            >
+                <div class="mat-row">
+                    <div class="mat-cell">
+                        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+                    </div>
+                </div>
+            </div>
+
             <mat-paginator
                 [length]="(teamsListCount$ | async)?.count"
                 [pageSize]="pageSize"
                 [pageSizeOptions]="pageSizeOptions"
                 (page)="changePage($event)">
             </mat-paginator>
-
-            <div
-                *ngIf="teamsList && teamsList.length < 1"
-                class="no-records">
-                {{ 'LNG_PAGE_LIST_LOCATIONS_LABEL_NO_RECORDS' | translate }}
-            </div>
         </mat-card>
     </div>
 

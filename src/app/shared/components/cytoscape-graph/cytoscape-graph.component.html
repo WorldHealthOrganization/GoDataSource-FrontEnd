@@ -8,6 +8,7 @@
         (optionChanged)="updateView($event)"
         [clearable]="false">
     </app-form-select>
+
     <!-- spinner -->
     <div class="spinner-graph"
          *ngIf="showLoading">
@@ -17,7 +18,7 @@
 
     <!-- legend -->
     <div class="graph-legend"
-         *ngIf="legend && showLegend">
+         *ngIf="legend && showLegend && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)">
         <!-- node color -->
         <div *ngIf="legend.nodeColorKeys && legend.nodeColorKeys.length"
              class="legend-name">
@@ -50,7 +51,9 @@
             <div>
                 {{nodeNameColorItem | translate}}
             </div>
-            <div *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value">
+            <div *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+            || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
+            || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value">
                 - {{legend.nodeNameColorAdditionalInfo[nodeNameColorItem] | translate}}
             </div>
         </div>
@@ -92,13 +95,28 @@
 
     </div>
 
-    <!-- cytoscape element -->
-    <div class="cy" id="cy"
-         [fxShow]="!showLoading">
-    </div>
+    <!-- Toggles -->
+    <div
+        *ngIf="!showLoading && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)"
+        class="graph-actions" fxLayout="row" fxLayoutGap="30px">
+        <!-- Toggle Edit mode -->
+        <app-form-slide-toggle
+            *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value && isEditModeAvailable()"
+            name="toggleEditMode"
+            [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_EDIT_MODE_LABEL' | translate"
+            [(ngModel)]="editMode"
+            (optionChanged)="toggleEditMode()"
+        ></app-form-slide-toggle>
 
-    <!--  show / hide legend -->
-    <div class="toggle-legend">
+        <!-- Display Labels -->
+        <app-form-slide-toggle
+            *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value"
+            name="displayLabels"
+            [(ngModel)]="displayLabels"
+            [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_DISPLAY_MARKER_LABELS_LABEL' | translate">
+        </app-form-slide-toggle>
+
+        <!-- Show / hide legend -->
         <app-form-slide-toggle
             name="showLegend"
             [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LEGEND_LABEL' | translate"
@@ -106,44 +124,68 @@
         </app-form-slide-toggle>
     </div>
 
+    <!-- cytoscape element -->
+    <div class="cy" id="cy"
+         [fxShow]="!showLoading && transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
+    </div>
+
+    <!-- Geospatial map -->
+    <div
+        *ngIf="!showLoading && transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
+        <!-- Geospatial map -->
+        <app-world-map
+            *ngIf="markers.length > 0"
+            width="100%"
+            height="500px"
+            [markers]="markers"
+            [lines]="lines"
+            [displayLabels]="displayLabels"
+            [fitMapOnMarkersChange]="true">
+        </app-world-map>
+
+        <!-- No data -->
+        <div
+            *ngIf="markers.length < 1"
+            class="geo-map-no-data">
+            <span>
+                {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NO_DATA' | translate }}
+            </span>
+        </div>
+    </div>
 </div>
 
 <div *ngIf="showCaseNodesWithoutDates()"
      class="entities-no-dates">
     <a target="_blank"
        routerLink="/cases"
-       [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_ONSET_CHAIN, caseIds: elements.caseNodesWithoutDates}">
+       [queryParams]="{applyListFilter: getCasesListFilter(), caseIds: elements.caseNodesWithoutDates}">
         {{elements.caseNodesWithoutDates.length}}
-        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_ONSET_TITLE' | translate}}
+        {{ getCasesWithoutDatesTitle() | translate}}
     </a>
 </div>
 <div *ngIf="showContactNodesWithoutDates()"
      class="entities-no-dates">
     <a target="_blank"
        routerLink="/contacts"
-       [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN, contactIds: elements.caseNodesWithoutDates}">
+       [queryParams]="{applyListFilter: getContactsListFilter(), contactIds: elements.caseNodesWithoutDates}">
         {{elements.contactNodesWithoutDates.length}}
-        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_TITLE' | translate}}
+        {{ getContactsWithoutDatesTitle() | translate}}
     </a>
 </div>
 <div *ngIf="showEventNodesWithoutDates()"
      class="entities-no-dates">
     <a target="_blank"
        routerLink="/events"
-       [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_CHAIN, eventIds: elements.eventNodesWithoutDates}">
+       [queryParams]="{applyListFilter: getEventsListFilter(), eventIds: elements.eventNodesWithoutDates}">
         {{elements.eventNodesWithoutDates.length}}
-        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_TITLE' | translate}}
+        {{ getEventsWithoutDatesTitle() | translate}}
     </a>
 </div>
 
-<button *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value && timelineViewType == 'horizontal'"
+<button *ngIf="( transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+        || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
+        || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value)"
     mat-raised-button
-    (click)="switchTimelineView('vertical')">
-    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL' | translate }}
-</button>
-
-<button *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value && timelineViewType == 'vertical'"
-    mat-raised-button
-    (click)="switchTimelineView('horizontal')">
-    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' | translate }}
+    (click)="switchTimelineView(timelineViewType === 'horizontal' ? 'vertical' : 'horizontal')">
+    {{ ( timelineViewType === 'horizontal' ? 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL' : 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' )| translate }}
 </button>

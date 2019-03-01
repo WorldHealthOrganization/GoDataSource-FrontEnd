@@ -1,0 +1,169 @@
+<form #groupForm="ngForm">
+    <div fxLayout="column" fxLayoutGap="20px" fxFlex>
+        <span class="section-title">
+            {{'LNG_FORM_CASE_QUICK_LABEL_PERSONAL' | translate}}
+        </span>
+
+        <div fxLayout="column">
+            <div fxLayout="row" fxLayoutGap="20px">
+                <app-form-input
+                    name="firstName"
+                    [(ngModel)]="case.firstName"
+                    [placeholder]="'LNG_CASE_FIELD_LABEL_FIRST_NAME' | translate"
+                    tooltip="LNG_CASE_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
+                    required="true"
+                    (optionChanged)="onChange()"
+                    maxlength="200">
+                </app-form-input>
+
+                <app-form-input
+                    name="lastName"
+                    [(ngModel)]="case.lastName"
+                    [placeholder]="'LNG_CASE_FIELD_LABEL_LAST_NAME' | translate"
+                    tooltip="LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION"
+                    (optionChanged)="onChange()"
+                    maxlength="200">
+                </app-form-input>
+            </div>
+
+            <div fxLayout="row" fxLayoutGap="20px">
+                <app-form-datepicker
+                    name="dateOfReporting"
+                    [(ngModel)]="case.dateOfReporting"
+                    [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING'| translate"
+                    tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
+                    required="true"
+                    (optionChanged)="onChange()"
+                    [maxDate]="currentDate"
+                    app-date-validator
+                    [dateSameOrBefore]="[
+                        currentDate
+                    ]">
+                </app-form-datepicker>
+
+                <app-form-select
+                    name="gender"
+                    [(ngModel)]="case.gender"
+                    [placeholder]="'LNG_CASE_FIELD_LABEL_GENDER' | translate"
+                    tooltip="LNG_CASE_FIELD_LABEL_GENDER_DESCRIPTION"
+                    (optionChanged)="onChange()"
+                    [options]="genderList$ | async">
+                </app-form-select>
+            </div>
+
+            <div fxLayout="row" fxLayoutGap="20px">
+                <app-form-select
+                    name="occupation"
+                    [(ngModel)]="case.occupation"
+                    [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
+                    tooltip="LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION"
+                    (optionChanged)="onChange()"
+                    [options]="occupationsList$ | async">
+                </app-form-select>
+
+                <div fxFlex>
+                    <app-form-input
+                        name="visualId"
+                        [(ngModel)]="case.visualId"
+                        [placeholder]="'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate"
+                        tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                        [tooltipTranslateData]="visualIDTranslateData"
+                        (optionChanged)="onChange()">
+                    </app-form-input></div>
+                </div>
+
+            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                <app-form-age-dob
+                    fxFlex
+                    name="ageDob"
+                    [(ngModel)]="case.age"
+                    (optionChanged)="onChange()"
+                    ageButtonLabel="LNG_CASE_FIELD_LABEL_AGE_BUTTON"
+                    dobButtonLabel="LNG_CASE_FIELD_LABEL_DATE_OF_BIRTH_BUTTON"
+                    dobPlaceholder="LNG_CASE_FIELD_LABEL_DOB"
+                    dobTooltip="LNG_CASE_FIELD_LABEL_DOB_DESCRIPTION"
+                    ageTooltip="LNG_CASE_FIELD_LABEL_AGE_DESCRIPTION">
+                </app-form-age-dob>
+            </div>
+
+            <div fxLayout="row" fxLayoutGap="20px">
+                <app-form-select
+                    name="riskLevel"
+                    [(ngModel)]="case.riskLevel"
+                    [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_LEVEL' | translate"
+                    tooltip="LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
+                    (optionChanged)="onChange()"
+                    [options]="caseRiskLevelsList$ | async">
+                </app-form-select>
+
+                <app-form-textarea
+                    name="riskReason"
+                    [(ngModel)]="case.riskReason"
+                    [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
+                    tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION"
+                    (optionChanged)="onChange()"
+                    [minRows]="1">
+                </app-form-textarea>
+            </div>
+
+        </div>
+
+        <span class="section-title">
+            {{'LNG_FORM_CASE_QUICK_LABEL_EPIDEMIOLOGY' | translate}}
+        </span>
+
+        <div fxLayout="column">
+            <div fxLayout="row" fxLayoutGap="20px">
+                <app-form-select
+                    name="classification"
+                    [(ngModel)]="case.classification"
+                    [placeholder]="'LNG_CASE_FIELD_LABEL_CLASSIFICATION' | translate"
+                    tooltip="LNG_CASE_FIELD_LABEL_CLASSIFICATION_DESCRIPTION"
+                    required="true"
+                    (optionChanged)="onChange()"
+                    [options]="caseClassificationsList$ | async">
+                </app-form-select>
+
+                <app-form-datepicker
+                    name="dateOfOnset"
+                    [(ngModel)]="case.dateOfOnset"
+                    [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate"
+                    tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION"
+                    [maxDate]="currentDate"
+                    app-date-validator
+                    required="true"
+                    (optionChanged)="onChange()"
+                    [dateSameOrBefore]="[
+                        currentDate,
+                        'dateOfOutcome'
+                    ]">
+                </app-form-datepicker>
+            </div>
+
+            <div fxLayout="row" fxLayoutGap="20px">
+                <app-form-select
+                    name="outcomeId"
+                    [(ngModel)]="case.outcomeId"
+                    [placeholder]="'LNG_CASE_FIELD_LABEL_OUTCOME' | translate"
+                    tooltip="LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION"
+                    (optionChanged)="onChange()"
+                    [options]="outcomeList$ | async">
+                </app-form-select>
+
+                <app-form-datepicker
+                    name="dateOfOutcome"
+                    [(ngModel)]="case.dateOfOutcome"
+                    [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME' | translate"
+                    tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION"
+                    [maxDate]="currentDate"
+                    (optionChanged)="onChange()"
+                    app-date-validator
+                    [dateSameOrBefore]="currentDate"
+                    [dateSameOrAfter]="[
+                        'dateOfOnset'
+                    ]">
+                </app-form-datepicker>
+            </div>
+        </div>
+    </div>
+</form>

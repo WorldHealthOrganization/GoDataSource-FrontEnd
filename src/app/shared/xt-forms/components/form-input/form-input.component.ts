@@ -9,7 +9,7 @@ import {
     HostBinding,
     Output,
     EventEmitter,
-    AfterViewInit
+    AfterViewInit, ViewChild, ElementRef
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { ElementBase } from '../../core/index';
@@ -61,10 +61,13 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
     @Input() displayFilterIcon: boolean = false;
 
     @Input() maxlength: number;
+    @Input() minlength: number;
 
     @Input() step: number = 1;
     @Input() min: number;
     @Input() max: number;
+
+    @ViewChild('inputElement') inputElement: ElementRef;
 
     @Output() optionChanged = new EventEmitter<any>();
     @Output() initialized = new EventEmitter<any>();
@@ -124,6 +127,34 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
         } else {
             this.type = 'text';
             this.tempTypeOverwritten = 'password';
+        }
+    }
+
+    /**
+     * Focus input
+     */
+    focus() {
+        // focus input
+        if (
+            this.inputElement &&
+            this.inputElement.nativeElement &&
+            this.inputElement.nativeElement.focus
+        ) {
+            this.inputElement.nativeElement.focus();
+        }
+    }
+
+    /**
+     * Select input
+     */
+    select() {
+        // select input
+        if (
+            this.inputElement &&
+            this.inputElement.nativeElement &&
+            this.inputElement.nativeElement.select
+        ) {
+            this.inputElement.nativeElement.select();
         }
     }
 }

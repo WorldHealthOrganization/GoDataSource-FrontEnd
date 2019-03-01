@@ -20,7 +20,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Observable } from 'rxjs/Observable';
 import { Constants } from '../../../../core/models/constants';
-import * as moment from 'moment';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-modify-follow-up',
@@ -29,11 +29,7 @@ import * as moment from 'moment';
     styleUrls: ['./modify-contact-follow-up.component.less']
 })
 export class ModifyContactFollowUpComponent extends ViewModifyComponent implements OnInit {
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
-        new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups')
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     teamsList$: Observable<TeamModel[]>;
 
@@ -48,6 +44,9 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
 
     authUser: UserModel;
 
+    // provide constants to template
+    Constants = Constants;
+
     constructor(
         private router: Router,
         protected route: ActivatedRoute,
@@ -58,7 +57,8 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         private followUpsDataService: FollowUpsDataService,
         private authDataService: AuthDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private teamDataService: TeamDataService
+        private teamDataService: TeamDataService,
+        private dialogService: DialogService
     ) {
         super(route);
     }
@@ -99,18 +99,27 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
                             .subscribe((followUpData: FollowUpModel) => {
                                 // initialize follow-up
                                 this.followUpData = new FollowUpModel(followUpData);
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        this.viewOnly ? 'LNG_PAGE_VIEW_FOLLOW_UP_TITLE' : 'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE',
-                                        '.',
-                                        true,
-                                        {},
-                                        this.followUpData
-                                    )
-                                );
+                                this.createBreadcrumbs();
                             });
                     });
             });
+    }
+
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [
+            new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
+            new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups'),
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_FOLLOW_UP_TITLE' : 'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE',
+                '.',
+                true,
+                {},
+                this.followUpData
+            )
+        ];
     }
 
     /**
@@ -127,19 +136,29 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         }
 
         // modify follow-up
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.followUpsDataService
             .modifyFollowUp(this.selectedOutbreak.id, this.followUpData.personId, this.followUpData.id, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
-
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .subscribe((followUpData) => {
+                // update model
+                this.followUpData = followUpData;
+
+                // mark form as pristine
+                form.form.markAsPristine();
+
+                // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE');
 
-                // navigate to listing page
-                this.disableDirtyConfirm();
-                this.router.navigate(['/contacts/follow-ups']);
+                // update breadcrumb
+                this.createBreadcrumbs();
+
+                // hide dialog
+                loadingDialog.close();
             });
     }
 
@@ -157,13 +176,5 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
      */
     hasContactReadAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
-    }
-
-    /**
-     * Check if date is in future
-     */
-    dateInTheFuture(followUpDate): boolean {
-        const date = followUpDate ? moment(followUpDate) : null;
-        return !!(date && date.startOf('day').isAfter(Constants.getCurrentDate()));
     }
 }

@@ -6,7 +6,7 @@
 
 <form class="page-content form-section" #form="ngForm" (submit)="modifyEntry(form)">
 
-    <mat-card class="form-content page-section">
+    <mat-card class="form-content page-section fit-color-picker">
 
         <div fxLayout="column">
 
@@ -134,8 +134,7 @@
         <button
             *ngIf="!viewOnly"
             mat-raised-button
-            color="primary"
-            class="button-primary">
+            color="accent">
             {{'LNG_COMMON_BUTTON_SAVE' | translate}}
         </button>
         <button

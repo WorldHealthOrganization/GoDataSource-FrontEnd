@@ -97,10 +97,13 @@ export class ClusterDataService {
      * @param {string} outbreakId
      * @param {string} clusterId
      * @param clusterData
-     * @returns {Observable<any>}
+     * @returns {Observable<ClusterModel>}
      */
-    modifyCluster(outbreakId: string, clusterId: string, clusterData): Observable<any> {
-        return this.http.put(`outbreaks/${outbreakId}/clusters/${clusterId}`, clusterData);
+    modifyCluster(outbreakId: string, clusterId: string, clusterData): Observable<ClusterModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`outbreaks/${outbreakId}/clusters/${clusterId}`, clusterData),
+            ClusterModel
+        );
     }
 
     /**
@@ -128,9 +131,9 @@ export class ClusterDataService {
 
         const qb = new RequestQueryBuilder();
         // include relation for Events
-        qb.include('location');
+        qb.include('location', true);
         // include relation for Cases / Contacts
-        qb.include('locations');
+        qb.include('locations', true);
 
         qb.merge(queryBuilder);
 

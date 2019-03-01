@@ -1,9 +1,10 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'/cases'"
-    [params]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS}"
+    [params]="getDashletParamsIncludingGlobalFilters({applyListFilter: Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS})"
     [value]="count"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
-    (moveAfter)="onMoveAfter()">
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
     {{ 'LNG_PAGE_DASHBOARD_KPI_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS' | translate }}
 </app-dashboard-custom-metric-dashlet>

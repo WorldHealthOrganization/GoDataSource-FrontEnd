@@ -76,8 +76,7 @@
             fxFlex fxLayout="row" fxLayoutAlign="end">
             <button
                 mat-raised-button
-                color="primary"
-                class="button-primary"
+                color="accent"
                 [disabled]="!uploader || uploader.queue.length < 1"
                 (click)="uploadFile()"
                 type="button">
@@ -111,7 +110,7 @@
                 *ngFor="let item of mappedFields; trackBy: trackByFieldID; let indexMapField = index;">
                 <div
                     fxFlex fxLayout="row" fxLayoutGap="20px">
-                    <app-form-select
+                    <app-form-select-change-detection-push
                         #sourceControl
                         [name]="'mapObject[' + item.id + '][source]'"
                         app-unique-validator="\]\[source\]$"
@@ -120,18 +119,18 @@
                         [ngModel]="item.sourceField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                         [options]="importableObject.fileHeadersKeyValue"
-                        (optionChanged)="item.sourceField = $event ? $event.value : $event; addMapOptionsIfNecessary(item);">
-                    </app-form-select>
+                        (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'sourceField', $event)">
+                    </app-form-select-change-detection-push>
 
-                    <app-form-select
+                    <app-form-select-change-detection-push
                         [name]="'mapObject[' + item.id + '][destination]'"
                         required="true"
                         [ngModel]="item.destinationField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                         [options]="importableObject.modelPropertiesKeyValue"
-                        (optionChanged)="item.destinationField = $event ? $event.value : $event; addMapOptionsIfNecessary(item);"
+                        (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'destinationField', $event)"
                         [disabled]="item.readonly">
-                    </app-form-select>
+                    </app-form-select-change-detection-push>
 
                     <div
                         *ngIf="item.isSourceArray || item.isDestinationArray"
@@ -139,14 +138,14 @@
                         <div
                             *ngFor="let levelMatch of item.numberOfMaxLevels; let levelIndex = index;"
                             fxFlex>
-                            <app-form-select
+                            <app-form-select-change-detection-push
                                 [name]="'mapObject[' + item.id + '][sourceDestinationLevel][' + levelIndex + ']'"
                                 required="true"
                                 [ngModel]="item.sourceDestinationLevel[levelIndex]"
                                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
                                 [options]="possibleSourceDestinationLevels"
-                                (optionChanged)="item.sourceDestinationLevel[levelIndex] = $event ? $event.value : $event; sourceControl.control.updateValueAndValidity();">
-                            </app-form-select>
+                                (optionChanged)="setDestinationLevel(item, levelIndex, $event, sourceControl)">
+                            </app-form-select-change-detection-push>
                         </div>
                     </div>
 
@@ -167,11 +166,11 @@
                         importableObject.distinctFileColumnValuesKeyValue &&
                         importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes] &&
                         !!importableObject.modelPropertyValuesMap[item.destinationField]"
-                    class="import-data-map-fields-children">
+                        class="import-data-map-fields-children">
                     <div
                         *ngFor="let mappedOpt of item.mappedOptions; trackBy: trackByFieldID; let indexMapOption = index"
                         fxFlex fxLayout="row" fxLayoutGap="20px">
-                        <app-form-select
+                        <app-form-select-change-detection-push
                             [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][sourceOption]'"
                             app-unique-validator
                             [appUniqueValidatorExpression]="'\\[' + item.id + '\\]\\[options\\]\\[\\d+\\]\\[sourceOption\\]$'"
@@ -180,9 +179,9 @@
                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                             [options]="importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes]"
                             (optionChanged)="mappedOpt.sourceOption = $event ? $event.value : $event;">
-                        </app-form-select>
+                        </app-form-select-change-detection-push>
 
-                        <app-form-select
+                        <app-form-select-change-detection-push
                             [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][destinationOption]'"
                             required="true"
                             [ngModel]="mappedOpt.destinationOption"
@@ -190,7 +189,7 @@
                             [options]="importableObject.modelPropertyValuesMap[item.destinationField]"
                             optionValueKey="id"
                             (optionChanged)="mappedOpt.destinationOption = $event ? $event.value : $event;">
-                        </app-form-select>
+                        </app-form-select-change-detection-push>
 
                         <div fxFlex="70px">
                             <button
@@ -208,8 +207,7 @@
                         <button
                             *ngIf="item.mappedOptions.length < importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes].length"
                             mat-raised-button
-                            color="primary"
-                            class="button-primary"
+                            color="accent"
                             (click)="addNewOptionMap(indexMapField)"
                             type="button">
                             <span class="xt-icon">addCircle</span>
@@ -227,8 +225,7 @@
                         mappedFields.length < importableObject.modelPropertiesKeyValue.length
                     "
                     mat-raised-button
-                    color="primary"
-                    class="button-primary"
+                    color="accent"
                     (click)="addNewFieldMap()"
                     type="button">
                     <span class="xt-icon">addCircle</span>
@@ -240,8 +237,7 @@
                 fxFlex fxLayout="row" fxLayoutAlign="end">
                 <button
                     mat-raised-button
-                    color="primary"
-                    class="button-primary"
+                    color="accent"
                     type="submit">
                     {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' | translate }}
                 </button>
@@ -252,7 +248,7 @@
     <!-- Import failed errors -->
     <div
         *ngIf="!displayLoading && importableObject && errMsgDetails"
-        fxFlex fxLayout="column" fxLayoutGap="30px"
+        fxFlex fxLayout="column" fxLayoutGap="5px"
         class="import-data-errors">
         <div
             class="import-data-errors-title">
@@ -261,7 +257,7 @@
         <div
             *ngFor="let err of errMsgDetails.details && errMsgDetails.details.failed ? errMsgDetails.details.failed : []"
             class="import-data-errors-err">
-            <ng-container [ngSwitch]="err.error.code">
+            <ng-container [ngSwitch]="err.error?.code">
                 <span *ngSwitchCase="ImportServerErrorCodes.DUPLICATE_RECORD">
                     {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_DUPLICATE' | translate:{ recordNo: err.recordNo } }}
                 </span>
@@ -278,7 +274,7 @@
                     {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE' | translate:{ recordNo: err.recordNo } }}
                 </span>
                 <span *ngSwitchDefault>
-                    {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED' | translate:{ recordNo: err.recordNo, fields: err.error && err.error.details && err.error.details.codes ? Object.keys(err.error.details.codes).join(', ') : [] } }}
+                    {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_GENERAL' | translate:{ recordNo: err.recordNo, message: err.error ? ( err.error.errmsg ? ( 'LNG_API_ERROR_CODE_UNKNOWN_ERROR' | translate ) : err.error.message ) : err.message } }}
                 </span>
             </ng-container>
         </div>
@@ -286,8 +282,7 @@
             fxFlex fxLayout="row" fxLayoutAlign="end">
             <button
                 mat-raised-button
-                color="primary"
-                class="button-primary"
+                color="accent"
                 type="button"
                 (click)="tryAgain()">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_TRY_AGAIN' | translate }}

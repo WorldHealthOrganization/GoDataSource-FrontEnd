@@ -14,6 +14,7 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
 import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { AddressType } from '../../../../core/models/address.model';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-create-event',
@@ -41,7 +42,8 @@ export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -77,19 +79,23 @@ export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit
             !_.isEmpty(dirtyFields)
         ) {
             // add the new Event
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.eventDataService
                 .createEvent(this.outbreakId, dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
-
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newEvent: EventModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE');
+
+                    // hide dialog
+                    loadingDialog.close();
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate(['/events']);
+                    this.router.navigate([`/events/${newEvent.id}/modify`]);
                 });
         }
     }

@@ -76,7 +76,7 @@ export class FormSelectComponent extends ElementBase<string | string[]> implemen
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        private i18nService: I18nService
+        protected i18nService: I18nService
     ) {
         super(controlContainer, validators, asyncValidators);
 
@@ -106,22 +106,26 @@ export class FormSelectComponent extends ElementBase<string | string[]> implemen
      * Create options for select-trigger
      */
     private initSelectedOptions() {
-        const selectedOptionsIds = this.value ? (
+        // option ids
+        const selectedOptionsIds = this.value !== null && this.value !== undefined ? (
             _.isArray(this.value) ?
                 this.value :
                 [this.value]
         ) : [];
 
-        this.selectedOptions = !_.isEmpty(this.options) ?
+        // determine selected options
+        this.selectedOptions = _.isEmpty(this.options) ?
+            [] :
             _.transform(selectedOptionsIds, (result, selectedValue) => {
                 const v = _.find(this.options, (option) => {
-                    return option[this.optionValueKey] === selectedValue;
+                    return this.compareWith ?
+                        this.compareWith(option[this.optionValueKey], selectedValue) :
+                        option[this.optionValueKey] === selectedValue;
                 });
                 if (v !== undefined) {
                     result.push(v);
                 }
-            }, []) :
-            [];
+            }, []);
     }
 
     /**
