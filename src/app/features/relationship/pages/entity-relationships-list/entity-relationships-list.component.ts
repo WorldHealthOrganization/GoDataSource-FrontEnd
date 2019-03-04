@@ -1,32 +1,27 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
+import { UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import * as _ from 'lodash';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
-import { ContactModel } from '../../../../core/models/contact.model';
-import { EventModel } from '../../../../core/models/event.model';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { tap } from 'rxjs/operators';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityModel } from '../../../../core/models/entity.model';
+import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -34,39 +29,8 @@ import { EntityModel } from '../../../../core/models/entity.model';
     templateUrl: './entity-relationships-list.component.html',
     styleUrls: ['./entity-relationships-list.component.less']
 })
-export class EntityRelationshipsListComponent extends ListComponent implements OnInit {
-
+export class EntityRelationshipsListComponent extends RelationshipsListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [];
-
-    // Entities Map for specific data
-    entityMap = {
-        [EntityType.CASE]: {
-            'label': 'LNG_PAGE_LIST_CASES_TITLE',
-            'link': '/cases',
-            'writePermission': PERMISSION.WRITE_CASE
-        },
-        [EntityType.CONTACT]: {
-            'label': 'LNG_PAGE_LIST_CONTACTS_TITLE',
-            'link': '/contacts',
-            'writePermission': PERMISSION.WRITE_CONTACT
-        },
-        [EntityType.EVENT]: {
-            'label': 'LNG_PAGE_LIST_EVENTS_TITLE',
-            'link': '/events',
-            'writePermission': PERMISSION.WRITE_EVENT
-        }
-    };
-
-    // authenticated user
-    authUser: UserModel;
-    // selected outbreak
-    selectedOutbreak: OutbreakModel;
-    // route params
-    entityType: EntityType;
-    entityId: string;
-    entity: CaseModel | ContactModel | EventModel;
-    // route data
-    relationshipType: RelationshipType;
 
     // list of relationships
     relationshipsList$: Observable<EntityModel[]>;
@@ -87,24 +51,24 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
     UserSettings = UserSettings;
 
     constructor(
-        private router: Router,
-        private route: ActivatedRoute,
-        private authDataService: AuthDataService,
-        private entityDataService: EntityDataService,
-        private relationshipDataService: RelationshipDataService,
-        private outbreakDataService: OutbreakDataService,
         protected snackbarService: SnackbarService,
+        protected router: Router,
+        protected route: ActivatedRoute,
+        protected authDataService: AuthDataService,
+        protected outbreakDataService: OutbreakDataService,
+        protected entityDataService: EntityDataService,
+        private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService
     ) {
         super(
-            snackbarService
+            snackbarService, router, route,
+            authDataService, outbreakDataService, entityDataService
         );
     }
 
     ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+        super.ngOnInit();
 
         // reference data
         this.certaintyLevelList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL);
@@ -124,64 +88,28 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
             );
         });
 
-        // get relationship type
-        this.route.data.subscribe((routeData) => {
-            this.relationshipType = routeData.relationshipType;
-
-            this.initializeBreadcrumbs();
-            this.needsRefreshList(true);
-        });
-
-        // get person type and ID from route params
-        this.route.params
-            .subscribe((params: { entityType, entityId }) => {
-                this.entityType = params.entityType;
-                this.entityId = params.entityId;
-
-                this.loadPerson();
-            });
-
-        // get selected outbreak
-        this.outbreakDataService
-            .getSelectedOutbreak()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                this.selectedOutbreak = selectedOutbreak;
-
-                this.loadPerson();
-            });
-
         // initialize Side Table Columns
         this.initializeSideTableColumns();
     }
 
-    private loadPerson() {
-        if (
-            this.entityType &&
-            this.entityId &&
-            this.selectedOutbreak
-        ) {
-            // initialize pagination
-            this.initPaginator();
-            // ...and (re)load the list when
-            this.needsRefreshList(true);
+    /**
+     * @Overrides parent method
+     */
+    onDataInitialized() {
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
+        // initialize pagination
+        this.initPaginator();
+        // refresh items list
+        this.needsRefreshList(true);
+    }
 
-            // get person data
-            this.entityDataService
-                .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-
-                    // Entity not found; navigate back to Entities list
-                    this.router.navigate([this.entityMap[this.entityType].link]);
-
-                    return ErrorObservable.create(err);
-                })
-                .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
-                    this.entity = entityData;
-
-                    this.initializeBreadcrumbs();
-                });
-        }
+    /**
+     * @Overrides parent method
+     */
+    onPersonLoaded() {
+        // (re)initialize breadcrumbs
+        this.initializeBreadcrumbs();
     }
 
     private initializeBreadcrumbs() {
@@ -189,18 +117,13 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
             this.relationshipType &&
             this.entity
         ) {
-            // add new breadcrumb: page title
-            const pageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
-                'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
-                'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
-
             this.breadcrumbs = [
                 new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
                 new BreadcrumbItemModel(
                     this.entity.name,
                     `${this.entityMap[this.entityType].link}/${this.entityId}/view`
                 ),
-                new BreadcrumbItemModel(pageTitle, null, true)
+                new BreadcrumbItemModel(this.relationshipsListPageTitle, null, true)
             ];
         }
     }
@@ -321,14 +244,6 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                 ).share();
             }
         }
-    }
-
-    get relationshipTypeRoutePath(): string {
-        return this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures';
-    }
-
-    hasEntityWriteAccess(): boolean {
-        return this.authUser.hasPermissions(this.entityMap[this.entityType].writePermission);
     }
 
     /**

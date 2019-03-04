@@ -22,12 +22,19 @@ export const EnglishUsLang = {
          */
         'LNG_COMMON_BUTTON_EXPOSURES_FROM': 'Exposures from',
         'LNG_COMMON_BUTTON_EXPOSURES_TO': 'Exposures to',
+        'LNG_COMMON_BUTTON_SHARE_RELATIONSHIPS': 'Share exposures',
 
         /**
          * uiGeneralActions
          */
         'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM': 'See exposures from',
         'LNG_PAGE_ACTION_SEE_EXPOSURES_TO': 'See exposures to',
+
+        /**
+         * uiEntityRelationshipsListShareAssignCreatePages
+         */
+        'LNG_PAGE_LIST_ENTITY_SHARE_RELATIONSHIPS_TITLE': 'Share exposures',
+        'LNG_PAGE_LIST_ENTITY_ASSIGN_RELATIONSHIPS_TITLE': 'Share with',
 
         /**
          * uiEntityRelationshipsListPage
@@ -45,5 +52,6 @@ export const EnglishUsLang = {
          */
         // LNG_PAGE_ACTION_SEE_RELATIONSHIPS
         // LNG_COMMON_BUTTON_RELATIONSHIPS
+        // LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_TYPE
     }
 };

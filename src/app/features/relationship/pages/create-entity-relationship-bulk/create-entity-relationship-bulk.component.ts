@@ -19,6 +19,7 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { RelationshipModel } from '../../../../core/models/relationship.model';
 import 'rxjs/add/observable/forkJoin';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
+import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 
 @Component({
     selector: 'app-create-entity-relationship-bulk',
@@ -46,16 +47,19 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
         }
     };
 
-    // selected outbreak ID
-    outbreakId: string;
+    // selected outbreak
+    selectedOutbreak: OutbreakModel;
     // route params
     entityType: EntityType;
     entityId: string;
+    entity: CaseModel | ContactModel | EventModel;
+    // route data
+    relationshipType: RelationshipType;
 
-    relationship: RelationshipModel = new RelationshipModel();
     selectedSourceIds: string[] = [];
     selectedTargetIds: string[] = [];
 
+    relationship: RelationshipModel = new RelationshipModel();
 
     constructor(
         private router: Router,
@@ -71,74 +75,103 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
     }
 
     ngOnInit() {
-
+        // get source and target persons from query params
         this.route.queryParams
             .subscribe((queryParams: { selectedSourceIds, selectedTargetIds }) => {
-                // bulk insert of relationships
-                if (!_.isEmpty(queryParams.selectedSourceIds) && !_.isEmpty(queryParams.selectedTargetIds)) {
-                    // bulk insert
-                    this.selectedSourceIds = JSON.parse(queryParams.selectedSourceIds);
-                    this.selectedTargetIds = JSON.parse(queryParams.selectedTargetIds);
-                } else {
-
+                if (_.isEmpty(queryParams.selectedSourceIds) || _.isEmpty(queryParams.selectedTargetIds)) {
                     this.snackbarService.showError('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
 
-                    // No entities selected; navigate back to Available Entities list
+                    // No source or target entities selected; navigate back to Share exposures list
                     this.disableDirtyConfirm();
-                    this.router.navigate(['..', 'assign']);
+                    this.router.navigate(['..']);
+                } else {
+                    this.selectedSourceIds = JSON.parse(queryParams.selectedSourceIds);
+                    this.selectedTargetIds = JSON.parse(queryParams.selectedTargetIds);
                 }
             });
 
+        // get relationship type
+        this.route.data.subscribe((routeData) => {
+            this.relationshipType = routeData.relationshipType;
+
+            this.initializeBreadcrumbs();
+        });
+
+        // get person type and ID from route params
         this.route.params
             .subscribe((params: { entityType, entityId }) => {
                 this.entityType = params.entityType;
                 this.entityId = params.entityId;
 
-                // add new breadcrumb: Entity List page
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-                );
-
-                // get selected outbreak
-                this.outbreakDataService
-                    .getSelectedOutbreak()
-                    .subscribe((selectedOutbreak: OutbreakModel) => {
-                        this.outbreakId = selectedOutbreak.id;
-
-                        // get entity data
-                        this.entityDataService
-                            .getEntity(this.entityType, this.outbreakId, this.entityId)
-                            .catch((err) => {
-                                this.snackbarService.showError(err.message);
-
-                                // Entity not found; navigate back to Entities list
-                                this.disableDirtyConfirm();
-                                this.router.navigate([this.entityMap[this.entityType].link]);
-
-                                return ErrorObservable.create(err);
-                            })
-                            .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
-                                // add new breadcrumb: Entity Modify page
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        entityData.name,
-                                        `${this.entityMap[this.entityType].link}/${this.entityId}/view`
-                                    )
-                                );
-                                // add new breadcrumb: Entity Relationships list
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        'LNG_PAGE_LIST_ENTITY_SHARE_RELATIONSHIPS_TITLE',
-                                        `/relationships/${this.entityType}/${this.entityId}/share`
-                                    )
-                                );
-                                // add new breadcrumb: page title
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TITLE', null, true)
-                                );
-                            });
-                    });
+                this.loadPerson();
             });
+
+        // get selected outbreak
+        this.outbreakDataService
+            .getSelectedOutbreak()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+
+                this.loadPerson();
+            });
+    }
+
+    private loadPerson() {
+        if (
+            this.entityType &&
+            this.entityId &&
+            this.selectedOutbreak
+        ) {
+            // get person data
+            this.entityDataService
+                .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
+
+                    // Entity not found; navigate back to Entities list
+                    this.router.navigate([this.entityMap[this.entityType].link]);
+
+                    return ErrorObservable.create(err);
+                })
+                .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
+                    this.entity = entityData;
+
+                    this.initializeBreadcrumbs();
+                });
+        }
+    }
+
+    private initializeBreadcrumbs() {
+        if (
+            this.relationshipType &&
+            this.entity
+        ) {
+            // add new breadcrumb: page title
+            const relationshipsListPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
+                'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
+                'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
+
+            this.breadcrumbs = [
+                new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
+                new BreadcrumbItemModel(
+                    this.entity.name,
+                    `${this.entityMap[this.entityType].link}/${this.entityId}/view`
+                ),
+                new BreadcrumbItemModel(
+                    relationshipsListPageTitle,
+                    `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
+                ),
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE',
+                    `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/share`
+                ),
+                new BreadcrumbItemModel('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TITLE', null, true)
+            ];
+        }
+    }
+
+    get relationshipTypeRoutePath(): string {
+        return this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures';
     }
 
     /**
@@ -147,16 +180,16 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
      * @param {NgForm} form
      */
     createNewRelationships(form: NgForm) {
-
         if (!this.formHelper.validateForm(form)) {
             return;
         }
+
         // bulk insert relationships
         const relationshipsBulkData = {sources: [], targets: [], relationship: {}};
         relationshipsBulkData.sources = this.selectedSourceIds;
         relationshipsBulkData.targets = this.selectedTargetIds;
         relationshipsBulkData.relationship = this.relationship;
-        this.relationshipDataService.createBulkRelationships(this.outbreakId, relationshipsBulkData)
+        this.relationshipDataService.createBulkRelationships(this.selectedOutbreak.id, relationshipsBulkData)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
 
@@ -164,9 +197,10 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
             })
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_SUCCESS_MESSAGE');
-                // navigate to listing page
+
+                // navigate back to root person's relationships list
                 this.disableDirtyConfirm();
-                this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
+                this.router.navigate([`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`]);
             });
 
     }

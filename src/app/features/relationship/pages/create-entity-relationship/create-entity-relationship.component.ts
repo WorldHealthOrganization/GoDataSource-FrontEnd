@@ -34,7 +34,6 @@ import { RelationshipType } from '../../../../core/enums/relationship-type.enum'
     styleUrls: ['./create-entity-relationship.component.less']
 })
 export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // Entities Map for specific data
@@ -85,7 +84,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
     ngOnInit() {
         // get selected persons from query params
         this.route.queryParams
-            .subscribe((queryParams: {selectedEntityIds}) => {
+            .subscribe((queryParams: { selectedEntityIds }) => {
                 if (_.isEmpty(queryParams.selectedEntityIds)) {
                     this.snackbarService.showError('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
 

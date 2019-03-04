@@ -61,24 +61,24 @@ const routes: Routes = [
                     PageChangeConfirmationGuard
                 ]
             },
-        ]
-    },
-    // #TODO remove Entity Relationships list - Share
-    {
-        path: ':entityType/:entityId/share',
-        component: fromPages.EntityRelationshipsListShareComponent
-    },
-    // #TODO remove Entity Relationships list - Assign
-    {
-        path: ':entityType/:entityId/assign-to',
-        component: fromPages.EntityRelationshipsListAssignComponent
-    },
-    // #TODO remove Create new Entity relationship(s) - bulk
-    {
-        path: ':entityType/:entityId/create-bulk',
-        component: fromPages.CreateEntityRelationshipBulkComponent,
-        canDeactivate: [
-            PageChangeConfirmationGuard
+            // Share person's exposures (1): Select relationships to share
+            {
+                path: 'share',
+                component: fromPages.EntityRelationshipsListShareComponent
+            },
+            // Share person's exposures (2): Select people to share with
+            {
+                path: 'share/assign-to',
+                component: fromPages.EntityRelationshipsListAssignComponent
+            },
+            // Share person's exposures (3): Create relationships form
+            {
+                path: 'share/create-bulk',
+                component: fromPages.CreateEntityRelationshipBulkComponent,
+                canDeactivate: [
+                    PageChangeConfirmationGuard
+                ]
+            },
         ]
     },
     // #TODO remove View Entity Relationship
