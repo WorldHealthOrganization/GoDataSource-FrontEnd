@@ -23,6 +23,9 @@ import { FilterModel, FilterType } from '../../../../shared/components/side-filt
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { tap } from 'rxjs/operators';
+import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
 
 @Component({
     selector: 'app-entity-relationships-list-assign',
@@ -61,6 +64,9 @@ export class EntityRelationshipsListAssignComponent extends ListComponent implem
 
     // available side filters
     availableSideFilters: FilterModel[];
+    // values for side filter
+    savedFiltersType = Constants.SAVED_FILTER_PAGE_TYPE.ENTITY_RELATIONSHIPS.value;
+    availableSavedFilters$: Observable<SavedFilterModel[]>;
 
     // reference data
     genderList$: Observable<any[]>;
@@ -85,7 +91,8 @@ export class EntityRelationshipsListAssignComponent extends ListComponent implem
         private outbreakDataService: OutbreakDataService,
         protected snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private savedFilterService: SavedFiltersService
     ) {
         super(
             snackbarService
@@ -157,7 +164,8 @@ export class EntityRelationshipsListAssignComponent extends ListComponent implem
                     .getSelectedOutbreak()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.outbreakId = selectedOutbreak.id;
-
+                        // get saved filters
+                        this.getAvailableSavedFilters();
                         // initialize pagination
                         this.initPaginator();
                         // ...and load the list of items
@@ -222,6 +230,22 @@ export class EntityRelationshipsListAssignComponent extends ListComponent implem
             countQueryBuilder.paginator.clear();
             this.entitiesListCount$ = this.entityDataService.getEntitiesCount(this.outbreakId, countQueryBuilder).share();
         }
+    }
+
+    /**
+     * Get available saved side filters
+     */
+    getAvailableSavedFilters() {
+
+        const qb = new RequestQueryBuilder();
+
+        qb.filter.where({
+            filterKey: {
+                eq: this.savedFiltersType
+            }
+        });
+
+        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
     }
 
     private generateSideFilters() {

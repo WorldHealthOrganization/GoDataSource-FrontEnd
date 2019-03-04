@@ -13,6 +13,8 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-saved-filters',
@@ -41,8 +43,8 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
         private savedFiltersService: SavedFiltersService,
         protected snackbarService: SnackbarService,
         private authDataService: AuthDataService,
-        private genericDataService: GenericDataService
-
+        private genericDataService: GenericDataService,
+        private dialogService: DialogService
     ) {
         super(
             snackbarService
@@ -93,18 +95,23 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
     }
 
     deleteFilter(filterId: string) {
-        return this.savedFiltersService.deleteSavedFilter(filterId)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_FILTER')
+            .subscribe((answer: DialogAnswer) => {
+            if (answer.button === DialogAnswerButton.Yes) {
+                this.savedFiltersService.deleteSavedFilter(filterId)
+                    .catch((err) => {
+                        this.snackbarService.showError(err.message);
 
-                return ErrorObservable.create(err);
-            })
-            .subscribe(() => {
-                this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE');
+                        return ErrorObservable.create(err);
+                    })
+                    .subscribe(() => {
+                        this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE');
 
-                // reload data
-                this.needsRefreshList(true);
-            });
+                        // reload data
+                        this.needsRefreshList(true);
+                    });
+            }
+        });
     }
 
 }

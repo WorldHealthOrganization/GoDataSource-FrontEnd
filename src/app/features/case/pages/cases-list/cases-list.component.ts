@@ -517,14 +517,15 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * Get available saved side filters
      */
     getAvailableSavedFilters() {
-        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList()
-            .map((savedFilters: SavedFilterModel[]) => {
-                return _.map(savedFilters, (savedFilter) => {
-                    if (savedFilter.filterKey === this.savedFiltersType) {
-                        return savedFilter;
-                    }
-                });
-            });
+        const qb = new RequestQueryBuilder();
+
+        qb.filter.where({
+            filterKey: {
+                eq: this.savedFiltersType
+            }
+        });
+
+        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
     }
 
     /**

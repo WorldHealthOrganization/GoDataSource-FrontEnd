@@ -34,6 +34,8 @@ import 'rxjs/add/operator/mergeMap';
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
 import { tap } from 'rxjs/operators';
+import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
 
 @Component({
     selector: 'app-contacts-list',
@@ -84,6 +86,9 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
     // available side filters
     availableSideFilters: FilterModel[];
+    // values for side filter
+    savedFiltersType = Constants.SAVED_FILTER_PAGE_TYPE.CONTACTS.value;
+    availableSavedFilters$: Observable<SavedFilterModel[]>;
 
     // print daily Follow-ups
     exportContactsDailyFollowUpListUrl: string;
@@ -133,7 +138,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         private route: ActivatedRoute,
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private savedFilterService: SavedFiltersService
     ) {
         super(
             snackbarService,
@@ -218,12 +224,30 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
             });
+        // get saved filters
+        this.getAvailableSavedFilters();
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
 
         // initialize side filters
         this.initializeSideFilters();
+    }
+
+    /**
+     * Get available saved side filters
+     */
+    getAvailableSavedFilters() {
+
+        const qb = new RequestQueryBuilder();
+
+        qb.filter.where({
+            filterKey: {
+                eq: this.savedFiltersType
+            }
+        });
+
+        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
     }
 
     /**

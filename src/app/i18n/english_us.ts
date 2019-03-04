@@ -185,6 +185,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_SAVE_FILTERS_TITLE': 'How do you want to name this filter?',
         'LNG_DIALOG_SAVE_FILTERS_FILTER_NAME_LABEL': 'Filter name',
         'LNG_DIALOG_SAVE_FILTERS_PUBLIC_FILTER_LABEL': 'Make this filter public?',
+        'LNG_DIALOG_CONFIRM_DELETE_FILTER': 'Are you sure you want to delete this filter?',
 
         /**
          *uiModifyLocationPage
@@ -212,11 +213,15 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON': 'Save filter',
         'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL': 'Load filter',
         'LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE': 'Filter saved successfully',
-        'LNG_SIDE_FILTERS_BUTTON_SAVE_FILTER_ACTIONS_TOOLTIP': 'You have to apply a filter before saving it',
-        // 'LNG_FILTER_FOR_DASHBOARD': 'Dashboard',
-        // 'LNG_FILTER_FOR_OUTBREAKS': 'Outbreaks',
-        // 'LNG_FILTER_FOR_CASES': 'Cases',
-        // 'LNG_FILTER_FOR_CONTACTS': 'Contacts',
+        'LNG_FILTER_FOR_LAB_RESULTS': 'Lab results',
+        'LNG_FILTER_FOR_CASE_LAB_RESULTS': 'Case lab results',
+        'LNG_FILTER_FOR_CONTACT_DAILY_FOLLOW_UPS': 'Contact Daily follow-ups',
+        'LNG_FILTER_FOR_AVAILABLE_ENTITIES': 'Available entities for relationships',
+        'LNG_FILTER_FOR_ENTITY_RELATIONSHIPS': 'Entity relationships / Assign to',
+        'LNG_FILTER_FOR_INDIVIDUAL_CONTACT_FOLLOW_UPS': 'Individual contact follow-ups',
+        'LNG_FILTER_FOR_OUTBREAKS': 'Outbreaks',
+        'LNG_FILTER_FOR_CASES': 'Cases',
+        'LNG_FILTER_FOR_CONTACTS': 'Contacts',
 
         /**
          * REMOVE

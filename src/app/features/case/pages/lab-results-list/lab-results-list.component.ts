@@ -22,6 +22,9 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { tap } from 'rxjs/operators';
+import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 
 @Component({
     selector: 'app-lab-results',
@@ -53,6 +56,10 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
     // available side filters
     availableSideFilters: FilterModel[];
 
+    // values for side filter
+    savedFiltersType = Constants.SAVED_FILTER_PAGE_TYPE.LAB_RESULTS.value;
+    availableSavedFilters$: Observable<SavedFilterModel[]>;
+
     // provide constants to template
     Constants = Constants;
     EntityType = EntityType;
@@ -66,7 +73,8 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
         private labResultDataService: LabResultDataService,
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private savedFilterService: SavedFiltersService
     ) {
         super(snackbarService);
     }
@@ -98,6 +106,24 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
         this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST).share();
         this.labTestResultsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT).share();
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+        // get available saved filters for side filters
+        this.getAvailableSavedFilters();
+    }
+
+    /**
+     * Get available saved side filters
+     */
+    getAvailableSavedFilters() {
+
+        const qb = new RequestQueryBuilder();
+
+        qb.filter.where({
+            filterKey: {
+                eq: this.savedFiltersType
+            }
+        });
+
+        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
     }
 
     /**

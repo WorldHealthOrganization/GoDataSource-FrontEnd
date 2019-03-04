@@ -9,7 +9,9 @@
 <!-- Side filters -->
 <app-side-filters
     [filterOptions]="availableSideFilters"
-    (filtersApplied)="applySideFilters($event)">
+    (filtersApplied)="applySideFilters($event)"
+    [savedFiltersType]="savedFiltersType"
+    [savedFilters]="availableSavedFilters$ | async">
 </app-side-filters>
 
 <app-total-number-of-records

@@ -26,6 +26,8 @@ import { Subscription } from 'rxjs/Subscription';
 import { tap } from 'rxjs/operators';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { DialogField } from '../../../../shared/components';
+import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
 
 @Component({
     selector: 'app-individual-contact-follow-ups-list',
@@ -51,6 +53,10 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
 
     availableSideFilters: FilterModel[];
 
+    // values for side filter
+    savedFiltersType = Constants.SAVED_FILTER_PAGE_TYPE.INDIVIDUAL_CONTACT_FOLLOW_UPS.value;
+    availableSavedFilters$: Observable<SavedFilterModel[]>;
+
     // provide constants to template
     Constants = Constants;
     UserSettings = UserSettings;
@@ -75,7 +81,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
-        private contactDataService: ContactDataService
+        private contactDataService: ContactDataService,
+        private savedFilterService: SavedFiltersService
     ) {
         super(
             snackbarService, dialogService, followUpsDataService,
@@ -116,6 +123,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                         // initialize print and export
                         this.initializeFollowUpsExport();
                         this.initializeFollowUpsPrint();
+                        // get saved filters
+                        this.getAvailableSavedFilters();
 
                         // initialize pagination
                         this.initPaginator();
@@ -137,6 +146,22 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
+    }
+
+    /**
+     * Get available saved side filters
+     */
+    getAvailableSavedFilters() {
+
+        const qb = new RequestQueryBuilder();
+
+        qb.filter.where({
+            filterKey: {
+                eq: this.savedFiltersType
+            }
+        });
+
+        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
     }
 
     /**

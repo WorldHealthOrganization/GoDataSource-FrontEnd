@@ -34,6 +34,8 @@ import { Subscription } from 'rxjs/Subscription';
 import { tap } from 'rxjs/operators';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
+import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -67,6 +69,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     ReferenceDataCategory = ReferenceDataCategory;
 
     availableSideFilters: FilterModel[];
+    // values for side filter
+    savedFiltersType = Constants.SAVED_FILTER_PAGE_TYPE.CONTACT_DAILY_FOLLOW_UPS.value;
+    availableSavedFilters$: Observable<SavedFilterModel[]>;
 
     dateFilterDefaultValue: Moment;
 
@@ -90,7 +95,8 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
-        private caseDataService: CaseDataService
+        private caseDataService: CaseDataService,
+        private savedFilterService: SavedFiltersService
     ) {
         super(
             snackbarService, dialogService, followUpsDataService,
@@ -143,7 +149,8 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         // initialize print and export
                         this.initializeFollowUpsExport();
                         this.initializeFollowUpsPrint();
-
+                        // get saved filters
+                        this.getAvailableSavedFilters();
                         // initialize pagination
                         this.initPaginator();
                         // ...and re-load the list when the Selected Outbreak is changed
@@ -183,6 +190,22 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                     this.initializeBreadcrumbs();
                 });
         }
+    }
+
+    /**
+     * Get available saved side filters
+     */
+    getAvailableSavedFilters() {
+
+        const qb = new RequestQueryBuilder();
+
+        qb.filter.where({
+            filterKey: {
+                eq: this.savedFiltersType
+            }
+        });
+
+        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
     }
 
     /**

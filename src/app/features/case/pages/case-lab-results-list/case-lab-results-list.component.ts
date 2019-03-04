@@ -21,6 +21,10 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { tap } from 'rxjs/operators';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
+import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
+import { Constants } from '../../../../core/models/constants';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -56,6 +60,9 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
 
     // available side filters
     availableSideFilters: FilterModel[];
+    // values for side filter
+    savedFiltersType = Constants.SAVED_FILTER_PAGE_TYPE.CASE_LAB_RESULTS.value;
+    availableSavedFilters$: Observable<SavedFilterModel[]>;
 
     constructor(
         private route: ActivatedRoute,
@@ -65,7 +72,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private savedFilterService: SavedFiltersService
     ) {
         super(
             snackbarService
@@ -92,6 +100,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                             this.breadcrumbs.push(new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/view`));
                             this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', '.', true));
 
+                            // get saved filters
+                            this.getAvailableSavedFilters();
                             // initialize pagination
                             this.initPaginator();
                             // ...and load the list of items
@@ -112,6 +122,22 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
 
         // initialize side filters
         this.initializeSideFilters();
+    }
+
+    /**
+     * Get available saved side filters
+     */
+    getAvailableSavedFilters() {
+
+        const qb = new RequestQueryBuilder();
+
+        qb.filter.where({
+            filterKey: {
+                eq: this.savedFiltersType
+            }
+        });
+
+        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
     }
 
     /**
