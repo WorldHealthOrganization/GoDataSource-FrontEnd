@@ -56,10 +56,12 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_NAME': 'Name',
         'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_PUBLIC': 'Public',
+        'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_PUBLIC_DESCRIPTION': '',
         'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_FOR_PAGE': 'For page',
         'LNG_PAGE_LIST_SAVED_FILTERS_TITLE': 'Saved Filters',
         'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE': 'Filter deleted successfully',
-        'LNG_PAGE_SAVED_FILTERS_ACTION_DELETE_FILTER': 'Delete filter',
+        'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE': 'Filter modified successfully',
+        'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER': 'Delete filter',
 
         /**
          * uiGenericLayout

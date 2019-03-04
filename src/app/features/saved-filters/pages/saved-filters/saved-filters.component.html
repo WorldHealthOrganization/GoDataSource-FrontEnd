@@ -74,7 +74,14 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                <app-yes-no-label [value]="item.isPublic"></app-yes-no-label>
+                <app-form-slide-toggle
+                    *ngIf="!item.readonly"
+                    name="isPublic"
+                    [(ngModel)]="item.isPublic"
+                    [label]="'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_PUBLIC' | translate"
+                    tooltip="LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_PUBLIC_DESCRIPTION"
+                    (optionChanged)="setPublicItem(item.id, $event)">
+                </app-form-slide-toggle>
             </mat-cell>
         </ng-container>
 
@@ -108,7 +115,7 @@
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
 
             <mat-cell *matCellDef="let item" fxFlex="70px">
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu" *ngIf="!item.readonly">
                     <span class="xt-icon">moreVertical</span>
                 </button>
 
@@ -118,7 +125,7 @@
                         [disabled]="item.readonly"
                         mat-menu-item
                         (click)="deleteFilter(item.id)">
-                        {{ 'LNG_PAGE_SAVED_FILTERS_ACTION_DELETE_FILTER' | translate }}
+                        {{ 'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER' | translate }}
                     </button>
                 </mat-menu>
             </mat-cell>

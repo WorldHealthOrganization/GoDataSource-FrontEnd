@@ -49,6 +49,18 @@ export class SavedFiltersService {
     }
 
     /**
+     * Modify a saved filter
+     * @param {string} savedFilterId
+     * @returns {Observable<any>}
+     */
+    modifySavedFilter(savedFilterId: string, savedFilterData): Observable<any> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`filter-mappings/${savedFilterId}`, savedFilterData),
+            SavedFilterModel
+        );
+    }
+
+    /**
      * Delete a saved filter
      * @param {string} savedFilterId
      */

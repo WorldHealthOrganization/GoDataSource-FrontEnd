@@ -94,6 +94,26 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
         return columns;
     }
 
+    /**
+     * Set a saved filter public if it's created by the current user
+     * @param savedFilterId
+     * @param isPublic
+     */
+    setPublicItem(savedFilterId: string, isPublic: boolean) {
+        this.savedFiltersService.modifySavedFilter(savedFilterId, {isPublic : isPublic})
+            .catch((err) => {
+                this.snackbarService.showApiError(err);
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess(`LNG_PAGE_LIST_SAVED_FILTERS_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE`)
+            });
+    }
+
+    /**
+     * Delete a saved filter
+     * @param filterId
+     */
     deleteFilter(filterId: string) {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_FILTER')
             .subscribe((answer: DialogAnswer) => {
