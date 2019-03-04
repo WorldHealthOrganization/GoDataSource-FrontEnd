@@ -10,6 +10,9 @@ import * as _ from 'lodash';
 import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
 import { tap } from 'rxjs/operators';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { Constants } from '../../../../core/models/constants';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-saved-filters',
@@ -25,13 +28,20 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
 
     authUser: UserModel;
 
+    yesNoOptionsList$: Observable<any[]>;
+
+    pagesWithSavedFilters: LabelValuePair[] = _.map(Constants.SAVED_FILTER_PAGE_TYPE, (page) => {
+        return new LabelValuePair(page.label, page.value);
+    });
+
     savedFiltersList$: Observable<SavedFilterModel[]>;
     savedFiltersListCount$: Observable<any>;
 
     constructor(
         private savedFiltersService: SavedFiltersService,
         protected snackbarService: SnackbarService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private genericDataService: GenericDataService
 
     ) {
         super(
@@ -41,6 +51,8 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
 
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         // initialize pagination
         this.initPaginator();

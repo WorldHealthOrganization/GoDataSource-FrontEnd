@@ -120,6 +120,10 @@ export class Constants {
     };
 
     static SAVED_FILTER_PAGE_TYPE = {
+        DASHBOARD: {
+            label: 'LNG_FILTER_FOR_DASHBOARD',
+            value: 'LNG_FILTER_FOR_DASHBOARD'
+        },
         OUTBREAKS: {
             label: 'LNG_FILTER_FOR_OUTBREAKS',
             value: 'LNG_FILTER_FOR_OUTBREAKS'

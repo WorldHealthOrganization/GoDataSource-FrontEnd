@@ -59,14 +59,17 @@
                 <div class="table-header-cell" fxLayout="column">
                     <div mat-sort-header class="column-header">{{'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_PUBLIC' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-input
+                        <app-form-select
                             name="publicFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('description', $event)"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanField('isPublic',$event.value)"
                             app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
@@ -81,14 +84,17 @@
                 <div class="table-header-cell" fxLayout="column">
                     <div mat-sort-header class="column-header">{{'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_FOR_PAGE' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-input
+                        <app-form-select
                             name="filterKeysFilter"
                             ngModel
+                            [options]="pagesWithSavedFilters"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('description', $event)"
+                            (optionChanged)="filterBySelectField('filterKey', $event)"
                             app-reset-input-on-side-filter
+                            optionLabelKey="label"
+                            optionLabelValue="value"
                             [displayFilterIcon]="true">
-                        </app-form-input>
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>

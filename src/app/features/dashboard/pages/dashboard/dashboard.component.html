@@ -67,6 +67,8 @@
         <app-side-filters
             [filterOptions]="availableSideFilters"
             (filtersCollected)="applySideFilters($event)"
+            [savedFiltersType]="savedFiltersType"
+            [savedFilters]="availableSavedFilters$ | async"
             [fixedFilters]="true">
         </app-side-filters>
 

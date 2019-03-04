@@ -22,6 +22,9 @@ import * as moment from 'moment';
 import { LoadingDialogModel } from '../../../../shared/components';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Subscription } from 'rxjs/Subscription';
+import { Constants } from '../../../../core/models/constants';
+import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -102,6 +105,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     globalFilterDate: Moment;
     globalFilterLocationId: string;
 
+    savedFiltersType = Constants.SAVED_FILTER_PAGE_TYPE.DASHBOARD.value;
+    availableSavedFilters$: Observable<SavedFilterModel[]>;
+
+
     @ViewChild('kpiSection') private kpiSection: ElementRef;
 
     // subscribers
@@ -114,7 +121,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         private domService: DomService,
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private savedFilterService: SavedFiltersService
     ) {}
 
     ngOnInit() {
@@ -135,6 +143,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                     this.selectedOutbreak = selectedOutbreak;
                     this.casesByClassificationAndLocationReportUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/per-classification-per-location-level-report/download/`;
                     this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
+                    this.getAvailableSavedFilters();
                 }
             });
 
@@ -148,6 +157,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
+    }
+
+    /**
+     * Get available saved side filters
+     */
+    getAvailableSavedFilters() {
+        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList()
+            .map((savedFilters: SavedFilterModel[]) => {
+                return _.map(savedFilters, (savedFilter) => {
+                    if (savedFilter.filterKey === this.savedFiltersType) {
+                        return savedFilter;
+                    }
+                });
+            });
     }
 
     /**

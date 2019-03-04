@@ -213,6 +213,10 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL': 'Load filter',
         'LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE': 'Filter saved successfully',
         'LNG_SIDE_FILTERS_BUTTON_SAVE_FILTER_ACTIONS_TOOLTIP': 'You have to apply a filter before saving it',
+        // 'LNG_FILTER_FOR_DASHBOARD': 'Dashboard',
+        // 'LNG_FILTER_FOR_OUTBREAKS': 'Outbreaks',
+        // 'LNG_FILTER_FOR_CASES': 'Cases',
+        // 'LNG_FILTER_FOR_CONTACTS': 'Contacts',
 
         /**
          * REMOVE
