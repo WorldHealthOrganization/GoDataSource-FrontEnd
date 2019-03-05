@@ -81,9 +81,9 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
                 if (_.isEmpty(queryParams.selectedSourceIds) || _.isEmpty(queryParams.selectedTargetIds)) {
                     this.snackbarService.showError('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
 
-                    // No source or target entities selected; navigate back to Share exposures list
+                    // No source or target entities selected; navigate back to exposures list
                     this.disableDirtyConfirm();
-                    this.router.navigate(['..']);
+                    this.router.navigate(['../..']);
                 } else {
                     this.selectedSourceIds = JSON.parse(queryParams.selectedSourceIds);
                     this.selectedTargetIds = JSON.parse(queryParams.selectedTargetIds);
@@ -162,8 +162,12 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
                     `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
                 ),
                 new BreadcrumbItemModel(
-                    'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE',
-                    `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/share`
+                    'LNG_PAGE_LIST_ENTITY_ASSIGN_RELATIONSHIPS_TITLE',
+                    `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/share`,
+                    false,
+                    {
+                        selectedTargetIds: JSON.stringify(this.selectedTargetIds)
+                    }
                 ),
                 new BreadcrumbItemModel('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TITLE', null, true)
             ];
@@ -184,10 +188,18 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
             return;
         }
 
+        // which are sources and which are targets (based on relationship type) ?
+        let relationshipSources = this.selectedSourceIds;
+        let relationshipTargets = this.selectedTargetIds;
+        if (this.relationshipType === RelationshipType.EXPOSURE) {
+            relationshipTargets = this.selectedSourceIds;
+            relationshipSources = this.selectedTargetIds;
+        }
+
         // bulk insert relationships
         const relationshipsBulkData = {sources: [], targets: [], relationship: {}};
-        relationshipsBulkData.sources = this.selectedSourceIds;
-        relationshipsBulkData.targets = this.selectedTargetIds;
+        relationshipsBulkData.sources = relationshipSources;
+        relationshipsBulkData.targets = relationshipTargets;
         relationshipsBulkData.relationship = this.relationship;
         this.relationshipDataService.createBulkRelationships(this.selectedOutbreak.id, relationshipsBulkData)
             .catch((err) => {

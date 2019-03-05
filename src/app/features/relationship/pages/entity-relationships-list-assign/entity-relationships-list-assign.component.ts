@@ -184,10 +184,6 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
                     this.relationshipsListPageTitle,
                     `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
                 ),
-                new BreadcrumbItemModel(
-                    'LNG_PAGE_LIST_ENTITY_SHARE_RELATIONSHIPS_TITLE',
-                    `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/share`
-                ),
                 new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_ASSIGN_RELATIONSHIPS_TITLE', null, true)
             ];
         }
@@ -346,7 +342,7 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
         return columns;
     }
 
-    selectEntities(form: NgForm) {
+    selectEntities() {
         // get list of follow-ups that we want to modify
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {

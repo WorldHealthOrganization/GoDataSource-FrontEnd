@@ -350,7 +350,7 @@
             color="accent">
             {{'LNG_COMMON_BUTTON_SELECT' | translate}}
         </button>
-        <button type="button" [routerLink]="['/relationships', entityType, this.entityId, 'share']" mat-raised-button>
+        <button type="button" [routerLink]="['/relationships', entityType, this.entityId, this.relationshipTypeRoutePath]" mat-raised-button>
             {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
         </button>
     </div>

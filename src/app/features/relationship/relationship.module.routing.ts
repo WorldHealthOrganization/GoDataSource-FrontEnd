@@ -34,6 +34,19 @@ const routes: Routes = [
                     PageChangeConfirmationGuard
                 ]
             },
+            // Share selected relationships (1): Select people to share with
+            {
+                path: 'share',
+                component: fromPages.EntityRelationshipsListAssignComponent
+            },
+            // Share selected relationships (2): Create relationships form
+            {
+                path: 'share/create-bulk',
+                component: fromPages.CreateEntityRelationshipBulkComponent,
+                canDeactivate: [
+                    PageChangeConfirmationGuard
+                ]
+            },
         ]
     },
     // Entity Contact Relationships
@@ -61,17 +74,12 @@ const routes: Routes = [
                     PageChangeConfirmationGuard
                 ]
             },
-            // Share person's exposures (1): Select relationships to share
+            // Share selected relationships (1): Select people to share with
             {
                 path: 'share',
-                component: fromPages.EntityRelationshipsListShareComponent
-            },
-            // Share person's exposures (2): Select people to share with
-            {
-                path: 'share/assign-to',
                 component: fromPages.EntityRelationshipsListAssignComponent
             },
-            // Share person's exposures (3): Create relationships form
+            // Share selected relationships (2): Create relationships form
             {
                 path: 'share/create-bulk',
                 component: fromPages.CreateEntityRelationshipBulkComponent,

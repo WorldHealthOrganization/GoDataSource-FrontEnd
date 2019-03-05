@@ -135,6 +135,11 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         // default table columns
         this.tableColumns = [
             new VisibleColumnModel({
+                field: 'checkbox',
+                required: true,
+                excludeFromSave: true
+            }),
+            new VisibleColumnModel({
                 field: 'lastName',
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME'
             }),
@@ -278,5 +283,26 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                         });
                 }
             });
+    }
+
+    /**
+     * Share selected relationships with other people
+     */
+    shareSelectedRelationships() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // redirect to next step
+        this.router.navigate(
+            [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/share`],
+            {
+                queryParams: {
+                    selectedTargetIds: JSON.stringify(selectedRecords)
+                }
+            }
+        );
     }
 }

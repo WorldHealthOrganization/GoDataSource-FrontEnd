@@ -33,14 +33,15 @@ export const EnglishUsLang = {
         /**
          * uiEntityRelationshipsListShareAssignCreatePages
          */
-        'LNG_PAGE_LIST_ENTITY_SHARE_RELATIONSHIPS_TITLE': 'Share exposures',
-        'LNG_PAGE_LIST_ENTITY_ASSIGN_RELATIONSHIPS_TITLE': 'Share with',
+        'LNG_PAGE_LIST_ENTITY_ASSIGN_RELATIONSHIPS_TITLE': 'Share exposures with',
+        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_ACTION_CREATE_RELATIONSHIP_BUTTON': 'Create relationships',
 
         /**
          * uiEntityRelationshipsListPage
          */
         'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE': 'Exposures to',
         'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE': 'Exposures from',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_RELATIONSHIPS': 'Share selected exposures',
 
         /**
          * uiCreateEntityRelationshipPage
@@ -53,5 +54,7 @@ export const EnglishUsLang = {
         // LNG_PAGE_ACTION_SEE_RELATIONSHIPS
         // LNG_COMMON_BUTTON_RELATIONSHIPS
         // LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_TYPE
+        // LNG_PAGE_LIST_ENTITY_SHARE_RELATIONSHIPS_TITLE
+        // LNG_COMMON_BUTTON_ASSIGN_TO
     }
 };
