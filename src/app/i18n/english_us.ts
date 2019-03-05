@@ -92,7 +92,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_EXPOSURE': 'View exposure',
 
         /**
-         * uiFollowUpfields
+         * uiFollowUpFields
          */
         'LNG_FOLLOW_UP_FIELD_LABEL_DATE': 'Date',
         'LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION': '',
