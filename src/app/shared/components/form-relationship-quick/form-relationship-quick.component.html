@@ -14,6 +14,18 @@
                 [dateSameOrBefore]="currentDate">
             </app-form-datepicker>
 
+            <app-form-slide-toggle
+                [name]="name + '[contactDateEstimated]'"
+                [(ngModel)]="relationship.contactDateEstimated"
+                [label]="'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED' | translate"
+                tooltip="LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED_DESCRIPTION"
+                [disabled]="disabled"
+                (optionChanged)="onChange()">
+            </app-form-slide-toggle>
+        </div>
+
+        <div fxLayout="row" fxLayoutGap="20px">
+
             <app-form-select
                 [name]="name + '[certaintyLevelId]'"
                 [(ngModel)]="relationship.certaintyLevelId"
@@ -26,6 +38,8 @@
                 optionValueKey="value"
                 (optionChanged)="onChange()">
             </app-form-select>
+
+            <div fxFlex><!-- placeholder --></div>
         </div>
 
         <div fxLayout="row" fxLayoutGap="20px">
