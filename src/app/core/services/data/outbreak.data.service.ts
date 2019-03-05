@@ -22,6 +22,7 @@ import 'rxjs/add/observable/throw';
 import { HierarchicalLocationModel } from '../../models/hierarchical-location.model';
 import { PeoplePossibleDuplicateModel } from '../../models/people-possible-duplicate.model';
 import { EntityType } from '../../models/entity-type';
+import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Injectable()
 export class OutbreakDataService {
@@ -50,6 +51,15 @@ export class OutbreakDataService {
             this.http.get(`outbreaks?filter=${filter}`),
             OutbreakModel
         );
+    }
+
+    /**
+     * Retrieve the number of Outbreaks
+     * @param {RequestQueryBuilder} queryBuilder
+     */
+    getOutbreaksCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`outbreaks/count?where=${whereFilter}`);
     }
 
     /**
@@ -237,6 +247,34 @@ export class OutbreakDataService {
 
         // emit the new value
         this.selectedOutbreakSubject.next(outbreak);
+    }
+
+    /**
+     * Check if the name of the new outbreak is unique
+     * @returns {Observable<boolean | IGeneralAsyncValidatorResponse>}
+     */
+    checkOutbreakNameUniquenessValidity(newOutbreakName: string, outbreakId?: string): Observable<boolean | IGeneralAsyncValidatorResponse> {
+        const qb: RequestQueryBuilder = new RequestQueryBuilder();
+        qb.filter.byEquality('name', newOutbreakName, true, true);
+
+        // condition for modify outbreak
+        if (outbreakId) {
+            qb.filter.where({
+                'id' : {
+                    neq : outbreakId
+                }
+            });
+        }
+
+        // check if we have duplicates
+        return this.getOutbreaksCount(qb)
+            .map((countData: { count: number }) => {
+                return !countData.count ?
+                    true : {
+                        isValid: false,
+                        errMsg: 'LNG_FORM_VALIDATION_ERROR_OUTBREAK_NAME_NOT_UNIQUE'
+                    };
+            });
     }
 
     /**

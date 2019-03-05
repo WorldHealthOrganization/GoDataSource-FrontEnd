@@ -25,6 +25,7 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'info': '&#xe923;',
             'supervisor': '&#xe920;',
             'arrowDropdownCircle': '&#xe91f;',
             'visibilityOf': '&#xe91d;',
@@ -59,6 +60,7 @@
             'menu': '&#xe90a;',
             'home': '&#xe901;',
             'lab': '&#xe9aa;',
+            'arrowAUp': '&#xe921;',
             'arrowADown': '&#xe922;',
             'arrowAUp': '&#xe921;',
           '0': 0

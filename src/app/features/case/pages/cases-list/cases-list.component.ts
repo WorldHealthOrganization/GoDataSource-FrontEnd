@@ -732,11 +732,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
         // construct query builder
         const qb = new RequestQueryBuilder();
-        qb.filter.where({
-            'persons.id': {
-                inq: selectedRecords
-            }
-        });
+        const personsQb = qb.addChildQueryBuilder('person');
+
+        // id
+        personsQb.filter.bySelect('id', selectedRecords, true, null);
+
+        // type
+        personsQb.filter.byEquality(
+            'type',
+            EntityType.CASE
+        );
 
         // display export dialog
         this.dialogService.showExportDialog({
@@ -749,6 +754,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
@@ -769,16 +775,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         // remove pagination
         personsQb.paginator.clear();
 
-        // remove child condition ?
-        if (personsQb.isEmpty()) {
-            qb.removeChildQueryBuilder('person');
-        } else {
-            // filter only cases
-            personsQb.filter.byEquality(
-                'type',
-                EntityType.CASE
-            );
-        }
+        // filter only cases
+        personsQb.filter.byEquality(
+            'type',
+            EntityType.CASE
+        );
 
         // display export dialog
         this.dialogService.showExportDialog({
@@ -791,6 +792,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }

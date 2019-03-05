@@ -104,7 +104,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         ExportDataExtension.XLSX,
         ExportDataExtension.XML,
         ExportDataExtension.JSON,
-        ExportDataExtension.ODS
+        ExportDataExtension.ODS,
+        ExportDataExtension.PDF
     ];
 
     anonymizeFields: LabelValuePair[] = [
@@ -704,11 +705,16 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
         // construct query builder
         const qb = new RequestQueryBuilder();
-        qb.filter.where({
-            'persons.id': {
-                inq: selectedRecords
-            }
-        });
+        const personsQb = qb.addChildQueryBuilder('person');
+
+        // id
+        personsQb.filter.bySelect('id', selectedRecords, true, null);
+
+        // type
+        personsQb.filter.byEquality(
+            'type',
+            EntityType.CONTACT
+        );
 
         // display export dialog
         this.dialogService.showExportDialog({
@@ -721,6 +727,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
@@ -756,48 +763,30 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         personsQb.removeRelation('relationships');
 
         // filter contacts
-        let removeFilter: boolean = false;
-        if (personsQb.isEmpty()) {
-            removeFilter = true;
-        } else {
-            personsQb.filter.byEquality(
-                'type',
-                EntityType.CONTACT
-            );
-        }
+        personsQb.filter.byEquality(
+            'type',
+            EntityType.CONTACT
+        );
 
         // relationships
         if (!relationships.queryBuilder.isEmpty()) {
             // filter by people
             const people = relationships.queryBuilder.include('people');
             if (!people.queryBuilder.isEmpty()) {
-                // do we need to merge conditions with case conditions ?
-                if (personsQb.isEmpty()) {
-                    personsQb.merge(people.queryBuilder);
-                } else {
-                    // merge contact & case conditions
-                    const contactConditions = personsQb.filter.generateCondition();
-                    personsQb.filter.clear();
-                    personsQb.filter.where({
-                        or: [
-                            contactConditions, {
-                                and: [
-                                    { type: EntityType.CASE },
-                                    people.queryBuilder.filter.generateCondition()
-                                ]
-                            }
-                        ]
-                    });
-                }
-
-                // don't remove filter anymore
-                removeFilter = false;
+                // merge contact & case conditions
+                const contactConditions = personsQb.filter.generateCondition();
+                personsQb.filter.clear();
+                personsQb.filter.where({
+                    or: [
+                        contactConditions, {
+                            and: [
+                                { type: EntityType.CASE },
+                                people.queryBuilder.filter.generateCondition()
+                            ]
+                        }
+                    ]
+                });
             }
-        }
-
-        // remove filter
-        if (removeFilter) {
-            qb.removeChildQueryBuilder('person');
         }
 
         // display export dialog
@@ -811,6 +800,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
