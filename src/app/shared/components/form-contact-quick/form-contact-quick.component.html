@@ -34,19 +34,6 @@
                 [dateSameOrBefore]="currentDate">
             </app-form-datepicker>
 
-            <app-form-slide-toggle
-                fxFlex
-                name="isDateOfReportingApproximate"
-                [(ngModel)]="contact.isDateOfReportingApproximate"
-                (optionChanged)="onChange()"
-                [label]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
-                tooltip="LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION">
-            </app-form-slide-toggle>
-
-        </div>
-
-        <div fxLayout="row" fxLayoutGap="20px">
-
             <app-form-select
                 name="gender"
                 [(ngModel)]="contact.gender"
@@ -55,7 +42,9 @@
                 (optionChanged)="onChange()"
                 [options]="genderList$ | async">
             </app-form-select>
+        </div>
 
+        <div fxLayout="row" fxLayoutGap="20px">
             <app-form-select
                 name="occupation"
                 [(ngModel)]="contact.occupation"
@@ -65,6 +54,7 @@
                 [options]="occupationsList$ | async">
             </app-form-select>
 
+            <div fxFlex><!-- placeholder --></div>
         </div>
 
         <div fxFlex fxLayout="row" fxLayoutGap="5px">
