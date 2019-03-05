@@ -16,6 +16,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ActivatedRouteMock } from '../../../../../core/services/helper/activated-route.service.spec';
 import { FollowUpsDataService } from '../../../../../core/services/data/follow-ups.data.service';
 import { FollowUpsDataServiceMock } from '../../../../../core/services/data/follow-ups.data.service.spec';
+import { ChronologyItem } from '../../../../../shared/components/chronology/typings/chronology-item';
 
 describe('ContactChronology', () => {
     const date = moment();
@@ -151,12 +152,31 @@ describe('ContactChronology', () => {
                     // determine expected chronology items
                     const contactData: ContactModel = getObserverData(await ContactDataServiceMock.getInstance().getContact(OutbreakDataServiceMock.selectedOutbreakId, ContactDataServiceMock.selectedContactId));
                     const followUpsData: FollowUpModel[] = getObserverData(await FollowUpsDataServiceMock.getInstance().getContactFollowUpsList(OutbreakDataServiceMock.selectedOutbreakId, contactData.id));
-                    const expectedChronologyItems = ContactChronology.getChronologyEntries(
+                    let expectedChronologyItems = ContactChronology.getChronologyEntries(
                         contactData,
                         followUpsData
                     );
 
+                    // sort collection asc
+                    expectedChronologyItems = _.sortBy(
+                        expectedChronologyItems,
+                        'date'
+                    );
+
+                    // determine number of days between events
+                    let previousItem: ChronologyItem;
+                    expectedChronologyItems.forEach((item: ChronologyItem, index: number) => {
+                        // we don't need to determine number of days for the first item
+                        if (index > 0) {
+                            item.daysSincePreviousEvent = moment(item.date).startOf('day').diff(moment(previousItem.date).startOf('day'), 'days');
+                        }
+
+                        // previous item
+                        previousItem = item;
+                    });
+
                     // make sure chronology items are the ones we expect
+                    expect(expectedChronologyItems.length).toBe(8);
                     expect(_.isEqual(comp.chronologyEntries, expectedChronologyItems)).toBeTruthy();
                     console.log(JSON.stringify(expectedChronologyItems));
                     console.log(JSON.stringify(comp.chronologyEntries));
