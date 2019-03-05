@@ -117,7 +117,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         private domService: DomService,
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService,
-        private dialogService: DialogService,
+        private dialogService: DialogService
     ) {}
 
     ngOnInit() {

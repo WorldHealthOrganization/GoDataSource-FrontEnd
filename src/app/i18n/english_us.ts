@@ -55,14 +55,28 @@ export const EnglishUsLang = {
          * NEW GROUP
          * uiSavedFiltersListPage
          */
+        'LNG_PAGE_LIST_SAVED_FILTERS_TITLE': 'Saved Filters',
         'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_NAME': 'Name',
         'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_PUBLIC': 'Public',
         'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_PUBLIC_DESCRIPTION': '',
         'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_FOR_PAGE': 'For page',
-        'LNG_PAGE_LIST_SAVED_FILTERS_TITLE': 'Saved Filters',
         'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE': 'Filter deleted successfully',
         'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE': 'Filter modified successfully',
         'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER': 'Delete filter',
+
+        /**
+         * NEW GROUP
+         * uiSavedFiltersForPagesLabels
+         */
+        'LNG_FILTER_FOR_LAB_RESULTS': 'Lab results',
+        'LNG_FILTER_FOR_CASE_LAB_RESULTS': 'Case lab results',
+        'LNG_FILTER_FOR_CONTACT_DAILY_FOLLOW_UPS': 'Contact Daily follow-ups',
+        'LNG_FILTER_FOR_AVAILABLE_ENTITIES': 'Available entities for relationships',
+        'LNG_FILTER_FOR_ENTITY_RELATIONSHIPS': 'Entity relationships / Assign to',
+        'LNG_FILTER_FOR_INDIVIDUAL_CONTACT_FOLLOW_UPS': 'Individual contact follow-ups',
+        'LNG_FILTER_FOR_OUTBREAKS': 'Outbreaks',
+        'LNG_FILTER_FOR_CASES': 'Cases',
+        'LNG_FILTER_FOR_CONTACTS': 'Contacts',
 
         /**
          * uiGenericLayout
@@ -216,15 +230,6 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON': 'Save filter',
         'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL': 'Load filter',
         'LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE': 'Filter saved successfully',
-        'LNG_FILTER_FOR_LAB_RESULTS': 'Lab results',
-        'LNG_FILTER_FOR_CASE_LAB_RESULTS': 'Case lab results',
-        'LNG_FILTER_FOR_CONTACT_DAILY_FOLLOW_UPS': 'Contact Daily follow-ups',
-        'LNG_FILTER_FOR_AVAILABLE_ENTITIES': 'Available entities for relationships',
-        'LNG_FILTER_FOR_ENTITY_RELATIONSHIPS': 'Entity relationships / Assign to',
-        'LNG_FILTER_FOR_INDIVIDUAL_CONTACT_FOLLOW_UPS': 'Individual contact follow-ups',
-        'LNG_FILTER_FOR_OUTBREAKS': 'Outbreaks',
-        'LNG_FILTER_FOR_CASES': 'Cases',
-        'LNG_FILTER_FOR_CONTACTS': 'Contacts',
 
         /**
          * REMOVE

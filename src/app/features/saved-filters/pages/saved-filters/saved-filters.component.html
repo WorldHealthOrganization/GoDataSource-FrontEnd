@@ -64,9 +64,8 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByBooleanField('isPublic',$event.value)"
+                            (optionChanged)="filterByBooleanField('isPublic', $event.value)"
                             app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
                             [displayFilterIcon]="true"
                             [clearable]="false">
                         </app-form-select>
@@ -115,7 +114,9 @@
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
 
             <mat-cell *matCellDef="let item" fxFlex="70px">
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu" *ngIf="!item.readonly">
+                <button *ngIf="!item.readonly"
+                        mat-icon-button
+                        [matMenuTriggerFor]="actionsMenu">
                     <span class="xt-icon">moreVertical</span>
                 </button>
 

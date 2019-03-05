@@ -29,7 +29,7 @@ export class SavedFiltersService {
     }
 
     /**
-     * Return total number of saved filers
+     * Return total number of saved filters
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<Object>}
      */
@@ -42,7 +42,6 @@ export class SavedFiltersService {
     /**
      * Save a filter
      * @param filterData
-     * @returns {Observable<Object>}
      */
     saveFilter(filterData: SavedFilterModel) {
         return this.http.post(`filter-mappings`, filterData);

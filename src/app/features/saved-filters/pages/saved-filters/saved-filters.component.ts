@@ -28,8 +28,6 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
         new BreadcrumbItemModel('LNG_PAGE_LIST_SAVED_FILTERS_TITLE', '.', true)
     ];
 
-    authUser: UserModel;
-
     yesNoOptionsList$: Observable<any[]>;
 
     pagesWithSavedFilters: LabelValuePair[] = _.map(Constants.SAVED_FILTER_PAGE_TYPE, (page) => {
@@ -42,7 +40,6 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
     constructor(
         private savedFiltersService: SavedFiltersService,
         protected snackbarService: SnackbarService,
-        private authDataService: AuthDataService,
         private genericDataService: GenericDataService,
         private dialogService: DialogService
     ) {
@@ -52,7 +49,6 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 

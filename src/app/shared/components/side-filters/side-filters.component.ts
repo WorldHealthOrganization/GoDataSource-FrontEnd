@@ -129,7 +129,7 @@ export class SideFiltersComponent {
     }
 
     /**
-     * Save a filter after it was applied to the list
+     * Save a filter
      */
     saveFilter() {
         this.dialogService
