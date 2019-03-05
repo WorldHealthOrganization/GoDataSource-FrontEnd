@@ -174,7 +174,7 @@ export class SideFiltersComponent {
      */
     toSaveData(): SavedFilterData {
         // exclude required filters
-        this.appliedFilters = _.filter(this.appliedFilters, (appliedFilter) => { return !appliedFilter.filter.required; });
+        this.appliedFilters = _.filter(this.appliedFilters, appliedFilter =>  !appliedFilter.filter.required );
 
         return new SavedFilterData({
             appliedFilters: _.map(this.appliedFilters, (filter) => filter.sanitizeForSave()),

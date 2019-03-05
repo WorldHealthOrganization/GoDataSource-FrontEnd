@@ -102,7 +102,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
                 return ErrorObservable.create(err);
             })
             .subscribe(() => {
-                this.snackbarService.showSuccess(`LNG_PAGE_LIST_SAVED_FILTERS_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE`)
+                this.snackbarService.showSuccess(`LNG_PAGE_LIST_SAVED_FILTERS_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE`);
             });
     }
 
