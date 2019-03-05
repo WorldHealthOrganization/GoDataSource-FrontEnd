@@ -52,6 +52,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_EVENTS_ACTION_EXPORT_EVENTS_RELATIONSHIPS': 'Export event relationships',
 
         /**
+         * NEW GROUP
          * uiSavedFiltersListPage
          */
         'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_NAME': 'Name',
