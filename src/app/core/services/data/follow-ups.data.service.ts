@@ -12,7 +12,6 @@ import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-c
 import { MetricContactsModel } from '../../models/metrics/metric-contacts.model';
 import { MetricContactsWithSuccessfulFollowUp } from '../../models/metrics/metric.contacts-with-success-follow-up.model';
 import { TeamFollowupsPerDayModel } from '../../models/team-followups-per-day.model';
-import { FormRangeModel } from '../../../shared/components/form-range/form-range.model';
 
 @Injectable()
 export class FollowUpsDataService {

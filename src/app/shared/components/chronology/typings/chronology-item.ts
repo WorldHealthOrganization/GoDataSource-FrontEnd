@@ -1,4 +1,5 @@
 import { Moment } from 'moment';
+import * as moment from 'moment';
 
 export class ChronologyItem {
     public label: string;
@@ -23,5 +24,8 @@ export class ChronologyItem {
             this,
             data
         );
+
+        // make sure that date is a date :)
+        this.date = this.date ? moment(this.date) : this.date;
     }
 }
