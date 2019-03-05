@@ -109,24 +109,17 @@
 
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button
-            *ngIf="hasContactWriteAccess()"
-            type="button"
-            mat-raised-button color="accent"
-            routerLink="/contacts/create"
-            [queryParams]="{ entityType: EntityType.EVENT, entityId: eventId }">
-            {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
-        </button>
+        <ng-container *ngIf="hasContactWriteAccess()">
+            <button
+                type="button"
+                mat-raised-button color="accent"
+                routerLink="/contacts/create"
+                [queryParams]="{ entityType: EntityType.EVENT, entityId: eventId }">
+                {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
+            </button>
 
-        <button
-            *ngIf="hasEventWriteAccess()"
-            type="button"
-            mat-raised-button color="accent"
-            [routerLink]="['/relationships', EntityType.EVENT, eventId, 'share']">
-            {{ 'LNG_COMMON_BUTTON_SHARE_RELATIONSHIPS' | translate }}
-        </button>
-
-        <div class="page-tabs-navbar-placeholder"></div>
+            <div class="page-tabs-navbar-placeholder"></div>
+        </ng-container>
 
         <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.EVENT, eventData.id, 'contacts']">
             {{ 'LNG_COMMON_BUTTON_EXPOSURES_FROM' | translate }}

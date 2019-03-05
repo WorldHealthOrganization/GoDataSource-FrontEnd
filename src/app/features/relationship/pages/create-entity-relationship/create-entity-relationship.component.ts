@@ -171,6 +171,10 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
                     relationshipsListPageTitle,
                     `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
                 ),
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE',
+                    `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/available-entities`
+                ),
                 new BreadcrumbItemModel('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_TITLE', null, true)
             ];
         }

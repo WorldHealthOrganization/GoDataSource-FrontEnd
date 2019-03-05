@@ -22,7 +22,6 @@ export const EnglishUsLang = {
          */
         'LNG_COMMON_BUTTON_EXPOSURES_FROM': 'Exposures from',
         'LNG_COMMON_BUTTON_EXPOSURES_TO': 'Exposures to',
-        'LNG_COMMON_BUTTON_SHARE_RELATIONSHIPS': 'Share exposures',
 
         /**
          * uiGeneralActions
@@ -56,5 +55,6 @@ export const EnglishUsLang = {
         // LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_TYPE
         // LNG_PAGE_LIST_ENTITY_SHARE_RELATIONSHIPS_TITLE
         // LNG_COMMON_BUTTON_ASSIGN_TO
+        // LNG_COMMON_BUTTON_SHARE_RELATIONSHIPS
     }
 };
