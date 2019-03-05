@@ -17,5 +17,10 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE': 'Shape'
 
+        /**
+         * uiAddressFields
+         */
+        'LNG_ADDRESS_FIELD_LABEL_DATE': 'Valid until',
+
     }
 };
