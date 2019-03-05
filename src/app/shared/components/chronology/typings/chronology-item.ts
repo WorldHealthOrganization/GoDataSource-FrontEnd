@@ -3,6 +3,7 @@ import { Moment } from 'moment';
 export class ChronologyItem {
     public label: string;
     public date: string | Moment;
+    public daysSincePreviousEvent: number;
     public translateData: {
         [key: string]: string
     } = {};
