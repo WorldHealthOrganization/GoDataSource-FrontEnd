@@ -185,7 +185,8 @@
                 <app-form-address-list
                     name="addresses"
                     [(ngModel)]="contactData.addresses"
-                    [disabled]="viewOnly">
+                    [disabled]="viewOnly"
+                    [required]="true">
                 </app-form-address-list>
             </mat-tab>
 
