@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSidenav } from '@angular/material';
 import { AppliedFilterModel, AppliedSortModel, FilterComparator, FilterModel, FilterType, SortModel } from './model';
 import { RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
@@ -9,7 +9,7 @@ import { AddressModel } from '../../../core/models/address.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Constants } from '../../../core/models/constants';
 import * as moment from 'moment';
-import { SavedFiltersService } from '../../../core/services/data/saved-filters.service';
+import { SavedFiltersService } from '../../../core/services/data/saved-filters.data.service';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogConfiguration, DialogField, DialogFieldType } from '../dialog/dialog.component';
 import {
@@ -18,6 +18,7 @@ import {
 } from '../../../core/models/saved-filters.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'app-side-filters',
@@ -25,7 +26,7 @@ import { SnackbarService } from '../../../core/services/helper/snackbar.service'
     templateUrl: './side-filters.component.html',
     styleUrls: ['./side-filters.component.less']
 })
-export class SideFiltersComponent {
+export class SideFiltersComponent implements OnInit {
     // available filters to be applied
     _filterOptions: FilterModel[] = [];
     @Input() set filterOptions(values: FilterModel[]) {
@@ -74,7 +75,7 @@ export class SideFiltersComponent {
 
     // get saved filters type
     @Input() savedFiltersType: string;
-    @Input() savedFilters: SavedFilterModel[];
+    savedFilters$: Observable<SavedFilterModel[]>;
 
     // applied filters
     appliedFilters: AppliedFilterModel[];
@@ -106,10 +107,15 @@ export class SideFiltersComponent {
         private i18nService: I18nService,
         private savedFiltersService: SavedFiltersService,
         private dialogService: DialogService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private savedFilterService: SavedFiltersService
     ) {
         // initialize data
         this.clear();
+    }
+
+    ngOnInit() {
+        this.getAvailableSavedFilters();
     }
 
     addFilter() {
@@ -129,6 +135,22 @@ export class SideFiltersComponent {
     }
 
     /**
+     * Get available saved side filters
+     */
+    getAvailableSavedFilters() {
+
+        const qb = new RequestQueryBuilder();
+
+        qb.filter.where({
+            filterKey: {
+                eq: this.savedFiltersType
+            }
+        });
+
+        this.savedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
+    }
+
+    /**
      * Save a filter
      */
     saveFilter() {
@@ -141,13 +163,13 @@ export class SideFiltersComponent {
                     fieldsList: [
                         new DialogField({
                             name: 'filterName',
-                            placeholder: 'LNG_DIALOG_SAVE_FILTERS_FILTER_NAME_LABEL',
+                            placeholder: 'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_NAME',
                             required: true,
                             fieldType: DialogFieldType.TEXT,
                     }),
                         new DialogField({
                             name: 'isPublic',
-                            placeholder: 'LNG_DIALOG_SAVE_FILTERS_PUBLIC_FILTER_LABEL',
+                            placeholder: 'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_PUBLIC',
                             fieldType: DialogFieldType.BOOLEAN
                         })
                     ]

@@ -25,7 +25,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { tap } from 'rxjs/operators';
 import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
-import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
 
 @Component({
     selector: 'app-entity-relationships-list-assign',
@@ -65,7 +65,7 @@ export class EntityRelationshipsListAssignComponent extends ListComponent implem
     // available side filters
     availableSideFilters: FilterModel[];
     // values for side filter
-    savedFiltersType = Constants.SAVED_FILTER_PAGE_TYPE.ENTITY_RELATIONSHIPS.value;
+    savedFiltersType = Constants.APP_PAGE.PEOPLE_TO_SHARE_RELATIONSHIPS_WITH.value;
     availableSavedFilters$: Observable<SavedFilterModel[]>;
 
     // reference data

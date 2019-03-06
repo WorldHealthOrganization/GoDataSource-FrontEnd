@@ -34,7 +34,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { tap } from 'rxjs/operators';
 import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
-import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
 
 @Component({
     selector: 'app-cases-list',
@@ -71,7 +71,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     // available side filters
     availableSideFilters: FilterModel[] = [];
     // saved filters type
-    savedFiltersType = Constants.SAVED_FILTER_PAGE_TYPE.CASES.value;
+    savedFiltersType = Constants.APP_PAGE.CASES.value;
     availableSavedFilters$: Observable<SavedFilterModel[]>;
 
     // provide constants to template

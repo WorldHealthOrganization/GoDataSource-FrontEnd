@@ -24,7 +24,7 @@ import { FilterModel, FilterType } from '../../../../shared/components/side-filt
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { tap } from 'rxjs/operators';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
-import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
 import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
 
 @Component({
@@ -66,7 +66,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     availableSideFilters: FilterModel[];
 
     // saved filters type
-    savedFiltersType = Constants.SAVED_FILTER_PAGE_TYPE.AVAILABLE_ENTITIES.value;
+    savedFiltersType = Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_RELATIONSHIPS.value;
     availableSavedFilters$: Observable<SavedFilterModel[]>;
 
     // reference data

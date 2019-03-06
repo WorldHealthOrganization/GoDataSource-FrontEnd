@@ -22,27 +22,31 @@ export const EnglishUsLang = {
          * uiSavedFiltersListPage
          */
         'LNG_PAGE_LIST_SAVED_FILTERS_TITLE': 'Saved Filters',
+        'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE': 'Filter deleted',
+        'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE': 'Filter modified',
+        'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER': 'Delete filter',
+
+        /**
+         * NEW GROUP
+         * uiSavedFiltersFields
+         */
         'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_NAME': 'Name',
         'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_PUBLIC': 'Public',
         'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_PUBLIC_DESCRIPTION': '',
         'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_FOR_PAGE': 'For page',
-        'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE': 'Filter deleted successfully',
-        'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE': 'Filter modified successfully',
-        'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER': 'Delete filter',
 
         /**
          * NEW GROUP
          * uiSavedFiltersForPagesLabels
          */
-        'LNG_FILTER_FOR_LAB_RESULTS': 'Lab results',
-        'LNG_FILTER_FOR_CASE_LAB_RESULTS': 'Case lab results',
-        'LNG_FILTER_FOR_CONTACT_DAILY_FOLLOW_UPS': 'Contact Daily follow-ups',
-        'LNG_FILTER_FOR_AVAILABLE_ENTITIES': 'Available entities for relationships',
-        'LNG_FILTER_FOR_ENTITY_RELATIONSHIPS': 'Entity relationships / Assign to',
-        'LNG_FILTER_FOR_INDIVIDUAL_CONTACT_FOLLOW_UPS': 'Individual contact follow-ups',
-        'LNG_FILTER_FOR_OUTBREAKS': 'Outbreaks',
-        'LNG_FILTER_FOR_CASES': 'Cases',
-        'LNG_FILTER_FOR_CONTACTS': 'Contacts',
+        'LNG_APP_PAGE_LAB_RESULTS': 'Lab results',
+        'LNG_APP_PAGE_CASE_LAB_RESULTS': 'Individual case lab results',
+        'LNG_APP_PAGE_DAILY_FOLLOW_UPS': 'Contact daily follow-ups',
+        'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_RELATIONSHIPS': 'Available entities for relationships',
+        'LNG_APP_PAGE_PEOPLE_TO_SHARE_RELATIONSHIPS_WITH': 'Entity relationships / Assign to',
+        'LNG_APP_PAGE_INDIVIDUAL_CONTACT_FOLLOW_UPS': 'Individual contact follow-ups',
+        'LNG_APP_PAGE_CASES': 'Cases',
+        'LNG_APP_PAGE_CONTACTS': 'Contacts',
 
         /**
          * uiGenericLayout
@@ -55,17 +59,15 @@ export const EnglishUsLang = {
         /**
          * uiDialogs
          */
-        'LNG_DIALOG_SAVE_FILTERS_TITLE': 'How do you want to name this filter?',
-        'LNG_DIALOG_SAVE_FILTERS_FILTER_NAME_LABEL': 'Filter name',
-        'LNG_DIALOG_SAVE_FILTERS_PUBLIC_FILTER_LABEL': 'Make this filter public?',
-        'LNG_DIALOG_CONFIRM_DELETE_FILTER': 'Are you sure you want to delete this filter?',
+        'LNG_DIALOG_SAVE_FILTERS_TITLE': 'Enter a name for the new filter',
+        'LNG_DIALOG_CONFIRM_DELETE_SAVED_FILTER': 'Are you sure you want to delete this filter?',
 
         /**
          * uiSideFilter
          */
         'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON': 'Save filter',
         'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL': 'Load filter',
-        'LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE': 'Filter saved successfully',
+        'LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE': 'Filter saved',
 
         /**
          * REMOVE

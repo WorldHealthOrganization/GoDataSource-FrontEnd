@@ -104,8 +104,7 @@
 <app-side-filters
     [filterOptions]="availableSideFilters"
     (filtersApplied)="applySideFilters($event)"
-    [savedFiltersType]="savedFiltersType"
-    [savedFilters]="availableSavedFilters$ | async">
+    [savedFiltersType]="savedFiltersType">
 </app-side-filters>
 
 <div fxLayout fxLayoutAlign="space-between end">

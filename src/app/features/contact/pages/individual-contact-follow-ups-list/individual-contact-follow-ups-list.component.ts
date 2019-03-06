@@ -27,7 +27,7 @@ import { tap } from 'rxjs/operators';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { DialogField } from '../../../../shared/components';
 import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
-import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
 
 @Component({
     selector: 'app-individual-contact-follow-ups-list',
@@ -54,7 +54,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
     availableSideFilters: FilterModel[];
 
     // values for side filter
-    savedFiltersType = Constants.SAVED_FILTER_PAGE_TYPE.INDIVIDUAL_CONTACT_FOLLOW_UPS.value;
+    savedFiltersType = Constants.APP_PAGE.INDIVIDUAL_CONTACT_FOLLOW_UPS.value;
     availableSavedFilters$: Observable<SavedFilterModel[]>;
 
     // provide constants to template

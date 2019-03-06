@@ -84,7 +84,7 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Filter Keys -->
+        <!-- For what page the filter was saved (Filter Keys) -->
         <ng-container matColumnDef="filter-keys">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
@@ -99,7 +99,8 @@
                             app-reset-input-on-side-filter
                             optionLabelKey="label"
                             optionLabelValue="value"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            [multiple]="true">
                         </app-form-select>
                     </div>
                 </div>

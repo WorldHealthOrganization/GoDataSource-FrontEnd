@@ -45,7 +45,7 @@ import { AuditLogDataService } from './data/audit-log.data.service';
 import { HelpDataService } from './data/help.data.service';
 import { GlobalEntitySearchDataService } from './data/global-entity-search.data.service';
 import { DeviceDataService } from './data/device.data.service';
-import { SavedFiltersService } from './data/saved-filters.service';
+import { SavedFiltersService } from './data/saved-filters.data.service';
 
 // export the list of services
 export const services: any[] = [

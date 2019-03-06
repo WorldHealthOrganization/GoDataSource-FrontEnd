@@ -23,7 +23,7 @@ import { FilterModel, FilterType } from '../../../../shared/components/side-filt
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { tap } from 'rxjs/operators';
 import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
-import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 
 @Component({
@@ -57,7 +57,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
     availableSideFilters: FilterModel[];
 
     // values for side filter
-    savedFiltersType = Constants.SAVED_FILTER_PAGE_TYPE.LAB_RESULTS.value;
+    savedFiltersType = Constants.APP_PAGE.LAB_RESULTS.value;
     availableSavedFilters$: Observable<SavedFilterModel[]>;
 
     // provide constants to template

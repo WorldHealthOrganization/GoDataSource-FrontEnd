@@ -119,38 +119,38 @@ export class Constants {
         }
     };
 
-    static SAVED_FILTER_PAGE_TYPE = {
+    static APP_PAGE = {
         LAB_RESULTS: {
-            label: 'LNG_FILTER_FOR_LAB_RESULTS',
-            value: 'LNG_FILTER_FOR_LAB_RESULTS'
+            label: 'LNG_APP_PAGE_LAB_RESULTS',
+            value: 'LNG_APP_PAGE_LAB_RESULTS'
         },
         CASE_LAB_RESULTS: {
-            label: 'LNG_FILTER_FOR_CASE_LAB_RESULTS',
-            value: 'LNG_FILTER_FOR_CASE_LAB_RESULTS'
+            label: 'LNG_APP_PAGE_CASE_LAB_RESULTS',
+            value: 'LNG_APP_PAGE_CASE_LAB_RESULTS'
         },
-        AVAILABLE_ENTITIES: {
-            label: 'LNG_FILTER_FOR_AVAILABLE_ENTITIES',
-            value: 'LNG_FILTER_FOR_AVAILABLE_ENTITIES'
+        AVAILABLE_ENTITIES_FOR_RELATIONSHIPS: {
+            label: 'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_RELATIONSHIPS',
+            value: 'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_RELATIONSHIPS'
         },
         INDIVIDUAL_CONTACT_FOLLOW_UPS: {
-            label: 'LNG_FILTER_FOR_INDIVIDUAL_CONTACT_FOLLOW_UPS',
-            value: 'LNG_FILTER_FOR_INDIVIDUAL_CONTACT_FOLLOW_UPS'
+            label: 'LNG_APP_PAGE_INDIVIDUAL_CONTACT_FOLLOW_UPS',
+            value: 'LNG_APP_PAGE_INDIVIDUAL_CONTACT_FOLLOW_UPS'
         },
-        CONTACT_DAILY_FOLLOW_UPS: {
-            label: 'LNG_FILTER_FOR_CONTACT_DAILY_FOLLOW_UPS',
-            value: 'LNG_FILTER_FOR_CONTACT_DAILY_FOLLOW_UPS'
+        DAILY_FOLLOW_UPS: {
+            label: 'LNG_APP_PAGE_DAILY_FOLLOW_UPS',
+            value: 'LNG_APP_PAGE_DAILY_FOLLOW_UPS'
         },
-        ENTITY_RELATIONSHIPS: {
-            label: 'LNG_FILTER_FOR_ENTITY_RELATIONSHIPS',
-            value: 'LNG_FILTER_FOR_ENTITY_RELATIONSHIPS'
+        PEOPLE_TO_SHARE_RELATIONSHIPS_WITH: {
+            label: 'LNG_APP_PAGE_PEOPLE_TO_SHARE_RELATIONSHIPS_WITH',
+            value: 'LNG_APP_PAGE_PEOPLE_TO_SHARE_RELATIONSHIPS_WITH'
         },
         CASES: {
-            label: 'LNG_FILTER_FOR_CASES',
-            value: 'LNG_FILTER_FOR_CASES'
+            label: 'LNG_APP_PAGE_CASES',
+            value: 'LNG_APP_PAGE_CASES'
         },
         CONTACTS: {
-            label: 'LNG_FILTER_FOR_CONTACTS',
-            value: 'LNG_FILTER_FOR_CONTACTS'
+            label: 'LNG_APP_PAGE_CONTACTS',
+            value: 'LNG_APP_PAGE_CONTACTS'
         }
     };
 

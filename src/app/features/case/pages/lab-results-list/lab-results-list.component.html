@@ -40,8 +40,7 @@
 <app-side-filters
     [filterOptions]="availableSideFilters"
     (filtersApplied)="applySideFilters($event)"
-    [savedFiltersType]="savedFiltersType"
-    [savedFilters]="availableSavedFilters$ | async">
+    [savedFiltersType]="savedFiltersType">
 </app-side-filters>
 
 <!--Total number of records from the list-->

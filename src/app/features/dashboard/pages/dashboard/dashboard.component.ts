@@ -24,7 +24,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { Subscription } from 'rxjs/Subscription';
 import { Constants } from '../../../../core/models/constants';
 import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
-import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
 
 @Component({
     selector: 'app-dashboard',

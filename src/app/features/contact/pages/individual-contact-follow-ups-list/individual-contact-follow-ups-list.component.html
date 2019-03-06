@@ -64,8 +64,7 @@
 <app-side-filters
     [filterOptions]="availableSideFilters"
     (filtersApplied)="applySideFilters($event)"
-    [savedFiltersType]="savedFiltersType"
-    [savedFilters]="availableSavedFilters$ | async">
+    [savedFiltersType]="savedFiltersType">
 </app-side-filters>
 
 <mat-card class="page-section page-content">

@@ -35,7 +35,7 @@ import { tap } from 'rxjs/operators';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
-import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -70,7 +70,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
 
     availableSideFilters: FilterModel[];
     // values for side filter
-    savedFiltersType = Constants.SAVED_FILTER_PAGE_TYPE.CONTACT_DAILY_FOLLOW_UPS.value;
+    savedFiltersType = Constants.APP_PAGE.DAILY_FOLLOW_UPS.value;
     availableSavedFilters$: Observable<SavedFilterModel[]>;
 
     dateFilterDefaultValue: Moment;

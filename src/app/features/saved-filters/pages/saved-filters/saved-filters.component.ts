@@ -3,9 +3,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { Observable } from 'rxjs/Observable';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
 import * as _ from 'lodash';
 import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
 import { tap } from 'rxjs/operators';
@@ -30,7 +28,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
 
     yesNoOptionsList$: Observable<any[]>;
 
-    pagesWithSavedFilters: LabelValuePair[] = _.map(Constants.SAVED_FILTER_PAGE_TYPE, (page) => {
+    pagesWithSavedFilters: LabelValuePair[] = _.map(Constants.APP_PAGE, (page) => {
         return new LabelValuePair(page.label, page.value);
     });
 
@@ -54,7 +52,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
 
         // initialize pagination
         this.initPaginator();
-        // ...and re-load the list when the Selected Outbreak is changed
+        // ...and re-load the list
         this.needsRefreshList(true);
     }
 
@@ -111,22 +109,22 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
      * @param filterId
      */
     deleteFilter(filterId: string) {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_FILTER')
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_SAVED_FILTER')
             .subscribe((answer: DialogAnswer) => {
-            if (answer.button === DialogAnswerButton.Yes) {
-                this.savedFiltersService.deleteSavedFilter(filterId)
-                    .catch((err) => {
-                        this.snackbarService.showError(err.message);
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.savedFiltersService.deleteSavedFilter(filterId)
+                        .catch((err) => {
+                            this.snackbarService.showApiError(err);
 
-                        return ErrorObservable.create(err);
-                    })
-                    .subscribe(() => {
-                        this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE');
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE');
 
-                        // reload data
-                        this.needsRefreshList(true);
-                    });
-            }
+                            // reload data
+                            this.needsRefreshList(true);
+                        });
+                }
         });
     }
 

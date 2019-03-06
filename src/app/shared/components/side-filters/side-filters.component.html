@@ -19,7 +19,7 @@
                         <app-form-select
                             name="loadFilter"
                             [placeholder]="'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL'"
-                            [options]="savedFilters"
+                            [options]="savedFilters$ | async"
                             (optionChanged)="loadSavedFilter($event)"
                             optionLabelKey="name"
                             optionValueKey="filterData">

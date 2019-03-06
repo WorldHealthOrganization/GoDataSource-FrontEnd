@@ -35,7 +35,7 @@ import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
 import { tap } from 'rxjs/operators';
 import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
-import { SavedFiltersService } from '../../../../core/services/data/saved-filters.service';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
 
 @Component({
     selector: 'app-contacts-list',
@@ -87,7 +87,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // available side filters
     availableSideFilters: FilterModel[];
     // values for side filter
-    savedFiltersType = Constants.SAVED_FILTER_PAGE_TYPE.CONTACTS.value;
+    savedFiltersType = Constants.APP_PAGE.CONTACTS.value;
     availableSavedFilters$: Observable<SavedFilterModel[]>;
 
     // print daily Follow-ups
