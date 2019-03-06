@@ -25,27 +25,29 @@ export const EnglishUsLang = {
         /**
          * uiCommonButtons
          */
-        'LNG_COMMON_BUTTON_EXPOSURES_FROM': 'Exposures from',
-        'LNG_COMMON_BUTTON_EXPOSURES_TO': 'Exposures to',
+        'LNG_COMMON_BUTTON_EXPOSURES_FROM': 'Contacts',
+        'LNG_COMMON_BUTTON_EXPOSURES_TO': 'Exposures',
 
         /**
          * uiGeneralActions
          */
-        'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM': 'See exposures from',
-        'LNG_PAGE_ACTION_SEE_EXPOSURES_TO': 'See exposures to',
+        'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM': 'See contacts',
+        'LNG_PAGE_ACTION_SEE_EXPOSURES_TO': 'See exposures',
 
         /**
          * uiEntityRelationshipsListShareAssignCreatePages
          */
-        'LNG_PAGE_LIST_ENTITY_ASSIGN_RELATIONSHIPS_TITLE': 'Share exposures with',
+        'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE': 'Share exposures with',
+        'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE': 'Share contacts with',
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_ACTION_CREATE_RELATIONSHIP_BUTTON': 'Create relationships',
 
         /**
          * uiEntityRelationshipsListPage
          */
-        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE': 'Exposures to',
-        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE': 'Exposures from',
-        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_RELATIONSHIPS': 'Share selected exposures',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE': 'Exposures',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE': 'Contacts',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_EXPOSURES': 'Share selected exposures',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_CONTACTS': 'Share selected contacts',
 
         /**
          * uiCreateEntityRelationshipPage

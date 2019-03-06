@@ -14,7 +14,6 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { NgForm } from '@angular/forms';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import * as _ from 'lodash';
@@ -174,6 +173,10 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
             this.relationshipType &&
             this.entity
         ) {
+            const assignRelationshipsPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
+                'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE' :
+                'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE';
+
             this.breadcrumbs = [
                 new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
                 new BreadcrumbItemModel(
@@ -184,7 +187,7 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
                     this.relationshipsListPageTitle,
                     `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
                 ),
-                new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_ASSIGN_RELATIONSHIPS_TITLE', null, true)
+                new BreadcrumbItemModel(assignRelationshipsPageTitle, null, true)
             ];
         }
     }

@@ -259,6 +259,12 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         return _.get(personTypeData, 'colorCode', '');
     }
 
+    get shareSelectedRelationshipsButtonLabel(): string {
+        return this.relationshipType === RelationshipType.EXPOSURE ?
+            'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_EXPOSURES' :
+            'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_CONTACTS';
+    }
+
     /**
      * Delete a relationship for current Entity
      * @param {EntityModel} relatedEntity

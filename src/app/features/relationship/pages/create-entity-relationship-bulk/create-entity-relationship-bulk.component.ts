@@ -151,6 +151,10 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
                 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
                 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
 
+            const assignRelationshipsPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
+                'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE' :
+                'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE';
+
             this.breadcrumbs = [
                 new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
                 new BreadcrumbItemModel(
@@ -162,7 +166,7 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
                     `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
                 ),
                 new BreadcrumbItemModel(
-                    'LNG_PAGE_LIST_ENTITY_ASSIGN_RELATIONSHIPS_TITLE',
+                    assignRelationshipsPageTitle,
                     `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/share`,
                     false,
                     {

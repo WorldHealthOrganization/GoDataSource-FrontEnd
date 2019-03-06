@@ -69,8 +69,7 @@ export class GenericDataService {
      */
     getAvailableRelatedEntityTypes(
         forType: EntityType = null,
-        // #TODO remove default value
-        relationshipType: RelationshipType = RelationshipType.CONTACT
+        relationshipType: RelationshipType
     ): EntityType[] {
         let availableTypes = [];
 
