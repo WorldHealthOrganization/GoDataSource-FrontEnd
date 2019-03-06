@@ -64,7 +64,8 @@ export class EventsListComponent extends ListComponent implements OnInit {
         ExportDataExtension.XLSX,
         ExportDataExtension.XML,
         ExportDataExtension.JSON,
-        ExportDataExtension.ODS
+        ExportDataExtension.ODS,
+        ExportDataExtension.PDF
     ];
 
     anonymizeFields: LabelValuePair[] = [
@@ -278,6 +279,7 @@ export class EventsListComponent extends ListComponent implements OnInit {
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
@@ -315,6 +317,7 @@ export class EventsListComponent extends ListComponent implements OnInit {
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }

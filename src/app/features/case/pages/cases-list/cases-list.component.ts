@@ -730,6 +730,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
@@ -767,6 +768,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            allowedExportTypes: this.allowedExportTypes,
             anonymizeFields: this.anonymizeFields,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
