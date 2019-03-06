@@ -15,9 +15,11 @@ import * as moment from 'moment';
 export class EntityModel {
     type: EntityType;
     model: CaseModel | ContactModel | EventModel;
+    relationship: any;
 
     constructor(data) {
         this.type = _.get(data, 'type');
+        this.relationship = _.get(data, 'relationship');
 
         switch (this.type) {
             case EntityType.CASE:

@@ -485,6 +485,22 @@ export abstract class ListComponent {
     }
 
     /**
+     * Filter by child query builder
+     * @param {string} qbFilterKey
+     * @returns {RequestFilter}
+     */
+    filterByChildQueryBuilder(
+        qbFilterKey: string
+    ): RequestFilter {
+        const childQueryBuilder = this.queryBuilder.addChildQueryBuilder(qbFilterKey);
+
+        // refresh list
+        this.needsRefreshList();
+
+        return childQueryBuilder.filter;
+    }
+
+    /**
      * Initialize paginator
      */
     protected initPaginator() {

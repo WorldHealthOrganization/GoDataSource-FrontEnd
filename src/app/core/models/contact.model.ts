@@ -40,24 +40,7 @@ export class ContactModel {
     age: AgeModel;
 
     inconsistencies: InconsistencyModel[];
-
-    /**
-     * Return contact id mask with data replaced
-     * @param contactIdMask
-     */
-    static generateContactIDMask(contactIdMask: string): string {
-        // validate
-        if (_.isEmpty(contactIdMask)) {
-            return '';
-        }
-
-        // !!!!!!!!!!!!!!!
-        // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
-        // !!!!!!!!!!!!!!!
-        return contactIdMask
-            .replace(/YYYY/g, moment().format('YYYY'))
-            .replace(/\*/g, '');
-    }
+    relationship: any;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -98,6 +81,26 @@ export class ContactModel {
         _.each(this.inconsistencies, (inconsistency, index) => {
             this.inconsistencies[index] = new InconsistencyModel(inconsistency);
         });
+
+        this.relationship = _.get(data, 'relationship');
+    }
+
+    /**
+     * Return contact id mask with data replaced
+     * @param contactIdMask
+     */
+    static generateContactIDMask(contactIdMask: string): string {
+        // validate
+        if (_.isEmpty(contactIdMask)) {
+            return '';
+        }
+
+        // !!!!!!!!!!!!!!!
+        // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
+        // !!!!!!!!!!!!!!!
+        return contactIdMask
+            .replace(/YYYY/g, moment().format('YYYY'))
+            .replace(/\*/g, '');
     }
 
     /**

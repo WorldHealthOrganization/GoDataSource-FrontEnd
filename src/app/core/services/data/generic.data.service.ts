@@ -4,9 +4,10 @@ import { Constants } from '../../models/constants';
 import { EntityType } from '../../models/entity-type';
 import * as _ from 'lodash';
 import { HttpClient } from '@angular/common/http';
-import { Moment } from 'moment';
 import * as moment from 'moment';
+import { Moment } from 'moment';
 import { LabelValuePair } from '../../models/label-value-pair';
+import { RelationshipType } from '../../enums/relationship-type.enum';
 
 @Injectable()
 export class GenericDataService {
@@ -63,20 +64,32 @@ export class GenericDataService {
     /**
      * Retrieve the list of available Entity Types that, optionally, can be related to a given type (Case, Contact or Event)
      * @param {EntityType} forType
+     * @param {RelationshipType} relationshipType
      * @returns {EntityType[]}
      */
-    getAvailableRelatedEntityTypes(forType: EntityType = null): EntityType[] {
+    getAvailableRelatedEntityTypes(
+        forType: EntityType = null,
+        relationshipType: RelationshipType
+    ): EntityType[] {
         let availableTypes = [];
 
         switch (forType) {
             case EntityType.CASE:
                 // all types can be related with a Case
-                availableTypes = [EntityType.CASE, EntityType.CONTACT, EntityType.EVENT];
+                availableTypes = [EntityType.CASE, EntityType.EVENT];
+                // a contact cannot be an exposure
+                if (relationshipType === RelationshipType.CONTACT) {
+                    availableTypes.push(EntityType.CONTACT);
+                }
                 break;
 
             case EntityType.EVENT:
                 // all types, except Event, can be related with an Event
-                availableTypes = [EntityType.CASE, EntityType.CONTACT];
+                availableTypes = [EntityType.CASE];
+                // a contact cannot be an exposure
+                if (relationshipType === RelationshipType.CONTACT) {
+                    availableTypes.push(EntityType.CONTACT);
+                }
                 break;
 
             case EntityType.CONTACT:

@@ -495,9 +495,11 @@
 
                         <button
                             mat-menu-item
-                            [routerLink]="['/relationships', EntityType.CONTACT, item.id]">
-                            {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
+                            [routerLink]="['/relationships', EntityType.CONTACT, item.id, 'exposures']">
+                            {{'LNG_PAGE_ACTION_SEE_EXPOSURES_TO' | translate}}
                         </button>
+
+                        <mat-divider></mat-divider>
 
                         <button mat-menu-item [routerLink]="['/contacts/contact-related-follow-ups', item.id]">
                             {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_FOLLOW_UPS' | translate }}

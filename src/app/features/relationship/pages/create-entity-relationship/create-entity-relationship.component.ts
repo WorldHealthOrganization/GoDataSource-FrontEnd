@@ -25,6 +25,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { GroupBase } from '../../../../shared/xt-forms/core';
 import { v4 as uuid } from 'uuid';
+import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 
 @Component({
     selector: 'app-create-entity-relationship',
@@ -33,7 +34,6 @@ import { v4 as uuid } from 'uuid';
     styleUrls: ['./create-entity-relationship.component.less']
 })
 export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // Entities Map for specific data
@@ -52,11 +52,14 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
         }
     };
 
-    // selected outbreak ID
-    outbreakId: string;
+    // selected outbreak
+    selectedOutbreak: OutbreakModel;
     // route params
     entityType: EntityType;
     entityId: string;
+    entity: CaseModel | ContactModel | EventModel;
+    // route data
+    relationshipType: RelationshipType;
 
     selectedEntityIds: string[];
     selectedEntities: (CaseModel|ContactModel|EventModel)[];
@@ -79,9 +82,9 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
     }
 
     ngOnInit() {
-
+        // get selected persons from query params
         this.route.queryParams
-            .subscribe((queryParams: {selectedEntityIds}) => {
+            .subscribe((queryParams: { selectedEntityIds }) => {
                 if (_.isEmpty(queryParams.selectedEntityIds)) {
                     this.snackbarService.showError('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
 
@@ -95,65 +98,97 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
                 }
             });
 
+        // get relationship type
+        this.route.data.subscribe((routeData) => {
+            this.relationshipType = routeData.relationshipType;
+
+            this.initializeBreadcrumbs();
+        });
+
+        // get person type and ID from route params
         this.route.params
-            .subscribe((params: {entityType, entityId}) => {
+            .subscribe((params: { entityType, entityId }) => {
                 this.entityType = params.entityType;
                 this.entityId = params.entityId;
 
-                // add new breadcrumb: Entity List page
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-                );
-
-                // get selected outbreak
-                this.outbreakDataService
-                    .getSelectedOutbreak()
-                    .subscribe((selectedOutbreak: OutbreakModel) => {
-                        this.outbreakId = selectedOutbreak.id;
-
-                        this.refreshSelectedEntitiesList();
-
-                        // get entity data
-                        this.entityDataService
-                            .getEntity(this.entityType, this.outbreakId, this.entityId)
-                            .catch((err) => {
-                                this.snackbarService.showError(err.message);
-
-                                // Entity not found; navigate back to Entities list
-                                this.disableDirtyConfirm();
-                                this.router.navigate([this.entityMap[this.entityType].link]);
-
-                                return ErrorObservable.create(err);
-                            })
-                            .subscribe((entityData: CaseModel|ContactModel|EventModel) => {
-                                // add new breadcrumb: Entity Modify page
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        entityData.name,
-                                        `${this.entityMap[this.entityType].link}/${this.entityId}/view`
-                                    )
-                                );
-                                // add new breadcrumb: Entity Relationships list
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE',
-                                        `/relationships/${this.entityType}/${this.entityId}`
-                                    )
-                                );
-                                // add new breadcrumb: page title
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_TITLE', null, true)
-                                );
-                            });
-                    });
+                this.loadPerson();
             });
+
+        // get selected outbreak
+        this.outbreakDataService
+            .getSelectedOutbreak()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+
+                this.loadPerson();
+            });
+    }
+
+    private loadPerson() {
+        if (
+            this.entityType &&
+            this.entityId &&
+            this.selectedOutbreak
+        ) {
+            this.refreshSelectedEntitiesList();
+
+            // get person data
+            this.entityDataService
+                .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
+
+                    // Entity not found; navigate back to Entities list
+                    this.router.navigate([this.entityMap[this.entityType].link]);
+
+                    return ErrorObservable.create(err);
+                })
+                .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
+                    this.entity = entityData;
+
+                    this.initializeBreadcrumbs();
+                });
+        }
+    }
+
+    private initializeBreadcrumbs() {
+        if (
+            this.relationshipType &&
+            this.entity
+        ) {
+            // add new breadcrumb: page title
+            const relationshipsListPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
+                'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
+                'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
+
+            this.breadcrumbs = [
+                new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
+                new BreadcrumbItemModel(
+                    this.entity.name,
+                    `${this.entityMap[this.entityType].link}/${this.entityId}/view`
+                ),
+                new BreadcrumbItemModel(
+                    relationshipsListPageTitle,
+                    `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
+                ),
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE',
+                    `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/available-entities`
+                ),
+                new BreadcrumbItemModel('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_TITLE', null, true)
+            ];
+        }
+    }
+
+    get relationshipTypeRoutePath(): string {
+        return this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures';
     }
 
     /**
      * (Re)-Load the list of persons selected to be related with current entity
      */
     refreshSelectedEntitiesList() {
-        if (!this.outbreakId || _.isEmpty(this.selectedEntityIds)) {
+        if (!this.selectedOutbreak || _.isEmpty(this.selectedEntityIds)) {
             return;
         }
 
@@ -166,7 +201,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
         });
 
         this.entityDataService
-            .getEntitiesList(this.outbreakId, qb)
+            .getEntitiesList(this.selectedOutbreak.id, qb)
             .subscribe((entities) => {
                 this.selectedEntities = entities;
 
@@ -194,20 +229,33 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
 
         _.each(fields.relationships, (relationship) => {
             const relatedEntityId = _.get(relationship, 'relatedEntityId');
+            const relatedEntityType = _.get(relationship, 'relatedEntityType');
             const relationshipData = _.get(relationship, 'relationship');
+
+            // get the source and target persons
+            let sourcePersonType = this.entityType;
+            let sourcePersonId = this.entityId;
+            let targetPersonId = relatedEntityId;
+
+            if (this.relationshipType === RelationshipType.EXPOSURE) {
+                // we are adding an exposure; swap source and target persons
+                sourcePersonType = relatedEntityType;
+                sourcePersonId = relatedEntityId;
+                targetPersonId = this.entityId;
+            }
 
             // add related entity ID
             relationshipData.persons.push({
-                id: relatedEntityId
+                id: targetPersonId
             });
 
             // create observable
             createRelationships$.push(
                 this.relationshipDataService
                     .createRelationship(
-                        this.outbreakId,
-                        this.entityType,
-                        this.entityId,
+                        this.selectedOutbreak.id,
+                        sourcePersonType,
+                        sourcePersonId,
                         relationshipData
                     )
             );
@@ -230,7 +278,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
 
                 // navigate to listing page
                 this.disableDirtyConfirm();
-                this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
+                this.router.navigate([`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`]);
             });
     }
 
