@@ -1,4 +1,5 @@
 import { ContactDataServiceMock } from '../data/contact.data.service.spec';
+import { CaseDataServiceMock } from '../data/case.data.service.spec';
 
 export const ActivatedRouteMock: {
     callbackData: {
@@ -13,7 +14,8 @@ export const ActivatedRouteMock: {
     params: {
         subscribe: (callback) => {
             callback(ActivatedRouteMock.callbackData ? ActivatedRouteMock.callbackData : {
-                contactId: ContactDataServiceMock.selectedContactId
+                contactId: ContactDataServiceMock.selectedContactId,
+                caseId: CaseDataServiceMock.selectedCaseId
             });
         }
     }

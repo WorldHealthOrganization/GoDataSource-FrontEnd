@@ -13,7 +13,7 @@ export const FollowUpsDataServiceMock: {
         }
     },
     getContactFollowUpsList: (outbreakId: string, contactId: string) => Observable<FollowUpModel[]>,
-    getFollowUpsList: (outbreakId: string, queryBuilder: RequestQueryBuilder, needsContactData: boolean) => Observable<FollowUpModel[]>
+    getFollowUpsList: (outbreakId: string, queryBuilder?: RequestQueryBuilder, needsContactData?: boolean) => Observable<FollowUpModel[]>
 } = {
     selectedFollowUpId: 'followUp 1',
 
