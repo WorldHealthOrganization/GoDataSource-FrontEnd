@@ -2,21 +2,26 @@ import { Observable } from 'rxjs/Observable';
 import { OutbreakModel } from '../../models/outbreak.model';
 import * as _ from 'lodash';
 
-export class OutbreakDataServiceMock {
-    static selectedOutbreakId = 'outbreak 1';
+export const OutbreakDataServiceMock: {
+    selectedOutbreakId: string,
+    outbreaks: OutbreakModel[],
+    getSelectedOutbreak: () => Observable<OutbreakModel>,
+    getSelectedOutbreakSubject: () => Observable<OutbreakModel>
+} = {
+    selectedOutbreakId: 'outbreak 1',
 
-    static outbreaks: OutbreakModel[] = [
+    outbreaks: [
         new OutbreakModel({
-            id: OutbreakDataServiceMock.selectedOutbreakId
+            id: 'outbreak 1'
         })
-    ];
+    ],
 
-    getSelectedOutbreak(): Observable<OutbreakModel> {
+    getSelectedOutbreak: (): Observable<OutbreakModel> => {
         return Observable.of(_.find(OutbreakDataServiceMock.outbreaks, { id: OutbreakDataServiceMock.selectedOutbreakId }));
-    }
+    },
 
-    getSelectedOutbreakSubject(): Observable<OutbreakModel> {
-        return this.getSelectedOutbreak();
+    getSelectedOutbreakSubject: (): Observable<OutbreakModel> => {
+        return OutbreakDataServiceMock.getSelectedOutbreak();
     }
-}
+};
 

@@ -17,6 +17,9 @@ import { ActivatedRouteMock } from '../../../../../core/services/helper/activate
 import { FollowUpsDataService } from '../../../../../core/services/data/follow-ups.data.service';
 import { FollowUpsDataServiceMock } from '../../../../../core/services/data/follow-ups.data.service.spec';
 import { ChronologyItem } from '../../../../../shared/components/chronology/typings/chronology-item';
+import { ChronologyComponent } from '../../../../../shared/components/chronology/chronology.component';
+import { By } from '@angular/platform-browser';
+import { DebugElement } from '@angular/core';
 
 describe('ContactChronology', () => {
     const date = moment();
@@ -131,57 +134,61 @@ describe('ContactChronology', () => {
         initializeFixture([
             ViewChronologyContactComponent
         ], [
-            {provide: ActivatedRoute, useClass: ActivatedRouteMock},
-            {provide: ContactDataService, useClass: ContactDataServiceMock},
-            {provide: OutbreakDataService, useClass: OutbreakDataServiceMock},
-            {provide: FollowUpsDataService, useClass: FollowUpsDataServiceMock}
+            {provide: ActivatedRoute, useValue: ActivatedRouteMock},
+            {provide: OutbreakDataService, useValue: OutbreakDataServiceMock},
+            {provide: ContactDataService, useValue: ContactDataServiceMock},
+            {provide: FollowUpsDataService, useValue: FollowUpsDataServiceMock}
         ]);
 
         // Handle fixture initialization
-        let comp: ViewChronologyContactComponent;
+        let viewChronologyContactComponent: ViewChronologyContactComponent;
+        let chronologyComponent: ChronologyComponent;
         let fixture: ComponentFixture<ViewChronologyContactComponent>;
         beforeEach((done) => (async () => {
             fixture = TestBed.createComponent(ViewChronologyContactComponent);
-            comp = fixture.componentInstance;
+            viewChronologyContactComponent = fixture.componentInstance;
+            chronologyComponent = fixture.debugElement.query(By.directive(ChronologyComponent)).componentInstance;
         })().then(done).catch(done.fail));
 
-        it(`should have specific chronology items`, async(
-            () => {
-                fixture.detectChanges();
-                fixture.whenStable().then(async () => {
-                    // determine expected chronology items
-                    const contactData: ContactModel = getObserverData(await ContactDataServiceMock.getInstance().getContact(OutbreakDataServiceMock.selectedOutbreakId, ContactDataServiceMock.selectedContactId));
-                    const followUpsData: FollowUpModel[] = getObserverData(await FollowUpsDataServiceMock.getInstance().getContactFollowUpsList(OutbreakDataServiceMock.selectedOutbreakId, contactData.id));
-                    let expectedChronologyItems = ContactChronology.getChronologyEntries(
-                        contactData,
-                        followUpsData
-                    );
+        it('should call service getSelectedOutbreak', async(() => {
+            spyOn(OutbreakDataServiceMock, 'getSelectedOutbreak').and.callThrough();
+            fixture.detectChanges();
+            expect(OutbreakDataServiceMock.getSelectedOutbreak).toHaveBeenCalled();
+        }));
 
-                    // sort collection asc
-                    expectedChronologyItems = _.sortBy(
-                        expectedChronologyItems,
-                        'date'
-                    );
+        it('should have specific chronology items', async(async () => {
+            fixture.detectChanges();
 
-                    // determine number of days between events
-                    let previousItem: ChronologyItem;
-                    expectedChronologyItems.forEach((item: ChronologyItem, index: number) => {
-                        // we don't need to determine number of days for the first item
-                        if (index > 0) {
-                            item.daysSincePreviousEvent = moment(item.date).startOf('day').diff(moment(previousItem.date).startOf('day'), 'days');
-                        }
+            // determine expected chronology items
+            const contactData: ContactModel = getObserverData(await ContactDataServiceMock.getContact(OutbreakDataServiceMock.selectedOutbreakId, ContactDataServiceMock.selectedContactId));
+            const followUpsData: FollowUpModel[] = getObserverData(await FollowUpsDataServiceMock.getContactFollowUpsList(OutbreakDataServiceMock.selectedOutbreakId, contactData.id));
+            let expectedChronologyItems = ContactChronology.getChronologyEntries(
+                contactData,
+                followUpsData
+            );
 
-                        // previous item
-                        previousItem = item;
-                    });
+            // sort collection asc
+            expectedChronologyItems = _.sortBy(
+                expectedChronologyItems,
+                'date'
+            );
 
-                    // make sure chronology items are the ones we expect
-                    expect(expectedChronologyItems.length).toBe(8);
-                    expect(_.isEqual(comp.chronologyEntries, expectedChronologyItems)).toBeTruthy();
-                    console.log(JSON.stringify(expectedChronologyItems));
-                    console.log(JSON.stringify(comp.chronologyEntries));
-                });
-            }
-        ));
+            // determine number of days between events
+            let previousItem: ChronologyItem;
+            expectedChronologyItems.forEach((item: ChronologyItem, index: number) => {
+                // we don't need to determine number of days for the first item
+                if (index > 0) {
+                    item.daysSincePreviousEvent = moment(item.date).startOf('day').diff(moment(previousItem.date).startOf('day'), 'days');
+                }
+
+                // previous item
+                previousItem = item;
+            });
+
+            // make sure chronology items are the ones we expect
+            expect(expectedChronologyItems.length).toEqual(8);
+            expect(viewChronologyContactComponent.chronologyEntries).not.toEqual(expectedChronologyItems);
+            expect(chronologyComponent.entries).toEqual(expectedChronologyItems);
+        }));
     });
 });

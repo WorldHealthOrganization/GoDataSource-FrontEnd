@@ -1,23 +1,27 @@
 import { Observable } from 'rxjs/Observable';
-import { OutbreakDataServiceMock } from './outbreak.data.service.spec';
 import * as _ from 'lodash';
 import { FollowUpModel } from '../../models/follow-up.model';
 import { ContactDataServiceMock } from './contact.data.service.spec';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import * as moment from 'moment';
 
-export class FollowUpsDataServiceMock {
-    static selectedFollowUpId = 'followUp 1';
-
-    static followUps: {
+export const FollowUpsDataServiceMock: {
+    selectedFollowUpId: string,
+    followUps: {
         [outbreakId: string]: {
             [contactId: string]: FollowUpModel[]
         }
-    } = {
-        [OutbreakDataServiceMock.selectedOutbreakId]: {
-            [ContactDataServiceMock.selectedContactId]: [
+    },
+    getContactFollowUpsList: (outbreakId: string, contactId: string) => Observable<FollowUpModel[]>,
+    getFollowUpsList: (outbreakId: string, queryBuilder: RequestQueryBuilder, needsContactData: boolean) => Observable<FollowUpModel[]>
+} = {
+    selectedFollowUpId: 'followUp 1',
+
+    followUps: {
+        'outbreak 1': {
+            'contact 1': [
                 new FollowUpModel({
-                    id: FollowUpsDataServiceMock.selectedFollowUpId,
+                    id: 'followUp 1',
                     personId: ContactDataServiceMock.selectedContactId,
                     date: moment('2019-03-05', 'YYYY-MM-DD'),
                     statusId: 'Status 1'
@@ -44,28 +48,24 @@ export class FollowUpsDataServiceMock {
                 })
             ]
         }
-    };
+    },
 
-    static getInstance() {
-        return new FollowUpsDataServiceMock();
-    }
-
-    getContactFollowUpsList(
+    getContactFollowUpsList: (
         outbreakId: string,
-        contactId: string,
-    ): Observable<FollowUpModel[]> {
+        contactId: string
+    ): Observable<FollowUpModel[]> => {
         return Observable.of(
             FollowUpsDataServiceMock.followUps[outbreakId] && FollowUpsDataServiceMock.followUps[outbreakId][contactId] ?
                 FollowUpsDataServiceMock.followUps[outbreakId][contactId] :
                 []
         );
-    }
+    },
 
-    getFollowUpsList(
+    getFollowUpsList: (
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
         needsContactData: boolean = true
-    ): Observable<FollowUpModel[]> {
+    ): Observable<FollowUpModel[]> => {
         // retrieve all follow-ups from this outbreak
         const items = FollowUpsDataServiceMock.followUps[outbreakId] ?
             _.transform(FollowUpsDataServiceMock.followUps[outbreakId], (accumulator, followUps) => {
@@ -88,5 +88,5 @@ export class FollowUpsDataServiceMock {
         // finished
         return Observable.of(personId ? _.filter(items, { personId: personId }) : items);
     }
-}
+};
 
