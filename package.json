@@ -70,6 +70,7 @@
         "karma-parallel": "0.3.1",
         "karma-jasmine-html-reporter": "0.2.2",
         "karma-phantomjs-launcher": "1.0.4",
+        "karma-spec-reporter": "0.0.32",
         "protractor": "5.1.2",
         "ts-node": "4.1.0",
         "tslint": "5.9.1",
