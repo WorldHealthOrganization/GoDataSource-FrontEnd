@@ -46,13 +46,21 @@ export const initializeFixture = (
     providers?: any[],
     imports?: any[]
 ) => {
+    // default providers
+    const defaultProviders = [
+        {provide: AuthDataService, useClass: AuthDataServiceMock},
+        {provide: GenericDataService, useClass: GenericDataServiceMock},
+        {provide: ReferenceDataDataService, useClass: ReferenceDataDataServiceMock},
+        {provide: LanguageDataService, useClass: LanguageDataServiceMock}
+    ];
+
     // set default providers
     if (!providers) {
+        providers = defaultProviders;
+    } else {
         providers = [
-            {provide: AuthDataService, useClass: AuthDataServiceMock},
-            {provide: GenericDataService, useClass: GenericDataServiceMock},
-            {provide: ReferenceDataDataService, useClass: ReferenceDataDataServiceMock},
-            {provide: LanguageDataService, useClass: LanguageDataServiceMock},
+            ...defaultProviders,
+            ...providers
         ];
     }
 
@@ -77,5 +85,14 @@ export const initializeFixture = (
 
         await TestBed.compileComponents();
     })().then(done).catch(done.fail));
+};
+
+/**
+ * Retrieve Observer sync data
+ */
+export const getObserverData = (
+    awaitedObserver
+): any => {
+    return (awaitedObserver as any).value;
 };
 
