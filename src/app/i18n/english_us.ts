@@ -27,5 +27,11 @@ export const EnglishUsLang = {
          */
         'LNG_LAYOUT_MENU_ITEM_SAVED_IMPORT_MAPPING_LABEL': 'Saved import mapping',
 
+        /**
+         * NEW GROUP
+         * uiSavedImportMappingsListPage
+         */
+        'LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_TITLE': 'Saved import mappings'
+
     }
 };
