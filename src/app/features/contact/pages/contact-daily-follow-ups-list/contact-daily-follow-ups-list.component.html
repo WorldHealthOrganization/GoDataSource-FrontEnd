@@ -366,8 +366,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted"
-                      class="select-and-toggle-for-lists">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 <app-form-select
                     *ngIf="hasFollowUpsWriteAccess()"
                     name="teamId"
@@ -436,8 +435,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item"
-                      class="select-and-toggle-for-lists">
+            <mat-cell *matCellDef="let item">
                 <app-form-slide-toggle
                     *ngIf="hasFollowUpsWriteAccess()"
                     name="targeted"
