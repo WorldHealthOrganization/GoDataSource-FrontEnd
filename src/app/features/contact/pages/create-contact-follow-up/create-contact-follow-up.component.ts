@@ -33,10 +33,13 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
         new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups')
     ];
 
-    followUpData: FollowUpModel = new FollowUpModel();
-    contactData: ContactModel = new ContactModel();
+    // selected outbreak
+    selectedOutbreak: OutbreakModel;
+    // route params
+    contactId: string;
+    contactData: ContactModel;
 
-    selectedOutbreak: OutbreakModel = new OutbreakModel();
+    followUpData: FollowUpModel = new FollowUpModel();
 
     dailyStatusTypeOptions$: Observable<any[]>;
 
@@ -61,46 +64,58 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
         // daily status types
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
         this.followUpData.statusId = Constants.FOLLOW_UP_STATUS.NO_DATA.value;
-        // retrieve query params
+
+        // read route params
         this.route.params
-            .subscribe((params: {contactId}) => {
-                // update breadcrumbs
-                this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_FOLLOW_UP_TITLE', '.', true));
+            .subscribe((params: { contactId }) => {
+                this.contactId = params.contactId;
 
-                // get selected outbreak
-                this.outbreakDataService
-                    .getSelectedOutbreak()
-                    .catch((err) => {
-                        // show error message
-                        this.snackbarService.showError(err.message);
-
-                        // redirect to cases
-                        this.disableDirtyConfirm();
-                        this.router.navigate(['/contacts']);
-                        return ErrorObservable.create(err);
-                    })
-                    .subscribe((selectedOutbreak: OutbreakModel) => {
-                        // keep selected outbreak for later user
-                        this.selectedOutbreak = selectedOutbreak;
-
-                        // retrieve contact information
-                        this.contactDataService
-                            .getContact(selectedOutbreak.id, params.contactId)
-                            .catch((err) => {
-                                // show error message
-                                this.snackbarService.showError(err.message);
-
-                                // redirect to cases
-                                this.disableDirtyConfirm();
-                                this.router.navigate(['/contacts']);
-                                return ErrorObservable.create(err);
-                            })
-                            .subscribe((contactData: ContactModel) => {
-                                // initialize contact
-                                this.contactData = contactData;
-                            });
-                    });
+                this.loadContact();
             });
+
+        this.outbreakDataService
+            .getSelectedOutbreak()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+
+                this.loadContact();
+            });
+    }
+
+    private loadContact() {
+        if (
+            this.contactId &&
+            this.selectedOutbreak
+        ) {
+            // retrieve contact information
+            this.contactDataService
+                .getContact(this.selectedOutbreak.id, this.contactId)
+                .catch((err) => {
+                    this.snackbarService.showApiError(err);
+
+                    this.disableDirtyConfirm();
+                    this.router.navigate(['/contacts']);
+                    return ErrorObservable.create(err);
+                })
+                .subscribe((contactData: ContactModel) => {
+                    this.contactData = contactData;
+
+                    this.initializeBreadcrumbs();
+                });
+        }
+    }
+
+    private initializeBreadcrumbs() {
+        if (
+            this.contactData
+        ) {
+            this.breadcrumbs = [
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
+                new BreadcrumbItemModel(this.contactData.name, `/contacts/${this.contactData.id}/view`),
+                new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', `/contacts/contact-related-follow-ups/${this.contactId}`),
+                new BreadcrumbItemModel('LNG_PAGE_CREATE_FOLLOW_UP_TITLE', '.', true)
+            ];
+        }
     }
 
     /**
@@ -119,7 +134,7 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
             this.followUpsDataService
                 .createFollowUp(this.selectedOutbreak.id, this.contactData.id, dirtyFields)
                 .catch((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     loadingDialog.close();
                     return ErrorObservable.create(err);
                 })

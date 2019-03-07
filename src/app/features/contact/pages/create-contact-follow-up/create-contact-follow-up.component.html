@@ -18,7 +18,7 @@
                     <div fxLayout="column">
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <div>{{EntityType.CONTACT | translate}}</div>
-                            <a [routerLink]="['/contacts', contactData.id, 'modify']">{{ contactData.name }}</a>
+                            <a [routerLink]="['/contacts', contactData?.id, 'modify']">{{ contactData?.name }}</a>
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
@@ -69,7 +69,7 @@
                 <app-form-fill-questionnaire
                     name="questionnaireAnswers"
                     [ngModel]="followUpData.questionnaireAnswers"
-                    [questions]="selectedOutbreak.contactFollowUpTemplate">
+                    [questions]="selectedOutbreak?.contactFollowUpTemplate">
                 </app-form-fill-questionnaire>
 
                 <div class="stepper-wrapper">

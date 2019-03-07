@@ -184,7 +184,9 @@
                                     fxFlex fxLayout="column"
                                     class="follow-up-range-date-column-data-info"
                                     [matTooltip]="'Contact: ' + contactFollowUpData.contact.name + ' / ' + 'Date: ' + date + ' / ' + (dailyStatuses[followUp.statusId]?.value | translate)"
-                                    [routerLink]="['/contacts', followUp.personId, 'follow-ups', followUp.id, 'view' ]">
+                                    [routerLink]="['/contacts', followUp.personId, 'follow-ups', followUp.id, 'view' ]"
+                                    [queryParams]="{rootPage: rootPage}"
+                                >
 
                                     <!-- FollowUp alerted icon -->
                                     <img

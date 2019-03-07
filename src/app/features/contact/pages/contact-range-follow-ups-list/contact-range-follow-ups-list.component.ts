@@ -20,6 +20,7 @@ import { DialogService, ExportDataExtension } from '../../../../core/services/he
 import { DialogField, LoadingDialogModel } from '../../../../shared/components';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { FormDateRangeSliderData } from '../../../../shared/xt-forms/components/form-date-range-slider/form-date-range-slider.component';
+import { FollowUpPage } from '../../typings/follow-up-page';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -45,6 +46,9 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
+
+    // which follow-ups list page are we visiting?
+    rootPage: FollowUpPage = FollowUpPage.RANGE;
 
     // follow ups list
     followUpsGroupedByContact: {
