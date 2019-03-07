@@ -15,6 +15,12 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { v4 as uuid } from 'uuid';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FormSelectChangeDetectionPushComponent } from '../../../../shared/components/form-select-change-detection-push/form-select-change-detection-push.component';
+import { SavedImportMappingService } from '../../../../core/services/data/saved-import-mapping.data.service';
+import {
+    DialogConfiguration, DialogField,
+    DialogFieldType
+} from '../../../../shared/components/dialog/dialog.component';
+import { SavedImportMappingModel } from '../../../../core/models/saved-import-mapping.model';
 
 export enum ImportDataExtension {
     CSV = '.csv',
@@ -297,7 +303,8 @@ export class ImportDataComponent implements OnInit {
         private dialogService: DialogService,
         private i18nService: I18nService,
         private formHelper: FormHelperService,
-        private importExportDataService: ImportExportDataService
+        private importExportDataService: ImportExportDataService,
+        private savedImportMappingService: SavedImportMappingService
     ) {
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
         if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
@@ -713,6 +720,37 @@ export class ImportDataComponent implements OnInit {
             // add option
             importableItem.mappedOptions.push(mapOpt);
         });
+    }
+
+    saveImportMapping() {
+        this.dialogService
+            .showInput(
+                new DialogConfiguration({
+                    message: 'LNG_DIALOG_SAVE_MAPPING_IMPORTS_TITLE',
+                    yesLabel: 'LNG_SIDE_FILTERS_SAVE_MAPPING_IMPORTS_BUTTON',
+                    required: true,
+                    fieldsList: [
+                        new DialogField({
+                            name: 'mappingImportName',
+                            placeholder: 'LNG_PAGE_LIST_SAVED_MAPPING_IMPORT_FIELD_LABEL_NAME',
+                            required: true,
+                            fieldType: DialogFieldType.TEXT,
+                        }),
+                        new DialogField({
+                            name: 'isPublic',
+                            placeholder: 'LNG_PAGE_LIST_SAVED_MAPPING_IMPORT_FIELD_LABEL_PUBLIC',
+                            fieldType: DialogFieldType.BOOLEAN
+                        })
+                    ]
+                }), true)
+            .subscribe((answer: DialogAnswer) => {
+                this.savedImportMappingService.saveImportMapping(new SavedImportMappingModel({})).catch((err) => {
+                    this.snackbarService.showApiError(err);
+                    return ErrorObservable.create(err);
+                }).subscribe(() => {
+                    this.snackbarService.showSuccess(`success message imported`);
+                });
+            });
     }
 
     /**

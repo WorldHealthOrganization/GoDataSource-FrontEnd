@@ -90,6 +90,16 @@
         *ngIf="!displayLoading && importableObject && !errMsgDetails"
         fxFlex fxLayout="column" fxLayoutGap="30px"
         class="import-data-map-fields">
+
+        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+
+            <app-form-select></app-form-select>
+
+            <div fxFlex><!-- placeholder --></div>
+            <div fxFlex><!-- placeholder --></div>
+            <div fxFlex><!-- placeholder --></div>
+        </div>
+
         <form
             #form="ngForm"
             (submit)="importData(form)">
@@ -236,11 +246,20 @@
             <div
                 fxFlex fxLayout="row" fxLayoutAlign="end">
                 <button
+                    (click)="saveImportMapping()"
+                    class="save-import-mapping-button"
+                    mat-raised-button
+                    color="accent">
+                    {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SAVE_IMPORT_MAPPING' | translate }}
+                </button>
+
+                <button
                     mat-raised-button
                     color="accent"
                     type="submit">
                     {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' | translate }}
                 </button>
+
             </div>
         </form>
     </div>

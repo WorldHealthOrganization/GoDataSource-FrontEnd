@@ -32,6 +32,10 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
     }
 
     ngOnInit() {
+        // initialize pagination
+        this.initPaginator();
+        // ...and re-load the list
+        this.needsRefreshList(true);
     }
 
     /**

@@ -113,21 +113,6 @@
                         {{ 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_CLUSTER' | translate }}
                     </button>
 
-                    <button *ngIf="hasCaseReadAccess() || hasContactReadAccess()"
-                            mat-menu-item [routerLink]="['.', item.id, 'people']">
-                        {{ 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_PEOPLE' | translate }}
-                    </button>
-
-                    <ng-container *app-selected-outbreak-is-active>
-                        <button *ngIf="hasOutbreakWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                            {{ 'LNG_PAGE_LIST_CLUSTERS_ACTION_MODIFY_CLUSTER' | translate }}
-                        </button>
-
-                        <button *ngIf="hasOutbreakWriteAccess()" mat-menu-item class="mat-menu-item-delete"
-                                (click)="deleteCluster(item)">
-                            {{ 'LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_CLUSTER' | translate }}
-                        </button>
-                    </ng-container>
                 </mat-menu>
             </mat-cell>
         </ng-container>
