@@ -34,8 +34,6 @@ import 'rxjs/add/operator/mergeMap';
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
 import { tap } from 'rxjs/operators';
-import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
-import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
 
 @Component({
     selector: 'app-contacts-list',
@@ -88,7 +86,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     availableSideFilters: FilterModel[];
     // values for side filter
     savedFiltersType = Constants.APP_PAGE.CONTACTS.value;
-    availableSavedFilters$: Observable<SavedFilterModel[]>;
 
     // print daily Follow-ups
     exportContactsDailyFollowUpListUrl: string;
@@ -140,7 +137,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
-        private savedFilterService: SavedFiltersService
     ) {
         super(
             snackbarService,

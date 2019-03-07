@@ -164,6 +164,7 @@ export class SideFiltersComponent implements OnInit {
                         new DialogField({
                             name: 'filterName',
                             placeholder: 'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_NAME',
+                            description: 'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_NAME_DESCRIPTION',
                             required: true,
                             fieldType: DialogFieldType.TEXT,
                     }),

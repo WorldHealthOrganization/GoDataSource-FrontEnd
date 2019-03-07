@@ -5,7 +5,7 @@ import * as fromPages from './pages';
 
 const routes: Routes = [
     {
-        path: ``,
+        path: '',
         component: fromPages.SavedFiltersComponent
     }
 ];

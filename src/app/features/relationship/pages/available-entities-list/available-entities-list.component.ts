@@ -4,7 +4,6 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Observable } from 'rxjs/Observable';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -21,9 +20,6 @@ import { FilterModel, FilterType } from '../../../../shared/components/side-filt
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { tap } from 'rxjs/operators';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
-import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
-import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -43,7 +39,6 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
 
     // saved filters type
     savedFiltersType = Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_RELATIONSHIPS.value;
-    availableSavedFilters$: Observable<SavedFilterModel[]>;
 
     // reference data
     genderList$: Observable<any[]>;
@@ -64,10 +59,8 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         protected authDataService: AuthDataService,
         protected outbreakDataService: OutbreakDataService,
         protected entityDataService: EntityDataService,
-        private relationshipDataService: RelationshipDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private savedFilterService: SavedFiltersService
     ) {
         super(
             snackbarService, router, route,

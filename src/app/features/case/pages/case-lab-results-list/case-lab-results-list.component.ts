@@ -21,10 +21,7 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { tap } from 'rxjs/operators';
-import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
-import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
 import { Constants } from '../../../../core/models/constants';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -62,7 +59,6 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     availableSideFilters: FilterModel[];
     // values for side filter
     savedFiltersType = Constants.APP_PAGE.CASE_LAB_RESULTS.value;
-    availableSavedFilters$: Observable<SavedFilterModel[]>;
 
     constructor(
         private route: ActivatedRoute,
@@ -72,8 +68,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService,
-        private savedFilterService: SavedFiltersService
+        private genericDataService: GenericDataService
     ) {
         super(
             snackbarService
