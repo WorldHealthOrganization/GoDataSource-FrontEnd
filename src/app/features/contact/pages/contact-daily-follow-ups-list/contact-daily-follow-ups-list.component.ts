@@ -149,8 +149,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         // initialize print and export
                         this.initializeFollowUpsExport();
                         this.initializeFollowUpsPrint();
-                        // get saved filters
-                        this.getAvailableSavedFilters();
+
                         // initialize pagination
                         this.initPaginator();
                         // ...and re-load the list when the Selected Outbreak is changed
@@ -190,22 +189,6 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                     this.initializeBreadcrumbs();
                 });
         }
-    }
-
-    /**
-     * Get available saved side filters
-     */
-    getAvailableSavedFilters() {
-
-        const qb = new RequestQueryBuilder();
-
-        qb.filter.where({
-            filterKey: {
-                eq: this.savedFiltersType
-            }
-        });
-
-        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
     }
 
     /**

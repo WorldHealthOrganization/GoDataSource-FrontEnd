@@ -225,30 +225,12 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
             });
-        // get saved filters
-        this.getAvailableSavedFilters();
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
 
         // initialize side filters
         this.initializeSideFilters();
-    }
-
-    /**
-     * Get available saved side filters
-     */
-    getAvailableSavedFilters() {
-
-        const qb = new RequestQueryBuilder();
-
-        qb.filter.where({
-            filterKey: {
-                eq: this.savedFiltersType
-            }
-        });
-
-        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
     }
 
     /**

@@ -199,9 +199,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     // get cases grouped by classification
                     this.getCasesGroupedByClassification();
 
-                    // get available saved filters for side filters
-                    this.getAvailableSavedFilters();
-
                     // initialize side filters
                     this.initializeSideFilters();
                 }
@@ -513,20 +510,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             });
     }
 
-    /**
-     * Get available saved side filters
-     */
-    getAvailableSavedFilters() {
-        const qb = new RequestQueryBuilder();
-
-        qb.filter.where({
-            filterKey: {
-                eq: this.savedFiltersType
-            }
-        });
-
-        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
-    }
 
     /**
      * Check if we have write access to cases

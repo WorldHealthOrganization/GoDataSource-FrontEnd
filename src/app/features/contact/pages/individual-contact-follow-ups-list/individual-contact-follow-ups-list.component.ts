@@ -123,8 +123,6 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                         // initialize print and export
                         this.initializeFollowUpsExport();
                         this.initializeFollowUpsPrint();
-                        // get saved filters
-                        this.getAvailableSavedFilters();
 
                         // initialize pagination
                         this.initPaginator();
@@ -146,22 +144,6 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
-    }
-
-    /**
-     * Get available saved side filters
-     */
-    getAvailableSavedFilters() {
-
-        const qb = new RequestQueryBuilder();
-
-        qb.filter.where({
-            filterKey: {
-                eq: this.savedFiltersType
-            }
-        });
-
-        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
     }
 
     /**

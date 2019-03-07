@@ -204,21 +204,6 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         }
     }
 
-    /**
-     * Get available saved side filters
-     */
-    getAvailableSavedFilters() {
-        const qb = new RequestQueryBuilder();
-
-        qb.filter.where({
-            filterKey: {
-                eq: this.savedFiltersType
-            }
-        });
-
-        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
-    }
-
     private generateSideFilters() {
         this.availableSideFilters = [
             new FilterModel({

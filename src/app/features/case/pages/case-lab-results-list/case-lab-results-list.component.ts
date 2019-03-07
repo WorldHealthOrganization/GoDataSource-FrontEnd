@@ -100,8 +100,6 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                             this.breadcrumbs.push(new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/view`));
                             this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', '.', true));
 
-                            // get saved filters
-                            this.getAvailableSavedFilters();
                             // initialize pagination
                             this.initPaginator();
                             // ...and load the list of items
@@ -122,22 +120,6 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
 
         // initialize side filters
         this.initializeSideFilters();
-    }
-
-    /**
-     * Get available saved side filters
-     */
-    getAvailableSavedFilters() {
-
-        const qb = new RequestQueryBuilder();
-
-        qb.filter.where({
-            filterKey: {
-                eq: this.savedFiltersType
-            }
-        });
-
-        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
     }
 
     /**

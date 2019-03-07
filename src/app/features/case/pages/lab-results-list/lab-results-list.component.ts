@@ -106,24 +106,6 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
         this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST).share();
         this.labTestResultsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT).share();
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-        // get available saved filters for side filters
-        this.getAvailableSavedFilters();
-    }
-
-    /**
-     * Get available saved side filters
-     */
-    getAvailableSavedFilters() {
-
-        const qb = new RequestQueryBuilder();
-
-        qb.filter.where({
-            filterKey: {
-                eq: this.savedFiltersType
-            }
-        });
-
-        this.availableSavedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
     }
 
     /**
