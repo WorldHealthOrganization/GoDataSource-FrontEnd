@@ -56,6 +56,7 @@ export class QuestionModel {
     variable: string;
     category: string;
     required: boolean;
+    inactive: boolean;
     order: number = 1;
     answerType: string;
     answers: AnswerModel[];
@@ -73,6 +74,7 @@ export class QuestionModel {
         this.variable = _.get(data, 'variable');
         this.category = _.get(data, 'category');
         this.required = _.get(data, 'required');
+        this.inactive = _.get(data, 'inactive');
         this.order = _.get(data, 'order');
         this.answerType = _.get(data, 'answerType');
 

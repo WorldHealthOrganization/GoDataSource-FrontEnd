@@ -18,6 +18,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE': 'Shape',
 
         /**
+         * uiOutbreakQuestionnaireTemplates
+         */
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE': 'Inactive?',
+
+        /**
          * uiAddressFields
          */
         'LNG_ADDRESS_FIELD_LABEL_DATE': 'Valid until',
