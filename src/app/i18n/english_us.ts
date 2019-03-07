@@ -23,6 +23,38 @@ export const EnglishUsLang = {
         'LNG_ADDRESS_FIELD_LABEL_DATE': 'Valid until',
 
         /**
+         * uiCommonButtons
+         */
+        'LNG_COMMON_BUTTON_EXPOSURES_FROM': 'Contacts',
+        'LNG_COMMON_BUTTON_EXPOSURES_TO': 'Exposures',
+
+        /**
+         * uiGeneralActions
+         */
+        'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM': 'See contacts',
+        'LNG_PAGE_ACTION_SEE_EXPOSURES_TO': 'See exposures',
+
+        /**
+         * uiEntityRelationshipsListShareAssignCreatePages
+         */
+        'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE': 'Share exposures with',
+        'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE': 'Share contacts with',
+        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_ACTION_CREATE_RELATIONSHIP_BUTTON': 'Create relationships',
+
+        /**
+         * uiEntityRelationshipsListPage
+         */
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE': 'Exposures',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE': 'Contacts',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_EXPOSURES': 'Share selected exposures',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_CONTACTS': 'Share selected contacts',
+
+        /**
+         * uiCreateEntityRelationshipPage
+         */
+        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_TITLE': 'Create',
+
+        /**
          * NEW GROUP
          * uiSavedFiltersListPage
          */
@@ -74,9 +106,16 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL': 'Load filter',
         'LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE': 'Filter saved',
 
+
         /**
-         * REMOVE
+         * REMOVE the tokens from below
          */
+        // LNG_PAGE_ACTION_SEE_RELATIONSHIPS
+        // LNG_COMMON_BUTTON_RELATIONSHIPS
+        // LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_TYPE
+        // LNG_PAGE_LIST_ENTITY_SHARE_RELATIONSHIPS_TITLE
+        // LNG_COMMON_BUTTON_ASSIGN_TO
+        // LNG_COMMON_BUTTON_SHARE_RELATIONSHIPS
         // LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE
         // LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP
     }

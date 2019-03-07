@@ -58,24 +58,7 @@ export class CaseModel {
     }[];
 
     alerted: boolean = false;
-
-    /**
-     * Return case id mask with data replaced
-     * @param caseIdMask
-     */
-    static generateCaseIDMask(caseIdMask: string): string {
-        // validate
-        if (_.isEmpty(caseIdMask)) {
-            return '';
-        }
-
-        // !!!!!!!!!!!!!!!
-        // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
-        // !!!!!!!!!!!!!!!
-        return caseIdMask
-            .replace(/YYYY/g, moment().format('YYYY'))
-            .replace(/\*/g, '');
-    }
+    relationship: any;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -137,6 +120,25 @@ export class CaseModel {
         });
 
         this.classificationHistory = _.get(data, 'classificationHistory', []);
+        this.relationship = _.get(data, 'relationship');
+    }
+
+    /**
+     * Return case id mask with data replaced
+     * @param caseIdMask
+     */
+    static generateCaseIDMask(caseIdMask: string): string {
+        // validate
+        if (_.isEmpty(caseIdMask)) {
+            return '';
+        }
+
+        // !!!!!!!!!!!!!!!
+        // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
+        // !!!!!!!!!!!!!!!
+        return caseIdMask
+            .replace(/YYYY/g, moment().format('YYYY'))
+            .replace(/\*/g, '');
     }
 
     /**

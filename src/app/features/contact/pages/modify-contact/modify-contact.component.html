@@ -146,9 +146,9 @@
                 <mat-card class="page-section">
                     <div fxLayout="column">
 
-                        <div fxLayout="row">
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-select
-                                fxFlex="25"
+                                fxFlex
                                 name="riskLevel"
                                 [(ngModel)]="contactData.riskLevel"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL' | translate"
@@ -156,6 +156,10 @@
                                 [options]="riskLevelsList$ | async"
                                 [disabled]="viewOnly">
                             </app-form-select>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
                         </div>
 
                         <div fxLayout="row">
@@ -231,17 +235,20 @@
 
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CONTACT, contactData.id]">
-            {{ 'LNG_COMMON_BUTTON_RELATIONSHIPS' | translate }}
+        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CONTACT, contactData.id, 'exposures']">
+            {{ 'LNG_COMMON_BUTTON_EXPOSURES_TO' | translate }}
+        </button>
+
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button mat-raised-button type="button" [routerLink]="['/contacts/contact-related-follow-ups', contactData.id]">
+            {{ 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_FOLLOW_UPS' | translate }}
         </button>
         <button mat-raised-button type="button" [routerLink]="['/contacts', contactData.id, 'movement']">
             {{ 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_MOVEMENT' | translate }}
         </button>
         <button mat-raised-button type="button" [routerLink]="['/contacts', contactData.id, 'chronology']">
             {{ 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_CHRONOLOGY' | translate }}
-        </button>
-        <button mat-raised-button type="button" [routerLink]="['/contacts/contact-related-follow-ups', contactData.id]">
-            {{ 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_FOLLOW_UPS' | translate }}
         </button>
     </div>
 </form>

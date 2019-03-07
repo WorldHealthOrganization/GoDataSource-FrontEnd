@@ -17,6 +17,7 @@ export class EventModel {
     deleted: boolean;
 
     inconsistencies: InconsistencyModel[];
+    relationship: any;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -37,6 +38,16 @@ export class EventModel {
         _.each(this.inconsistencies, (inconsistency, index) => {
             this.inconsistencies[index] = new InconsistencyModel(inconsistency);
         });
+
+        this.relationship = _.get(data, 'relationship');
+    }
+
+    get firstName(): string {
+        return this.name;
+    }
+
+    get lastName(): string {
+        return '';
     }
 
     /**
