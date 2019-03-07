@@ -45,6 +45,7 @@ import { AuditLogDataService } from './data/audit-log.data.service';
 import { HelpDataService } from './data/help.data.service';
 import { GlobalEntitySearchDataService } from './data/global-entity-search.data.service';
 import { DeviceDataService } from './data/device.data.service';
+import { SavedImportMappingService } from './data/saved-import-mappings.data.service';
 
 // export the list of services
 export const services: any[] = [
@@ -74,6 +75,7 @@ export const services: any[] = [
     TransmissionChainDataService,
     ImportExportDataService,
     IconDataService,
+    SavedImportMappingService,
     SystemSettingsDataService,
     SystemBackupDataService,
     SystemSyncDataService,

@@ -22,5 +22,10 @@ export const EnglishUsLang = {
          */
         'LNG_ADDRESS_FIELD_LABEL_DATE': 'Valid until',
 
+        /**
+         * uiGenericLayout
+         */
+        'LNG_LAYOUT_MENU_ITEM_SAVED_IMPORT_MAPPING_LABEL': 'Saved import mapping',
+
     }
 };

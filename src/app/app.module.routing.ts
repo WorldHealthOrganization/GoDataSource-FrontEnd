@@ -72,6 +72,18 @@ const routes: Routes = [
                     permissions: [PERMISSION.READ_SYS_CONFIG]
                 }
             },
+            // Saved Import Mapping Module routes
+            {
+                path: ModulePath.SavedImportMappingModule,
+                loadChildren: './features/saved-import-mapping/saved-import-mapping.module#SavedImportMappingModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                }
+            },
             // Terms of use Module routes
             {
                 path: ModulePath.TermsOfUseModule,

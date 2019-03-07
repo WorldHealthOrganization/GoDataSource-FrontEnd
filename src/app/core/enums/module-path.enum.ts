@@ -20,6 +20,7 @@ export enum ModulePath {
     TeamModule = 'teams',
     AuditLogModule = 'audit-log',
     CloudBackupModule = 'cloud-backup',
+    SavedImportMappingModule = 'saved-import-mapping',
     TermsOfUseModule = 'terms-of-use',
     LanguageModule = 'languages',
     HelpModule = 'help'
