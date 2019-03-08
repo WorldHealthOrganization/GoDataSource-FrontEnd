@@ -4,6 +4,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ImportDataExtension, ImportServerModelNames } from '../../components/import-data/import-data.component';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-import-case-data',
@@ -32,6 +33,9 @@ export class ImportCaseDataComponent implements OnInit {
         ImportDataExtension.ODS,
         ImportDataExtension.JSON
     ];
+
+    // Constants for template usage
+    Constants = Constants;
 
     displayLoading: boolean = true;
 

@@ -11,8 +11,7 @@ export class SavedImportField {
         destination?: string,
         options?: SavedImportOption[],
         levels?: number[]
-    } = {})
-    {
+    } = {}) {
         Object.assign(
             this,
             data
@@ -27,8 +26,7 @@ export class SavedImportOption {
     constructor(data: {
         source?: string,
         destination?: string
-    } = {})
-    {
+    } = {}) {
         Object.assign(
             this,
             data
@@ -37,11 +35,10 @@ export class SavedImportOption {
 }
 
 export class SavedImportMappingModel {
-
     id: string;
     name: string;
     isPublic: boolean;
-    readonly: boolean;
+    readOnly: boolean;
     mappingKey: string;
     mappingData: SavedImportField[];
 
@@ -49,14 +46,15 @@ export class SavedImportMappingModel {
         id?: string,
         name?: string,
         isPublic?: boolean,
-        readonly?: boolean,
+        readOnly?: boolean,
+        mappingKey?: string,
         mappingData?: SavedImportField[]
     }) {
         this.id = _.get(data, 'id');
         this.name = _.get(data, 'name');
-        this.mappingKey= _.get(data, 'mappingKey');
         this.isPublic = _.get(data, 'isPublic', false);
-        this.readonly = _.get(data, 'readonly', false);
+        this.readOnly = _.get(data, 'readOnly', false);
+        this.mappingKey = _.get(data, 'mappingKey');
         this.mappingData = _.get(data, 'mappingData', []);
     }
 }

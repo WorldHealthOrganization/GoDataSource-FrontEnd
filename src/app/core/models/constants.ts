@@ -162,6 +162,20 @@ export class Constants {
     };
 
     /**
+     *Pages that have import options
+     */
+    static APP_IMPORT_PAGE = {
+        CASE: {
+            label: 'LNG_APP_PAGE_IMPORT_CASES',
+            value: 'LNG_APP_PAGE_IMPORT_CASES'
+        },
+        CONTACTS: {
+            label: 'LNG_APP_PAGE_IMPORT_CONTACTS',
+            value: 'LNG_APP_PAGE_IMPORT_CONTACTS'
+        }
+    };
+
+    /**
      * System sync log status
      */
     static SYSTEM_SYNC_LOG_STATUS = {

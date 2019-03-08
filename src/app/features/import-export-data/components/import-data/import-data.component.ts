@@ -20,7 +20,13 @@ import {
     DialogConfiguration, DialogField,
     DialogFieldType
 } from '../../../../shared/components/dialog/dialog.component';
-import { SavedImportMappingModel } from '../../../../core/models/saved-import-mapping.model';
+import {
+    SavedImportField, SavedImportMappingModel,
+    SavedImportOption
+} from '../../../../core/models/saved-import-mapping.model';
+import { Constants } from '../../../../core/models/constants';
+import { Observable } from 'rxjs/Observable';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 
 export enum ImportDataExtension {
     CSV = '.csv',
@@ -117,6 +123,16 @@ export class ImportDataComponent implements OnInit {
     get model(): string {
         return this._model;
     }
+
+    /**
+     * Saved import mapping
+     */
+    @Input() savedImportPage: string;
+
+    /**
+     * ...
+     */
+    savedMappingsList$: Observable<SavedImportMappingModel[]>;
 
     /**
      * File uploader
@@ -331,6 +347,9 @@ export class ImportDataComponent implements OnInit {
      * Component initialized
      */
     ngOnInit() {
+        // get saved import mapping
+        this.getSavedImportMappings();
+
         // init uploader
         this.uploader = new FileUploader({
             allowedMimeType: this.allowedMimeTypes,
@@ -646,6 +665,22 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
+     * ....
+     */
+    getSavedImportMappings() {
+        const qb = new RequestQueryBuilder();
+
+        // ...
+        qb.filter.where({
+            mappingKey: {
+                eq: this.savedImportPage
+            }
+        });
+
+        this.savedMappingsList$ = this.savedImportMappingService.getSavedImportMappingsList(qb);
+    }
+
+    /**
      * Add drop-downs for mapping a drop-down type options
      * @param importableItem
      */
@@ -722,6 +757,9 @@ export class ImportDataComponent implements OnInit {
         });
     }
 
+    /**
+     * Save an import mapping
+     */
     saveImportMapping() {
         this.dialogService
             .showInput(
@@ -744,13 +782,62 @@ export class ImportDataComponent implements OnInit {
                     ]
                 }), true)
             .subscribe((answer: DialogAnswer) => {
-                this.savedImportMappingService.saveImportMapping(new SavedImportMappingModel({})).catch((err) => {
+            // create the array who will contain all mapped fields for saving in data base
+            const mappedImportFieldsForSaving = [];
+                _.each(this.mappedFields, (mappedField: ImportableMapField) => {
+                    mappedImportFieldsForSaving.push(new SavedImportField({
+                        source: mappedField.sourceField,
+                        destination: mappedField.destinationField,
+                        options: this.mappedFiledOptions(mappedField.mappedOptions),
+                        levels: mappedField.sourceDestinationLevel
+                    }));
+                });
+                this.savedImportMappingService.saveImportMapping(new SavedImportMappingModel({
+                    name: answer.inputValue.value.mappingImportName,
+                    isPublic: answer.inputValue.value.isPublic,
+                    mappingKey: 'LNG_APP_PAGE_IMPORT_CASES',
+                    mappingData: mappedImportFieldsForSaving
+                })).catch((err) => {
                     this.snackbarService.showApiError(err);
                     return ErrorObservable.create(err);
                 }).subscribe(() => {
                     this.snackbarService.showSuccess(`success message imported`);
                 });
             });
+    }
+
+    /**
+     * Create the options array for each field
+     * @param fieldOptions
+     * @returns {SavedImportOption[]}
+     */
+    mappedFiledOptions(fieldOptions): SavedImportOption[] {
+        // create the array we'll return
+        const mappedFieldOptions = [];
+        // if field options are not empty, for each option push a new model of option to be saved
+        if (!_.isEmpty(fieldOptions)) {
+            _.each(fieldOptions, (fieldOption) => {
+                mappedFieldOptions.push(new SavedImportOption({
+                    source: fieldOption.sourceOption ? fieldOption.sourceOption : '' ,
+                    destination: fieldOption.destinationOption ? fieldOption.destinationOption : ''
+                }));
+            });
+        }
+
+        return mappedFieldOptions;
+    }
+
+    /**
+     * Load a saved import mapping
+     */
+    loadSavedImportMapping(savedImportMapping: SavedImportMappingModel) {
+        console.log(savedImportMapping.mappingData);
+        console.log(this.mappedFields);
+        this.mappedFields = [];
+        _.each(savedImportMapping.mappingData, (option) => {
+            console.log(option);
+             this.mappedFields.push(new ImportableMapField(option.destinationField, option.sourceField));
+        });
     }
 
     /**
