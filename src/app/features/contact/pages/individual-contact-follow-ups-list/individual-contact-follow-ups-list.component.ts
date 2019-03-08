@@ -26,6 +26,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { tap } from 'rxjs/operators';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { DialogField } from '../../../../shared/components';
+import { FollowUpPage } from '../../typings/follow-up-page';
 
 @Component({
     selector: 'app-individual-contact-follow-ups-list',
@@ -62,6 +63,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
 
     contactId: string;
     contactData: ContactModel;
+
+    // which follow-ups list page are we visiting?
+    rootPage: FollowUpPage = FollowUpPage.FOR_CONTACT;
 
     // subscribers
     outbreakSubscriber: Subscription;

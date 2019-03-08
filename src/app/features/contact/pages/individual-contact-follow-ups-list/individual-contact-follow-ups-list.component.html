@@ -386,7 +386,11 @@
                     </button>
 
                     <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-                        <button mat-menu-item [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'view' ]">
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'view' ]"
+                            [queryParams]="{rootPage: rootPage}"
+                        >
                             {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_VIEW_FOLLOW_UP' | translate }}
                         </button>
 
@@ -399,7 +403,9 @@
                                         *ngIf="item.personId && !Constants.isDateInTheFuture(item.date)">
                                         <button
                                             mat-menu-item
-                                            [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'modify']">
+                                            [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'modify']"
+                                            [queryParams]="{rootPage: rootPage}"
+                                        >
                                             {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_FOLLOW_UP' | translate }}
                                         </button>
 

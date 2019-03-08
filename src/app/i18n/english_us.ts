@@ -13,6 +13,12 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiFollowUpsListPage
+         */
+        'LNG_PAGE_LIST_FOLLOW_UPS_TITLE': 'Follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_FOR_RELATED_CONTACTS_TITLE': 'Follow-ups for related contacts',
+
+        /**
          * uiChainsOfTransmissionGraph
          */
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE': 'Shape',
