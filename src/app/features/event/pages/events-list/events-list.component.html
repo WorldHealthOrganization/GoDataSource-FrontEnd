@@ -285,8 +285,14 @@
 
                         <button
                             mat-menu-item
-                            [routerLink]="['/relationships', EntityType.EVENT, item.id]">
-                            {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
+                            [routerLink]="['/relationships', EntityType.EVENT, item.id, 'contacts']">
+                            {{'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM' | translate}}
+                        </button>
+
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/relationships', EntityType.EVENT, item.id, 'exposures']">
+                            {{'LNG_PAGE_ACTION_SEE_EXPOSURES_TO' | translate}}
                         </button>
                     </ng-container>
 

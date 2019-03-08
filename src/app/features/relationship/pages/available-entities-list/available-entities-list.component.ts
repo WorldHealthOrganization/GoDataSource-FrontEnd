@@ -3,13 +3,9 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
@@ -23,6 +19,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { tap } from 'rxjs/operators';
+import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -30,37 +27,18 @@ import { tap } from 'rxjs/operators';
     templateUrl: './available-entities-list.component.html',
     styleUrls: ['./available-entities-list.component.less']
 })
-export class AvailableEntitiesListComponent extends ListComponent implements OnInit {
-
+export class AvailableEntitiesListComponent extends RelationshipsListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // Entities Map for specific data
-    entityMap = {
-        [EntityType.CASE]: {
-            'label': 'LNG_PAGE_LIST_CASES_TITLE',
-            'link': '/cases'
-        },
-        [EntityType.CONTACT]: {
-            'label': 'LNG_PAGE_LIST_CONTACTS_TITLE',
-            'link': '/contacts'
-        },
-        [EntityType.EVENT]: {
-            'label': 'LNG_PAGE_LIST_EVENTS_TITLE',
-            'link': '/events'
-        }
-    };
-
-    // selected outbreak ID
-    outbreakId: string;
-    // route params
-    entityType: EntityType;
-    entityId: string;
     // entities list relationships
     entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
     entitiesListCount$: Observable<any>;
 
     // available side filters
     availableSideFilters: FilterModel[];
+
+    // saved filters type
+    savedFiltersType = Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_RELATIONSHIPS.value;
 
     // reference data
     genderList$: Observable<any[]>;
@@ -75,22 +53,24 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     EntityType = EntityType;
 
     constructor(
-        private router: Router,
-        private route: ActivatedRoute,
-        private authDataService: AuthDataService,
-        private entityDataService: EntityDataService,
-        private relationshipDataService: RelationshipDataService,
-        private outbreakDataService: OutbreakDataService,
         protected snackbarService: SnackbarService,
+        protected router: Router,
+        protected route: ActivatedRoute,
+        protected authDataService: AuthDataService,
+        protected outbreakDataService: OutbreakDataService,
+        protected entityDataService: EntityDataService,
         private genericDataService: GenericDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
     ) {
         super(
-            snackbarService
+            snackbarService, router, route,
+            authDataService, outbreakDataService, entityDataService
         );
     }
 
     ngOnInit() {
+        super.ngOnInit();
+
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).share();
@@ -114,85 +94,87 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
 
         // side filters
         this.generateSideFilters();
+    }
 
-        this.route.params
-            .subscribe((params: {entityType, entityId}) => {
-                this.entityType = params.entityType;
-                this.entityId = params.entityId;
+    /**
+     * @Overrides parent method
+     */
+    onDataInitialized() {
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
 
-                // exclude current Entity from the list
-                this.queryBuilder.filter.where({
-                    id: {
-                        'neq': this.entityId
-                    }
-                });
-                // retrieve only available entity types
-                const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(this.entityType);
-                this.queryBuilder.filter.where({
-                    type: {
-                        'inq': availableTypes
-                    }
-                });
+        // initialize query builder
+        this.clearQueryBuilder();
 
-                // add new breadcrumb: Entity List page
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-                );
+        // initialize pagination
+        this.initPaginator();
+        // ...and (re)load the list
+        this.needsRefreshList(true);
+    }
 
-                // get selected outbreak
-                this.outbreakDataService
-                    .getSelectedOutbreak()
-                    .subscribe((selectedOutbreak: OutbreakModel) => {
-                        this.outbreakId = selectedOutbreak.id;
+    /**
+     * @Overrides parent method
+     */
+    onPersonLoaded() {
+        // (re)initialize breadcrumbs
+        this.initializeBreadcrumbs();
+    }
 
-                        // initialize pagination
-                        this.initPaginator();
-                        // ...and load the list of items
-                        this.needsRefreshList(true);
+    /**
+     * @Overrides parent method
+     */
+    clearQueryBuilder() {
+        // clear query builder
+        this.queryBuilder.clear();
 
-                        // get entity data
-                        this.entityDataService
-                            .getEntity(this.entityType, this.outbreakId, this.entityId)
-                            .catch((err) => {
-                                this.snackbarService.showError(err.message);
+        // apply default criterias
+        // exclude current person from the list
+        this.queryBuilder.filter.where({
+            id: {
+                'neq': this.entityId
+            }
+        });
+        // retrieve only available entity types
+        const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(this.entityType, this.relationshipType);
+        this.queryBuilder.filter.where({
+            type: {
+                'inq': availableTypes
+            }
+        });
+    }
 
-                                // Entity not found; navigate back to Entities list
-                                this.router.navigate([this.entityMap[this.entityType].link]);
-
-                                return ErrorObservable.create(err);
-                            })
-                            .subscribe((entityData: CaseModel|ContactModel|EventModel) => {
-                                // add new breadcrumb: Entity Modify page
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        entityData.name,
-                                        `${this.entityMap[this.entityType].link}/${this.entityId}/view`
-                                    )
-                                );
-                                // add new breadcrumb: Entity Relationships list
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE',
-                                        `/relationships/${this.entityType}/${this.entityId}`
-                                    )
-                                );
-                                // add new breadcrumb: page title
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE', null, true)
-                                );
-                            });
-                    });
-            });
+    private initializeBreadcrumbs() {
+        if (
+            this.relationshipType &&
+            this.entity
+        ) {
+            this.breadcrumbs = [
+                new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
+                new BreadcrumbItemModel(
+                    this.entity.name,
+                    `${this.entityMap[this.entityType].link}/${this.entityId}/view`
+                ),
+                new BreadcrumbItemModel(
+                    this.relationshipsListPageTitle,
+                    `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
+                ),
+                new BreadcrumbItemModel('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE', null, true)
+            ];
+        }
     }
 
     /**
      * Re(load) the available Entities list, based on the applied filter, sort criterias
      */
     refreshList() {
-        if (this.outbreakId && this.entityType && this.entityId) {
+        if (
+            this.entityType &&
+            this.entityId &&
+            this.selectedOutbreak
+        ) {
             // retrieve the list of Relationships
             this.entitiesList$ = this.entityDataService.getEntitiesList(
-                this.outbreakId,
+                this.selectedOutbreak.id,
                 this.queryBuilder
             )
                 .pipe(tap(this.checkEmptyList.bind(this)));
@@ -203,11 +185,15 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
      * Get total number of items, based on the applied filters
      */
     refreshListCount() {
-        if (this.outbreakId && this.entityType && this.entityId) {
+        if (
+            this.entityType &&
+            this.entityId &&
+            this.selectedOutbreak
+        ) {
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.entitiesListCount$ = this.entityDataService.getEntitiesCount(this.outbreakId, countQueryBuilder).share();
+            this.entitiesListCount$ = this.entityDataService.getEntitiesCount(this.selectedOutbreak.id, countQueryBuilder).share();
         }
     }
 
@@ -354,7 +340,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
 
         // redirect to next step
         this.router.navigate(
-            [`/relationships/${this.entityType}/${this.entityId}/create`],
+            [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/create`],
             {
                 queryParams: {
                     selectedEntityIds: JSON.stringify(selectedRecords)

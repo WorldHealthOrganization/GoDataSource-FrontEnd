@@ -26,6 +26,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { tap } from 'rxjs/operators';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { DialogField } from '../../../../shared/components';
+import { FollowUpPage } from '../../typings/follow-up-page';
 
 @Component({
     selector: 'app-individual-contact-follow-ups-list',
@@ -51,6 +52,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
 
     availableSideFilters: FilterModel[];
 
+    // values for side filter
+    savedFiltersType = Constants.APP_PAGE.INDIVIDUAL_CONTACT_FOLLOW_UPS.value;
+
     // provide constants to template
     Constants = Constants;
     UserSettings = UserSettings;
@@ -59,6 +63,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
 
     contactId: string;
     contactData: ContactModel;
+
+    // which follow-ups list page are we visiting?
+    rootPage: FollowUpPage = FollowUpPage.FOR_CONTACT;
 
     // subscribers
     outbreakSubscriber: Subscription;
@@ -75,7 +82,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
-        private contactDataService: ContactDataService
+        private contactDataService: ContactDataService,
     ) {
         super(
             snackbarService, dialogService, followUpsDataService,

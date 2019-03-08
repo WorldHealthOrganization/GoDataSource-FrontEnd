@@ -1,32 +1,27 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
-import { RelationshipModel } from '../../../../core/models/relationship.model';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Constants } from '../../../../core/models/constants';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
+import { UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import * as _ from 'lodash';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
-import { ContactModel } from '../../../../core/models/contact.model';
-import { EventModel } from '../../../../core/models/event.model';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { tap } from 'rxjs/operators';
+import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
+import { EntityModel } from '../../../../core/models/entity.model';
+import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -34,41 +29,11 @@ import { tap } from 'rxjs/operators';
     templateUrl: './entity-relationships-list.component.html',
     styleUrls: ['./entity-relationships-list.component.less']
 })
-export class EntityRelationshipsListComponent extends ListComponent implements OnInit {
-
+export class EntityRelationshipsListComponent extends RelationshipsListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // Entities Map for specific data
-    entityMap = {
-        [EntityType.CASE]: {
-            'label': 'LNG_PAGE_LIST_CASES_TITLE',
-            'link': '/cases',
-            'writePermission': PERMISSION.WRITE_CASE
-        },
-        [EntityType.CONTACT]: {
-            'label': 'LNG_PAGE_LIST_CONTACTS_TITLE',
-            'link': '/contacts',
-            'writePermission': PERMISSION.WRITE_CONTACT
-        },
-        [EntityType.EVENT]: {
-            'label': 'LNG_PAGE_LIST_EVENTS_TITLE',
-            'link': '/events',
-            'writePermission': PERMISSION.WRITE_EVENT
-        }
-    };
-
-    // authenticated user
-    authUser: UserModel;
-
-    // selected outbreak ID
-    outbreakId: string;
-
-    // route params
-    entityType: EntityType;
-    entityId: string;
-
     // list of relationships
-    relationshipsList$: Observable<RelationshipModel[]>;
+    relationshipsList$: Observable<EntityModel[]>;
     relationshipsListCount$: Observable<any>;
 
     // reference data
@@ -86,25 +51,26 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
     UserSettings = UserSettings;
 
     constructor(
-        private router: Router,
-        private route: ActivatedRoute,
-        private authDataService: AuthDataService,
-        private entityDataService: EntityDataService,
-        private relationshipDataService: RelationshipDataService,
-        private outbreakDataService: OutbreakDataService,
         protected snackbarService: SnackbarService,
+        protected router: Router,
+        protected route: ActivatedRoute,
+        protected authDataService: AuthDataService,
+        protected outbreakDataService: OutbreakDataService,
+        protected entityDataService: EntityDataService,
+        private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService
     ) {
         super(
-            snackbarService
+            snackbarService, router, route,
+            authDataService, outbreakDataService, entityDataService
         );
     }
 
     ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+        super.ngOnInit();
 
+        // reference data
         this.certaintyLevelList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL);
         this.exposureTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE);
         this.exposuresFrequencyList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY);
@@ -122,56 +88,44 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
             );
         });
 
-        this.route.params
-            .subscribe((params: { entityType, entityId }) => {
-                this.entityType = params.entityType;
-                this.entityId = params.entityId;
-
-                // add new breadcrumb: Entity List page
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-                );
-
-                // get selected outbreak
-                this.outbreakDataService
-                    .getSelectedOutbreak()
-                    .subscribe((selectedOutbreak: OutbreakModel) => {
-                        this.outbreakId = selectedOutbreak.id;
-
-                        // initialize pagination
-                        this.initPaginator();
-                        // ...and re-load the list when the Selected Outbreak is changed
-                        this.needsRefreshList(true);
-
-                        // get entity data
-                        this.entityDataService
-                            .getEntity(this.entityType, this.outbreakId, this.entityId)
-                            .catch((err) => {
-                                this.snackbarService.showError(err.message);
-
-                                // Entity not found; navigate back to Entities list
-                                this.router.navigate([this.entityMap[this.entityType].link]);
-
-                                return ErrorObservable.create(err);
-                            })
-                            .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
-                                // add new breadcrumb: Entity Modify page
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        entityData.name,
-                                        `${this.entityMap[this.entityType].link}/${this.entityId}/view`
-                                    )
-                                );
-                                // add new breadcrumb: page title
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE', null, true)
-                                );
-                            });
-                    });
-            });
-
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    /**
+     * @Overrides parent method
+     */
+    onDataInitialized() {
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
+        // initialize pagination
+        this.initPaginator();
+        // refresh items list
+        this.needsRefreshList(true);
+    }
+
+    /**
+     * @Overrides parent method
+     */
+    onPersonLoaded() {
+        // (re)initialize breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    private initializeBreadcrumbs() {
+        if (
+            this.relationshipType &&
+            this.entity
+        ) {
+            this.breadcrumbs = [
+                new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
+                new BreadcrumbItemModel(
+                    this.entity.name,
+                    `${this.entityMap[this.entityType].link}/${this.entityId}/view`
+                ),
+                new BreadcrumbItemModel(this.relationshipsListPageTitle, null, true)
+            ];
+        }
     }
 
     /**
@@ -181,20 +135,21 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
         // default table columns
         this.tableColumns = [
             new VisibleColumnModel({
-                field: 'people.lastName',
+                field: 'checkbox',
+                required: true,
+                excludeFromSave: true
+            }),
+            new VisibleColumnModel({
+                field: 'lastName',
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME'
             }),
             new VisibleColumnModel({
-                field: 'people.firstName',
+                field: 'firstName',
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME'
             }),
             new VisibleColumnModel({
-                field: 'people.visualId',
+                field: 'visualId',
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_VISUAL_ID'
-            }),
-            new VisibleColumnModel({
-                field: 'type',
-                label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_TYPE'
             }),
             new VisibleColumnModel({
                 field: 'contactDate',
@@ -234,27 +189,31 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
      * Re(load) the Relationships list, based on the applied filter, sort criterias
      */
     refreshList() {
-        if (this.outbreakId && this.entityType && this.entityId) {
-
-            // include related people in response
-            const qb = new RequestQueryBuilder();
-            qb.merge(this.queryBuilder);
-
-            const peopleQueryBuilder = qb.include('people', true);
-            peopleQueryBuilder.queryBuilder.filter.where({
-                id: {
-                    neq: this.entityId
-                }
-            }, true);
-
-            // retrieve the list of Relationships
-            this.relationshipsList$ = this.relationshipDataService.getEntityRelationships(
-                this.outbreakId,
-                this.entityType,
-                this.entityId,
-                qb
-            )
-                .pipe(tap(this.checkEmptyList.bind(this)));
+        if (
+            this.relationshipType &&
+            this.entityType &&
+            this.entityId &&
+            this.selectedOutbreak
+        ) {
+            if (this.relationshipType === RelationshipType.EXPOSURE) {
+                // retrieve the list of exposures
+                this.relationshipsList$ = this.relationshipDataService.getEntityExposures(
+                    this.selectedOutbreak.id,
+                    this.entityType,
+                    this.entityId,
+                    this.queryBuilder
+                )
+                    .pipe(tap(this.checkEmptyList.bind(this)));
+            } else {
+                // retrieve the list of contacts
+                this.relationshipsList$ = this.relationshipDataService.getEntityContacts(
+                    this.selectedOutbreak.id,
+                    this.entityType,
+                    this.entityId,
+                    this.queryBuilder
+                )
+                    .pipe(tap(this.checkEmptyList.bind(this)));
+            }
         }
     }
 
@@ -262,33 +221,34 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
      * Get total number of items, based on the applied filters
      */
     refreshListCount() {
-        if (this.outbreakId && this.entityType && this.entityId) {
-
-            // include related people in response
-            const qb = new RequestQueryBuilder();
-            qb.merge(this.queryBuilder);
-
-            const peopleQueryBuilder = qb.include('people', false);
-            peopleQueryBuilder.queryBuilder.filter.where({
-                id: {
-                    neq: this.entityId
-                }
-            }, true);
-
+        if (
+            this.relationshipType &&
+            this.entityType &&
+            this.entityId &&
+            this.selectedOutbreak
+        ) {
             // remove paginator from query builder
-            const countQueryBuilder = _.cloneDeep(qb);
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.relationshipsListCount$ = this.relationshipDataService.getEntityRelationshipsCount(
-                this.outbreakId,
-                this.entityType,
-                this.entityId,
-                countQueryBuilder
-            ).share();
-        }
-    }
 
-    hasEntityWriteAccess(): boolean {
-        return this.authUser.hasPermissions(this.entityMap[this.entityType].writePermission);
+            if (this.relationshipType === RelationshipType.EXPOSURE) {
+                // count the exposures
+                this.relationshipsListCount$ = this.relationshipDataService.getEntityExposuresCount(
+                    this.selectedOutbreak.id,
+                    this.entityType,
+                    this.entityId,
+                    countQueryBuilder
+                ).share();
+            } else {
+                // count the contacts
+                this.relationshipsListCount$ = this.relationshipDataService.getEntityContactsCount(
+                    this.selectedOutbreak.id,
+                    this.entityType,
+                    this.entityId,
+                    countQueryBuilder
+                ).share();
+            }
+        }
     }
 
     /**
@@ -299,19 +259,23 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
         return _.get(personTypeData, 'colorCode', '');
     }
 
+    get shareSelectedRelationshipsButtonLabel(): string {
+        return this.relationshipType === RelationshipType.EXPOSURE ?
+            'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_EXPOSURES' :
+            'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_CONTACTS';
+    }
+
     /**
      * Delete a relationship for current Entity
-     * @param {RelationshipModel} relationshipModel
+     * @param {EntityModel} relatedEntity
      */
-    deleteRelationship(relationshipModel: RelationshipModel) {
-        // get related entity
-        const relatedEntityModel = _.get(relationshipModel.relatedEntity(this.entityId), 'model', {});
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP', relatedEntityModel)
+    deleteRelationship(relatedEntity: EntityModel) {
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP', relatedEntity.model)
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete relationship
                     this.relationshipDataService
-                        .deleteRelationship(this.outbreakId, this.entityType, this.entityId, relationshipModel.id)
+                        .deleteRelationship(this.selectedOutbreak.id, this.entityType, this.entityId, relatedEntity.relationship.id)
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
 
@@ -325,5 +289,26 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                         });
                 }
             });
+    }
+
+    /**
+     * Share selected relationships with other people
+     */
+    shareSelectedRelationships() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // redirect to next step
+        this.router.navigate(
+            [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/share`],
+            {
+                queryParams: {
+                    selectedTargetIds: JSON.stringify(selectedRecords)
+                }
+            }
+        );
     }
 }

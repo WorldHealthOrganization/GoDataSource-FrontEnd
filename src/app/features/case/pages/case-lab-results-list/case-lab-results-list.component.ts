@@ -21,6 +21,7 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { tap } from 'rxjs/operators';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -56,6 +57,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
 
     // available side filters
     availableSideFilters: FilterModel[];
+    // values for side filter
+    savedFiltersType = Constants.APP_PAGE.CASE_LAB_RESULTS.value;
 
     constructor(
         private route: ActivatedRoute,

@@ -29,9 +29,11 @@
                                 <div>
                                     {{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}
                                 </div>
-                                <div>
+                                <a
+                                    [routerLink]="['/contacts', followUpData.contact.id, 'view']"
+                                >
                                     {{ followUpData.contact.name }}
-                                </div>
+                                </a>
                             </div>
 
                             <div

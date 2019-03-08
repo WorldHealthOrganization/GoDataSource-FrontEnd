@@ -9,14 +9,15 @@
 <!-- Side filters -->
 <app-side-filters
     [filterOptions]="availableSideFilters"
-    (filtersApplied)="applySideFilters($event)">
+    (filtersApplied)="applySideFilters($event)"
+    [savedFiltersType]="savedFiltersType">
 </app-side-filters>
 
 <app-total-number-of-records
     [value]="(entitiesListCount$ | async)?.count">
 </app-total-number-of-records>
 
-<form class="page-content form-section" #form="ngForm" (submit)="selectEntities(form)">
+<form class="page-content form-section" #form="ngForm" (submit)="selectEntities()">
 
     <div class="form-content">
 
@@ -350,7 +351,7 @@
             color="accent">
             {{'LNG_COMMON_BUTTON_SELECT' | translate}}
         </button>
-        <button type="button" [routerLink]="['/relationships', entityType, this.entityId, 'share']" mat-raised-button>
+        <button type="button" [routerLink]="['/relationships', entityType, this.entityId, this.relationshipTypeRoutePath]" mat-raised-button>
             {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
         </button>
     </div>

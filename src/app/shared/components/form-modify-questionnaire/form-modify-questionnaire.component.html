@@ -96,6 +96,13 @@
             {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate }}
         </div>
 
+        <!-- Inactive ? -->
+        <div
+            fxFlex="100px"
+            class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
+            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE' | translate }}
+        </div>
+
         <!-- Required ? -->
         <div
             fxFlex="100px"
@@ -126,7 +133,8 @@
             <!-- Question Row Data -->
             <div
                 fxFlex fxLayout="row"
-                [class.question-in-edit-row]="questionIndex === questionIndexInEditMode">
+                [class.question-in-edit-row]="questionIndex === questionIndexInEditMode"
+                [class.question-is-inactive]="questionIndex === questionIndexInEditMode ? questionInEditModeClone.inactive : question.inactive">
                 <!-- Order -->
                 <div
                     fxFlex="70px"
@@ -160,6 +168,13 @@
                     fxFlex="200px"
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
                     {{ question.answerType | translate }}
+                </div>
+
+                <!-- Inactive ? -->
+                <div
+                    fxFlex="100px"
+                    class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
+                    {{ (question.inactive ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
                 </div>
 
                 <!-- Required ? -->
@@ -291,6 +306,17 @@
                                     [disabled]="questionAnswerIndexInEditMode !== null"
                                     (optionChanged)="questionAnswerTypeChanged($event)">
                                 </app-form-select>
+                            </div>
+
+                            <!-- question inactive -->
+                            <div
+                                fxFlex="150px">
+                                <app-form-slide-toggle
+                                    name="questionInactive"
+                                    [(ngModel)]="questionInEditModeClone.inactive"
+                                    [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE' | translate"
+                                    [required]="false">
+                                </app-form-slide-toggle>
                             </div>
 
                             <!-- question required -->

@@ -84,6 +84,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
     // available side filters
     availableSideFilters: FilterModel[];
+    // values for side filter
+    savedFiltersType = Constants.APP_PAGE.CONTACTS.value;
 
     // print daily Follow-ups
     exportContactsDailyFollowUpListUrl: string;
@@ -134,7 +136,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         private route: ActivatedRoute,
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
     ) {
         super(
             snackbarService,
