@@ -319,7 +319,6 @@ export class CaseDataService {
             (listResult) => {
                 const results = [];
                 Object.keys(listResult).forEach((key) => {
-                    // const metricResult = new MetricCasesCountStratified(listResult[key]);
                     const metricResult = listResult[key];
                     results.push(metricResult);
                 });
