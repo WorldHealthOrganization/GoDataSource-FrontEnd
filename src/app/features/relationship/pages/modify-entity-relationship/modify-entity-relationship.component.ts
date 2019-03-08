@@ -22,6 +22,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
+import { EntityModel } from '../../../../core/models/entity.model';
 
 @Component({
     selector: 'app-modify-entity-relationship',
@@ -63,6 +64,9 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     relationship: RelationshipModel = new RelationshipModel();
     // route data
     relationshipType: RelationshipType;
+
+    // provide constants to template
+    EntityModel = EntityModel;
 
     constructor(
         protected route: ActivatedRoute,

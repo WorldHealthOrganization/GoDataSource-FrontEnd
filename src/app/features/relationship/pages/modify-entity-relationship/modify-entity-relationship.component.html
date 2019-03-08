@@ -13,6 +13,17 @@
 
                 <mat-card class="page-section">
 
+                    <div
+                        fxLayout="row" fxLayoutGap="20px" fxFlex
+                        class="follow-ups-title">
+                        <div>{{ relationship.relatedEntity(entityId).type | translate }}</div>
+                        <a
+                            [routerLink]="['', EntityModel.getLinkForEntityType(relationship.relatedEntity(entityId).type), relationship.relatedEntity(entityId).model.id, 'view']"
+                        >
+                            {{ relationship.relatedEntity(entityId).model.name }}
+                        </a>
+                    </div>
+
                     <app-form-relationship
                         name="relationship"
                         [ngModel]="relationship"
