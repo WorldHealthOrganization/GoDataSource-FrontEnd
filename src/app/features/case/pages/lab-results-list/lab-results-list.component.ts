@@ -53,6 +53,9 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
     // available side filters
     availableSideFilters: FilterModel[];
 
+    // values for side filter
+    savedFiltersType = Constants.APP_PAGE.LAB_RESULTS.value;
+
     // provide constants to template
     Constants = Constants;
     EntityType = EntityType;
@@ -66,7 +69,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
         private labResultDataService: LabResultDataService,
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
     ) {
         super(snackbarService);
     }

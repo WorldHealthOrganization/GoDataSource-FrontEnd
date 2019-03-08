@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSidenav } from '@angular/material';
 import { AppliedFilterModel, AppliedSortModel, FilterComparator, FilterModel, FilterType, SortModel } from './model';
 import { RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
@@ -9,6 +9,16 @@ import { AddressModel } from '../../../core/models/address.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Constants } from '../../../core/models/constants';
 import * as moment from 'moment';
+import { SavedFiltersService } from '../../../core/services/data/saved-filters.data.service';
+import { DialogService } from '../../../core/services/helper/dialog.service';
+import { DialogAnswer, DialogConfiguration, DialogField, DialogFieldType } from '../dialog/dialog.component';
+import {
+    SavedFilterData, SavedFilterDataAppliedFilter, SavedFilterDataAppliedSort,
+    SavedFilterModel
+} from '../../../core/models/saved-filters.model';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { SnackbarService } from '../../../core/services/helper/snackbar.service';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'app-side-filters',
@@ -16,7 +26,7 @@ import * as moment from 'moment';
     templateUrl: './side-filters.component.html',
     styleUrls: ['./side-filters.component.less']
 })
-export class SideFiltersComponent {
+export class SideFiltersComponent implements OnInit {
     // available filters to be applied
     _filterOptions: FilterModel[] = [];
     @Input() set filterOptions(values: FilterModel[]) {
@@ -63,6 +73,10 @@ export class SideFiltersComponent {
      */
     @Input() fixedFilters: boolean = false;
 
+    // get saved filters type
+    @Input() savedFiltersType: string;
+    savedFilters$: Observable<SavedFilterModel[]>;
+
     // applied filters
     appliedFilters: AppliedFilterModel[];
     // selected operator to be used between filters
@@ -90,10 +104,18 @@ export class SideFiltersComponent {
 
     constructor(
         private formHelper: FormHelperService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private savedFiltersService: SavedFiltersService,
+        private dialogService: DialogService,
+        private snackbarService: SnackbarService,
+        private savedFilterService: SavedFiltersService
     ) {
         // initialize data
         this.clear();
+    }
+
+    ngOnInit() {
+        this.getAvailableSavedFilters();
     }
 
     addFilter() {
@@ -110,6 +132,107 @@ export class SideFiltersComponent {
 
     deleteSort(index) {
         this.appliedSort.splice(index, 1);
+    }
+
+    /**
+     * Get available saved side filters
+     */
+    getAvailableSavedFilters() {
+
+        const qb = new RequestQueryBuilder();
+
+        qb.filter.where({
+            filterKey: {
+                eq: this.savedFiltersType
+            }
+        });
+
+        this.savedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
+    }
+
+    /**
+     * Save a filter
+     */
+    saveFilter() {
+        this.dialogService
+            .showInput(
+                new DialogConfiguration({
+                    message: 'LNG_DIALOG_SAVE_FILTERS_TITLE',
+                    yesLabel: 'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON',
+                    required: true,
+                    fieldsList: [
+                        new DialogField({
+                            name: 'filterName',
+                            placeholder: 'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_NAME',
+                            description: 'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_NAME_DESCRIPTION',
+                            required: true,
+                            fieldType: DialogFieldType.TEXT,
+                    }),
+                        new DialogField({
+                            name: 'isPublic',
+                            placeholder: 'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_PUBLIC',
+                            fieldType: DialogFieldType.BOOLEAN
+                        })
+                    ]
+                }), true)
+            .subscribe((answer: DialogAnswer) => {
+                this.savedFiltersService.saveFilter(
+                    new SavedFilterModel({
+                        name: answer.inputValue.value.filterName,
+                        isPublic: answer.inputValue.value.isPublic,
+                        filterKey: this.savedFiltersType,
+                        filterData: this.toSaveData()
+                    })
+                ).catch((err) => {
+                    this.snackbarService.showApiError(err);
+                    return ErrorObservable.create(err);
+                }).subscribe(() => {
+                    this.snackbarService.showSuccess(`LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE`);
+                });
+            });
+    }
+
+    /**
+     * Convert query builder to an object that we can save in db
+     */
+    toSaveData(): SavedFilterData {
+        // exclude required filters
+        this.appliedFilters = _.filter(this.appliedFilters, appliedFilter =>  !appliedFilter.filter.required );
+
+        return new SavedFilterData({
+            appliedFilters: _.map(this.appliedFilters, (filter) => filter.sanitizeForSave()),
+            appliedFilterOperator: this.appliedFilterOperator,
+            appliedSort: _.map(this.appliedSort, (sort) => sort.sanitizeForSave()),
+        });
+    }
+
+    /**
+     * Apply a saved filter
+     */
+    loadSavedFilter(savedFilter: SavedFilterModel) {
+        this.clear(false);
+        this.appliedFilterOperator = savedFilter.filterData.appliedFilterOperator as RequestFilterOperator;
+        _.each(savedFilter.filterData.appliedFilters, (filter: SavedFilterDataAppliedFilter) => {
+            // search through our current filters for our own filter
+            const ourFilter = _.find(this.filterOptions, (filterOption: FilterModel) => filterOption.uniqueKey === filter.filter.uniqueKey);
+            if (ourFilter) {
+                this.appliedFilters.push(new AppliedFilterModel({
+                    filter: ourFilter,
+                    comparator: filter.comparator as FilterComparator,
+                    value: filter.value
+                }));
+            }
+        });
+        _.each(savedFilter.filterData.appliedSort, (sortCriteria: SavedFilterDataAppliedSort) => {
+            // search through our current sort criterias for our own sort criteria
+            const ourSort = _.find(this.sortOptions, (sortOption: SortModel) => sortOption.uniqueKey === sortCriteria.sort.uniqueKey);
+            if (ourSort) {
+                this.appliedSort.push(new AppliedSortModel({
+                    sort: ourSort,
+                    direction: sortCriteria.direction as RequestSortDirection
+                }));
+            }
+        });
     }
 
     /**
@@ -143,10 +266,10 @@ export class SideFiltersComponent {
             null;
     }
 
-    clear() {
+    clear(addFirstItem: boolean = true) {
         this.appliedFilterOperator = RequestFilterOperator.AND;
         this.appliedSort = [];
-        this.addRequiredAndValueFilters();
+        this.addRequiredAndValueFilters(addFirstItem);
     }
 
     reset() {
@@ -159,7 +282,7 @@ export class SideFiltersComponent {
     /**
      * Add filters resulted from filter options
      */
-    private addRequiredAndValueFilters() {
+    private addRequiredAndValueFilters(addFirstItem: boolean = true) {
         // reinitialize applied filters
         this.appliedFilters = [];
 
@@ -182,7 +305,10 @@ export class SideFiltersComponent {
         });
 
         // if empty, then we need to add at least one empty applied field
-        if (this.appliedFilters.length < 1) {
+        if (
+            addFirstItem &&
+            this.appliedFilters.length < 1
+        ) {
             this.appliedFilters.push(new AppliedFilterModel());
         }
     }

@@ -67,6 +67,8 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     ReferenceDataCategory = ReferenceDataCategory;
 
     availableSideFilters: FilterModel[];
+    // values for side filter
+    savedFiltersType = Constants.APP_PAGE.DAILY_FOLLOW_UPS.value;
 
     dateFilterDefaultValue: Moment;
 

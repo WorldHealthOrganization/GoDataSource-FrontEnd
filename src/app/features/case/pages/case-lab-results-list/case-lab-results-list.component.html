@@ -23,7 +23,8 @@
 
 <app-side-filters
     [filterOptions]="availableSideFilters"
-    (filtersApplied)="applySideFilters($event)">
+    (filtersApplied)="applySideFilters($event)"
+    [savedFiltersType]="savedFiltersType">
 </app-side-filters>
 
 <!--Total number of records from the list-->

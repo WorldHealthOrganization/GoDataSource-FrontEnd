@@ -15,6 +15,17 @@
                 <!-- Filters -->
                 <div *ngIf="filterOptions.length > 0" class="section filters-section" fxLayout="column">
 
+                    <div>
+                        <app-form-select
+                            name="loadFilter"
+                            [placeholder]="'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL'"
+                            [options]="savedFilters$ | async"
+                            (optionChanged)="loadSavedFilter($event)"
+                            optionLabelKey="name"
+                            optionValueKey="filterData">
+                        </app-form-select>
+                    </div>
+
                     <div class="title">
                         {{'LNG_SIDE_FILTERS_TITLE' | translate}}
                     </div>
@@ -300,9 +311,19 @@
                         (click)="reset()">
                         {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
                     </button>
+
                 </div>
 
-
+                <div>
+                    <button
+                        class="save-filter-button"
+                        mat-raised-button
+                        color="primary"
+                        type="button"
+                        (click)="saveFilter()">
+                        {{ 'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON' | translate}}
+                    </button>
+                </div>
             </form>
 
         </mat-sidenav>

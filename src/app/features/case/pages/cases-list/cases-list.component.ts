@@ -68,6 +68,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
     // available side filters
     availableSideFilters: FilterModel[] = [];
+    // saved filters type
+    savedFiltersType = Constants.APP_PAGE.CASES.value;
 
     // provide constants to template
     Constants = Constants;
@@ -131,7 +133,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
         private genericDataService: GenericDataService,
-        private clusterDataService: ClusterDataService
+        private clusterDataService: ClusterDataService,
     ) {
         super(
             snackbarService,
@@ -503,6 +505,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     });
             });
     }
+
 
     /**
      * Check if we have write access to cases

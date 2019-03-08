@@ -51,6 +51,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
 
     availableSideFilters: FilterModel[];
 
+    // values for side filter
+    savedFiltersType = Constants.APP_PAGE.INDIVIDUAL_CONTACT_FOLLOW_UPS.value;
+
     // provide constants to template
     Constants = Constants;
     UserSettings = UserSettings;
@@ -75,7 +78,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
-        private contactDataService: ContactDataService
+        private contactDataService: ContactDataService,
     ) {
         super(
             snackbarService, dialogService, followUpsDataService,

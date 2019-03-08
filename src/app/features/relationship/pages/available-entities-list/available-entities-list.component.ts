@@ -4,7 +4,6 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Observable } from 'rxjs/Observable';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -38,6 +37,9 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     // available side filters
     availableSideFilters: FilterModel[];
 
+    // saved filters type
+    savedFiltersType = Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_RELATIONSHIPS.value;
+
     // reference data
     genderList$: Observable<any[]>;
     personTypesList$: Observable<any[]>;
@@ -57,9 +59,8 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         protected authDataService: AuthDataService,
         protected outbreakDataService: OutbreakDataService,
         protected entityDataService: EntityDataService,
-        private relationshipDataService: RelationshipDataService,
         private genericDataService: GenericDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
     ) {
         super(
             snackbarService, router, route,
