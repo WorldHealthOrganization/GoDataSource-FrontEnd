@@ -34,6 +34,14 @@ export const EnglishUsLang = {
         'LNG_ADDRESS_FIELD_LABEL_DATE': 'Valid until',
 
         /**
+         * uiDashboardPage
+         */
+        'LNG_PAGE_DASHBOARD_EPI_CURVE_TITLE': 'Epi Curve',
+        'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE': 'Cases counts over time stratified by classification',
+        'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE': 'Cases counts over time stratified by outcome',
+        'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE': 'Cases counts over reporting time stratified by classification',
+
+        /**
          * uiCommonButtons
          */
         'LNG_COMMON_BUTTON_EXPOSURES_FROM': 'Contacts',

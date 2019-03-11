@@ -762,6 +762,21 @@ export class Constants {
         }
     };
 
+    static EPI_CURVE_TYPES = {
+        CLASSIFICATION: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE',
+            value: 'classification'
+        },
+        OUTCOME: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE',
+            value: 'outcome'
+        },
+        REPORTING: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE',
+            value: 'reporting'
+        }
+    };
+
     static GANTT_CHART_VIEW_TYPE = {
         DAY: {
             label: 'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_DAYS_LABEL',
