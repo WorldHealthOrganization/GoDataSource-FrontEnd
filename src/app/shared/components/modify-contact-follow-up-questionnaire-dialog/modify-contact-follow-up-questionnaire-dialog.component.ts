@@ -8,6 +8,10 @@ import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
+import { Observable } from 'rxjs/Observable';
+import { LabelValuePair } from '../../../core/models/label-value-pair';
 
 export class ModifyContactFollowUpQuestionnaireData {
     constructor(
@@ -37,15 +41,20 @@ export class ModifyContactFollowUpQuestionnaireDialogComponent implements OnInit
 
     loading: boolean = true;
 
+    dailyStatusTypeOptions$: Observable<LabelValuePair[]>;
+
     constructor(
         public dialogRef: MatDialogRef<ModifyContactFollowUpQuestionnaireDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: ModifyContactFollowUpQuestionnaireData,
         private followUpsDataService: FollowUpsDataService,
         private formHelper: FormHelperService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {}
 
     ngOnInit() {
+        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
+
         // make sure we have the latest follow-up data
         this.followUpsDataService.getFollowUp(
             this.data.outbreak.id,
@@ -90,7 +99,10 @@ export class ModifyContactFollowUpQuestionnaireDialogComponent implements OnInit
             this.dialogRef.close(new DialogAnswer(
                 DialogAnswerButton.Yes,
                 new DialogAnswerInputValue(
-                    this.data.followUp
+                    new FollowUpModel({
+                        ...this.data.followUp,
+                        ...dirtyFields
+                    })
                 )
             ));
         });

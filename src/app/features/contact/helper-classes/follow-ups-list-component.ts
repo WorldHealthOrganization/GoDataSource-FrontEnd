@@ -298,9 +298,11 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                     )
                 }
             }
-        ).subscribe(() => {
-            // NOTHING TO DO HERE
-            // not even to refresh list of follow-ups since we don't want to display this information, and it would be a waste of time to refresh the list, loose page etc...
+        ).subscribe((answer: DialogAnswer) => {
+            if (answer.button === DialogAnswerButton.Yes) {
+                // update list information that was changed
+                followUp.statusId = (answer.inputValue.value as FollowUpModel).statusId;
+            }
         });
     }
 
