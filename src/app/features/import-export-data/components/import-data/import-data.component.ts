@@ -15,6 +15,19 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { v4 as uuid } from 'uuid';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FormSelectChangeDetectionPushComponent } from '../../../../shared/components/form-select-change-detection-push/form-select-change-detection-push.component';
+import { SavedImportMappingService } from '../../../../core/services/data/saved-import-mapping.data.service';
+import {
+    DialogButton, DialogComponent,
+    DialogConfiguration, DialogField,
+    DialogFieldType
+} from '../../../../shared/components/dialog/dialog.component';
+import {
+    SavedImportField, SavedImportMappingModel,
+    SavedImportOption
+} from '../../../../core/models/saved-import-mapping.model';
+import { Observable } from 'rxjs/Observable';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
+import { MatDialogRef } from '@angular/material';
 
 export enum ImportDataExtension {
     CSV = '.csv',
@@ -111,6 +124,19 @@ export class ImportDataComponent implements OnInit {
     get model(): string {
         return this._model;
     }
+
+    /**
+     * Saved import mapping
+     */
+    @Input() savedImportPage: string;
+
+    /**
+     * List with saved import mappings
+     */
+    savedMappingsList$: Observable<SavedImportMappingModel[]>;
+
+    // loaded saved import mapping
+    loadedImportMapping: SavedImportMappingModel;
 
     /**
      * File uploader
@@ -240,6 +266,12 @@ export class ImportDataComponent implements OnInit {
     mappedFields: ImportableMapField[] = [];
 
     /**
+     * Mapped fields for saving
+     * @type {Array}
+     */
+    mappedImportFieldsForSaving: SavedImportField[] = [];
+
+    /**
      * Keep err msg details
      */
     errMsgDetails: {
@@ -297,7 +329,8 @@ export class ImportDataComponent implements OnInit {
         private dialogService: DialogService,
         private i18nService: I18nService,
         private formHelper: FormHelperService,
-        private importExportDataService: ImportExportDataService
+        private importExportDataService: ImportExportDataService,
+        private savedImportMappingService: SavedImportMappingService
     ) {
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
         if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
@@ -324,6 +357,9 @@ export class ImportDataComponent implements OnInit {
      * Component initialized
      */
     ngOnInit() {
+        // get saved import mapping
+        this.getImportMappings();
+
         // init uploader
         this.uploader = new FileUploader({
             allowedMimeType: this.allowedMimeTypes,
@@ -639,6 +675,22 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
+     * Get saved import mappings for specific page
+     */
+    getImportMappings() {
+        const qb = new RequestQueryBuilder();
+
+        // specify for what page we want to get the saved items
+        qb.filter.where({
+            mappingKey: {
+                eq: this.savedImportPage
+            }
+        });
+
+        this.savedMappingsList$ = this.savedImportMappingService.getImportMappingsList(qb);
+    }
+
+    /**
      * Add drop-downs for mapping a drop-down type options
      * @param importableItem
      */
@@ -712,6 +764,158 @@ export class ImportDataComponent implements OnInit {
 
             // add option
             importableItem.mappedOptions.push(mapOpt);
+        });
+    }
+
+    /**
+     * Save an import mapping
+     */
+    saveImportMapping() {
+        const createImportMapping = () => {
+            this.dialogService
+                .showInput(
+                    new DialogConfiguration({
+                        message: 'LNG_DIALOG_SAVE_MAPPING_IMPORTS_TITLE',
+                        yesLabel: 'LNG_DIALOG_SAVE_MAPPING_IMPORTS_BUTTON',
+                        required: true,
+                        fieldsList: [
+                            new DialogField({
+                                name: 'mappingImportName',
+                                placeholder: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_NAME',
+                                description: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_NAME_DESCRIPTION',
+                                required: true,
+                                fieldType: DialogFieldType.TEXT,
+                            }),
+                            new DialogField({
+                                name: 'isPublic',
+                                placeholder: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC',
+                                fieldType: DialogFieldType.BOOLEAN
+                            })
+                        ]
+                    }), true)
+                .subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        this.savedImportMappingService.createImportMapping (new SavedImportMappingModel({
+                            name: answer.inputValue.value.mappingImportName,
+                            isPublic: answer.inputValue.value.isPublic,
+                            mappingKey: this.savedImportPage,
+                            mappingData: this.getMappedImportFieldsForSaving()
+                        })).catch((err) => {
+                            this.snackbarService.showApiError(err);
+                            return ErrorObservable.create(err);
+                        }).subscribe((data) => {
+                            this.getImportMappings();
+
+                            this.loadedImportMapping = new SavedImportMappingModel(data);
+
+                            this.snackbarService.showSuccess(`LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_SUCCESS_MESSAGE`);
+                        });
+                    }
+                });
+        };
+        // create / update?
+        if (
+            this.loadedImportMapping &&
+            this.loadedImportMapping.id &&
+            !this.loadedImportMapping.readOnly
+        ) {
+            this.dialogService
+                .showConfirm(new DialogConfiguration({
+                    message: 'LNG_DIALOG_SAVE_MAPPINGS_UPDATE_OR_CREATE_TITLE',
+                    yesLabel: 'LNG_COMMON_BUTTON_UPDATE',
+                    addDefaultButtons: true,
+                    buttons: [
+                        new DialogButton({
+                            clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                                dialogHandler.close(new DialogAnswer(DialogAnswerButton.Extra_1));
+                            },
+                            label: 'LNG_COMMON_BUTTON_CREATE'
+                        })
+                    ]
+                }), {
+                    mapping: this.loadedImportMapping.name
+                })
+                .subscribe((answer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        // update
+                        this.savedImportMappingService.modifyImportMapping(
+                            this.loadedImportMapping.id, {
+                                mappingData: this.mappedImportFieldsForSaving
+                            }
+                        ).catch((err) => {
+                            this.snackbarService.showApiError(err);
+                            return ErrorObservable.create(err);
+                        }).subscribe((data) => {
+                            this.getImportMappings();
+
+                            // update import mapping
+                            this.loadedImportMapping = new SavedImportMappingModel(data);
+                            // display message
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
+                        });
+                    } else if (answer.button === DialogAnswerButton.Extra_1) {
+                        createImportMapping();
+                    }
+                });
+        } else {
+            createImportMapping();
+        }
+    }
+
+    /**
+     * Get mapped import fields for saving
+     */
+    getMappedImportFieldsForSaving() {
+        const mappedFiledOptions = (fieldOptions): SavedImportOption[] => {
+            // create the array we'll return
+            const mappedFieldOptions = [];
+            // if field options are not empty, for each option push a new model of option to be saved
+            if (!_.isEmpty(fieldOptions)) {
+                _.each(fieldOptions, (fieldOption) => {
+                    mappedFieldOptions.push(new SavedImportOption({
+                        source: fieldOption.sourceOption ? fieldOption.sourceOption : '' ,
+                        destination: fieldOption.destinationOption ? fieldOption.destinationOption : ''
+                    }));
+                });
+            }
+
+            return mappedFieldOptions;
+        };
+
+        _.each(this.mappedFields, (mappedField: ImportableMapField) => {
+            this.mappedImportFieldsForSaving.push(new SavedImportField({
+                source: mappedField.sourceField,
+                destination: mappedField.destinationField,
+                options: mappedFiledOptions(mappedField.mappedOptions),
+                levels: mappedField.sourceDestinationLevel
+            }));
+        });
+
+        return this.mappedImportFieldsForSaving;
+    }
+
+    /**
+     * Load a saved import mapping
+     */
+    loadSavedImportMapping(savedImportMapping: SavedImportMappingModel) {
+        // keep loaded import mapping reference
+        this.loadedImportMapping = savedImportMapping;
+
+        this.mappedFields = [];
+        _.each(savedImportMapping.mappingData, (option: SavedImportField) => {
+            const mapField = new ImportableMapField(
+                option.destination,
+                option.source
+            );
+            mapField.mappedOptions = (option.options || []).map((item: SavedImportOption) => {
+                return {
+                    id: uuid(),
+                    sourceOption: item.source,
+                    destinationOption: item.destination
+                };
+            });
+            mapField.sourceDestinationLevel = option.levels;
+            this.mappedFields.push(mapField);
         });
     }
 

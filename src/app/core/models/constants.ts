@@ -197,6 +197,32 @@ export class Constants {
     };
 
     /**
+     *Pages that have import options
+     */
+    static APP_IMPORT_PAGE = {
+        CASE: {
+            label: 'LNG_APP_PAGE_IMPORT_CASES',
+            value: 'LNG_APP_PAGE_IMPORT_CASES'
+        },
+        CONTACT: {
+            label: 'LNG_APP_PAGE_IMPORT_CONTACT',
+            value: 'LNG_APP_PAGE_IMPORT_CONTACT'
+        },
+        CASE_LAB_DATA: {
+            label: 'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA',
+            value: 'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA'
+        },
+        REFERENCE_DATA: {
+            label: 'LNG_APP_PAGE_IMPORT_REFERENCE_DATA',
+            value: 'LNG_APP_PAGE_IMPORT_REFERENCE_DATA'
+        },
+        LOCATION_DATA: {
+            label: 'LNG_APP_PAGE_IMPORT_LOCATION_DATA',
+            value: 'LNG_APP_PAGE_IMPORT_LOCATION_DATA'
+        }
+    };
+
+    /**
      * System sync log status
      */
     static SYSTEM_SYNC_LOG_STATUS = {
