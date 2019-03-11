@@ -118,6 +118,7 @@ export const EnglishUsLang = {
          * uiDialogs
          */
         'LNG_DIALOG_SAVE_FILTERS_UPDATE_OR_CREATE_TITLE': 'Do you want to update \'{{filter}}\' or create a new one?',
+        'LNG_DIALOG_SAVE_MAPPINGS_UPDATE_OR_CREATE_TITLE': 'Do you want to update \'{{mapping}}\' or create a new one?',
         'LNG_DIALOG_SAVE_FILTERS_TITLE': 'Enter a name for the new filter',
         'LNG_DIALOG_CONFIRM_DELETE_SAVED_FILTER': 'Are you sure you want to delete this filter?',
         'LNG_DIALOG_CONFIRM_DELETE_SAVED_IMPORT_MAPPING': 'Are you sure you want to delete this saved import mapping?',

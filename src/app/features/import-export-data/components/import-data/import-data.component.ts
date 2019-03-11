@@ -17,6 +17,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FormSelectChangeDetectionPushComponent } from '../../../../shared/components/form-select-change-detection-push/form-select-change-detection-push.component';
 import { SavedImportMappingService } from '../../../../core/services/data/saved-import-mapping.data.service';
 import {
+    DialogButton, DialogComponent,
     DialogConfiguration, DialogField,
     DialogFieldType
 } from '../../../../shared/components/dialog/dialog.component';
@@ -26,6 +27,7 @@ import {
 } from '../../../../core/models/saved-import-mapping.model';
 import { Observable } from 'rxjs/Observable';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
+import { MatDialogRef } from '@angular/material';
 
 export enum ImportDataExtension {
     CSV = '.csv',
@@ -133,6 +135,8 @@ export class ImportDataComponent implements OnInit {
      */
     savedMappingsList$: Observable<SavedImportMappingModel[]>;
 
+    // loaded saved import mapping
+    loadedImportMapping: SavedImportMappingModel;
     /**
      * File uploader
      */
@@ -760,51 +764,109 @@ export class ImportDataComponent implements OnInit {
      * Save an import mapping
      */
     saveImportMapping() {
-        this.dialogService
-            .showInput(
-                new DialogConfiguration({
-                    message: 'LNG_DIALOG_SAVE_MAPPING_IMPORTS_TITLE',
-                    yesLabel: 'LNG_DIALOG_SAVE_MAPPING_IMPORTS_BUTTON',
-                    required: true,
-                    fieldsList: [
-                        new DialogField({
-                            name: 'mappingImportName',
-                            placeholder: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_NAME',
-                            required: true,
-                            fieldType: DialogFieldType.TEXT,
-                        }),
-                        new DialogField({
-                            name: 'isPublic',
-                            placeholder: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC',
-                            fieldType: DialogFieldType.BOOLEAN
+        const createImportMapping = () => {
+            this.dialogService
+                .showInput(
+                    new DialogConfiguration({
+                        message: 'LNG_DIALOG_SAVE_MAPPING_IMPORTS_TITLE',
+                        yesLabel: 'LNG_DIALOG_SAVE_MAPPING_IMPORTS_BUTTON',
+                        required: true,
+                        fieldsList: [
+                            new DialogField({
+                                name: 'mappingImportName',
+                                placeholder: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_NAME',
+                                required: true,
+                                fieldType: DialogFieldType.TEXT,
+                            }),
+                            new DialogField({
+                                name: 'isPublic',
+                                placeholder: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC',
+                                fieldType: DialogFieldType.BOOLEAN
+                            })
+                        ]
+                    }), true)
+                .subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        // create the array who will contain all mapped fields for saving in data base
+                        const mappedImportFieldsForSaving = [];
+                        _.each(this.mappedFields, (mappedField: ImportableMapField) => {
+                            mappedImportFieldsForSaving.push(new SavedImportField({
+                                source: mappedField.sourceField,
+                                destination: mappedField.destinationField,
+                                options: this.mappedFiledOptions(mappedField.mappedOptions),
+                                levels: mappedField.sourceDestinationLevel
+                            }));
+                        });
+                        this.savedImportMappingService.saveImportMapping(new SavedImportMappingModel({
+                            name: answer.inputValue.value.mappingImportName,
+                            isPublic: answer.inputValue.value.isPublic,
+                            mappingKey: this.savedImportPage,
+                            mappingData: mappedImportFieldsForSaving
+                        })).catch((err) => {
+                            this.snackbarService.showApiError(err);
+                            return ErrorObservable.create(err);
+                        }).subscribe(() => {
+                            this.snackbarService.showSuccess(`LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_SUCCESS_MESSAGE`);
+                        });
+                    }
+                });
+        };
+        // create / update?
+        if (
+            this.loadedImportMapping &&
+            this.loadedImportMapping.id &&
+            !this.loadedImportMapping.readOnly
+        ) {
+            this.dialogService
+                .showConfirm(new DialogConfiguration({
+                    message: 'LNG_DIALOG_SAVE_MAPPINGS_UPDATE_OR_CREATE_TITLE',
+                    yesLabel: 'LNG_COMMON_BUTTON_UPDATE',
+                    addDefaultButtons: true,
+                    buttons: [
+                        new DialogButton({
+                            clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                                dialogHandler.close(new DialogAnswer(DialogAnswerButton.Extra_1));
+                            },
+                            label: 'LNG_COMMON_BUTTON_CREATE'
                         })
                     ]
-                }), true)
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    // create the array who will contain all mapped fields for saving in data base
-                    const mappedImportFieldsForSaving = [];
-                    _.each(this.mappedFields, (mappedField: ImportableMapField) => {
-                        mappedImportFieldsForSaving.push(new SavedImportField({
-                            source: mappedField.sourceField,
-                            destination: mappedField.destinationField,
-                            options: this.mappedFiledOptions(mappedField.mappedOptions),
-                            levels: mappedField.sourceDestinationLevel
-                        }));
-                    });
-                    this.savedImportMappingService.saveImportMapping(new SavedImportMappingModel({
-                        name: answer.inputValue.value.mappingImportName,
-                        isPublic: answer.inputValue.value.isPublic,
-                        mappingKey: this.savedImportPage,
-                        mappingData: mappedImportFieldsForSaving
-                    })).catch((err) => {
-                        this.snackbarService.showApiError(err);
-                        return ErrorObservable.create(err);
-                    }).subscribe(() => {
-                        this.snackbarService.showSuccess(`LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_SUCCESS_MESSAGE`);
-                    });
-                }
-        });
+                }), {
+                    mapping: this.loadedImportMapping.name
+                })
+                .subscribe((answer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        // create the array who will contain all mapped fields for saving in data base
+                        const mappedImportFieldsForSaving = [];
+                        _.each(this.mappedFields, (mappedField: ImportableMapField) => {
+                            mappedImportFieldsForSaving.push(new SavedImportField({
+                                source: mappedField.sourceField,
+                                destination: mappedField.destinationField,
+                                options: this.mappedFiledOptions(mappedField.mappedOptions),
+                                levels: mappedField.sourceDestinationLevel
+                            }));
+                        });
+                        // update
+                        this.savedImportMappingService.modifySavedImportMapping(
+                            this.loadedImportMapping.id, {
+                                mappingData: mappedImportFieldsForSaving
+                            }
+                        ).catch((err) => {
+                            this.snackbarService.showApiError(err);
+                            return ErrorObservable.create(err);
+                        }).subscribe(() => {
+                            // update filters
+                            this.getSavedImportMappings();
+
+                            // display message
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
+                        });
+                    } else if (answer.button === DialogAnswerButton.Extra_1) {
+                        createImportMapping();
+                    }
+                });
+        } else {
+            createImportMapping();
+        }
     }
 
     /**
@@ -832,6 +894,9 @@ export class ImportDataComponent implements OnInit {
      * Load a saved import mapping
      */
     loadSavedImportMapping(savedImportMapping: SavedImportMappingModel) {
+        // keep loaded import mapping reference
+        this.loadedImportMapping = savedImportMapping;
+
         this.mappedFields = [];
         _.each(savedImportMapping.mappingData, (option: SavedImportField) => {
             const mapField = new ImportableMapField(
