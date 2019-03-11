@@ -192,10 +192,11 @@ export class SideFiltersComponent implements OnInit {
                         ).catch((err) => {
                             this.snackbarService.showApiError(err);
                             return ErrorObservable.create(err);
-                        }).switchMap(() => {
+                        }).subscribe(() => {
                             // update filters
                             this.getAvailableSavedFilters();
-                        }).subscribe(() => {
+
+                            // display message
                             this.snackbarService.showSuccess('LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE');
                         });
                     }
@@ -235,11 +236,11 @@ export class SideFiltersComponent implements OnInit {
                         ).catch((err) => {
                             this.snackbarService.showApiError(err);
                             return ErrorObservable.create(err);
-                        }).switchMap(() => {
+                        }).subscribe(() => {
                             // update filters
                             this.getAvailableSavedFilters();
-                        }).subscribe(() => {
-                            // show message
+
+                            // display message
                             this.snackbarService.showSuccess('LNG_SIDE_FILTERS_MODIFY_FILTER_SUCCESS_MESSAGE');
                         });
                     } else if (answer.button === DialogAnswerButton.Extra_1) {
