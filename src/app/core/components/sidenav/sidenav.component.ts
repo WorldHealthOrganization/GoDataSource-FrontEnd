@@ -60,16 +60,16 @@ export class SidenavComponent implements OnInit {
                 '/saved-filters'
             ),
             new ChildNavItem(
-                'cloud-backup',
-                'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP_LABEL',
-                [PERMISSION.READ_SYS_CONFIG],
-                '/cloud-backup'
-            ),
-            new ChildNavItem(
                 'saved-import-mapping',
                 'LNG_LAYOUT_MENU_ITEM_SAVED_IMPORT_MAPPING_LABEL',
                 [],
                 '/saved-import-mapping'
+            ),
+            new ChildNavItem(
+                'cloud-backup',
+                'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP_LABEL',
+                [PERMISSION.READ_SYS_CONFIG],
+                '/cloud-backup'
             ),
             new ChildNavItem(
                 'terms-of-use',
