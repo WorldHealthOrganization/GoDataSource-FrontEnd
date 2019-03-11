@@ -149,7 +149,7 @@
     </div>
 
     <mat-paginator
-        [length]="(clustersListCount$ | async)?.count"
+        [length]="(savedImportMappingsListCount$ | async)?.count"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">
