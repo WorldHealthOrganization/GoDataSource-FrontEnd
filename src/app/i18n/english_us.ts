@@ -116,6 +116,7 @@ export const EnglishUsLang = {
         /**
          * uiDialogs
          */
+        'LNG_DIALOG_SAVE_FILTERS_UPDATE_OR_CREATE_TITLE': 'Do you want to update \'{{filter}}\' or create a new one?',
         'LNG_DIALOG_SAVE_FILTERS_TITLE': 'Enter a name for the new filter',
         'LNG_DIALOG_CONFIRM_DELETE_SAVED_FILTER': 'Are you sure you want to delete this filter?',
 
@@ -125,6 +126,7 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON': 'Save filter',
         'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL': 'Load filter',
         'LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE': 'Filter saved',
+        'LNG_SIDE_FILTERS_MODIFY_FILTER_SUCCESS_MESSAGE': 'Filter updated',
 
 
         /**

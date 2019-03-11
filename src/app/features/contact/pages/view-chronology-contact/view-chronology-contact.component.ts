@@ -29,7 +29,7 @@ export class ViewChronologyContactComponent implements OnInit {
         protected route: ActivatedRoute,
         private contactDataService: ContactDataService,
         private outbreakDataService: OutbreakDataService,
-        private followUpsDataService: FollowUpsDataService,
+        private followUpsDataService: FollowUpsDataService
     ) {}
 
     ngOnInit() {

@@ -69,7 +69,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
         private labResultDataService: LabResultDataService,
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService,
+        private genericDataService: GenericDataService
     ) {
         super(snackbarService);
     }

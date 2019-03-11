@@ -133,7 +133,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
         private genericDataService: GenericDataService,
-        private clusterDataService: ClusterDataService,
+        private clusterDataService: ClusterDataService
     ) {
         super(
             snackbarService,
