@@ -101,6 +101,37 @@ html, body, ul, li, div, span {
             .mat-cell {
                 font-size: 16px !important;
                 padding-left: @cell-padding-left;
+
+                app-form-slide-toggle {
+                    .form-slide-toggle-container {
+                        height: auto;
+                        padding-bottom: 0;
+                    }
+                }
+
+                app-form-select {
+                    .form-select-container {
+                        height: 20px;
+
+                        .mat-form-field-wrapper {
+                            padding-bottom: 0;
+
+                            .mat-form-field-infix {
+                                padding: 5px 0 0 0;
+                                height: 17px;
+
+                                .mat-select {
+                                    position: absolute;
+                                    margin-top: -19px;
+                                }
+
+                                .mat-form-field-label-wrapper {
+                                    top: -36px;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
