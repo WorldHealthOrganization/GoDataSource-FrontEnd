@@ -141,7 +141,6 @@ export class SideFiltersComponent implements OnInit {
      * Get available saved side filters
      */
     getAvailableSavedFilters() {
-
         const qb = new RequestQueryBuilder();
 
         qb.filter.where({
@@ -192,7 +191,10 @@ export class SideFiltersComponent implements OnInit {
                         ).catch((err) => {
                             this.snackbarService.showApiError(err);
                             return ErrorObservable.create(err);
-                        }).subscribe(() => {
+                        }).subscribe((data) => {
+                            // select this filter
+                            this.loadedFilter = new SavedFilterModel(data);
+
                             // update filters
                             this.getAvailableSavedFilters();
 
@@ -236,7 +238,10 @@ export class SideFiltersComponent implements OnInit {
                         ).catch((err) => {
                             this.snackbarService.showApiError(err);
                             return ErrorObservable.create(err);
-                        }).subscribe(() => {
+                        }).subscribe((data) => {
+                            // select this filter
+                            this.loadedFilter = new SavedFilterModel(data);
+
                             // update filters
                             this.getAvailableSavedFilters();
 

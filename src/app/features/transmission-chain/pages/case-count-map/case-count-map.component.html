@@ -109,7 +109,8 @@
         width="100%"
         height="500px"
         [markers]="markers"
-        [fitMapOnMarkersChange]="true"
+        [fitMapOnMarkersChange]="false"
+        [centerLocation]="markers[0]?.point"
         [displayLoading]="displayLoading"
         [fitLayer]="WorldMapMarkerLayer.CLUSTER"
         [clusterDistance]="clusterDistance">

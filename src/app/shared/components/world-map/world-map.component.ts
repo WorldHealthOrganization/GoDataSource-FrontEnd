@@ -274,12 +274,12 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     /**
      * Minimum map zoom level ( >= 1 )
      */
-    @Input() minZoom: number = 2;
+    @Input() minZoom: number;
 
     /**
      * Maximum map zoom level ( >= 1 )
      */
-    @Input() maxZoom: number = 8;
+    @Input() maxZoom: number;
 
     /**
      * Zoom out / in map to fit markers whenever we set markers ?
@@ -309,7 +309,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     /**
      * Center zoom when focusing on a specific point
      */
-    @Input() centerLocationZoom: number = 10;
+    @Input() centerLocationZoom: number;
 
     // subscribers
     outbreakSubscriber: Subscription;
@@ -396,7 +396,9 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             );
 
             // zoom closer
-            this.map.getView().setZoom(this.centerLocationZoom);
+            if (this.centerLocationZoom) {
+                this.map.getView().setZoom(this.centerLocationZoom);
+            }
         }
     }
 
