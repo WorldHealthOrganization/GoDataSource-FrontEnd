@@ -76,13 +76,17 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
                 <app-form-slide-toggle
-                    [disabled]="item.readonly"
+                    *ngIf="!item.readOnly"
                     name="isPublic"
                     [(ngModel)]="item.isPublic"
                     [label]="'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC' | translate"
                     tooltip="LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC_DESCRIPTION"
                     (optionChanged)="setPublicItem(item.id, $event)">
                 </app-form-slide-toggle>
+                <app-yes-no-label
+                    *ngIf="item.readOnly"
+                    [value]="item.isPublic">
+                </app-yes-no-label>
             </mat-cell>
         </ng-container>
 
@@ -117,7 +121,10 @@
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
 
             <mat-cell *matCellDef="let item" fxFlex="70px">
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                <button
+                    *ngIf="!item.readOnly"
+                    mat-icon-button
+                    [matMenuTriggerFor]="actionsMenu">
                     <span class="xt-icon">moreVertical</span>
                 </button>
 
@@ -125,7 +132,7 @@
 
                     <button
                         mat-menu-item
-                        (click)="deleteSavedImportMapping(item.id)">
+                        (click)="deleteImportMapping(item.id)">
                         {{ 'LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_DELETE_MAPPING' | translate }}
                     </button>
 

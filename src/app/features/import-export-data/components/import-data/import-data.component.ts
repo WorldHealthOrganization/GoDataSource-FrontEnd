@@ -137,6 +137,7 @@ export class ImportDataComponent implements OnInit {
 
     // loaded saved import mapping
     loadedImportMapping: SavedImportMappingModel;
+
     /**
      * File uploader
      */
@@ -265,6 +266,12 @@ export class ImportDataComponent implements OnInit {
     mappedFields: ImportableMapField[] = [];
 
     /**
+     * Mapped fields for saving
+     * @type {Array}
+     */
+    mappedImportFieldsForSaving: SavedImportField[] = [];
+
+    /**
      * Keep err msg details
      */
     errMsgDetails: {
@@ -351,7 +358,7 @@ export class ImportDataComponent implements OnInit {
      */
     ngOnInit() {
         // get saved import mapping
-        this.getSavedImportMappings();
+        this.getImportMappings();
 
         // init uploader
         this.uploader = new FileUploader({
@@ -670,7 +677,7 @@ export class ImportDataComponent implements OnInit {
     /**
      * Get saved import mappings for specific page
      */
-    getSavedImportMappings() {
+    getImportMappings() {
         const qb = new RequestQueryBuilder();
 
         // specify for what page we want to get the saved items
@@ -680,7 +687,7 @@ export class ImportDataComponent implements OnInit {
             }
         });
 
-        this.savedMappingsList$ = this.savedImportMappingService.getSavedImportMappingsList(qb);
+        this.savedMappingsList$ = this.savedImportMappingService.getImportMappingsList(qb);
     }
 
     /**
@@ -775,6 +782,7 @@ export class ImportDataComponent implements OnInit {
                             new DialogField({
                                 name: 'mappingImportName',
                                 placeholder: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_NAME',
+                                description: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_NAME_DESCRIPTION',
                                 required: true,
                                 fieldType: DialogFieldType.TEXT,
                             }),
@@ -787,25 +795,19 @@ export class ImportDataComponent implements OnInit {
                     }), true)
                 .subscribe((answer: DialogAnswer) => {
                     if (answer.button === DialogAnswerButton.Yes) {
-                        // create the array who will contain all mapped fields for saving in data base
-                        const mappedImportFieldsForSaving = [];
-                        _.each(this.mappedFields, (mappedField: ImportableMapField) => {
-                            mappedImportFieldsForSaving.push(new SavedImportField({
-                                source: mappedField.sourceField,
-                                destination: mappedField.destinationField,
-                                options: this.mappedFiledOptions(mappedField.mappedOptions),
-                                levels: mappedField.sourceDestinationLevel
-                            }));
-                        });
-                        this.savedImportMappingService.saveImportMapping(new SavedImportMappingModel({
+                        this.savedImportMappingService.createImportMapping (new SavedImportMappingModel({
                             name: answer.inputValue.value.mappingImportName,
                             isPublic: answer.inputValue.value.isPublic,
                             mappingKey: this.savedImportPage,
-                            mappingData: mappedImportFieldsForSaving
+                            mappingData: this.getMappedImportFieldsForSaving()
                         })).catch((err) => {
                             this.snackbarService.showApiError(err);
                             return ErrorObservable.create(err);
-                        }).subscribe(() => {
+                        }).subscribe((data) => {
+                            this.getImportMappings();
+
+                            this.loadedImportMapping = new SavedImportMappingModel(data);
+
                             this.snackbarService.showSuccess(`LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_SUCCESS_MESSAGE`);
                         });
                     }
@@ -835,28 +837,19 @@ export class ImportDataComponent implements OnInit {
                 })
                 .subscribe((answer) => {
                     if (answer.button === DialogAnswerButton.Yes) {
-                        // create the array who will contain all mapped fields for saving in data base
-                        const mappedImportFieldsForSaving = [];
-                        _.each(this.mappedFields, (mappedField: ImportableMapField) => {
-                            mappedImportFieldsForSaving.push(new SavedImportField({
-                                source: mappedField.sourceField,
-                                destination: mappedField.destinationField,
-                                options: this.mappedFiledOptions(mappedField.mappedOptions),
-                                levels: mappedField.sourceDestinationLevel
-                            }));
-                        });
                         // update
-                        this.savedImportMappingService.modifySavedImportMapping(
+                        this.savedImportMappingService.modifyImportMapping(
                             this.loadedImportMapping.id, {
-                                mappingData: mappedImportFieldsForSaving
+                                mappingData: this.mappedImportFieldsForSaving
                             }
                         ).catch((err) => {
                             this.snackbarService.showApiError(err);
                             return ErrorObservable.create(err);
-                        }).subscribe(() => {
-                            // update filters
-                            this.getSavedImportMappings();
+                        }).subscribe((data) => {
+                            this.getImportMappings();
 
+                            // update import mapping
+                            this.loadedImportMapping = new SavedImportMappingModel(data);
                             // display message
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
                         });
@@ -870,24 +863,35 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
-     * Create the options array for each field
-     * @param fieldOptions
-     * @returns {SavedImportOption[]}
+     * Get mapped import fields for saving
      */
-    mappedFiledOptions(fieldOptions): SavedImportOption[] {
-        // create the array we'll return
-        const mappedFieldOptions = [];
-        // if field options are not empty, for each option push a new model of option to be saved
-        if (!_.isEmpty(fieldOptions)) {
-            _.each(fieldOptions, (fieldOption) => {
-                mappedFieldOptions.push(new SavedImportOption({
-                    source: fieldOption.sourceOption ? fieldOption.sourceOption : '' ,
-                    destination: fieldOption.destinationOption ? fieldOption.destinationOption : ''
-                }));
-            });
-        }
+    getMappedImportFieldsForSaving() {
+        const mappedFiledOptions = (fieldOptions): SavedImportOption[] => {
+            // create the array we'll return
+            const mappedFieldOptions = [];
+            // if field options are not empty, for each option push a new model of option to be saved
+            if (!_.isEmpty(fieldOptions)) {
+                _.each(fieldOptions, (fieldOption) => {
+                    mappedFieldOptions.push(new SavedImportOption({
+                        source: fieldOption.sourceOption ? fieldOption.sourceOption : '' ,
+                        destination: fieldOption.destinationOption ? fieldOption.destinationOption : ''
+                    }));
+                });
+            }
 
-        return mappedFieldOptions;
+            return mappedFieldOptions;
+        };
+
+        _.each(this.mappedFields, (mappedField: ImportableMapField) => {
+            this.mappedImportFieldsForSaving.push(new SavedImportField({
+                source: mappedField.sourceField,
+                destination: mappedField.destinationField,
+                options: mappedFiledOptions(mappedField.mappedOptions),
+                levels: mappedField.sourceDestinationLevel
+            }));
+        });
+
+        return this.mappedImportFieldsForSaving;
     }
 
     /**

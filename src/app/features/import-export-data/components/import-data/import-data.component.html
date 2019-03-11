@@ -91,10 +91,13 @@
         fxFlex fxLayout="column" fxLayoutGap="30px"
         class="import-data-map-fields">
 
-        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+        <div
+            *ngIf="savedImportPage"
+            fxLayout="row" fxLayoutGap="20px" fxFlex>
 
             <app-form-select
                 name="loadImportMapping"
+                [ngModel]="loadedImportMapping?.id"
                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_LABEL' | translate"
                 [options]="savedMappingsList$ | async "
                 (optionChanged)="loadSavedImportMapping($event)"
@@ -251,11 +254,11 @@
             </div>
 
             <div
-                fxFlex fxLayout="row" fxLayoutAlign="end">
+                fxFlex fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
                 <button
+                    *ngIf="savedImportPage"
                     (click)="saveImportMapping()"
                     type="button"
-                    class="save-import-mapping-button"
                     mat-raised-button
                     color="accent">
                     {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SAVE_IMPORT_MAPPING' | translate }}

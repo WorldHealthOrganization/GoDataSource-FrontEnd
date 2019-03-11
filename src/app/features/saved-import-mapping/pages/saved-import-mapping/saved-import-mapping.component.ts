@@ -58,7 +58,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
      * Re(load) the Clusters list, based on the applied filter, sort criterias
      */
     refreshList() {
-        this.savedImportMappingsList$ = this.savedImportMappingService.getSavedImportMappingsList(this.queryBuilder)
+        this.savedImportMappingsList$ = this.savedImportMappingService.getImportMappingsList(this.queryBuilder)
             .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
@@ -68,7 +68,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
     refreshListCount() {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
-        this.savedImportMappingsListCount$ = this.savedImportMappingService.getSavedImportMappingsListCount(countQueryBuilder).share();
+        this.savedImportMappingsListCount$ = this.savedImportMappingService.getImportMappingsListCount(countQueryBuilder).share();
     }
 
     /**
@@ -90,12 +90,12 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
      * Delete a saved import mapping
      * @param {string} savedImportId
      */
-    deleteSavedImportMapping(savedImportId: string) {
+    deleteImportMapping(savedImportId: string) {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_SAVED_IMPORT_MAPPING')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete contact
-                    this.savedImportMappingService.deleteSavedImportMapping(savedImportId)
+                    this.savedImportMappingService.deleteImportMapping(savedImportId)
                         .catch((err) => {
                             this.snackbarService.showApiError(err);
 
@@ -117,7 +117,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
      * @param {boolean} isPublic
      */
     setPublicItem(savedImportMappingId: string, isPublic: boolean) {
-        this.savedImportMappingService.modifySavedImportMapping(savedImportMappingId, {isPublic : isPublic})
+        this.savedImportMappingService.modifyImportMapping(savedImportMappingId, {isPublic : isPublic})
             .catch((err) => {
                 this.snackbarService.showApiError(err);
                 return ErrorObservable.create(err);

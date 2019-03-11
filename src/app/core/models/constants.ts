@@ -212,10 +212,6 @@ export class Constants {
             label: 'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA',
             value: 'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA'
         },
-        HIERARCHICAL_LOCATIONS: {
-            label: 'LNG_APP_PAGE_IMPORT_HIERARCHICAL_LOCATION',
-            value: 'LNG_APP_PAGE_IMPORT_HIERARCHICAL_LOCATION'
-        },
         REFERENCE_DATA: {
             label: 'LNG_APP_PAGE_IMPORT_REFERENCE_DATA',
             value: 'LNG_APP_PAGE_IMPORT_REFERENCE_DATA'

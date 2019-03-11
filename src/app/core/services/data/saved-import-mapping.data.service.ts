@@ -20,7 +20,7 @@ export class SavedImportMappingService {
      * Retrieve the list of saved import mapping
      * @returns {Observable<SavedImportMappingModel[]>}
      */
-    getSavedImportMappingsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<SavedImportMappingModel[]> {
+    getImportMappingsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<SavedImportMappingModel[]> {
         const filter = queryBuilder.buildQuery();
 
         return this.modelHelper.mapObservableListToModel(
@@ -34,7 +34,7 @@ export class SavedImportMappingService {
      * @param queryBuilder
      * @returns {Observable<Object>}
      */
-    getSavedImportMappingsListCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+    getImportMappingsListCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
 
         return this.http.get(`import-mappings/count?where=${whereFilter}`, {});
@@ -46,7 +46,7 @@ export class SavedImportMappingService {
      * @param importMappingData
      * @returns {Observable<Object>}
      */
-    saveImportMapping(importMappingData: SavedImportMappingModel) {
+    createImportMapping (importMappingData: SavedImportMappingModel) {
         return this.http.post(`import-mappings`, importMappingData);
     }
 
@@ -56,7 +56,7 @@ export class SavedImportMappingService {
      * @param savedImportMappingData
      * @returns {Observable<any>}
      */
-    modifySavedImportMapping(savedImportMappingId: string, savedImportMappingData): Observable<any> {
+    modifyImportMapping(savedImportMappingId: string, savedImportMappingData): Observable<any> {
         return this.modelHelper.mapObservableToModel(
             this.http.put(`import-mappings/${savedImportMappingId}`, savedImportMappingData),
             SavedImportMappingModel
@@ -68,7 +68,7 @@ export class SavedImportMappingService {
      * @param savedImportMappingId
      * @returns {Observable<Object>}
      */
-    deleteSavedImportMapping(savedImportMappingId: string) {
+    deleteImportMapping(savedImportMappingId: string) {
         return this.http.delete(`import-mappings/${savedImportMappingId}`);
     }
 
