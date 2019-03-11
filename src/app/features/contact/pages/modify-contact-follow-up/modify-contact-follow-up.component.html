@@ -89,7 +89,7 @@
                 <app-form-fill-questionnaire
                     name="questionnaireAnswers"
                     [ngModel]="followUpData.questionnaireAnswers"
-                    [questions]="selectedOutbreak.contactFollowUpTemplate"
+                    [questions]="selectedOutbreak?.contactFollowUpTemplate"
                     [disabled]="viewOnly"
                     [componentTitle]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate">
                 </app-form-fill-questionnaire>

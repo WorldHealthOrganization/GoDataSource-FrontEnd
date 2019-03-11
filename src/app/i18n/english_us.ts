@@ -17,6 +17,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_FOLLOW_UPS_TITLE': 'Follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_FOR_RELATED_CONTACTS_TITLE': 'Follow-ups for related contacts',
+        'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_QUESTIONNAIRE': 'Quick modify follow-up',
 
         /**
          * uiChainsOfTransmissionGraph

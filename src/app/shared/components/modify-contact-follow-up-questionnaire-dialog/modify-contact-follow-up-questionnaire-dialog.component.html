@@ -8,12 +8,31 @@
     <div
         *ngIf="!loading">
         <form #form="ngForm">
+            <div
+                fxFlex fxLayout="row" fxLayoutGap="20px">
+                <div fxFlex>
+                    <app-form-select
+                        name="statusId"
+                        [ngModel]="data.followUp.statusId"
+                        [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate"
+                        tooltip="LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION"
+                        [options]="dailyStatusTypeOptions$ | async"
+                        [required]="true"
+                        optionLabelKey="label"
+                        optionValueKey="value">
+                    </app-form-select>
+                </div>
+
+                <div fxFlex><!-- placeholder --></div>
+            </div>
+
             <app-form-fill-questionnaire
+                fxFlex
                 name="questionnaireAnswers"
                 [ngModel]="data.followUp.questionnaireAnswers"
                 [questions]="data.outbreak.contactFollowUpTemplate"
-                [componentTitle]="'LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_TITLE' | translate"
-            ></app-form-fill-questionnaire>
+                [componentTitle]="'LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_TITLE' | translate">
+            </app-form-fill-questionnaire>
 
             <div
                  fxFlex fxLayout="row" fxLayoutAlign="end">
