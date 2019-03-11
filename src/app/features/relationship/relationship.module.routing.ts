@@ -6,55 +6,51 @@ import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
+import { RelationshipType } from '../../core/enums/relationship-type.enum';
 
-const routes: Routes = [
-    // Entity Relationships list
+const relationshipTypeChildrenRoutes = [
+    // Relationships list
     {
-        path: ':entityType/:entityId',
-        component: fromPages.EntityRelationshipsListComponent
+        path: '',
+        component: fromPages.EntityRelationshipsListComponent,
     },
-    // List available entities to be related with a given entity
+    // Create relationships (1): List available persons to be selected for creating new relationships
     {
-        path: ':entityType/:entityId/available-entities',
+        path: 'available-entities',
         component: fromPages.AvailableEntitiesListComponent
     },
-    // Create new Entity relationship(s)
+    // Create relationships (2): Create relationships form
     {
-        path: ':entityType/:entityId/create',
+        path: 'create',
         component: fromPages.CreateEntityRelationshipComponent,
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
     },
-    // Entity Relationships list - Share
+    // Share selected relationships (1): Select people to share with
     {
-        path: ':entityType/:entityId/share',
-        component: fromPages.EntityRelationshipsListShareComponent
-    },
-    // Entity Relationships list - Assign
-    {
-        path: ':entityType/:entityId/assign',
+        path: 'share',
         component: fromPages.EntityRelationshipsListAssignComponent
     },
-    // Create new Entity relationship(s) - bulk
+    // Share selected relationships (2): Create relationships form
     {
-        path: ':entityType/:entityId/createBulk',
+        path: 'share/create-bulk',
         component: fromPages.CreateEntityRelationshipBulkComponent,
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
     },
-    // View Entity Relationship
+    // View Relationship
     {
-        path: ':entityType/:entityId/:relationshipId/view',
+        path: ':relationshipId/view',
         component: fromPages.ModifyEntityRelationshipComponent,
         data: {
             action: ViewModifyComponentAction.VIEW
         }
     },
-    // Modify Entity Relationship
+    // Modify Relationship
     {
-        path: ':entityType/:entityId/:relationshipId/modify',
+        path: ':relationshipId/modify',
         component: fromPages.ModifyEntityRelationshipComponent,
         data: {
             action: ViewModifyComponentAction.MODIFY
@@ -62,6 +58,25 @@ const routes: Routes = [
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
+    },
+];
+
+const routes: Routes = [
+    // Entity Exposure Relationships
+    {
+        path: ':entityType/:entityId/exposures',
+        data: {
+            relationshipType: RelationshipType.EXPOSURE
+        },
+        children: relationshipTypeChildrenRoutes
+    },
+    // Entity Contact Relationships
+    {
+        path: ':entityType/:entityId/contacts',
+        data: {
+            relationshipType: RelationshipType.CONTACT
+        },
+        children: relationshipTypeChildrenRoutes
     },
     // View Case with onset date that is before the date of onset of the primary case
     {

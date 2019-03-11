@@ -49,13 +49,19 @@ export class SidenavComponent implements OnInit {
             ),
             new ChildNavItem(
                 'security-questions',
-                'Set Security Questions',
+                'LNG_LAYOUT_MENU_ITEM_SET_SECURITY_QUESTION_LABEL',
                 [],
                 '/account/set-security-questions'
             ),
             new ChildNavItem(
+                'saved-filters',
+                'LNG_LAYOUT_MENU_ITEM_SAVED_FILTERS_LABEL',
+                [PERMISSION.READ_SYS_CONFIG],
+                '/saved-filters'
+            ),
+            new ChildNavItem(
                 'cloud-backup',
-                'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP',
+                'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP_LABEL',
                 [PERMISSION.READ_SYS_CONFIG],
                 '/cloud-backup'
             ),
@@ -67,7 +73,7 @@ export class SidenavComponent implements OnInit {
             ),
             new ChildNavItem(
                 'terms-of-use',
-                'LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE',
+                'LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE_LABEL',
                 [],
                 '/terms-of-use'
             )

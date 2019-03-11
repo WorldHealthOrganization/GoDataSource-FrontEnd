@@ -27,6 +27,11 @@
                             [name]="'relationships[' + relationshipsIds[ind] + '][relatedEntityId]'"
                             [ngModel]="person.id"/>
 
+                        <input
+                            type="hidden"
+                            [name]="'relationships[' + relationshipsIds[ind] + '][relatedEntityType]'"
+                            [ngModel]="person.type"/>
+
                         <app-form-relationship
                             [name]="'relationships[' + relationshipsIds[ind] + '][relationship]'"
                             [ngModel]="relationships[ind]"

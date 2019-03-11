@@ -48,6 +48,11 @@ export enum FilterComparator {
 export class SortModel {
     self: SortModel;
 
+    /**
+     * Unique key
+     */
+    uniqueKey: string;
+
     constructor(
         // name of the field that the sort applies to
         public fieldName: string,
@@ -57,6 +62,18 @@ export class SortModel {
     ) {
         // set handler
         this.self = this;
+
+        // generate unique key
+        this.uniqueKey = this.fieldName + this.fieldLabel;
+    }
+
+    /**
+     * Return unique key of sort
+     */
+    sanitizeForSave() {
+        return {
+            uniqueKey: this.uniqueKey
+        };
     }
 }
 
@@ -67,6 +84,29 @@ export class AppliedSortModel {
 
     // direction
     public direction: RequestSortDirection = RequestSortDirection.ASC;
+
+    constructor(data?: {
+        sort: SortModel,
+        direction: RequestSortDirection
+    }) {
+        if (data) {
+            // assign properties
+            Object.assign(
+                this,
+                data
+            );
+        }
+    }
+
+    /**
+     * Return the sort criteria
+     */
+    sanitizeForSave() {
+        return {
+            sort: this.sort.sanitizeForSave(),
+            direction: this.direction
+        };
+    }
 }
 
 
@@ -120,6 +160,11 @@ export class FilterModel {
     flagIt: boolean;
 
     /**
+     * Unique key
+     */
+    uniqueKey: string;
+
+    /**
      * Constructor
      * @param data ( fieldName / fieldLabel / type are required )
      */
@@ -154,6 +199,18 @@ export class FilterModel {
             this.self,
             data
         );
+
+        // generate unique key
+        this.uniqueKey = this.fieldName + this.fieldLabel;
+    }
+
+    /**
+     * Return unique key of filter
+     */
+    sanitizeForSave() {
+        return {
+            uniqueKey: this.uniqueKey
+        };
     }
 }
 
@@ -403,5 +460,16 @@ export class AppliedFilterModel {
                 AppliedFilterModel.allowedComparators[this.filter.type] &&
                 AppliedFilterModel.allowedComparators[this.filter.type].length > 1
             );
+    }
+
+    /**
+     * Return the filter
+     */
+    sanitizeForSave() {
+        return {
+            filter: this.filter.sanitizeForSave(),
+            comparator: this.comparator,
+            value: this.value
+        };
     }
 }

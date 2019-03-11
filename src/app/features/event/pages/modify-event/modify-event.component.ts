@@ -129,6 +129,14 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
     }
 
     /**
+     * Check if we have access to create a contact
+     * @returns {boolean}
+     */
+    hasContactWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
+    }
+
+    /**
      * Create breadcrumbs
      */
     createBreadcrumbs() {

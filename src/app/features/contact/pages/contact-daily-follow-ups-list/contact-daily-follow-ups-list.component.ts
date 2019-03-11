@@ -16,6 +16,7 @@ import { DialogService, ExportDataExtension } from '../../../../core/services/he
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as moment from 'moment';
+import { Moment } from 'moment';
 import { AppliedFilterModel, FilterComparator, FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -25,7 +26,6 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { Moment } from 'moment';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -34,6 +34,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { tap } from 'rxjs/operators';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
+import { FollowUpPage } from '../../typings/follow-up-page';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -67,11 +68,16 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     ReferenceDataCategory = ReferenceDataCategory;
 
     availableSideFilters: FilterModel[];
+    // values for side filter
+    savedFiltersType = Constants.APP_PAGE.DAILY_FOLLOW_UPS.value;
 
     dateFilterDefaultValue: Moment;
 
     caseId: string;
     caseData: CaseModel;
+
+    // which follow-ups list page are we visiting?
+    rootPage: FollowUpPage = FollowUpPage.DAILY;
 
     @ViewChild('followUpDate', {read: NgModel}) followUpDateElem: NgModel;
 
@@ -120,6 +126,8 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 // no need to retrieve any data? then we can initialize breadcrumbs
                 if (!this.caseId) {
                     this.initializeBreadcrumbs();
+                } else {
+                    this.rootPage = FollowUpPage.CASE_RELATED;
                 }
 
                 // outbreak subscriber
@@ -189,32 +197,36 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      * Initialize breadcrumbs
      */
     private initializeBreadcrumbs() {
-        // init
-        this.breadcrumbs = [];
-
         // add case / contact breadcrumbs
-        if (!this.caseId) {
-            this.breadcrumbs.push(new BreadcrumbItemModel(
-                'LNG_PAGE_LIST_CONTACTS_TITLE',
-                '/contacts'
-            ));
-        } else if (this.caseData) {
-            this.breadcrumbs.push(new BreadcrumbItemModel(
-                'LNG_PAGE_LIST_CASES_TITLE',
-                '/cases'
-            ));
-            this.breadcrumbs.push(new BreadcrumbItemModel(
-                this.caseData.name,
-                `/cases/${this.caseData.id}/view`
-            ));
+        if (!this.caseData) {
+            this.breadcrumbs = [
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_CONTACTS_TITLE',
+                    '/contacts'
+                ),
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+                    '.',
+                    true
+                )
+            ];
+        } else {
+            this.breadcrumbs = [
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_CASES_TITLE',
+                    '/cases'
+                ),
+                new BreadcrumbItemModel(
+                    this.caseData.name,
+                    `/cases/${this.caseData.id}/view`
+                ),
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_FOLLOW_UPS_FOR_RELATED_CONTACTS_TITLE',
+                    '.',
+                    true
+                )
+            ];
         }
-
-        // add follow-ups breadcrumbs
-        this.breadcrumbs.push(new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
-            '.',
-            true
-        ));
     }
 
     /**

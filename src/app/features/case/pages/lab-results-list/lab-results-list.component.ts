@@ -53,6 +53,9 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
     // available side filters
     availableSideFilters: FilterModel[];
 
+    // values for side filter
+    savedFiltersType = Constants.APP_PAGE.LAB_RESULTS.value;
+
     // provide constants to template
     Constants = Constants;
     EntityType = EntityType;

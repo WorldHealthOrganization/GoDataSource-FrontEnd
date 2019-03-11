@@ -119,6 +119,41 @@ export class Constants {
         }
     };
 
+    static APP_PAGE = {
+        LAB_RESULTS: {
+            label: 'LNG_APP_PAGE_LAB_RESULTS',
+            value: 'LNG_APP_PAGE_LAB_RESULTS'
+        },
+        CASE_LAB_RESULTS: {
+            label: 'LNG_APP_PAGE_CASE_LAB_RESULTS',
+            value: 'LNG_APP_PAGE_CASE_LAB_RESULTS'
+        },
+        AVAILABLE_ENTITIES_FOR_RELATIONSHIPS: {
+            label: 'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_RELATIONSHIPS',
+            value: 'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_RELATIONSHIPS'
+        },
+        INDIVIDUAL_CONTACT_FOLLOW_UPS: {
+            label: 'LNG_APP_PAGE_INDIVIDUAL_CONTACT_FOLLOW_UPS',
+            value: 'LNG_APP_PAGE_INDIVIDUAL_CONTACT_FOLLOW_UPS'
+        },
+        DAILY_FOLLOW_UPS: {
+            label: 'LNG_APP_PAGE_DAILY_FOLLOW_UPS',
+            value: 'LNG_APP_PAGE_DAILY_FOLLOW_UPS'
+        },
+        PEOPLE_TO_SHARE_RELATIONSHIPS_WITH: {
+            label: 'LNG_APP_PAGE_PEOPLE_TO_SHARE_RELATIONSHIPS_WITH',
+            value: 'LNG_APP_PAGE_PEOPLE_TO_SHARE_RELATIONSHIPS_WITH'
+        },
+        CASES: {
+            label: 'LNG_APP_PAGE_CASES',
+            value: 'LNG_APP_PAGE_CASES'
+        },
+        CONTACTS: {
+            label: 'LNG_APP_PAGE_CONTACTS',
+            value: 'LNG_APP_PAGE_CONTACTS'
+        }
+    };
+
     /**
      * FollowUp status
      */
@@ -754,6 +789,21 @@ export class Constants {
         MONTH: {
             label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_MONTHS_LABEL',
             value: 'month'
+        }
+    };
+
+    static EPI_CURVE_TYPES = {
+        CLASSIFICATION: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE',
+            value: 'classification'
+        },
+        OUTCOME: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE',
+            value: 'outcome'
+        },
+        REPORTING: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE',
+            value: 'reporting'
         }
     };
 

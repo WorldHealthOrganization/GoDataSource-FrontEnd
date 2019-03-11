@@ -9,13 +9,17 @@ module.exports = function (config) {
             require('karma-parallel'),
             require('karma-jasmine'),
             require('karma-phantomjs-launcher'),
-            require('karma-jasmine-html-reporter'),
             require('karma-coverage-istanbul-reporter'),
+            require('karma-spec-reporter'),
             require('@angular/cli/plugins/karma')
         ],
         client: {
-            clearContext: false // leave Jasmine Spec Runner output visible in browser
+            clearContext: false, // leave Jasmine Spec Runner output visible in browser
+            captureConsole: true
         },
+        loggers: [
+            { type: 'console' }
+        ],
         coverageIstanbulReporter: {
             reports: ['html', 'lcovonly'],
             fixWebpackSourcePaths: true
@@ -23,7 +27,17 @@ module.exports = function (config) {
         angularCli: {
             environment: 'dev'
         },
-        reporters: ['progress', 'kjhtml'],
+        reporters: ['spec'],
+        specReporter: {
+            // limit number of lines logged per test
+            maxLogLines: 5,
+            suppressErrorSummary: false,
+            suppressFailed: false,
+            suppressPassed: false,
+            suppressSkipped: false,
+            showSpecTiming: true,
+            failFast: false
+        },
         port: 9875,
         colors: true,
         logLevel: config.LOG_INFO,
@@ -31,7 +45,7 @@ module.exports = function (config) {
         browserDisconnectTimeout: 5000,
         browserDisconnectTolerance: 2,
         parallelOptions: {
-            executors: require('os').cpus().length,
+            executors: require('os').cpus().length - 1,
             shardStrategy: 'round-robin'
         },
         autoWatch: true,

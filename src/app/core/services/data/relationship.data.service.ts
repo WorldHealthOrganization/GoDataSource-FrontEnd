@@ -56,6 +56,92 @@ export class RelationshipDataService {
     }
 
     /**
+     * Retrieve Relationships of a Case / Contact / Event, where the person is a contact
+     * @param {string} outbreakId
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<EntityModel[]>}
+     */
+    getEntityExposures(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<EntityModel[]> {
+        const filter = queryBuilder.buildQuery();
+
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/exposures?filter=${filter}`),
+            EntityModel
+        );
+    }
+
+    /**
+     * Retrieve the total number of Relationships of a Case / Contact / Event, where the person is a contact
+     * @param {string} outbreakId
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getEntityExposuresCount(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const filter = queryBuilder.buildQuery();
+
+        return this.http.get(
+            `outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/exposures/filtered-count?filter=${filter}`
+        );
+    }
+
+    /**
+     * Retrieve Relationships of a Case / Contact / Event, where the person is the exposure
+     * @param {string} outbreakId
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<EntityModel[]>}
+     */
+    getEntityContacts(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<EntityModel[]> {
+        const filter = queryBuilder.buildQuery();
+
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/contacts?filter=${filter}`),
+            EntityModel
+        );
+    }
+
+    /**
+     * Retrieve the total number of Relationships of a Case / Contact / Event, where the person is the exposure
+     * @param {string} outbreakId
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getEntityContactsCount(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const filter = queryBuilder.buildQuery();
+
+        return this.http.get(
+            `outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/contacts/filtered-count?filter=${filter}`
+        );
+    }
+
+    /**
      * Retrieve Relationships of a Case / Contact / Event
      * @param {string} outbreakId
      * @param {EntityType} entityType

@@ -13,9 +13,20 @@
 
                 <mat-card class="page-section">
 
+                    <div
+                        fxLayout="row" fxLayoutGap="20px" fxFlex
+                        class="follow-ups-title">
+                        <div>{{ relationship.relatedEntity(entityId).type | translate }}</div>
+                        <a
+                            [routerLink]="['', EntityModel.getLinkForEntityType(relationship.relatedEntity(entityId).type), relationship.relatedEntity(entityId).model.id, 'view']"
+                        >
+                            {{ relationship.relatedEntity(entityId).model.name }}
+                        </a>
+                    </div>
+
                     <app-form-relationship
                         name="relationship"
-                        [ngModel]="relationshipData"
+                        [ngModel]="relationship"
                         required="true"
                         [disabled]="viewOnly">
                     </app-form-relationship>
@@ -27,12 +38,12 @@
         </mat-tab-group>
     </div>
 
-    <div *ngIf="!viewOnly" class="form-actions">
+    <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button *ngIf="viewOnly && hasContactWriteAccess()"
-                mat-raised-button type="button" color="accent"
-                [routerLink]="['/relationships', entityType, entityId, relationshipId, 'modify']">
+        <button *ngIf="viewOnly && hasEntityWriteAccess()"
+            mat-raised-button type="button" color="accent"
+            [routerLink]="['/relationships', entityType, entityId, relationshipTypeRoutePath, relationshipId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
 

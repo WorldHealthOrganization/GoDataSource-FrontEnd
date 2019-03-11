@@ -7,7 +7,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { ChronologyItem } from '../../../../shared/components/chronology/typings/chronology-item';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ContactChronology } from './typings/contact-chronology';
 
@@ -29,7 +29,7 @@ export class ViewChronologyContactComponent implements OnInit {
         protected route: ActivatedRoute,
         private contactDataService: ContactDataService,
         private outbreakDataService: OutbreakDataService,
-        private followUpsDataService: FollowUpsDataService,
+        private followUpsDataService: FollowUpsDataService
     ) {}
 
     ngOnInit() {
@@ -68,7 +68,7 @@ export class ViewChronologyContactComponent implements OnInit {
                                 .subscribe((followUps: FollowUpModel[]) => {
                                     // set data
                                     this.chronologyEntries = ContactChronology.getChronologyEntries(this.contactData, followUps);
-                            });
+                                });
                         });
                 });
         });

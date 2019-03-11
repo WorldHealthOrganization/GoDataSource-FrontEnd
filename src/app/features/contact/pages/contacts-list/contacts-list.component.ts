@@ -84,6 +84,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
     // available side filters
     availableSideFilters: FilterModel[];
+    // values for side filter
+    savedFiltersType = Constants.APP_PAGE.CONTACTS.value;
 
     // print daily Follow-ups
     exportContactsDailyFollowUpListUrl: string;

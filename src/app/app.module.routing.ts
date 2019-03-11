@@ -60,6 +60,18 @@ const routes: Routes = [
                     permissions: [PERMISSION.READ_ROLE]
                 }
             },
+            // Saved Filters
+            {
+                path: ModulePath.SavedFiltersModule,
+                loadChildren: './features/saved-filters/saved-filters.module#SavedFiltersModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                }
+            },
             // Cloud Backup Module routes
             {
                 path: ModulePath.CloudBackupModule,

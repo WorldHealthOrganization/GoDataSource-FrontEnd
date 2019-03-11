@@ -93,7 +93,9 @@
                 <div fxFlex="33">
                     <!-- cases by geographic location - pie chart -->
                     <mat-card class="dashboard-gauge">
-                        <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_BY_GEOGRAPHIC_LOCATION_TITLE' | translate}}</div>
+                        <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_BY_GEOGRAPHIC_LOCATION_TITLE' |
+                            translate}}
+                        </div>
                         <div fxLayoutAlign="center">
                             <app-case-by-geographic-location-dashlet
                                 *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
@@ -106,7 +108,8 @@
 
                 <div fxFlex="33">
                     <mat-card class="dashboard-gauge">
-                        <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE' | translate}}</div>
+                        <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE' | translate}}
+                        </div>
                         <!-- case hospitalization status pie chart -->
                         <div fxLayoutAlign="center">
                             <app-cases-hospitalized-pie-chart-dashlet
@@ -135,15 +138,41 @@
                 </app-histogram-transmission-chains-size-dashlet>
             </mat-card>
 
-            <mat-card class="page-section">
+            <mat-card
+                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+                class="page-section">
+
                 <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_EPI_CURVE_TITLE' | translate}}</div>
+
+                <!-- dropdown with view types -->
+                <app-form-select
+                    name="epiCurveViewType"
+                    [(ngModel)]="epiCurveViewType"
+                    required="true"
+                    [options]="epiCurveViewTypes$ | async"
+                    [clearable]="false">
+                </app-form-select>
 
                 <!-- epi curve -->
                 <app-epi-curve-dashlet
-                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+                    *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.CLASSIFICATION.value"
                     [globalFilterDate]="globalFilterDate"
                     [globalFilterLocationId]="globalFilterLocationId">
                 </app-epi-curve-dashlet>
+
+                <!-- epi curve outcome -->
+                <app-epi-curve-outcome-dashlet
+                    *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.OUTCOME.value"
+                    [globalFilterDate]="globalFilterDate"
+                    [globalFilterLocationId]="globalFilterLocationId">
+                </app-epi-curve-outcome-dashlet>
+
+                <!-- epi curve reporting -->
+                <app-epi-curve-reporting-dashlet
+                    *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.REPORTING.value"
+                    [globalFilterDate]="globalFilterDate"
+                    [globalFilterLocationId]="globalFilterLocationId">
+                </app-epi-curve-reporting-dashlet>
             </mat-card>
 
             <!-- KPIs -->
@@ -164,7 +193,8 @@
                             </button>
 
                             <mat-menu #actionsMenu="matMenu">
-                                <button class="dashboard-kpi-menu-item" mat-menu-item (click)="showAllDashlets(group.id)">
+                                <button class="dashboard-kpi-menu-item" mat-menu-item
+                                        (click)="showAllDashlets(group.id)">
                                     {{'LNG_PAGE_DASHBOARD_KPI_SECTION_MENU_SHOW_ALL_LABEL' | translate}}
                                 </button>
                             </mat-menu>

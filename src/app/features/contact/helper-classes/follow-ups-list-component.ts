@@ -324,7 +324,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             return ErrorObservable.create(err);
         }).subscribe(() => {
             // update loaded follow-up data
-            followUp.teamId = team.id;
+            followUp.teamId = team ? team.id : null;
 
             // show success ?
             // this might not be the best idea...maybe we can replace / remove it
