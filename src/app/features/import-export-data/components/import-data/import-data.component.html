@@ -95,7 +95,7 @@
 
             <app-form-select
                 name="loadImportMapping"
-                [placeholder]="'LNG_LOAD_SAVED_IMPORT_MAPPING_LABEL' | translate"
+                [placeholder]="'LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_LABEL' | translate"
                 [options]="savedMappingsList$ | async "
                 (optionChanged)="loadSavedImportMapping($event)"
                 optionLabelKey="name"
@@ -254,6 +254,7 @@
                 fxFlex fxLayout="row" fxLayoutAlign="end">
                 <button
                     (click)="saveImportMapping()"
+                    type="button"
                     class="save-import-mapping-button"
                     mat-raised-button
                     color="accent">

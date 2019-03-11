@@ -3,6 +3,7 @@ import { CacheKey, CacheService } from '../../../../core/services/helper/cache.s
 import { Router } from '@angular/router';
 import { ImportDataExtension } from '../../components/import-data/import-data.component';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-import-hierarchical-locations',
@@ -22,6 +23,8 @@ export class ImportHierarchicalLocationsComponent {
             true
         )
     ];
+
+    Constants = Constants;
 
     allowedExtensions: string[] = [
         ImportDataExtension.XML,

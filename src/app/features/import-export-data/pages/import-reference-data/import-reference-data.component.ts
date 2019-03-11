@@ -4,6 +4,7 @@ import { ImportDataExtension, ImportServerModelNames } from '../../components/im
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-import-case-lab-data',
@@ -32,6 +33,8 @@ export class ImportReferenceDataComponent {
         ImportDataExtension.ODS,
         ImportDataExtension.JSON
     ];
+
+    Constants = Constants;
 
     importFileUrl: string = 'importable-files';
     importDataUrl: string = 'reference-data/import-importable-file-using-map';

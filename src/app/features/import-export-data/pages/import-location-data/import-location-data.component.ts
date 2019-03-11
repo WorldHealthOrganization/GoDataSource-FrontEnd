@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ImportDataExtension, ImportServerModelNames } from '../../components/import-data/import-data.component';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-import-case-data',
@@ -22,6 +23,8 @@ export class ImportLocationDataComponent {
             true
         )
     ];
+
+    Constants = Constants;
 
     allowedExtensions: string[] = [
         ImportDataExtension.CSV,

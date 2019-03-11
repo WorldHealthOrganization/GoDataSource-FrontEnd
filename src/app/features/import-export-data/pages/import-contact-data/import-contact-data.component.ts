@@ -4,6 +4,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ImportDataExtension, ImportServerModelNames } from '../../components/import-data/import-data.component';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-import-contact-data',
@@ -23,6 +24,8 @@ export class ImportContactDataComponent implements OnInit {
             true
         )
     ];
+
+    Constants = Constants;
 
     allowedExtensions: string[] = [
         ImportDataExtension.CSV,

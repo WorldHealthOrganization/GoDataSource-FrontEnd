@@ -172,6 +172,22 @@ export class Constants {
         CONTACTS: {
             label: 'LNG_APP_PAGE_IMPORT_CONTACTS',
             value: 'LNG_APP_PAGE_IMPORT_CONTACTS'
+        },
+        CASE_LAB_DATA: {
+            label: 'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA',
+            value: 'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA'
+        },
+        HIERARCHICAL_LOCATIONS: {
+            label: 'LNG_APP_PAGE_IMPORT_HIERARCHICAL_LOCATION',
+            value: 'LNG_APP_PAGE_IMPORT_HIERARCHICAL_LOCATION'
+        },
+        REFERENCE_DATA: {
+            label: 'LNG_APP_PAGE_IMPORT_REFERENCE_DATA',
+            value: 'LNG_APP_PAGE_IMPORT_REFERENCE_DATA'
+        },
+        LOCATION_DATA: {
+            label: 'LNG_APP_PAGE_IMPORT_LOCATION_DATA',
+            value: 'LNG_APP_PAGE_IMPORT_LOCATION_DATA'
         }
     };
 

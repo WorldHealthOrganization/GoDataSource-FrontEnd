@@ -36,7 +36,7 @@
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_CLUSTER_FIELD_LABEL_NAME' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="nameFilter"
@@ -55,46 +55,60 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Description -->
+        <!-- Public -->
         <ng-container matColumnDef="isPublic">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header class="column-header">{{'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-input
+                        <app-form-select
                             name="descriptionFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('description', $event)"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanField('isPublic', $event.value)"
                             app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.description }}
+                <app-form-slide-toggle
+                    [disabled]="item.readonly"
+                    name="isPublic"
+                    [(ngModel)]="item.isPublic"
+                    [label]="'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC' | translate"
+                    tooltip="LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC_DESCRIPTION"
+                    (optionChanged)="setPublicItem(item.id, $event)">
+                </app-form-slide-toggle>
             </mat-cell>
         </ng-container>
-        <!-- Description -->
+
+        <!-- For page -->
         <ng-container matColumnDef="mappingKey">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header class="column-header">{{'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_FOR_PAGE' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="descriptionFilter"
+                        <app-form-select
+                            name="mappingKeysFilter"
                             ngModel
+                            [options]="pagesWithSavedFilters"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('description', $event)"
+                            (optionChanged)="filterBySelectField('mappingKey', $event)"
                             app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+                            optionLabelKey="label"
+                            optionLabelValue="value"
+                            [displayFilterIcon]="true"
+                            [multiple]="true">
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.description }}
+                {{ item.mappingKey | translate }}
             </mat-cell>
         </ng-container>
 
@@ -109,8 +123,10 @@
 
                 <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
 
-                    <button mat-menu-item [routerLink]="['.', item.id, 'view']">
-                        {{ 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_CLUSTER' | translate }}
+                    <button
+                        mat-menu-item
+                        (click)="deleteSavedImportMapping(item.id)">
+                        {{ 'LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_DELETE_MAPPING' | translate }}
                     </button>
 
                 </mat-menu>

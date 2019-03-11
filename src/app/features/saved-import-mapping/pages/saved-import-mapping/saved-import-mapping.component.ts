@@ -7,6 +7,12 @@ import { Observable } from 'rxjs/Observable';
 import { SavedImportMappingModel } from '../../../../core/models/saved-import-mapping.model';
 import { tap } from 'rxjs/operators';
 import * as _ from 'lodash';
+import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-saved-import-mapping',
@@ -19,12 +25,20 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
         new BreadcrumbItemModel('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_TITLE', '.', true)
     ];
 
+    yesNoOptionsList$: Observable<any[]>;
+
+    pagesWithSavedFilters: LabelValuePair[] = _.map(Constants.APP_IMPORT_PAGE, (page) => {
+        return new LabelValuePair(page.label, page.value);
+    });
+
     savedImportMappingsList$: Observable<SavedImportMappingModel[]>;
     savedImportMappingsListCount$: Observable<any>;
 
     constructor(
         protected snackbarService: SnackbarService,
-        private savedImportMappingService: SavedImportMappingService
+        private savedImportMappingService: SavedImportMappingService,
+        private dialogService: DialogService,
+        private genericDataService: GenericDataService
     ) {
         super(
             snackbarService
@@ -32,6 +46,8 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
     }
 
     ngOnInit() {
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+
         // initialize pagination
         this.initPaginator();
         // ...and re-load the list
@@ -70,8 +86,45 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
         return columns;
     }
 
-    getSavedImportMappingsList(){
+    /**
+     * Delete a saved import mapping
+     * @param {string} savedImportId
+     */
+    deleteSavedImportMapping(savedImportId: string) {
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_SAVED_IMPORT_MAPPING')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // delete contact
+                    this.savedImportMappingService.deleteSavedImportMapping(savedImportId)
+                        .catch((err) => {
+                            this.snackbarService.showApiError(err);
 
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                            // reload data
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+
+    /**
+     * Modify public status of a saved import mapping
+     * @param {string} savedImportMappingId
+     * @param {boolean} isPublic
+     */
+    setPublicItem(savedImportMappingId: string, isPublic: boolean) {
+        this.savedImportMappingService.modifySavedImportMapping(savedImportMappingId, {isPublic : isPublic})
+            .catch((err) => {
+                this.snackbarService.showApiError(err);
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess(`LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE`);
+            });
     }
 
 }
