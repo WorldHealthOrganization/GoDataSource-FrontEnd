@@ -79,6 +79,11 @@ export class WorldMapMovementComponent {
             // finished
             return currentAddress;
         }).value();
+
+        // set center to first item
+        if (!_.isEmpty(this.markers)) {
+            this.selectedGeoPoint = this.markers[0].point;
+        }
     }
     get addresses(): AddressModel[] {
         return this._addresses;
