@@ -129,7 +129,7 @@ export class ImportDataComponent implements OnInit {
     @Input() savedImportPage: string;
 
     /**
-     * ...
+     * List with saved import mappings
      */
     savedMappingsList$: Observable<SavedImportMappingModel[]>;
 
@@ -664,12 +664,12 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
-     * ....
+     * Get saved import mappings for specific page
      */
     getSavedImportMappings() {
         const qb = new RequestQueryBuilder();
 
-        // ...
+        // specify for what page we want to get the saved items
         qb.filter.where({
             mappingKey: {
                 eq: this.savedImportPage

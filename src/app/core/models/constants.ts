@@ -169,9 +169,9 @@ export class Constants {
             label: 'LNG_APP_PAGE_IMPORT_CASES',
             value: 'LNG_APP_PAGE_IMPORT_CASES'
         },
-        CONTACTS: {
-            label: 'LNG_APP_PAGE_IMPORT_CONTACTS',
-            value: 'LNG_APP_PAGE_IMPORT_CONTACTS'
+        CONTACT: {
+            label: 'LNG_APP_PAGE_IMPORT_CONTACT',
+            value: 'LNG_APP_PAGE_IMPORT_CONTACT'
         },
         CASE_LAB_DATA: {
             label: 'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA',
