@@ -78,7 +78,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         private genericDataService: GenericDataService,
         private dialogService: DialogService,
         private i18nService: I18nService,
-        private relationshipDataService: RelationshipDataService,
+        private relationshipDataService: RelationshipDataService
     ) {
         super(route);
     }

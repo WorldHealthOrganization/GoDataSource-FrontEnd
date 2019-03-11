@@ -60,7 +60,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         protected outbreakDataService: OutbreakDataService,
         protected entityDataService: EntityDataService,
         private genericDataService: GenericDataService,
-        private referenceDataDataService: ReferenceDataDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(
             snackbarService, router, route,

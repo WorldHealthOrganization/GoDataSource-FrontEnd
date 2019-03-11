@@ -74,13 +74,17 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
                 <app-form-slide-toggle
-                    [disabled]="item.readonly"
+                    *ngIf="!item.readOnly"
                     name="isPublic"
                     [(ngModel)]="item.isPublic"
                     [label]="'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_PUBLIC' | translate"
                     tooltip="LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_PUBLIC_DESCRIPTION"
                     (optionChanged)="setPublicItem(item.id, $event)">
                 </app-form-slide-toggle>
+                <app-yes-no-label
+                    *ngIf="item.readOnly"
+                    [value]="item.isPublic">
+                </app-yes-no-label>
             </mat-cell>
         </ng-container>
 
@@ -115,14 +119,14 @@
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
 
             <mat-cell *matCellDef="let item" fxFlex="70px">
-                <button *ngIf="!item.readonly"
-                        mat-icon-button
-                        [matMenuTriggerFor]="actionsMenu">
+                <button
+                    *ngIf="!item.readOnly"
+                    mat-icon-button
+                    [matMenuTriggerFor]="actionsMenu">
                     <span class="xt-icon">moreVertical</span>
                 </button>
 
                 <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-
                     <button
                         mat-menu-item
                         (click)="deleteFilter(item.id)">

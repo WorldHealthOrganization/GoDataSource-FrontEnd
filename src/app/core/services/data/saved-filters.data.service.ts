@@ -40,10 +40,10 @@ export class SavedFiltersService {
     }
 
     /**
-     * Save a filter
+     * Create filter
      * @param filterData
      */
-    saveFilter(filterData: SavedFilterModel) {
+    createFilter(filterData: SavedFilterModel) {
         return this.http.post(`filter-mappings`, filterData);
     }
 
@@ -52,7 +52,7 @@ export class SavedFiltersService {
      * @param {string} savedFilterId
      * @returns {Observable<any>}
      */
-    modifySavedFilter(savedFilterId: string, savedFilterData): Observable<any> {
+    modifyFilter(savedFilterId: string, savedFilterData): Observable<any> {
         return this.modelHelper.mapObservableToModel(
             this.http.put(`filter-mappings/${savedFilterId}`, savedFilterData),
             SavedFilterModel
@@ -63,7 +63,7 @@ export class SavedFiltersService {
      * Delete a saved filter
      * @param {string} savedFilterId
      */
-    deleteSavedFilter(savedFilterId: string) {
+    deleteFilter(savedFilterId: string) {
         return this.http.delete(`filter-mappings/${savedFilterId}`);
     }
 }

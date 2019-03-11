@@ -94,7 +94,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
      * @param isPublic
      */
     setPublicItem(savedFilterId: string, isPublic: boolean) {
-        this.savedFiltersService.modifySavedFilter(savedFilterId, {isPublic : isPublic})
+        this.savedFiltersService.modifyFilter(savedFilterId, {isPublic : isPublic})
             .catch((err) => {
                 this.snackbarService.showApiError(err);
                 return ErrorObservable.create(err);
@@ -112,7 +112,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_SAVED_FILTER')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
-                    this.savedFiltersService.deleteSavedFilter(filterId)
+                    this.savedFiltersService.deleteFilter(filterId)
                         .catch((err) => {
                             this.snackbarService.showApiError(err);
 

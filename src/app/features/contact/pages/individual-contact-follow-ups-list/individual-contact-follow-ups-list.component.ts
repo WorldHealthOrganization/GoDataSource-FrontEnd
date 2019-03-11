@@ -82,7 +82,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
-        private contactDataService: ContactDataService,
+        private contactDataService: ContactDataService
     ) {
         super(
             snackbarService, dialogService, followUpsDataService,

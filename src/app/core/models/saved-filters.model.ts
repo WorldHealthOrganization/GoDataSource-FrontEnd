@@ -70,7 +70,7 @@ export class SavedFilterModel {
     id: string;
     name: string;
     isPublic: boolean;
-    readonly: boolean;
+    readOnly: boolean;
     filterKey: string;
     filterData: SavedFilterData;
 
@@ -78,14 +78,14 @@ export class SavedFilterModel {
         id?: string,
         name?: string,
         isPublic?: boolean,
-        readonly?: boolean,
+        readOnly?: boolean,
         filterKey?: string,
         filterData?: SavedFilterData
     }) {
         this.id = _.get(data, 'id');
         this.name = _.get(data, 'name');
-        this.isPublic = _.get(data, 'isPublic', false);
-        this.readonly = _.get(data, 'readonly', false);
+        this.isPublic = _.get(data, 'isPublic');
+        this.readOnly = _.get(data, 'readOnly');
         this.filterKey = _.get(data, 'filterKey');
         this.filterData = new SavedFilterData(_.get(data, 'filterData', {}));
     }

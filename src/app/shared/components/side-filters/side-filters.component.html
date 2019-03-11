@@ -18,11 +18,12 @@
                     <div>
                         <app-form-select
                             name="loadFilter"
-                            [placeholder]="'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL'"
+                            [ngModel]="loadedFilter?.id"
+                            [placeholder]="'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL' | translate"
                             [options]="savedFilters$ | async"
                             (optionChanged)="loadSavedFilter($event)"
                             optionLabelKey="name"
-                            optionValueKey="filterData">
+                            optionValueKey="id">
                         </app-form-select>
                     </div>
 
@@ -320,7 +321,8 @@
                         mat-raised-button
                         color="primary"
                         type="button"
-                        (click)="saveFilter()">
+                        (click)="saveFilter()"
+                        [disabled]="appliedFilters.length < 1 && appliedSort.length < 1">
                         {{ 'LNG_SIDE_FILTERS_SAVE_FILTER_BUTTON' | translate}}
                     </button>
                 </div>
