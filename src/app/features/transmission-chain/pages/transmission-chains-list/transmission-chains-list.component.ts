@@ -143,7 +143,16 @@ export class TransmissionChainsListComponent extends ListComponent implements On
             if (this.appliedListFilter === ApplyListFilter.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES) {
                 this.transmissionChains$ = this.transmissionChainDataService.getTransmissionChainsFromContactsWhoBecameCasesList(this.selectedOutbreak.id, this.queryBuilder);
             } else {
-                this.transmissionChains$ = this.transmissionChainDataService.getIndependentTransmissionChainsList(this.selectedOutbreak.id, this.queryBuilder);
+                const qb = new RequestQueryBuilder();
+
+                qb.filter.flag(
+                    'countContacts',
+                    true
+                );
+
+                qb.merge(this.queryBuilder);
+
+                this.transmissionChains$ = this.transmissionChainDataService.getIndependentTransmissionChainsList(this.selectedOutbreak.id, qb);
             }
 
             this.transmissionChains$ = this.transmissionChains$
@@ -164,6 +173,7 @@ export class TransmissionChainsListComponent extends ListComponent implements On
             'firstContactDate',
             'noCases',
             'noAliveCases',
+            'numberOfContacts',
             'duration',
             'active'
         ];
