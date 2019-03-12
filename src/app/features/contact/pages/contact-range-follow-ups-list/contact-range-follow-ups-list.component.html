@@ -216,5 +216,12 @@
                 </div>
             </div>
         </div>
+
+        <mat-paginator
+            [length]="(followUpsGroupedByContactCount$ | async)?.count"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="changePage($event)">
+        </mat-paginator>
     </div>
 </mat-card>
