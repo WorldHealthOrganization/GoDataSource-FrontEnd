@@ -108,6 +108,18 @@ const routes: Routes = [
                     permissions: [PERMISSION.READ_SYS_CONFIG]
                 }
             },
+            // Versions
+            {
+                path: ModulePath.VersionsModule,
+                loadChildren: './features/versions/versions.module#VersionsModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                }
+            },
             // Outbreak Module routes
             {
                 path: ModulePath.OutbreakModule,

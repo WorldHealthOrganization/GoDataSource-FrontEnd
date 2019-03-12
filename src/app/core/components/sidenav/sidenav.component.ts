@@ -76,6 +76,12 @@ export class SidenavComponent implements OnInit {
                 'LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE_LABEL',
                 [],
                 '/terms-of-use'
+            ),
+            new ChildNavItem(
+                'versions',
+                'LNG_LAYOUT_MENU_ITEM_VERSIONS_LABEL',
+                [],
+                '/versions'
             )
         ]
     );

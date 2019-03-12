@@ -53,5 +53,13 @@ export class SystemSettingsDataService {
             SystemSettingsVersionModel
         );
     }
+
+    /**
+     * Retrieve versions number
+     * @returns {Observable<Object>}
+     */
+    getVersionsNumber() {
+        return this.http.get('/system-settings/version');
+    }
 }
 

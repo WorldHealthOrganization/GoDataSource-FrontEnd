@@ -114,6 +114,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP_LABEL': 'Cloud backup',
         'LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE_LABEL': 'Terms of use',
         'LNG_LAYOUT_MENU_ITEM_SAVED_IMPORT_MAPPING_LABEL': 'Saved import mapping',
+        'LNG_LAYOUT_MENU_ITEM_VERSIONS_LABEL': 'Versions',
 
         /**
          * uiDialogs
@@ -168,6 +169,11 @@ export const EnglishUsLang = {
         'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC_DESCRIPTION': '',
         'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_FOR_PAGE': 'For page',
 
+        /**
+         * NEW GROUP
+         * uiVersionsPage
+         */
+        'LNG_PAGE_VERSIONS_TITLE': 'Versions',
 
         /**
          * REMOVE the tokens from below
