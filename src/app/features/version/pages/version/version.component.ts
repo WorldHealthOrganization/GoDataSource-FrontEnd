@@ -3,14 +3,14 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 
 @Component({
-    selector: 'app-versions',
-    templateUrl: './versions.component.html',
-    styleUrls: ['./versions.component.less']
+    selector: 'app-version',
+    templateUrl: './version.component.html',
+    styleUrls: ['./version.component.less']
 })
-export class VersionsComponent implements OnInit {
+export class VersionComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_VERSIONS_TITLE', '.')
+        new BreadcrumbItemModel('LNG_PAGE_VERSION_TITLE', '.')
     ];
 
     version: string;
@@ -21,7 +21,7 @@ export class VersionsComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.systemSettingsDataService.getVersionsNumber()
+        this.systemSettingsDataService.getVersionNumber()
             .subscribe((versionData: { version: string }) => {
                 this.version = versionData.version;
             });

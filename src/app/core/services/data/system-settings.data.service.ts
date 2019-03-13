@@ -55,10 +55,10 @@ export class SystemSettingsDataService {
     }
 
     /**
-     * Retrieve versions number
+     * Retrieve version number
      * @returns {Observable<Object>}
      */
-    getVersionsNumber() {
+    getVersionNumber() {
         return this.http.get('/system-settings/version');
     }
 }

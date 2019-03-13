@@ -6,7 +6,7 @@ import { ModuleWithProviders } from '@angular/compiler/src/core';
 const routes: Routes = [
     {
         path: '',
-        component: fromPages.VersionsComponent
+        component: fromPages.VersionComponent
     }
 ];
 

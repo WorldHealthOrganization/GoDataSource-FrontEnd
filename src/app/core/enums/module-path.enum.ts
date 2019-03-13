@@ -23,7 +23,7 @@ export enum ModulePath {
     CloudBackupModule = 'cloud-backup',
     SavedImportMappingModule = 'saved-import-mapping',
     TermsOfUseModule = 'terms-of-use',
-    VersionsModule = 'versions',
+    VersionModule = 'version',
     LanguageModule = 'languages',
     HelpModule = 'help'
 }

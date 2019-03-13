@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 
 // modules
-import { routing } from './versions.module.routing';
+import { routing } from './version.module.routing';
 import { SharedModule } from '../../shared/shared.module';
 
 // components
@@ -17,6 +17,6 @@ import * as fromPages from './pages';
     ],
     entryComponents: []
 })
-export class VersionsModule {
+export class VersionModule {
 
 }
