@@ -290,5 +290,18 @@ export class FollowUpsDataService {
             RangeFollowUpsModel
         );
     }
+
+    /**
+     * Count groups => FollowUps grouped by contacts from an Outbreak
+     * @param {string} outbreakId
+     * @returns {Observable<FollowUpModel[]>}
+     */
+    getRangeFollowUpsListCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const filter = queryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/range-follow-ups/count?filter=${filter}`);
+    }
 }
 

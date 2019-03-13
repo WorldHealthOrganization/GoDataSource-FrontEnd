@@ -175,7 +175,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                     this.slideFilterData.maxRange = this.selectedOutbreak.periodOfFollowup;
 
                     // initialize pagination
-                    // this.initPaginator();
+                    this.initPaginator();
 
                     // filter
                     this.filterByDateRange(new FormDateRangeSliderData({
@@ -275,10 +275,10 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
      */
     refreshListCount() {
         if (this.selectedOutbreak) {
-            // // remove paginator from query builder
-            // const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-            // countQueryBuilder.paginator.clear();
-            // this.followUpsGroupedByContactCount$ = this.followUpsDataService.getRangeFollowUpsList(this.selectedOutbreak.id, countQueryBuilder).share();
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            this.followUpsGroupedByContactCount$ = this.followUpsDataService.getRangeFollowUpsListCount(this.selectedOutbreak.id, countQueryBuilder).share();
         }
     }
 
@@ -333,15 +333,15 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         // order by name
         this.queryBuilder.sort
             .by(
-                'firstName',
+                'contact.firstName',
                 RequestSortDirection.ASC
             )
             .by(
-                'lastName',
+                'contact.lastName',
                 RequestSortDirection.ASC
             )
             .by(
-                'visualId',
+                'contact.visualId',
                 RequestSortDirection.ASC
             );
     }
