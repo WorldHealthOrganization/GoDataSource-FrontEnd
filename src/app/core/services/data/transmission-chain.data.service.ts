@@ -527,6 +527,41 @@ export class TransmissionChainDataService {
                                 graphEdge.label = String(noDays);
                             }
                         }
+
+                        // set edge icon
+                        if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
+                            if (relationship.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.CO_WORKERS) {
+                                graphEdge.label = 'people';
+                            } else if (relationship.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.FAMILY) {
+                                graphEdge.label = 'people';
+                            } else if (relationship.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.FRIENDS) {
+                                graphEdge.label = 'person_add';
+                            } else if (relationship.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.FUNERAL) {
+                                graphEdge.label = 'turned_in';
+                            } else if (relationship.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.NEIGHBOUR) {
+                                graphEdge.label = 'nature_people';
+                            } else if (relationship.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.NOSOCOMIAL) {
+                                graphEdge.label = 'airline_seat_flat';
+                            } else if (relationship.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.TRAVEL) {
+                                graphEdge.label = 'commute';
+                            } else if (relationship.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.UNKNOWN) {
+                                graphEdge.label = 'help';
+                            }
+                            graphEdge.fontFamily = 'xtIcon';
+
+                        } else if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.EXPOSURE_TYPE) {
+                            if (relationship.exposureTypeId === Constants.EXPOSURE_TYPE.DIRECT_PHYSICAL_CONTACT) {
+                                graphEdge.label = 'touch_app';
+                            } else if (relationship.socialRelationshipTypeId === Constants.EXPOSURE_TYPE.SLEPT_ATE_SPENT_TIME_TOGETHER) {
+                                graphEdge.label = 'hotel';
+                            } else if (relationship.socialRelationshipTypeId === Constants.EXPOSURE_TYPE.TOUCHED_BODY_FLUIDS) {
+                                graphEdge.label = 'pan_tool';
+                            } else if (relationship.socialRelationshipTypeId === Constants.EXPOSURE_TYPE.TOUCHED_LINENS_CLOTHES) {
+                                graphEdge.label = 'free_breakfast';
+                            }
+                            graphEdge.fontFamily = 'xtIcon';
+                        }
+
                         graphData.edges.push({data: graphEdge});
                     }
                 });

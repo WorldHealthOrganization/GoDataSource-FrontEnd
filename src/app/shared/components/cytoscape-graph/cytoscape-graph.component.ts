@@ -222,7 +222,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                 'label': 'data(label)',
                 'text-wrap': 'wrap',
                 'height': 40,
-                'width': 40
+                'width': 40,
             }
         },
         {
@@ -235,7 +235,9 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                 'target-arrow-color': 'data(edgeColor)',
                 'label': 'data(label)',
                 'text-rotation': 'autorotate',
-                'text-margin-y': '14px'
+                'text-margin-y': '14px',
+                'text-wrap': 'wrap',
+                'font-family': 'data(fontFamily)'
             }
         }
     ];

@@ -2,7 +2,7 @@
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <mat-radio-group class="radio-group" [(ngModel)]="value" [disabled]="disabled">
-        <mat-radio-button class="radio-button" *ngFor="let option of options" [value]="option.value">
+        <mat-radio-button class="radio-button" *ngFor="let option of options" [value]="option.value" (change)="onChange(option.value)">
             {{option.label | translate}}
         </mat-radio-button>
     </mat-radio-group>

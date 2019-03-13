@@ -11,6 +11,7 @@ export class GraphEdgeModel {
     edgeColor: string;
     edgeStyle: string;
     label: string;
+    fontFamily: string;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -21,6 +22,7 @@ export class GraphEdgeModel {
         this.edgeColor = _.get(data, 'edgeColor', Constants.DEFAULT_COLOR_CHAINS);
         this.edgeStyle = _.get(data, 'edgeStyle', 'solid');
         this.label = _.get(data, 'label', '');
+        this.fontFamily = 'Roboto, "Helvetica Neue", sans-serif';
     }
 
 }
