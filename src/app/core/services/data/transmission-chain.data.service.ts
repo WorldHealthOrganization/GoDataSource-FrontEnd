@@ -289,21 +289,9 @@ export class TransmissionChainDataService {
                         if (!_.isEmpty(colorCriteria.nodeShape)) {
 
                             if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.TYPE.value ) {
-                               if (node.type === EntityType.CASE) {
-                                   nodeData.shape = 'ellipse';
-                               } else if (node.type === EntityType.CONTACT) {
-                                   nodeData.shape = 'pentagon';
-                               } else if (node.type === EntityType.EVENT) {
-                                   nodeData.shape = 'star';
-                               }
+                               nodeData.setNodeShapeType(node);
                             } else if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.CLASSIFICATION.value) {
-                                if (node.model.classification === Constants.CASE_CLASSIFICATION.CONFIRMED) {
-                                    nodeData.shape = 'ellipse';
-                                } else if (node.model.classification === Constants.CASE_CLASSIFICATION.PROBABLE) {
-                                    nodeData.shape = 'rectangle';
-                                } else if (node.model.classification === Constants.CASE_CLASSIFICATION.SUSPECT) {
-                                    nodeData.shape = 'pentagon';
-                                }
+                                nodeData.setNodeShapeClassification(node);
                             }
                         }
                         // determine label
@@ -468,13 +456,8 @@ export class TransmissionChainDataService {
                             }
                         }
                         // set edge style
-                        if (relationship.certaintyLevelId === Constants.CERTAINITY_LEVEL.LOW) {
-                            graphEdge.edgeStyle = 'dotted';
-                        } else if (relationship.certaintyLevelId === Constants.CERTAINITY_LEVEL.MEDIUM) {
-                            graphEdge.edgeStyle = 'dashed';
-                        } else {
-                            graphEdge.edgeStyle = 'solid';
-                        }
+                        graphEdge.setEdgeStyle(relationship);
+
                         // set edge label
                         if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value) {
                             graphEdge.label = '';
@@ -530,35 +513,11 @@ export class TransmissionChainDataService {
 
                         // set edge icon
                         if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
-                            if (relationship.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.CO_WORKERS) {
-                                graphEdge.label = 'people';
-                            } else if (relationship.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.FAMILY) {
-                                graphEdge.label = 'people';
-                            } else if (relationship.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.FRIENDS) {
-                                graphEdge.label = 'person_add';
-                            } else if (relationship.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.FUNERAL) {
-                                graphEdge.label = 'turned_in';
-                            } else if (relationship.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.NEIGHBOUR) {
-                                graphEdge.label = 'nature_people';
-                            } else if (relationship.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.NOSOCOMIAL) {
-                                graphEdge.label = 'airline_seat_flat';
-                            } else if (relationship.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.TRAVEL) {
-                                graphEdge.label = 'commute';
-                            } else if (relationship.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.UNKNOWN) {
-                                graphEdge.label = 'help';
-                            }
+                            graphEdge.setEdgeIconContextOfTransmission(relationship);
                             graphEdge.fontFamily = 'xtIcon';
 
-                        } else if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.EXPOSURE_TYPE) {
-                            if (relationship.exposureTypeId === Constants.EXPOSURE_TYPE.DIRECT_PHYSICAL_CONTACT) {
-                                graphEdge.label = 'touch_app';
-                            } else if (relationship.socialRelationshipTypeId === Constants.EXPOSURE_TYPE.SLEPT_ATE_SPENT_TIME_TOGETHER) {
-                                graphEdge.label = 'hotel';
-                            } else if (relationship.socialRelationshipTypeId === Constants.EXPOSURE_TYPE.TOUCHED_BODY_FLUIDS) {
-                                graphEdge.label = 'pan_tool';
-                            } else if (relationship.socialRelationshipTypeId === Constants.EXPOSURE_TYPE.TOUCHED_LINENS_CLOTHES) {
-                                graphEdge.label = 'free_breakfast';
-                            }
+                        } else if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.EXPOSURE_TYPE.value) {
+                            graphEdge.setEdgeIconExposureType(relationship);
                             graphEdge.fontFamily = 'xtIcon';
                         }
 
