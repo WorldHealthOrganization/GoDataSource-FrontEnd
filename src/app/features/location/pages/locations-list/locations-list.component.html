@@ -205,7 +205,7 @@
                                 <app-form-select
                                     name="activeFilter"
                                     ngModel
-                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                     [options]="yesNoOptionsList$ | async"
                                     (optionChanged)="filterByBooleanField('active', $event.value)"
                                     app-reset-input-on-side-filter
