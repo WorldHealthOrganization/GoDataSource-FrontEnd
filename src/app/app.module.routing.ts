@@ -269,6 +269,21 @@ const routes: Routes = [
                     ]
                 }
             },
+            // D3 Graphs Module routes
+            {
+                path: ModulePath.D3GraphsModule,
+                loadChildren: './features/d3-graphs/d3-graphs.module#D3GraphsModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [
+                        PERMISSION.READ_OUTBREAK,
+                        PERMISSION.READ_REPORT
+                    ]
+                }
+            },
             // Import / Export Data Module routes
             {
                 path: ModulePath.ImportExportDataModule,

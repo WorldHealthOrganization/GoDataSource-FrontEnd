@@ -109,6 +109,10 @@ export const EnglishUsLang = {
         /**
          * uiGenericLayout
          */
+        'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL': 'Chains of transmission graph',
+        'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAIN_BARS_LABEL': 'Chains of transmission bars',
+        'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LIST_LABEL': 'Chains of transmission list',
+        'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_COUNT_MAP_LABEL': 'Cases count map',
         'LNG_LAYOUT_MENU_ITEM_SET_SECURITY_QUESTION_LABEL': 'Set security question',
         'LNG_LAYOUT_MENU_ITEM_SAVED_FILTERS_LABEL': 'Saved filters',
         'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP_LABEL': 'Cloud backup',
@@ -125,6 +129,12 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_SAVED_IMPORT_MAPPING': 'Are you sure you want to delete this saved import mapping?',
         'LNG_DIALOG_SAVE_MAPPING_IMPORTS_TITLE' : 'Enter a name for the new mapping import',
         'LNG_DIALOG_SAVE_MAPPING_IMPORTS_BUTTON' : 'Save import mapping',
+
+        /**
+         * NEW GROUP
+         * uiChainsOfTransmissionBars
+         */
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE': 'Chains of transmission bars',
 
         /**
          * uiSideFilter
