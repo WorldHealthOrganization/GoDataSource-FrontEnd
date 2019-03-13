@@ -98,6 +98,19 @@
             </mat-cell>
         </ng-container>
 
+        <!--Total number of contacts-->
+        <ng-container matColumnDef="numberOfContacts">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NUMBER_OF_CONTACTS' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.contactsCount}}
+            </mat-cell>
+        </ng-container>
+
         <!-- Duration -->
         <ng-container matColumnDef="duration">
             <mat-header-cell *matHeaderCellDef>
