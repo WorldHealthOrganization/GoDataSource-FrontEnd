@@ -329,7 +329,7 @@ export class Constants {
     };
 
     /**
-     * Used to display icons for context of transmission
+     * Used to display icons for exposure type
      */
     static EXPOSURE_TYPE = {
         DIRECT_PHYSICAL_CONTACT: 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_TYPE_DIRECT_PHYSICAL_CONTACT',

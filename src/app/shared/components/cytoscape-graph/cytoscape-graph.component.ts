@@ -222,7 +222,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                 'label': 'data(label)',
                 'text-wrap': 'wrap',
                 'height': 40,
-                'width': 40,
+                'width': 40
             }
         },
         {
