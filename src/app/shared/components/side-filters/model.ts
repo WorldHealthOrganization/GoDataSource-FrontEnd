@@ -158,6 +158,8 @@ export class FilterModel {
 
     // flag where property instead of creating specific rules...
     flagIt: boolean;
+    // flag to know if we must display or not "None" label in side filters select option
+    displayNoneLabel: boolean;
 
     /**
      * Unique key
@@ -189,7 +191,8 @@ export class FilterModel {
             value: FilterComparator,
             valueType: ValueType
         }[],
-        flagIt?: boolean
+        flagIt?: boolean,
+        displayNoneLabel?: boolean
     }) {
         // set handler
         this.self = this;
