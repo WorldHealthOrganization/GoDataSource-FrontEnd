@@ -32,6 +32,8 @@ export class TransmissionChainModel {
     duration: number;
     // size of the chain ( no of cases )
     size: number;
+    // total number of contacts
+    contactsCount: number;
     // earliest date of onset
     earliestDateOfOnset: string;
     // root case
@@ -40,6 +42,7 @@ export class TransmissionChainModel {
     constructor(chainData = null, nodesData = {}, relationshipsData = []) {
         this.active = _.get(chainData, 'active', false);
         this.size = _.get(chainData, 'size', 0);
+        this.contactsCount = _.get(chainData, 'contactsCount', 0);
         this.duration = _.get(chainData, 'period.duration', 0);
 
         const chainRelationsData = _.get(chainData, 'chain', []);

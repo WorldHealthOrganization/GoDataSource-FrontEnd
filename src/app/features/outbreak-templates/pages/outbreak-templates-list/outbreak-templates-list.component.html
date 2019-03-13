@@ -63,9 +63,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                <a [routerLink]="['/outbreak-templates', item.id, 'view']">
-                    {{ item.name }}
-                </a>
+                {{ item.name }}
             </mat-cell>
         </ng-container>
 

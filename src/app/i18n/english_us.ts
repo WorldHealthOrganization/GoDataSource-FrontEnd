@@ -170,6 +170,11 @@ export const EnglishUsLang = {
         'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_FOR_PAGE': 'For page',
 
         /**
+         * uiTransmissionChainFields
+         */
+        'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NUMBER_OF_CONTACTS': 'Number of contacts',
+
+        /**
          * NEW GROUP
          * uiVersionPage
          */
