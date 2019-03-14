@@ -39,6 +39,26 @@
 
 <mat-card class="page-section page-content">
 
-    #TODO chain
+    <div #chart id="chart" (window:resize)="onResize($event)"></div>
+
+    <div class="graph" fxLayout="row" fxLayoutGap="20px">
+        <div fxLayout="column">
+            <span class="date" *ngFor="let date of days">{{date}}</span>
+        </div>
+
+        <div class="case" fxLayout="column">
+            <div class="date-of-onset"></div>
+            <div class="date-of-onset"></div>
+            <div class="date-of-onset"></div>
+            <div class="isolation"></div>
+            <div class="isolation"></div>
+            <div class="isolation"></div>
+            <div class="isolation"></div>
+            <div class="isolation"></div>
+            <div class="isolation"></div>
+            <div class="lab-result">G</div>
+        </div>
+    </div>
+
 
 </mat-card>

@@ -1,0 +1,50 @@
+app-transmission-chain-bars {
+
+    #bar {
+        width: inherit;
+        height: inherit;
+    }
+
+    .bar {
+        fill: steelblue;
+
+        &:hover {
+            fill: brown;
+        }
+    }
+
+    .axis--x path {
+        display: none;
+    }
+
+
+    @cell-width: 40px;
+    @cell-height: 25px;
+    .graph {
+        .date {
+            height: @cell-height;
+            display: flex;
+            align-items: center;
+        }
+
+        .case {
+            border: 1px solid black;
+
+            .date-of-onset,
+            .isolation,
+            .labresult {
+
+            }
+
+            .date-of-onset {
+
+            }
+            .isolation {
+
+            }
+            .lab-result {
+
+            }
+        }
+    }
+}
