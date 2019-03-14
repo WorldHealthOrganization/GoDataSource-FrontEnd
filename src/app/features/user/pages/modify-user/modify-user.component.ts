@@ -84,6 +84,11 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
             delete dirtyFields.passwordConfirm;
         }
 
+        // remove password if empty
+        if (_.isEmpty(dirtyFields.password)) {
+            delete dirtyFields.password;
+        }
+
         if (form.valid && !_.isEmpty(dirtyFields)) {
 
             // modify the user
