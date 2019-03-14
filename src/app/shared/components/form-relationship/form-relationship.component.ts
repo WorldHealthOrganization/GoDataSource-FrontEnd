@@ -13,6 +13,7 @@ import { ReferenceDataDataService } from '../../../core/services/data/reference-
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { EntityType } from '../../../core/models/entity-type';
 import { Moment } from 'moment';
+import { Constants } from '../../../core/models/constants';
 
 @Component({
     selector: 'app-form-relationship',
@@ -104,7 +105,7 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
                 .subscribe((options: LabelValuePair[]) => {
                     if (!_.isEmpty(options)) {
                         // get the last option selected by default (high)
-                        this.value.certaintyLevelId = options[options.length - 1].value;
+                        this.value.certaintyLevelId = Constants.CERTAINITY_LEVEL.HIGH;
                     }
                 });
         });

@@ -85,7 +85,7 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
                 .subscribe((options: LabelValuePair[]) => {
                     if (!_.isEmpty(options)) {
                         // get the last option selected by default (high)
-                        this.value.certaintyLevelId = options[options.length - 1].value;
+                        this.value.certaintyLevelId = Constants.CERTAINITY_LEVEL.HIGH;
                     }
                 });
         });
