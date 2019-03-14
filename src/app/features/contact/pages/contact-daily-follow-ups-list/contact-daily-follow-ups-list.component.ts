@@ -346,8 +346,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 fieldName: 'statusId',
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
                 type: FilterType.SELECT,
-                options$: this.dailyStatusTypeOptions$,
-                displayNoneLabel: false
+                options$: this.dailyStatusTypeOptions$
             }),
             new FilterModel({
                 fieldName: 'weekNumber',
