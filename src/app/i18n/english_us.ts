@@ -121,6 +121,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP_LABEL': 'Cloud backup',
         'LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE_LABEL': 'Terms of use',
         'LNG_LAYOUT_MENU_ITEM_SAVED_IMPORT_MAPPING_LABEL': 'Saved import mapping',
+        'LNG_LAYOUT_MENU_ITEM_VERSION_LABEL': 'Version',
 
         /**
          * uiDialogs
@@ -179,6 +180,13 @@ export const EnglishUsLang = {
          * uiTransmissionChainFields
          */
         'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NUMBER_OF_CONTACTS': 'Number of contacts',
+
+        /**
+         * NEW GROUP
+         * uiVersionPage
+         */
+        'LNG_PAGE_VERSION_TITLE': 'Version',
+        'LNG_PAGE_VERSION_TEXT_DESCRIPTION': 'Go.Data version: {{version}} .'
 
         /**
          * REMOVE the tokens from below
