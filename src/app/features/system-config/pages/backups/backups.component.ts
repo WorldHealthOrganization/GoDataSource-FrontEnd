@@ -455,7 +455,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
                         dataBackup: answer.inputValue.value
                     })
                     .catch((err) => {
-                        this.snackbarService.showError(err.message);
+                        this.snackbarService.showApiError(err);
                         return ErrorObservable.create(err);
                     })
                     .subscribe(() => {

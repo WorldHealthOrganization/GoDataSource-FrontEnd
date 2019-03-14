@@ -25,6 +25,13 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE': 'Shape',
 
         /**
+         * uiAPIErrors
+         */
+        'LNG_API_ERROR_CODE_REQUEST_VALIDATION_ERROR_DUPLICATE_CLIENT_IDS': 'Client IDs must be unique',
+        'LNG_API_ERROR_CODE_REQUEST_VALIDATION_ERROR_DUPLICATE_SERVER_IDS': 'Server URLs must be unique',
+        'LNG_API_ERROR_CODE_REQUEST_VALIDATION_ERROR_INVALID_BACKUP_LOCATION': 'Configured backup location is not accessible for read/write',
+
+        /**
          * uiOutbreakQuestionnaireTemplates
          */
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE': 'Inactive?',
