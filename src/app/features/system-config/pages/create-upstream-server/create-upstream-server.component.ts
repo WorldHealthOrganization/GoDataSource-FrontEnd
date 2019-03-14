@@ -93,7 +93,7 @@ export class CreateUpstreamServerComponent extends ConfirmOnFormChanges implemen
                             upstreamServers: settings.upstreamServers
                         })
                         .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err);
                             loadingDialog.close();
                             return ErrorObservable.create(err);
                         })

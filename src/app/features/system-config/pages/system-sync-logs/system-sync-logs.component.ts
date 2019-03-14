@@ -244,7 +244,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                                 sync: answer.inputValue.value
                             })
                             .catch((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return ErrorObservable.create(err);
                             })
                             .subscribe((settings: SystemSettingsModel) => {

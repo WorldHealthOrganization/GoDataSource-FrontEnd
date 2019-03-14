@@ -1,0 +1,17 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section page-content mat-card">
+
+    <div fxLayout="column" fxLayoutGap="20px">
+
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="30px">
+            {{ 'LNG_PAGE_VERSION_TEXT_DESCRIPTION' | translate: {version : version} }}
+        </div>
+
+    </div>
+
+</mat-card>
