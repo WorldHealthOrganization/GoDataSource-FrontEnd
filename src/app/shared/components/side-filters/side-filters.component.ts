@@ -167,14 +167,14 @@ export class SideFiltersComponent implements OnInit {
                         fieldsList: [
                             new DialogField({
                                 name: 'filterName',
-                                placeholder: 'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_NAME',
-                                description: 'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_NAME_DESCRIPTION',
+                                placeholder: 'LNG_SAVED_FILTERS_FIELD_LABEL_NAME',
+                                description: 'LNG_SAVED_FILTERS_FIELD_LABEL_NAME_DESCRIPTION',
                                 required: true,
                                 fieldType: DialogFieldType.TEXT,
                             }),
                             new DialogField({
                                 name: 'isPublic',
-                                placeholder: 'LNG_PAGE_LIST_SAVED_FILTERS_FIELD_LABEL_PUBLIC',
+                                placeholder: 'LNG_SAVED_FILTERS_FIELD_LABEL_PUBLIC',
                                 fieldType: DialogFieldType.BOOLEAN
                             })
                         ]
