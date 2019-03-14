@@ -150,7 +150,7 @@
                     <!-- Contact Name -->
                     <div
                         fxFlex="270px"
-                        class="follow-up-range-column-data follow-up-range-name-column-data">
+                        class="follow-up-range-column-data follow-up-range-name-column-data follow-up-range-name-column-data-no-wrap">
                         <a
                             [routerLink]="['/contacts', contactFollowUpData.contact.id, 'view' ]">
                             {{ contactFollowUpData.contact.name + ( contactFollowUpData.contact.visualId ? ' ( ' + contactFollowUpData.contact.visualId + ' )' : '' ) }}
@@ -217,4 +217,11 @@
             </div>
         </div>
     </div>
+
+    <mat-paginator
+        [length]="(followUpsGroupedByContactCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
 </mat-card>

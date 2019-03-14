@@ -12,6 +12,7 @@ import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-c
 import { MetricContactsModel } from '../../models/metrics/metric-contacts.model';
 import { MetricContactsWithSuccessfulFollowUp } from '../../models/metrics/metric.contacts-with-success-follow-up.model';
 import { TeamFollowupsPerDayModel } from '../../models/team-followups-per-day.model';
+import { RangeFollowUpsModel } from '../../models/range-follow-ups.model';
 
 @Injectable()
 export class FollowUpsDataService {
@@ -272,6 +273,35 @@ export class FollowUpsDataService {
     getCountedFollowUpsGroupedByTeams(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
         const filter = queryBuilder.buildQuery();
         return this.http.get(`/outbreaks/${outbreakId}/follow-ups/per-team/count?filter=${filter}`, {});
+    }
+
+    /**
+     * Retrieve the list of FollowUps grouped by contacts from an Outbreak
+     * @param {string} outbreakId
+     * @returns {Observable<FollowUpModel[]>}
+     */
+    getRangeFollowUpsList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<RangeFollowUpsModel[]> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/range-follow-ups?filter=${filter}`),
+            RangeFollowUpsModel
+        );
+    }
+
+    /**
+     * Count groups => FollowUps grouped by contacts from an Outbreak
+     * @param {string} outbreakId
+     * @returns {Observable<FollowUpModel[]>}
+     */
+    getRangeFollowUpsListCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const filter = queryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/range-follow-ups/count?filter=${filter}`);
     }
 }
 
