@@ -17,14 +17,25 @@ app-transmission-chain-bars {
         display: none;
     }
 
-
+    @date-cell-width: 90px;
     @cell-width: 40px;
     @cell-height: 25px;
     .graph {
         .date {
+            width: @date-cell-width;
             height: @cell-height;
             display: flex;
             align-items: center;
+        }
+
+        .visual-id {
+            height: 2 * @cell-height;
+            font-size: 12px;
+            word-wrap: break-word;
+        }
+
+        .case-column {
+            width: @cell-width;
         }
 
         .case {
@@ -33,17 +44,26 @@ app-transmission-chain-bars {
             .date-of-onset,
             .isolation,
             .labresult {
-
+                width: 100%;
+                height: @cell-height;
             }
 
             .date-of-onset {
-
+                // nothing
             }
             .isolation {
-
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: steelblue;
+                color: black;
             }
             .lab-result {
-
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: darkred;
+                color: white;
             }
         }
     }

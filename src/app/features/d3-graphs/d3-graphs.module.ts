@@ -8,6 +8,9 @@ import { SharedModule } from '../../shared/shared.module';
 import * as fromPages from './pages';
 import * as fromComponents from './components';
 
+// services
+import * as fromServices from './services';
+
 @NgModule({
     imports: [
         routing,
@@ -16,6 +19,9 @@ import * as fromComponents from './components';
     declarations: [
         ...fromPages.pageComponents,
         ...fromComponents.components
+    ],
+    providers: [
+        ...fromServices.services
     ],
     entryComponents: []
 })
