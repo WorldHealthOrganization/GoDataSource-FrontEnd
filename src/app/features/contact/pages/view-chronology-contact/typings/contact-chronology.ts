@@ -12,7 +12,8 @@ export class ContactChronology {
             if (!_.isEmpty(followUp.date)) {
                 chronologyEntries.push(new ChronologyItem({
                     date: followUp.date,
-                    label: followUp.statusId
+                    label: followUp.statusId,
+                    itemTypeFollowUp: true
                 }));
             }
         });
