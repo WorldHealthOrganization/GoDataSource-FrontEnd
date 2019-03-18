@@ -19,6 +19,7 @@ export class TransmissionChainBarsComponent implements OnInit {
     mockData: any = {
         cases: {
             'aaa': {
+                id: 'aaa',
                 visualId: 'CAS-133001',
                 dateOfOnset: '2019-02-01',
                 isolation: [
@@ -31,6 +32,7 @@ export class TransmissionChainBarsComponent implements OnInit {
                 lastGraphDate: '2019-02-10',
             },
             'bbb': {
+                id: 'bbb',
                 visualId: 'CAS-133004',
                 dateOfOnset: '2019-02-05',
                 isolation: [
@@ -43,6 +45,7 @@ export class TransmissionChainBarsComponent implements OnInit {
                 lastGraphDate: '2019-02-10',
             },
             'ccc': {
+                id: 'ccc',
                 visualId: 'CAS-133005',
                 dateOfOnset: '2019-02-06',
                 isolation: [
@@ -54,12 +57,66 @@ export class TransmissionChainBarsComponent implements OnInit {
                 firstGraphDate: '2019-02-06',
                 lastGraphDate: '2019-02-14',
             },
+            'ddd': {
+                id: 'ddd',
+                visualId: 'CAS-133006',
+                dateOfOnset: '2019-02-07',
+                isolation: [
+                    {date: '2019-02-09'}, {date: '2019-02-10'}, {date: '2019-02-11'}, {date: '2019-02-12'}, {date: '2019-02-13'},
+                ],
+                labResults: [
+                    {date: '2019-02-14', result: 'M'}
+                ],
+                firstGraphDate: '2019-02-07',
+                lastGraphDate: '2019-02-14',
+            },
+            'eee': {
+                id: 'eee',
+                visualId: 'CAS-133007',
+                dateOfOnset: '2019-02-08',
+                isolation: [
+                    {date: '2019-02-11'}, {date: '2019-02-12'}, {date: '2019-02-13'}, {date: '2019-02-14'}, {date: '2019-02-15'},
+                ],
+                labResults: [
+                    {date: '2019-02-16', result: 'M'}
+                ],
+                firstGraphDate: '2019-02-08',
+                lastGraphDate: '2019-02-16',
+            },
+            'fff': {
+                id: 'fff',
+                visualId: 'CAS-134008',
+                dateOfOnset: '2019-01-27',
+                isolation: [
+                    {date: '2019-01-30'}, {date: '2019-01-31'}, {date: '2019-02-01'}, {date: '2019-02-02'}, {date: '2019-02-03'}, {date: '2019-02-04'}, {date: '2019-02-05'}, {date: '2019-02-06'},
+                ],
+                labResults: [
+                    {date: '2019-02-09', result: 'G'}
+                ],
+                firstGraphDate: '2019-01-27',
+                lastGraphDate: '2019-02-09',
+            },
+            'ggg': {
+                id: 'ggg',
+                visualId: 'CAS-134009',
+                dateOfOnset: '2019-01-30',
+                isolation: [
+                    {date: '2019-02-02'}, {date: '2019-02-03'}, {date: '2019-02-04'}, {date: '2019-02-05'},
+                ],
+                labResults: [
+                    {date: '2019-02-06', result: 'G'}
+                ],
+                firstGraphDate: '2019-01-30',
+                lastGraphDate: '2019-02-06',
+            },
         },
         relationships: {
-            'aaa': ['bbb', 'ccc']
+            'aaa': ['bbb', 'ccc'],
+            'ccc': ['ddd', 'eee'],
+            'fff': ['aaa', 'bbb', 'ggg']
         },
-        minDate: '2019-02-01',
-        maxDate: '2019-02-14',
+        minDate: '2019-01-27',
+        maxDate: '2019-02-16',
     };
     days: string[] = [];
 
