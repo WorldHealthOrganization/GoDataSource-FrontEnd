@@ -105,18 +105,41 @@
                     fxFlex="270px"
                     class="follow-up-range-date-header">
                     {{ 'LNG_CONTACT_FIELD_LABEL_NAME' | translate }}
+
+                    <app-form-input
+                        name="contactFullNameAndVisualId"
+                        [(ngModel)]="contactFullNameAndVisualId"
+                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                        (optionChanged)="filterByChildQueryBuilder('contact').byTextMultipleProperties([ 'firstName', 'lastName', 'visualId' ], $event)"
+                        app-reset-input-on-side-filter
+                        [displayFilterIcon]="true">
+                    </app-form-input>
                 </div>
 
                 <!--Date of last contact-->
                 <div fxFlex="100px"
                      class="follow-up-range-date-header">
                     {{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}
+
+                    <app-form-daterange
+                        name="dateOfLastContact"
+                        [(ngModel)]="dateOfLastContact"
+                        (changed)="filterByChildQueryBuilder('contact').byDateRange('dateOfLastContact', $event)"
+                        app-reset-input-on-side-filter>
+                    </app-form-daterange>
                 </div>
 
                 <!--Date of the end of the follow-up-->
                 <div fxFlex="100px"
                      class="follow-up-range-date-header">
                     {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP' | translate}}
+
+                    <app-form-daterange
+                        name="dateOfTheEndOfTheFollowUp"
+                        [(ngModel)]="dateOfTheEndOfTheFollowUp"
+                        (changed)="filterByChildQueryBuilder('contact').byDateRange('followUp.endDate', $event)"
+                        app-reset-input-on-side-filter>
+                    </app-form-daterange>
                 </div>
 
                 <!-- Statuses -->

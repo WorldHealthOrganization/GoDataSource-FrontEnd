@@ -86,6 +86,10 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
     loadingDialog: LoadingDialogModel;
 
+    contactFullNameAndVisualId: string;
+    dateOfLastContact: Moment;
+    dateOfTheEndOfTheFollowUp: Moment;
+
     /**
      * Filter slider data
      */
