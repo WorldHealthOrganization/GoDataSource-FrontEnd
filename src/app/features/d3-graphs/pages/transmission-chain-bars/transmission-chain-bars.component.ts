@@ -1,6 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import * as d3 from 'd3';
 import * as moment from 'moment';
 import { Constants } from '../../../../core/models/constants';
 import { TransmissionChainBarsService } from '../../services/transmission-chain-bars.service';
@@ -98,6 +97,97 @@ export class TransmissionChainBarsComponent implements OnInit {
             },
             'ggg': {
                 id: 'ggg',
+                visualId: 'CAS-134009',
+                dateOfOnset: '2019-01-30',
+                isolation: [
+                    {date: '2019-02-02'}, {date: '2019-02-03'}, {date: '2019-02-04'}, {date: '2019-02-05'},
+                ],
+                labResults: [
+                    {date: '2019-02-06', result: 'G'}
+                ],
+                firstGraphDate: '2019-01-30',
+                lastGraphDate: '2019-02-06',
+            },
+            'hhh': {
+                id: 'hhh',
+                visualId: 'CAS-134009',
+                dateOfOnset: '2019-01-30',
+                isolation: [
+                    {date: '2019-02-02'}, {date: '2019-02-03'}, {date: '2019-02-04'}, {date: '2019-02-05'},
+                ],
+                labResults: [
+                    {date: '2019-02-06', result: 'G'}
+                ],
+                firstGraphDate: '2019-01-30',
+                lastGraphDate: '2019-02-06',
+            },
+            'iii': {
+                id: 'iii',
+                visualId: 'CAS-134009',
+                dateOfOnset: '2019-01-30',
+                isolation: [
+                    {date: '2019-02-02'}, {date: '2019-02-03'}, {date: '2019-02-04'}, {date: '2019-02-05'},
+                ],
+                labResults: [
+                    {date: '2019-02-06', result: 'G'}
+                ],
+                firstGraphDate: '2019-01-30',
+                lastGraphDate: '2019-02-06',
+            },
+            'jjj': {
+                id: 'jjj',
+                visualId: 'CAS-134009',
+                dateOfOnset: '2019-01-30',
+                isolation: [
+                    {date: '2019-02-02'}, {date: '2019-02-03'}, {date: '2019-02-04'}, {date: '2019-02-05'},
+                ],
+                labResults: [
+                    {date: '2019-02-06', result: 'G'}
+                ],
+                firstGraphDate: '2019-01-30',
+                lastGraphDate: '2019-02-06',
+            },
+            'kkk': {
+                id: 'kkk',
+                visualId: 'CAS-134009',
+                dateOfOnset: '2019-01-30',
+                isolation: [
+                    {date: '2019-02-02'}, {date: '2019-02-03'}, {date: '2019-02-04'}, {date: '2019-02-05'},
+                ],
+                labResults: [
+                    {date: '2019-02-06', result: 'G'}
+                ],
+                firstGraphDate: '2019-01-30',
+                lastGraphDate: '2019-02-06',
+            },
+            'lll': {
+                id: 'lll',
+                visualId: 'CAS-134009',
+                dateOfOnset: '2019-01-30',
+                isolation: [
+                    {date: '2019-02-02'}, {date: '2019-02-03'}, {date: '2019-02-04'}, {date: '2019-02-05'},
+                ],
+                labResults: [
+                    {date: '2019-02-06', result: 'G'}
+                ],
+                firstGraphDate: '2019-01-30',
+                lastGraphDate: '2019-02-06',
+            },
+            'mmm': {
+                id: 'mmm',
+                visualId: 'CAS-134009',
+                dateOfOnset: '2019-01-30',
+                isolation: [
+                    {date: '2019-02-02'}, {date: '2019-02-03'}, {date: '2019-02-04'}, {date: '2019-02-05'},
+                ],
+                labResults: [
+                    {date: '2019-02-06', result: 'G'}
+                ],
+                firstGraphDate: '2019-01-30',
+                lastGraphDate: '2019-02-06',
+            },
+            'nnn': {
+                id: 'nnn',
                 visualId: 'CAS-134009',
                 dateOfOnset: '2019-01-30',
                 isolation: [

@@ -61,7 +61,7 @@ export class TransmissionChainBarsService {
         });
 
         // draw axis on hover
-        this.drawAxisOnHover();
+        // this.drawAxisOnHover();
     }
 
     /**
@@ -167,6 +167,7 @@ export class TransmissionChainBarsService {
 
         // draw the case bar container (to show the border)
         const caseBar = caseColumnContainer.append('svg')
+            .attr('class', 'case-bar')
             .attr('x', 0)
             .attr('y', this.visualIdCellHeight + (this.graphData.dates[caseData.firstGraphDate] * this.cellHeight));
         caseBar.append('rect')
@@ -177,6 +178,42 @@ export class TransmissionChainBarsService {
             .attr('stroke-width', '1')
             // .attr('shape-rendering', 'crispEdges');
             .attr('shape-rendering', 'optimizeQuality');
+
+        /**
+         * Show relationships with different color when hover on a Case
+         */
+        caseBar.on('click', () => {
+            // selected case does already have accent?
+            if (caseBar.classed('accent')) {
+                // selected case has accent;
+                // remove accent from case
+                caseBar.classed('accent', false);
+                // remove accent from all relationships
+                this.canvas.selectAll('.relationship')
+                    .classed('accent', false);
+            } else {
+                // selected case doesn't have accent;
+                // remove accent from all elements
+                this.canvas.selectAll('.accent')
+                    .classed('accent', false);
+
+                // add accent to case
+                caseBar.classed('accent', true);
+                // add accent to relationships
+                const sourceCaseRelationships = this.canvas
+                    // find the relationships where current case is source
+                    .selectAll(`.source-case-${caseData.id}`)
+                    // show relationships with accent color
+                    .classed('accent', true)
+                    // remove them temporarily
+                    .remove();
+
+                // add them back (so they are rendered on top of the others)
+                _.get(sourceCaseRelationships, '_groups[0]', []).forEach((relationshipElem) => {
+                    this.canvas.append(() => relationshipElem);
+                });
+            }
+        });
 
         // draw case's relations
         if (this.graphData.relationships[caseData.id]) {
@@ -234,6 +271,7 @@ export class TransmissionChainBarsService {
 
         // draw the horizontal line from the source case to the target case
         this.canvas.append('line')
+            .attr('class', `relationship source-case-${sourceCaseId}`)
             .attr('stroke', 'black')
             .attr('stroke-width', '1px')
             .attr('x1', lineStartX)
@@ -243,6 +281,7 @@ export class TransmissionChainBarsService {
 
         // draw the vertical line (arrow's base)
         this.canvas.append('line')
+            .attr('class', `relationship source-case-${sourceCaseId}`)
             .attr('stroke', 'black')
             .attr('stroke-width', '1px')
             .attr('x1', lineEndX)
@@ -252,6 +291,7 @@ export class TransmissionChainBarsService {
 
         // draw the top of the arrow
         this.canvas.append('polygon')
+            .attr('class', `relationship source-case-${sourceCaseId}`)
             .attr('fill', 'black')
             .attr('points', `${arrowX},${arrowY} ${arrowX - 5},${(arrowY - 8)} ${arrowX + 5},${arrowY - 8}`);
     }
@@ -292,4 +332,3 @@ export class TransmissionChainBarsService {
         return this.visualIdCellHeight + daysNo * this.cellHeight;
     }
 }
-

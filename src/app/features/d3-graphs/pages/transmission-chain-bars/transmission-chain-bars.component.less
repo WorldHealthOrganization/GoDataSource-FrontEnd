@@ -1,8 +1,25 @@
+@relationship-accent-color: #da0000;
+
 app-transmission-chain-bars {
     #chart {
         .axis-hover {
             &:hover {
                 fill: rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        .relationship {
+            &.accent {
+                stroke: @relationship-accent-color;
+                fill: @relationship-accent-color;
+            }
+        }
+
+        .case-bar {
+            &.accent {
+                rect {
+                    stroke: @relationship-accent-color;
+                }
             }
         }
     }
