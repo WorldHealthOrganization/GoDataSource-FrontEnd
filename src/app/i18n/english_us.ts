@@ -12,10 +12,10 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
-
-
-
-
+        /**
+         * uiChronologyContactPage
+         */
+        'LNG_PAGE_VIEW_CHRONOLOGY_CHRONOLOGY_ITEM_TYPE_FOLLOW_UP': 'Follow-up:',
 
         /**
          * REMOVE the tokens from below
