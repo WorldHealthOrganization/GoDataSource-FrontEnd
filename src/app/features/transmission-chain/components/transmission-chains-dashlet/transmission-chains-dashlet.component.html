@@ -164,7 +164,24 @@
                         <app-form-radio
                             name="edgeLabelCriteria"
                             [(ngModel)]="colorCriteria.edgeLabelCriteria"
-                            [options]="edgeLabelCriteriaOptions$ | async">
+                            [options]="edgeLabelCriteriaOptions$ | async"
+                            (optionChanged)="changeEdgeLabelIconSelection('label',$event)">
+                        </app-form-radio>
+                    </div>
+
+                    <!-- Edge Icon -->
+                    <div
+                        fxFlex fxLayout="column">
+                        <div
+                            fxFlex>
+                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE' | translate }}
+                        </div>
+
+                        <app-form-radio
+                            name="edgeIconCriteria"
+                            [(ngModel)]="colorCriteria.edgeIconCriteria"
+                            [options]="edgeIconCriteriaOptions$ | async"
+                            (optionChanged)="changeEdgeLabelIconSelection('icon',$event)">
                         </app-form-radio>
                     </div>
 
