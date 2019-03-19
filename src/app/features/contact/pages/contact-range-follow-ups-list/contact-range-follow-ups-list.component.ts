@@ -24,6 +24,7 @@ import { FollowUpPage } from '../../typings/follow-up-page';
 import { RangeFollowUpsModel } from '../../../../core/models/range-follow-ups.model';
 import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { Observable } from 'rxjs/Observable';
+import { DateRangeModel } from '../../../../core/models/date-range.model';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -86,9 +87,11 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
     loadingDialog: LoadingDialogModel;
 
+    showFilters: boolean = false;
+
     contactFullNameAndVisualId: string;
-    dateOfLastContact: Moment;
-    dateOfTheEndOfTheFollowUp: Moment;
+    dateOfLastContact: DateRangeModel = new DateRangeModel;
+    dateOfTheEndOfTheFollowUp: DateRangeModel = new DateRangeModel;
 
     /**
      * Filter slider data
@@ -348,5 +351,15 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                 'contact.visualId',
                 RequestSortDirection.ASC
             );
+    }
+
+    resetFilters() {
+        this.resetFiltersToSideFilters();
+        if (this.sliderDateFilterValue) {
+            this.filterByDateRange(this.sliderDateFilterValue);
+        }
+        this.contactFullNameAndVisualId = '';
+        this.dateOfLastContact = new DateRangeModel;
+        this.dateOfTheEndOfTheFollowUp = new DateRangeModel;
     }
 }
