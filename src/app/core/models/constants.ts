@@ -315,6 +315,30 @@ export class Constants {
     };
 
     /**
+     * Used to display icons for context of transmission
+     */
+    static CONTEXT_OF_TRANSMISSION = {
+        CO_WORKERS: 'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION_CO_WORKERS',
+        FAMILY: 'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION_FAMILY',
+        FRIENDS: 'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION_FRIENDS',
+        FUNERAL: 'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION_FUNERAL',
+        NEIGHBOUR: 'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION_NEIGHBOR',
+        NOSOCOMIAL: 'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION_NOSOCOMIAL_TRANSMISSION',
+        TRAVEL: 'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION_TRAVEL_TO_OUTBREAK_AREA',
+        UNKNOWN: 'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION_UNKNOWN'
+    };
+
+    /**
+     * Used to display icons for exposure type
+     */
+    static EXPOSURE_TYPE = {
+        DIRECT_PHYSICAL_CONTACT: 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_TYPE_DIRECT_PHYSICAL_CONTACT',
+        SLEPT_ATE_SPENT_TIME_TOGETHER: 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_TYPE_SLEPT_ATE_OR_SPEND_TIME_IN_SAME_HOUSEHOLD',
+        TOUCHED_BODY_FLUIDS: 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_TYPE_TOUCHED_BODY_FLUIDS',
+        TOUCHED_LINENS_CLOTHES: 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_TYPE_TOUCHED_OR_SHARED_LINENS_CLOTHES_DISHES'
+    };
+
+    /**
      * Used to match certainity level in the logic ( ex: chains of transmission )
      */
     static CERTAINITY_LEVEL = {
@@ -433,6 +457,22 @@ export class Constants {
         CLUSTER_NAME: {
             label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
             value: 'clusterId'
+        }
+    };
+
+    // used for the criteria radio buttons in the chains of transmission settings
+    static TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS = {
+        NONE: {
+            label: 'LNG_COMMON_LABEL_NONE',
+            value: 'none'
+        },
+        SOCIAL_RELATIONSHIP_TYPE: {
+            label: 'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION',
+            value: 'socialRelationshipTypeId'
+        },
+        EXPOSURE_TYPE: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+            value: 'exposureTypeId'
         }
     };
 
