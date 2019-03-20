@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import * as d3 from 'd3';
 import * as moment from 'moment';
 import * as _ from 'lodash';
+import { Constants } from '../../../core/models/constants';
+import { TransmissionChainBarsModel } from '../typings/transmission-chain-bars.model';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 @Injectable()
 export class TransmissionChainBarsService {
@@ -17,7 +20,7 @@ export class TransmissionChainBarsService {
     private visualIdCellHeight = 80;
 
     // data used to draw the graph
-    private graphData: any;
+    private graphData: TransmissionChainBarsModel;
     // graph container
     private graphContainer: any;
     // child container for the dates
@@ -25,6 +28,8 @@ export class TransmissionChainBarsService {
     // child container for the cases
     private graphCasesContainer: any;
 
+    // dates map to know the row # of each day date
+    private datesMap = {};
     // cases map (by uid) to know the column index of each case
     private caseColumnMap = {};
     // current column index where a new case will be drawn
@@ -33,17 +38,29 @@ export class TransmissionChainBarsService {
     //      this.drawnRelations[sourceCaseId][targetCaseId] = true
     private drawnRelations = {};
 
+    // cache some translations
+    private translationsMap = {};
+
+    constructor(
+        private i18nService: I18nService
+    ) {
+    }
+
     drawGraph(containerNative: any, data: any) {
         // clear current graph before redrawing
         d3.select(containerNative).selectAll('*').remove();
 
         // reset graph data
+        this.datesMap = {};
         this.caseColumnMap = {};
         this.currentColumnIdx = 0;
         this.drawnRelations = {};
 
         // cache graph data
         this.graphData = data;
+
+        // collect the dates to be displayed on the graph (Oy axis)
+        this.collectDates();
 
         // set graph container height (keep extra 30px for horizontal scrollbar)
         const graphHeight = this.determineGraphHeight() + 30;
@@ -57,9 +74,16 @@ export class TransmissionChainBarsService {
 
         // draw the cases
         this.drawCases();
+    }
 
-        // #TODO draw axis on hover (currently overlaps with relationships accent feature)
-        // this.drawAxisOnHover();
+    /**
+     * Collect and cache the dates to be displayed on the graph (Oy axis)
+     */
+    private collectDates() {
+        const dayDates = this.getDaysBetween(this.graphData.minGraphDate, this.graphData.maxGraphDate);
+        dayDates.forEach((date, index) => {
+            this.datesMap[date] = index;
+        });
     }
 
     /**
@@ -82,7 +106,7 @@ export class TransmissionChainBarsService {
             .attr('height', this.visualIdCellHeight);
 
         // draw each date
-        Object.keys(this.graphData.dates).forEach((dayDate, index) => {
+        Object.keys(this.datesMap).forEach((dayDate, index) => {
             // set position (top-left corner)
             const dateContainer = this.graphDatesContainer.append('svg')
                 .attr('x', 0)
@@ -108,7 +132,7 @@ export class TransmissionChainBarsService {
     private drawCases() {
         // determine graph width based on the number of cases
         // cases-no * (margin-between-cases + case-cell-width)
-        const casesGraphWidth = Object.values(this.graphData.cases).length * (this.marginBetween + this.cellWidth);
+        const casesGraphWidth = this.graphData.caseIds.length * (this.marginBetween + this.cellWidth);
 
         // create cases container
         this.graphCasesContainer = this.graphContainer.append('div')
@@ -120,10 +144,10 @@ export class TransmissionChainBarsService {
             .attr('height', this.determineGraphHeight());
 
         // draw each case column
-        Object.values(this.graphData.cases).forEach((caseData) => {
+        this.graphData.caseIds.forEach((caseId) => {
             // did we already draw this case?
-            if (this.caseColumnMap[caseData.id] === undefined) {
-                this.drawCase(caseData.id);
+            if (this.caseColumnMap[caseId] === undefined) {
+                this.drawCase(caseId);
             }
         });
     }
@@ -132,7 +156,7 @@ export class TransmissionChainBarsService {
      * Draw a case block
      */
     private drawCase(caseId) {
-        const caseData = this.graphData.cases[caseId];
+        const caseData = this.graphData.casesMap[caseId];
 
         if (!caseData) {
             return;
@@ -162,34 +186,55 @@ export class TransmissionChainBarsService {
             // center the text vertically
             .attr('y', this.visualIdCellHeight / 2);
 
-        // draw the case isolation cells
-        caseData.isolation.forEach((isolation) => {
-            const isolationGroup = caseColumnContainer.append('g')
-                .attr('transform', `translate(0, ${this.visualIdCellHeight + (this.graphData.dates[isolation.date] * this.cellHeight)})`);
-            isolationGroup.append('rect')
-                .attr('width', this.cellWidth)
-                .attr('height', this.cellHeight)
-                .attr('fill', 'steelblue');
-            isolationGroup.append('text')
-                .text('iso')
-                .attr('fill', 'black')
-                .attr('alignment-baseline', 'central')
-                .attr('text-anchor', 'middle')
-                // center the text
-                .attr('x', this.cellWidth / 2)
-                .attr('y', this.cellHeight / 2);
+        /**
+         * draw the case isolation cells
+         */
+        caseData.dateRanges.forEach((isolation) => {
+            const isolationDates = this.getDaysBetween(isolation.startDate, isolation.endDate);
+            let isolationLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_ISOLATED_CASE_LABEL');
+            if (isolation.typeId === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_HOSPITALIZATION') {
+                isolationLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_CASE_LABEL');
+            }
+
+            // draw a cell for each isolation date
+            isolationDates.forEach((isolationDate) => {
+                const isolationGroup = caseColumnContainer.append('g')
+                    .attr('transform', `translate(0, ${this.visualIdCellHeight + (this.datesMap[isolationDate] * this.cellHeight)})`);
+                isolationGroup.append('rect')
+                    .attr('width', this.cellWidth)
+                    .attr('height', this.cellHeight)
+                    .attr('fill', 'steelblue');
+                isolationGroup.append('text')
+                    .text(isolationLabel)
+                    .attr('fill', 'black')
+                    .attr('alignment-baseline', 'central')
+                    .attr('text-anchor', 'middle')
+                    // center the text
+                    .attr('x', this.cellWidth / 2)
+                    .attr('y', this.cellHeight / 2);
+            });
         });
 
-        // draw the lab results cells
+        /**
+         * draw the lab results cells
+         */
         caseData.labResults.forEach((labResult) => {
+            let result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_NEGATIVE_LABEL');
+            if (labResult.result === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_POSITIVE') {
+                result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_POSITIVE_LABEL');
+            }
+
+            // #TODO replace dateOfResult with dateSampleTaken
+            const labResultDate = moment(labResult.dateOfResult).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+
             const labResultGroup = caseColumnContainer.append('g')
-                .attr('transform', `translate(0, ${this.visualIdCellHeight + (this.graphData.dates[labResult.date] * this.cellHeight)})`);
+                .attr('transform', `translate(0, ${this.visualIdCellHeight + (this.datesMap[labResultDate] * this.cellHeight)})`);
             labResultGroup.append('rect')
                 .attr('width', this.cellWidth)
                 .attr('height', this.cellHeight)
                 .attr('fill', 'darkred');
             labResultGroup.append('text')
-                .text(labResult.result)
+                .text(result)
                 .attr('fill', 'white')
                 .attr('alignment-baseline', 'central')
                 .attr('text-anchor', 'middle')
@@ -199,13 +244,14 @@ export class TransmissionChainBarsService {
         });
 
         // draw the case bar container (to show the border)
+        const caseDateOfOnset = moment(caseData.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
         const caseBar = caseColumnContainer.append('svg')
             .attr('class', 'case-bar')
             .attr('x', 0)
-            .attr('y', this.visualIdCellHeight + (this.graphData.dates[caseData.firstGraphDate] * this.cellHeight));
+            .attr('y', this.visualIdCellHeight + (this.datesMap[caseDateOfOnset] * this.cellHeight));
         caseBar.append('rect')
             .attr('width', this.cellWidth)
-            .attr('height', (moment(caseData.lastGraphDate).diff(moment(caseData.firstGraphDate), 'days') + 1) * this.cellHeight)
+            .attr('height', (moment(caseData.lastGraphDate).diff(moment(caseData.dateOfOnset), 'days') + 1) * this.cellHeight)
             .attr('fill', 'transparent')
             .attr('stroke', 'black')
             .attr('stroke-width', '1')
@@ -275,8 +321,8 @@ export class TransmissionChainBarsService {
         const sourceCaseColumnIdx = this.caseColumnMap[sourceCaseId];
         const targetCaseColumnIdx = this.caseColumnMap[targetCaseId];
         // get source and target cases data
-        const sourceCaseData = this.graphData.cases[sourceCaseId];
-        const targetCaseData = this.graphData.cases[targetCaseId];
+        const sourceCaseData = this.graphData.casesMap[sourceCaseId];
+        const targetCaseData = this.graphData.casesMap[targetCaseId];
 
         if (
             !_.isNumber(sourceCaseColumnIdx) ||
@@ -287,6 +333,9 @@ export class TransmissionChainBarsService {
             return;
         }
 
+        const sourceCaseFirstGraphDate = moment(sourceCaseData.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        const targetCaseFirstGraphDate = moment(targetCaseData.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+
         // mark the relation as being drawn, to avoid duplicates
         _.set(this.drawnRelations, `[${sourceCaseId}][${targetCaseId}]`, true);
 
@@ -294,13 +343,13 @@ export class TransmissionChainBarsService {
         // left or right?
         const leftOrRight = (sourceCaseColumnIdx < targetCaseColumnIdx) ? 1 : 0;
         const lineStartX = (sourceCaseColumnIdx * (this.marginBetween + this.cellWidth)) + (leftOrRight * this.cellWidth);
-        const lineStartY = this.visualIdCellHeight + (this.graphData.dates[sourceCaseData.firstGraphDate] * this.cellHeight) + (this.cellHeight / 2);
+        const lineStartY = this.visualIdCellHeight + (this.datesMap[sourceCaseFirstGraphDate] * this.cellHeight) + (this.cellHeight / 2);
         // stop at the horizontal middle of the target case's bar
         const lineEndX = (targetCaseColumnIdx * (this.marginBetween + this.cellWidth)) + (this.cellWidth / 2);
         const lineEndY = lineStartY;
         // draw the arrow at the horizontal middle of the target case's bar, but touching the bar
         const arrowX = lineEndX;
-        const arrowY = this.visualIdCellHeight + (this.graphData.dates[targetCaseData.firstGraphDate] * this.cellHeight);
+        const arrowY = this.visualIdCellHeight + (this.datesMap[targetCaseFirstGraphDate] * this.cellHeight);
 
         // draw the horizontal line from the source case to the target case
         this.graphCasesContainer.append('line')
@@ -330,30 +379,44 @@ export class TransmissionChainBarsService {
     }
 
     /**
-     * Draw the axis that show up when user hovers over a certain row or column
-     */
-    private drawAxisOnHover() {
-        const graphWidth = this.dateCellWidth + this.currentColumnIdx * (this.marginBetween + this.cellWidth);
-
-        // draw horizontal rows
-        // for (let i = 0; i < Object.values(this.graphData.dates).length; i++) {
-        //     this.canvas.append('rect')
-        //         .attr('width', graphWidth)
-        //         .attr('height', this.cellHeight)
-        //         .attr('x', 0)
-        //         .attr('y', this.visualIdCellHeight + (i * this.cellHeight))
-        //         .attr('fill', 'transparent')
-        //         .attr('class', 'axis-hover');
-        // }
-    }
-
-    /**
      * Determine graph height based on the data
      */
     private determineGraphHeight(): number {
-        const daysNo = moment(this.graphData.maxDate).diff(moment(this.graphData.minDate), 'days') + 1;
+        const daysNo = Object.keys(this.datesMap).length;
 
         // visual-id-column-height + days-no * cell-height
         return this.visualIdCellHeight + daysNo * this.cellHeight;
+    }
+
+    /**
+     * Get the list of days of a period
+     */
+    private getDaysBetween(startDate: string, endDate: string): string[] {
+        // start from the start date and increment it
+        const dateMoment = moment(startDate);
+        const endDateMoment = moment(endDate);
+
+        const days = [];
+        while (!dateMoment.isAfter(endDateMoment)) {
+            // get date in proper format
+            const dayDate = dateMoment.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+            // update list
+            days.push(dayDate);
+            // increment date with 1 day
+            dateMoment.add(1, 'days');
+        }
+
+        return days;
+    }
+
+    /**
+     * Translate token and cache it
+     */
+    private translate(token: string): string {
+        if (!this.translationsMap[token]) {
+            this.translationsMap[token] = this.i18nService.instant(token);
+        }
+
+        return this.translationsMap[token];
     }
 }
