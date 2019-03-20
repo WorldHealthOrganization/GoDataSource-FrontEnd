@@ -13,7 +13,6 @@ export class CaseModel {
     middleName: string;
     lastName: string;
     gender: string;
-    phoneNumber: string;
     occupation: string;
     riskLevel: string;
     riskReason: string;
@@ -66,7 +65,6 @@ export class CaseModel {
         this.middleName = _.get(data, 'middleName');
         this.lastName = _.get(data, 'lastName');
         this.gender = _.get(data, 'gender');
-        this.phoneNumber = _.get(data, 'phoneNumber');
         this.occupation = _.get(data, 'occupation');
         this.documents = _.get(data, 'documents', []);
 
