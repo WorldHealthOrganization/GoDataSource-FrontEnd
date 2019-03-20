@@ -555,12 +555,15 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     deleteCase(caseModel: CaseModel) {
         this.caseDataService.getExposedContactsForCase(this.selectedOutbreak.id, caseModel.id)
             .subscribe((exposedContacts: {count: number}) => {
-                const translateData = {
-                    name: caseModel.name,
-                    numberOfContacts: exposedContacts.count
-                };
-                if (exposedContacts) {
-                    this.dialogService.showConfirm(`LNG_DIALOG_CONFIRM_DELETE_CASE`, translateData)
+                if (exposedContacts.count) {
+                    const translateData = {
+                        name: caseModel.name,
+                        numberOfContacts: exposedContacts.count
+                    };
+                    this.dialogService.showConfirm(
+                        exposedContacts.count > 0 ?
+                            `LNG_DIALOG_CONFIRM_DELETE_CASE_WITH_EXPOSED_CONTACTS` :
+                            'LNG_DIALOG_CONFIRM_DELETE_CASE', translateData)
                         .subscribe((answer: DialogAnswer) => {
                             if (answer.button === DialogAnswerButton.Yes) {
                                 // delete case

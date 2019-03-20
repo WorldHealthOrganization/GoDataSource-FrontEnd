@@ -21,7 +21,8 @@ export const EnglishUsLang = {
         /**
          * uiDialogs
          */
-        'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Case: "{{name}}" has {{numberOfContacts}} exposed contacts that will be deleted. Are you sure you want to delete this case?'
+        'LNG_DIALOG_CONFIRM_DELETE_CASE_WITH_EXPOSED_CONTACTS': 'Case: "{{name}}" has {{numberOfContacts}} exposed contacts that will be deleted. Are you sure you want to delete this case?'
+        // 'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Case: "{{name}}" has {{numberOfContacts}} exposed contacts that will be deleted. Are you sure you want to delete this case?'
 
         /**
          * REMOVE the tokens from below
