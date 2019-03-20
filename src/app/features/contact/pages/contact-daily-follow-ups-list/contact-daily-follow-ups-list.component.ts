@@ -424,7 +424,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
                     }),
                     new FilterModel({
-                        fieldName: 'phone',
+                        fieldName: 'addresses.phoneNumber',
                         fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PHONE',
                         type: FilterType.TEXT,
                         relationshipPath: ['contact'],
