@@ -555,7 +555,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     deleteCase(caseModel: CaseModel) {
         this.caseDataService.getExposedContactsForCase(this.selectedOutbreak.id, caseModel.id)
             .subscribe((exposedContacts: {count: number}) => {
-                if (exposedContacts.count) {
+                if (exposedContacts) {
                     const translateData = {
                         name: caseModel.name,
                         numberOfContacts: exposedContacts.count
