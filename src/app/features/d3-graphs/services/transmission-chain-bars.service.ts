@@ -16,10 +16,14 @@ export class TransmissionChainBarsService {
     // case visual ID cell height (first row)
     private visualIdCellHeight = 80;
 
-    // SVG container for the graph
-    private canvas: any;
     // data used to draw the graph
     private graphData: any;
+    // graph container
+    private graphContainer: any;
+    // child container for the dates
+    private graphDatesContainer: any;
+    // child container for the cases
+    private graphCasesContainer: any;
 
     // cases map (by uid) to know the column index of each case
     private caseColumnMap = {};
@@ -29,38 +33,32 @@ export class TransmissionChainBarsService {
     //      this.drawnRelations[sourceCaseId][targetCaseId] = true
     private drawnRelations = {};
 
-    drawGraph(container: any, data: any) {
+    drawGraph(containerNative: any, data: any) {
         // clear current graph before redrawing
-        d3.select(container).selectAll('*').remove();
+        d3.select(containerNative).selectAll('*').remove();
 
         // reset graph data
         this.caseColumnMap = {};
         this.currentColumnIdx = 0;
         this.drawnRelations = {};
 
-        // create graph container
-        const canvas = d3
-            .select(container)
-            .append('svg')
-            .attr('width', this.determineGraphWidth(data))
-            .attr('height', this.determineGraphHeight(data));
-
-        // cache common data
-        this.canvas = canvas;
+        // cache graph data
         this.graphData = data;
+
+        // set graph container height (keep extra 30px for horizontal scrollbar)
+        const graphHeight = this.determineGraphHeight() + 30;
+        containerNative.style.height = `${graphHeight}px`;
+
+        // create graph d3 container
+        this.graphContainer = d3.select(containerNative);
 
         // draw the dates column
         this.drawDates();
 
-        // draw each case column
-        Object.values(data.cases).forEach((caseData, index) => {
-            // did we already draw this case?
-            if (this.caseColumnMap[caseData.id] === undefined) {
-                this.drawCase(caseData.id);
-            }
-        });
+        // draw the cases
+        this.drawCases();
 
-        // draw axis on hover
+        // #TODO draw axis on hover (currently overlaps with relationships accent feature)
         // this.drawAxisOnHover();
     }
 
@@ -68,8 +66,17 @@ export class TransmissionChainBarsService {
      * Draw the first column (with all the dates in the graph)
      */
     private drawDates() {
+        // create dates container
+        this.graphDatesContainer = this.graphContainer.append('div')
+            .classed('dates-container', true);
+
+        // create SVG container
+        this.graphDatesContainer = this.graphDatesContainer.append('svg')
+            .attr('width', this.dateCellWidth)
+            .attr('height', '100%');
+
         // draw the first cell (placeholder for dates column and visual IDs row)
-        this.canvas.append('rect')
+        this.graphDatesContainer.append('rect')
             .attr('fill', 'transparent')
             .attr('width', this.dateCellWidth)
             .attr('height', this.visualIdCellHeight);
@@ -77,7 +84,7 @@ export class TransmissionChainBarsService {
         // draw each date
         Object.keys(this.graphData.dates).forEach((dayDate, index) => {
             // set position (top-left corner)
-            const dateContainer = this.canvas.append('svg')
+            const dateContainer = this.graphDatesContainer.append('svg')
                 .attr('x', 0)
                 .attr('y', this.visualIdCellHeight + index * this.cellHeight);
 
@@ -92,6 +99,32 @@ export class TransmissionChainBarsService {
                 .attr('alignment-baseline', 'central')
                 // center the text vertically
                 .attr('y', this.cellHeight / 2);
+        });
+    }
+
+    /**
+     * Draw the cases (one column for each case)
+     */
+    private drawCases() {
+        // determine graph width based on the number of cases
+        // cases-no * (margin-between-cases + case-cell-width)
+        const casesGraphWidth = Object.values(this.graphData.cases).length * (this.marginBetween + this.cellWidth);
+
+        // create cases container
+        this.graphCasesContainer = this.graphContainer.append('div')
+            .classed('cases-container', true);
+
+        // create SVG container
+        this.graphCasesContainer = this.graphCasesContainer.append('svg')
+            .attr('width', casesGraphWidth)
+            .attr('height', this.determineGraphHeight());
+
+        // draw each case column
+        Object.values(this.graphData.cases).forEach((caseData) => {
+            // did we already draw this case?
+            if (this.caseColumnMap[caseData.id] === undefined) {
+                this.drawCase(caseData.id);
+            }
         });
     }
 
@@ -114,8 +147,8 @@ export class TransmissionChainBarsService {
         this.caseColumnMap[caseData.id] = caseColumnIdx;
 
         // draw the case column container
-        const caseColumnContainer = this.canvas.append('svg')
-            .attr('x', this.dateCellWidth + (caseColumnIdx * (this.marginBetween + this.cellWidth)))
+        const caseColumnContainer = this.graphCasesContainer.append('svg')
+            .attr('x', caseColumnIdx * (this.marginBetween + this.cellWidth))
             .attr('y', 0);
 
         // draw the visual ID cell
@@ -189,18 +222,18 @@ export class TransmissionChainBarsService {
                 // remove accent from case
                 caseBar.classed('accent', false);
                 // remove accent from all relationships
-                this.canvas.selectAll('.relationship')
+                this.graphCasesContainer.selectAll('.relationship')
                     .classed('accent', false);
             } else {
                 // selected case doesn't have accent;
                 // remove accent from all elements
-                this.canvas.selectAll('.accent')
+                this.graphCasesContainer.selectAll('.accent')
                     .classed('accent', false);
 
                 // add accent to case
                 caseBar.classed('accent', true);
                 // add accent to relationships
-                const sourceCaseRelationships = this.canvas
+                const sourceCaseRelationships = this.graphCasesContainer
                     // find the relationships where current case is source
                     .selectAll(`.source-case-${caseData.id}`)
                     // show relationships with accent color
@@ -210,7 +243,7 @@ export class TransmissionChainBarsService {
 
                 // add them back (so they are rendered on top of the others)
                 _.get(sourceCaseRelationships, '_groups[0]', []).forEach((relationshipElem) => {
-                    this.canvas.append(() => relationshipElem);
+                    this.graphCasesContainer.append(() => relationshipElem);
                 });
             }
         });
@@ -260,17 +293,17 @@ export class TransmissionChainBarsService {
         // start from the vertical middle of the top cell from source case's bar
         // left or right?
         const leftOrRight = (sourceCaseColumnIdx < targetCaseColumnIdx) ? 1 : 0;
-        const lineStartX = this.dateCellWidth + (sourceCaseColumnIdx * (this.marginBetween + this.cellWidth)) + (leftOrRight * this.cellWidth);
+        const lineStartX = (sourceCaseColumnIdx * (this.marginBetween + this.cellWidth)) + (leftOrRight * this.cellWidth);
         const lineStartY = this.visualIdCellHeight + (this.graphData.dates[sourceCaseData.firstGraphDate] * this.cellHeight) + (this.cellHeight / 2);
         // stop at the horizontal middle of the target case's bar
-        const lineEndX = this.dateCellWidth + (targetCaseColumnIdx * (this.marginBetween + this.cellWidth)) + (this.cellWidth / 2);
+        const lineEndX = (targetCaseColumnIdx * (this.marginBetween + this.cellWidth)) + (this.cellWidth / 2);
         const lineEndY = lineStartY;
         // draw the arrow at the horizontal middle of the target case's bar, but touching the bar
         const arrowX = lineEndX;
         const arrowY = this.visualIdCellHeight + (this.graphData.dates[targetCaseData.firstGraphDate] * this.cellHeight);
 
         // draw the horizontal line from the source case to the target case
-        this.canvas.append('line')
+        this.graphCasesContainer.append('line')
             .attr('class', `relationship source-case-${sourceCaseId}`)
             .attr('stroke', 'black')
             .attr('stroke-width', '1px')
@@ -280,7 +313,7 @@ export class TransmissionChainBarsService {
             .attr('y2', lineEndY);
 
         // draw the vertical line (arrow's base)
-        this.canvas.append('line')
+        this.graphCasesContainer.append('line')
             .attr('class', `relationship source-case-${sourceCaseId}`)
             .attr('stroke', 'black')
             .attr('stroke-width', '1px')
@@ -290,7 +323,7 @@ export class TransmissionChainBarsService {
             .attr('y2', arrowY);
 
         // draw the top of the arrow
-        this.canvas.append('polygon')
+        this.graphCasesContainer.append('polygon')
             .attr('class', `relationship source-case-${sourceCaseId}`)
             .attr('fill', 'black')
             .attr('points', `${arrowX},${arrowY} ${arrowX - 5},${(arrowY - 8)} ${arrowX + 5},${arrowY - 8}`);
@@ -303,30 +336,22 @@ export class TransmissionChainBarsService {
         const graphWidth = this.dateCellWidth + this.currentColumnIdx * (this.marginBetween + this.cellWidth);
 
         // draw horizontal rows
-        for (let i = 0; i < Object.values(this.graphData.dates).length; i++) {
-            this.canvas.append('rect')
-                .attr('width', graphWidth)
-                .attr('height', this.cellHeight)
-                .attr('x', 0)
-                .attr('y', this.visualIdCellHeight + (i * this.cellHeight))
-                .attr('fill', 'transparent')
-                .attr('class', 'axis-hover');
-        }
-    }
-
-    /**
-     * Determine graph width based on the data
-     */
-    private determineGraphWidth(data): number {
-        // date-column-width + cases-no * (margin-between-cases + case-cell-width)
-        return this.dateCellWidth + Object.values(data.cases).length * (this.marginBetween + this.cellWidth);
+        // for (let i = 0; i < Object.values(this.graphData.dates).length; i++) {
+        //     this.canvas.append('rect')
+        //         .attr('width', graphWidth)
+        //         .attr('height', this.cellHeight)
+        //         .attr('x', 0)
+        //         .attr('y', this.visualIdCellHeight + (i * this.cellHeight))
+        //         .attr('fill', 'transparent')
+        //         .attr('class', 'axis-hover');
+        // }
     }
 
     /**
      * Determine graph height based on the data
      */
-    private determineGraphHeight(data): number {
-        const daysNo = moment(data.maxDate).diff(moment(data.minDate), 'days') + 1;
+    private determineGraphHeight(): number {
+        const daysNo = moment(this.graphData.maxDate).diff(moment(this.graphData.minDate), 'days') + 1;
 
         // visual-id-column-height + days-no * cell-height
         return this.visualIdCellHeight + daysNo * this.cellHeight;

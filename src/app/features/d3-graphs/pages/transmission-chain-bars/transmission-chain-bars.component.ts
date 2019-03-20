@@ -3,6 +3,12 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import * as moment from 'moment';
 import { Constants } from '../../../../core/models/constants';
 import { TransmissionChainBarsService } from '../../services/transmission-chain-bars.service';
+import { LoadingDialogModel } from '../../../../shared/components';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
+import * as domtoimage from 'dom-to-image';
+import * as FileSaver from 'file-saver';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-transmission-chain-bars',
@@ -14,6 +20,9 @@ export class TransmissionChainBarsComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE', null, true)
     ];
+
+    loadingDialog: LoadingDialogModel;
+
 
     mockData: any = {
         cases: {
@@ -188,15 +197,15 @@ export class TransmissionChainBarsComponent implements OnInit {
             },
             'nnn': {
                 id: 'nnn',
-                visualId: 'CAS-134009',
-                dateOfOnset: '2019-01-30',
+                visualId: 'CAS-134099',
+                dateOfOnset: '2019-01-31',
                 isolation: [
                     {date: '2019-02-02'}, {date: '2019-02-03'}, {date: '2019-02-04'}, {date: '2019-02-05'},
                 ],
                 labResults: [
                     {date: '2019-02-06', result: 'G'}
                 ],
-                firstGraphDate: '2019-01-30',
+                firstGraphDate: '2019-01-31',
                 lastGraphDate: '2019-02-06',
             },
         },
@@ -213,7 +222,10 @@ export class TransmissionChainBarsComponent implements OnInit {
     @ViewChild('chart') chartContainer: ElementRef;
 
     constructor(
-        private transmissionChainBarsService: TransmissionChainBarsService
+        private transmissionChainBarsService: TransmissionChainBarsService,
+        private dialogService: DialogService,
+        private importExportDataService: ImportExportDataService,
+        private i18nService: I18nService,
     ) {
     }
 
@@ -236,5 +248,44 @@ export class TransmissionChainBarsComponent implements OnInit {
             this.days.push(dayDate);
             dateMoment.add(1, 'days');
         }
+    }
+
+    /**
+     * Display loading dialog
+     */
+    private showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+
+    /**
+     * Hide loading dialog
+     */
+    private closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
+    }
+
+    /**
+     * Print chain
+     */
+    exportChain() {
+        this.showLoadingDialog();
+
+        domtoimage.toPng(this.chartContainer.nativeElement)
+            .then((dataUrl) => {
+                const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
+
+                this.importExportDataService.exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
+                    .subscribe((blob) => {
+                        const fileName = this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE');
+                        FileSaver.saveAs(
+                            blob,
+                            `${fileName}.pdf`
+                        );
+                        this.closeLoadingDialog();
+                    });
+            });
     }
 }

@@ -135,6 +135,7 @@ export const EnglishUsLang = {
          * uiChainsOfTransmissionBars
          */
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE': 'Chains of transmission bars',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_EXPORT_CHAIN': 'Export chain',
 
         /**
          * uiSideFilter
