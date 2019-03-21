@@ -86,7 +86,8 @@
                                 <app-form-input
                                     *ngIf="
                                         filter.filter?.type === FilterType.TEXT ||
-                                        filter.filter?.type === FilterType.NUMBER || (
+                                        filter.filter?.type === FilterType.NUMBER ||
+                                         filter.filter?.type === FilterType.ADDRESS_PHONE_NUMBER || (
                                             filter.filter?.type === FilterType.ADDRESS &&
                                             filter.comparator === FilterComparator.CONTAINS
                                         )"

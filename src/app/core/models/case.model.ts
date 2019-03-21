@@ -161,4 +161,13 @@ export class CaseModel {
 
         return address ? address : new AddressModel();
     }
+
+    /**
+     * Get phone numbers
+     */
+    get phoneNumbers() {
+        return _.map(this.addresses, (address: AddressModel) => {
+            return address.phoneNumber;
+        });
+    }
 }

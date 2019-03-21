@@ -63,14 +63,6 @@
                                 <div
                                     fxFlex fxLayout="row" fxLayoutGap="20px">
                                     <app-form-select
-                                        name="phoneNumber"
-                                        [(ngModel)]="uniqueOptions?.phoneNumber.value"
-                                        [placeholder]="'LNG_CASE_FIELD_LABEL_PHONE_NUMBER' | translate"
-                                        tooltip="LNG_CASE_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION"
-                                        [options]="uniqueOptions?.phoneNumber.options">
-                                    </app-form-select>
-
-                                    <app-form-select
                                         name="occupation"
                                         [(ngModel)]="uniqueOptions?.occupation.value"
                                         [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
@@ -86,9 +78,7 @@
                                     tooltip="LNG_CASE_FIELD_LABEL_AGE_DESCRIPTION"
                                     [options]="uniqueOptions?.ageDob.options">
                                 </app-form-select>
-                            </div>
 
-                            <div fxLayout="row" fxLayoutGap="20px">
                                 <app-form-select
                                     name="visualId"
                                     [(ngModel)]="uniqueOptions?.visualId.value"
@@ -98,8 +88,7 @@
                                 </app-form-select>
 
                                 <div fxFlex><!-- placeholder --></div>
-                                <div fxFlex><!-- placeholder --></div>
-                                <div fxFlex><!-- placeholder --></div>
+
                             </div>
 
                         </div>
