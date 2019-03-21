@@ -75,17 +75,9 @@ export class GenericDataService {
 
         switch (forType) {
             case EntityType.CASE:
-                // all types can be related with a Case
-                availableTypes = [EntityType.CASE, EntityType.EVENT];
-                // a contact cannot be an exposure
-                if (relationshipType === RelationshipType.CONTACT) {
-                    availableTypes.push(EntityType.CONTACT);
-                }
-                break;
-
             case EntityType.EVENT:
-                // all types, except Event, can be related with an Event
-                availableTypes = [EntityType.CASE];
+                // all types can be related with a Case or an Event
+                availableTypes = [EntityType.CASE, EntityType.EVENT];
                 // a contact cannot be an exposure
                 if (relationshipType === RelationshipType.CONTACT) {
                     availableTypes.push(EntityType.CONTACT);
