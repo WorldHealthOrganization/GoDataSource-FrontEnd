@@ -2,6 +2,7 @@ import { ContactModel } from '../../../../../core/models/contact.model';
 import { FollowUpModel } from '../../../../../core/models/follow-up.model';
 import { ChronologyItem } from '../../../../../shared/components/chronology/typings/chronology-item';
 import * as _ from 'lodash';
+import { Constants } from '../../../../../core/models/constants';
 
 export class ContactChronology {
     static getChronologyEntries(contactData: ContactModel, followUps: FollowUpModel[]): ChronologyItem[] {
@@ -13,7 +14,7 @@ export class ContactChronology {
                 chronologyEntries.push(new ChronologyItem({
                     date: followUp.date,
                     label: followUp.statusId,
-                    itemTypeFollowUp: true
+                    type: Constants.CHRONOLOGY_ITEM_TYPE.FOLLOW_UP
                 }));
             }
         });
