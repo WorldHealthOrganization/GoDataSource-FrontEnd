@@ -143,7 +143,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                 return ErrorObservable.create(err);
             }).subscribe(() => {
                 // update loaded ref data
-                refEntry.order = order ? order : null
+                refEntry.order = order ? order : null;
 
                 // show success ?
                 // this might not be the best idea...maybe we can replace / remove it
