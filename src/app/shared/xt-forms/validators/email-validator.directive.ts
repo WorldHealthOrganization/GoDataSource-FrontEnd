@@ -1,7 +1,7 @@
 import { Directive, forwardRef } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
-
 import * as _ from 'lodash';
+import * as Isemail from 'isemail';
 
 @Directive({
     selector: '[app-email-validator][ngModel]',
@@ -26,7 +26,7 @@ export class EmailValidatorDirective implements Validator {
             return null;
         }
 
-        const isValid = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/i.test(control.value);
+        const isValid = Isemail.validate(control.value);
 
         // check if the value is an email address
         if (!isValid) {
