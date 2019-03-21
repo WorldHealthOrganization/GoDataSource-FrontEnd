@@ -194,5 +194,4 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges 
             element.classList.remove('c3-axis-x-8n');
         }
     }
-
 }
