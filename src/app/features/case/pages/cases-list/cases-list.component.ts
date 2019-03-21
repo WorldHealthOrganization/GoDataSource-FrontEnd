@@ -897,7 +897,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }
             });
         }
-
         // refresh list
         this.needsRefreshList();
     }
