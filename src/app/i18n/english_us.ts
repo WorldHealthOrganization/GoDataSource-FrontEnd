@@ -16,7 +16,20 @@ export const EnglishUsLang = {
         /**
          * uiChainsOfTransmissionGraph
          */
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE': 'Icon'
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE': 'Icon',
+
+        /**
+         * uiDashboardPage
+         */
+        'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_TITLE': 'Contact Follow-up Report',
+        'LNG_PAGE_DASHBOARD_CONTACT_FOLLOWED_UP_LABEL': 'Followed-up',
+        'LNG_PAGE_DASHBOARD_CONTACT_NOT_FOLLOWED_UP_LABEL': 'Not Followed-up',
+        'LNG_PAGE_DASHBOARD_CONTACT_NOT_PERCENTAGE_LABEL': 'Percentage',
+        'LNG_PAGE_DASHBOARD_CONTACT_NOT_PERCENTAGE_X_AXIS_LABEL': 'Date',
+        'LNG_PAGE_DASHBOARD_CONTACT_NOT_PERCENTAGE_Y_AXIS_LABEL': 'Number of Contacts',
+        'LNG_PAGE_DASHBOARD_CONTACT_NOT_PERCENTAGE_Y2_AXIS_LABEL': 'Percentage'
+
+
 
 
 

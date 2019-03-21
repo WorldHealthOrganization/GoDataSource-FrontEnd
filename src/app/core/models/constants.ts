@@ -90,6 +90,15 @@ export class Constants {
     // default color to be used in chains - timeline checkpoints - first day of month - text
     static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_MONTH_TEXT = '#3A9A8A';
 
+    // default color to be used in dashboard - contact follow up report
+    static DEFAULT_COLOR_CHART_CONTACTS_NOT_FOLLOWED = '#ED7D31';
+
+    // default color to be used in dashboard - contact follow up report
+    static DEFAULT_COLOR_CHART_CONTACTS_FOLLOWED = '#00B0F0';
+
+    // default color to be used in dashboard - contact follow up report
+    static DEFAULT_COLOR_CHART_CONTACTS_PERCENTAGE = '#000000';
+
     // these need to be hardcoded, this is why we don't pull them from reference data
     // they are in reference data only to disable some options or translate labels ( since answer type category is readonly )
     static ANSWER_TYPES = {
