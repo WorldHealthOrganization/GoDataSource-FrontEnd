@@ -189,6 +189,20 @@
                 </app-contact-follow-up-overview-dashlet>
             </mat-card>
 
+            <!-- Cases based on contact status -->
+            <mat-card class="page-section">
+                <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_TITLE' |
+                    translate}}
+                </div>
+
+                <!-- Cases based on contact status c3 chart -->
+                <app-cases-based-on-contact-dashlet
+                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+                    [globalFilterDate]="globalFilterDate"
+                    [globalFilterLocationId]="globalFilterLocationId">
+                </app-cases-based-on-contact-dashlet>
+            </mat-card>
+
             <!-- KPIs -->
             <div #kpiSection>
                 <mat-card

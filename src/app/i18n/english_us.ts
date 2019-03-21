@@ -29,6 +29,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_CONTACT_NOT_PERCENTAGE_Y_AXIS_LABEL': 'Number of Contacts',
         'LNG_PAGE_DASHBOARD_CONTACT_NOT_PERCENTAGE_Y2_AXIS_LABEL': 'Percentage',
 
+        'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_TITLE': 'Cases based on contact stau',
+
         /**
          * uiDialogs
          */
