@@ -16,8 +16,9 @@
                     <div
                         fxLayout="row" fxLayoutGap="20px" fxFlex
                         class="follow-ups-title">
-                        <div>{{ relationship.relatedEntity(entityId).type | translate }}</div>
+                        <div>{{ relationship.relatedEntity(entityId)?.type | translate }}</div>
                         <a
+                            *ngIf="relationship.relatedEntity(entityId)"
                             [routerLink]="['', EntityModel.getLinkForEntityType(relationship.relatedEntity(entityId).type), relationship.relatedEntity(entityId).model.id, 'view']"
                         >
                             {{ relationship.relatedEntity(entityId).model.name }}

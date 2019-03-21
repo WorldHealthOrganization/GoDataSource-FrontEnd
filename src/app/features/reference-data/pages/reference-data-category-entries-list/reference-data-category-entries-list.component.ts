@@ -16,6 +16,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { tap } from 'rxjs/operators';
 import 'rxjs/add/operator/switchMap';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-reference-data-category-entries-list',
@@ -108,7 +109,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = ['label', 'description', 'icon', 'color', 'active', 'readonly', 'actions'];
+        const columns = ['label', 'description', 'icon', 'color', 'order', 'active', 'readonly', 'actions'];
 
         return columns;
     }
@@ -119,5 +120,34 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
      */
     hasReferenceDataWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
+    }
+
+    /**
+     * Change Reference entry item order value
+     */
+    changeRefEntryOrder(
+        refEntry: ReferenceDataEntryModel,
+        order: any
+    ) {
+        // convert string to number
+        order = order && _.isString(order) ? parseFloat(order) : order;
+
+        // modify reference entry item
+        this.referenceDataDataService
+            .modifyEntry(
+                refEntry.id, {
+                    order: order ? order : null
+                }
+            ).catch((err) => {
+                this.snackbarService.showApiError(err);
+                return ErrorObservable.create(err);
+            }).subscribe(() => {
+                // update loaded ref data
+                refEntry.order = order ? order : null
+
+                // show success ?
+                // this might not be the best idea...maybe we can replace / remove it
+                this.snackbarService.showSuccess('LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_CHANGE_ORDER_SUCCESS_MESSAGE');
+            });
     }
 }

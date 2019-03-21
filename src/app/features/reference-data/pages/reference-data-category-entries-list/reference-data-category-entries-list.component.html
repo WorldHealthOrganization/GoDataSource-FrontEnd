@@ -93,6 +93,31 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Order -->
+        <ng-container matColumnDef="order">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <app-form-input
+                    *ngIf="hasReferenceDataWriteAccess()"
+                    name="order"
+                    [ngModel]="item.order"
+                    [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER' | translate"
+                    tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER_DESCRIPTION"
+                    type="number"
+                    (optionChanged)="changeRefEntryOrder(item, $event)">
+                </app-form-input>
+                <div
+                    *ngIf="!hasReferenceDataWriteAccess()">
+                    {{ item.order }}
+                </div>
+            </mat-cell>
+        </ng-container>
+
         <!-- Active -->
         <ng-container matColumnDef="active">
             <mat-header-cell *matHeaderCellDef>
