@@ -25,7 +25,16 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
-            'info': '&#xe923;',
+            'contacts': '&#xe924;',
+            'person_add': '&#xe925;',
+            'turned_in': '&#xe926;',
+            'nature_people': '&#xe927;',
+            'airline_seat_flat': '&#xe928;',
+            'commute': '&#xe929;',
+            'touch_app': '&#xe92a;',
+            'hotel': '&#xe92b;',
+            'pan_tool': '&#xe92c;',
+            'free_breakfast': '&#xe92d;',
             'supervisor': '&#xe920;',
             'arrowDropdownCircle': '&#xe91f;',
             'visibilityOf': '&#xe91d;',
@@ -59,8 +68,8 @@
             'add': '&#xe909;',
             'menu': '&#xe90a;',
             'home': '&#xe901;',
+            'info': '&#xe923;',
             'lab': '&#xe9aa;',
-            'arrowAUp': '&#xe921;',
             'arrowADown': '&#xe922;',
             'arrowAUp': '&#xe921;',
           '0': 0

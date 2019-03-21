@@ -132,7 +132,8 @@
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS' | translate"
                                 tooltip="LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION"
                                 [options]="finalFollowUpStatus$ | async"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [clearable]="false">
                             </app-form-select>
                         </div>
 

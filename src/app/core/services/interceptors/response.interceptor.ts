@@ -59,7 +59,7 @@ export class ResponseInterceptor implements HttpInterceptor {
                 // for 0 response status, ask user to restart the app (the server is unreachable)
                 if (error.status === 0) {
                     // we have to display a hardcoded message in this situation because we are not able to load the language
-                    this.snackbarService.showError('The server is unreachable. Please restart Go.Data.', {}, 0);
+                    this.snackbarService.showError('The application has become unresponsive. Please do a hard reload or restart Go.Data.', {}, 0);
                 }
 
                 // for 401 response status, clear the Auth Data

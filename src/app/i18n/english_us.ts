@@ -12,6 +12,17 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
+
+        /**
+         * uiChainsOfTransmissionGraph
+         */
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE': 'Icon',
+
+        /**
+         * uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_DELETE_CASE_WITH_EXPOSED_CONTACTS': 'Case: "{{name}}" has {{numberOfContacts}} exposed contacts that will be deleted. Are you sure you want to delete this case?',
+
         /**
          * uiChronologyContactPage
          */

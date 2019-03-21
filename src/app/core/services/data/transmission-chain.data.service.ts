@@ -289,21 +289,9 @@ export class TransmissionChainDataService {
                         if (!_.isEmpty(colorCriteria.nodeShape)) {
 
                             if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.TYPE.value ) {
-                               if (node.type === EntityType.CASE) {
-                                   nodeData.shape = 'ellipse';
-                               } else if (node.type === EntityType.CONTACT) {
-                                   nodeData.shape = 'pentagon';
-                               } else if (node.type === EntityType.EVENT) {
-                                   nodeData.shape = 'star';
-                               }
+                               nodeData.setNodeShapeType(node);
                             } else if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.CLASSIFICATION.value) {
-                                if (node.model.classification === Constants.CASE_CLASSIFICATION.CONFIRMED) {
-                                    nodeData.shape = 'ellipse';
-                                } else if (node.model.classification === Constants.CASE_CLASSIFICATION.PROBABLE) {
-                                    nodeData.shape = 'rectangle';
-                                } else if (node.model.classification === Constants.CASE_CLASSIFICATION.SUSPECT) {
-                                    nodeData.shape = 'pentagon';
-                                }
+                                nodeData.setNodeShapeClassification(node);
                             }
                         }
                         // determine label
@@ -468,13 +456,8 @@ export class TransmissionChainDataService {
                             }
                         }
                         // set edge style
-                        if (relationship.certaintyLevelId === Constants.CERTAINITY_LEVEL.LOW) {
-                            graphEdge.edgeStyle = 'dotted';
-                        } else if (relationship.certaintyLevelId === Constants.CERTAINITY_LEVEL.MEDIUM) {
-                            graphEdge.edgeStyle = 'dashed';
-                        } else {
-                            graphEdge.edgeStyle = 'solid';
-                        }
+                        graphEdge.setEdgeStyle(relationship);
+
                         // set edge label
                         if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value) {
                             graphEdge.label = '';
@@ -527,6 +510,17 @@ export class TransmissionChainDataService {
                                 graphEdge.label = String(noDays);
                             }
                         }
+
+                        // set edge icon
+                        if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
+                            graphEdge.setEdgeIconContextOfTransmission(relationship);
+                            graphEdge.fontFamily = 'xtIcon';
+
+                        } else if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.EXPOSURE_TYPE.value) {
+                            graphEdge.setEdgeIconExposureType(relationship);
+                            graphEdge.fontFamily = 'xtIcon';
+                        }
+
                         graphData.edges.push({data: graphEdge});
                     }
                 });

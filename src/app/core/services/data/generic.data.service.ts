@@ -183,6 +183,14 @@ export class GenericDataService {
     }
 
     /**
+     * Retrieve the list of criteria used for edge icon - radio button
+     * @returns {Observable<any[]>}
+     */
+    getTransmissionChainEdgeIconCriteriaOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS));
+    }
+
+    /**
      * Retrieve the list of criteria used for node icon - radio button
      * @returns {Observable<any[]>}
      */
