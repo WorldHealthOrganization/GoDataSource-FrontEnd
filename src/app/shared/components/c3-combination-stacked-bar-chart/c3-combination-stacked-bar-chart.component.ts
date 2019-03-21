@@ -75,7 +75,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges 
                 ],
                 labels: this.showLabels,
                 axes: {
-                    percentage: 'y2'
+                    [this.lineData]: 'y2'
                 }
             },
             point: {
