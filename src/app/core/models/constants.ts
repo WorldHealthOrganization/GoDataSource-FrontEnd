@@ -99,6 +99,18 @@ export class Constants {
     // default color to be used in dashboard - contact follow up report
     static DEFAULT_COLOR_CHART_CONTACTS_PERCENTAGE = '#000000';
 
+    // default color to be used in dashboard - cases based on contact status
+    static DEFAULT_COLOR_CHART_CASE_NOT_FROM_CONTACT = '#A6A6A6';
+
+    // default color to be used in dashboard - cases based on contact status
+    static DEFAULT_COLOR_CHART_CASE_FROM_CONTACT_FOLLOW_UP_COMPLETE = '#70AD47';
+
+    // default color to be used in dashboard - cases based on contact status
+    static DEFAULT_COLOR_CHART_CASE_FROM_CONTACT_LOST_TO_FOLLOW_UP = '#ED7D31';
+
+    // default color to be used in dashboard - cases based on contact status
+    static DEFAULT_COLOR_CHART_CASE_FROM_CONTACT_PERCENTAGE = '#FFC000';
+
     // these need to be hardcoded, this is why we don't pull them from reference data
     // they are in reference data only to disable some options or translate labels ( since answer type category is readonly )
     static ANSWER_TYPES = {

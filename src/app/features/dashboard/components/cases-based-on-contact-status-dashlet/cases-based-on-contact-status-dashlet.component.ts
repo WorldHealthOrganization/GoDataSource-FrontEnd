@@ -10,8 +10,8 @@ import { Subscription } from 'rxjs/Subscription';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs/Subscriber';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { MetricContactsFollowedUpReportModel } from '../../../../core/models/metrics/metric-contacts-followed-up-report.model';
+import { MetricCasesBasedOnContactStatusModel } from '../../../../core/models/metrics/metric-cases-based-on-contact-status.model';
+import { CaseDataService } from '../../../../core/services/data/case.data.service';
 
 @Component({
     selector: 'app-cases-based-on-contact-status-dashlet',
@@ -35,6 +35,7 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
         this._globalFilterDate = globalFilterDate;
         this.refreshDataCaller.call();
     }
+
     get globalFilterDate(): Moment {
         return this._globalFilterDate;
     }
@@ -45,6 +46,7 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
         this._globalFilterLocationId = globalFilterLocationId;
         this.refreshDataCaller.call();
     }
+
     get globalFilterLocationId(): string {
         return this._globalFilterLocationId;
     }
@@ -68,10 +70,11 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
     }), 100);
 
     constructor(
-        private contactDataService: ContactDataService,
+        private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
         private i18nService: I18nService
-    ) {}
+    ) {
+    }
 
     ngOnInit() {
         // retrieve ref data
@@ -106,58 +109,69 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
     /**
      * set the data needed for the chart
      */
-    setContactFollowUpReportResults(metricData: MetricContactsFollowedUpReportModel[]) {
+    setCasesBasedOnContactStatusReportResults(metricData: MetricCasesBasedOnContactStatusModel[]) {
         // initialize data
         this.colorPattern = [];
         this.chartDataCategories = [];
         this.chartDataColumns = [];
         const chartData = {};
 
-        const followedUpTranslated = this.i18nService.instant('LNG_PAGE_DASHBOARD_CONTACT_FOLLOWED_UP_LABEL');
-        const notFollowedUpTranslated = this.i18nService.instant('LNG_PAGE_DASHBOARD_CONTACT_NOT_FOLLOWED_UP_LABEL');
-        const percentageTranslated = this.i18nService.instant('LNG_PAGE_DASHBOARD_CONTACT_NOT_PERCENTAGE_LABEL');
+        const totalCasesNotFromContactTranslated = this.i18nService.instant('LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_NOT_FROM_CONTACT_LABEL');
+        const totalCasesFromContactWithFollowupCompleteTranslated = this.i18nService.instant('LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_FROM_CONTACT_WITH_FOLLOW_UP_COMPLETE_LABEL');
+        const totalCasesFromContactWithFollowupLostToFollowupTranslated = this.i18nService.instant('LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_FROM_CONTACT_WITH_FOLLOW_UP_LOST_LABEL');
+        const percentageOfCasesWithFollowupDataTranslated = this.i18nService.instant('LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_PERCENTAGE_LABEL');
 
         // build chart data
         _.forEach(metricData, (metric) => {
             // create the array with categories ( dates displayed on x axis )
-            this.chartDataCategories.push(moment(metric.day).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+            this.chartDataCategories.push(moment(metric.start).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
 
-            if (chartData[followedUpTranslated]) {
-                chartData[followedUpTranslated].push(metric.followedUp);
+            if (chartData[totalCasesNotFromContactTranslated]) {
+                chartData[totalCasesNotFromContactTranslated].push(metric.totalCasesNotFromContact);
             } else {
-                this.chartDataColumns.push(followedUpTranslated);
-                this.colorPattern.push(Constants.DEFAULT_COLOR_CHART_CONTACTS_FOLLOWED);
+                this.chartDataColumns.push(totalCasesNotFromContactTranslated);
+                this.colorPattern.push(Constants.DEFAULT_COLOR_CHART_CASE_NOT_FROM_CONTACT);
 
-                chartData[followedUpTranslated] = [];
-                chartData[followedUpTranslated].push(followedUpTranslated);
-                chartData[followedUpTranslated].push(metric.followedUp);
+                chartData[totalCasesNotFromContactTranslated] = [];
+                chartData[totalCasesNotFromContactTranslated].push(totalCasesNotFromContactTranslated);
+                chartData[totalCasesNotFromContactTranslated].push(metric.totalCasesNotFromContact);
             }
 
-            if (chartData[notFollowedUpTranslated]) {
-                chartData[notFollowedUpTranslated].push(metric.notFollowedUp);
+            if (chartData[totalCasesFromContactWithFollowupCompleteTranslated]) {
+                chartData[totalCasesFromContactWithFollowupCompleteTranslated].push(metric.totalCasesFromContactWithFollowupComplete);
             } else {
-                this.chartDataColumns.push(notFollowedUpTranslated);
-                this.colorPattern.push(Constants.DEFAULT_COLOR_CHART_CONTACTS_NOT_FOLLOWED);
+                this.chartDataColumns.push(totalCasesFromContactWithFollowupCompleteTranslated);
+                this.colorPattern.push(Constants.DEFAULT_COLOR_CHART_CASE_FROM_CONTACT_FOLLOW_UP_COMPLETE);
 
-                chartData[notFollowedUpTranslated] = [];
-                chartData[notFollowedUpTranslated].push(notFollowedUpTranslated);
-                chartData[notFollowedUpTranslated].push(metric.notFollowedUp);
+                chartData[totalCasesFromContactWithFollowupCompleteTranslated] = [];
+                chartData[totalCasesFromContactWithFollowupCompleteTranslated].push(totalCasesFromContactWithFollowupCompleteTranslated);
+                chartData[totalCasesFromContactWithFollowupCompleteTranslated].push(metric.totalCasesFromContactWithFollowupComplete);
             }
 
-            if (chartData[percentageTranslated]) {
-                chartData[percentageTranslated].push(metric.percentage);
+            if (chartData[totalCasesFromContactWithFollowupLostToFollowupTranslated]) {
+                chartData[totalCasesFromContactWithFollowupLostToFollowupTranslated].push(metric.totalCasesFromContactWithFollowupLostToFollowup);
             } else {
-                // this.chartDataColumns.push('percentage');
-                this.colorPattern.push(Constants.DEFAULT_COLOR_CHART_CONTACTS_PERCENTAGE);
+                this.chartDataColumns.push(totalCasesFromContactWithFollowupLostToFollowupTranslated);
+                this.colorPattern.push(Constants.DEFAULT_COLOR_CHART_CASE_FROM_CONTACT_LOST_TO_FOLLOW_UP);
 
-                chartData[percentageTranslated] = [];
-                chartData[percentageTranslated].push(percentageTranslated);
-                chartData[percentageTranslated].push(metric.percentage);
+                chartData[totalCasesFromContactWithFollowupLostToFollowupTranslated] = [];
+                chartData[totalCasesFromContactWithFollowupLostToFollowupTranslated].push(totalCasesFromContactWithFollowupLostToFollowupTranslated);
+                chartData[totalCasesFromContactWithFollowupLostToFollowupTranslated].push(metric.totalCasesFromContactWithFollowupLostToFollowup);
+            }
+
+            if (chartData[percentageOfCasesWithFollowupDataTranslated]) {
+                chartData[percentageOfCasesWithFollowupDataTranslated].push(metric.percentageOfCasesWithFollowupData);
+            } else {
+                this.colorPattern.push(Constants.DEFAULT_COLOR_CHART_CASE_FROM_CONTACT_PERCENTAGE);
+
+                chartData[percentageOfCasesWithFollowupDataTranslated] = [];
+                chartData[percentageOfCasesWithFollowupDataTranslated].push(percentageOfCasesWithFollowupDataTranslated);
+                chartData[percentageOfCasesWithFollowupDataTranslated].push(metric.percentageOfCasesWithFollowupData);
             }
 
         });
 
-        this.lineData = percentageTranslated;
+        this.lineData = percentageOfCasesWithFollowupDataTranslated;
         // finish
         return chartData;
     }
@@ -166,7 +180,7 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
      * Refresh Data
      */
     refreshData() {
-        if ( this.outbreakId ) {
+        if (this.outbreakId) {
             // release previous subscriber
             if (this.previousSubscriber) {
                 this.previousSubscriber.unsubscribe();
@@ -182,7 +196,7 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
             // date
             if (this.globalFilterDate) {
                 qb.filter.byEquality(
-                    'endDate',
+                    'end',
                     this.globalFilterDate.format('YYYY-MM-DD')
                 );
             }
@@ -195,20 +209,32 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
                 );
             }
 
+            // set period type to day to show the whole period
+            qb.filter.byEquality(
+                'periodType',
+                'day'
+            );
+
+            // set period interval to start of outbreak until current date
+            const startDate = this.outbreak.startDate;
+            const endDate = moment().format('YYYY-MM-DD');
+
+            qb.filter.where({
+                periodInterval: [startDate, endDate]
+            });
+
             // get data - start Date will be set to start of outbreak
-            const reportData = {startDate: this.outbreak.startDate};
             this.displayLoading = true;
-            this.previousSubscriber = this.contactDataService
-                .getContactsFollowedUpReport(this.outbreakId, reportData, qb)
+            this.previousSubscriber = this.caseDataService
+                .getCasesBasedOnContactStatusReport(this.outbreakId, qb)
                 .subscribe((results) => {
                     // convert data to chart data format
                     this.chartData = [];
-                    const chartDataObject = this.setContactFollowUpReportResults(results);
+                    const chartDataObject = this.setCasesBasedOnContactStatusReportResults(results);
                     _.each(chartDataObject, (data) => {
                         this.chartData.push(data);
                     });
-
-                    // finished
+                   // finished
                     this.displayLoading = false;
                 });
         }

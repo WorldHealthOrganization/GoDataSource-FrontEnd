@@ -17,6 +17,7 @@ import { MetricCasesDelayBetweenOnsetHospitalizationModel } from '../../models/m
 import { Constants } from '../../models/constants';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import { MetricCasesCountStratifiedOutcome } from '../../models/metrics/metric-cases-count-stratified-outcome.model';
+import { MetricCasesBasedOnContactStatusModel } from '../../models/metrics/metric-cases-based-on-contact-status.model';
 
 @Injectable()
 export class CaseDataService {
@@ -412,6 +413,33 @@ export class CaseDataService {
     }
 
     /**
+     * Cases based on contact status report
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<MetricCasesBasedOnContactStatusModel[]>}
+     */
+    getCasesBasedOnContactStatusReport(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricCasesBasedOnContactStatusModel[]> {
+        const filter = queryBuilder.buildQuery();
+        const obs = this.http.get(`outbreaks/${outbreakId}/cases/per-period-per-contact-status/count?filter=${filter}`);
+        return obs.map(
+            (listResult: any) => {
+                const results: MetricCasesBasedOnContactStatusModel[] = [];
+                if (listResult.period) {
+
+                    _.forEach(listResult.period, (result) => {
+                        const metricResult: any = result;
+                        results.push(metricResult);
+                    });
+                }
+                return results;
+            }
+        );
+    }
+
+    /**
      *  Restore a case that was deleted
      * @param {string} outbreakId
      * @param {string} caseId
@@ -492,4 +520,5 @@ export class CaseDataService {
                 };
         });
     }
+
 }
