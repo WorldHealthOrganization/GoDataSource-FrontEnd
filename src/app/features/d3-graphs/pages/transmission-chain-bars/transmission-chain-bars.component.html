@@ -27,7 +27,7 @@
 
 <mat-card class="page-section page-content">
 
-    <div fxLayout="column" fxLayoutGap="10px">
+    <div class="filters" fxLayout="column" fxLayoutGap="10px">
         <div>
             <button
                 mat-raised-button
@@ -104,6 +104,14 @@
         </div>
     </div>
 
-    <div #chart id="chart"></div>
+    <div [fxShow]="!loadingData && !noData" #chart id="chart"></div>
+
+    <div *ngIf="!loadingData && noData">
+        {{'LNG_PAGE_TRANSMISSION_CHAIN_BARS_NO_DATA' | translate}}
+    </div>
+
+    <div *ngIf="loadingData">
+        <mat-spinner></mat-spinner>
+    </div>
 
 </mat-card>

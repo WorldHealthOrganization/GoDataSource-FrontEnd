@@ -189,7 +189,7 @@ export class TransmissionChainBarsService {
         /**
          * draw the case isolation cells
          */
-        caseData.dateRanges.forEach((isolation) => {
+        (caseData.dateRanges || []).forEach((isolation) => {
             const isolationDates = this.getDaysBetween(isolation.startDate, isolation.endDate);
             let isolationLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_ISOLATED_CASE_LABEL');
             if (isolation.typeId === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_HOSPITALIZATION') {
@@ -218,7 +218,7 @@ export class TransmissionChainBarsService {
         /**
          * draw the lab results cells
          */
-        caseData.labResults.forEach((labResult) => {
+        (caseData.labResults || []).forEach((labResult) => {
             let result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_NEGATIVE_LABEL');
             if (labResult.result === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_POSITIVE') {
                 result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_POSITIVE_LABEL');

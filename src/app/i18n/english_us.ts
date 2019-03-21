@@ -144,6 +144,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE': 'Chains of transmission bars',
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_EXPORT_CHAIN': 'Export chain',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_NO_DATA': 'There is no data to build the graph.',
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_CASE_ONSET_LABEL': 'S',
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_ISOLATED_CASE_LABEL': 'iso',
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_CASE_LABEL': 'hsp',

@@ -30,6 +30,10 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     outbreakSubscriber: Subscription;
     // query builder for fetching data
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
+    // show loading while fetching data and building the graph
+    loadingData: boolean = false;
+    // do we have data to draw the graph?
+    noData: boolean = false;
     // loading indicator
     loadingDialog: LoadingDialogModel;
     // show filters?
@@ -79,9 +83,18 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
             return;
         }
 
+        this.loadingData = true;
+
         this.transmissionChainBarsDataService.getTransmissionChainBarsData(this.selectedOutbreak.id, this.queryBuilder)
             .subscribe((graphData) => {
-                this.transmissionChainBarsService.drawGraph(this.chartContainer.nativeElement, graphData);
+                this.loadingData = false;
+
+                if (graphData.casesOrder.length > 0) {
+                    this.noData = false;
+                    this.transmissionChainBarsService.drawGraph(this.chartContainer.nativeElement, graphData);
+                } else {
+                    this.noData = true;
+                }
             });
     }
 
