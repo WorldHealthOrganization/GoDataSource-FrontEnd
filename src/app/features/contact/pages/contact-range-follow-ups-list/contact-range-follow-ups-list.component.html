@@ -33,6 +33,97 @@
 </app-topnav>
 
 <mat-card class="page-section page-content">
+
+    <div>
+        <!-- panel toggle -->
+        <div
+            fxFlex fxLayout="row" fxLayoutAlign="space-between center"
+            class="display-filter-button">
+            <!-- filters toggle -->
+            <button
+                mat-raised-button
+                (click)="showFilters = !showFilters">
+                {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_DISPLAY_FILTERS_BUTTON' | translate }}
+            </button>
+        </div>
+
+        <!-- filter panel -->
+        <div
+            *ngIf="showFilters"
+            fxFlex fxLayout="column" fxLayoutGap="20px">
+            <!-- Filters -->
+
+            <div fxFlex fxLayout="row" fxLayoutGap="20px">
+                <div fxFlex fxLayout="column" fxLayoutGap="20px">
+                    <div fxFlex>
+                        {{ 'LNG_CONTACT_FIELD_LABEL_NAME' | translate }}
+                    </div>
+                    <app-form-input
+                        name="contactName"
+                        [(ngModel)]="filters.contactName"
+                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate">
+                    </app-form-input>
+                </div>
+
+                <div fxFlex fxLayout="column" fxLayoutGap="20px">
+                    <div fxFlex>
+                        {{ 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate }}
+                    </div>
+                    <app-form-input
+                        name="visualId"
+                        [(ngModel)]="filters.visualId"
+                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                        app-reset-input-on-side-filter>
+                    </app-form-input>
+                </div>
+            </div>
+
+            <div fxFlex fxLayout="row" fxLayoutGap="20px">
+                <div fxFlex fxLayout="column" fxLayoutGap="20px">
+                    <div fxFlex>
+                        {{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}
+                    </div>
+                    <app-form-daterange
+                        name="dateOfLastContact"
+                        [(ngModel)]="filters.dateOfLastContact"
+                        (changed)="filters.dateOfLastContact = $event"
+                        app-reset-input-on-side-filter>
+                    </app-form-daterange>
+                </div>
+
+                <div fxFlex fxLayout="column" fxLayoutGap="20px">
+                    <div fxFlex>
+                        {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP' | translate }}
+                    </div>
+                    <app-form-daterange
+                        name="dateOfTheEndOfTheFollowUp"
+                        [(ngModel)]="filters.dateOfTheEndOfTheFollowUp"
+                        (changed)="filters.dateOfTheEndOfTheFollowUp = $event"
+                        app-reset-input-on-side-filter>
+                    </app-form-daterange>
+                </div>
+            </div>
+
+            <div
+                fxFlex fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
+                <!-- Reset filters -->
+                <button
+                    fxFlex="150px"
+                    mat-raised-button
+                    (click)="resetFilters()">
+                    {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+                </button>
+
+                <button
+                    mat-raised-button
+                    color="accent"
+                    (click)="applyFilters()">
+                    {{ 'LNG_COMMON_BUTTON_APPLY_FILTERS' | translate }}
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div
         fxFlex fxLayout="column" fxLayoutGap="5px">
         <div
@@ -91,93 +182,6 @@
                     (click)="needsRefreshList(true)">
                     {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
                 </button>
-            </div>
-        </div>
-
-        <div>
-            <!-- panel toggle -->
-            <div
-                fxFlex fxLayout="row" fxLayoutAlign="space-between center">
-                <!-- filters toggle -->
-                <button
-                    mat-raised-button
-                    (click)="showFilters = !showFilters">
-                    {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_DISPLAY_FILTERS_BUTTON' | translate }}
-                </button>
-            </div>
-
-            <!-- filter panel -->
-            <div
-                *ngIf="showFilters"
-                fxFlex fxLayout="column" fxLayoutGap="20px"
-                class="filters-container">
-                <!-- Filters -->
-
-                <div fxFlex fxLayout="row" fxLayoutGap="20px">
-                    <div fxFlex fxLayout="column" fxLayoutGap="20px">
-                        <div fxFlex>
-                        {{ 'LNG_CONTACT_FIELD_LABEL_NAME' | translate }}
-                        </div>
-                        <app-form-input
-                            name="contactFullNameAndVisualId"
-                            [(ngModel)]="contactFullNameAndVisualId"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByChildQueryBuilder('contact').byTextMultipleProperties([ 'firstName', 'lastName'], $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
-                    </div>
-
-                    <div fxFlex fxLayout="column" fxLayoutGap="20px">
-                        <div fxFlex>
-                            {{ 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate }}
-                        </div>
-                        <app-form-input
-                            name="visualId"
-                            [(ngModel)]="visualId"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByChildQueryBuilder('contact').byText('visualId', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
-                    </div>
-
-                    <div fxFlex fxLayout="column" fxLayoutGap="20px">
-                        <div fxFlex>
-                        {{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}
-                        </div>
-                        <app-form-daterange
-                            name="dateOfLastContact"
-                            [(ngModel)]="dateOfLastContact"
-                            (changed)="filterByChildQueryBuilder('contact').byDateRange('dateOfLastContact', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
-                    </div>
-
-                    <div fxFlex fxLayout="column" fxLayoutGap="20px">
-                        <div fxFlex>
-                            {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP' | translate }}
-                        </div>
-                        <app-form-daterange
-                            name="dateOfTheEndOfTheFollowUp"
-                            [(ngModel)]="dateOfTheEndOfTheFollowUp"
-                            (changed)="filterByChildQueryBuilder('contact').byDateRange('followUp.endDate', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
-                    </div>
-
-                </div>
-
-                <div
-                    fxFlex fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
-                    <!-- Reset filters -->
-                    <button
-                        fxFlex="150px"
-                        mat-raised-button
-                        (click)="resetFilters()">
-                        {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_RESET_FILTERS_BUTTON' | translate }}
-                    </button>
-                </div>
             </div>
         </div>
 

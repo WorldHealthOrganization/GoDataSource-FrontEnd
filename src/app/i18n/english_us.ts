@@ -27,7 +27,6 @@ export const EnglishUsLang = {
          * uiRangeFollowUpsListPage
          */
         'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_DISPLAY_FILTERS_BUTTON': 'Display filters',
-        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_RESET_FILTERS_BUTTON': 'Reset filters',
 
         /**
          * REMOVE the tokens from below

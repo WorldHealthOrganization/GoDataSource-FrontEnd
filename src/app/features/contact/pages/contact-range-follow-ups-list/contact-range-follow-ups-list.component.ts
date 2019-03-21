@@ -89,9 +89,12 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
     showFilters: boolean = false;
 
-    contactFullNameAndVisualId: string = '';
-    dateOfLastContact: DateRangeModel = new DateRangeModel();
-    dateOfTheEndOfTheFollowUp: DateRangeModel = new DateRangeModel();
+    filters = {
+        contactName: null,
+        visualId: null,
+        dateOfLastContact: null,
+        dateOfTheEndOfTheFollowUp: null
+    };
 
     /**
      * Filter slider data
@@ -358,8 +361,34 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         if (this.sliderDateFilterValue) {
             this.filterByDateRange(this.sliderDateFilterValue);
         }
-        this.contactFullNameAndVisualId = '';
-        this.dateOfLastContact = new DateRangeModel;
-        this.dateOfTheEndOfTheFollowUp = new DateRangeModel;
+        this.filters = {
+            contactName: null,
+            visualId: null,
+            dateOfLastContact: null,
+            dateOfTheEndOfTheFollowUp: null
+        };
+    }
+
+    applyFilters() {
+
+        if (this.filters.contactName !== null) {
+            this.queryBuilder.addChildQueryBuilder(`contact`).filter.byTextMultipleProperties([ 'firstName', 'lastName'], this.filters.contactName);
+        }
+
+        if (this.filters.visualId !== null) {
+            this.queryBuilder.addChildQueryBuilder(`contact`).filter.byText('visualId', this.filters.visualId);
+        }
+
+        if (this.filters.dateOfLastContact !== null) {
+            this.queryBuilder.addChildQueryBuilder('contact').filter.byDateRange('dateOfLastContact', this.filters.dateOfLastContact);
+        }
+
+        if (this.filters.dateOfTheEndOfTheFollowUp !== null) {
+            this.queryBuilder.addChildQueryBuilder('contact').filter.byDateRange('followUp.endDate', this.filters.dateOfTheEndOfTheFollowUp);
+        }
+
+        this.showFilters = false;
+
+        this.needsRefreshList();
     }
 }
