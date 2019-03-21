@@ -114,9 +114,9 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
         this.chartDataColumns = [];
         const chartData = {};
 
-        const followedUpTranslated = this.i18nService.instant('LNG_PAGE_DASHBOARD_CONTACT_FOLLOWED_UP_LABEL');
-        const notFollowedUpTranslated = this.i18nService.instant('LNG_PAGE_DASHBOARD_CONTACT_NOT_FOLLOWED_UP_LABEL');
-        const percentageTranslated = this.i18nService.instant('LNG_PAGE_DASHBOARD_CONTACT_NOT_PERCENTAGE_LABEL');
+        const followedUpTranslated = this.i18nService.instant('LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_FOLLOWED_UP_LABEL');
+        const notFollowedUpTranslated = this.i18nService.instant('LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_NOT_FOLLOWED_UP_LABEL');
+        const percentageTranslated = this.i18nService.instant('LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_NOT_PERCENTAGE_LABEL');
 
         // build chart data
         _.forEach(metricData, (metric) => {
