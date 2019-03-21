@@ -122,7 +122,21 @@
                             name="contactFullNameAndVisualId"
                             [(ngModel)]="contactFullNameAndVisualId"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByChildQueryBuilder('contact').byTextMultipleProperties([ 'firstName', 'lastName', 'visualId' ], $event)"
+                            (optionChanged)="filterByChildQueryBuilder('contact').byTextMultipleProperties([ 'firstName', 'lastName'], $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+
+                    <div fxFlex fxLayout="column" fxLayoutGap="20px">
+                        <div fxFlex>
+                            {{ 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate }}
+                        </div>
+                        <app-form-input
+                            name="visualId"
+                            [(ngModel)]="visualId"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByChildQueryBuilder('contact').byText('visualId', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>

@@ -89,9 +89,9 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
     showFilters: boolean = false;
 
-    contactFullNameAndVisualId: string;
-    dateOfLastContact: DateRangeModel = new DateRangeModel;
-    dateOfTheEndOfTheFollowUp: DateRangeModel = new DateRangeModel;
+    contactFullNameAndVisualId: string = '';
+    dateOfLastContact: DateRangeModel = new DateRangeModel();
+    dateOfTheEndOfTheFollowUp: DateRangeModel = new DateRangeModel();
 
     /**
      * Filter slider data
