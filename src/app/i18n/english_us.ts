@@ -13,6 +13,14 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiCommonButtons
+         */
+        'LNG_COMMON_BUTTON_SHOW_FILTERS': 'Show filters',
+        'LNG_COMMON_BUTTON_HIDE_FILTERS': 'Hide filters',
+        'LNG_COMMON_BUTTON_RESET_FILTERS': 'Reset filters',
+        'LNG_COMMON_BUTTON_APPLY_FILTERS': 'Apply filters',
+
+        /**
          * uiFollowUpsListPage
          */
         'LNG_PAGE_LIST_FOLLOW_UPS_TITLE': 'Follow-ups',
@@ -136,10 +144,12 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE': 'Chains of transmission bars',
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_EXPORT_CHAIN': 'Export chain',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_CASE_ONSET_LABEL': 'S',
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_ISOLATED_CASE_LABEL': 'iso',
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_CASE_LABEL': 'hsp',
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_POSITIVE_LABEL': 'pos+',
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_NEGATIVE_LABEL': 'neg-',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FILTERS_HOSPITALISATION_ISOLATION': 'Hospitalisation / Isolation',
 
         /**
          * uiSideFilter

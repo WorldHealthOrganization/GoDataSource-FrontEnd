@@ -4,7 +4,7 @@ export interface TransmissionChainBarsModel {
     casesMap: {
         [uid: string]: CaseBarModel
     };
-    caseIds: string[];
+    casesOrder: string[];
     relationships: {
         [sourceUid: string]: string[]
     };

@@ -132,7 +132,7 @@ export class TransmissionChainBarsService {
     private drawCases() {
         // determine graph width based on the number of cases
         // cases-no * (margin-between-cases + case-cell-width)
-        const casesGraphWidth = this.graphData.caseIds.length * (this.marginBetween + this.cellWidth);
+        const casesGraphWidth = this.graphData.casesOrder.length * (this.marginBetween + this.cellWidth);
 
         // create cases container
         this.graphCasesContainer = this.graphContainer.append('div')
@@ -144,7 +144,7 @@ export class TransmissionChainBarsService {
             .attr('height', this.determineGraphHeight());
 
         // draw each case column
-        this.graphData.caseIds.forEach((caseId) => {
+        this.graphData.casesOrder.forEach((caseId) => {
             // did we already draw this case?
             if (this.caseColumnMap[caseId] === undefined) {
                 this.drawCase(caseId);
@@ -224,8 +224,7 @@ export class TransmissionChainBarsService {
                 result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_POSITIVE_LABEL');
             }
 
-            // #TODO replace dateOfResult with dateSampleTaken
-            const labResultDate = moment(labResult.dateOfResult).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+            const labResultDate = moment(labResult.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
             const labResultGroup = caseColumnContainer.append('g')
                 .attr('transform', `translate(0, ${this.visualIdCellHeight + (this.datesMap[labResultDate] * this.cellHeight)})`);
@@ -242,6 +241,26 @@ export class TransmissionChainBarsService {
                 .attr('x', this.cellWidth / 2)
                 .attr('y', this.cellHeight / 2);
         });
+
+        /**
+         * draw the date of onset cell
+         */
+        const dateOfOnsetLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_CASE_ONSET_LABEL');
+        const dateOfOnset = moment(caseData.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        const dateOfOnsetGroup = caseColumnContainer.append('g')
+            .attr('transform', `translate(0, ${this.visualIdCellHeight + (this.datesMap[dateOfOnset] * this.cellHeight)})`);
+        dateOfOnsetGroup.append('rect')
+            .attr('width', this.cellWidth)
+            .attr('height', this.cellHeight)
+            .attr('fill', 'white');
+        dateOfOnsetGroup.append('text')
+            .text(dateOfOnsetLabel)
+            .attr('fill', 'black')
+            .attr('alignment-baseline', 'central')
+            .attr('text-anchor', 'middle')
+            // center the text
+            .attr('x', this.cellWidth / 2)
+            .attr('y', this.cellHeight / 2);
 
         // draw the case bar container (to show the border)
         const caseDateOfOnset = moment(caseData.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);

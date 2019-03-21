@@ -15,7 +15,6 @@ export interface CaseBarModel {
         locationId: string;
     }[];
     labResults?: {
-        dateOfResult: string;
         dateSampleTaken: string;
         testType: string;
         result: string;
