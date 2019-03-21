@@ -27,13 +27,15 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_CONTACT_NOT_PERCENTAGE_LABEL': 'Percentage',
         'LNG_PAGE_DASHBOARD_CONTACT_NOT_PERCENTAGE_X_AXIS_LABEL': 'Date',
         'LNG_PAGE_DASHBOARD_CONTACT_NOT_PERCENTAGE_Y_AXIS_LABEL': 'Number of Contacts',
-        'LNG_PAGE_DASHBOARD_CONTACT_NOT_PERCENTAGE_Y2_AXIS_LABEL': 'Percentage'
+        'LNG_PAGE_DASHBOARD_CONTACT_NOT_PERCENTAGE_Y2_AXIS_LABEL': 'Percentage',
 
 
 
 
-
-
+        /**
+         * uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_DELETE_CASE_WITH_EXPOSED_CONTACTS': 'Case: "{{name}}" has {{numberOfContacts}} exposed contacts that will be deleted. Are you sure you want to delete this case?'
 
         /**
          * REMOVE the tokens from below
