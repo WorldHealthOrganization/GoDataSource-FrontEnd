@@ -553,22 +553,33 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * @param {CaseModel} caseModel
      */
     deleteCase(caseModel: CaseModel) {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CASE', caseModel)
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    // delete case
-                    this.caseDataService
-                        .deleteCase(this.selectedOutbreak.id, caseModel.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
+        this.caseDataService.getExposedContactsForCase(this.selectedOutbreak.id, caseModel.id)
+            .subscribe((exposedContacts: {count: number}) => {
+                if (exposedContacts) {
+                    const translateData = {
+                        name: caseModel.name,
+                        numberOfContacts: exposedContacts.count
+                    };
+                    this.dialogService.showConfirm(
+                        exposedContacts.count > 0 ?
+                            `LNG_DIALOG_CONFIRM_DELETE_CASE_WITH_EXPOSED_CONTACTS` :
+                            'LNG_DIALOG_CONFIRM_DELETE_CASE', translateData)
+                        .subscribe((answer: DialogAnswer) => {
+                            if (answer.button === DialogAnswerButton.Yes) {
+                                // delete case
+                                this.caseDataService
+                                    .deleteCase(this.selectedOutbreak.id, caseModel.id)
+                                    .catch((err) => {
+                                        this.snackbarService.showError(err.message);
 
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE');
+                                        return ErrorObservable.create(err);
+                                    })
+                                    .subscribe(() => {
+                                        this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE');
 
-                            // reload data
-                            this.needsRefreshList(true);
+                                        // reload data
+                                        this.needsRefreshList(true);
+                                    });                            }
                         });
                 }
             });

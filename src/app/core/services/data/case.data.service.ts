@@ -127,6 +127,16 @@ export class CaseDataService {
     }
 
     /**
+     * Get exposed contacts for a case that user want to delete
+     * @param {string} outbreakId
+     * @param {string} caseId
+     * @returns {Observable<Object>}
+     */
+    getExposedContactsForCase(outbreakId: string, caseId: string) {
+        return this.http.get(`outbreaks/${outbreakId}/cases/${caseId}/isolated-contacts`);
+    }
+
+    /**
      * Return count of cases
      * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
