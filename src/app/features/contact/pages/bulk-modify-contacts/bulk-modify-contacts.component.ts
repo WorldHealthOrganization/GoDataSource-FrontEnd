@@ -25,6 +25,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { BulkContactsService } from '../../../../core/services/helper/bulk-contacts.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import * as moment from 'moment';
+import { AddressModel, AddressType } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-bulk-modify-contacts',
@@ -71,7 +72,10 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     ) => void;
 
     data: any[][] = [];
-    dataContactIds: string[];
+    extraContactData: {
+        id: string,
+        addresses: AddressModel[]
+    }[];
 
     @ViewChild('sheetTable') sheetTable;
 
@@ -164,8 +168,8 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         this.contactDataService
             .getContactsList(this.selectedOutbreak.id, qb)
             .subscribe((contactModels) => {
-                this.dataContactIds = [];
-                this.data = (contactModels || []).map((contact: ContactModel, index: number) => {
+                this.extraContactData = [];
+                this.data = (contactModels || []).map((contact: ContactModel) => {
                     // determine contact data
                     const contactData = [];
                     this.sheetColumns.forEach((column: AbstractSheetColumn) => {
@@ -173,7 +177,24 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                         const property = column.property;
 
                         // retrieve value
-                        let value = _.get(contact, property);
+                        let value;
+                        let addressModel: AddressModel;
+                        switch (property) {
+                            case 'addresses.phoneNumber':
+                                addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                                value = addressModel ? addressModel.phoneNumber : null;
+                                break;
+                            case 'addresses.city':
+                                addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                                value = addressModel ? addressModel.city : null;
+                                break;
+                            case 'addresses.addressLine1':
+                                addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                                value = addressModel ? addressModel.addressLine1 : null;
+                                break;
+                            default:
+                                value = _.get(contact, property);
+                        }
 
                         // format value
                         switch (column.type) {
@@ -196,7 +217,10 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                     });
 
                     // return spreadsheet data
-                    this.dataContactIds.push(contact.id);
+                    this.extraContactData.push({
+                        id: contact.id,
+                        addresses: contact.addresses
+                    });
                     return contactData;
                 });
             });
@@ -220,9 +244,15 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
                 .setProperty('gender')
                 .setOptions(this.genderList$, this.i18nService),
-            // new TextSheetColumn()
-            //     .setTitle('LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER') ...search for the current address..or create new one
-            //     .setProperty('addresses[0].phoneNumber'),
+            new TextSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
+                .setProperty('addresses.city'),
+            new TextSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
+                .setProperty('addresses.addressLine1'),
+            new TextSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER')
+                .setProperty('addresses.phoneNumber'),
             new DateSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING')
                 .setProperty('dateOfReporting')
@@ -367,7 +397,47 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                         .subscribe((data) => {
                             // add id
                             (data || []).forEach((contactData, index: number) => {
-                                contactData.id = this.dataContactIds[index];
+                                // set data
+                                contactData.id = this.extraContactData[index].id;
+
+                                // create / modify address phone number
+                                if (contactData.addresses) {
+                                    // find address
+                                    let address: AddressModel = AddressModel.getCurrentAddress(this.extraContactData[index].addresses);
+
+                                    // create a new one if there isn't a current address
+                                    if (!address) {
+                                        // create the new address
+                                        address = new AddressModel({
+                                            typeId: AddressType.CURRENT_ADDRESS
+                                        });
+
+                                        // since it is a new address we need to add it to the contact model
+                                        if (_.isArray(this.extraContactData[index].addresses)) {
+                                            this.extraContactData[index].addresses.push(address);
+                                        } else {
+                                            this.extraContactData[index].addresses = [address];
+                                        }
+                                    }
+
+                                    // replace phone number
+                                    if (contactData.addresses.phoneNumber !== undefined) {
+                                        address.phoneNumber = contactData.addresses.phoneNumber;
+                                    }
+
+                                    // replace city
+                                    if (contactData.addresses.city !== undefined) {
+                                        address.city = contactData.addresses.city;
+                                    }
+
+                                    // replace address1
+                                    if (contactData.addresses.addressLine1 !== undefined) {
+                                        address.addressLine1 = contactData.addresses.addressLine1;
+                                    }
+
+                                    // replace with correct data
+                                    contactData.addresses = this.extraContactData[index].addresses;
+                                }
                             });
 
                             // modify contacts
