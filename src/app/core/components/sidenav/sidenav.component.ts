@@ -239,6 +239,16 @@ export class SidenavComponent implements OnInit {
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 ),
                 new ChildNavItem(
+                    'transmission-chain-bars',
+                    'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAIN_BARS_LABEL',
+                    [
+                        PERMISSION.READ_OUTBREAK,
+                        PERMISSION.READ_REPORT
+                    ],
+                    '/graphs/transmission-chain-bars',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+                ),
+                new ChildNavItem(
                     'transmission-chains-list',
                     'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LIST_LABEL',
                     [
