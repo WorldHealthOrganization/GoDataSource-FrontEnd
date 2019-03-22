@@ -202,7 +202,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                                         clientApplications: settings.clientApplications
                                     })
                                     .catch((err) => {
-                                        this.snackbarService.showError(err.message);
+                                        this.snackbarService.showApiError(err);
                                         return ErrorObservable.create(err);
                                     })
                                     .subscribe(() => {
@@ -250,7 +250,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                             clientApplications: settings.clientApplications
                         })
                         .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err);
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {

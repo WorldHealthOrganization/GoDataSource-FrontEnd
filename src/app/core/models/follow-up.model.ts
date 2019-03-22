@@ -20,7 +20,10 @@ export class FollowUpModel {
 
     alerted: boolean = false;
 
-    constructor(data = null) {
+    constructor(
+        data = null,
+        includeContact: boolean = true
+    ) {
         this.id = _.get(data, 'id');
         this.date = _.get(data, 'date');
         this.personId = _.get(data, 'personId');
@@ -31,8 +34,10 @@ export class FollowUpModel {
 
         this.address = new AddressModel(_.get(data, 'address'));
 
-        this.contact = _.get(data, 'contact', {});
-        this.contact = new ContactModel(this.contact);
+        if (includeContact) {
+            this.contact = _.get(data, 'contact', {});
+            this.contact = new ContactModel(this.contact);
+        }
 
         this.teamId = _.get(data, 'teamId');
         this.index = _.get(data, 'index');

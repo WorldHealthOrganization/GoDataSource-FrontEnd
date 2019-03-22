@@ -63,4 +63,32 @@ export class GraphNodeModel {
             }
         }
     }
+
+    /**
+     * set the node shape based on the entity type
+     * @param nodeData
+     */
+    setNodeShapeType(nodeData) {
+        if (nodeData.type === EntityType.CASE) {
+            this.shape = 'ellipse';
+        } else if (nodeData.type === EntityType.CONTACT) {
+            this.shape = 'pentagon';
+        } else if (nodeData.type === EntityType.EVENT) {
+            this.shape = 'star';
+        }
+    }
+
+    /**
+     * set the node shape based on the classification
+     * @param nodeData
+     */
+    setNodeShapeClassification(nodeData) {
+        if (nodeData.model.classification === Constants.CASE_CLASSIFICATION.CONFIRMED) {
+            this.shape = 'ellipse';
+        } else if (nodeData.model.classification === Constants.CASE_CLASSIFICATION.PROBABLE) {
+            this.shape = 'rectangle';
+        } else if (nodeData.model.classification === Constants.CASE_CLASSIFICATION.SUSPECT) {
+            this.shape = 'pentagon';
+        }
+    }
 }

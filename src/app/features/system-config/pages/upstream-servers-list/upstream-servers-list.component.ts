@@ -175,7 +175,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
                                         upstreamServers: settings.upstreamServers
                                     })
                                     .catch((err) => {
-                                        this.snackbarService.showError(err.message);
+                                        this.snackbarService.showApiError(err);
                                         return ErrorObservable.create(err);
                                     })
                                     .subscribe(() => {

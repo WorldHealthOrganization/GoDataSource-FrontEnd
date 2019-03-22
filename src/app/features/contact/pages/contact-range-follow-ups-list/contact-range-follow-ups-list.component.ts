@@ -21,6 +21,9 @@ import { DialogField, LoadingDialogModel } from '../../../../shared/components';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { FormDateRangeSliderData } from '../../../../shared/xt-forms/components/form-date-range-slider/form-date-range-slider.component';
 import { FollowUpPage } from '../../typings/follow-up-page';
+import { RangeFollowUpsModel } from '../../../../core/models/range-follow-ups.model';
+import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -62,6 +65,9 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         // status ID => Status
         [statusId: string]: ReferenceDataEntryModel
     } = {};
+
+    // used for pagination
+    followUpsGroupedByContactCount$: Observable<any>;
 
     // loading flag - display spinner instead of table
     displayLoading: boolean = false;
@@ -120,6 +126,9 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        // initialize query builder
+        this.initializeQueryBuilder();
+
         // add page title
         this.exportRangeFollowUpsFileName = this.i18nService.instant('LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE') +
             ' - ' +
@@ -165,11 +174,14 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                     this.slideFilterData.maxDate = moment().add(this.selectedOutbreak.periodOfFollowup, 'days').endOf('day');
                     this.slideFilterData.maxRange = this.selectedOutbreak.periodOfFollowup;
 
+                    // initialize pagination
+                    this.initPaginator();
+
                     // filter
                     this.filterByDateRange(new FormDateRangeSliderData({
                         low: moment(),
                         high: moment().add(this.selectedOutbreak.periodOfFollowup, 'days')
-                    }));
+                    }), true);
                 }
 
                 // daily status colors
@@ -181,9 +193,6 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                             this.dailyStatuses[entry.id] = entry;
                         });
                     });
-
-                // ...and re-load the list when the Selected Outbreak is changed
-                this.needsRefreshList(true);
             });
 
     }
@@ -196,57 +205,48 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             // retrieve the list of Follow Ups
             this.displayLoading = true;
             this.followUpsGroupedByContact = [];
+            let minDate: Moment;
+            let maxDate: Moment;
             this.followUpsDataService
-                .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
-                .subscribe((followUps: FollowUpModel[]) => {
-                    // determine follow-up questionnaire alertness
-                    followUps = FollowUpModel.determineAlertness(
-                        this.selectedOutbreak.contactFollowUpTemplate,
-                        followUps
-                    );
+                .getRangeFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
+                .subscribe((rangeData: RangeFollowUpsModel[]) => {
+                    this.followUpsGroupedByContact = _.map(rangeData, (data: RangeFollowUpsModel) => {
+                        // determine follow-up questionnaire alertness
+                        data.followUps = FollowUpModel.determineAlertness(
+                            this.selectedOutbreak.contactFollowUpTemplate,
+                            data.followUps
+                        );
 
-                    // group contact information
-                    let minDate: Moment;
-                    let maxDate: Moment;
-                    this.followUpsGroupedByContact = _.chain(followUps)
-                        .groupBy('personId')
-                        .sortBy((data: FollowUpModel[]) => {
-                            return data[0].contact.name.toLowerCase();
-                        })
-                        .map((data: FollowUpModel[]) => {
-                            return {
-                                contact: data[0].contact,
-                                followUps: _.chain(data)
-                                    .groupBy((followUp: FollowUpModel) => {
-                                        // contact information not needed anymore
-                                        delete followUp.contact;
+                        // get grouped followups by contact & date
+                        return {
+                            contact: data.contact,
+                            followUps: _.chain(data.followUps)
+                                .groupBy((followUp: FollowUpModel) => {
+                                    // determine min & max dates
+                                    const date = moment(followUp.date).startOf('day');
+                                    if (followUp.statusId) {
+                                        minDate = minDate ?
+                                            (date.isBefore(minDate) ? date : minDate) :
+                                            date;
+                                        maxDate = maxDate ?
+                                            (date.isAfter(maxDate) ? moment(date) : maxDate) :
+                                            moment(date);
+                                    }
 
-                                        // determine min & max dates
-                                        const date = moment(followUp.date).startOf('day');
-                                        if (followUp.statusId) {
-                                            minDate = minDate ?
-                                                (date.isBefore(minDate) ? date : minDate) :
-                                                date;
-                                            maxDate = maxDate ?
-                                                (date.isAfter(maxDate) ? moment(date) : maxDate) :
-                                                moment(date);
+                                    // sort by date ascending
+                                    return date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                                })
+                                .mapValues((followUpData: FollowUpModel[]) => {
+                                    return _.sortBy(
+                                        followUpData,
+                                        (followUp: FollowUpModel) => {
+                                            return moment(followUp.date);
                                         }
-
-                                        // sort by date ascending
-                                        return date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                                    })
-                                    .mapValues((followUpData: FollowUpModel[]) => {
-                                        return _.sortBy(
-                                            followUpData,
-                                            (followUp: FollowUpModel) => {
-                                                return moment(followUp.date);
-                                            }
-                                        );
-                                    })
-                                    .value()
-                            };
-                        })
-                        .value();
+                                    );
+                                })
+                                .value()
+                        };
+                    });
 
                     // create dates array
                     this.daysToDisplay = [];
@@ -271,6 +271,18 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     }
 
     /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        if (this.selectedOutbreak) {
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            this.followUpsGroupedByContactCount$ = this.followUpsDataService.getRangeFollowUpsListCount(this.selectedOutbreak.id, countQueryBuilder).share();
+        }
+    }
+
+    /**
      * Display loading dialog
      */
     showLoadingDialog() {
@@ -289,7 +301,10 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     /**
      * Filter by slider value
      */
-    filterByDateRange(value: FormDateRangeSliderData) {
+    filterByDateRange(
+        value: FormDateRangeSliderData,
+        instant: boolean = false
+    ) {
         // set the new value
         this.sliderDateFilterValue = value;
 
@@ -308,6 +323,26 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         };
 
         // refresh list
-        this.needsRefreshList();
+        this.needsRefreshList(instant);
+    }
+
+    /**
+     * Initialize query builder
+     */
+    initializeQueryBuilder() {
+        // order by name
+        this.queryBuilder.sort
+            .by(
+                'contact.firstName',
+                RequestSortDirection.ASC
+            )
+            .by(
+                'contact.lastName',
+                RequestSortDirection.ASC
+            )
+            .by(
+                'contact.visualId',
+                RequestSortDirection.ASC
+            );
     }
 }

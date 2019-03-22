@@ -263,7 +263,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
 
         return Observable.forkJoin(createRelationships$)
             .catch((err) => {
-                this.snackbarService.showError(err.message);
+                this.snackbarService.showApiError(err);
 
                 return ErrorObservable.create(err);
             })

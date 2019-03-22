@@ -100,7 +100,7 @@ export class CreateClientApplicationComponent extends ConfirmOnFormChanges imple
                             clientApplications: settings.clientApplications
                         })
                         .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err);
                             loadingDialog.close();
                             return ErrorObservable.create(err);
                         })

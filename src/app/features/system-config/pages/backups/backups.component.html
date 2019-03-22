@@ -88,7 +88,7 @@
                             <app-form-input
                                 name="locationFilter"
                                 ngModel
-                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                 (optionChanged)="filterByTextContainingField('location', $event)"
                                 app-reset-input-on-side-filter
                                 [displayFilterIcon]="true">
@@ -111,7 +111,7 @@
                             <app-form-select
                                 name="modulesFilter"
                                 ngModel
-                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                 [options]="backupModulesList$ | async"
                                 (optionChanged)="filterBySelectField('modules', $event)"
                                 multiple="true"
@@ -162,7 +162,7 @@
                             <app-form-select
                                 name="statusFilter"
                                 ngModel
-                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                 [options]="backupStatusList$ | async"
                                 (optionChanged)="filterBySelectField('status', $event)"
                                 multiple="true"
@@ -191,7 +191,7 @@
                             <app-form-select
                                 name="usersFilter"
                                 ngModel
-                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                 [options]="usersList$ | async"
                                 multiple="true"
                                 (optionChanged)="filterBySelectField('userId', $event, 'id')"
@@ -219,7 +219,7 @@
                             <app-form-input
                                 name="errorFilter"
                                 ngModel
-                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                 (optionChanged)="filterByTextContainingField('error', $event)"
                                 app-reset-input-on-side-filter
                                 [displayFilterIcon]="true">

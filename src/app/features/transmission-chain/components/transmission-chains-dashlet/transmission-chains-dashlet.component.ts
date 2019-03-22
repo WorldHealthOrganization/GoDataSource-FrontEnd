@@ -66,6 +66,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     nodeLabelCriteriaOptions$: Observable<any[]>;
     edgeColorCriteriaOptions$: Observable<any[]>;
     edgeLabelCriteriaOptions$: Observable<any[]>;
+    edgeIconCriteriaOptions$: Observable<any[]>;
 
     // reference data categories needed for filters
     referenceDataCategories: any = [
@@ -139,6 +140,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         nodeNameColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.CLASSIFICATION.value,
         edgeColorCriteria: Constants.TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS.CERTAINITY_LEVEL.value,
         edgeLabelCriteria: Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value,
+        edgeIconCriteria: Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value,
         nodeIconCriteria: Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS.NONE.value,
         nodeShapeCriteria: Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.NONE.value
     };
@@ -196,6 +198,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.nodeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeColorCriteriaOptions();
         this.edgeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeColorCriteriaOptions();
         this.edgeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeLabelCriteriaOptions();
+        this.edgeIconCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeIconCriteriaOptions();
         this.nodeIconCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeIconCriteriaOptions();
         this.nodeShapeCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeShapeCriteriaOptions();
         this.nodeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeLabelCriteriaOptions();
@@ -412,6 +415,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.legend.nodeNameColorField = this.colorCriteria.nodeNameColorCriteria;
         this.legend.edgeColorField = this.colorCriteria.edgeColorCriteria;
         this.legend.edgeLabelField = this.colorCriteria.edgeLabelCriteria;
+        this.legend.edgeIconField = this.colorCriteria.edgeIconCriteria;
         if (this.legend.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value ) {
             this.legend.edgeLabelContextTransmissionEntries = {};
             const refDataEntries = this.referenceDataEntries[this.referenceDataLabelMap[Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value].refDataCateg];
@@ -569,6 +573,19 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      */
     getPng64(splitFactor: number) {
           return this.cytoscapeChild.getPng64(splitFactor);
+    }
+
+    /**
+     * Only allow to show edge icon or edge label: switch between them
+     * @param field
+     * @param $event
+     */
+    changeEdgeLabelIconSelection(field, $event) {
+        if (field === 'label' && $event !== Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value) {
+            this.colorCriteria.edgeIconCriteria = Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value;
+        } else if (field === 'icon' && $event !== Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value) {
+            this.colorCriteria.edgeLabelCriteria = Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value;
+        }
     }
 }
 

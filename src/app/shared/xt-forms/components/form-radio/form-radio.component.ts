@@ -65,8 +65,8 @@ export class FormRadioComponent extends ElementBase<string> implements OnInit {
     /**
      * Function triggered when the input value is changed
      */
-    onChange() {
+    onChange($event) {
         // emit the current value
-        return this.optionChanged.emit(this.value);
+        return this.optionChanged.emit($event);
     }
 }
