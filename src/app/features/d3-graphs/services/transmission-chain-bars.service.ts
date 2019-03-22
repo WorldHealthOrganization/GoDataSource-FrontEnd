@@ -19,6 +19,16 @@ export class TransmissionChainBarsService {
     // case visual ID cell height (first row)
     private visualIdCellHeight = 80;
 
+    // keeping this config centralized in case we need to make the graph configurable by the user
+    private graphConfig = {
+        isolationColor: 'steelblue',
+        isolationTextColor: 'black',
+        labResultColor: 'darkred',
+        labResultTextColor: 'white',
+        dateOfOnsetColor: 'white',
+        dateOfOnsetTextColor: 'black'
+    };
+
     // data used to draw the graph
     private graphData: TransmissionChainBarsModel;
     // graph container
@@ -203,10 +213,10 @@ export class TransmissionChainBarsService {
                 isolationGroup.append('rect')
                     .attr('width', this.cellWidth)
                     .attr('height', this.cellHeight)
-                    .attr('fill', 'steelblue');
+                    .attr('fill', this.graphConfig.isolationColor);
                 isolationGroup.append('text')
                     .text(isolationLabel)
-                    .attr('fill', 'black')
+                    .attr('fill', this.graphConfig.isolationTextColor)
                     .attr('alignment-baseline', 'central')
                     .attr('text-anchor', 'middle')
                     // center the text
@@ -231,10 +241,10 @@ export class TransmissionChainBarsService {
             labResultGroup.append('rect')
                 .attr('width', this.cellWidth)
                 .attr('height', this.cellHeight)
-                .attr('fill', 'darkred');
+                .attr('fill', this.graphConfig.labResultColor);
             labResultGroup.append('text')
                 .text(result)
-                .attr('fill', 'white')
+                .attr('fill', this.graphConfig.labResultTextColor)
                 .attr('alignment-baseline', 'central')
                 .attr('text-anchor', 'middle')
                 // center the text
@@ -252,10 +262,10 @@ export class TransmissionChainBarsService {
         dateOfOnsetGroup.append('rect')
             .attr('width', this.cellWidth)
             .attr('height', this.cellHeight)
-            .attr('fill', 'white');
+            .attr('fill', this.graphConfig.dateOfOnsetColor);
         dateOfOnsetGroup.append('text')
             .text(dateOfOnsetLabel)
-            .attr('fill', 'black')
+            .attr('fill', this.graphConfig.dateOfOnsetTextColor)
             .attr('alignment-baseline', 'central')
             .attr('text-anchor', 'middle')
             // center the text
