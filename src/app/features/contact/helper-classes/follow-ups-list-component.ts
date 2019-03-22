@@ -205,7 +205,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
      * Modify selected follow-ups
      */
     modifySelectedFollowUps(table: MatTable<any>) {
-        // get list of follow-ups that we want to modify
+        // get list of selected ids
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {
             return;
@@ -250,7 +250,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
      * Export selected follow-ups
      */
     exportSelectedFollowUps() {
-        // get list of follow-ups that we want to modify
+        // get list of selected ids
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {
             return;

@@ -249,7 +249,7 @@ export class EventsListComponent extends ListComponent implements OnInit {
      * Export relationships for selected events
      */
     exportSelectedEventsRelationship() {
-        // get list of follow-ups that we want to modify
+        // get list of selected ids
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {
             return;

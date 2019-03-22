@@ -150,6 +150,19 @@ export class ContactDataService {
     }
 
     /**
+     * Modify multiple contacts
+     */
+    bulkModifyContacts(
+        outbreakId: string,
+        contactsData: any
+    ) {
+        return this.http.put(
+            `outbreaks/${outbreakId}/contacts/bulk`,
+            contactsData
+        );
+    }
+
+    /**
      * Retrieve the list of contacts grouped by the risk level
      * @param {string} outbreakId
      * @returns {Observable<RiskLevelGroupModel>}
