@@ -2,6 +2,7 @@ import { Component, Input, ViewEncapsulation } from '@angular/core';
 import * as _ from 'lodash';
 import { ChronologyItem } from './typings/chronology-item';
 import * as moment from 'moment';
+import { Constants } from '../../../core/models/constants';
 
 @Component({
     selector: 'app-chronology',
@@ -11,6 +12,9 @@ import * as moment from 'moment';
 })
 export class ChronologyComponent {
     private _entries: ChronologyItem[] = [];
+
+    Constants = Constants;
+
     @Input() set entries(entries: ChronologyItem[]) {
         // set collection
         this._entries = entries || [];

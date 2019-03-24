@@ -48,14 +48,39 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE': 'Icon',
 
         /**
+         * uiDashboardPage
+         */
+        'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_TITLE': 'Contact Follow-up Report',
+        'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_FOLLOWED_UP_LABEL': 'Followed-up',
+        'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_NOT_FOLLOWED_UP_LABEL': 'Not Followed-up',
+        'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_NOT_PERCENTAGE_LABEL': 'Percentage',
+        'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_X_AXIS_LABEL': 'Date',
+        'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_Y_AXIS_LABEL': 'Number of Contacts',
+        'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_Y2_AXIS_LABEL': 'Percentage cases from contact list',
+
+        'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_TITLE': 'Cases based on contact status',
+        'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_NOT_FROM_CONTACT_LABEL': 'Cases not from contact',
+        'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_FROM_CONTACT_WITH_FOLLOW_UP_COMPLETE_LABEL': 'Cases from contact with follow-up complete',
+        'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_FROM_CONTACT_WITH_FOLLOW_UP_LOST_LABEL': 'Cases from contact lost to follow-up',
+        'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_PERCENTAGE_LABEL': 'Percentage of cases from contact list',
+        'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_X_AXIS_LABEL': 'Date',
+        'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_Y_AXIS_LABEL': 'Number of Cases',
+        'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_Y2_AXIS_LABEL': 'Percentage',
+
+        /**
          * uiDialogs
          */
         'LNG_DIALOG_CONFIRM_DELETE_CASE_WITH_EXPOSED_CONTACTS': 'Case: "{{name}}" has {{numberOfContacts}} exposed contacts that will be deleted. Are you sure you want to delete this case?',
 
         /**
+         * uiChronologyContactPage
+         */
+        'LNG_PAGE_VIEW_CHRONOLOGY_CHRONOLOGY_ITEM_TYPE_FOLLOW_UP': 'Follow-up:',
+
+        /**
          *uiEventFields
          */
-        'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER': 'Phone number',
+        'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER': 'Phone number'
 
         /**
          * REMOVE the tokens from below

@@ -13,6 +13,7 @@
         </mgl-timeline-entry-dot>
 
         <mgl-timeline-entry-side>
+            {{ entry.type === Constants.CHRONOLOGY_ITEM_TYPE.FOLLOW_UP ? ('LNG_PAGE_VIEW_CHRONOLOGY_CHRONOLOGY_ITEM_TYPE_FOLLOW_UP' | translate) : '' }}
             {{ entry.label | translate:entry.translateData }}
         </mgl-timeline-entry-side>
     </mgl-timeline-entry>

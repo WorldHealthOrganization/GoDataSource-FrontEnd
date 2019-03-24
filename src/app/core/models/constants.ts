@@ -90,6 +90,27 @@ export class Constants {
     // default color to be used in chains - timeline checkpoints - first day of month - text
     static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_MONTH_TEXT = '#3A9A8A';
 
+    // default color to be used in dashboard - contact follow up report
+    static DEFAULT_COLOR_CHART_CONTACTS_NOT_FOLLOWED = '#ED7D31';
+
+    // default color to be used in dashboard - contact follow up report
+    static DEFAULT_COLOR_CHART_CONTACTS_FOLLOWED = '#00B0F0';
+
+    // default color to be used in dashboard - contact follow up report
+    static DEFAULT_COLOR_CHART_CONTACTS_PERCENTAGE = '#000000';
+
+    // default color to be used in dashboard - cases based on contact status
+    static DEFAULT_COLOR_CHART_CASE_NOT_FROM_CONTACT = '#A6A6A6';
+
+    // default color to be used in dashboard - cases based on contact status
+    static DEFAULT_COLOR_CHART_CASE_FROM_CONTACT_FOLLOW_UP_COMPLETE = '#70AD47';
+
+    // default color to be used in dashboard - cases based on contact status
+    static DEFAULT_COLOR_CHART_CASE_FROM_CONTACT_LOST_TO_FOLLOW_UP = '#ED7D31';
+
+    // default color to be used in dashboard - cases based on contact status
+    static DEFAULT_COLOR_CHART_CASE_FROM_CONTACT_PERCENTAGE = '#FFC000';
+
     // these need to be hardcoded, this is why we don't pull them from reference data
     // they are in reference data only to disable some options or translate labels ( since answer type category is readonly )
     static ANSWER_TYPES = {
@@ -345,6 +366,13 @@ export class Constants {
         LOW: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_1_LOW',
         MEDIUM: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_2_MEDIUM',
         HIGH: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_3_HIGH'
+    };
+
+    /**
+     * Chronology item type
+     */
+    static CHRONOLOGY_ITEM_TYPE = {
+      FOLLOW_UP: 'LNG_FOLLOW_UP_ITEM',
     };
 
     /**
