@@ -20,103 +20,29 @@
                     [disabled]="viewOnly || entry.readonly">
                 </app-form-input>
 
-                <app-form-slide-toggle
-                    name="active"
-                    [label]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE' | translate"
-                    tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE_DESCRIPTION"
-                    [ngModel]="entry.active"
-                    [disabled]="viewOnly || entry.readonly">
-                </app-form-slide-toggle>
+                <div
+                    fxFlex fxLayout="row" fxLayoutGap="20px">
+                    <app-form-slide-toggle
+                        name="active"
+                        [label]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE' | translate"
+                        tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE_DESCRIPTION"
+                        [ngModel]="entry.active"
+                        [disabled]="viewOnly || entry.readonly">
+                    </app-form-slide-toggle>
 
-                <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
-                    <div>
-                        {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR' | translate }}
-                        <span
-                            *ngIf="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
-                            [matTooltip]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
-                            class="xt-icon form-icon">help</span>
-                    </div>
-
-                    <!-- Read only -->
-                    <input
-                        *ngIf="viewOnly"
-                        fxFlex="132px"
-                        class="ref-data-color-picker"
-                        [style.background]="entry.colorCode"
-                        name="colorCode"
-                        [ngModel]="entry.colorCode"
-                        [readonly]="true"
-                        [required]="false"/>
-
-                    <!-- Read & Write -->
-                    <input
-                        *ngIf="!viewOnly"
-                        #colorPickerInput="ngModel"
-                        fxFlex="132px"
-                        class="ref-data-color-picker"
-                        [style.background]="entry.colorCode"
-                        name="colorCode"
-                        [ngModel]="entry.colorCode"
-                        type="text"
-                        [readonly]="true"
-                        [required]="false"
-                        [colorPicker]="entry.colorCode"
-                        cpOutputFormat="hex"
-                        (colorPickerChange)="entry.colorCode = $event; colorPickerInput.control.markAsDirty();"
-                        (click)="$event.target.select()"/>
-                </div>
-
-                <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
-                    <!-- View Icon  -->
-                    <div
-                        *ngIf="!changeIcon"
-                        fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
-
-                        <!-- Label -->
-                        <div>
-                            {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON' | translate }}
-                        </div>
-
-                        <!-- Image -->
-                        <img
-                            *ngIf="entry.iconId"
-                            [src]="entry.iconUrl" />
-                        <div
-                            *ngIf="!entry.iconId">
-                            {{ 'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_LABEL_NO_COLOR' | translate }}
-                        </div>
-
-                        <!-- Change -->
-                        <div>
-                            <button
-                                *ngIf="!viewOnly"
-                                type="button"
-                                mat-raised-button
-                                (click)="changeIcon = true;">
-                                {{'LNG_COMMON_BUTTON_CHANGE' | translate}}
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Change Icon -->
-                    <app-form-select
-                        *ngIf="changeIcon"
-                        name="iconId"
-                        [ngModel]="entry.iconId"
-                        [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON' | translate"
-                        tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON_DESCRIPTION"
-                        [options]="iconsList$ | async"
-                        optionLabelKey="name"
-                        optionValueKey="id"
-                        optionLabelImgKey="url"
+                    <app-form-input
+                        name="order"
+                        [ngModel]="entry.order"
+                        [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER' | translate"
+                        tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER_DESCRIPTION"
+                        type="number"
                         [disabled]="viewOnly">
-                    </app-form-select>
+                    </app-form-input>
                 </div>
             </div>
 
-            <div fxLayout="row">
+            <div fxLayout="row" fxLayoutGap="20px">
                 <app-form-textarea
-                    fxFlex
                     name="description"
                     [ngModel]="entry.description | translate"
                     [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION' | translate"
@@ -124,6 +50,94 @@
                     minRows="1"
                     [disabled]="viewOnly || entry.readonly">
                 </app-form-textarea>
+
+                <div
+                    fxFlex fxLayout="row" fxLayoutGap="20px">
+                    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+                        <div>
+                            {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR' | translate }}
+                            <span
+                                *ngIf="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
+                                [matTooltip]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
+                                class="xt-icon form-icon">help</span>
+                        </div>
+
+                        <!-- Read only -->
+                        <input
+                            *ngIf="viewOnly"
+                            fxFlex="132px"
+                            class="ref-data-color-picker"
+                            [style.background]="entry.colorCode"
+                            name="colorCode"
+                            [ngModel]="entry.colorCode"
+                            [readonly]="true"
+                            [required]="false"/>
+
+                        <!-- Read & Write -->
+                        <input
+                            *ngIf="!viewOnly"
+                            #colorPickerInput="ngModel"
+                            fxFlex="132px"
+                            class="ref-data-color-picker"
+                            [style.background]="entry.colorCode"
+                            name="colorCode"
+                            [ngModel]="entry.colorCode"
+                            type="text"
+                            [readonly]="true"
+                            [required]="false"
+                            [colorPicker]="entry.colorCode"
+                            cpOutputFormat="hex"
+                            (colorPickerChange)="entry.colorCode = $event; colorPickerInput.control.markAsDirty();"
+                            (click)="$event.target.select()"/>
+                    </div>
+
+                    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+                        <!-- View Icon  -->
+                        <div
+                            *ngIf="!changeIcon"
+                            fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+
+                            <!-- Label -->
+                            <div>
+                                {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON' | translate }}
+                            </div>
+
+                            <!-- Image -->
+                            <img
+                                *ngIf="entry.iconId"
+                                [src]="entry.iconUrl" />
+                            <div
+                                *ngIf="!entry.iconId">
+                                {{ 'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_LABEL_NO_COLOR' | translate }}
+                            </div>
+
+                            <!-- Change -->
+                            <div>
+                                <button
+                                    *ngIf="!viewOnly"
+                                    type="button"
+                                    mat-raised-button
+                                    (click)="changeIcon = true;">
+                                    {{'LNG_COMMON_BUTTON_CHANGE' | translate}}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Change Icon -->
+                        <app-form-select
+                            *ngIf="changeIcon"
+                            name="iconId"
+                            [ngModel]="entry.iconId"
+                            [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON' | translate"
+                            tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON_DESCRIPTION"
+                            [options]="iconsList$ | async"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            optionLabelImgKey="url"
+                            [disabled]="viewOnly">
+                        </app-form-select>
+                    </div>
+                </div>
             </div>
 
         </div>

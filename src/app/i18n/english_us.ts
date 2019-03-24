@@ -67,6 +67,18 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_Y_AXIS_LABEL': 'Number of Cases',
         'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_Y2_AXIS_LABEL': 'Percentage',
 
+
+        /**
+         * uiReferenceDataEntryFields
+         */
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER': 'Order',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER_DESCRIPTION': '',
+
+        /**
+         * uiReferenceDataCategoryEntriesListPage
+         */
+        'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_CHANGE_ORDER_SUCCESS_MESSAGE': 'Order changed',
+
         /**
          * uiDialogs
          */
