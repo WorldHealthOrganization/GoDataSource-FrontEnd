@@ -75,13 +75,7 @@ export const EnglishUsLang = {
         /**
          * uiChronologyContactPage
          */
-        'LNG_PAGE_VIEW_CHRONOLOGY_CHRONOLOGY_ITEM_TYPE_FOLLOW_UP': 'Follow-up:',
-
-
-        /**
-         * uiRangeFollowUpsListPage
-         */
-        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_DISPLAY_FILTERS_BUTTON': 'Display filters'
+        'LNG_PAGE_VIEW_CHRONOLOGY_CHRONOLOGY_ITEM_TYPE_FOLLOW_UP': 'Follow-up:'
 
         /**
          * REMOVE the tokens from below

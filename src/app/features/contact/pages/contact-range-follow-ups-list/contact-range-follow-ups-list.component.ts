@@ -87,7 +87,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
     loadingDialog: LoadingDialogModel;
 
-    showFilters: boolean = false;
+    filtersVisible: boolean = false;
 
     filters = {
         contactName: null,
@@ -357,38 +357,76 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     }
 
     resetFilters() {
-        this.resetFiltersToSideFilters();
-        if (this.sliderDateFilterValue) {
-            this.filterByDateRange(this.sliderDateFilterValue);
-        }
+        // reset filters in UI
         this.filters = {
             contactName: null,
             visualId: null,
             dateOfLastContact: null,
             dateOfTheEndOfTheFollowUp: null
         };
+
+        // reset applied filters
+        this.resetFiltersToSideFilters();
+
+        // apply default filter
+        if (this.sliderDateFilterValue) {
+            this.filterByDateRange(this.sliderDateFilterValue);
+        }
+
+        // hide filters
+        this.filtersVisible = false;
+
+        // refresh list
+        this.needsRefreshList();
     }
 
     applyFilters() {
+        // clear query builder and apply each filter separately
+        this.queryBuilder.clear();
+
+        // apply default filter
+        if (this.sliderDateFilterValue) {
+            this.filterByDateRange(this.sliderDateFilterValue);
+        }
 
         if (this.filters.contactName !== null) {
-            this.queryBuilder.addChildQueryBuilder(`contact`).filter.byTextMultipleProperties([ 'firstName', 'lastName'], this.filters.contactName);
+            this.queryBuilder.addChildQueryBuilder(`contact`)
+                .filter.byTextMultipleProperties([ 'firstName', 'lastName'], this.filters.contactName);
         }
 
         if (this.filters.visualId !== null) {
-            this.queryBuilder.addChildQueryBuilder(`contact`).filter.byText('visualId', this.filters.visualId);
+            this.queryBuilder.addChildQueryBuilder(`contact`)
+                .filter.byText('visualId', this.filters.visualId);
         }
 
         if (this.filters.dateOfLastContact !== null) {
-            this.queryBuilder.addChildQueryBuilder('contact').filter.byDateRange('dateOfLastContact', this.filters.dateOfLastContact);
+            this.queryBuilder.addChildQueryBuilder('contact')
+                .filter.byDateRange('dateOfLastContact', this.filters.dateOfLastContact);
         }
 
         if (this.filters.dateOfTheEndOfTheFollowUp !== null) {
-            this.queryBuilder.addChildQueryBuilder('contact').filter.byDateRange('followUp.endDate', this.filters.dateOfTheEndOfTheFollowUp);
+            this.queryBuilder.addChildQueryBuilder('contact')
+                .filter.byDateRange('followUp.endDate', this.filters.dateOfTheEndOfTheFollowUp);
         }
 
-        this.showFilters = false;
+        // hide filters
+        this.filtersVisible = false;
 
+        // refresh list
         this.needsRefreshList();
+    }
+
+    /**
+     * Show/Hide filters
+     */
+    toggleFilters() {
+        this.filtersVisible = !this.filtersVisible;
+    }
+
+    /**
+     * Show/Hide filters button label
+     */
+    get toggleFiltersButtonLabel(): string {
+        return this.filtersVisible ? 'LNG_COMMON_BUTTON_HIDE_FILTERS' : 'LNG_COMMON_BUTTON_SHOW_FILTERS';
     }
 }
