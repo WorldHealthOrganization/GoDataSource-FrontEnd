@@ -244,7 +244,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
                 .setProperty('contact.addresses[0].addressLine1'),
             new TextSheetColumn()
-                .setTitle('LNG_CONTACT_FIELD_LABEL_PHONE')
+                .setTitle('LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER')
                 .setProperty('contact.addresses[0].phoneNumber'),
 
             // Relationship properties

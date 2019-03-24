@@ -264,7 +264,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             }),
             new VisibleColumnModel({
                 field: 'phoneNumber',
-                label: 'LNG_CASE_FIELD_LABEL_PHONE'
+                label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER'
             }),
             new VisibleColumnModel({
                 field: 'dateOfOnset',

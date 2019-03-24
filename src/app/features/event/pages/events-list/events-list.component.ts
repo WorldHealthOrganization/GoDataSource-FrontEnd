@@ -232,7 +232,7 @@ export class EventsListComponent extends ListComponent implements OnInit {
      */
     filterByPhoneNumber(value: string) {
         // remove previous condition
-        this.queryBuilder.filter.remove('address');
+        this.queryBuilder.filter.remove('address.phoneNumber');
 
         if (!_.isEmpty(value)) {
             // add new condition

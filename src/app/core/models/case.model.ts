@@ -165,9 +165,12 @@ export class CaseModel {
     /**
      * Get phone numbers
      */
-    get phoneNumbers() {
-        return _.map(this.addresses, (address: AddressModel) => {
-            return address.phoneNumber;
-        });
+    get phoneNumbers(): string[] {
+        return this.addresses.reduce((acc: string[], address) => {
+            if (!_.isEmpty(address.phoneNumber)) {
+                acc.push(address.phoneNumber);
+            }
+            return acc;
+        }, []);
     }
 }

@@ -57,6 +57,20 @@
                         <div fxLayout="row" fxLayoutGap="20px">
                             <div
                                 fxFlex fxLayout="row" fxLayoutGap="20px">
+                                <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
+                                <!-- [maxlength]="255" -->
+                                <app-form-input
+                                    name="visualId"
+                                    [(ngModel)]="contactData.visualId"
+                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
+                                    tooltip="LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                                    [tooltipTranslateData]="visualIDTranslateData"
+                                    [maxlength]="255"
+                                    [disabled]="viewOnly"
+                                    app-general-async-validator
+                                    [asyncValidatorObservable]="contactIdMaskValidator">
+                                </app-form-input>
+
                                 <app-form-select
                                     name="occupation"
                                     [(ngModel)]="contactData.occupation"
@@ -81,20 +95,6 @@
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
-                            <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
-                            <!-- [maxlength]="255" -->
-                            <app-form-input
-                                name="visualId"
-                                [(ngModel)]="contactData.visualId"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
-                                [tooltipTranslateData]="visualIDTranslateData"
-                                [maxlength]="255"
-                                [disabled]="viewOnly"
-                                app-general-async-validator
-                                [asyncValidatorObservable]="contactIdMaskValidator">
-                            </app-form-input>
-
                             <app-form-datepicker
                                 fxFlex
                                 name="dateOfReporting"
@@ -126,6 +126,8 @@
                                 [disabled]="viewOnly"
                                 [clearable]="false">
                             </app-form-select>
+
+                            <div fxFlex><!-- placeholder --></div>
                         </div>
 
                     </div>
