@@ -369,6 +369,13 @@ export class Constants {
     };
 
     /**
+     * Chronology item type
+     */
+    static CHRONOLOGY_ITEM_TYPE = {
+      FOLLOW_UP: 'LNG_FOLLOW_UP_ITEM',
+    };
+
+    /**
      * Use to match outcome status in the logic
      */
     static OUTCOME_STATUS = {

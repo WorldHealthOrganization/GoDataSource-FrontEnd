@@ -12,6 +12,35 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
+        /**
+         * uiCommonButtons
+         */
+        'LNG_COMMON_BUTTON_SHOW_FILTERS': 'Show filters',
+        'LNG_COMMON_BUTTON_HIDE_FILTERS': 'Hide filters',
+        'LNG_COMMON_BUTTON_RESET_FILTERS': 'Reset filters',
+        'LNG_COMMON_BUTTON_APPLY_FILTERS': 'Apply filters',
+
+        /**
+         * NEW GROUP
+         * uiChainsOfTransmissionBars
+         */
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE': 'Chains of transmission bars',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_EXPORT_CHAIN': 'Export chain',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_NO_DATA': 'There is no data to build the graph.',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_CASE_ONSET_LABEL': 'S',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_ISOLATED_CASE_LABEL': 'iso',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_CASE_LABEL': 'hsp',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_POSITIVE_LABEL': 'Lab+',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_NEGATIVE_LABEL': 'Lab-',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FILTERS_HOSPITALISATION_ISOLATION': 'Hospitalisation / Isolation',
+
+        /**
+         * uiGenericLayout
+         */
+        'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL': 'Chains of transmission graph',
+        'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAIN_BARS_LABEL': 'Chains of transmission bars',
+        'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LIST_LABEL': 'Chains of transmission list',
+        'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_COUNT_MAP_LABEL': 'Cases count map',
 
         /**
          * uiChainsOfTransmissionGraph
@@ -41,7 +70,12 @@ export const EnglishUsLang = {
         /**
          * uiDialogs
          */
-        'LNG_DIALOG_CONFIRM_DELETE_CASE_WITH_EXPOSED_CONTACTS': 'Case: "{{name}}" has {{numberOfContacts}} exposed contacts that will be deleted. Are you sure you want to delete this case?'
+        'LNG_DIALOG_CONFIRM_DELETE_CASE_WITH_EXPOSED_CONTACTS': 'Case: "{{name}}" has {{numberOfContacts}} exposed contacts that will be deleted. Are you sure you want to delete this case?',
+
+        /**
+         * uiChronologyContactPage
+         */
+        'LNG_PAGE_VIEW_CHRONOLOGY_CHRONOLOGY_ITEM_TYPE_FOLLOW_UP': 'Follow-up:',
 
         /**
          * REMOVE the tokens from below
