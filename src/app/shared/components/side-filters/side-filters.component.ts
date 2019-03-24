@@ -19,6 +19,7 @@ import {
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { Observable } from 'rxjs/Observable';
+import { RequestFilter } from '../../../core/helperClasses/request-query-builder/request-filter';
 
 @Component({
     selector: 'app-side-filters',
@@ -594,6 +595,22 @@ export class SideFiltersComponent implements OnInit {
                             default:
                                 qb.merge(AddressModel.buildSearchFilter(appliedFilter.value, filter.fieldName));
                         }
+                        break;
+
+                    // filter by phone number
+                    case FilterType.ADDRESS_PHONE_NUMBER:
+                        qb.filter.where({
+                            addresses: {
+                                elemMatch: {
+                                    phoneNumber: {
+                                        $regex: RequestFilter.escapeStringForRegex(appliedFilter.value)
+                                            .replace(/%/g, '.*')
+                                            .replace(/\\\?/g, '.'),
+                                        $options: 'i'
+                                    }
+                                }
+                            }
+                        });
                         break;
 
                     case FilterType.RANGE_NUMBER:

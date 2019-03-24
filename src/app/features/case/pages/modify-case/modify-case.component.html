@@ -57,13 +57,18 @@
                         <div fxLayout="row" fxLayoutGap="20px">
                             <div
                                 fxFlex fxLayout="row" fxLayoutGap="20px">
+                                <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
+                                <!-- [maxlength]="255" -->
                                 <app-form-input
-                                    name="phoneNumber"
-                                    [(ngModel)]="caseData.phoneNumber"
-                                    [placeholder]="'LNG_CASE_FIELD_LABEL_PHONE_NUMBER' | translate"
-                                    tooltip="LNG_CASE_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION"
-                                    maxlength="50"
-                                    [disabled]="viewOnly">
+                                    name="visualId"
+                                    [(ngModel)]="caseData.visualId"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                                    [tooltipTranslateData]="visualIDTranslateData"
+                                    [maxlength]="255"
+                                    [disabled]="viewOnly"
+                                    app-general-async-validator
+                                    [asyncValidatorObservable]="caseIdMaskValidator">
                                 </app-form-input>
 
                                 <app-form-select
@@ -88,26 +93,6 @@
                                 dobTooltip="LNG_CASE_FIELD_LABEL_DOB_DESCRIPTION"
                                 ageTooltip="LNG_CASE_FIELD_LABEL_AGE_DESCRIPTION">
                             </app-form-age-dob>
-                        </div>
-
-                        <div fxLayout="row" fxLayoutGap="20px">
-                            <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
-                            <!-- [maxlength]="255" -->
-                            <app-form-input
-                                name="visualId"
-                                [(ngModel)]="caseData.visualId"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
-                                [tooltipTranslateData]="visualIDTranslateData"
-                                [maxlength]="255"
-                                [disabled]="viewOnly"
-                                app-general-async-validator
-                                [asyncValidatorObservable]="caseIdMaskValidator">
-                            </app-form-input>
-
-                            <div fxFlex><!-- placeholder --></div>
-                            <div fxFlex><!-- placeholder --></div>
-                            <div fxFlex><!-- placeholder --></div>
                         </div>
 
                     </div>

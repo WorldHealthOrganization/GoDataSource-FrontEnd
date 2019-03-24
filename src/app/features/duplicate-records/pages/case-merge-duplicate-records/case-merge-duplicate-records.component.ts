@@ -64,10 +64,6 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
             options: LabelValuePair[],
             value: any
         },
-        phoneNumber: {
-            options: LabelValuePair[],
-            value: any
-        },
         occupation: {
             options: LabelValuePair[],
             value: any
@@ -222,10 +218,6 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
                 options: [],
                 value: undefined
             },
-            phoneNumber: {
-                options: [],
-                value: undefined
-            },
             occupation: {
                 options: [],
                 value: undefined
@@ -314,7 +306,6 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
             this.uniqueOptions.middleName = EntityModel.uniqueStringOptions(this.mergeRecords, 'middleName');
             this.uniqueOptions.lastName = EntityModel.uniqueStringOptions(this.mergeRecords, 'lastName');
             this.uniqueOptions.gender = EntityModel.uniqueStringOptions(this.mergeRecords, 'gender');
-            this.uniqueOptions.phoneNumber = EntityModel.uniqueStringOptions(this.mergeRecords, 'phoneNumber');
             this.uniqueOptions.occupation = EntityModel.uniqueStringOptions(this.mergeRecords, 'occupation');
             this.uniqueOptions.ageDob = EntityModel.uniqueAgeDobOptions(
                 this.mergeRecords,

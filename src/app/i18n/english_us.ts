@@ -75,11 +75,18 @@ export const EnglishUsLang = {
         /**
          * uiChronologyContactPage
          */
-        'LNG_PAGE_VIEW_CHRONOLOGY_CHRONOLOGY_ITEM_TYPE_FOLLOW_UP': 'Follow-up:'
+        'LNG_PAGE_VIEW_CHRONOLOGY_CHRONOLOGY_ITEM_TYPE_FOLLOW_UP': 'Follow-up:',
+
+        /**
+         *uiEventFields
+         */
+        'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER': 'Phone number'
 
         /**
          * REMOVE the tokens from below
          */
-
+        // LNG_CONTACT_FIELD_LABEL_PHONE
+        // LNG_CONTACT_FIELD_LABEL_PHONE_DESCRIPTION
+        // LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION
     }
 };

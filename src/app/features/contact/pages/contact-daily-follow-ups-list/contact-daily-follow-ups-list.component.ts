@@ -424,11 +424,11 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
                     }),
                     new FilterModel({
-                        fieldName: 'phone',
-                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PHONE',
+                        fieldName: 'addresses.phoneNumber',
+                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
                         type: FilterType.TEXT,
-                        relationshipPath: ['contact'],
-                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+                        childQueryBuilderKey: 'contact'
                     }),
                     new FilterModel({
                         fieldName: 'occupation',
@@ -477,7 +477,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         childQueryBuilderKey: 'case'
                     }),
                     new FilterModel({
-                        fieldName: 'phoneNumber',
+                        fieldName: 'addresses.phoneNumber',
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
                         type: FilterType.TEXT,
                         relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',

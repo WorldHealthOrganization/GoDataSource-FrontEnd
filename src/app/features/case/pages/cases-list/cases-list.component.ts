@@ -33,6 +33,7 @@ import { CountedItemsListItem } from '../../../../shared/components/counted-item
 import { Subscription } from 'rxjs/Subscription';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { tap } from 'rxjs/operators';
+import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 
 @Component({
     selector: 'app-cases-list',
@@ -262,6 +263,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 label: 'LNG_CASE_FIELD_LABEL_GENDER'
             }),
             new VisibleColumnModel({
+                field: 'phoneNumber',
+                label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER'
+            }),
+            new VisibleColumnModel({
                 field: 'dateOfOnset',
                 label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
             }),
@@ -342,9 +347,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 sortable: true
             }),
             new FilterModel({
-                fieldName: 'phoneNumber',
+                fieldName: 'addresses',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
-                type: FilterType.TEXT,
+                type: FilterType.ADDRESS_PHONE_NUMBER,
                 sortable: true
             }),
             new FilterModel({
@@ -868,6 +873,32 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 exportFinished: () => { this.closeLoadingDialog(); }
             });
         }
+    }
+
+    /**
+     * Filter by phone number
+     */
+    filterByPhoneNumber(value: string) {
+        // remove previous condition
+        this.queryBuilder.filter.remove('addresses');
+
+        if (!_.isEmpty(value)) {
+            // add new condition
+            this.queryBuilder.filter.where({
+                addresses: {
+                    elemMatch: {
+                        phoneNumber: {
+                            $regex: RequestFilter.escapeStringForRegex(value)
+                                .replace(/%/g, '.*')
+                                .replace(/\\\?/g, '.'),
+                            $options: 'i'
+                        }
+                    }
+                }
+            });
+        }
+        // refresh list
+        this.needsRefreshList();
     }
 
     /**

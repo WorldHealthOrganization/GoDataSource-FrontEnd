@@ -34,6 +34,7 @@ import 'rxjs/add/operator/mergeMap';
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
 import { tap } from 'rxjs/operators';
+import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 
 @Component({
     selector: 'app-contacts-list',
@@ -111,7 +112,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME', 'middleName'),
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_LAST_NAME', 'lastName'),
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_GENDER', 'gender'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_PHONE', 'phoneNumber'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER', 'phoneNumber'),
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_OCCUPATION', 'occupation'),
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH', 'dob'),
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_AGE', 'age'),
@@ -262,7 +263,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             }),
             new VisibleColumnModel({
                 field: 'phoneNumber',
-                label: 'LNG_CONTACT_FIELD_LABEL_PHONE'
+                label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER'
             }),
             new VisibleColumnModel({
                 field: 'riskLevel',
@@ -351,6 +352,11 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 fieldName: 'addresses',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
                 type: FilterType.ADDRESS
+            }),
+            new FilterModel({
+                fieldName: 'addresses',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
+                type: FilterType.ADDRESS_PHONE_NUMBER,
             }),
             new FilterModel({
                 fieldName: 'finalStatus',
@@ -783,6 +789,33 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
+    }
+
+    /**
+     * Filter by phone number
+     */
+    filterByPhoneNumber(value: string) {
+        // remove previous condition
+        this.queryBuilder.filter.remove('addresses');
+
+        if (!_.isEmpty(value)) {
+            // add new condition
+            this.queryBuilder.filter.where({
+                addresses: {
+                    elemMatch: {
+                        phoneNumber: {
+                            $regex: RequestFilter.escapeStringForRegex(value)
+                                .replace(/%/g, '.*')
+                                .replace(/\\\?/g, '.'),
+                            $options: 'i'
+                        }
+                    }
+                }
+            });
+        }
+
+        // refresh list
+        this.needsRefreshList();
     }
 
     /**
