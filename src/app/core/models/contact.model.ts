@@ -12,7 +12,6 @@ export class ContactModel {
     middleName: string;
     lastName: string;
     gender: string;
-    phoneNumber: string;
     occupation: string;
     documents: DocumentModel[];
     addresses: AddressModel[];
@@ -48,7 +47,6 @@ export class ContactModel {
         this.middleName = _.get(data, 'middleName');
         this.lastName = _.get(data, 'lastName');
         this.gender = _.get(data, 'gender');
-        this.phoneNumber = _.get(data, 'phoneNumber');
         this.occupation = _.get(data, 'occupation');
         this.outbreakId = _.get(data, 'outbreakId');
         this.documents = _.get(data, 'documents', []);
@@ -123,5 +121,17 @@ export class ContactModel {
         const address = mainAddress ? mainAddress : this.addresses[0];
 
         return address ? address : new AddressModel();
+    }
+
+    /**
+     * Get phone numbers
+     */
+    get phoneNumbers(): string[] {
+        return this.addresses.reduce((acc: string[], address) => {
+            if (!_.isEmpty(address.phoneNumber)) {
+                acc.push(address.phoneNumber);
+            }
+            return acc;
+        }, []);
     }
 }

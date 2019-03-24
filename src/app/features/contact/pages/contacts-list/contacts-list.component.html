@@ -303,13 +303,13 @@
         <ng-container matColumnDef="phoneNumber">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_CONTACT_FIELD_LABEL_PHONE'| translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER'| translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="phoneNumberFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('phoneNumber', $event)"
+                            (optionChanged)="filterByPhoneNumber($event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -317,7 +317,9 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
-                {{ item.phoneNumber }}
+                <ng-container *ngFor="let phoneNumber of item.phoneNumbers">
+                    {{phoneNumber}}<br/>
+                </ng-container>
             </mat-cell>
         </ng-container>
 

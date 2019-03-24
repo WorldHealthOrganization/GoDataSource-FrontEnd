@@ -5,6 +5,7 @@ export class ChronologyItem {
     public label: string;
     public date: string | Moment;
     public daysSincePreviousEvent: number;
+    public type: string;
     public translateData: {
         [key: string]: string
     } = {};
@@ -15,6 +16,7 @@ export class ChronologyItem {
         date: string | Moment,
 
         // optional
+        type?: string,
         translateData?: {
             [key: string]: string
         }

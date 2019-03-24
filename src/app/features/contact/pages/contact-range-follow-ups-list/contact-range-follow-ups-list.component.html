@@ -33,6 +33,78 @@
 </app-topnav>
 
 <mat-card class="page-section page-content">
+
+    <div class="filters" fxLayout="column" fxLayoutGap="10px">
+        <div>
+            <button
+                mat-raised-button
+                (click)="toggleFilters()"
+            >
+                {{ toggleFiltersButtonLabel | translate }}
+            </button>
+        </div>
+
+        <div
+            *ngIf="filtersVisible"
+            fxLayout="column" fxLayoutGap="20px"
+        >
+            <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="20px">
+                <app-form-input
+                    name="contactName"
+                    [(ngModel)]="filters.contactName"
+                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_NAME' | translate">
+                </app-form-input>
+
+                <app-form-input
+                    name="visualId"
+                    [(ngModel)]="filters.visualId"
+                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
+                    app-reset-input-on-side-filter>
+                </app-form-input>
+            </div>
+
+            <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="20px">
+                <div fxFlex fxLayout="column" fxLayoutGap="10px">
+                    <div>{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}</div>
+
+                    <app-form-daterange
+                        name="dateOfLastContact"
+                        [(ngModel)]="filters.dateOfLastContact"
+                        (changed)="filters.dateOfLastContact = $event"
+                    ></app-form-daterange>
+                </div>
+
+                <div fxFlex fxLayout="column" fxLayoutGap="10px">
+                    <div>{{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP' | translate }}</div>
+
+                    <app-form-daterange
+                        name="dateOfTheEndOfTheFollowUp"
+                        [(ngModel)]="filters.dateOfTheEndOfTheFollowUp"
+                        (changed)="filters.dateOfTheEndOfTheFollowUp = $event"
+                    ></app-form-daterange>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px">
+                <button
+                    mat-raised-button
+                    (click)="resetFilters()"
+                >
+                    {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+                </button>
+
+                <button
+                    mat-raised-button
+                    color="accent"
+                    (click)="applyFilters()"
+                >
+                    {{ 'LNG_COMMON_BUTTON_APPLY_FILTERS' | translate }}
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div
         fxFlex fxLayout="column" fxLayoutGap="5px">
         <div

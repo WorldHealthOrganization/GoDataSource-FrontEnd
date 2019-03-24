@@ -26,7 +26,8 @@ export enum FilterType {
     RANGE_DATE = 'range_date',
     DATE = 'date',
     ADDRESS = 'address',
-    LOCATION = 'location'
+    LOCATION = 'location',
+    ADDRESS_PHONE_NUMBER = 'address_phone_number'
 }
 
 // comparator types

@@ -1,0 +1,117 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+
+                <button mat-raised-button color="accent"
+                        [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <ng-container>
+                        <button
+                            mat-menu-item
+                            (click)="exportChain()">
+                            {{'LNG_PAGE_TRANSMISSION_CHAIN_BARS_EXPORT_CHAIN' | translate}}
+                        </button>
+                    </ng-container>
+                </mat-menu>
+
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section page-content">
+
+    <div class="filters" fxLayout="column" fxLayoutGap="10px">
+        <div>
+            <button
+                mat-raised-button
+                (click)="toggleFilters()"
+            >
+                {{ toggleFiltersButtonLabel | translate }}
+            </button>
+        </div>
+
+        <div
+            *ngIf="filtersVisible"
+            fxLayout="column" fxLayoutGap="20px"
+        >
+            <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="20px">
+                <!-- Date of onset -->
+                <div fxFlex fxLayout="column" fxLayoutGap="10px">
+                    <div>{{ 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate }}</div>
+
+                    <app-form-daterange
+                        name="dateOfOnset"
+                        [ngModel]="filters.dateOfOnset"
+                        (changed)="filters.dateOfOnset = $event"
+                    ></app-form-daterange>
+                </div>
+
+                <!-- Location -->
+                <app-form-location-dropdown
+                    fxFlex
+                    name="locationId"
+                    [(ngModel)]="filters.locationId"
+                    [useOutbreakLocations]="true"
+                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"
+                ></app-form-location-dropdown>
+            </div>
+
+            <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="20px">
+                <!-- Hospitalisation / Isolation date -->
+                <div fxFlex fxLayout="column" fxLayoutGap="10px">
+                    <div>{{ 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FILTERS_HOSPITALISATION_ISOLATION' | translate }}</div>
+
+                    <app-form-daterange
+                        name="isolationDate"
+                        [ngModel]="filters.isolationDate"
+                        (changed)="filters.isolationDate = $event"
+                    ></app-form-daterange>
+                </div>
+
+                <!-- Hospitalisation / Isolation center name -->
+                <app-form-input
+                    fxFlex
+                    name="isolationCenterName"
+                    [(ngModel)]="filters.isolationCenterName"
+                    [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME' | translate"
+                ></app-form-input>
+            </div>
+
+            <!-- Action buttons -->
+            <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px">
+                <button
+                    mat-raised-button
+                    (click)="resetFilters()"
+                >
+                    {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+                </button>
+
+                <button
+                    mat-raised-button
+                    color="accent"
+                    (click)="applyFilters()"
+                >
+                    {{ 'LNG_COMMON_BUTTON_APPLY_FILTERS' | translate }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div [fxShow]="!loadingData && !noData" #chart id="chart"></div>
+
+    <div *ngIf="!loadingData && noData">
+        {{'LNG_PAGE_TRANSMISSION_CHAIN_BARS_NO_DATA' | translate}}
+    </div>
+
+    <div *ngIf="loadingData">
+        <mat-spinner></mat-spinner>
+    </div>
+
+</mat-card>
