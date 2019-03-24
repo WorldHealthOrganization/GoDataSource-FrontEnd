@@ -175,6 +175,20 @@
                 </app-epi-curve-reporting-dashlet>
             </mat-card>
 
+            <!-- Contact follow-up overview -->
+            <mat-card class="page-section">
+                <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_TITLE' |
+                    translate}}
+                </div>
+
+                <!-- Contact follow-up overview c3 chart -->
+                <app-contact-follow-up-overview-dashlet
+                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+                    [globalFilterDate]="globalFilterDate"
+                    [globalFilterLocationId]="globalFilterLocationId">
+                </app-contact-follow-up-overview-dashlet>
+            </mat-card>
+
             <!-- KPIs -->
             <div #kpiSection>
                 <mat-card
