@@ -24,6 +24,7 @@ import { CasesNotIdentifiedThroughContactsDashletComponent } from './cases-not-i
 import { EpiCurveOutcomeDashletComponent } from './epi-curve-outcome-dashlet/epi-curve-outcome-dashlet.component';
 import { EpiCurveReportingDashletComponent } from './epi-curve-reporting-dashlet/epi-curve-reporting-dashlet.component';
 import { ContactFollowUpOverviewDashletComponent } from './contact-follow-up-overview-dashlet/contact-follow-up-overview-dashlet.component';
+import { CasesBasedOnContactStatusDashletComponent } from './cases-based-on-contact-status-dashlet/cases-based-on-contact-status-dashlet.component';
 
 // export the list of all page components
 export const components: any[] = [
@@ -51,6 +52,7 @@ export const components: any[] = [
     CasesHospitalizedPieChartDashletComponent,
     CasesByGeographicLocationDashletComponent,
     CasesNotIdentifiedThroughContactsDashletComponent,
-    ContactFollowUpOverviewDashletComponent
+    ContactFollowUpOverviewDashletComponent,
+    CasesBasedOnContactStatusDashletComponent
 ];
 
