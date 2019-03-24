@@ -80,7 +80,7 @@ export const EnglishUsLang = {
         /**
          *uiEventFields
          */
-        'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER': 'Phone number'
+        'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER': 'Phone number',
 
         /**
          * REMOVE the tokens from below
