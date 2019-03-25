@@ -1,0 +1,35 @@
+@relationship-accent-color: #da0000;
+
+app-transmission-chain-bars {
+    .filters {
+        margin-bottom: 20px;
+    }
+
+    #chart {
+        display: flex;
+        width: 100%;
+        // keep some padding for scrollbars when exporting the graph
+        padding-right: 18px;
+        box-sizing: border-box;
+
+        .cases-container {
+            flex: 1 1;
+            overflow-x: scroll;
+
+            .relationship {
+                &.accent {
+                    stroke: @relationship-accent-color;
+                    fill: @relationship-accent-color;
+                }
+            }
+
+            .case-bar {
+                &.accent {
+                    rect {
+                        stroke: @relationship-accent-color;
+                    }
+                }
+            }
+        }
+    }
+}

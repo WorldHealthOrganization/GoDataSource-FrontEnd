@@ -24,6 +24,7 @@ import { FollowUpPage } from '../../typings/follow-up-page';
 import { RangeFollowUpsModel } from '../../../../core/models/range-follow-ups.model';
 import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { Observable } from 'rxjs/Observable';
+import { DateRangeModel } from '../../../../core/models/date-range.model';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -85,6 +86,15 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     ReferenceDataCategory = ReferenceDataCategory;
 
     loadingDialog: LoadingDialogModel;
+
+    filtersVisible: boolean = false;
+
+    filters = {
+        contactName: null,
+        visualId: null,
+        dateOfLastContact: null,
+        dateOfTheEndOfTheFollowUp: null
+    };
 
     /**
      * Filter slider data
@@ -344,5 +354,79 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                 'contact.visualId',
                 RequestSortDirection.ASC
             );
+    }
+
+    resetFilters() {
+        // reset filters in UI
+        this.filters = {
+            contactName: null,
+            visualId: null,
+            dateOfLastContact: null,
+            dateOfTheEndOfTheFollowUp: null
+        };
+
+        // reset applied filters
+        this.resetFiltersToSideFilters();
+
+        // apply default filter
+        if (this.sliderDateFilterValue) {
+            this.filterByDateRange(this.sliderDateFilterValue);
+        }
+
+        // hide filters
+        this.filtersVisible = false;
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    applyFilters() {
+        // clear query builder and apply each filter separately
+        this.queryBuilder.clear();
+
+        // apply default filter
+        if (this.sliderDateFilterValue) {
+            this.filterByDateRange(this.sliderDateFilterValue);
+        }
+
+        if (this.filters.contactName !== null) {
+            this.queryBuilder.addChildQueryBuilder(`contact`)
+                .filter.byTextMultipleProperties([ 'firstName', 'lastName'], this.filters.contactName);
+        }
+
+        if (this.filters.visualId !== null) {
+            this.queryBuilder.addChildQueryBuilder(`contact`)
+                .filter.byText('visualId', this.filters.visualId);
+        }
+
+        if (this.filters.dateOfLastContact !== null) {
+            this.queryBuilder.addChildQueryBuilder('contact')
+                .filter.byDateRange('dateOfLastContact', this.filters.dateOfLastContact);
+        }
+
+        if (this.filters.dateOfTheEndOfTheFollowUp !== null) {
+            this.queryBuilder.addChildQueryBuilder('contact')
+                .filter.byDateRange('followUp.endDate', this.filters.dateOfTheEndOfTheFollowUp);
+        }
+
+        // hide filters
+        this.filtersVisible = false;
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
+     * Show/Hide filters
+     */
+    toggleFilters() {
+        this.filtersVisible = !this.filtersVisible;
+    }
+
+    /**
+     * Show/Hide filters button label
+     */
+    get toggleFiltersButtonLabel(): string {
+        return this.filtersVisible ? 'LNG_COMMON_BUTTON_HIDE_FILTERS' : 'LNG_COMMON_BUTTON_SHOW_FILTERS';
     }
 }

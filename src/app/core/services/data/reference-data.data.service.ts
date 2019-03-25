@@ -5,7 +5,7 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../models/reference-data.model';
 import { CacheKey, CacheService } from '../helper/cache.service';
 import * as _ from 'lodash';
-import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/request-query-builder';
 import { LabelValuePair } from '../../models/label-value-pair';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/do';
@@ -105,8 +105,14 @@ export class ReferenceDataDataService {
     }
 
     getEntries(): Observable<ReferenceDataEntryModel[]> {
+        // sort entries
+        const qb = new RequestQueryBuilder();
+        qb.sort.by('order', RequestSortDirection.ASC);
+        const filter = qb.buildQuery();
+
+        // map to model
         return this.modelHelper.mapObservableListToModel(
-            this.http.get(`reference-data`),
+            this.http.get(`reference-data?filter=${filter}`),
             ReferenceDataEntryModel
         );
     }

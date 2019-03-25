@@ -25,6 +25,7 @@ export class ReferenceDataEntryModel {
     active: boolean;
     category: ReferenceDataCategoryModel;
     colorCode: string;
+    order: number;
 
     private _iconId: string;
     iconUrl: string;
@@ -47,6 +48,7 @@ export class ReferenceDataEntryModel {
         this.active = _.get(data, 'active', true);
         this.colorCode = _.get(data, 'colorCode');
         this.iconId = _.get(data, 'iconId');
+        this.order = _.get(data, 'order');
 
         // add category
         const categoryData = _.get(data, 'category');

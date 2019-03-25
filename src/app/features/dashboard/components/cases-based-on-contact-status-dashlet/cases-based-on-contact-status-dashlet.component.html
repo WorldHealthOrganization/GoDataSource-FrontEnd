@@ -1,0 +1,37 @@
+<!-- Chart -->
+<ng-container
+    *ngIf="!displayLoading && chartData?.length > 0">
+    <div fxLayout="column" fxFlex fxLayoutAlign="center">
+        <app-c3-combination-stacked-bar-chart
+            [chartId]="'c3CasesBasedOnContactStatusReport'"
+            [chartData]="chartData"
+            [chartDataColumns]="chartDataColumns"
+            [lineData]="lineData"
+            [chartDataCategories]="chartDataCategories"
+            [showLabels]="false"
+            [xLabel]="'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_X_AXIS_LABEL' | translate"
+            [yLabel]="'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_Y_AXIS_LABEL' | translate"
+            [y2Label]="'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_Y2_AXIS_LABEL' | translate"
+            [colorPattern]="colorPattern">
+        </app-c3-combination-stacked-bar-chart>
+    </div>
+</ng-container>
+
+<!-- No data -->
+<ng-container
+    *ngIf="!displayLoading && chartData?.length < 1">
+    <div
+        fxFlex fxLayout="column" fxFlexAlign="center"
+        class="dashlet-no-data">
+        <div fxFlex>
+            {{ 'LNG_PAGE_DASHLET_CASES_COUNT_OVER_TIME_NO_DATA_LABEL' | translate }}
+        </div>
+    </div>
+</ng-container>
+
+<!-- Loading data -->
+<div
+    *ngIf="displayLoading"
+    class="dashlet-loading">
+    <mat-spinner></mat-spinner>
+</div>

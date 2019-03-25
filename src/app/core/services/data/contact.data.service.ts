@@ -13,6 +13,8 @@ import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import * as _ from 'lodash';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
+import { MetricCasesCountStratified } from '../../models/metrics/metric-cases-count-stratified.model';
+import { MetricContactsFollowedUpReportModel } from '../../models/metrics/metric-contacts-followed-up-report.model';
 
 @Injectable()
 export class ContactDataService {
@@ -272,5 +274,37 @@ export class ContactDataService {
                 };
         });
     }
+
+    /**
+     * Contacts followed up report
+     * @param {string} outbreakId
+     * @param reportData
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<MetricContactsFollowedUpReportModel[]>}
+     */
+    getContactsFollowedUpReport(
+        outbreakId: string,
+        reportData: any,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricContactsFollowedUpReportModel[]> {
+        const filter = queryBuilder.buildQuery();
+        const obs = this.http.post(`outbreaks/${outbreakId}/contacts/follow-up-report?filter=${filter}`, reportData);
+        return obs.map(
+            (listResult: any) => {
+                const results: MetricContactsFollowedUpReportModel[] = [];
+                const listReport: any = listResult.report;
+                if (listReport.days) {
+
+                    Object.keys(listReport.days).forEach((key) => {
+                        const metricResult: any = listReport.days[key];
+                        metricResult.day = key;
+                        results.push(metricResult);
+                    });
+                }
+                return results;
+            }
+        );
+    }
+
 }
 

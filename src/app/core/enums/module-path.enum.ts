@@ -15,6 +15,7 @@ export enum ModulePath {
     LocationModule = 'locations',
     DashboardModule = 'dashboard',
     TransmissionChainModule = 'transmission-chains',
+    D3GraphsModule = 'graphs',
     ImportExportDataModule = 'import-export-data',
     SystemConfigModule = 'system-config',
     TeamModule = 'teams',

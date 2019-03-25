@@ -26,6 +26,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { LoadingDialogModel } from '../../../../shared/components/loading-dialog/loading-dialog.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 
 @Component({
     selector: 'app-events-list',
@@ -139,6 +140,11 @@ export class EventsListComponent extends ListComponent implements OnInit {
                 label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION'
             }),
             new VisibleColumnModel({
+                field: 'phoneNumber',
+                label: 'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER',
+                visible: false
+            }),
+            new VisibleColumnModel({
                 field: 'address',
                 label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
                 visible: false
@@ -219,6 +225,29 @@ export class EventsListComponent extends ListComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    /**
+     * Filter by phone number
+     */
+    filterByPhoneNumber(value: string) {
+        // remove previous condition
+        this.queryBuilder.filter.remove('address.phoneNumber');
+
+        if (!_.isEmpty(value)) {
+            // add new condition
+            this.queryBuilder.filter.where({
+                'address.phoneNumber': {
+                        regex: RequestFilter.escapeStringForRegex(value)
+                            .replace(/%/g, '.*')
+                            .replace(/\\\?/g, '.'),
+                        $options: 'i'
+                }
+            });
+        }
+
+        // refresh list
+        this.needsRefreshList();
     }
 
     /**
