@@ -110,10 +110,6 @@ export const EnglishUsLang = {
         /**
          * REMOVE the tokens from below
          */
-        // 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER', => check api if not used anymore
-        // 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION' => check api if not used anymore
-        // LNG_CONTACT_FIELD_LABEL_PHONE => check api if not used anymore
-        // LNG_CONTACT_FIELD_LABEL_PHONE_DESCRIPTION => check api if not used anymore
         // LNG_CONTACT_FIELD_LABEL_PHONE
         // LNG_CONTACT_FIELD_LABEL_PHONE_DESCRIPTION
         // LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION
