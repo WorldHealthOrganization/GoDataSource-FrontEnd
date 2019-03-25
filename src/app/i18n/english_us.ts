@@ -21,6 +21,12 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_APPLY_FILTERS': 'Apply filters',
 
         /**
+         * uiModifyFollowUpListPage
+         * #TODO
+         */
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TITLE': 'Modify selected follow-ups',
+
+        /**
          * NEW GROUP
          * uiChainsOfTransmissionBars
          */
@@ -113,5 +119,6 @@ export const EnglishUsLang = {
         // LNG_CONTACT_FIELD_LABEL_PHONE
         // LNG_CONTACT_FIELD_LABEL_PHONE_DESCRIPTION
         // LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION
+        // LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_INVALID_FIELDS
     }
 };
