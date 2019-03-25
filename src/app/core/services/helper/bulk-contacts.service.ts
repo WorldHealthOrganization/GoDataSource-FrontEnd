@@ -17,12 +17,11 @@ export interface InvalidTableData {
 }
 
 @Injectable()
-export class BulkAddContactsService {
+export class BulkContactsService {
 
     constructor(
         private i18nService: I18nService
-    ) {
-    }
+    ) {}
 
     /**
      * Validate all table cells
@@ -157,6 +156,44 @@ export class BulkAddContactsService {
         // retrieve all dropdowns items
         return Observable.forkJoin(dropdownItemsObservables)
             .map(() => dropdownsMap);
+    }
+
+    /**
+     * Retrieve errors
+     * @param response
+     * @param errToken
+     */
+    getErrors(
+        response: any,
+        errToken: string
+    ) {
+        return _.map(
+            response.invalidColumns,
+            (columns: GridSettings[], row: number) => {
+                // initialize
+                const data: {
+                    row: number,
+                    columns: string
+                } = {
+                    row: _.parseInt(row) + 1,
+                    columns: ''
+                };
+
+                // merge columns into just one error message
+                _.each(
+                    columns,
+                    (column: GridSettings) => {
+                        data.columns += `${data.columns.length < 1 ? '' : ', '}${column.title}`;
+                    }
+                );
+
+                // finished
+                return {
+                    message: errToken,
+                    data: data
+                };
+            }
+        );
     }
 }
 

@@ -20,12 +20,11 @@ import { DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, TextSheetColu
 import { SheetCellType } from '../../../../core/models/sheet/sheet-cell-type';
 import * as Handsontable from 'handsontable';
 import { Constants } from '../../../../core/models/constants';
-import { BulkAddContactsService } from '../../../../core/services/helper/bulk-add-contacts.service';
+import { BulkContactsService } from '../../../../core/services/helper/bulk-contacts.service';
 import { SheetCellValidator } from '../../../../core/models/sheet/sheet-cell-validator';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { GridSettings } from 'handsontable';
 import { NgModel } from '@angular/forms';
 import { ContactModel } from '../../../../core/models/contact.model';
 import 'rxjs/add/operator/mergeMap';
@@ -92,7 +91,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
         private i18nService: I18nService,
-        private bulkAddContactsService: BulkAddContactsService,
+        private bulkContactsService: BulkContactsService,
         private dialogService: DialogService
     ) {
         super();
@@ -464,38 +463,15 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
         // validate sheet
         const loadingDialog = this.dialogService.showLoadingDialog();
-        this.bulkAddContactsService
+        this.bulkContactsService
             .validateTable(sheetCore)
             .subscribe((response) => {
                 // we can't continue if we have errors
                 if (!response.isValid) {
                     // map error messages if any?
-                    this.errorMessages = _.map(
-                        response.invalidColumns,
-                        (columns: GridSettings[], row: number) => {
-                            // initialize
-                            const data: {
-                                row: number,
-                                columns: string
-                            } = {
-                                row: _.parseInt(row) + 1,
-                                columns: ''
-                            };
-
-                            // merge columns into just one error message
-                            _.each(
-                                columns,
-                                (column: GridSettings) => {
-                                    data.columns += `${data.columns.length < 1 ? '' : ', '}${column.title}`;
-                                }
-                            );
-
-                            // finished
-                            return {
-                                message: 'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_ERROR_MSG',
-                                data: data
-                            };
-                        }
+                    this.errorMessages = this.bulkContactsService.getErrors(
+                        response,
+                        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_ERROR_MSG'
                     );
 
                     // show error
@@ -503,7 +479,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                     this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_INVALID_FIELDS');
                 } else {
                     // collect data from table
-                    this.bulkAddContactsService.getData(sheetCore, this.sheetColumns)
+                    this.bulkContactsService.getData(sheetCore, this.sheetColumns)
                         .mergeMap((data) => {
                             // get Contact mask configured on outbreak
                             const contactMask = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);

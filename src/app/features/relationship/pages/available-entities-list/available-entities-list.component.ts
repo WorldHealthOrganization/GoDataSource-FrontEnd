@@ -332,7 +332,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     }
 
     selectEntities(form: NgForm) {
-        // get list of follow-ups that we want to modify
+        // get list of selected ids
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {
             return;

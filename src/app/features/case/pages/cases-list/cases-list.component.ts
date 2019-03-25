@@ -682,7 +682,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * Export selected records
      */
     exportSelectedCases() {
-        // get list of follow-ups that we want to modify
+        // get list of selected ids
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {
             return;
@@ -719,7 +719,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * Export relationship for selected cases
      */
     exportSelectedCasesRelationships() {
-        // get list of follow-ups that we want to modify
+        // get list of selected ids
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {
             return;
@@ -843,7 +843,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * Export cases dossier
      */
     exportSelectedCasesDossier() {
-        // get list of follow-ups that we want to modify
+        // get list of selected ids
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {
             return;

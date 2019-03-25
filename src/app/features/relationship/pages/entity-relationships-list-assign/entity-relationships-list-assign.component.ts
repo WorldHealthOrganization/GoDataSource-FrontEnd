@@ -346,7 +346,7 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
     }
 
     selectEntities() {
-        // get list of follow-ups that we want to modify
+        // get list of selected ids
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {
             return;
