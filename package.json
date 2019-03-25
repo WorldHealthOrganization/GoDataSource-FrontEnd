@@ -7,6 +7,7 @@
         "start": "ng serve --host 0.0.0.0 --port 4550",
         "build": "ng build --prod --aot --build-optimizer",
         "build-high-memory": "node --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng build --prod --aot --build-optimizer",
+        "build-medium-memory": "node --max_old_space_size=2048 ./node_modules/@angular/cli/bin/ng build --prod --aot --build-optimizer",
         "build-low-memory": "node --max_old_space_size=1024 ./node_modules/@angular/cli/bin/ng build --prod --aot --build-optimizer",
         "test": "ng test",
         "test-debug": "ng test --config karma.conf.dev.js",
