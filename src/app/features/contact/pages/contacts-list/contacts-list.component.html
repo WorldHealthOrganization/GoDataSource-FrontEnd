@@ -160,6 +160,15 @@
                                 (click)="exportSelectedContactsRelationship()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_RELATIONSHIPS' | translate }}
                             </button>
+
+                            <mat-divider></mat-divider>
+
+                            <button
+                                *ngIf="hasContactWriteAccess()"
+                                mat-menu-item
+                                (click)="bulkModifyContacts()">
+                                {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS' | translate }}
+                            </button>
                         </mat-menu>
                     </div>
                     <div class="column-filter">

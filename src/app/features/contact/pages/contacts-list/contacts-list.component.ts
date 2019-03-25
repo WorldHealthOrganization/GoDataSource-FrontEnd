@@ -17,7 +17,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import 'rxjs/add/operator/filter';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -128,6 +128,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     loadingDialog: LoadingDialogModel;
 
     constructor(
+        private router: Router,
         private contactDataService: ContactDataService,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
@@ -607,7 +608,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      * Export selected records
      */
     exportSelectedContacts() {
-        // get list of follow-ups that we want to modify
+        // get list of contacts that we want to export
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {
             return;
@@ -645,7 +646,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      * Export contacts dossier
      */
     exportSelectedContactsDossier() {
-        // get list of follow-ups that we want to modify
+        // get list of selected ids
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {
             return;
@@ -681,7 +682,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      * Export relationships for selected contacts
      */
     exportSelectedContactsRelationship() {
-        // get list of follow-ups that we want to modify
+        // get list of selected ids
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {
             return;
@@ -832,5 +833,25 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             this.loadingDialog.close();
             this.loadingDialog = null;
         }
+    }
+
+    /**
+     * Modify selected contacts
+     */
+    bulkModifyContacts() {
+        // get list of contacts that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // redirect to modify contacts page
+        this.router.navigate(
+            ['/contacts', 'modify-bulk'], {
+                queryParams: {
+                    contactIds: JSON.stringify(selectedRecords)
+                }
+            }
+        );
     }
 }

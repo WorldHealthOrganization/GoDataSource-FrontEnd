@@ -48,6 +48,21 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE': 'Icon',
 
         /**
+         * NEW GROUP
+         * uiBulkModifyContactsPage
+         */
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_TITLE': 'Bulk Modify Contacts',
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_ERRORS': 'Validation errors:',
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_ERROR_MSG': ' - row {{row}}, column(s) "{{columns}}" are invalid',
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_WARNING_INVALID_FIELDS': 'Some fields are invalid',
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE': 'Contacts modified',
+
+        /**
+         * uiContactsListPage
+         */
+        'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS': 'Modify selected contacts',
+
+        /**
          * uiDashboardPage
          */
         'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_TITLE': 'Contact Follow-up Report',
@@ -57,7 +72,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_X_AXIS_LABEL': 'Date',
         'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_Y_AXIS_LABEL': 'Number of Contacts',
         'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_Y2_AXIS_LABEL': 'Percentage cases from contact list',
-
         'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_TITLE': 'Cases based on contact status',
         'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_NOT_FROM_CONTACT_LABEL': 'Cases not from contact',
         'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_FROM_CONTACT_WITH_FOLLOW_UP_COMPLETE_LABEL': 'Cases from contact with follow-up complete',
@@ -66,7 +80,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_X_AXIS_LABEL': 'Date',
         'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_Y_AXIS_LABEL': 'Number of Cases',
         'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_Y2_AXIS_LABEL': 'Percentage',
-
 
         /**
          * uiReferenceDataEntryFields

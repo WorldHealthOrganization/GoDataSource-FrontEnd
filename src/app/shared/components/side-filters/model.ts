@@ -339,6 +339,13 @@ export class AppliedFilterModel {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION',
             value: FilterComparator.LOCATION,
             valueType: ValueType.SELECT
+        }],
+
+        // phone number
+        [FilterType.ADDRESS_PHONE_NUMBER]: [{
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS',
+            value: FilterComparator.CONTAINS,
+            valueType: ValueType.STRING
         }]
     };
 
@@ -354,7 +361,8 @@ export class AppliedFilterModel {
         [FilterType.RANGE_DATE]: FilterComparator.BETWEEN,
         [FilterType.DATE]: FilterComparator.DATE,
         [FilterType.ADDRESS]: FilterComparator.CONTAINS,
-        [FilterType.LOCATION]: FilterComparator.LOCATION
+        [FilterType.LOCATION]: FilterComparator.LOCATION,
+        [FilterType.ADDRESS_PHONE_NUMBER]: FilterComparator.CONTAINS
     };
 
     // applied filter
