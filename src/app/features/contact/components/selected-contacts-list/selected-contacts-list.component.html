@@ -1,0 +1,14 @@
+<mat-card
+    fxFlex
+    class="page-section"
+>
+    <div>{{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_SELECTED_CONTACTS' | translate}}</div>
+    <div fxLayout="row wrap" fxLayoutGap="20px">
+        <a
+            *ngFor="let contact of contacts"
+            [routerLink]="['/contacts', contact.id, 'view']"
+        >
+            {{ contact.name }}
+        </a>
+    </div>
+</mat-card>

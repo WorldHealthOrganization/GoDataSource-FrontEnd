@@ -29,6 +29,14 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_APPLY_FILTERS': 'Apply filters',
 
         /**
+         * uiModifyFollowUpListPage
+         */
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_SELECTED_CONTACTS': 'Selected contacts:',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_CHANGES_FOR_SELECTED_FOLLOW_UPS': 'The following changes will be made to the selected follow-ups:',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_CHANGES_FOR_SELECTED_FOLLOW_UPS_QUESTIONNAIRE': 'Questionnaire:',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups updated',
+
+        /**
          * NEW GROUP
          * uiChainsOfTransmissionBars
          */
@@ -121,5 +129,7 @@ export const EnglishUsLang = {
         // LNG_CONTACT_FIELD_LABEL_PHONE
         // LNG_CONTACT_FIELD_LABEL_PHONE_DESCRIPTION
         // LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION
+        // LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_INVALID_FIELDS
+        // LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE
     }
 };
