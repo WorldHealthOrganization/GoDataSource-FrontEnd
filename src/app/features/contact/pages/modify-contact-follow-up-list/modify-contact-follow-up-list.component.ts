@@ -42,10 +42,15 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     selectedFollowUpsIds: string[];
     // selected follow-ups to be modified
     selectedFollowUps: FollowUpModel[] = [];
+    // current dirty fields
+    currentDirtyFields: any = {};
 
     // dropdowns
     dailyStatusTypeOptions$: Observable<any[]>;
     teamsList$: Observable<TeamModel[]>;
+
+    // provide constants to template
+    Object = Object;
 
     constructor(
         private router: Router,
@@ -63,8 +68,8 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
 
     ngOnInit() {
         // dropdowns
-        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
-        this.teamsList$ = this.teamDataService.getTeamsList();
+        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS).share();
+        this.teamsList$ = this.teamDataService.getTeamsList().share();
 
 
         // read route query params
@@ -131,8 +136,22 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         const dirtyFields: any = this.formHelper.mergeDirtyFields(stepForms);
 
         // remove status if empty
-        if (!dirtyFields.status) {
-            delete dirtyFields.status;
+        if (!dirtyFields.statusId) {
+            delete dirtyFields.statusId;
+        }
+
+        // remove date if empty
+        if (!dirtyFields.date) {
+            delete dirtyFields.date;
+        }
+
+        return dirtyFields;
+    }
+
+    onChangeStep(step: { selectedIndex: number }, stepForms: NgForm[]) {
+        if (step.selectedIndex === 2) {
+            // reload dirty fields to display the changes
+            this.currentDirtyFields = this.getFormDirtyFields(stepForms);
         }
     }
 
@@ -179,12 +198,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
                 return ErrorObservable.create(err);
             })
             .subscribe(() => {
-                // multiple or single followups to save ?
-                if (observableList$.length > 1) {
-                    this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE');
-                } else {
-                    this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE');
-                }
+                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                 // navigate to listing page
                 this.disableDirtyConfirm();

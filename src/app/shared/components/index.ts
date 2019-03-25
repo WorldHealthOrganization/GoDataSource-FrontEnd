@@ -52,6 +52,7 @@ import { FormCaseQuickComponent } from './form-case-quick/form-case-quick.compon
 import { FormEventQuickComponent } from './form-event-quick/form-event-quick.component';
 import { FormSelectChangeDetectionPushComponent } from './form-select-change-detection-push/form-select-change-detection-push.component';
 import { C3CombinationStackedBarChartComponent } from './c3-combination-stacked-bar-chart/c3-combination-stacked-bar-chart.component';
+import { ListItemLabelComponent } from './list-item-label/list-item-label.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -115,6 +116,7 @@ export const components: any[] = [
     // display information
     CountedItemsListComponent,
     YesNoLabelComponent,
+    ListItemLabelComponent,
     ReferenceDataLabelComponent,
     LocationBreadcrumbsComponent,
     ChronologyComponent,
