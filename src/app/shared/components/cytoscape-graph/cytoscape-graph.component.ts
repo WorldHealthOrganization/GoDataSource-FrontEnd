@@ -672,22 +672,25 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
         // page dimensions on the server
         const pageSize = {
             width: 1190,
-            height: 840
+            // height: 840
         };
 
         // canvas dimensions
-        const originalHeight = document.getElementById('cy').clientHeight;
+        // const originalHeight = document.getElementById('cy').clientHeight;
         const originalWidth = document.getElementById('cy').clientWidth;
 
         // calculate scale between server and original width
         const scaleFactor = Math.round(pageSize.width / originalWidth);
+
         // calculate scale factor based on split factor.
         let scale = scaleFactor * splitFactor;
+
         // if scale is calculated as 1, default it to 4 for a better quality of the image
-        if (scale === 1) {
+        if (scale <= 1) {
             scale = 4;
         }
 
+        // get png
         let png64 = '';
         if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
             || this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
@@ -697,6 +700,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
             png64 = this.cy.png({bg: 'white', scale: scale});
         }
 
+        // finished
         return png64;
     }
 
