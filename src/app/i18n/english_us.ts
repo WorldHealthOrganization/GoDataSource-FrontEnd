@@ -13,6 +13,14 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiContactsListPage
+         */
+        'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_BUTTON': 'Print daily follow-ups status',
+        'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE': 'Daily contact follow-ups status',
+        'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_BUTTON': 'Print daily follow-ups form',
+        'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE': 'Daily contact follow-ups form',
+
+        /**
          * uiCommonButtons
          */
         'LNG_COMMON_BUTTON_SHOW_FILTERS': 'Show filters',

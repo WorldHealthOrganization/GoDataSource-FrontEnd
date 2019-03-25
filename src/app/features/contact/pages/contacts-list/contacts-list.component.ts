@@ -88,11 +88,16 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // values for side filter
     savedFiltersType = Constants.APP_PAGE.CONTACTS.value;
 
-    // print daily Follow-ups
+    // print daily follow-ups status
     exportContactsDailyFollowUpListUrl: string;
     exportContactsDailyFollowUpListFileName: string;
     exportContactsDailyFollowUpListFileType: ExportDataExtension = ExportDataExtension.PDF;
     exportContactsDailyFollowUpListDialogFields: DialogField[];
+
+    // print daily follow-ups form
+    exportContactsDailyFollowUpsFormUrl: string;
+    exportContactsDailyFollowUpsFormFileName: string;
+    exportContactsDailyFollowUpsFormFileType: ExportDataExtension = ExportDataExtension.PDF;
 
     exportContactsUrl: string;
     contactsDataExportFileName: string = moment().format('YYYY-MM-DD');
@@ -152,8 +157,11 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             ' - ' +
             this.contactsDataExportFileName;
 
-        // file name
+        // export file names
         this.exportContactsDailyFollowUpListFileName = this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE') +
+            ' - ' +
+            moment().format('YYYY-MM-DD');
+        this.exportContactsDailyFollowUpsFormFileName = this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE') +
             ' - ' +
             moment().format('YYYY-MM-DD');
 
@@ -207,12 +215,14 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 // export contacts url
                 this.exportContactsUrl = null;
                 this.exportContactsDailyFollowUpListUrl = null;
+                this.exportContactsDailyFollowUpsFormUrl = null;
                 if (
                     this.selectedOutbreak &&
                     this.selectedOutbreak.id
                 ) {
                     this.exportContactsUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/export`;
                     this.exportContactsDailyFollowUpListUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/daily-list/export`;
+                    this.exportContactsDailyFollowUpsFormUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/export-daily-follow-up-form`;
                 }
                 // get contacts grouped by risk level
                 this.getContactsGroupedByRiskLevel();

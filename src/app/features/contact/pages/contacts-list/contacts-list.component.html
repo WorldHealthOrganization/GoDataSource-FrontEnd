@@ -13,6 +13,12 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/import-export-data', 'contact-data', 'import']">
+                        {{'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON' | translate}}
+                    </button>
+
                     <app-export-button
                         *ngIf="exportContactsUrl"
                         [menuItem]="true"
@@ -29,6 +35,12 @@
                         (exportFinished)="closeLoadingDialog()">
                     </app-export-button>
 
+                    <button
+                        mat-menu-item
+                        (click)="exportFilteredContactsRelationships()">
+                        {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_EXPORT_CONTACTS_RELATIONSHIPS' | translate }}
+                    </button>
+
                     <app-export-button
                         *ngIf="exportContactsDailyFollowUpListUrl"
                         [menuItem]="true"
@@ -43,17 +55,18 @@
                         [extraDialogFields]="exportContactsDailyFollowUpListDialogFields">
                     </app-export-button>
 
-                    <button
-                        mat-menu-item
-                        [routerLink]="['/import-export-data', 'contact-data', 'import']">
-                        {{'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON' | translate}}
-                    </button>
-
-                    <button
-                        mat-menu-item
-                        (click)="exportFilteredContactsRelationships()">
-                        {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_EXPORT_CONTACTS_RELATIONSHIPS' | translate }}
-                    </button>
+                    <app-export-button
+                        *ngIf="exportContactsDailyFollowUpsFormUrl"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE' | translate"
+                        [url]="exportContactsDailyFollowUpsFormUrl"
+                        [fileName]="exportContactsDailyFollowUpsFormFileName"
+                        [fileType]="exportContactsDailyFollowUpsFormFileType"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()"
+                        [queryBuilder]="queryBuilder">
+                    </app-export-button>
                 </mat-menu>
             </div>
         </div>
