@@ -674,6 +674,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
             width: 1190,
             height: 840
         };
+
         // canvas dimensions
         const originalHeight = document.getElementById('cy').clientHeight;
         const originalWidth = document.getElementById('cy').clientWidth;

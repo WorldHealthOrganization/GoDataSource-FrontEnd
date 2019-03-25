@@ -572,7 +572,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * @returns {any}
      */
     getPng64(splitFactor: number) {
-          return this.cytoscapeChild.getPng64(splitFactor);
+        return this.cytoscapeChild.getPng64(splitFactor);
     }
 
     /**
