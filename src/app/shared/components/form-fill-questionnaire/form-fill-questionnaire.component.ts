@@ -135,6 +135,9 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
             currentCategory.questions.push(question);
         });
 
+        // init value
+        this.initValue();
+
         // initialize uploader
         this.initializeUploader();
     }
@@ -196,8 +199,19 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         // write value
         super.writeValue(value);
 
+        // init value
+        this.initValue();
+
         // check if we have a file attachment saved
         this.initializeAttachments();
+    }
+
+    /**
+     * Init values
+     */
+    initValue() {
+        // #TODO
+        // this.value
     }
 
     /**
