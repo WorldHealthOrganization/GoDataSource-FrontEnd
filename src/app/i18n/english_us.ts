@@ -37,6 +37,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups updated',
 
         /**
+         * uiCaseCountMap
+         */
+        'LNG_PAGE_CASE_COUNT_EXPORT_MAP': 'Export map',
+
+        /**
          * NEW GROUP
          * uiChainsOfTransmissionBars
          */
@@ -127,6 +132,7 @@ export const EnglishUsLang = {
          * uiImportData
          */
         'LNG_PAGE_IMPORT_DATA_BUTTON_RESET_IMPORT_MAPPING' : 'Reset import mapping'
+
         /**
          * REMOVE the tokens from below
          */
@@ -135,5 +141,11 @@ export const EnglishUsLang = {
         // LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION
         // LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_INVALID_FIELDS
         // LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE
+        // LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_LIST_BUTTON
+        // LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CASE_COUNT_MAP_BUTTON
+        // LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GRAPH_BUTTON
+        // LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_CASE_COUNT_MAP_BUTTON
+        // LNG_PAGE_CASE_COUNT_MAP_ACTION_GRAPH_BUTTON
+        // LNG_PAGE_CASE_COUNT_MAP_ACTION_LIST_BUTTON
     }
 };
