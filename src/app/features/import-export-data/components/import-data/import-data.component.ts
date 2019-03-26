@@ -266,6 +266,11 @@ export class ImportDataComponent implements OnInit {
     mappedFields: ImportableMapField[] = [];
 
     /**
+     * Mapped fields for reset
+     */
+    initialImportMapping: ImportableMapField[] = [];
+
+    /**
      * Mapped fields for saving
      * @type {Array}
      */
@@ -666,6 +671,9 @@ export class ImportDataComponent implements OnInit {
                     this.mappedFields.push(importableItem);
                 });
 
+                // save initial import mapping
+                this.initialImportMapping = _.clone(this.mappedFields);
+
                 // display form
                 this._displayLoading = false;
                 this._displayLoadingLocked = false;
@@ -860,6 +868,14 @@ export class ImportDataComponent implements OnInit {
         } else {
             createImportMapping();
         }
+    }
+
+    /**
+     * Reset import mapping to initial values
+     */
+    resetImportMapping() {
+        this.mappedFields = _.clone(this.initialImportMapping);
+        this.loadedImportMapping = undefined;
     }
 
     /**

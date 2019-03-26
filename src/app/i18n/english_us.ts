@@ -121,8 +121,12 @@ export const EnglishUsLang = {
         /**
          *uiEventFields
          */
-        'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER': 'Phone number'
+        'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER': 'Phone number',
 
+        /**
+         * uiImportData
+         */
+        'LNG_PAGE_IMPORT_DATA_BUTTON_RESET_IMPORT_MAPPING' : 'Reset import mapping'
         /**
          * REMOVE the tokens from below
          */
