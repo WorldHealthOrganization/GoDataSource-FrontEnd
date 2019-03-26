@@ -19,13 +19,13 @@
                     </div>
                     <div>
                         <div
-                            *ngFor="let question of categoryData.questions; let questionIndex = index">
+                            *ngFor="let question of categoryData.questions; let questionIndex = index"
+                            class="questionnaire-category-question">
 
                             <!-- Go through each question answer -->
                             <div
                                 *ngFor="let answerData of value[question.variable]; let answerDataIndex = index"
-                                fxFlex fxLayout="column" fxLayoutGap="20px"
-                                class="questionnaire-category-question">
+                                fxFlex fxLayout="column" fxLayoutGap="20px">
 
                                 <!-- Question and answers -->
                                 <div

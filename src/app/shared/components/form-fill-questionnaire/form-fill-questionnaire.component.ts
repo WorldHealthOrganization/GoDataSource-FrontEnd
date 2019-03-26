@@ -210,8 +210,20 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
      * Init values
      */
     initValue() {
-        // #TODO
-        // this.value
+        // init first value for each question
+        _.each(this.questionsGroupedByCategory, (data: { questions: QuestionModel[] }) => {
+            _.each(data.questions, (question: QuestionModel) => {
+                if (
+                    !_.isArray(this.value[question.variable]) ||
+                    this.value[question.variable].length < 1 ||
+                    this.value[question.variable][0].value === undefined
+                ) {
+                    this.value[question.variable] = [{
+                        value: null
+                    }];
+                }
+            });
+        });
     }
 
     /**
