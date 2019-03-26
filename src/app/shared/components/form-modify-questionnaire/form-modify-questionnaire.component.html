@@ -109,6 +109,14 @@
             class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
             {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate }}
         </div>
+
+        <!-- Multi answer ? -->
+        <div
+            *ngIf="!displayChangeButton"
+            fxFlex="120px"
+            class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
+            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER' | translate }}
+        </div>
     </div>
 
     <!-- Question Data -->
@@ -182,6 +190,14 @@
                     fxFlex="100px"
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
                     {{ (question.required ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
+                </div>
+
+                <!-- Multi answer ? -->
+                <div
+                    *ngIf="!displayChangeButton"
+                    fxFlex="120px"
+                    class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
+                    {{ (question.multiAnswer ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
                 </div>
             </div>
 
@@ -315,7 +331,7 @@
                                     name="questionInactive"
                                     [(ngModel)]="questionInEditModeClone.inactive"
                                     [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE' | translate"
-                                    [required]="false">
+                                    required="false">
                                 </app-form-slide-toggle>
                             </div>
 
@@ -326,7 +342,19 @@
                                     name="questionRequired"
                                     [(ngModel)]="questionInEditModeClone.required"
                                     [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate"
-                                    [required]="false">
+                                    required="false">
+                                </app-form-slide-toggle>
+                            </div>
+
+                            <!-- question multi answer -->
+                            <div
+                                *ngIf="!displayChangeButton"
+                                fxFlex="150px">
+                                <app-form-slide-toggle
+                                    name="questionMultiAnswer"
+                                    [(ngModel)]="questionInEditModeClone.multiAnswer"
+                                    [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER' | translate"
+                                    required="false">
                                 </app-form-slide-toggle>
                             </div>
                         </div>

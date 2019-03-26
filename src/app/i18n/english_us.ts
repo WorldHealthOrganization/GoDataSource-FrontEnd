@@ -21,6 +21,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE': 'Daily contact follow-ups form',
 
         /**
+         * uiOutbreakQuestionnaireTemplates
+         */
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER': 'Multi answer',
+
+        /**
          * uiCommonButtons
          */
         'LNG_COMMON_BUTTON_SHOW_FILTERS': 'Show filters',
