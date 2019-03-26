@@ -2,6 +2,15 @@
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <button
+                    *ngIf="hasHelpWriteAccess()"
+                    mat-raised-button color="accent"
+                    [routerLink]="'./categories'">
+                    {{'LNG_PAGE_GLOBAL_HELP_BUTTON_MANAGE_CATEGORIES' | translate}}
+                </button>
+            </div>
         </div>
     </ng-container>
 </app-topnav>

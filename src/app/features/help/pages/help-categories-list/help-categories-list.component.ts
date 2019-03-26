@@ -25,8 +25,8 @@ import { tap } from 'rxjs/operators';
     styleUrls: ['./help-categories-list.component.less']
 })
 export class HelpCategoriesListComponent extends ListComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [
+        new BreadcrumbItemModel('LNG_PAGE_GLOBAL_HELP_TITLE', '/help'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '.', true)
     ];
 
