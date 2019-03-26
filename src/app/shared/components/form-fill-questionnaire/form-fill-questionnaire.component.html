@@ -19,175 +19,170 @@
                     </div>
                     <div>
                         <div
-                            *ngFor="let question of categoryData.questions; let questionIndex = index"
-                            fxFlex fxLayout="column" fxLayoutGap="20px"
-                            class="questionnaire-category-question">
+                            *ngFor="let question of categoryData.questions; let questionIndex = index">
+
+                            <!-- Go through each question answer -->
                             <div
-                                fxFlex fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="space-evenly stretch">
-                                <div fxFlex fxLayout="row" fxLayoutAlign="start center">
+                                *ngFor="let answerData of value[question.variable]; let answerDataIndex = index"
+                                fxFlex fxLayout="column" fxLayoutGap="20px"
+                                class="questionnaire-category-question">
+
+                                <!-- Question and answers -->
+                                <div
+                                    fxFlex fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="space-evenly stretch">
                                     <div
-                                        class="questionnaire-category-question-nr">
-                                        {{ ( 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE' | translate )  + (categoryData.startIndex + questionIndex + 1) }}
-                                    </div>
-                                    <div
-                                        class="questionnaire-category-question-text">
-                                        {{ question.text | translate }}
-                                    </div>
-                                </div>
-                                <div fxFlex>
-                                    <div fxFlex fxLayout="row" fxLayoutGap="5px">
-                                        <!-- Free Text -->
-                                        <app-form-input
-                                            *ngIf="question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value || question.answerType === Constants.ANSWER_TYPES.NUMERIC.value"
-                                            [name]="name + '[' + question.variable + ']'"
-                                            [alternativeName]="alternativeName + '[' + questionIndex + ']'"
-                                            [(ngModel)]="value[question.variable]"
-                                            [placeholder]="'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER' | translate"
-                                            [required]="question.required"
-                                            (optionChanged)="onChange()"
-                                            [disabled]="disabled"
-                                            [type]="question.answerType === Constants.ANSWER_TYPES.NUMERIC.value ? 'number' : 'text'">
-                                        </app-form-input>
-
-                                        <!-- Date / Time Picker -->
-                                        <app-form-datepicker
-                                            *ngIf="question.answerType === Constants.ANSWER_TYPES.DATE_TIME.value"
-                                            [name]="name + '[' + question.variable + ']'"
-                                            [alternativeName]="alternativeName + '[' + questionIndex + ']'"
-                                            [(ngModel)]="value[question.variable]"
-                                            [placeholder]="'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE' | translate"
-                                            [required]="question.required"
-                                            [disabled]="disabled"
-                                            (optionChanged)="onChange()"
-                                            app-date-validator>
-                                        </app-form-datepicker>
-
-                                        <!-- Multiple Selections -->
-                                        <app-form-select
-                                            *ngIf="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value || question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value"
-                                            [name]="name + '[' + question.variable + ']'"
-                                            [alternativeName]="alternativeName + '[' + questionIndex + ']'"
-                                            [(ngModel)]="value[question.variable]"
-                                            [placeholder]="(question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ? 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER' : 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS') | translate"
-                                            [required]="question.required"
-                                            [options]="question.answers"
-                                            optionLabelKey="label"
-                                            optionValueKey="value"
-                                            [multiple]="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value"
-                                            (optionChanged)="onChange()"
-                                            [disabled]="disabled">
-                                        </app-form-select>
-
-                                        <!-- Upload File -->
+                                        fxFlex fxLayout="row" fxLayoutAlign="start center">
                                         <div
-                                            *ngIf="question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value"
-                                            fxFlex fxLayout="row" fxLayoutGap="20px">
-                                            <input
-                                                hidden
-                                                #importDataBtn
-                                                type="file"
-                                                ng2FileSelect
-                                                [uploader]="uploadersData[question.variable]?.uploader"/>
+                                            class="questionnaire-category-question-nr">
+                                            {{ ( 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE' | translate )  + (categoryData.startIndex + questionIndex + 1) }}
+                                        </div>
+                                        <div
+                                            class="questionnaire-category-question-text">
+                                            {{ question.text | translate }}
+                                        </div>
+                                    </div>
+                                    <div fxFlex>
+                                        <div fxFlex fxLayout="row" fxLayoutGap="5px">
+
+                                            <!-- Free Text -->
+                                            <app-form-input
+                                                *ngIf="question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value || question.answerType === Constants.ANSWER_TYPES.NUMERIC.value"
+                                                [name]="name + '[' + question.variable + ']' + '[' + answerDataIndex + '][value]'"
+                                                [alternativeName]="alternativeName + '[' + questionIndex + ']'"
+                                                [(ngModel)]="answerData.value"
+                                                [placeholder]="'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER' | translate"
+                                                [required]="question.required"
+                                                (optionChanged)="onChange()"
+                                                [disabled]="disabled"
+                                                [type]="question.answerType === Constants.ANSWER_TYPES.NUMERIC.value ? 'number' : 'text'">
+                                            </app-form-input>
+
+                                            <!-- Date / Time Picker -->
+                                            <app-form-datepicker
+                                                *ngIf="question.answerType === Constants.ANSWER_TYPES.DATE_TIME.value"
+                                                [name]="name + '[' + question.variable + ']' + '[' + answerDataIndex + '][value]'"
+                                                [alternativeName]="alternativeName + '[' + questionIndex + ']'"
+                                                [(ngModel)]="answerData.value"
+                                                [placeholder]="'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE' | translate"
+                                                [required]="question.required"
+                                                [disabled]="disabled"
+                                                (optionChanged)="onChange()"
+                                                app-date-validator>
+                                            </app-form-datepicker>
+
+                                            <!-- Multiple Selections -->
+                                            <app-form-select
+                                                *ngIf="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value || question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value"
+                                                [name]="name + '[' + question.variable + ']' + '[' + answerDataIndex + '][value]'"
+                                                [alternativeName]="alternativeName + '[' + questionIndex + ']'"
+                                                [(ngModel)]="answerData.value"
+                                                [placeholder]="(question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ? 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER' : 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS') | translate"
+                                                [required]="question.required"
+                                                [options]="question.answers"
+                                                optionLabelKey="label"
+                                                optionValueKey="value"
+                                                [multiple]="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value"
+                                                (optionChanged)="onChange()"
+                                                [disabled]="disabled">
+                                            </app-form-select>
+
+                                            <!-- Upload File -->
                                             <div
+                                                *ngIf="question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value"
                                                 fxFlex fxLayout="row" fxLayoutGap="20px">
-                                                <div fxFlex fxLayout="column" fxLayoutGap="20px">
-                                                    <div
-                                                        fxFlex>
-                                                        {{ uploadersData[question.variable].uploader.queue.length > 0 ?
-                                                            uploadersData[question.variable].uploader.queue[0].file.name : (
-                                                                value[question.variable] && uploadersData[question.variable].attachment ?
-                                                                    uploadersData[question.variable].attachment.name :
+                                                <input
+                                                    hidden
+                                                    #importDataBtn
+                                                    type="file"
+                                                    ng2FileSelect
+                                                    [uploader]="uploadersData[question.variable][answerDataIndex].uploader"/>
+                                                <div
+                                                    fxFlex fxLayout="row" fxLayoutGap="20px">
+                                                    <div fxFlex fxLayout="column" fxLayoutGap="20px">
+                                                        <div
+                                                            fxFlex>
+                                                            {{ uploadersData[question.variable][answerDataIndex].uploader.queue.length > 0 ?
+                                                            uploadersData[question.variable][answerDataIndex].uploader.queue[0].file.name : (
+                                                                answerData.value && uploadersData[question.variable][answerDataIndex].attachment ?
+                                                                    uploadersData[question.variable][answerDataIndex].attachment.name :
                                                                     (('LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE' | translate) + (question.required ? '*' : ''))
                                                             )
-                                                        }}
+                                                            }}
+                                                        </div>
+
+                                                        <!-- Validation Input -->
+                                                        <app-form-hidden-input
+                                                            #fileHiddenInput="ngModel"
+                                                            [name]="name + '[' + question.variable + ']' + '[' + answerDataIndex + '][value]'"
+                                                            [alternativeName]="alternativeName + '[' + questionIndex + ']'"
+                                                            [placeholder]="'LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE' | translate"
+                                                            [ngModel]="answerData.value"
+                                                            [required]="uploadersData[question.variable][answerDataIndex].uploading || question.required">
+                                                        </app-form-hidden-input>
                                                     </div>
 
-                                                    <!-- Validation Input -->
-                                                    <app-form-hidden-input
-                                                        #fileHiddenInput="ngModel"
-                                                        [name]="name + '[' + question.variable + ']'"
-                                                        [alternativeName]="alternativeName + '[' + questionIndex + ']'"
-                                                        [placeholder]="'LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE' | translate"
-                                                        [ngModel]="value[question.variable]"
-                                                        [required]="uploadersData[question.variable].uploading || question.required">
-                                                    </app-form-hidden-input>
-                                                </div>
+                                                    <div
+                                                        *ngIf="answerData.value"
+                                                        fxFlex="90px">
+                                                        <button
+                                                            type="button"
+                                                            mat-raised-button
+                                                            (click)="downloadAttachment(question.variable, answerDataIndex)">
+                                                            {{ 'LNG_QUESTIONNAIRE_BUTTON_DOWNLOAD' | translate }}
+                                                        </button>
+                                                    </div>
 
-                                                <div
-                                                    *ngIf="value[question.variable]"
-                                                    fxFlex="90px">
-                                                    <button
-                                                        type="button"
-                                                        mat-raised-button
-                                                        (click)="downloadAttachment(question.variable)">
-                                                        {{ 'LNG_QUESTIONNAIRE_BUTTON_DOWNLOAD' | translate }}
-                                                    </button>
-                                                </div>
+                                                    <div
+                                                        *ngIf="!disabled && answerData.value"
+                                                        fxFlex="90px">
+                                                        <button
+                                                            type="button"
+                                                            mat-raised-button
+                                                            (click)="removeAttachment(question.variable, answerDataIndex, importDataBtn, fileHiddenInput)">
+                                                            {{ 'LNG_QUESTIONNAIRE_BUTTON_REMOVE' | translate }}
+                                                        </button>
+                                                    </div>
 
-                                                <div
-                                                    *ngIf="!disabled && value[question.variable]"
-                                                    fxFlex="90px">
-                                                    <button
-                                                        type="button"
-                                                        mat-raised-button
-                                                        (click)="removeAttachment(question.variable, importDataBtn, fileHiddenInput)">
-                                                        {{ 'LNG_QUESTIONNAIRE_BUTTON_REMOVE' | translate }}
-                                                    </button>
-                                                </div>
-
-                                                <div
-                                                    *ngIf="!disabled"
-                                                    fxFlex="90px">
-                                                    <button
-                                                        type="button"
-                                                        mat-raised-button
-                                                        color="primary"
-                                                        (click)="importAttachment(importDataBtn, fileHiddenInput)"
-                                                        [disabled]="uploadersData[question.variable].uploading">
-                                                        {{ (value[question.variable] ? 'LNG_QUESTIONNAIRE_BUTTON_REPLACE' : 'LNG_QUESTIONNAIRE_BUTTON_BROWSE') | translate }}
-                                                    </button>
+                                                    <div
+                                                        *ngIf="!disabled"
+                                                        fxFlex="90px">
+                                                        <button
+                                                            type="button"
+                                                            mat-raised-button
+                                                            color="primary"
+                                                            (click)="importAttachment(importDataBtn, fileHiddenInput)"
+                                                            [disabled]="uploadersData[question.variable][answerDataIndex].uploading">
+                                                            {{ (answerData.value ? 'LNG_QUESTIONNAIRE_BUTTON_REPLACE' : 'LNG_QUESTIONNAIRE_BUTTON_BROWSE') | translate }}
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <!-- copy value button -->
-                                        <div
-                                            *ngIf="displayCopyField && question.answerType !== Constants.ANSWER_TYPES.FILE_UPLOAD.value"
-                                            fxFlex="40px"
-                                            fxLayout="column"
-                                            fxLayoutAlign="center">
-                                            <button
-                                                class="copy-field-button"
-                                                type="button"
-                                                mat-icon-button
-                                                [title]="displayCopyFieldDescription"
-                                                (click)="triggerCopyValue(question.variable)">
-                                                <span class="xt-icon">fileCopy</span>
-                                            </button>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div
-                                *ngIf="(
+                                <!-- Additional questions -->
+                                <div
+                                    *ngIf="(
                                         question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ||
                                         question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value
-                                    ) && hasSubQuestions(question, value[question.variable])"
-                                class="questionnaire-category-question-additional">
-                                <div
-                                    *ngFor="let answer of subQuestionsAnswer(question, value[question.variable])">
-                                    <app-form-fill-questionnaire
-                                        [name]="name"
-                                        [alternativeName]="alternativeName + '[' + questionIndex + ']'"
-                                        [ngModel]="value"
-                                        [questions]="additionalQuestions[question.variable][answer]"
-                                        [disabled]="disabled"
-                                        [hideCategories]="true"
-                                        (changed)="onChange(false)"
-                                        (groupValidated)="validateGroup()"
-                                        [componentTitle]="'LNG_QUESTIONNAIRE_SUB_QUESTIONS_TITLE' | translate">
-                                    </app-form-fill-questionnaire>
+                                    ) && hasSubQuestions(question, answerData.value)"
+                                    class="questionnaire-category-question-additional">
+                                    <div
+                                        *ngFor="let answer of subQuestionsAnswer(question, answerData.value)">
+                                        <app-form-fill-questionnaire
+                                            [name]="name"
+                                            [alternativeName]="alternativeName + '[' + questionIndex + ']'"
+                                            [ngModel]="value"
+                                            [questions]="additionalQuestions[question.variable][answer]"
+                                            [disabled]="disabled"
+                                            [hideCategories]="true"
+                                            (changed)="onChange(false)"
+                                            (groupValidated)="validateGroup()"
+                                            [componentTitle]="'LNG_QUESTIONNAIRE_SUB_QUESTIONS_TITLE' | translate">
+                                        </app-form-fill-questionnaire>
+                                    </div>
                                 </div>
                             </div>
                         </div>

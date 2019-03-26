@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { Constants } from './constants';
 import { CaseModel } from './case.model';
+import { IAnswerData } from './question.model';
 
 export class LabResultModel {
     case: CaseModel;
@@ -17,7 +18,9 @@ export class LabResultModel {
     notes: string;
     status: string;
     quantitativeResult: string;
-    questionnaireAnswers: {};
+    questionnaireAnswers: {
+        [variable: string]: IAnswerData[];
+    };
     personId: string;
     deleted: boolean;
 

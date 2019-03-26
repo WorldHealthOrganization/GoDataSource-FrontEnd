@@ -5,7 +5,7 @@ import { EventModel } from './event.model';
 import { EntityType } from './entity-type';
 import { LabelValuePair } from './label-value-pair';
 import { AddressModel } from './address.model';
-import { QuestionModel } from './question.model';
+import { IAnswerData, QuestionModel } from './question.model';
 import { Constants } from './constants';
 import * as moment from 'moment';
 
@@ -256,7 +256,23 @@ export class EntityModel {
         return _.map(entities, (caseData: CaseModel) => {
             // check if we need to mark case as alerted because of questionnaire answers
             caseData.alerted = false;
-            _.each(caseData.questionnaireAnswers, (answerKey: string, questionVariable: string) => {
+            _.each(caseData.questionnaireAnswers, (
+                answers: IAnswerData[],
+                questionVariable: string
+            ) => {
+                // retrieve answer value
+                // only the newest one is of interest, the old ones shouldn't trigger an alert
+                // the first item should be the newest
+                const answerKey = _.get(answers, '0.value', undefined);
+
+                // there is no point in checking the value if there isn't one
+                if (
+                    _.isEmpty(answerKey) &&
+                    !_.isNumber(answerKey)
+                ) {
+                    return;
+                }
+
                 // at least one alerted ?
                 if (_.isArray(answerKey)) {
                     // go through all answers

@@ -2,6 +2,11 @@
 import * as _ from 'lodash';
 import { Constants } from './constants';
 
+export interface IAnswerData {
+    date?: string;
+    value: any;
+}
+
 export class AnswerModel {
     label: string;
     value: string;
