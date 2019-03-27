@@ -1,0 +1,38 @@
+<div fxLayout="column" fxLayoutGap="20px">
+
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+        <span class="person-type">{{'entity type' | translate}}</span>
+
+        <span class="xt-icon" (click)="onRemove()">close</span>
+    </div>
+
+    <div class="person-summary-wrapper">
+        <div fxLayout="column" fxLayoutGap="10px">
+            <div
+                *ngFor="let data of relationshipData"
+                fxLayout="row" fxLayoutGap="10px"
+            >
+                <span class="label">{{data.label | translate}}:</span>
+                <span class="value">{{data.value | translate}}</span>
+            </div>
+        </div>
+    </div>
+
+    <div fxLayout="column" fxLayoutGap="10px">
+        <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
+            <a
+                mat-raised-button
+                color="accent"
+                (click)="onModifyRelationship()">
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON' | translate}}
+            </a>
+
+            <a
+                mat-raised-button
+                color="warn"
+                (click)="onDeleteRelationship()">
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON' | translate}}
+            </a>
+        </div>
+    </div>
+</div>

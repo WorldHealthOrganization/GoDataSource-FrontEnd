@@ -16,6 +16,7 @@ import { LabelValuePair } from '../../models/label-value-pair';
 import * as moment from 'moment';
 import { Constants } from '../../models/constants';
 import { I18nService } from '../helper/i18n.service';
+import { RelationshipModel } from '../../models/relationship.model';
 
 @Injectable()
 export class EntityDataService {
@@ -156,7 +157,7 @@ export class EntityDataService {
      * @returns {LabelValuePair[]}
      */
     getLightObjectDisplay(
-        entity: CaseModel | EventModel | ContactModel
+        entity: CaseModel | EventModel | ContactModel | RelationshipModel
     ): LabelValuePair[] {
 
         const lightObject = [];
@@ -306,6 +307,43 @@ export class EntityDataService {
                 entity.dateOfReporting ?
                         moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                         ''
+            ));
+        }
+
+        if (entity instanceof RelationshipModel) {
+            lightObject.push(new LabelValuePair(
+                'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+                entity.contactDate ?
+                    moment(entity.contactDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                    ''
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+                entity.certaintyLevelId
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+                entity.exposureTypeId
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+                entity.exposureFrequencyId
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+                entity.exposureDurationId
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+                entity.socialRelationshipTypeId
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
+                entity.socialRelationshipDetail
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+                entity.clusterId
             ));
         }
 

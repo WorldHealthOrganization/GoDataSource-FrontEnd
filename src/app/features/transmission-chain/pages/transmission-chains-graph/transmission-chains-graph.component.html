@@ -69,6 +69,28 @@
         </mat-card>
     </div>
 
+    <div
+        *ngIf="selectedRelationship"
+        class="selected-relationship-details"
+        fxFlex="400px"
+        fxLayout="column">
+        <mat-card class="page-section">
+            <app-relationship-summary
+                [relationship]="selectedRelationship"
+                (remove)="removeRelationship()"
+                (modifyRelationship)="modifySelectedRelationship($event)"
+                (deleteRelationship)="deleteSelectedRelationship($event)">
+            </app-relationship-summary>
+            <!--<app-person-summary-->
+                <!--[person]="person"-->
+                <!--(remove)="removeSelectedNode(index)"-->
+                <!--(modifyPerson)="modifySelectedPerson($event)"-->
+                <!--(deletePerson)="deleteSelectedPerson($event)"-->
+                <!--(createContact)="createContactForSelectedPerson($event)"-->
+            <!--&gt;</app-person-summary>-->
+        </mat-card>
+    </div>
+
     <!-- Create relationship between 2 nodes -->
     <mat-card
         *ngIf="selectedNodes.canCreateRelationship && hasCaseWriteAccess()"

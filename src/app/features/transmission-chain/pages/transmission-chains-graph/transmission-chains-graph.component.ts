@@ -64,6 +64,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
     // nodes selected from graph
     selectedNodes: SelectedNodes = new SelectedNodes();
+    // selected relationship
+    selectedRelationship: RelationshipModel;
     // action to do on the selected node
     currentNodeAction: NodeAction = null;
 
@@ -292,23 +294,38 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 // hide loading dialog
                 loadingDialog.close();
 
-                // show edge information
-                this.dialogService.showCustomDialog(
-                    ViewCotEdgeDialogComponent,
-                    {
-                        ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
-                        ...{
-                            data: {
-                                relationship: relationshipData
+                if (this.editMode) {
+                    this.selectedRelationship = new RelationshipModel(relationshipData);
+
+                    // focus box
+                    setTimeout(() => {
+                        this.domService.scrollItemIntoView(
+                            '.selected-relationship-details'
+                        );
+                    });
+                } else {
+                    // show edge information
+                    this.dialogService.showCustomDialog(
+                        ViewCotEdgeDialogComponent,
+                        {
+                            ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+                            ...{
+                                data: {
+                                    relationship: relationshipData
+                                }
                             }
                         }
-                    }
-                );
+                    );
+                }
             });
     }
 
     removeSelectedNode(index) {
         this.selectedNodes.removeNodeAtIndex(index);
+    }
+
+    removeRelationship() {
+        this.selectedRelationship = undefined;
     }
 
     swapSelectedNodes() {
@@ -363,6 +380,14 @@ export class TransmissionChainsGraphComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    modifySelectedRelationship(relationship: RelationshipModel) {
+        console.log(`modify`);
+    }
+
+    deleteSelectedRelationship(relationship: RelationshipModel) {
+        console.log(`delete`);
     }
 
     resetFormModels() {
