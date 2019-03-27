@@ -1,7 +1,7 @@
 import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, NgModel } from '@angular/forms';
 import * as _ from 'lodash';
-import { GroupBase } from '../../xt-forms/core';
+import { GroupBase, GroupFilteredValue } from '../../xt-forms/core';
 import { AnswerModel, IAnswerData, QuestionModel } from '../../../core/models/question.model';
 import { Constants } from '../../../core/models/constants';
 import { FileItem, FileUploader } from 'ng2-file-upload';
@@ -37,7 +37,7 @@ interface UploaderData {
 })
 export class FormFillQuestionnaireComponent extends GroupBase<{
     [variable: string]: IAnswerData[]
-}> implements OnInit {
+}> implements OnInit, GroupFilteredValue<any> {
     @Input() disabled: boolean = false;
 
     @Input() componentTitle: string;
@@ -514,7 +514,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REMOVE_ATTACHMENT')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
-                    this.value[questionVariable][index].value = '';
+                    this.value[questionVariable][index].value = undefined;
                     this.uploadersData[questionVariable][index].uploader.clearQueue();
                     importDataBtn.value = '';
 
@@ -572,5 +572,30 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
 
         // init file uploader if needed
         this.initializeUploader();
+    }
+
+    /**
+     * Get Filtered Value
+     */
+    getFilteredValue(): any {
+        // strip unnecessary data
+        return !this.value ?
+            this.value :
+            _.transform(
+                _.cloneDeep(this.value),
+                (accumulator, answers: IAnswerData[], variable: string) => {
+                    // clean answers
+                    answers = _.filter(
+                        answers,
+                        (answer: IAnswerData) => !_.isEmpty(answer.value) || _.isNumber(answer.value)
+                    );
+
+                    // add only if we still have answers for this variable
+                    if (!_.isEmpty(answers)) {
+                        accumulator[variable] = answers;
+                    }
+                },
+                {}
+            );
     }
 }

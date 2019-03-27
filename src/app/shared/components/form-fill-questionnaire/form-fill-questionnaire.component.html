@@ -54,7 +54,7 @@
 
                                             <!-- Question multi answer add new answer -->
                                             <div
-                                                *ngIf="question.multiAnswer && answerDataIndex < 1"
+                                                *ngIf="!disabled && question.multiAnswer && answerDataIndex < 1"
                                                 fxFlex="140px" fxLayout="row" fxLayoutAlign="end center">
                                                 <button
                                                     mat-raised-button color="accent"
@@ -78,7 +78,7 @@
                                                     [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                                     [ngModel]="answerData.date"
                                                     [placeholder]="'LNG_QUESTIONNAIRE_LABEL_MULTI_ANSWER_DATE' | translate"
-                                                    [required]="answerData.value"
+                                                    [required]="value[question.variable][answerDataIndex].value"
                                                     [disabled]="disabled"
                                                     (optionChanged)="changedAnswerDate(answerData, $event)"
                                                     app-date-validator>
@@ -210,7 +210,7 @@
 
                                     <!-- Multi answer remove button -->
                                     <div
-                                        *ngIf="question.multiAnswer"
+                                        *ngIf="!disabled && question.multiAnswer"
                                         fxFlex="48px" fxLayout="column" fxLayoutAlign="end">
                                         <button
                                             *ngIf="value[question.variable].length > 1"
