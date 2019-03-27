@@ -575,6 +575,28 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
     }
 
     /**
+     * Remove multi answer
+     */
+    removeMultiAnswer(
+        questionVariable: string,
+        answerDataIndex
+    ) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REMOVE_MULTI_ANSWER')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // remove answer
+                    this.value[questionVariable].splice(answerDataIndex, 1);
+
+                    // remove file uploader if this is the case
+                    if (this.uploadersData[questionVariable]) {
+                        this.uploadersData[questionVariable].splice(answerDataIndex, 1);
+                    }
+                }
+            });
+    }
+
+    /**
      * Get Filtered Value
      */
     getFilteredValue(): any {

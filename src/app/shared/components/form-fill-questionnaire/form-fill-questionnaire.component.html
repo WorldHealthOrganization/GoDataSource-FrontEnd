@@ -216,7 +216,8 @@
                                             *ngIf="value[question.variable].length > 1"
                                             type="button"
                                             mat-icon-button
-                                            class="questionnaire-category-question-remove-btn">
+                                            class="questionnaire-category-question-remove-btn"
+                                            (click)="removeMultiAnswer(question.variable, answerDataIndex)">
                                             <span class="xt-icon">delete</span>
                                         </button>
                                     </div>
