@@ -11,27 +11,31 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
-                    <ng-container>
+                    <button
+                        mat-menu-item
+                        (click)="exportCaseCountMap()">
+                        {{'LNG_PAGE_CASE_COUNT_EXPORT_MAP' | translate}}
+                    </button>
 
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/transmission-chains']">
-                            {{'LNG_PAGE_CASE_COUNT_MAP_ACTION_GRAPH_BUTTON' | translate}}
-                        </button>
+                    <mat-divider></mat-divider>
 
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/transmission-chains', 'list']">
-                            {{'LNG_PAGE_CASE_COUNT_MAP_ACTION_LIST_BUTTON' | translate}}
-                        </button>
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/transmission-chains']">
+                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL' | translate}}
+                    </button>
 
-                        <button
-                            mat-menu-item
-                            (click)="exportCaseCountMap()">
-                            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT' | translate}}
-                        </button>
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/graphs/transmission-chain-bars']">
+                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAIN_BARS_LABEL' | translate}}
+                    </button>
 
-                    </ng-container>
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/transmission-chains', 'list']">
+                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LIST_LABEL' | translate}}
+                    </button>
                 </mat-menu>
 
             </div>
