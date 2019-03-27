@@ -215,8 +215,8 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         // init value
         this.initValue();
 
-        // check if we have a file attachment saved
-        this.initializeAttachments();
+        // init file uploader if needed
+        this.initializeUploader();
 
         // check if we need to set parent dates to children as well
         setTimeout(() => {
