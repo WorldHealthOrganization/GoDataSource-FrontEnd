@@ -78,7 +78,7 @@
                                                     [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                                     [ngModel]="answerData.date"
                                                     [placeholder]="'LNG_QUESTIONNAIRE_LABEL_MULTI_ANSWER_DATE' | translate"
-                                                    [required]="value[question.variable][answerDataIndex].value"
+                                                    [required]="!!answerData.value"
                                                     [disabled]="disabled"
                                                     (optionChanged)="changedAnswerDate(answerData, $event)"
                                                     app-date-validator>
