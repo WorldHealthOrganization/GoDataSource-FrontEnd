@@ -1,0 +1,38 @@
+<!-- String -->
+<div
+    *ngIf="valueType === FieldValueType.STRING"
+    class="string-diff"
+    fxLayout="column" fxLayoutGap="2px"
+>
+    <span class="field-name">{{value.field}}</span>
+    <div class="field-changes" fxLayout="column">
+        <span class="old-value">{{value.oldValue}}</span>
+        <span class="new-value">{{value.newValue}}</span>
+    </div>
+</div>
+
+<!-- Language token -->
+<div
+    *ngIf="valueType === FieldValueType.LNG_TOKEN"
+    class="string-diff"
+    fxLayout="column" fxLayoutGap="2px"
+>
+    <span class="field-name">{{value.field}}</span>
+    <div class="field-changes" fxLayout="column">
+        <span class="old-value">{{value.oldValue | translate}}</span>
+        <span class="new-value">{{value.newValue | translate}}</span>
+    </div>
+</div>
+
+<!-- Date -->
+<div
+    *ngIf="valueType === FieldValueType.DATE"
+    class="string-diff"
+    fxLayout="column" fxLayoutGap="2px"
+>
+    <span class="field-name">{{value.field}}</span>
+    <div class="field-changes" fxLayout="column">
+        <span class="old-value">{{value.oldValue | dateTimeDefault}}</span>
+        <span class="new-value">{{value.newValue | dateTimeDefault}}</span>
+    </div>
+</div>
