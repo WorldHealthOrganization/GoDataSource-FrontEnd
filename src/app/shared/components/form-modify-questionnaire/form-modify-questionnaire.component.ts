@@ -161,6 +161,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     answerTypesInstantList: LabelValuePair[];
 
     /**
+     * List of answers display orientations
+     */
+    answersDisplayInstantList: LabelValuePair[];
+
+    /**
      * Child question is in edit mode ?
      */
     childQuestionIsInEditMode: boolean = false;
@@ -262,17 +267,21 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // retrieve data
         Observable.forkJoin([
             this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.QUESTION_CATEGORY),
-            this.genericDataService.getAnswerTypesList()
+            this.genericDataService.getAnswerTypesList(),
+            this.genericDataService.getAnswersDisplayOrientationsList(),
         ]).subscribe(([
             questionCategoriesList,
-            answerTypesInstantList
+            answerTypesInstantList,
+            answersDisplayInstantList
         ]: [
             LabelValuePair[],
+            any[],
             any[]
         ]) => {
             // set edit options
             this.questionCategoriesInstantList = questionCategoriesList;
             this.answerTypesInstantList = answerTypesInstantList;
+            this.answersDisplayInstantList = answersDisplayInstantList;
 
             // questionnaire data
             this.route.data.subscribe((routeData: { questionnaire: OutbreakQestionnaireTypeEnum }) => {

@@ -96,6 +96,13 @@
             {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate }}
         </div>
 
+        <!-- Answer Display -->
+        <div
+            fxFlex="200px"
+            class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
+            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY' | translate }}
+        </div>
+
         <!-- Inactive ? -->
         <div
             fxFlex="100px"
@@ -176,6 +183,13 @@
                     fxFlex="200px"
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
                     {{ question.answerType | translate }}
+                </div>
+
+                <!-- Answers Display -->
+                <div
+                    fxFlex="200px"
+                    class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
+                    {{ question.answersDisplay | translate }}
                 </div>
 
                 <!-- Inactive ? -->
@@ -321,6 +335,21 @@
                                     [options]="answerTypesInstantList"
                                     [disabled]="questionAnswerIndexInEditMode !== null"
                                     (optionChanged)="questionAnswerTypeChanged($event)">
+                                </app-form-select>
+                            </div>
+
+                            <!-- question - answers display -->
+                            <div
+                                fxFlex="200px">
+                                <app-form-select
+                                    name="questionAnswersDisplay"
+                                    [(ngModel)]="questionInEditModeClone.answersDisplay"
+                                    [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY' | translate"
+                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY_DESCRIPTION"
+                                    [required]="true"
+                                    [clearable]="false"
+                                    [options]="answersDisplayInstantList"
+                                    [disabled]="questionAnswerIndexInEditMode !== null">
                                 </app-form-select>
                             </div>
 

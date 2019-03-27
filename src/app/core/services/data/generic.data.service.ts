@@ -54,6 +54,14 @@ export class GenericDataService {
     }
 
     /**
+     * Retrieve the list of Answer Display Orientations
+     * @returns {Observable<any[]>}
+     */
+    getAnswersDisplayOrientationsList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.ANSWERS_DISPLAY));
+    }
+
+    /**
      * Retrieve the list of Progress Options
      * @returns {Observable<any[]>}
      */
