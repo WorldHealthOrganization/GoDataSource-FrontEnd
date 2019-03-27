@@ -65,6 +65,7 @@ export class QuestionModel {
     multiAnswer: boolean;
     order: number = 1;
     answerType: string;
+    answersDisplay: string;
     answers: AnswerModel[];
 
     // new flag - DON'T save this field
@@ -84,6 +85,7 @@ export class QuestionModel {
         this.multiAnswer = _.get(data, 'multiAnswer');
         this.order = _.get(data, 'order');
         this.answerType = _.get(data, 'answerType');
+        this.answersDisplay = _.get(data, 'answersDisplay', Constants.ANSWERS_DISPLAY.VERTICAL.value);
 
         if (keepFlags) {
             this.new = _.get(data, 'new');
