@@ -24,6 +24,7 @@ export const EnglishUsLang = {
          * uiQuestionnaire
          */
         'LNG_QUESTIONNAIRE_LABEL_MULTI_ANSWER_DATE': 'Select date',
+        'LNG_QUESTIONNAIRE_BUTTON_ADD_MULTI_ANSWER': 'Add answer',
 
         /**
          * uiOutbreakQuestionnaireTemplates

@@ -36,14 +36,32 @@
 
                                         <!-- Question -->
                                         <div
-                                            fxFlex fxLayout="row" fxLayoutAlign="start center">
+                                            fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+                                            <!-- Question no. -->
                                             <div
-                                                class="questionnaire-category-question-nr">
-                                                {{ ( 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE' | translate )  + (categoryData.startIndex + questionIndex + 1) }}
+                                                fxFlex="48px">
+                                                <div class="questionnaire-category-question-nr">
+                                                    {{ ( 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE' | translate )  + (categoryData.startIndex + questionIndex + 1) }}
+                                                </div>
                                             </div>
+
+                                            <!-- Question text -->
                                             <div
+                                                fxFlex
                                                 class="questionnaire-category-question-text">
                                                 {{ question.text | translate }}
+                                            </div>
+
+                                            <!-- Question multi answer add new answer -->
+                                            <div
+                                                *ngIf="question.multiAnswer && answerDataIndex < 1"
+                                                fxFlex="140px" fxLayout="row" fxLayoutAlign="end center">
+                                                <button
+                                                    mat-raised-button color="accent"
+                                                    type="button"
+                                                    (click)="addMultiAnswer(value[question.variable])">
+                                                    {{'LNG_QUESTIONNAIRE_BUTTON_ADD_MULTI_ANSWER' | translate}}
+                                                </button>
                                             </div>
                                         </div>
 

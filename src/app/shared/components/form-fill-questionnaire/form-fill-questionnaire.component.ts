@@ -242,9 +242,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
                     this.value[question.variable].length < 1 ||
                     this.value[question.variable][0].value === undefined
                 ) {
-                    this.value[question.variable] = [{
-                        value: undefined
-                    }];
+                    this.value[question.variable] = [this.generateNewAnswer()];
                 }
             });
         });
@@ -290,11 +288,14 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
             if (this.value[questionVariable]) {
                 // init uploaders data
                 _.each(this.value[questionVariable], (data: IAnswerData, index: number) => {
-                    // retrieve uploader file
-                    if (!_.isEmpty(data.value)) {
-                        // init uploader data
-                        const uploaderData = uploadersData[index];
+                    // init uploader data
+                    const uploaderData = uploadersData[index];
 
+                    // retrieve uploader file
+                    if (
+                        !_.isEmpty(data.value) &&
+                        _.isEmpty(uploaderData.attachment)
+                    ) {
                         // retrieve uploader file
                         this.attachmentDataService
                             .getAttachment(this.selectedOutbreak.id, data.value)
@@ -322,11 +323,13 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         // initialize uploader
         _.each(this.uploadersData, (uploadersData: UploaderData[], questionVariable: string) => {
             if (this.value[questionVariable]) {
-                // remove all uploaders
-                uploadersData.splice(0, uploadersData.length);
-
                 // init uploaders data
-                _.each(this.value[questionVariable], () => {
+                _.each(this.value[questionVariable], (answer: IAnswerData, index: number) => {
+                    // init only if necessary
+                    if (uploadersData.length > index) {
+                        return;
+                    }
+
                     // init uploader data
                     const uploaderData = {
                         uploader: new FileUploader({}),
@@ -336,7 +339,6 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
 
                     // add it to teh list
                     uploadersData.push(uploaderData);
-                    const index: number = uploadersData.length - 1;
 
                     // configure options
                     uploaderData.uploader.setOptions({
@@ -550,5 +552,25 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
 
         // trigger parent on change
         this.onChange();
+    }
+
+    /**
+     * generate new answer
+     */
+    private generateNewAnswer(): IAnswerData {
+        return {
+            value: undefined
+        };
+    }
+
+    /**
+     * Add multi answer
+     */
+    addMultiAnswer(responsesArray: IAnswerData[]) {
+        // create new response
+        responsesArray.push(this.generateNewAnswer());
+
+        // init file uploader if needed
+        this.initializeUploader();
     }
 }
