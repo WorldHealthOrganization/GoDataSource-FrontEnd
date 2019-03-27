@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { AddressModel } from './address.model';
 import { ContactModel } from './contact.model';
 import { DateDefaultPipe } from '../../shared/pipes/date-default-pipe/date-default.pipe';
-import { QuestionModel } from './question.model';
+import { IAnswerData, QuestionModel } from './question.model';
 
 export class FollowUpModel {
     id: string;
@@ -12,7 +12,9 @@ export class FollowUpModel {
     contact: ContactModel;
     deleted: boolean;
     targeted: boolean;
-    questionnaireAnswers: {};
+    questionnaireAnswers: {
+        [variable: string]: IAnswerData[];
+    };
     outbreakId: string;
     statusId: string;
     teamId: string;
@@ -63,7 +65,23 @@ export class FollowUpModel {
         return _.map(entities, (followUpData: FollowUpModel) => {
             // check if we need to mark follow-up as alerted because of questionnaire answers
             followUpData.alerted = false;
-            _.each(followUpData.questionnaireAnswers, (answerKey: string, questionVariable: string) => {
+            _.each(followUpData.questionnaireAnswers, (
+                answers: IAnswerData[],
+                questionVariable: string
+            ) => {
+                // retrieve answer value
+                // only the newest one is of interest, the old ones shouldn't trigger an alert
+                // the first item should be the newest
+                const answerKey = _.get(answers, '0.value', undefined);
+
+                // there is no point in checking the value if there isn't one
+                if (
+                    _.isEmpty(answerKey) &&
+                    !_.isNumber(answerKey)
+                ) {
+                    return;
+                }
+
                 // at least one alerted ?
                 if (_.isArray(answerKey)) {
                     // go through all answers

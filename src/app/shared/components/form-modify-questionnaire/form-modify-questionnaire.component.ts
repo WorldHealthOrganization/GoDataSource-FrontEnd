@@ -808,11 +808,13 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             1
         );
 
-        // update questions order
+        // update questions answers order
+        const previousQuestionOrder: number = this.questionInEditModeClone.order;
         this.setQuestionnaireQuestionsOrder(
             [this.questionInEditModeClone],
             false
         );
+        this.questionInEditModeClone.order = previousQuestionOrder;
 
         // mark form as dirty
         this.markQuestionFormDirty();
@@ -1124,10 +1126,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                     this.questionInEditModeClone.answers.splice(answerIndex, 1);
 
                     // update order
+                    const previousQuestionOrder: number = this.questionInEditModeClone.order;
                     this.setQuestionnaireQuestionsOrder(
                         [this.questionInEditModeClone],
                         false
                     );
+                    this.questionInEditModeClone.order = previousQuestionOrder;
 
                     // mark form as dirty
                     this.markQuestionFormDirty();
@@ -1325,10 +1329,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                         this.questionInEditModeClone.answers.splice(this.questionAnswerIndexInEditMode, 1);
 
                         // update order
+                        const previousQuestionOrder: number = this.questionInEditModeClone.order;
                         this.setQuestionnaireQuestionsOrder(
                             [this.questionInEditModeClone],
                             false
                         );
+                        this.questionInEditModeClone.order = previousQuestionOrder;
 
                         // cancel answer edit
                         this.resetQuestionAnswerEditMode();
@@ -1486,10 +1492,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // NOTHING
 
         // set question order
+        const previousQuestionOrder: number = this.questionInEditModeClone.order;
         this.setQuestionnaireQuestionsOrder(
             [this.questionInEditModeClone],
             false
         );
+        this.questionInEditModeClone.order = previousQuestionOrder;
 
         // start modifying the new answer
         this.modifyAnswer(

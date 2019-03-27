@@ -2,6 +2,11 @@
 import * as _ from 'lodash';
 import { Constants } from './constants';
 
+export interface IAnswerData {
+    date?: string;
+    value: any;
+}
+
 export class AnswerModel {
     label: string;
     value: string;
@@ -57,6 +62,7 @@ export class QuestionModel {
     category: string;
     required: boolean;
     inactive: boolean;
+    multiAnswer: boolean;
     order: number = 1;
     answerType: string;
     answers: AnswerModel[];
@@ -75,6 +81,7 @@ export class QuestionModel {
         this.category = _.get(data, 'category');
         this.required = _.get(data, 'required');
         this.inactive = _.get(data, 'inactive');
+        this.multiAnswer = _.get(data, 'multiAnswer');
         this.order = _.get(data, 'order');
         this.answerType = _.get(data, 'answerType');
 

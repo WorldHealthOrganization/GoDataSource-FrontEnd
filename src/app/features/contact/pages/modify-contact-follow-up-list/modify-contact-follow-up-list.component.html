@@ -167,8 +167,19 @@
                         *ngFor="let variable of Object.keys(currentDirtyFields.questionnaireAnswers)"
                         fxLayout="row" fxLayoutGap="15px"
                     >
-                        <span>{{variable}}:</span>
-                        <span>{{currentDirtyFields.questionnaireAnswers[variable]}}</span>
+                        <div
+                            fxFlex="200px">{{variable}}: </div>
+                        <div
+                            fxFlex>
+                            <div
+                                *ngFor="let answerData of currentDirtyFields.questionnaireAnswers[variable]"
+                                fxLayout="row" fxLayoutGap="15px"
+                            >
+                                <span
+                                    *ngIf="answerData.date">{{answerData.date | dateDefault}} :</span>
+                                <span>{{answerData.value}}</span>
+                            </div>
+                        </div>
                     </div>
                 </ng-container>
             </mat-card>

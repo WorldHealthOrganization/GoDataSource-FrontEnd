@@ -20,6 +20,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { IAnswerData } from '../../../../core/models/question.model';
 
 @Component({
     selector: 'app-modify-contact-follow-ups-list',
@@ -43,7 +44,12 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     // selected follow-ups to be modified
     selectedFollowUps: FollowUpModel[] = [];
     // current dirty fields
-    currentDirtyFields: any = {};
+    currentDirtyFields: {
+        questionnaireAnswers?: {
+            [variable: string]: IAnswerData[];
+        },
+        [key: string]: any
+    } = {};
 
     // dropdowns
     dailyStatusTypeOptions$: Observable<any[]>;

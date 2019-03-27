@@ -21,6 +21,22 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE': 'Daily contact follow-ups form',
 
         /**
+         * uiQuestionnaire
+         */
+        'LNG_QUESTIONNAIRE_LABEL_MULTI_ANSWER_DATE': 'Select date',
+        'LNG_QUESTIONNAIRE_BUTTON_ADD_MULTI_ANSWER': 'Add answer',
+
+        /**
+         * uiOutbreakQuestionnaireTemplates
+         */
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER': 'Multi answer',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER_DESCRIPTION': '',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE_DESCRIPTION': '',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED_DESCRIPTION': '',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS_DESCRIPTION': '',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT_DESCRIPTION': '',
+
+        /**
          * uiCommonButtons
          */
         'LNG_COMMON_BUTTON_SHOW_FILTERS': 'Show filters',
@@ -112,6 +128,7 @@ export const EnglishUsLang = {
          * uiDialogs
          */
         'LNG_DIALOG_CONFIRM_DELETE_CASE_WITH_EXPOSED_CONTACTS': 'Case: "{{name}}" has {{numberOfContacts}} exposed contacts that will be deleted. Are you sure you want to delete this case?',
+        'LNG_DIALOG_CONFIRM_REMOVE_MULTI_ANSWER': 'Are you sure you want to remove this answer?',
 
         /**
          * uiChronologyContactPage
