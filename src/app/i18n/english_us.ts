@@ -89,6 +89,11 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_COUNT_MAP_LABEL': 'Cases count map',
 
         /**
+         * uiGlobalHelpPage
+         */
+        'LNG_PAGE_GLOBAL_HELP_BUTTON_MANAGE_CATEGORIES': 'Manage help categories',
+
+        /**
          * uiChainsOfTransmissionGraph
          */
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE': 'Icon',
