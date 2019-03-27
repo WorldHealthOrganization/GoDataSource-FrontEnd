@@ -39,6 +39,10 @@ export class SelectedNodes {
         this.nodes.splice(index, 1);
     }
 
+    removeAllNodes(): void {
+        this.nodes.splice(0, this.nodes.length);
+    }
+
     /**
      * Keep only a single node on the selected nodes list
      * @param node

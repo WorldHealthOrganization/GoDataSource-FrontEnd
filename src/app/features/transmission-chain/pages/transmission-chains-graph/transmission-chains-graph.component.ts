@@ -34,7 +34,8 @@ import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 
 enum NodeAction {
     MODIFY_PERSON = 'modify-person',
-    CREATE_CONTACT = 'create-contact'
+    CREATE_CONTACT = 'create-contact',
+    MODIFY_EDGE = 'modify-edge'
 }
 
 @Component({
@@ -254,6 +255,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 loadingDialog.close();
 
                 if (this.editMode) {
+                    this.selectedRelationship = undefined;
                     // add node to selected persons list
                     this.selectedNodes.addNode(entityData);
 
@@ -295,6 +297,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 loadingDialog.close();
 
                 if (this.editMode) {
+                    this.selectedNodes.removeAllNodes();
+
                     this.selectedRelationship = new RelationshipModel(relationshipData);
 
                     // focus box
@@ -345,6 +349,15 @@ export class TransmissionChainsGraphComponent implements OnInit {
         this.currentNodeAction = NodeAction.MODIFY_PERSON;
     }
 
+    modifySelectedRelationship(relationship: RelationshipModel) {
+        console.log(`modify`);
+        this.currentNodeAction = NodeAction.MODIFY_EDGE;
+    }
+
+    deleteSelectedRelationship(relationship: RelationshipModel) {
+        console.log(`delete`);
+    }
+
     createContactForSelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
         // remove other selected node(s) (if any)
         this.selectedNodes.keepNode(person);
@@ -380,14 +393,6 @@ export class TransmissionChainsGraphComponent implements OnInit {
                         });
                 }
             });
-    }
-
-    modifySelectedRelationship(relationship: RelationshipModel) {
-        console.log(`modify`);
-    }
-
-    deleteSelectedRelationship(relationship: RelationshipModel) {
-        console.log(`delete`);
     }
 
     resetFormModels() {
