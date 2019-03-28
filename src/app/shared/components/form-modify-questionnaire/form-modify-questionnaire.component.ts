@@ -1658,4 +1658,20 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             }
         });
     }
+
+    /**
+     * retrieve answer Value map
+     */
+    getCheckAnswerDuplicates(answers: AnswerModel[]): {
+        [answerValues: string]: number
+    } {
+        return _.transform(
+            answers,
+            (accumulator: {}, answer: AnswerModel, answerIndex: number) => {
+                if (!_.isEmpty(answer.value)) {
+                    accumulator[answer.value] = answerIndex;
+                }
+            },
+            {});
+    }
 }

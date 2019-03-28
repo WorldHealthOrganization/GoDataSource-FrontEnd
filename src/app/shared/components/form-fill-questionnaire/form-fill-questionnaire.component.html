@@ -24,7 +24,7 @@
 
                             <!-- Go through each question answer -->
                             <div
-                                *ngFor="let answerData of value[question.variable]; let answerDataIndex = index"
+                                *ngFor="let answerData of (childValueIndex === undefined ? value[question.variable] : [value[question.variable][childValueIndex]]); let answerDataIndex = index"
                                 fxFlex fxLayout="column" fxLayoutGap="20px">
 
                                 <!-- Questions and answers & remove buttons -->
@@ -60,7 +60,7 @@
                                                 <button
                                                     mat-raised-button color="accent"
                                                     type="button"
-                                                    (click)="addMultiAnswer(value[question.variable])">
+                                                    (click)="addMultiAnswer(question.variable)">
                                                     {{'LNG_QUESTIONNAIRE_BUTTON_ADD_MULTI_ANSWER' | translate}}
                                                 </button>
                                             </div>
@@ -75,7 +75,7 @@
                                                 *ngIf="question.multiAnswer"
                                                 fxFlex>
                                                 <app-form-datepicker
-                                                    [name]="name + '[' + question.variable + ']' + '[' + answerDataIndex + '][date]'"
+                                                    [name]="name + '[' + question.variable + ']' + '[' + (childValueIndex === undefined ? answerDataIndex : childValueIndex) + '][date]'"
                                                     [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                                     [ngModel]="answerData.date"
                                                     [placeholder]="'LNG_QUESTIONNAIRE_LABEL_MULTI_ANSWER_DATE' | translate"
@@ -93,7 +93,7 @@
                                                     <!-- Free Text -->
                                                     <app-form-input
                                                         *ngIf="question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value || question.answerType === Constants.ANSWER_TYPES.NUMERIC.value"
-                                                        [name]="name + '[' + question.variable + ']' + '[' + answerDataIndex + '][value]'"
+                                                        [name]="name + '[' + question.variable + ']' + '[' + (childValueIndex === undefined ? answerDataIndex : childValueIndex) + '][value]'"
                                                         [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                                         [(ngModel)]="answerData.value"
                                                         [placeholder]="'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER' | translate"
@@ -106,7 +106,7 @@
                                                     <!-- Date / Time Picker -->
                                                     <app-form-datepicker
                                                         *ngIf="question.answerType === Constants.ANSWER_TYPES.DATE_TIME.value"
-                                                        [name]="name + '[' + question.variable + ']' + '[' + answerDataIndex + '][value]'"
+                                                        [name]="name + '[' + question.variable + ']' + '[' + (childValueIndex === undefined ? answerDataIndex : childValueIndex) + '][value]'"
                                                         [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                                         [(ngModel)]="answerData.value"
                                                         [placeholder]="'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE' | translate"
@@ -116,19 +116,19 @@
                                                         app-date-validator>
                                                     </app-form-datepicker>
 
-                                                    <!-- Multiple Selections -->
+                                                    <!-- Single & Multiple Answers -->
                                                     <app-form-select
                                                         *ngIf="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value || question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value"
-                                                        [name]="name + '[' + question.variable + ']' + '[' + answerDataIndex + '][value]'"
+                                                        [name]="name + '[' + question.variable + ']' + '[' + (childValueIndex === undefined ? answerDataIndex : childValueIndex) + '][value]'"
                                                         [alternativeName]="alternativeName + '[' + questionIndex + ']'"
-                                                        [(ngModel)]="answerData.value"
+                                                        [ngModel]="answerData.value"
                                                         [placeholder]="(question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ? 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER' : 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS') | translate"
                                                         [required]="question.required"
                                                         [options]="question.answers"
                                                         optionLabelKey="label"
                                                         optionValueKey="value"
                                                         [multiple]="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value"
-                                                        (optionChanged)="onChange()"
+                                                        (optionChanged)="selectedDropdownAnswer(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex), $event)"
                                                         [disabled]="disabled">
                                                     </app-form-select>
 
@@ -141,16 +141,16 @@
                                                             #importDataBtn
                                                             type="file"
                                                             ng2FileSelect
-                                                            [uploader]="uploadersData[question.variable][answerDataIndex].uploader"/>
+                                                            [uploader]="uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploader"/>
                                                         <div
                                                             fxFlex fxLayout="row" fxLayoutGap="20px">
                                                             <div fxFlex fxLayout="column" fxLayoutGap="20px">
                                                                 <div
                                                                     fxFlex>
-                                                                    {{ uploadersData[question.variable][answerDataIndex].uploader.queue.length > 0 ?
-                                                                    uploadersData[question.variable][answerDataIndex].uploader.queue[0].file.name : (
-                                                                        answerData.value && uploadersData[question.variable][answerDataIndex].attachment ?
-                                                                            uploadersData[question.variable][answerDataIndex].attachment.name :
+                                                                    {{ uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploader.queue.length > 0 ?
+                                                                    uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploader.queue[0].file.name : (
+                                                                        answerData.value && uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].attachment ?
+                                                                            uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].attachment.name :
                                                                             (('LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE' | translate) + (question.required ? '*' : ''))
                                                                     )
                                                                     }}
@@ -159,11 +159,11 @@
                                                                 <!-- Validation Input -->
                                                                 <app-form-hidden-input
                                                                     #fileHiddenInput="ngModel"
-                                                                    [name]="name + '[' + question.variable + ']' + '[' + answerDataIndex + '][value]'"
+                                                                    [name]="name + '[' + question.variable + ']' + '[' + (childValueIndex === undefined ? answerDataIndex : childValueIndex) + '][value]'"
                                                                     [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                                                     [placeholder]="'LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE' | translate"
                                                                     [ngModel]="answerData.value"
-                                                                    [required]="uploadersData[question.variable][answerDataIndex].uploading || question.required">
+                                                                    [required]="uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploading || question.required">
                                                                 </app-form-hidden-input>
                                                             </div>
 
@@ -173,7 +173,7 @@
                                                                 <button
                                                                     type="button"
                                                                     mat-raised-button
-                                                                    (click)="downloadAttachment(question.variable, answerDataIndex)">
+                                                                    (click)="downloadAttachment(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex))">
                                                                     {{ 'LNG_QUESTIONNAIRE_BUTTON_DOWNLOAD' | translate }}
                                                                 </button>
                                                             </div>
@@ -184,7 +184,7 @@
                                                                 <button
                                                                     type="button"
                                                                     mat-raised-button
-                                                                    (click)="removeAttachment(question.variable, answerDataIndex, importDataBtn, fileHiddenInput)">
+                                                                    (click)="removeAttachment(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex), importDataBtn, fileHiddenInput)">
                                                                     {{ 'LNG_QUESTIONNAIRE_BUTTON_REMOVE' | translate }}
                                                                 </button>
                                                             </div>
@@ -197,7 +197,7 @@
                                                                     mat-raised-button
                                                                     color="primary"
                                                                     (click)="importAttachment(importDataBtn, fileHiddenInput)"
-                                                                    [disabled]="uploadersData[question.variable][answerDataIndex].uploading">
+                                                                    [disabled]="uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploading">
                                                                     {{ (answerData.value ? 'LNG_QUESTIONNAIRE_BUTTON_REPLACE' : 'LNG_QUESTIONNAIRE_BUTTON_BROWSE') | translate }}
                                                                 </button>
                                                             </div>
@@ -218,7 +218,7 @@
                                             type="button"
                                             mat-icon-button
                                             class="questionnaire-category-question-remove-btn"
-                                            (click)="removeMultiAnswer(question.variable, answerDataIndex)">
+                                            (click)="removeMultiAnswer(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex))">
                                             <span class="xt-icon">delete</span>
                                         </button>
                                     </div>
@@ -243,7 +243,9 @@
                                             (changed)="onChange(false)"
                                             (groupValidated)="validateGroup()"
                                             [componentTitle]="'LNG_QUESTIONNAIRE_SUB_QUESTIONS_TITLE' | translate"
-                                            [parentDate]="question.multiAnswer ? answerData.date : undefined">
+                                            [parentDate]="answerData.date"
+                                            [childValueIndex]="determineChildIndex(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex), answer)"
+                                            [uploadersData]="uploadersData">
                                         </app-form-fill-questionnaire>
                                     </div>
                                 </div>

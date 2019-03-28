@@ -622,7 +622,11 @@
                                                         [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE' | translate"
                                                         tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE_DESCRIPTION"
                                                         required="true"
-                                                        [disabled]="childQuestionIsInEditMode">
+                                                        [disabled]="childQuestionIsInEditMode"
+                                                        app-has-property-validator
+                                                        [checkObject]="getCheckAnswerDuplicates(questionInEditModeClone.answers)"
+                                                        checkErrorMsg="LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_ANSWER_VALUE"
+                                                        [checkCompareValue]="questionAnswerIndexInEditMode">
                                                     </app-form-input>
                                                 </div>
 
