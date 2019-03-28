@@ -31,6 +31,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import * as FileSaver from 'file-saver';
 import { DomService } from '../../../../core/services/helper/dom.service';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
+import * as _ from 'lodash';
 
 enum NodeAction {
     MODIFY_PERSON = 'modify-person',
@@ -299,7 +300,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 if (this.editMode) {
                     this.selectedNodes.removeAllNodes();
 
-                    this.selectedRelationship = new RelationshipModel(relationshipData);
+                    this.selectedRelationship = relationshipData;
 
                     // focus box
                     setTimeout(() => {
@@ -552,6 +553,52 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
                 // refresh graph
                 this.cotDashletChild.refreshChain();
+
+                // reset form
+                this.resetFormModels();
+
+                // reset selected nodes
+                this.resetNodes();
+
+                // reset node action
+                this.currentNodeAction = null;
+            });
+    }
+
+    /**
+     * Modify a selected relationship relationship
+     * @param {NgForm} form
+     */
+    modifyRelationship(form: NgForm) {
+        if (!this.formHelper.validateForm(form)) {
+            return;
+        }
+
+        // get forms fields
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+        // create source person
+        const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
+        console.log(sourcePerson);
+        this.relationshipDataService
+            .modifyRelationship(
+                this.selectedOutbreak.id,
+                sourcePerson.type,
+                sourcePerson.id,
+                this.selectedRelationship.id,
+                dirtyFields)
+            .catch((err) => {
+                this.snackbarService.showApiError(err);
+
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
+
+                // refresh graph
+                this.cotDashletChild.refreshChain();
+
+                // reset selected relationship
+                this.selectedRelationship = undefined;
 
                 // reset form
                 this.resetFormModels();

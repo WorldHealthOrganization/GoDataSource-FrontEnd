@@ -311,6 +311,20 @@ export class EntityDataService {
         }
 
         if (entity instanceof RelationshipModel) {
+            const sourcePerson = _.find(entity.persons, person => person.source === true);
+            const sourcePeople = _.find(entity.people, people => people.model.id === sourcePerson.id);
+            const destinationPeople = _.find(entity.people, people => people.model.id !== sourcePerson.id);
+
+            lightObject.push(new LabelValuePair(
+                'LNG_RELATIONSHIP_FIELD_LABEL_SOURCE',
+                sourcePeople.model.name
+            ));
+
+            lightObject.push(new LabelValuePair(
+                'LNG_RELATIONSHIP_FIELD_LABEL_TARGET',
+                destinationPeople.model.name
+            ));
+
             lightObject.push(new LabelValuePair(
                 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
                 entity.contactDate ?

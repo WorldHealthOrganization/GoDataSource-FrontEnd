@@ -164,6 +164,28 @@
         </form>
     </mat-card>
 
+    <!--Modify Relationship-->
+    <mat-card
+        *ngIf="selectedRelationship && currentNodeAction === NodeAction.MODIFY_EDGE"
+        class="page-section quick-action modify-person"
+        fxFlex>
+
+        <form #form="ngForm" (submit)="modifyRelationship(form)">
+            <app-form-relationship-quick
+                name="relationship"
+                [ngModel]="selectedRelationship"
+                required="true"
+                >
+            </app-form-relationship-quick>
+
+            <div fxLayout="row">
+                <button mat-raised-button color="accent" type="submit">
+                    {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+                </button>
+            </div>
+        </form>
+    </mat-card>
+
     <!-- Create new Contact for Case/Event -->
     <mat-card
         *ngIf="selectedNodes.canCreateContact && currentNodeAction === NodeAction.CREATE_CONTACT"
