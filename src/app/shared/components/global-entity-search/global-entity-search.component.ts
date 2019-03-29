@@ -7,7 +7,7 @@ import { FormHelperService } from '../../../core/services/helper/form-helper.ser
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { GlobalEntitySearchDataService } from '../../../core/services/data/global-entity-search.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { EntityModel } from '../../../core/models/entity.model';

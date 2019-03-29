@@ -14,7 +14,7 @@ import { LoadingDialogModel } from '../../../../shared/components/index';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { GanttChartDelayOnsetDashletComponent } from '../../components/gantt-chart-delay-onset-dashlet/gantt-chart-delay-onset-dashlet.component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Constants } from '../../../../core/models/constants';
 

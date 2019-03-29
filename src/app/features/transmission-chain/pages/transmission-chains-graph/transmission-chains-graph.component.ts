@@ -25,7 +25,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { SelectedNodes } from '../../classes/selected-nodes';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import 'rxjs/add/operator/switchMap';
+
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import * as FileSaver from 'file-saver';

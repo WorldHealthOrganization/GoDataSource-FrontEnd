@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { UserRoleModel } from '../../../../core/models/user-role.model';

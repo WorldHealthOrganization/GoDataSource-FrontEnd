@@ -3,12 +3,10 @@ import { TranslateService } from '@ngx-translate/core';
 import { LanguageModel, LanguageTokenModel } from '../../models/language.model';
 import { StorageKey, StorageService } from './storage.service';
 import { LanguageDataService } from '../data/language.data.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable ,  Subscriber } from 'rxjs';
 import { ModelHelperService } from './model-helper.service';
 import { UserDataService } from '../data/user.data.service';
 import { AuthDataService } from '../data/auth.data.service';
-import 'rxjs/add/operator/mergeMap';
-import { Subscriber } from 'rxjs/Subscriber';
 
 @Injectable()
 export class I18nService {

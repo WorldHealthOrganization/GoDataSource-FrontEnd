@@ -1,13 +1,13 @@
 import * as _ from 'lodash';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { ContactFollowUpsModel } from '../../models/contact-follow-ups.model';
 import { FollowUpModel } from '../../models/follow-up.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { LocationDataService } from './location.data.service';
-import 'rxjs/add/operator/mergeMap';
+
 import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-contacts-lost-to-follow-up.model';
 import { MetricContactsModel } from '../../models/metrics/metric-contacts.model';
 import { MetricContactsWithSuccessfulFollowUp } from '../../models/metrics/metric.contacts-with-success-follow-up.model';

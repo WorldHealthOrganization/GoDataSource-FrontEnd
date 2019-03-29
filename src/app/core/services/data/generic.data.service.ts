@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Constants } from '../../models/constants';
 import { EntityType } from '../../models/entity-type';
 import * as _ from 'lodash';

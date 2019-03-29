@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable ,  Subscription } from 'rxjs';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { Constants } from '../../../../core/models/constants';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
@@ -22,7 +22,6 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { Subscription } from 'rxjs/Subscription';
 import { tap } from 'rxjs/operators';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { DialogField } from '../../../../shared/components';

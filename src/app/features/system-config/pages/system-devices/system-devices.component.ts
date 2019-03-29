@@ -9,8 +9,8 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { LoadingDialogModel } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/forkJoin';
+import { Observable } from 'rxjs';
+
 import { DeviceDataService } from '../../../../core/services/data/device.data.service';
 import { DeviceModel } from '../../../../core/models/device.model';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';

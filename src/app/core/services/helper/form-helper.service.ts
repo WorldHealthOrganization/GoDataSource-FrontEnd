@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import 'rxjs/add/operator/map';
+
 import { AbstractControl, FormControl, NgForm } from '@angular/forms';
 import * as _ from 'lodash';
 import { SnackbarService } from './snackbar.service';

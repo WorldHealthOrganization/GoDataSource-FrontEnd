@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';

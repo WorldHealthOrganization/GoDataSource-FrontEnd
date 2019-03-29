@@ -9,7 +9,7 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SystemSyncLogDataService } from '../../../../core/services/data/system-sync-log.data.service';
 import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField } from '../../../../shared/components';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';

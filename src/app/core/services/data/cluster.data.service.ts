@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { ClusterModel } from '../../models/cluster.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';

@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { LanguageModel, LanguageTokenModel } from '../../models/language.model';
 import { CacheKey, CacheService } from '../helper/cache.service';
-import 'rxjs/add/operator/share';
-import 'rxjs/add/observable/of';
+
+
 import * as _ from 'lodash';
 import { localLanguages } from '../../../i18n';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';

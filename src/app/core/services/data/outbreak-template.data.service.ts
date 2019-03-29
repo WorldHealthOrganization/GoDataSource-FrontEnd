@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/takeUntil';
+
+
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { OutbreakTemplateModel } from '../../models/outbreak-template.model';
 

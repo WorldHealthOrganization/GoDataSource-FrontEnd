@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import * as _ from 'lodash';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -16,7 +16,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import 'rxjs/add/operator/switchMap';
+
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 

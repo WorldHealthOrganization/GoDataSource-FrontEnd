@@ -3,7 +3,7 @@ import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, 
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, FormControl } from '@angular/forms';
 import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
 import { RelationshipModel } from '../../../core/models/relationship.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ClusterDataService } from '../../../core/services/data/cluster.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';

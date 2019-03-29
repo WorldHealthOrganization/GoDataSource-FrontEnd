@@ -5,7 +5,7 @@ import {
 import * as cytoscape from 'cytoscape';
 import * as cola from 'cytoscape-cola';
 import * as dagre from 'cytoscape-dagre';
-import { Observable } from 'rxjs/Observable';
+import { Observable ,  Subscription } from 'rxjs';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
 import { Constants } from '../../../core/models/constants';
 import * as _ from 'lodash';
@@ -16,7 +16,7 @@ import { TransmissionChainModel } from '../../../core/models/transmission-chain.
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../core/models/reference-data.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
-import 'rxjs/add/observable/forkJoin';
+
 import { AddressModel, AddressType } from '../../../core/models/address.model';
 import { EntityModel } from '../../../core/models/entity.model';
 import { GraphNodeModel } from '../../../core/models/graph-node.model';
@@ -28,7 +28,6 @@ import { DialogService } from '../../../core/services/helper/dialog.service';
 import { EntityDataService } from '../../../core/services/data/entity.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
-import { Subscription } from 'rxjs/Subscription';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { EventModel } from '../../../core/models/event.model';
 import { ContactModel } from '../../../core/models/contact.model';

@@ -18,7 +18,7 @@ import {
 } from '../../../core/models/saved-filters.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { RequestFilter } from '../../../core/helperClasses/request-query-builder/request-filter';
 
 @Component({

@@ -1,8 +1,7 @@
 import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
 import { HostListener, Injectable, QueryList, ViewChildren } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable ,  Observer } from 'rxjs';
 import * as _ from 'lodash';
-import { Observer } from 'rxjs/Observer';
 import { DialogService } from '../helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../shared/components/dialog/dialog.component';
 import { NgForm } from '@angular/forms';

@@ -14,7 +14,7 @@ import { NgForm } from '@angular/forms';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { EntityType } from '../../../../core/models/entity-type';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';

@@ -2,7 +2,7 @@ import { EventEmitter, Host, Inject, Input, Optional, Output, SkipSelf } from '@
 import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS } from '@angular/forms';
 import { GroupValidator } from './group-validator';
 import * as _ from 'lodash';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 /**
  * Base class to be extended by components that implement lists of group components or single components

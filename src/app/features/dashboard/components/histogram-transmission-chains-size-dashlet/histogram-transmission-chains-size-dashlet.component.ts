@@ -9,8 +9,7 @@ import { Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Subscriber } from 'rxjs/Subscriber';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscriber ,  Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({

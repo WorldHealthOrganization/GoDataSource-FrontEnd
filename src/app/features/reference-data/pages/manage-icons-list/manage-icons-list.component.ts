@@ -5,7 +5,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ReferenceDataCategoryModel } from '../../../../core/models/reference-data.model';
 import { IconDataService } from '../../../../core/services/data/icon.data.service';
 import { IconModel } from '../../../../core/models/icon.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';

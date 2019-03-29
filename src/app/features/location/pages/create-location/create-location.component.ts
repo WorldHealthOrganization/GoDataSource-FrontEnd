@@ -11,7 +11,7 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({

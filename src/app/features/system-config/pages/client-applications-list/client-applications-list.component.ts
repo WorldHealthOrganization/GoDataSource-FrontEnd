@@ -14,13 +14,12 @@ import { DialogService, ExportDataExtension } from '../../../../core/services/he
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/forkJoin';
+import { Observable ,  Subscriber } from 'rxjs';
+
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { environment } from '../../../../../environments/environment';
-import { Subscriber } from 'rxjs/Subscriber';
 
 @Component({
     selector: 'app-client-applications-list',

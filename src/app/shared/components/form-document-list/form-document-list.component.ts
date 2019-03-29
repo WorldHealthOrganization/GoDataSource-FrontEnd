@@ -3,7 +3,7 @@ import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer
 
 import { ListBase } from '../../xt-forms/core';
 import { DocumentModel } from '../../../core/models/document.model';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Subscriber } from 'rxjs';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 

@@ -3,7 +3,7 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { UserModel } from '../../../../core/models/user.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';

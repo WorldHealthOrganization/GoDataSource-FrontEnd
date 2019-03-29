@@ -7,7 +7,7 @@ import { DashboardDashlet, DashboardKpiGroup } from '../../../../core/enums/dash
 import * as _ from 'lodash';
 import { DashletSettingsModel, UserSettingsDashboardModel } from '../../../../core/models/user-settings-dashboard.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable ,  Subscription } from 'rxjs';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -21,7 +21,6 @@ import { Moment } from 'moment';
 import * as moment from 'moment';
 import { LoadingDialogModel } from '../../../../shared/components';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { Subscription } from 'rxjs/Subscription';
 import { Constants } from '../../../../core/models/constants';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 

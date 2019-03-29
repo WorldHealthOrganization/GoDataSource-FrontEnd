@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
@@ -19,7 +19,7 @@ import { SheetCellValidator } from '../../../../core/models/sheet/sheet-cell-val
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { NgModel } from '@angular/forms';
-import 'rxjs/add/operator/mergeMap';
+
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { BulkContactsService } from '../../../../core/services/helper/bulk-contacts.service';

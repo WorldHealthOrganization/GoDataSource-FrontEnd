@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -18,7 +18,7 @@ import { CountedItemsListItem } from '../../../../shared/components/counted-item
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import 'rxjs/add/operator/filter';
+
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
@@ -30,7 +30,7 @@ import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import 'rxjs/add/operator/mergeMap';
+
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
 import { tap } from 'rxjs/operators';

@@ -12,7 +12,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import 'rxjs/add/operator/switchMap';
+
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({

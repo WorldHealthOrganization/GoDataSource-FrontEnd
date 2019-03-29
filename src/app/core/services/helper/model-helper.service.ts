@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
+import { Observable } from 'rxjs';
+
 import { UserModel } from '../../models/user.model';
 import { UserRoleModel } from '../../models/user-role.model';
 import { PermissionModel } from '../../models/permission.model';

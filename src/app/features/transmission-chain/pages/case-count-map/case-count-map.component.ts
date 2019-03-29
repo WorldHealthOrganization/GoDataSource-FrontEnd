@@ -9,7 +9,7 @@ import { AddressType } from '../../../../core/models/address.model';
 import { WorldMapComponent, WorldMapMarker, WorldMapMarkerLayer, WorldMapPoint } from '../../../../shared/components/world-map/world-map.component';
 import * as _ from 'lodash';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { TransmissionChainFilters } from '../../components/transmission-chains-filters/transmission-chains-filters.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';

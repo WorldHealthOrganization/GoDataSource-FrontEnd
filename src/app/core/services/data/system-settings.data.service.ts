@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { SystemSettingsModel } from '../../models/system-settings.model';
 import { SystemSettingsVersionModel } from '../../models/system-settings-version.model';

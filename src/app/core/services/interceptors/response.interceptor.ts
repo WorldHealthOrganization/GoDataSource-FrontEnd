@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpResponse, HttpErrorResponse } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/catch';
+import { Observable } from 'rxjs';
+
+
 import * as _ from 'lodash';
 import { LoggerService } from '../helper/logger.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';

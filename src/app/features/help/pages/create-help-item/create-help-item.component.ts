@@ -12,7 +12,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import * as _ from 'lodash';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
-import 'rxjs/add/operator/switchMap';
+
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({

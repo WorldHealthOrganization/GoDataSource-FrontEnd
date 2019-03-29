@@ -2,9 +2,9 @@ import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ActivatedRoute, Router } from '@angular/router';
-import 'rxjs/add/operator/filter';
+
 import { LocationModel } from '../../../../core/models/location.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';

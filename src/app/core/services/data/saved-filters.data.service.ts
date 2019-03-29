@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder/request-query-builder';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { SavedFilterModel } from '../../models/saved-filters.model';
 
 @Injectable()

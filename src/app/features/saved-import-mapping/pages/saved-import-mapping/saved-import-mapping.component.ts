@@ -3,7 +3,7 @@ import { SavedImportMappingService } from '../../../../core/services/data/saved-
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { SavedImportMappingModel } from '../../../../core/models/saved-import-mapping.model';
 import { tap } from 'rxjs/operators';
 import * as _ from 'lodash';

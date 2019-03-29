@@ -2,7 +2,7 @@ import { RequestFilter, RequestFilterOperator, RequestQueryBuilder } from './req
 import * as _ from 'lodash';
 import { ListFilterDataService } from '../services/data/list-filter.data.service';
 import { Params } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ApplyListFilter, Constants } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';

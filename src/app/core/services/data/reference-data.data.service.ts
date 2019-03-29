@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../models/reference-data.model';
 import { CacheKey, CacheService } from '../helper/cache.service';
 import * as _ from 'lodash';
 import { RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/request-query-builder';
 import { LabelValuePair } from '../../models/label-value-pair';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/do';
+
+
 
 @Injectable()
 export class ReferenceDataDataService {

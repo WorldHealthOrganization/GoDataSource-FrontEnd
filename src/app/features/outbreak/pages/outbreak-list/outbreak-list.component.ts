@@ -5,7 +5,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
