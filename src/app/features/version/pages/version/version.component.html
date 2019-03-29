@@ -10,11 +10,11 @@
 
         <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="30px">
             <div
-                *ngIf="version">
-                {{ 'LNG_PAGE_VERSION_TEXT_DESCRIPTION' | translate: { version: version } }}
+                *ngIf="versionData?.version">
+                {{ 'LNG_PAGE_VERSION_TEXT_DESCRIPTION' | translate: { version: versionData.version, build: versionData.build } }}
             </div>
             <div
-                *ngIf="!version"
+                *ngIf="!versionData?.version"
                 class="app-version-spinner">
                 <mat-spinner></mat-spinner>
             </div>

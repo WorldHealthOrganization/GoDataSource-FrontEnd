@@ -115,6 +115,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS': 'Modify selected contacts',
 
         /**
+         * uiVersionPage
+         */
+        'LNG_PAGE_VERSION_TEXT_DESCRIPTION': 'Go.Data version: {{version}} - build {{build}}',
+
+        /**
          * uiModifyOutbreakQuestionnairePage
          */
         'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_ANSWER_VALUE': 'Duplicate answer',
