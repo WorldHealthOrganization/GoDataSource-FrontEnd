@@ -96,7 +96,7 @@
                                                         [name]="name + '[' + question.variable + ']' + '[' + (childValueIndex === undefined ? answerDataIndex : childValueIndex) + '][value]'"
                                                         [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                                         [(ngModel)]="answerData.value"
-                                                        [placeholder]="'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER' | translate"
+                                                        [placeholder]="(question.answerType === Constants.ANSWER_TYPES.NUMERIC.value ? 'LNG_QUESTIONNAIRE_LABEL_WRITE_NUMERIC_ANSWER' : 'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER') | translate"
                                                         [required]="question.required"
                                                         (optionChanged)="onChange()"
                                                         [disabled]="disabled"

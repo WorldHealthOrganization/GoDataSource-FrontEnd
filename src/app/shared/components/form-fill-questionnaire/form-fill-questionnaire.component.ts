@@ -659,6 +659,9 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
 
         // init file uploader if needed
         this.initializeUploader();
+
+        // form changed
+        this.onChange();
     }
 
     // handle child remove recursive
@@ -668,6 +671,14 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         curQuestionVariable: string,
         curAnswerDataIndex: number
     ) {
+        // nothing to do here ?
+        if (
+            _.isEmpty(additionalQuestions) ||
+            _.isEmpty(additionalQuestions[curQuestionVariable])
+        ) {
+            return;
+        }
+
         // make sure we have an array of answer since we have one for multi and we need to handle single answers a s well
         curParentValues = _.isArray(curParentValues) ? curParentValues : [curParentValues] as string[];
 
@@ -756,6 +767,9 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
                     if (this.uploadersData[questionVariable]) {
                         this.uploadersData[questionVariable].splice(answerDataIndex, 1);
                     }
+
+                    // form changed
+                    this.onChange();
                 }
             });
     }
@@ -827,6 +841,14 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         curQuestionVariable: string,
         curAnswerDataIndex: number
     ) {
+        // nothing to do here ?
+        if (
+            _.isEmpty(additionalQuestions) ||
+            _.isEmpty(additionalQuestions[curQuestionVariable])
+        ) {
+            return;
+        }
+
         // make sure we have an array of answer since we have one for multi and we need to handle single answers a s well
         curParentValues = _.isArray(curParentValues) ? curParentValues : [curParentValues] as string[];
         const curParentDate = this.value[curQuestionVariable][curAnswerDataIndex].date;
