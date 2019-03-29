@@ -53,23 +53,36 @@
                             optionValueKey="value"
                             [multiple]="field.inputOptionsMultiple"
                             [required]="field.required"
-                            app-required-one-or-other-validator
-                            [requiredOtherField]="field.requiredOneOfTwo"
                             [disabled]="field.disabled">
                         </app-form-select>
 
-                        <!-- Text / Number -->
+                        <!-- Text -->
                         <app-form-input
-                            *ngIf="field.fieldType === DialogFieldType.TEXT"
+                            *ngIf="field.fieldType === DialogFieldType.TEXT && field.type !== 'number'"
                             [name]="field.name"
                             [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                             [placeholder]="field.placeholder | translate:confirmData?.translateData"
                             [tooltip]="field.description"
                             [required]="field.required"
                             [type]="field.type"
-                            app-required-one-or-other-validator
-                            [requiredOtherField]="field.requiredOneOfTwo"
                             [disabled]="field.disabled">
+                        </app-form-input>
+
+                        <!-- Number -->
+                        <app-form-input
+                            *ngIf="field.fieldType === DialogFieldType.TEXT && field.type === 'number'"
+                            [name]="field.name"
+                            [(ngModel)]="dialogAnswerInputValue.value[field.name]"
+                            [placeholder]="field.placeholder | translate:confirmData?.translateData"
+                            [tooltip]="field.description"
+                            [required]="field.required"
+                            type="number"
+                            [disabled]="field.disabled"
+                            app-min-max-validator
+                            [min]="field.min"
+                            [minNumber]="field.min"
+                            [max]="field.max"
+                            [maxNumber]="field.max">
                         </app-form-input>
 
                         <!-- Boolean -->
@@ -79,7 +92,6 @@
                             [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                             [label]="field.placeholder | translate:confirmData?.translateData"
                             [tooltip]="field.description"
-                            [required]="field.required"
                             [disabled]="field.disabled">
                         </app-form-slide-toggle>
 

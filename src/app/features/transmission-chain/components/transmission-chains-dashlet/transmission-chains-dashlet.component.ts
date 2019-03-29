@@ -248,23 +248,31 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                     .getSelectedOutbreakSubject()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.selectedOutbreak = selectedOutbreak;
-                        // load person if selected
-                        if (this.personId) {
-                            this.entityDataService
-                                .getEntity(this.selectedEntityType, this.selectedOutbreak.id, this.personId)
-                                .subscribe((entity) => {
-                                    this.personName = entity.name;
+
+                        // when we have data
+                        if (
+                            this.selectedOutbreak &&
+                            this.selectedOutbreak.id
+                        ) {
+                            // load person if selected
+                            if (this.personId) {
+                                this.entityDataService
+                                    .getEntity(this.selectedEntityType, this.selectedOutbreak.id, this.personId)
+                                    .subscribe((entity) => {
+                                        this.personName = entity.name;
+                                    });
+                            }
+
+                            // load clusters list
+                            this.clusterDataService
+                                .getClusterList(this.selectedOutbreak.id)
+                                .subscribe((clusters) => {
+                                    this.legend.clustersList = [];
+                                    _.forEach(clusters, (cluster) => {
+                                        this.legend.clustersList[cluster.id] = cluster.name;
+                                    });
                                 });
                         }
-                        // load clusters list
-                        this.clusterDataService
-                            .getClusterList(this.selectedOutbreak.id)
-                            .subscribe( (clusters) => {
-                                this.legend.clustersList = [];
-                                _.forEach(clusters, (cluster) => {
-                                    this.legend.clustersList[cluster.id] = cluster.name;
-                                });
-                            });
 
                         // load chain
                         this.displayChainsOfTransmission();

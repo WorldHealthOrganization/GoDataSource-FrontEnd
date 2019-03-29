@@ -77,8 +77,9 @@ export class DialogField {
     public inputOptionsMultiple: boolean = false;
     public inputOptionsClearable: boolean = true;
     public required: boolean = false;
+    public min: number;
+    public max: number;
     public type: string = 'text';
-    public requiredOneOfTwo: string;
     public value: any;
     public visible: boolean | ((dialogFieldsValues: any) => boolean) = true;
     public disabled: boolean = false;
@@ -104,8 +105,9 @@ export class DialogField {
         inputOptionsMultiple?: boolean,
         inputOptionsClearable?: boolean,
         required?: boolean,
+        min?: number,
+        max?: number,
         type?: string,
-        requiredOneOfTwo?: string,
         value?: any,
         visible?: boolean | ((dialogFieldsValues: any) => boolean),
         disabled?: boolean,
