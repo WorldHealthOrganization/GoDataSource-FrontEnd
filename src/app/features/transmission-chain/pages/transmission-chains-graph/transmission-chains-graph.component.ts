@@ -183,7 +183,9 @@ export class TransmissionChainsGraphComponent implements OnInit {
                     placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_SPLIT_FACTOR',
                     required: true,
                     type: 'number',
-                    value: '1'
+                    value: 1,
+                    min: 1,
+                    max: 15
                 })],
             }), true)
             .subscribe((answer) => {
