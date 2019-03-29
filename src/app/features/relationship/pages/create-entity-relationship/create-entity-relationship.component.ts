@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -26,6 +26,9 @@ import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components'
 import { GroupBase } from '../../../../shared/xt-forms/core';
 import { v4 as uuid } from 'uuid';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 
 @Component({
     selector: 'app-create-entity-relationship',
@@ -62,10 +65,18 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
     relationshipType: RelationshipType;
 
     selectedEntityIds: string[];
-    selectedEntities: (CaseModel|ContactModel|EventModel)[];
+    selectedEntities: (CaseModel | ContactModel | EventModel)[];
 
     relationships: RelationshipModel[] = [];
     relationshipsIds: string[] = [];
+
+    // reference data
+    certaintyLevelOptions$: Observable<any[]>;
+    exposureTypeOptions$: Observable<any[]>;
+    exposureFrequencyOptions$: Observable<any[]>;
+    exposureDurationOptions$: Observable<any[]>;
+    socialRelationshipOptions$: Observable<any[]>;
+    clusterOptions$: Observable<any[]>;
 
     constructor(
         private router: Router,
@@ -76,12 +87,21 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private clusterDataService: ClusterDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super();
     }
 
     ngOnInit() {
+        // reference data
+        this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL).share();
+        this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE).share();
+        this.exposureFrequencyOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY).share();
+        this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION).share();
+        this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).share();
+
         // get selected persons from query params
         this.route.queryParams
             .subscribe((queryParams: { selectedEntityIds }) => {
@@ -119,6 +139,9 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
             .getSelectedOutbreak()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+
+                // get clusters list
+                this.clusterOptions$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id).share();
 
                 this.loadPerson();
             });
@@ -292,7 +315,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
             (value) => {
                 return _.isObject(value) ?
                     this.isEmptyObject(value) :
-                    ( !_.isNumber(value) && _.isEmpty(value) );
+                    (!_.isNumber(value) && _.isEmpty(value));
             }
         );
     }

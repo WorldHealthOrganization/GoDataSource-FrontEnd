@@ -39,8 +39,14 @@
                             required="true"
                             [displayCopyField]="true"
                             [displayCopyFieldDescription]="'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_COPY_BUTTON_TITLE' | translate"
-                            (copyValue)="copyValueToEmptyFields($event, relationships[ind], relationshipsForm)">
-                        </app-form-relationship>
+                            (copyValue)="copyValueToEmptyFields($event, relationships[ind], relationshipsForm)"
+                            [certaintyLevelOptions$]="certaintyLevelOptions$"
+                            [exposureTypeOptions$]="exposureTypeOptions$"
+                            [exposureFrequencyOptions$]="exposureFrequencyOptions$"
+                            [exposureDurationOptions$]="exposureDurationOptions$"
+                            [socialRelationshipOptions$]="socialRelationshipOptions$"
+                            [clusterOptions$]="clusterOptions$"
+                        ></app-form-relationship>
                     </mat-card>
 
                     <div
