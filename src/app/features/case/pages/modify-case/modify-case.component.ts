@@ -74,6 +74,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     };
 
     caseIdMaskValidator: Observable<boolean>;
+    couldGenerateVisualId: boolean | IGeneralAsyncValidatorResponse = false;
 
     constructor(
         private router: Router,
@@ -280,6 +281,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                             this.caseData.id
                         ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
                             observer.next(isValid);
+                            console.log(isValid);
+                            this.couldGenerateVisualId = !isValid;
                             observer.complete();
                         });
                     });
@@ -470,5 +473,19 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             ...this.parentOnsetDates,
             [this.caseData.dateOfInfection, this.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION')]
         ];
+    }
+
+    generateVisualIdForFormerContact(form: NgForm) {
+        return this.caseDataService.generateCaseVisualID(this.selectedOutbreak.id, this.selectedOutbreak.caseIdMask, this.caseData.id )
+            .catch((err) => {
+                console.log(err);
+                this.snackbarService.showApiError(err);
+                return ErrorObservable.create(err);
+            })
+            .subscribe((data) => {
+                console.log(data);
+                this.caseData.visualId = data;
+                form.form.markAsDirty();
+            });
     }
 }
