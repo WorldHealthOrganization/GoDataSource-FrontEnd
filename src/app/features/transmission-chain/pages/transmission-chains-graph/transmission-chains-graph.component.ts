@@ -350,13 +350,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
         this.currentNodeAction = NodeAction.MODIFY_PERSON;
     }
 
-    modifySelectedRelationship(relationship: RelationshipModel) {
-        console.log(`modify`);
+    modifySelectedRelationship() {
         this.currentNodeAction = NodeAction.MODIFY_EDGE;
-    }
-
-    deleteSelectedRelationship(relationship: RelationshipModel) {
-        console.log(`delete`);
     }
 
     createContactForSelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
@@ -578,7 +573,6 @@ export class TransmissionChainsGraphComponent implements OnInit {
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
         // create source person
         const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
-        console.log(sourcePerson);
         this.relationshipDataService
             .modifyRelationship(
                 this.selectedOutbreak.id,
@@ -608,6 +602,44 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
                 // reset node action
                 this.currentNodeAction = null;
+            });
+    }
+
+    /**
+     * Delete selected relationship
+     */
+    deleteSelectedRelationship() {
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP_CHAIN_OF_TRANSMISSION')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
+                    // delete relationship
+                    this.relationshipDataService
+                        .deleteRelationship(this.selectedOutbreak.id, sourcePerson.type, sourcePerson.id, this.selectedRelationship.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
+
+                            // refresh graph
+                            this.cotDashletChild.refreshChain();
+
+                            // reset selected relationship
+                            this.selectedRelationship = undefined;
+
+                            // reset form
+                            this.resetFormModels();
+
+                            // reset selected nodes
+                            this.resetNodes();
+
+                            // reset node action
+                            this.currentNodeAction = null;
+                        });
+                }
             });
     }
 }
