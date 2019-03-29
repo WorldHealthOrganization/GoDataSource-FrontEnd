@@ -11,19 +11,24 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
-                    <ng-container>
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/transmission-chains']">
-                            {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GRAPH_BUTTON' | translate}}
-                        </button>
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/transmission-chains']">
+                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL' | translate}}
+                    </button>
 
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/transmission-chains', 'case-count-map']">
-                            {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_CASE_COUNT_MAP_BUTTON' | translate}}
-                        </button>
-                    </ng-container>
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/graphs/transmission-chain-bars']">
+                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAIN_BARS_LABEL' | translate}}
+                    </button>
+
+                    <button
+                        *ngIf="hasCaseReadAccess()"
+                        mat-menu-item
+                        [routerLink]="['/transmission-chains', 'case-count-map']">
+                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_COUNT_MAP_LABEL' | translate}}
+                    </button>
                 </mat-menu>
 
             </div>
@@ -49,7 +54,9 @@
         <ng-container matColumnDef="firstContactDate">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_EARLIEST_DATE_OF_ONSET' | translate}}</div>
+                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_EARLIEST_DATE_OF_ONSET' |
+                        translate}}
+                    </div>
                 </div>
             </mat-header-cell>
 
@@ -66,7 +73,8 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                <a *ngIf="item.rootPerson" [routerLink]="['/transmission-chains']" [queryParams]="{ personId: item.rootPerson.id, selectedEntityType: item.rootPerson.type }">
+                <a *ngIf="item.rootPerson" [routerLink]="['/transmission-chains']"
+                   [queryParams]="{ personId: item.rootPerson.id, selectedEntityType: item.rootPerson.type }">
                     {{ item.rootPerson.name }}
                 </a>
             </mat-cell>
@@ -102,7 +110,8 @@
         <ng-container matColumnDef="numberOfContacts">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NUMBER_OF_CONTACTS' | translate}}</div>
+                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NUMBER_OF_CONTACTS' | translate}}
+                    </div>
                 </div>
             </mat-header-cell>
 

@@ -161,6 +161,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     answerTypesInstantList: LabelValuePair[];
 
     /**
+     * List of answers display orientations
+     */
+    answersDisplayInstantList: LabelValuePair[];
+
+    /**
      * Child question is in edit mode ?
      */
     childQuestionIsInEditMode: boolean = false;
@@ -262,17 +267,21 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // retrieve data
         Observable.forkJoin([
             this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.QUESTION_CATEGORY),
-            this.genericDataService.getAnswerTypesList()
+            this.genericDataService.getAnswerTypesList(),
+            this.genericDataService.getAnswersDisplayOrientationsList(),
         ]).subscribe(([
             questionCategoriesList,
-            answerTypesInstantList
+            answerTypesInstantList,
+            answersDisplayInstantList
         ]: [
             LabelValuePair[],
+            any[],
             any[]
         ]) => {
             // set edit options
             this.questionCategoriesInstantList = questionCategoriesList;
             this.answerTypesInstantList = answerTypesInstantList;
+            this.answersDisplayInstantList = answersDisplayInstantList;
 
             // questionnaire data
             this.route.data.subscribe((routeData: { questionnaire: OutbreakQestionnaireTypeEnum }) => {
@@ -808,11 +817,13 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             1
         );
 
-        // update questions order
+        // update questions answers order
+        const previousQuestionOrder: number = this.questionInEditModeClone.order;
         this.setQuestionnaireQuestionsOrder(
             [this.questionInEditModeClone],
             false
         );
+        this.questionInEditModeClone.order = previousQuestionOrder;
 
         // mark form as dirty
         this.markQuestionFormDirty();
@@ -1124,10 +1135,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                     this.questionInEditModeClone.answers.splice(answerIndex, 1);
 
                     // update order
+                    const previousQuestionOrder: number = this.questionInEditModeClone.order;
                     this.setQuestionnaireQuestionsOrder(
                         [this.questionInEditModeClone],
                         false
                     );
+                    this.questionInEditModeClone.order = previousQuestionOrder;
 
                     // mark form as dirty
                     this.markQuestionFormDirty();
@@ -1325,10 +1338,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                         this.questionInEditModeClone.answers.splice(this.questionAnswerIndexInEditMode, 1);
 
                         // update order
+                        const previousQuestionOrder: number = this.questionInEditModeClone.order;
                         this.setQuestionnaireQuestionsOrder(
                             [this.questionInEditModeClone],
                             false
                         );
+                        this.questionInEditModeClone.order = previousQuestionOrder;
 
                         // cancel answer edit
                         this.resetQuestionAnswerEditMode();
@@ -1486,10 +1501,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // NOTHING
 
         // set question order
+        const previousQuestionOrder: number = this.questionInEditModeClone.order;
         this.setQuestionnaireQuestionsOrder(
             [this.questionInEditModeClone],
             false
         );
+        this.questionInEditModeClone.order = previousQuestionOrder;
 
         // start modifying the new answer
         this.modifyAnswer(
@@ -1640,5 +1657,21 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 }
             }
         });
+    }
+
+    /**
+     * retrieve answer Value map
+     */
+    getCheckAnswerDuplicates(answers: AnswerModel[]): {
+        [answerValues: string]: number
+    } {
+        return _.transform(
+            answers,
+            (accumulator: {}, answer: AnswerModel, answerIndex: number) => {
+                if (!_.isEmpty(answer.value)) {
+                    accumulator[answer.value] = answerIndex;
+                }
+            },
+            {});
     }
 }

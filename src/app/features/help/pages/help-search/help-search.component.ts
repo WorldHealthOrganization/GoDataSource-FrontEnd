@@ -12,6 +12,9 @@ import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import * as _ from 'lodash';
 import { tap } from 'rxjs/operators';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-help-search',
@@ -20,10 +23,12 @@ import { tap } from 'rxjs/operators';
     styleUrls: ['./help-search.component.less']
 })
 export class HelpSearchComponent extends ListComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_GLOBAL_HELP_TITLE', '/help', true)
     ];
+
+    // authenticated user
+    authUser: UserModel;
 
     helpItemsList$: Observable<HelpItemModel[]>;
 
@@ -35,6 +40,7 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
     searchedTerm: string = '';
 
     constructor(
+        private authDataService: AuthDataService,
         private helpDataService: HelpDataService,
         protected snackbarService: SnackbarService,
         protected listFilterDataService: ListFilterDataService,
@@ -48,6 +54,9 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
     }
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList();
 
         // ...and re-load the list
@@ -105,6 +114,10 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
 
         // refresh list
         this.needsRefreshList();
+    }
+
+    hasHelpWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_HELP);
     }
 
 }

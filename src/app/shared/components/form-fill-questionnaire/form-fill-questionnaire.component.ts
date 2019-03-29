@@ -1,8 +1,8 @@
-import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, NgModel } from '@angular/forms';
 import * as _ from 'lodash';
-import { GroupBase } from '../../xt-forms/core';
-import { AnswerModel, QuestionModel } from '../../../core/models/question.model';
+import { GroupBase, GroupFilteredValue } from '../../xt-forms/core';
+import { AnswerModel, IAnswerData, QuestionModel } from '../../../core/models/question.model';
 import { Constants } from '../../../core/models/constants';
 import { FileItem, FileUploader } from 'ng2-file-upload';
 import { environment } from '../../../../environments/environment';
@@ -15,6 +15,8 @@ import { AttachmentModel } from '../../../core/models/attachment.model';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import * as FileSaver from 'file-saver';
+import { Moment } from 'moment';
+import * as moment from 'moment';
 
 interface UploaderData {
     uploader: FileUploader;
@@ -33,10 +35,26 @@ interface UploaderData {
         multi: true
     }]
 })
-export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnInit {
+export class FormFillQuestionnaireComponent extends GroupBase<{
+    [variable: string]: IAnswerData[]
+}> implements OnInit, GroupFilteredValue<any> {
     @Input() disabled: boolean = false;
 
     @Input() componentTitle: string;
+
+    private _parentDate: string | Moment;
+    @Input() set parentDate(parentDate: string | Moment) {
+        // set value
+        this._parentDate = parentDate;
+
+        // set dates to answers
+        setTimeout(() => {
+            this.initParentDates();
+        });
+    }
+    get parentDate(): string | Moment {
+        return this._parentDate;
+    }
 
     questionsGroupedByCategory: {
         category: string,
@@ -53,18 +71,45 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
     // import constants into template
     Constants = Constants;
 
-    @Input() displayCopyField: boolean = false;
-    @Input() displayCopyFieldDescription: string = '';
-    @Output() copyValue = new EventEmitter<string>();
-
+    /**
+     * Hide categories
+     */
     @Input() hideCategories: boolean = false;
+
+    /**
+     * Child Index Value
+     */
+    private _childValueIndex: number;
+    @Input() set childValueIndex(childValueIndex: number) {
+        // set the new child value index
+        this._childValueIndex = childValueIndex;
+
+        // init values
+        this.initValue();
+    }
+    get childValueIndex(): number {
+        return this._childValueIndex;
+    }
 
     /**
      * File uploader
      */
-    uploadersData: {
-        [questionVariable: string]: UploaderData
+    private _uploadersDataLocked: boolean = false;
+    private _uploadersData: {
+        [questionVariable: string]: UploaderData[]
     } = {};
+    @Input() set uploadersData(uploadersData: {
+        [questionVariable: string]: UploaderData[]
+    }) {
+        // set data & lock
+        this._uploadersData = uploadersData;
+        this._uploadersDataLocked = true;
+    }
+    get uploadersData(): {
+        [questionVariable: string]: UploaderData[]
+    } {
+        return this._uploadersData;
+    }
 
     /**
      * Outbreak
@@ -83,7 +128,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
         questions = _.sortBy(questions, 'order');
 
         // group them by category, keeping in mind the questions order
-        this.uploadersData = {};
+        this._uploadersData = this._uploadersDataLocked ? this.uploadersData : {};
         this.questionsGroupedByCategory = [];
         let currentCategory: {
             category: string,
@@ -100,15 +145,14 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
             // add file upload handler if necessary
             if (question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value) {
                 // create file uploader
-                this.uploadersData[question.variable] = {
-                    uploader: new FileUploader({}),
-                    attachment: null,
-                    uploading: false
-                };
+                if (!_.isArray(this.uploadersData[question.variable])) {
+                    this.uploadersData[question.variable] = [];
+                }
             }
 
             // map answers
             _.each(question.answers, (answer: AnswerModel) => {
+                // map additional questions
                 if (!_.isEmpty(answer.additionalQuestions)) {
                     // answer value should be unique
                     // can't use _.set since we can have dots & square brackets inside strings
@@ -140,6 +184,9 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
             // add question
             currentCategory.questions.push(question);
         });
+
+        // init value
+        this.initValue();
 
         // initialize uploader
         this.initializeUploader();
@@ -174,9 +221,6 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
         private dialogService: DialogService
     ) {
         super(controlContainer, validators, asyncValidators);
-
-        // initialize
-        this.value = this.value ? this.value : {};
     }
 
     /**
@@ -202,8 +246,101 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
         // write value
         super.writeValue(value);
 
-        // check if we have a file attachment saved
-        this.initializeAttachments();
+        // init value
+        this.initValue();
+
+        // init file uploader if needed
+        this.initializeUploader();
+
+        // check if we need to set parent dates to children as well
+        setTimeout(() => {
+            this.initParentDates();
+        });
+    }
+
+    /**
+     * Init values
+     */
+    initValue() {
+        // do we need to init value ?
+        if (!this.value) {
+            this.value = {};
+        }
+
+        // init first value for each question
+        _.each(this.questionsGroupedByCategory, (data: { questions: QuestionModel[] }) => {
+            _.each(data.questions, (question: QuestionModel) => {
+                // init array to keep answer responses
+                if (!_.isArray(this.value[question.variable])) {
+                    this.value[question.variable] = [];
+                }
+
+                // generate values if necessary
+                while (this.value[question.variable].length < (this.childValueIndex === undefined ? 1 : this.childValueIndex + 1)) {
+                    this.value[question.variable].push(this.generateNewAnswer(this.parentDate));
+                }
+            });
+        });
+    }
+
+    /**
+     * Set dates where needed
+     */
+    initParentDates() {
+        // nothing to do ?
+        // change only our question answers
+        // since this is called only for additional questions then we surely have childValueIndex
+        if (
+            !this.parentDate ||
+            this.childValueIndex === undefined
+        ) {
+            return;
+        }
+
+        // set date
+        const childDate: string = this.parentDate instanceof moment ?
+            (this.parentDate as Moment).format() :
+            (this.parentDate as string);
+        const setDates = (question: QuestionModel, childIndex: number) => {
+            const answer: IAnswerData = this.value[question.variable][childIndex];
+
+            // set child date
+            answer.date = childDate;
+
+            // recursive
+            if (
+                !_.isEmpty(question.answers) &&
+                !_.isEmpty(answer.value)
+            ) {
+                _.each(question.answers, (answerModel: AnswerModel) => {
+                    if (!_.isEmpty(answerModel.additionalQuestions)) {
+                        _.each(answerModel.additionalQuestions, (additionalQuestion: QuestionModel) => {
+                            _.each(
+                                _.isArray(answer.value) ? answer.value : [answer.value],
+                                (answerValue: string) => {
+                                    setDates(
+                                        additionalQuestion,
+                                        this.determineChildIndex(
+                                            additionalQuestion.variable,
+                                            childIndex,
+                                            answerValue
+                                        )
+                                    );
+                                }
+                            );
+                        });
+                    }
+                });
+            }
+        };
+
+        // go through categories
+        _.each(this.questionsGroupedByCategory, (data: { questions: QuestionModel[] }) => {
+            _.each(data.questions, (question: QuestionModel) => {
+                // set date
+                setDates(question, this.childValueIndex);
+            });
+        });
     }
 
     /**
@@ -220,13 +357,26 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
         }
 
         // initialize attachments
-        _.each(this.uploadersData, (uploaderData: UploaderData, questionVariable: string) => {
+        _.each(this.uploadersData, (uploadersData: UploaderData[], questionVariable: string) => {
             if (this.value[questionVariable]) {
-                this.attachmentDataService
-                    .getAttachment(this.selectedOutbreak.id, this.value[questionVariable])
-                    .subscribe((attachment: AttachmentModel) => {
-                        uploaderData.attachment = attachment;
-                    });
+                // init uploaders data
+                _.each(this.value[questionVariable], (data: IAnswerData, index: number) => {
+                    // init uploader data
+                    const uploaderData = uploadersData[index];
+
+                    // retrieve uploader file
+                    if (
+                        !_.isEmpty(data.value) &&
+                        _.isEmpty(uploaderData.attachment)
+                    ) {
+                        // retrieve uploader file
+                        this.attachmentDataService
+                            .getAttachment(this.selectedOutbreak.id, data.value)
+                            .subscribe((attachment: AttachmentModel) => {
+                                uploaderData.attachment = attachment;
+                            });
+                    }
+                });
             }
         });
     }
@@ -244,94 +394,111 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
         }
 
         // initialize uploader
-        _.each(this.uploadersData, (uploaderData: UploaderData, questionVariable: string) => {
-            // configure options
-            uploaderData.uploader.setOptions({
-                authToken: this.authDataService.getAuthToken(),
-                url: `${environment.apiUrl}/outbreaks/${this.selectedOutbreak.id}/attachments`,
-                autoUpload: true
-            });
+        _.each(this.uploadersData, (uploadersData: UploaderData[], questionVariable: string) => {
+            if (this.value[questionVariable]) {
+                // init uploaders data
+                _.each(this.value[questionVariable], (answer: IAnswerData, index: number) => {
+                    // init only if necessary
+                    if (uploadersData.length > index) {
+                        return;
+                    }
 
-            // don't allow multiple files to be uploaded
-            // we could set queueLimit to 1, but we won't be able to replace the file that way
-            uploaderData.uploader.onAfterAddingFile = () => {
-                // check if we need to replace existing item
-                if (uploaderData.uploader.queue.length > 1) {
-                    // remove old item
-                    uploaderData.uploader.removeFromQueue(uploaderData.uploader.queue[0]);
-                }
+                    // init uploader data
+                    const uploaderData = {
+                        uploader: new FileUploader({}),
+                        attachment: null,
+                        uploading: false
+                    };
 
-                // set name property
-                uploaderData.uploader.options.additionalParameter = {
-                    name: uploaderData.uploader.queue[0].file.name
-                };
-            };
+                    // add it to teh list
+                    uploadersData.push(uploaderData);
 
-            // handle server errors
-            uploaderData.uploader.onErrorItem = () => {
-                // display error
-                this.snackbarService.showError('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
+                    // configure options
+                    uploaderData.uploader.setOptions({
+                        authToken: this.authDataService.getAuthToken(),
+                        url: `${environment.apiUrl}/outbreaks/${this.selectedOutbreak.id}/attachments`,
+                        autoUpload: true
+                    });
 
-                // reset uploading flag
-                uploaderData.uploading = false;
-            };
+                    // don't allow multiple files to be uploaded
+                    // we could set queueLimit to 1, but we won't be able to replace the file that way
+                    uploaderData.uploader.onAfterAddingFile = () => {
+                        // check if we need to replace existing item
+                        if (uploaderData.uploader.queue.length > 1) {
+                            // remove old item
+                            uploaderData.uploader.removeFromQueue(uploaderData.uploader.queue[0]);
+                        }
 
-            // handle errors when trying to upload files
-            uploaderData.uploader.onWhenAddingFileFailed = () => {
-                // display error
-                this.snackbarService.showError('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
-            };
+                        // set name property
+                        uploaderData.uploader.options.additionalParameter = {
+                            name: uploaderData.uploader.queue[0].file.name
+                        };
+                    };
 
-            // progress handle
-            uploaderData.uploader.onBeforeUploadItem = () => {
-                // started uploading
-                uploaderData.uploading = true;
+                    // handle server errors
+                    uploaderData.uploader.onErrorItem = () => {
+                        // display error
+                        this.snackbarService.showError('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
 
-                // make invalid for required files
-                this.value[questionVariable] = '';
-            };
+                        // reset uploading flag
+                        uploaderData.uploading = false;
+                    };
 
-            // everything went smoothly ?
-            uploaderData.uploader.onCompleteItem = (item: FileItem, response: string, status: number) => {
-                // finished uploading
-                uploaderData.uploading = false;
+                    // handle errors when trying to upload files
+                    uploaderData.uploader.onWhenAddingFileFailed = () => {
+                        // display error
+                        this.snackbarService.showError('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
+                    };
 
-                // an error occurred ?
-                if (status !== 200) {
-                    return;
-                }
+                    // progress handle
+                    uploaderData.uploader.onBeforeUploadItem = () => {
+                        // started uploading
+                        uploaderData.uploading = true;
 
-                // we should get a ImportableFileModel object
-                let jsonResponse;
-                try { jsonResponse = JSON.parse(response); } catch {}
-                if (
-                    !response ||
-                    !jsonResponse
-                ) {
-                    this.snackbarService.showError('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
-                    return;
-                }
+                        // make invalid for required files
+                        this.value[questionVariable][index].value = '';
+                    };
 
-                // set file upload done
-                // closure not needed ..!?
-                uploaderData.attachment = jsonResponse;
-                this.value[questionVariable] = jsonResponse.id;
-                this.onChange();
-            };
+                    // everything went smoothly ?
+                    uploaderData.uploader.onCompleteItem = (item: FileItem, response: string, status: number) => {
+                        // finished uploading
+                        uploaderData.uploading = false;
+
+                        // an error occurred ?
+                        if (status !== 200) {
+                            return;
+                        }
+
+                        // we should get a ImportableFileModel object
+                        let jsonResponse;
+                        try {
+                            jsonResponse = JSON.parse(response);
+                        } catch {
+                        }
+                        if (
+                            !response ||
+                            !jsonResponse
+                        ) {
+                            this.snackbarService.showError('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
+                            return;
+                        }
+
+                        // set file upload done
+                        // closure not needed ..!?
+                        uploaderData.attachment = jsonResponse;
+                        this.value[questionVariable][index].value = jsonResponse.id;
+                        setTimeout(() => {
+                            this.onChange();
+                        });
+                    };
+                });
+            }
         });
 
         // check if we have a file attachment saved
         if (this.value) {
             this.initializeAttachments();
         }
-    }
-
-    /**
-     * Copy value
-     * @param property
-     */
-    triggerCopyValue(property) {
-        this.copyValue.emit(property);
     }
 
     /**
@@ -392,27 +559,27 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
 
     /**
      * Download attachment
-     * @param questionVariable
      */
-    downloadAttachment(questionVariable: string) {
+    downloadAttachment(
+        questionVariable: string,
+        index: number
+    ) {
         this.attachmentDataService
-            .downloadAttachment(this.selectedOutbreak.id, this.value[questionVariable])
+            .downloadAttachment(this.selectedOutbreak.id, this.value[questionVariable][index].value)
             .subscribe((blob) => {
                 FileSaver.saveAs(
                     blob,
-                    this.uploadersData[questionVariable].attachment.name
+                    this.uploadersData[questionVariable][index].attachment.name
                 );
             });
     }
 
     /**
      * Remove attachment
-     * @param questionVariable
-     * @param importDataBtn
-     * @param fileHiddenInput
      */
     removeAttachment(
         questionVariable: string,
+        index: number,
         importDataBtn,
         fileHiddenInput: NgModel
     ) {
@@ -420,8 +587,8 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REMOVE_ATTACHMENT')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
-                    delete this.value[questionVariable];
-                    this.uploadersData[questionVariable].uploader.clearQueue();
+                    this.value[questionVariable][index].value = undefined;
+                    this.uploadersData[questionVariable][index].uploader.clearQueue();
                     importDataBtn.value = '';
 
                     // touch control
@@ -442,5 +609,347 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
 
         // trigger open file
         importDataBtn.click();
+    }
+
+    /**
+     * Update answer date
+     */
+    changedAnswerDate(
+        answerData: IAnswerData,
+        value: string | Moment
+    ) {
+        // set date
+        answerData.date = value instanceof moment ?
+            (value as Moment).format() :
+            (value as string);
+
+        // trigger parent on change
+        this.onChange();
+    }
+
+    /**
+     * generate new answer
+     */
+    private generateNewAnswer(parentDate: Moment | string): IAnswerData {
+        // determine if we have parent date
+        const childDate: string = parentDate instanceof moment ?
+            (parentDate as Moment).format() :
+            (parentDate as string);
+
+        // set date
+        return {
+            value: undefined,
+            date: childDate
+        };
+    }
+
+    /**
+     * Add multi answer
+     */
+    addMultiAnswer(variable: string) {
+        // create new response
+        this.value[variable].push(this.generateNewAnswer(undefined));
+
+        // might cause an impact issue
+        // force redraw so we can fix a binding issue
+        // old bind object remained bind by angular which was causing issues ( add 3 items, set date to item 1 and item 2, remove item 1
+        // add new item which is the new item 2, change item 1 or item 2 date, you will see that both are bind to the same object )
+        // the same applies for value
+        this.value[variable] = _.cloneDeep(this.value[variable]);
+
+        // init file uploader if needed
+        this.initializeUploader();
+
+        // form changed
+        this.onChange();
+    }
+
+    // handle child remove recursive
+    private removeChildAnswers(
+        additionalQuestions: any,
+        curParentValues: string[] | string,
+        curQuestionVariable: string,
+        curAnswerDataIndex: number
+    ) {
+        // nothing to do here ?
+        if (
+            _.isEmpty(additionalQuestions) ||
+            _.isEmpty(additionalQuestions[curQuestionVariable])
+        ) {
+            return;
+        }
+
+        // make sure we have an array of answer since we have one for multi and we need to handle single answers a s well
+        curParentValues = _.isArray(curParentValues) ? curParentValues : [curParentValues] as string[];
+
+        // go through each answer and check if we have additional questions
+        _.each(
+            curParentValues,
+            (answerValue: string) => {
+                // check children questions
+                const questions: QuestionModel[] = additionalQuestions[curQuestionVariable][answerValue];
+                if (!_.isEmpty(questions)) {
+                    // determine child index that we need to remove
+                    const childIndex: number = this.determineChildIndex(curQuestionVariable, curAnswerDataIndex, answerValue);
+
+                    // check children questions if we need to remove answers
+                    _.each(
+                        questions,
+                        (question: QuestionModel) => {
+                            // delete child value
+                            if (
+                                this.value[question.variable] &&
+                                this.value[question.variable].length > childIndex
+                            ) {
+                                // construct additional questions
+                                const tempAdditionalQuestions = {
+                                    [question.variable]: {}
+                                };
+
+                                // map answers
+                                _.each(question.answers, (answerModel: AnswerModel) => {
+                                    if (!_.isEmpty(answerModel.additionalQuestions)) {
+                                        if (!tempAdditionalQuestions[question.variable]) {
+                                            tempAdditionalQuestions[question.variable] = {};
+                                        }
+                                        tempAdditionalQuestions[question.variable][answerModel.value] = answerModel.additionalQuestions;
+                                    }
+                                });
+
+                                // recursive check for questions
+                                if (!_.isEmpty(tempAdditionalQuestions[question.variable])) {
+                                    this.removeChildAnswers(
+                                        tempAdditionalQuestions,
+                                        this.value[question.variable][childIndex].value,
+                                        question.variable,
+                                        childIndex
+                                    );
+                                }
+
+                                // remove parent
+                                this.value[question.variable].splice(childIndex, 1);
+
+                                // remove uploaded data if we have one
+                                if (this.uploadersData[question.variable]) {
+                                    this.uploadersData[question.variable].splice(childIndex, 1);
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+        );
+    }
+
+    /**
+     * Remove multi answer
+     */
+    removeMultiAnswer(
+        questionVariable: string,
+        answerDataIndex: number
+    ) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REMOVE_MULTI_ANSWER')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // remove child answers
+                    this.removeChildAnswers(
+                        this.additionalQuestions,
+                        this.value[questionVariable][answerDataIndex].value,
+                        questionVariable,
+                        answerDataIndex
+                    );
+
+                    // remove answer parent
+                    this.value[questionVariable].splice(answerDataIndex, 1);
+
+                    // remove file uploader if this is the case
+                    if (this.uploadersData[questionVariable]) {
+                        this.uploadersData[questionVariable].splice(answerDataIndex, 1);
+                    }
+
+                    // form changed
+                    this.onChange();
+                }
+            });
+    }
+
+    /**
+     * Get Filtered Value
+     */
+    getFilteredValue(): any {
+        // strip unnecessary data
+        return !this.value ?
+            this.value :
+            _.transform(
+                _.cloneDeep(this.value),
+                (accumulator, answers: IAnswerData[], variable: string) => {
+                    // clean answers
+                    answers = _.filter(
+                        answers,
+                        (answer: IAnswerData) => !_.isEmpty(answer.value) || _.isNumber(answer.value)
+                    );
+
+                    // add only if we still have answers for this variable
+                    if (!_.isEmpty(answers)) {
+                        accumulator[variable] = answers;
+                    }
+                },
+                {}
+            );
+    }
+
+    /**
+     * Determine child index to know which value we should display...
+     */
+    determineChildIndex(
+        variable: string,
+        answerDataIndex: number,
+        answerValue: string
+    ): number {
+        // determine index
+        let index: number = 0;
+        _.each(
+            this.value[variable],
+            (answerData: IAnswerData, answerIndex: number) => {
+                // determine if this is our answer
+                if (answerIndex >= answerDataIndex) {
+                    // stop
+                    return false;
+                }
+
+                // count same answers
+                if (_.isArray(answerData.value) ?
+                    (answerData.value as string[]).includes(answerValue) :
+                    (answerData.value === answerValue)
+                ) {
+                    index++;
+                }
+            }
+        );
+
+        // finished
+        return index;
+    }
+
+    /**
+     * Insert child answers if needed
+     */
+    insertChildAnswers(
+        additionalQuestions: any,
+        curParentValues: string[] | string,
+        curQuestionVariable: string,
+        curAnswerDataIndex: number
+    ) {
+        // nothing to do here ?
+        if (
+            _.isEmpty(additionalQuestions) ||
+            _.isEmpty(additionalQuestions[curQuestionVariable])
+        ) {
+            return;
+        }
+
+        // make sure we have an array of answer since we have one for multi and we need to handle single answers a s well
+        curParentValues = _.isArray(curParentValues) ? curParentValues : [curParentValues] as string[];
+        const curParentDate = this.value[curQuestionVariable][curAnswerDataIndex].date;
+
+        // go through each answer and check if we have additional questions
+        let maxDataIndex: number;
+        let curAnswerRealIndex: number;
+        _.each(
+            curParentValues,
+            (answerValue: string) => {
+                // only if we have additional questions we need to insert children
+                const questions: QuestionModel[] = additionalQuestions[curQuestionVariable][answerValue];
+                if (_.isEmpty(questions)) {
+                    return;
+                }
+
+                // determine max answer data index
+                maxDataIndex = -1;
+                curAnswerRealIndex = 0;
+                _.each(this.value[curQuestionVariable], (answer: IAnswerData, index: number) => {
+                    // check if our selected answer
+                    const values = _.isArray(answer.value) ? answer.value : [answer.value];
+                    if (values.includes(answerValue)) {
+                        maxDataIndex++;
+
+                        // determine real answer index
+                        if (index < curAnswerDataIndex) {
+                            curAnswerRealIndex++;
+                        }
+                    }
+                });
+
+                // do we need to insert answer ?
+                if (maxDataIndex >= curAnswerRealIndex) {
+                    // check children questions if we need to remove answers
+                    _.each(
+                        questions,
+                        (question: QuestionModel) => {
+                            // insert value
+                            this.value[question.variable].splice(
+                                curAnswerRealIndex,
+                                0,
+                                this.generateNewAnswer(curParentDate)
+                            );
+
+                            // create file uploader
+                            if (!_.isArray(this.uploadersData[question.variable])) {
+                                this.uploadersData[question.variable] = [];
+                            }
+
+                            // add file upload ?
+                            this.initializeUploader();
+
+                            // recursive isn't needed since we generate a new answer that is empty
+                            // NOTHING
+                        }
+                    );
+                }
+            }
+        );
+    }
+
+    /**
+     * Selected answer change => we might need to insert a new child value or delete one
+     */
+    selectedDropdownAnswer(
+        variable: string,
+        answerDataIndex: number,
+        newAnswer: AnswerModel | AnswerModel[]
+    ) {
+        // determine old & new values
+        const answerNewValue: string | string[] = newAnswer ?
+            _.isArray(newAnswer) ? (newAnswer as AnswerModel[]).map((a: AnswerModel) => a.value) : (newAnswer as AnswerModel).value :
+            undefined;
+        const answerOldValue: string | string[] = this.value[variable][answerDataIndex].value;
+
+        // determine if we need to remove child answers
+        this.removeChildAnswers(
+            this.additionalQuestions,
+            answerOldValue,
+            variable,
+            answerDataIndex
+        );
+
+        // remove uploaded data if we have one
+        if (this.uploadersData[variable]) {
+            this.uploadersData[variable].splice(answerDataIndex, 1);
+        }
+
+        // determine if we need to insert child answers
+        this.insertChildAnswers(
+            this.additionalQuestions,
+            answerNewValue,
+            variable,
+            answerDataIndex
+        );
+
+        // set the new value
+        this.value[variable][answerDataIndex].value = answerNewValue;
+
+        // finished
+        this.onChange();
     }
 }

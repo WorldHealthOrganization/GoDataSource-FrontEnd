@@ -263,6 +263,7 @@ export class SidenavComponent implements OnInit {
                     'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_COUNT_MAP_LABEL',
                     [
                         PERMISSION.READ_OUTBREAK,
+                        PERMISSION.READ_REPORT,
                         PERMISSION.READ_CASE
                     ],
                     '/transmission-chains/case-count-map',

@@ -123,6 +123,10 @@ export class TransmissionChainsGraphComponent implements OnInit {
             });
     }
 
+    hasCaseReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_CASE);
+    }
+
     hasCaseWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
     }

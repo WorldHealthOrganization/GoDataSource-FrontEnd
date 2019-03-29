@@ -21,7 +21,11 @@ const routes: Routes = [
     // Help categories list
     {
         path: 'categories',
-        component: fromPages.HelpCategoriesListComponent
+        component: fromPages.HelpCategoriesListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_HELP],
+        }
     },
     // Create Help Category
     {
@@ -61,7 +65,11 @@ const routes: Routes = [
     // Help categories list
     {
         path: 'categories/:categoryId/items',
-        component: fromPages.HelpItemsListComponent
+        component: fromPages.HelpItemsListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_HELP]
+        }
     },
     // Create Help Item
     {

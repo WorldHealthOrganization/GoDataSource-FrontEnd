@@ -6,6 +6,7 @@ import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { CaseCenterDateRangeModel } from './case-center-date-range.model';
 import * as moment from 'moment';
+import { IAnswerData } from './question.model';
 
 export class CaseModel {
     id: string;
@@ -27,7 +28,9 @@ export class CaseModel {
     safeBurial: boolean;
     dateOfBurial: string;
     dateRanges: CaseCenterDateRangeModel[];
-    questionnaireAnswers: {};
+    questionnaireAnswers: {
+        [variable: string]: IAnswerData[];
+    };
     type: EntityType = EntityType.CASE;
     dateOfReporting: string;
     dateOfLastContact: string;
