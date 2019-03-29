@@ -96,6 +96,13 @@
             {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate }}
         </div>
 
+        <!-- Answer Display -->
+        <div
+            fxFlex="200px"
+            class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
+            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY' | translate }}
+        </div>
+
         <!-- Inactive ? -->
         <div
             fxFlex="100px"
@@ -108,6 +115,14 @@
             fxFlex="100px"
             class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
             {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate }}
+        </div>
+
+        <!-- Multi answer ? -->
+        <div
+            *ngIf="!displayChangeButton"
+            fxFlex="120px"
+            class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
+            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER' | translate }}
         </div>
     </div>
 
@@ -170,6 +185,13 @@
                     {{ question.answerType | translate }}
                 </div>
 
+                <!-- Answers Display -->
+                <div
+                    fxFlex="200px"
+                    class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
+                    {{ question.answersDisplay | translate }}
+                </div>
+
                 <!-- Inactive ? -->
                 <div
                     fxFlex="100px"
@@ -182,6 +204,14 @@
                     fxFlex="100px"
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
                     {{ (question.required ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
+                </div>
+
+                <!-- Multi answer ? -->
+                <div
+                    *ngIf="!displayChangeButton"
+                    fxFlex="120px"
+                    class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
+                    {{ (question.multiAnswer ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
                 </div>
             </div>
 
@@ -308,6 +338,21 @@
                                 </app-form-select>
                             </div>
 
+                            <!-- question - answers display -->
+                            <div
+                                fxFlex="200px">
+                                <app-form-select
+                                    name="questionAnswersDisplay"
+                                    [(ngModel)]="questionInEditModeClone.answersDisplay"
+                                    [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY' | translate"
+                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY_DESCRIPTION"
+                                    [required]="true"
+                                    [clearable]="false"
+                                    [options]="answersDisplayInstantList"
+                                    [disabled]="questionAnswerIndexInEditMode !== null">
+                                </app-form-select>
+                            </div>
+
                             <!-- question inactive -->
                             <div
                                 fxFlex="150px">
@@ -315,7 +360,8 @@
                                     name="questionInactive"
                                     [(ngModel)]="questionInEditModeClone.inactive"
                                     [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE' | translate"
-                                    [required]="false">
+                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE_DESCRIPTION"
+                                    required="false">
                                 </app-form-slide-toggle>
                             </div>
 
@@ -326,7 +372,21 @@
                                     name="questionRequired"
                                     [(ngModel)]="questionInEditModeClone.required"
                                     [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate"
-                                    [required]="false">
+                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED_DESCRIPTION"
+                                    required="false">
+                                </app-form-slide-toggle>
+                            </div>
+
+                            <!-- question multi answer -->
+                            <div
+                                *ngIf="!displayChangeButton"
+                                fxFlex="150px">
+                                <app-form-slide-toggle
+                                    name="questionMultiAnswer"
+                                    [(ngModel)]="questionInEditModeClone.multiAnswer"
+                                    [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER' | translate"
+                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER_DESCRIPTION"
+                                    required="false">
                                 </app-form-slide-toggle>
                             </div>
                         </div>
@@ -562,7 +622,11 @@
                                                         [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE' | translate"
                                                         tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE_DESCRIPTION"
                                                         required="true"
-                                                        [disabled]="childQuestionIsInEditMode">
+                                                        [disabled]="childQuestionIsInEditMode"
+                                                        app-has-property-validator
+                                                        [checkObject]="getCheckAnswerDuplicates(questionInEditModeClone.answers)"
+                                                        checkErrorMsg="LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_ANSWER_VALUE"
+                                                        [checkCompareValue]="questionAnswerIndexInEditMode">
                                                     </app-form-input>
                                                 </div>
 
@@ -573,6 +637,7 @@
                                                         name="answerAdditionalQuestionsShow"
                                                         [(ngModel)]="questionAnswerInEditModeClone.additionalQuestionsShow"
                                                         [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS' | translate"
+                                                        tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS_DESCRIPTION"
                                                         required="false"
                                                         [disabled]="childQuestionIsInEditMode">
                                                     </app-form-slide-toggle>
@@ -585,6 +650,7 @@
                                                         name="answerAlert"
                                                         [(ngModel)]="questionAnswerInEditModeClone.alert"
                                                         [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT' | translate"
+                                                        tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT_DESCRIPTION"
                                                         required="false"
                                                         [disabled]="childQuestionIsInEditMode">
                                                     </app-form-slide-toggle>

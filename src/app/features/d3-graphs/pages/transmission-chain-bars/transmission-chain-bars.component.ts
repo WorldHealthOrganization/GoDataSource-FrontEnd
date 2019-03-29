@@ -14,6 +14,9 @@ import { Subscription } from 'rxjs/Subscription';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-transmission-chain-bars',
@@ -26,6 +29,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         new BreadcrumbItemModel('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE', null, true)
     ];
 
+    // authenticated user
+    authUser: UserModel;
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
     outbreakSubscriber: Subscription;
@@ -50,6 +55,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     @ViewChild('chart') chartContainer: ElementRef;
 
     constructor(
+        private authDataService: AuthDataService,
         private transmissionChainBarsService: TransmissionChainBarsService,
         private transmissionChainBarsDataService: TransmissionChainBarsDataService,
         private outbreakDataService: OutbreakDataService,
@@ -61,6 +67,9 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        // authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
@@ -284,5 +293,9 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
 
         // rebuild graph
         this.loadGraph();
+    }
+
+    hasCaseReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_CASE);
     }
 }

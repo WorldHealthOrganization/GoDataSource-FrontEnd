@@ -102,10 +102,22 @@
                 [options]="savedMappingsList$ | async "
                 (optionChanged)="loadSavedImportMapping($event)"
                 optionLabelKey="name"
-                optionValueKey="id">
+                optionValueKey="id"
+                [clearable]="false">
             </app-form-select>
 
-            <div fxFlex><!-- placeholder --></div>
+            <div
+                fxFlex
+                class="reset-import-mapping-container">
+                <button
+                    (click)="resetImportMapping()"
+                    type="button"
+                    mat-raised-button
+                    color="accent">
+                    {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_RESET_IMPORT_MAPPING' | translate }}
+                </button>
+            </div>
+
             <div fxFlex><!-- placeholder --></div>
             <div fxFlex><!-- placeholder --></div>
         </div>

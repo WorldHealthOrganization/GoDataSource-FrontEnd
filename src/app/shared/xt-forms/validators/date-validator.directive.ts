@@ -111,6 +111,11 @@ export class DateValidatorDirective implements Validator {
                     compareItem = compare as DateValidatorFieldComparator;
                 }
 
+                // if compare is empty, then we can't validate
+                if (_.isEmpty(compareItem)) {
+                    return;
+                }
+
                 // retrieve date from brother control
                 // & label if necessary
                 let compareWithDate: Moment;
