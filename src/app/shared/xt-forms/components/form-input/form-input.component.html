@@ -38,6 +38,13 @@
             help
         </span>
 
+        <span
+            *ngIf="refresh"
+            class=""
+            >
+            refresh
+        </span>
+
         <span *ngIf="type === 'password'" [matTooltip]="" class="xt-icon form-password-icon" (click)="togglePasswordDisplay()">visibility</span>
         <span *ngIf="tempTypeOverwritten === 'password'" [matTooltip]="" class="xt-icon form-password-icon" (click)="togglePasswordDisplay()">visibilityOf</span>
 
