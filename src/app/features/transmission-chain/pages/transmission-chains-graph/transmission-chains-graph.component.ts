@@ -31,10 +31,12 @@ import { UserModel } from '../../../../core/models/user.model';
 import * as FileSaver from 'file-saver';
 import { DomService } from '../../../../core/services/helper/dom.service';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
+import * as _ from 'lodash';
 
 enum NodeAction {
     MODIFY_PERSON = 'modify-person',
-    CREATE_CONTACT = 'create-contact'
+    CREATE_CONTACT = 'create-contact',
+    MODIFY_EDGE = 'modify-edge'
 }
 
 @Component({
@@ -64,6 +66,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
     // nodes selected from graph
     selectedNodes: SelectedNodes = new SelectedNodes();
+    // selected relationship
+    selectedRelationship: RelationshipModel;
     // action to do on the selected node
     currentNodeAction: NodeAction = null;
 
@@ -258,6 +262,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 loadingDialog.close();
 
                 if (this.editMode) {
+                    this.selectedRelationship = undefined;
                     // add node to selected persons list
                     this.selectedNodes.addNode(entityData);
 
@@ -298,23 +303,40 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 // hide loading dialog
                 loadingDialog.close();
 
-                // show edge information
-                this.dialogService.showCustomDialog(
-                    ViewCotEdgeDialogComponent,
-                    {
-                        ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
-                        ...{
-                            data: {
-                                relationship: relationshipData
+                if (this.editMode) {
+                    this.resetNodes();
+
+                    this.selectedRelationship = relationshipData;
+
+                    // focus box
+                    setTimeout(() => {
+                        this.domService.scrollItemIntoView(
+                            '.selected-relationship-details'
+                        );
+                    });
+                } else {
+                    // show edge information
+                    this.dialogService.showCustomDialog(
+                        ViewCotEdgeDialogComponent,
+                        {
+                            ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+                            ...{
+                                data: {
+                                    relationship: relationshipData
+                                }
                             }
                         }
-                    }
-                );
+                    );
+                }
             });
     }
 
     removeSelectedNode(index) {
         this.selectedNodes.removeNodeAtIndex(index);
+    }
+
+    removeRelationship() {
+        this.selectedRelationship = undefined;
     }
 
     swapSelectedNodes() {
@@ -332,6 +354,10 @@ export class TransmissionChainsGraphComponent implements OnInit {
         this.resetFormModels();
 
         this.currentNodeAction = NodeAction.MODIFY_PERSON;
+    }
+
+    modifySelectedRelationship() {
+        this.currentNodeAction = NodeAction.MODIFY_EDGE;
     }
 
     createContactForSelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
@@ -537,6 +563,90 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
                 // reset node action
                 this.currentNodeAction = null;
+            });
+    }
+
+    /**
+     * Modify a selected relationship relationship
+     * @param {NgForm} form
+     */
+    modifyRelationship(form: NgForm) {
+        if (!this.formHelper.validateForm(form)) {
+            return;
+        }
+
+        // get forms fields
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+        // create source person
+        const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
+        this.relationshipDataService
+            .modifyRelationship(
+                this.selectedOutbreak.id,
+                sourcePerson.type,
+                sourcePerson.id,
+                this.selectedRelationship.id,
+                dirtyFields.relationship
+            )
+            .catch((err) => {
+                this.snackbarService.showApiError(err);
+
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
+
+                // refresh graph
+                this.cotDashletChild.refreshChain();
+
+                // reset selected relationship
+                this.selectedRelationship = undefined;
+
+                // reset form
+                this.resetFormModels();
+
+                // reset selected nodes
+                this.resetNodes();
+
+                // reset node action
+                this.currentNodeAction = null;
+            });
+    }
+
+    /**
+     * Delete selected relationship
+     */
+    deleteSelectedRelationship() {
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP_CHAIN_OF_TRANSMISSION')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
+                    // delete relationship
+                    this.relationshipDataService
+                        .deleteRelationship(this.selectedOutbreak.id, sourcePerson.type, sourcePerson.id, this.selectedRelationship.id)
+                        .catch((err) => {
+                            this.snackbarService.showApiError(err);
+
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
+
+                            // refresh graph
+                            this.cotDashletChild.refreshChain();
+
+                            // reset selected relationship
+                            this.selectedRelationship = undefined;
+
+                            // reset form
+                            this.resetFormModels();
+
+                            // reset selected nodes
+                            this.resetNodes();
+
+                            // reset node action
+                            this.currentNodeAction = null;
+                        });
+                }
             });
     }
 }

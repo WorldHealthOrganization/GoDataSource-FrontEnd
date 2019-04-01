@@ -16,6 +16,7 @@ import { LabelValuePair } from '../../models/label-value-pair';
 import * as moment from 'moment';
 import { Constants } from '../../models/constants';
 import { I18nService } from '../helper/i18n.service';
+import { RelationshipModel } from '../../models/relationship.model';
 
 @Injectable()
 export class EntityDataService {

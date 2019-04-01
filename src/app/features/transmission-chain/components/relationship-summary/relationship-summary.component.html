@@ -1,0 +1,51 @@
+<div fxLayout="column" fxLayoutGap="20px">
+
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+        <span class="relationship-type">{{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RELATIONSHIP_SUMMARY_TITLE' | translate }}</span>
+
+        <span class="xt-icon" (click)="onRemove()">close</span>
+    </div>
+
+    <div class="relationship-summary-wrapper">
+        <div fxLayout="column" fxLayoutGap="10px">
+            <div
+                *ngFor="let data of relationshipData"
+                fxLayout="row" fxLayoutGap="10px"
+            >
+                <span class="label">{{data.label | translate}}:</span>
+                <span class="value">{{data.value | translate}}</span>
+            </div>
+        </div>
+    </div>
+
+    <div fxLayout="column" fxLayoutGap="10px">
+        <div
+            *ngIf="hasCaseWriteAccess() || hasContactWriteAccess()"
+            fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
+            <a
+                mat-raised-button
+                color="accent"
+                (click)="onModifyRelationship()">
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP' | translate}}
+            </a>
+
+            <a
+                mat-raised-button
+                color="warn"
+                (click)="onDeleteRelationship()">
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_RELATIONSHIP' | translate}}
+            </a>
+        </div>
+
+        <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
+            <a
+                [href]="relationshipLink"
+                target="_blank"
+                mat-raised-button
+                color="primary"
+            >
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_RELATIONSHIP' | translate}}
+            </a>
+        </div>
+    </div>
+</div>

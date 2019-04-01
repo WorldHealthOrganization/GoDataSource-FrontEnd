@@ -76,6 +76,21 @@
         </mat-card>
     </div>
 
+    <div
+        *ngIf="selectedRelationship"
+        class="selected-relationship-details"
+        fxFlex="400px"
+        fxLayout="column">
+        <mat-card class="page-section">
+            <app-relationship-summary
+                [relationship]="selectedRelationship"
+                (remove)="removeRelationship()"
+                (modifyRelationship)="modifySelectedRelationship($event)"
+                (deleteRelationship)="deleteSelectedRelationship($event)">
+            </app-relationship-summary>
+        </mat-card>
+    </div>
+
     <!-- Create relationship between 2 nodes -->
     <mat-card
         *ngIf="selectedNodes.canCreateRelationship && hasCaseWriteAccess()"
@@ -147,6 +162,28 @@
                 name="person"
                 [ngModel]="selectedNodes.nodes[0]"
             ></app-form-event-quick>
+
+            <div fxLayout="row">
+                <button mat-raised-button color="accent" type="submit">
+                    {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+                </button>
+            </div>
+        </form>
+    </mat-card>
+
+    <!--Modify Relationship-->
+    <mat-card
+        *ngIf="selectedRelationship && currentNodeAction === NodeAction.MODIFY_EDGE"
+        class="page-section quick-action modify-person"
+        fxFlex>
+
+        <form #form="ngForm" (submit)="modifyRelationship(form)">
+            <app-form-relationship-quick
+                name="relationship"
+                [ngModel]="selectedRelationship"
+                required="true"
+            >
+            </app-form-relationship-quick>
 
             <div fxLayout="row">
                 <button mat-raised-button color="accent" type="submit">

@@ -98,6 +98,12 @@ export const EnglishUsLang = {
          * uiChainsOfTransmissionGraph
          */
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE': 'Icon',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RELATIONSHIP_SUMMARY_TITLE': 'Relationship',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship modified',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP': 'Edit ',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_RELATIONSHIP': 'Delete ',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_RELATIONSHIP': 'View Resource',
+
 
         /**
          * NEW GROUP
@@ -159,6 +165,7 @@ export const EnglishUsLang = {
          */
         'LNG_DIALOG_CONFIRM_DELETE_CASE_WITH_EXPOSED_CONTACTS': 'Case: "{{name}}" has {{numberOfContacts}} exposed contacts that will be deleted. Are you sure you want to delete this case?',
         'LNG_DIALOG_CONFIRM_REMOVE_MULTI_ANSWER': 'Are you sure you want to remove this answer?',
+        'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP_CHAIN_OF_TRANSMISSION': 'Are you sure you want to delete this relationship?',
 
         /**
          * uiChronologyContactPage
@@ -173,7 +180,12 @@ export const EnglishUsLang = {
         /**
          * uiImportData
          */
-        'LNG_PAGE_IMPORT_DATA_BUTTON_RESET_IMPORT_MAPPING' : 'Reset import mapping'
+        'LNG_PAGE_IMPORT_DATA_BUTTON_RESET_IMPORT_MAPPING' : 'Reset import mapping',
+
+        /**
+         * uiReferenceDataCategoryFields
+         */
+        'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_RELATIONSHIP': 'Relationship'
 
         /**
          * REMOVE the tokens from below
