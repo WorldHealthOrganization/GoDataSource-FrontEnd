@@ -280,9 +280,14 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                             this.caseData.visualId,
                             this.caseData.id
                         ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                            const resp = isValid as IGeneralAsyncValidatorResponse;
+                            if (resp.errMsg) {
+                                this.couldGenerateVisualId = !resp.isValid;
+                            } else {
+                                this.couldGenerateVisualId = !isValid;
+                            }
                             observer.next(isValid);
                             console.log(isValid);
-                            this.couldGenerateVisualId = !isValid;
                             observer.complete();
                         });
                     });
@@ -475,17 +480,23 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         ];
     }
 
-    generateVisualIdForFormerContact(form: NgForm) {
-        return this.caseDataService.generateCaseVisualID(this.selectedOutbreak.id, this.selectedOutbreak.caseIdMask, this.caseData.id )
+    /**
+     * Generate visual ID for former contacts if they don't match the mask
+     * @param {NgForm} form
+     * @returns {Subscription}
+     */
+    generateVisualIdForFormerContact() {
+        return this.caseDataService.generateCaseVisualID(
+            this.selectedOutbreak.id,
+            this.selectedOutbreak.caseIdMask,
+            this.caseData.id )
             .catch((err) => {
-                console.log(err);
                 this.snackbarService.showApiError(err);
                 return ErrorObservable.create(err);
             })
             .subscribe((data) => {
-                console.log(data);
                 this.caseData.visualId = data;
-                form.form.markAsDirty();
+                this.couldGenerateVisualId = false;
             });
     }
 }

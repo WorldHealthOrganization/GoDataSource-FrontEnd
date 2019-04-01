@@ -59,7 +59,6 @@
                                 fxFlex fxLayout="row" fxLayoutGap="20px">
                                 <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
                                 <!-- [maxlength]="255" -->
-                                <div fxLayout="row" fxLayoutGap="20px">
                                     <app-form-input
                                         name="visualId"
                                         #visualId
@@ -73,13 +72,16 @@
                                         [asyncValidatorObservable]="caseIdMaskValidator">
                                     </app-form-input>
 
-                                    <button
-                                        mat-raised-button type="button"
-                                        (click)="generateVisualIdForFormerContact(form); visualId.control.markAsDirty()"
-                                        [disabled]="couldGenerateVisualId">
-                                        Generate Case ID
-                                    </button>
-                                </div>
+                                    <div class="generate-case-id-button-container" *ngIf="couldGenerateVisualId">
+                                        <button
+                                            fxFlex
+                                            mat-raised-button
+                                            type="button"
+                                            color="primary"
+                                            (click)="generateVisualIdForFormerContact(form); visualId.control.markAsDirty()">
+                                            Generate Case ID
+                                        </button>
+                                    </div>
 
                                 <app-form-select
                                     name="occupation"
