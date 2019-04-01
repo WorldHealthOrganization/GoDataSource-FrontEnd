@@ -46,20 +46,12 @@ export class SystemSettingsDataService {
      * @param apiUrl
      */
     getAPIVersion(
-        apiUrl: string
+        apiUrl: string = ''
     ): Observable<SystemSettingsVersionModel> {
         return this.modelHelper.mapObservableToModel(
             this.http.get(`${apiUrl}/system-settings/version`),
             SystemSettingsVersionModel
         );
-    }
-
-    /**
-     * Retrieve version number
-     * @returns {Observable<Object>}
-     */
-    getVersionNumber() {
-        return this.http.get('/system-settings/version');
     }
 }
 

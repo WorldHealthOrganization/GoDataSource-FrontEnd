@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 
 @Component({
     selector: 'app-version',
@@ -14,7 +15,7 @@ export class VersionComponent implements OnInit {
         new BreadcrumbItemModel('LNG_PAGE_VERSION_TITLE', '.')
     ];
 
-    version: string = '';
+    versionData: SystemSettingsVersionModel;
 
     constructor(
         private systemSettingsDataService: SystemSettingsDataService
@@ -22,9 +23,10 @@ export class VersionComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.systemSettingsDataService.getVersionNumber()
-            .subscribe((versionData: { version: string }) => {
-                this.version = versionData.version;
+        this.systemSettingsDataService
+            .getAPIVersion()
+            .subscribe((versionData) => {
+                this.versionData = versionData;
             });
     }
 

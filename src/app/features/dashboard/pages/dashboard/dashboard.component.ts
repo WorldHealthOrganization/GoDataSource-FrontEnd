@@ -23,6 +23,8 @@ import { LoadingDialogModel } from '../../../../shared/components';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Constants } from '../../../../core/models/constants';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -122,7 +124,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService,
         private genericDataService: GenericDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        protected snackbarService: SnackbarService
     ) {}
 
     ngOnInit() {
@@ -313,7 +316,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.domService
             .getPNGBase64('app-epi-curve-dashlet svg', '#tempCanvas')
             .subscribe((pngBase64) => {
-                this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
+                this.importExportDataService
+                    .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
+                    .catch((err) => {
+                        this.snackbarService.showApiError(err);
+                        this.closeLoadingDialog();
+                        return ErrorObservable.create(err);
+                    })
                     .subscribe((blob) => {
                         this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
                     });
@@ -329,7 +338,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
             .then((dataUrl) => {
                 const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
 
-                this.importExportDataService.exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
+                this.importExportDataService
+                    .exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
+                    .catch((err) => {
+                        this.snackbarService.showApiError(err);
+                        this.closeLoadingDialog();
+                        return ErrorObservable.create(err);
+                    })
                     .subscribe((blob) => {
                         this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL');
                     });

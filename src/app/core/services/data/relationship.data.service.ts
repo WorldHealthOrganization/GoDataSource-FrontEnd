@@ -13,6 +13,7 @@ import { ReportCasesWithOnsetModel } from '../../models/report-cases-with-onset.
 import { LabelValuePair } from '../../models/label-value-pair';
 import { Constants } from '../../models/constants';
 import * as moment from 'moment';
+import * as _ from 'lodash';
 import { EntityModel } from '../../models/entity.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
 
@@ -369,6 +370,20 @@ export class RelationshipDataService {
     ): LabelValuePair[] {
 
         const lightObject = [];
+
+        const sourcePerson = _.find(relationship.persons, person => person.source === true);
+        const sourcePeople = _.find(relationship.people, people => people.model.id === sourcePerson.id);
+        const destinationPeople = _.find(relationship.people, people => people.model.id !== sourcePerson.id);
+
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_SOURCE',
+            sourcePeople.model.name
+        ));
+
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_TARGET',
+            destinationPeople.model.name
+        ));
 
         // dialog fields
         lightObject.push(new LabelValuePair(

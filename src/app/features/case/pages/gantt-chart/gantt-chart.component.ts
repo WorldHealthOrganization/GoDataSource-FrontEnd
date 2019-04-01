@@ -17,6 +17,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { Observable } from 'rxjs';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Constants } from '../../../../core/models/constants';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 @Component({
     selector: 'app-gantt-chart',
@@ -125,7 +126,13 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
             this.domService
                 .getPNGBase64(ganttChartName, '#tempCanvas')
                 .subscribe((pngBase64) => {
-                    this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
+                    this.importExportDataService
+                        .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
+                        .catch((err) => {
+                            this.snackbarService.showApiError(err);
+                            this.closeLoadingDialog();
+                            return ErrorObservable.create(err);
+                        })
                         .subscribe((blob) => {
                             this.downloadFile(blob, 'LNG_PAGE_GANTT_CHART_REPORT_LABEL');
                             this.closeLoadingDialog();

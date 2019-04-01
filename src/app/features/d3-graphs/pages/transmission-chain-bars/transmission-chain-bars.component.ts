@@ -12,6 +12,8 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -60,6 +62,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         private dialogService: DialogService,
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService,
+        protected snackbarService: SnackbarService
     ) {
     }
 
@@ -133,7 +136,13 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
             .then((dataUrl) => {
                 const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
 
-                this.importExportDataService.exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
+                this.importExportDataService
+                    .exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
+                    .catch((err) => {
+                        this.snackbarService.showApiError(err);
+                        this.closeLoadingDialog();
+                        return ErrorObservable.create(err);
+                    })
                     .subscribe((blob) => {
                         const fileName = this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE');
                         FileSaver.saveAs(

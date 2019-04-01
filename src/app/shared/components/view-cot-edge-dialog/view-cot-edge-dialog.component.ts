@@ -57,7 +57,7 @@ export class ViewCotEdgeDialogComponent {
         const sourcePerson = this.relationship.sourcePerson;
 
         if (sourcePerson) {
-            return `/relationships/${sourcePerson.type}/${sourcePerson.id}/${this.relationship.id}/view`;
+            return `/relationships/${sourcePerson.type}/${sourcePerson.id}/contacts/${this.relationship.id}/view`;
         }
 
         return null;
