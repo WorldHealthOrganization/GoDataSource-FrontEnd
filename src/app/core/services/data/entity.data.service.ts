@@ -157,7 +157,7 @@ export class EntityDataService {
      * @returns {LabelValuePair[]}
      */
     getLightObjectDisplay(
-        entity: CaseModel | EventModel | ContactModel | RelationshipModel
+        entity: CaseModel | EventModel | ContactModel
     ): LabelValuePair[] {
 
         const lightObject = [];
