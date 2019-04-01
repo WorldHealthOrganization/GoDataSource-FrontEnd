@@ -26,7 +26,6 @@ import { Constants } from '../../../core/models/constants';
 export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel> implements OnInit, AfterViewInit, GroupDirtyFields {
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
-    @Input() newRelationship: boolean = true;
 
     certaintyLevelOptions$: Observable<any[]>;
     exposureTypeOptions$: Observable<any[]>;

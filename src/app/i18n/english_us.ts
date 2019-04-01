@@ -98,6 +98,7 @@ export const EnglishUsLang = {
          * uiChainsOfTransmissionGraph
          */
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE': 'Icon',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RELATIONSHIP_SUMMARY_TITLE': 'Relationship',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship modified',
 
         /**

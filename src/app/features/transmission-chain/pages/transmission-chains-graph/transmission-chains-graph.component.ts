@@ -302,7 +302,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 loadingDialog.close();
 
                 if (this.editMode) {
-                    this.selectedNodes.removeAllNodes();
+                    this.resetNodes();
 
                     this.selectedRelationship = relationshipData;
 
@@ -583,7 +583,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 sourcePerson.type,
                 sourcePerson.id,
                 this.selectedRelationship.id,
-                dirtyFields)
+                dirtyFields.relationship
+            )
             .catch((err) => {
                 this.snackbarService.showApiError(err);
 
@@ -621,7 +622,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
                     this.relationshipDataService
                         .deleteRelationship(this.selectedOutbreak.id, sourcePerson.type, sourcePerson.id, this.selectedRelationship.id)
                         .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err);
 
                             return ErrorObservable.create(err);
                         })
