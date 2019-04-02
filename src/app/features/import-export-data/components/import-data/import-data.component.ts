@@ -848,7 +848,7 @@ export class ImportDataComponent implements OnInit {
                         // update
                         this.savedImportMappingService.modifyImportMapping(
                             this.loadedImportMapping.id, {
-                                mappingData: this.mappedImportFieldsForSaving
+                                mappingData: this.getMappedImportFieldsForSaving()
                             }
                         ).catch((err) => {
                             this.snackbarService.showApiError(err);
@@ -897,6 +897,8 @@ export class ImportDataComponent implements OnInit {
 
             return mappedFieldOptions;
         };
+        // reset all mapped import fields for saving
+        this.mappedImportFieldsForSaving = [];
 
         _.each(this.mappedFields, (mappedField: ImportableMapField) => {
             this.mappedImportFieldsForSaving.push(new SavedImportField({
