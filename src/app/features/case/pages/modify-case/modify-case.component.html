@@ -65,23 +65,15 @@
                                         [(ngModel)]="caseData.visualId"
                                         [placeholder]="'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate"
                                         tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                                        displayRefresh="true"
+                                        (refresh)="generateVisualIdForFormerContact(); visualId.control.markAsDirty()"
                                         [tooltipTranslateData]="visualIDTranslateData"
                                         [maxlength]="255"
                                         [disabled]="viewOnly"
                                         app-general-async-validator
-                                        [asyncValidatorObservable]="caseIdMaskValidator">
+                                        [asyncValidatorObservable]="caseIdMaskValidator"
+                                    >
                                     </app-form-input>
-
-                                    <div class="generate-case-id-button-container" *ngIf="couldGenerateVisualId">
-                                        <button
-                                            fxFlex
-                                            mat-raised-button
-                                            type="button"
-                                            color="primary"
-                                            (click)="generateVisualIdForFormerContact(form); visualId.control.markAsDirty()">
-                                            Generate Case ID
-                                        </button>
-                                    </div>
 
                                 <app-form-select
                                     name="occupation"

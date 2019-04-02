@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'xtIcon';
   src:
-    url('fonts/xtIcon.ttf?kfum0x') format('truetype'),
-    url('fonts/xtIcon.woff?kfum0x') format('woff'),
-    url('fonts/xtIcon.svg?kfum0x#xtIcon') format('svg');
+    url('fonts/xtIcon.ttf?lmcwjy') format('truetype'),
+    url('fonts/xtIcon.woff?lmcwjy') format('woff'),
+    url('fonts/xtIcon.svg?lmcwjy#xtIcon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -165,6 +165,9 @@
 }
 .xtIconinfo:before {
   content: "\e923";
+}
+.xtIconsync:before {
+  content: "\e92e";
 }
 .xtIconlab:before {
   content: "\e9aa";

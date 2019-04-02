@@ -39,9 +39,9 @@
         </span>
 
         <span
-            *ngIf="refresh"
-            class=""
-            >
+            *ngIf="displayRefresh"
+            class="xt-icon refresh-icon"
+            (click)="onRefreshPressed()">
             refresh
         </span>
 
