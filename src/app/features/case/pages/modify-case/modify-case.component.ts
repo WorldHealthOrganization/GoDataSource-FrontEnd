@@ -74,7 +74,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     };
 
     caseIdMaskValidator: Observable<boolean>;
-    couldGenerateVisualId: boolean | IGeneralAsyncValidatorResponse = false;
 
     constructor(
         private router: Router,
@@ -280,12 +279,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                             this.caseData.visualId,
                             this.caseData.id
                         ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                            const resp = isValid as IGeneralAsyncValidatorResponse;
-                            if (resp.errMsg) {
-                                this.couldGenerateVisualId = !resp.isValid;
-                            } else {
-                                this.couldGenerateVisualId = !isValid;
-                            }
                             observer.next(isValid);
                             console.log(isValid);
                             observer.complete();
@@ -496,7 +489,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             })
             .subscribe((data) => {
                 this.caseData.visualId = data;
-                this.couldGenerateVisualId = false;
             });
     }
 }
