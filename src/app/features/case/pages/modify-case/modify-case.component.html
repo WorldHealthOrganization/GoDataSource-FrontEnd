@@ -66,7 +66,7 @@
                                         [placeholder]="'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate"
                                         tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
                                         displayRefresh="true"
-                                        (refresh)="generateVisualIdForFormerContact(); visualId.control.markAsDirty()"
+                                        (refresh)="generateVisualId(); visualId.control.markAsDirty()"
                                         [tooltipTranslateData]="visualIDTranslateData"
                                         [maxlength]="255"
                                         [disabled]="viewOnly"

@@ -280,7 +280,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                             this.caseData.id
                         ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
                             observer.next(isValid);
-                            console.log(isValid);
                             observer.complete();
                         });
                     });
@@ -478,7 +477,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
      * @param {NgForm} form
      * @returns {Subscription}
      */
-    generateVisualIdForFormerContact() {
+    generateVisualId() {
         return this.caseDataService.generateCaseVisualID(
             this.selectedOutbreak.id,
             this.selectedOutbreak.caseIdMask,
