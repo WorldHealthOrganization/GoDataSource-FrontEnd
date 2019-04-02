@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { NgForm } from '@angular/forms';
+import { FormControlName, NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -75,6 +75,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
     caseIdMaskValidator: Observable<boolean>;
 
+    displayRefresh: boolean = false;
+    @ViewChild('visualId') visualId: FormControlName;
+
     constructor(
         private router: Router,
         protected route: ActivatedRoute,
@@ -126,6 +129,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 // outbreak
                 this.selectedOutbreak = selectedOutbreak;
+                if (!_.isUndefined(this.selectedOutbreak.caseIdMask)) {
+                    this.displayRefresh = true;
+                }
 
                 // breadcrumbs
                 this.retrieveCaseData();
@@ -478,16 +484,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
      * @returns {Subscription}
      */
     generateVisualId() {
-        return this.caseDataService.generateCaseVisualID(
-            this.selectedOutbreak.id,
-            this.selectedOutbreak.caseIdMask,
-            this.caseData.id )
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
-                return ErrorObservable.create(err);
-            })
-            .subscribe((data) => {
-                this.caseData.visualId = data;
-            });
+        if (!_.isUndefined(this.selectedOutbreak.caseIdMask)) {
+            this.caseData.visualId = this.selectedOutbreak.caseIdMask;
+            this.visualId.control.markAsDirty();
+        }
     }
 }
