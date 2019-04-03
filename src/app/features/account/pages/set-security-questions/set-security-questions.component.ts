@@ -9,7 +9,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { SecurityQuestionModel } from '../../../../core/models/securityQuestion.model';
 import { Observable } from 'rxjs';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { catchError } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
 @Component({
@@ -40,7 +40,7 @@ export class SetSecurityQuestionsComponent implements OnInit {
 
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
-        this.securityQuestionsList$ = this.userDataService.getSecurityQuestionsList().share();
+        this.securityQuestionsList$ = this.userDataService.getSecurityQuestionsList().pipe(share());
 
         // check if user has security questions set
         if (

@@ -16,7 +16,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { Constants } from '../../../../core/models/constants';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { tap } from 'rxjs/operators';
+import { share, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-audit-logs-list',
@@ -104,7 +104,7 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
                     (result, value: LabelValuePair) => {
                         result[value.value] = value.label;
                     }
-                );
+                ) as any;
             });
 
         // initialize Side Table Columns
@@ -167,22 +167,24 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
         // retrieve the list of Audit Logs
         this.auditLogsList$ = this.auditLogDataService
             .getAuditLogsList(this.queryBuilder)
-            .pipe(tap(this.checkEmptyList.bind(this)))
-            .do((items: AuditLogModel[]) => {
-                this.auditLogsTrim = {};
-                _.each(items, (item: AuditLogModel) => {
-                    const changedDataStringified: string = item.changedData ? JSON.stringify(item.changedData) : '';
-                    this.auditLogsTrim[item.id] = {
-                        changeDataAllString: changedDataStringified,
-                        changeDataTrimString: changedDataStringified.substr(
-                            0,
-                            Constants.DEFAULT_TABLE_COLUMN_TRIM_TEXT_LONGER_THAN_NO_CHARS
-                        ) + this.i18nService.instant('LNG_PAGE_LIST_AUDIT_LOGS_ELLIPSIS_LABEL'),
-                        displayAll: changedDataStringified.length <= Constants.DEFAULT_TABLE_COLUMN_TRIM_TEXT_LONGER_THAN_NO_CHARS,
-                        displayButtons: changedDataStringified.length > Constants.DEFAULT_TABLE_COLUMN_TRIM_TEXT_LONGER_THAN_NO_CHARS
-                    };
-                });
-            });
+            .pipe(
+                tap(this.checkEmptyList.bind(this)),
+                tap((items: AuditLogModel[]) => {
+                    this.auditLogsTrim = {};
+                    _.each(items, (item: AuditLogModel) => {
+                        const changedDataStringified: string = item.changedData ? JSON.stringify(item.changedData) : '';
+                        this.auditLogsTrim[item.id] = {
+                            changeDataAllString: changedDataStringified,
+                            changeDataTrimString: changedDataStringified.substr(
+                                0,
+                                Constants.DEFAULT_TABLE_COLUMN_TRIM_TEXT_LONGER_THAN_NO_CHARS
+                            ) + this.i18nService.instant('LNG_PAGE_LIST_AUDIT_LOGS_ELLIPSIS_LABEL'),
+                            displayAll: changedDataStringified.length <= Constants.DEFAULT_TABLE_COLUMN_TRIM_TEXT_LONGER_THAN_NO_CHARS,
+                            displayButtons: changedDataStringified.length > Constants.DEFAULT_TABLE_COLUMN_TRIM_TEXT_LONGER_THAN_NO_CHARS
+                        };
+                    });
+                })
+            );
     }
 
     /**
@@ -192,7 +194,7 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
         // remove paginator from query builder
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
-        this.auditLogsListCount$ = this.auditLogDataService.getAuditLogsCount(countQueryBuilder).share();
+        this.auditLogsListCount$ = this.auditLogDataService.getAuditLogsCount(countQueryBuilder).pipe(share());
     }
 
     /**

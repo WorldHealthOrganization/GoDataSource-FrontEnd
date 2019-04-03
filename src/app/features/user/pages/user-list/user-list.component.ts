@@ -15,7 +15,7 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import * as _ from 'lodash';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
 @Component({
@@ -92,7 +92,7 @@ export class UserListComponent extends ListComponent implements OnInit {
         // remove paginator from query builder
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
-        this.usersListCount$ = this.userDataService.getUsersCount(countQueryBuilder).share();
+        this.usersListCount$ = this.userDataService.getUsersCount(countQueryBuilder).pipe(share());
     }
 
     /**

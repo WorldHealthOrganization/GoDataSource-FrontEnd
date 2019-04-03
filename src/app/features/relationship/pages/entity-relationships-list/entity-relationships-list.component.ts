@@ -17,7 +17,7 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
@@ -76,7 +76,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         this.exposuresFrequencyList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY);
         this.exposureDurationList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION);
         this.relationshipTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION);
-        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).share();
+        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
         personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
             this.personTypesListMap = _.transform(
                 personTypeCategory.entries,
@@ -238,7 +238,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                     this.entityType,
                     this.entityId,
                     countQueryBuilder
-                ).share();
+                ).pipe(share());
             } else {
                 // count the contacts
                 this.relationshipsListCount$ = this.relationshipDataService.getEntityContactsCount(
@@ -246,7 +246,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                     this.entityType,
                     this.entityId,
                     countQueryBuilder
-                ).share();
+                ).pipe(share());
             }
         }
     }
@@ -254,7 +254,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     /**
      * Retrieve Person Type color
      */
-    getPersonTypeColor(personType) {
+    getPersonTypeColor(personType: string) {
         const personTypeData = _.get(this.personTypesListMap, personType);
         return _.get(personTypeData, 'colorCode', '');
     }

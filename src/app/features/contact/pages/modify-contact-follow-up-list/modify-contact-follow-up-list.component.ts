@@ -20,7 +20,7 @@ import { TeamDataService } from '../../../../core/services/data/team.data.servic
 import { ContactModel } from '../../../../core/models/contact.model';
 import { IAnswerData } from '../../../../core/models/question.model';
 import { throwError, forkJoin } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 
 @Component({
     selector: 'app-modify-contact-follow-ups-list',
@@ -74,9 +74,8 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
 
     ngOnInit() {
         // dropdowns
-        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS).share();
-        this.teamsList$ = this.teamDataService.getTeamsList().share();
-
+        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS).pipe(share());
+        this.teamsList$ = this.teamDataService.getTeamsList().pipe(share());
 
         // read route query params
         this.route.queryParams

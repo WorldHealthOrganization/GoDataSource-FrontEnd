@@ -25,7 +25,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import * as moment from 'moment';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 
 @Component({
     selector: 'app-bulk-modify-contacts',
@@ -98,9 +98,9 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         this.setSheetWidth();
 
         // reference data
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
-        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION).share();
-        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).share();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION).pipe(share());
+        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).pipe(share());
 
         // configure Sheet widget
         this.configureSheetWidget();

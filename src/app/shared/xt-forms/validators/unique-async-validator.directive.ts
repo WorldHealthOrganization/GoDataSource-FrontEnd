@@ -1,5 +1,5 @@
 import { Attribute, Directive, forwardRef } from '@angular/core';
-import { AsyncValidator, AbstractControl, NG_ASYNC_VALIDATORS, ValidationErrors } from '@angular/forms';
+import { AbstractControl, NG_ASYNC_VALIDATORS, ValidationErrors } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -17,14 +17,14 @@ import { map } from 'rxjs/operators';
 /**
  * Async validator
  */
-export class UniqueAsyncValidatorDirective implements AsyncValidator {
+export class UniqueAsyncValidatorDirective {
 
     constructor(
         @Attribute('app-unique-async-validator') public type: string,
     ) {
     }
 
-    validate(control: AbstractControl): Observable<ValidationErrors> {
+    validate(control: AbstractControl): Observable<ValidationErrors | null> {
 
         const someAsyncCall = of(true);
 

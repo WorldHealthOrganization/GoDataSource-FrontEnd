@@ -11,7 +11,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
 @Component({
@@ -48,7 +48,7 @@ export class RolesListComponent extends ListComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.availablePermissions$ = this.userRoleDataService.getAvailablePermissions().share();
+        this.availablePermissions$ = this.userRoleDataService.getAvailablePermissions().pipe(share());
 
         this.needsRefreshList(true);
     }

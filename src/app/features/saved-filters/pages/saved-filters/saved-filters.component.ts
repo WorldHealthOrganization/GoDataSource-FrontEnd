@@ -6,7 +6,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
 import * as _ from 'lodash';
 import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -70,7 +70,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
     refreshListCount() {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
-        this.savedFiltersListCount$ = this.savedFiltersService.getSavedFiltersListCount(countQueryBuilder).share();
+        this.savedFiltersListCount$ = this.savedFiltersService.getSavedFiltersListCount(countQueryBuilder).pipe(share());
     }
 
     /**

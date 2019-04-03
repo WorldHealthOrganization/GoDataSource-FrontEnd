@@ -21,7 +21,7 @@ import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Observable } from 'rxjs';
 import { TeamDataService } from '../../../core/services/data/team.data.service';
 import { throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 
 export abstract class FollowUpsListComponent extends ListComponent implements OnInit {
     // authenticated user
@@ -87,7 +87,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
         // load teams list
         // using share does the job, but it takes a bit to see the changes in the list
         // loading an array is instantaneous
-        this.teamsList$ = this.teamDataService.getTeamsList().share();
+        this.teamsList$ = this.teamDataService.getTeamsList().pipe(share());
         this.teamsList$.subscribe((teamsList) => {
             // teams loaded used by quick team change
             this.teamsListLoaded = teamsList;

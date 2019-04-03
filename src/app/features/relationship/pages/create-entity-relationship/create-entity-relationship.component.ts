@@ -26,7 +26,7 @@ import { RelationshipType } from '../../../../core/enums/relationship-type.enum'
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
-import { catchError } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { throwError, forkJoin } from 'rxjs';
 
 @Component({
@@ -95,11 +95,11 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
 
     ngOnInit() {
         // reference data
-        this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL).share();
-        this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE).share();
-        this.exposureFrequencyOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY).share();
-        this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION).share();
-        this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).share();
+        this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL).pipe(share());
+        this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE).pipe(share());
+        this.exposureFrequencyOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY).pipe(share());
+        this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION).pipe(share());
+        this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).pipe(share());
 
         // get selected persons from query params
         this.route.queryParams
@@ -140,7 +140,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
                 this.selectedOutbreak = selectedOutbreak;
 
                 // get clusters list
-                this.clusterOptions$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id).share();
+                this.clusterOptions$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id).pipe(share());
 
                 this.loadPerson();
             });
@@ -326,6 +326,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
      * Copy value from current record to all the other records
      * @param property
      * @param sourceRelationship
+     * @param form
      */
     copyValueToEmptyFields(
         property: string,

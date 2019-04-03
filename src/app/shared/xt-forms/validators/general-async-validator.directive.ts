@@ -1,5 +1,5 @@
 import { Directive, forwardRef, Input } from '@angular/core';
-import { AsyncValidator, AbstractControl, NG_ASYNC_VALIDATORS, ValidationErrors } from '@angular/forms';
+import { AbstractControl, NG_ASYNC_VALIDATORS, ValidationErrors } from '@angular/forms';
 import { Observable, timer, of } from 'rxjs';
 import * as _ from 'lodash';
 import { Constants } from '../../../core/models/constants';
@@ -24,14 +24,14 @@ export interface IGeneralAsyncValidatorResponse {
         }
     ]
 })
-export class GeneralAsyncValidatorDirective implements AsyncValidator {
+export class GeneralAsyncValidatorDirective {
     @Input() asyncValidatorObservable: Observable<boolean | IGeneralAsyncValidatorResponse>;
     @Input() asyncValidatorErrMsg: string = 'LNG_FORM_VALIDATION_ERROR_GENERAL_ASYNC';
     @Input() asyncValidatorErrMsgTranslateData: {
         [key: string]: any
     };
 
-    validate(control: AbstractControl): Observable<ValidationErrors> {
+    validate(control: AbstractControl): Observable<ValidationErrors | null> {
         if (
             !this.asyncValidatorObservable ||
             _.isEmpty(control.value)

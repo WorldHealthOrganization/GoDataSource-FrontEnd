@@ -18,7 +18,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
 @Component({
@@ -89,7 +89,7 @@ export class TeamListComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
 
-        this.teamsListCount$ = this.teamDataService.getTeamsCount(countQueryBuilder).share();
+        this.teamsListCount$ = this.teamDataService.getTeamsCount(countQueryBuilder).pipe(share());
     }
 
     /**

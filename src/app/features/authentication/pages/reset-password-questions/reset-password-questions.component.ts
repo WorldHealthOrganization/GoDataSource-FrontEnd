@@ -9,7 +9,7 @@ import * as _ from 'lodash';
 import { Observable } from 'rxjs';
 import { SecurityQuestionModel } from '../../../../core/models/securityQuestion.model';
 import { throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 
 @Component({
     selector: 'app-reset-password-questions',
@@ -33,7 +33,7 @@ export class ResetPasswordQuestionsComponent {
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
     ) {
-        this.securityQuestionsList$ = this.userDataService.getSecurityQuestionsList().share();
+        this.securityQuestionsList$ = this.userDataService.getSecurityQuestionsList().pipe(share());
     }
 
 
@@ -52,7 +52,7 @@ export class ResetPasswordQuestionsComponent {
                         return throwError(err);
                     })
                 )
-                .subscribe((result) => {
+                .subscribe((result: any) => {
                     // send the user to reset password page
                     this.router.navigate(['/auth/reset-password'], { queryParams: { token: result.token } });
                  });
