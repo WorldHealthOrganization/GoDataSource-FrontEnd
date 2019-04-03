@@ -12,7 +12,12 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
-
+        /**
+         * savedImportMappingsPages
+         */
+        'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA': 'Lab data',
+        'LNG_APP_PAGE_IMPORT_REFERENCE_DATA': 'Reference data',
+        'LNG_APP_PAGE_IMPORT_LOCATION_DATA': 'Locations',
 
         /**
          * REMOVE the tokens from below
