@@ -61,10 +61,13 @@
                                 <!-- [maxlength]="255" -->
                                 <app-form-input
                                     name="visualId"
+                                    #visualId
                                     [(ngModel)]="contactData.visualId"
                                     [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
                                     tooltip="LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
                                     [tooltipTranslateData]="visualIDTranslateData"
+                                    [displayRefresh]="displayRefresh"
+                                    (refresh)="generateVisualId()"
                                     [maxlength]="255"
                                     [disabled]="viewOnly"
                                     app-general-async-validator

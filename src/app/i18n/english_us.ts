@@ -168,7 +168,12 @@ export const EnglishUsLang = {
         /**
          * uiImportData
          */
-        'LNG_PAGE_IMPORT_DATA_BUTTON_RESET_IMPORT_MAPPING' : 'Reset import mapping'
+        'LNG_PAGE_IMPORT_DATA_BUTTON_RESET_IMPORT_MAPPING' : 'Reset import mapping',
+
+        /**
+         * uiGeneralTooltips
+         */
+        'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION' : 'Regenerate visual ID',
 
         /**
          * REMOVE the tokens from below

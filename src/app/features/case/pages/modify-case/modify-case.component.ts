@@ -129,7 +129,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 // outbreak
                 this.selectedOutbreak = selectedOutbreak;
-                if (!_.isUndefined(this.selectedOutbreak.caseIdMask)) {
+                if (!_.isEmpty(this.selectedOutbreak.caseIdMask)) {
                     this.displayRefresh = true;
                 }
 
@@ -479,12 +479,10 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     }
 
     /**
-     * Generate visual ID for former contacts if they don't match the mask
-     * @param {NgForm} form
-     * @returns {Subscription}
+     * Generate visual ID for case
      */
     generateVisualId() {
-        if (!_.isUndefined(this.selectedOutbreak.caseIdMask)) {
+        if (!_.isEmpty(this.selectedOutbreak.caseIdMask)) {
             this.caseData.visualId = this.selectedOutbreak.caseIdMask;
             this.visualId.control.markAsDirty();
         }
