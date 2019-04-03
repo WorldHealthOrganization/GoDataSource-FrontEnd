@@ -6,18 +6,16 @@ import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryMo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { catchError, switchMap, tap } from 'rxjs/operators';
-
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
-import { throwError } from 'rxjs/internal/observable/throwError';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-reference-data-category-entries-list',
@@ -73,10 +71,12 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
         if (this.categoryId) {
             this.categoryEntries$ = this.referenceDataDataService
                 .getReferenceDataByCategory(this.categoryId)
-                .map((category: ReferenceDataCategoryModel) => {
-                    return category.entries;
-                })
-                .pipe(tap(this.checkEmptyList.bind(this)));
+                .pipe(
+                    map((category: ReferenceDataCategoryModel) => {
+                        return category.entries;
+                    }),
+                    tap(this.checkEmptyList.bind(this))
+                );
         }
     }
 

@@ -16,12 +16,11 @@ import {
     SavedFilterData, SavedFilterDataAppliedFilter, SavedFilterDataAppliedSort,
     SavedFilterModel
 } from '../../../core/models/saved-filters.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { Observable } from 'rxjs';
 import { RequestFilter } from '../../../core/helperClasses/request-query-builder/request-filter';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs/internal/observable/throwError';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-side-filters',

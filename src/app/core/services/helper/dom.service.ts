@@ -7,6 +7,7 @@ export class DomService {
     /**
      * Scroll to the end of the list of elements with the given css selector
      * @param selector
+     * @param block
      */
     scrollItemIntoView(
         selector,
@@ -21,7 +22,7 @@ export class DomService {
                 item.scrollIntoView({
                     behavior: 'smooth',
                     block: block
-                });
+                } as ScrollIntoViewOptions);
             }
         });
     }
@@ -86,7 +87,7 @@ export class DomService {
                 observer.complete();
 
             };
-             img.src = url;
+            img.src = url;
         });
     }
 

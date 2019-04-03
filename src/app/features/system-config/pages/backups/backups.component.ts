@@ -8,7 +8,6 @@ import { DialogService, ExportDataExtension } from '../../../../core/services/he
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Observable } from 'rxjs';
@@ -21,9 +20,10 @@ import { MatDialogRef } from '@angular/material';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { tap } from 'rxjs/operators';
+import { catchError, map, share, tap } from 'rxjs/operators';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import * as moment from 'moment';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-backups',
@@ -96,7 +96,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
         this.refreshSystemSettings();
 
         // module list
-        this.backupModulesList$ = this.genericDataService.getBackupModuleList().share();
+        this.backupModulesList$ = this.genericDataService.getBackupModuleList().pipe(share());
         this.backupModulesList$.subscribe((moduleList) => {
             this.moduleList = moduleList;
         });
@@ -123,14 +123,17 @@ export class BackupsComponent extends ListComponent implements OnInit {
         // retrieve outbreaks
         this.outbreakDataService
             .getOutbreaksList()
-            .map((outbreaks: OutbreakModel[]) => {
-                return _.map(outbreaks, (outbreak: OutbreakModel) => {
-                    return new LabelValuePair(
-                        outbreak.name,
-                        outbreak.id
-                    );
-                });
-            }).subscribe((mappedOutbreaks: LabelValuePair[]) => {
+            .pipe(
+                map((outbreaks: OutbreakModel[]) => {
+                    return _.map(outbreaks, (outbreak: OutbreakModel) => {
+                        return new LabelValuePair(
+                            outbreak.name,
+                            outbreak.id
+                        );
+                    });
+                })
+            )
+            .subscribe((mappedOutbreaks: LabelValuePair[]) => {
                 this.mappedOutbreaks = mappedOutbreaks;
             });
         // initialize pagination
@@ -173,7 +176,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
     refreshListCount() {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
-        this.backupsListCount$ = this.systemBackupDataService.getBackupListCount(countQueryBuilder).share();
+        this.backupsListCount$ = this.systemBackupDataService.getBackupListCount(countQueryBuilder).pipe(share());
     }
 
     /**
@@ -196,7 +199,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
      * Get translation token from language
      */
     getModuleTranslation(module: string) {
-        const moduleItem: LabelValuePair = _.find(this.moduleList, { value: module });
+        const moduleItem: LabelValuePair = _.find(this.moduleList, {value: module});
         return moduleItem ?
             moduleItem.label :
             '';
@@ -242,10 +245,12 @@ export class BackupsComponent extends ListComponent implements OnInit {
             if (answer.button === DialogAnswerButton.Yes) {
                 this.systemBackupDataService
                     .createBackup(answer.inputValue.value)
-                    .catch((err) => {
-                        this.snackbarService.showError(err.message);
-                        return ErrorObservable.create(err);
-                    })
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showError(err.message);
+                            return throwError(err);
+                        })
+                    )
                     .subscribe(() => {
                         // display success message
                         this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE');
@@ -266,10 +271,12 @@ export class BackupsComponent extends ListComponent implements OnInit {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.systemBackupDataService
                         .deleteBackup(item.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             // display success message
                             this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_ACTION_DELETE_SUCCESS_MESSAGE');
@@ -291,10 +298,12 @@ export class BackupsComponent extends ListComponent implements OnInit {
             this.waitForBackupIdToBeReady = undefined;
             this.systemBackupDataService
                 .restoreBackup(backupItemData.id)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showError(err.message);
+                        return throwError(err);
+                    })
+                )
                 .subscribe(() => {
                     // display success message
                     this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_BACKUP_RESTORE_SUCCESS_MESSAGE');
@@ -312,15 +321,17 @@ export class BackupsComponent extends ListComponent implements OnInit {
                     // check if backup is ready
                     this.systemBackupDataService
                         .getBackup(this.waitForBackupIdToBeReady)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
 
-                            // can't continue with the restore
-                            this.waitForBackupIdToBeReady = undefined;
-                            this.needsRefreshList(true);
+                                // can't continue with the restore
+                                this.waitForBackupIdToBeReady = undefined;
+                                this.needsRefreshList(true);
 
-                            return ErrorObservable.create(err);
-                        })
+                                return throwError(err);
+                            })
+                        )
                         .subscribe((newBackup: BackupModel) => {
                             switch (newBackup.status) {
                                 // backup ready ?
@@ -372,10 +383,12 @@ export class BackupsComponent extends ListComponent implements OnInit {
                     if (answerBackup.button === DialogAnswerButton.Yes) {
                         this.systemBackupDataService
                             .createBackup(answerBackup.inputValue.value)
-                            .catch((err) => {
-                                this.snackbarService.showError(err.message);
-                                return ErrorObservable.create(err);
-                            })
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showError(err.message);
+                                    return throwError(err);
+                                })
+                            )
                             .subscribe((newBackup: BackupModel) => {
                                 // display success message
                                 this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE');
@@ -454,10 +467,12 @@ export class BackupsComponent extends ListComponent implements OnInit {
                     .modifySystemSettings({
                         dataBackup: answer.inputValue.value
                     })
-                    .catch((err) => {
-                        this.snackbarService.showApiError(err);
-                        return ErrorObservable.create(err);
-                    })
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            return throwError(err);
+                        })
+                    )
                     .subscribe(() => {
                         // display success message
                         this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE');

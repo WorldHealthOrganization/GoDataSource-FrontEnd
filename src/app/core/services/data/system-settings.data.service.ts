@@ -13,7 +13,8 @@ export class SystemSettingsDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {}
+    ) {
+    }
 
     /**
      * Retrieve System settings

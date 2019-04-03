@@ -13,7 +13,8 @@ export class SystemSyncLogDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {}
+    ) {
+    }
 
     /**
      * Retrieve a sync log

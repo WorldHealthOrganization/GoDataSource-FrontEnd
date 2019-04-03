@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm, NgModel } from '@angular/forms';
@@ -32,6 +31,8 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { MatDialogRef } from '@angular/material';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-modify-case',
@@ -335,25 +336,32 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                 ...this.caseData,
                 ...dirtyFields
             })
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
 
-                // hide dialog
-                loadingDialog.close();
+                    // hide dialog
+                    loadingDialog.close();
 
-                return ErrorObservable.create(err);
-            })
+                    return throwError(err);
+                })
+            )
             .subscribe((caseDuplicates: EntityDuplicatesModel) => {
                 // modify Case
                 const runModifyCase = (finishCallBack?: () => void) => {
                     // modify the Case
                     this.caseDataService
                         .modifyCase(this.selectedOutbreak.id, this.caseId, dirtyFields)
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err);
-                            loadingDialog.close();
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+
+                                // hide dialog
+                                loadingDialog.close();
+
+                                return throwError(err);
+                            })
+                        )
                         .subscribe((modifiedCase: CaseModel) => {
                             // update model
                             this.caseData = modifiedCase;

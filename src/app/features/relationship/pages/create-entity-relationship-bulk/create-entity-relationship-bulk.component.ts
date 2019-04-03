@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -14,12 +13,12 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
-
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
-
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-create-entity-relationship-bulk',
@@ -125,14 +124,16 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
             // get person data
             this.entityDataService
                 .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showError(err.message);
 
-                    // Entity not found; navigate back to Entities list
-                    this.router.navigate([this.entityMap[this.entityType].link]);
+                        // Entity not found; navigate back to Entities list
+                        this.router.navigate([this.entityMap[this.entityType].link]);
 
-                    return ErrorObservable.create(err);
-                })
+                        return throwError(err);
+                    })
+                )
                 .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
                     this.entity = entityData;
 
@@ -206,11 +207,13 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
         relationshipsBulkData.targets = relationshipTargets;
         relationshipsBulkData.relationship = this.relationship;
         this.relationshipDataService.createBulkRelationships(this.selectedOutbreak.id, relationshipsBulkData)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
 
-                return ErrorObservable.create(err);
-            })
+                    return throwError(err);
+                })
+            )
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_SUCCESS_MESSAGE');
 

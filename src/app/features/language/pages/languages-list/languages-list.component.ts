@@ -10,10 +10,10 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
 import { LanguageModel } from '../../../../core/models/language.model';
 import { DialogAnswer, DialogAnswerButton, LoadingDialogModel } from '../../../../shared/components';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { TopnavComponent } from '../../../../shared/components/topnav/topnav.component';
-import { tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-languages-list',
@@ -96,10 +96,12 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
                     // delete language
                     this.languageDataService
                         .deleteLanguage(language.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_SUCCESS_MESSAGE');
 

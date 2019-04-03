@@ -10,15 +10,15 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { NgForm } from '@angular/forms';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -113,11 +113,13 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.outbreakDataService
             .modifyOutbreak(this.outbreakId, dirtyFields)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
             .subscribe((modifiedOutbreak) => {
                 // update model
                 this.outbreak = modifiedOutbreak;

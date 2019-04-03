@@ -28,7 +28,7 @@
         "@angular/router": "7.2.11",
         "@handsontable/angular": "3.0.0",
         "@ng-select/ng-select": "2.16.4",
-        "@ngx-translate/core": "9.1.1",
+        "@ngx-translate/core": "11.0.1",
         "@swimlane/ngx-charts": "10.1.0",
         "angular-mgl-timeline": "0.3.1",
         "c3": "0.6.8",
@@ -51,7 +51,8 @@
         "ngx-wig": "2.0.1",
         "ol": "5.3.0",
         "rxjs": "6.4.0",
-        "zone.js": "0.8.29"
+        "zone.js": "0.8.29",
+        "uuid": "3.3.2"
     },
     "devDependencies": {
         "@angular-devkit/build-angular": "0.13.7",
@@ -64,6 +65,7 @@
         "@types/jasminewd2": "2.0.3",
         "@types/lodash": "4.14.123",
         "@types/node": "6.0.109",
+        "@types/uuid": "^3.4.4",
         "codelyzer": "5.0.0",
         "jasmine-core": "2.5.2",
         "jasmine-spec-reporter": "4.2.1",

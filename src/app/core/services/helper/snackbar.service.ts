@@ -14,13 +14,15 @@ export class SnackbarService {
     constructor(
         private snackbar: MatSnackBar,
         private i18nService: I18nService
-    ) {}
+    ) {
+    }
 
     /**
      * Show a Success Snackbar
      * @param messageToken
      * @param translateData
      * @param duration
+     * @param html
      */
     showSuccess(
         messageToken,
@@ -50,6 +52,7 @@ export class SnackbarService {
      * @param messageToken
      * @param translateData
      * @param duration
+     * @param html
      */
     showError(
         messageToken,
@@ -78,6 +81,7 @@ export class SnackbarService {
      * Show a Notice Snackbar
      * @param messageToken
      * @param translateData
+     * @param html
      * @returns {MatSnackBarRef<SnackbarComponent>}
      */
     showNotice(
@@ -106,6 +110,7 @@ export class SnackbarService {
      * @param err API error object
      * @param {{}} translateData
      * @param {number} duration
+     * @param html
      * @returns {Subscription}
      */
     showApiError(

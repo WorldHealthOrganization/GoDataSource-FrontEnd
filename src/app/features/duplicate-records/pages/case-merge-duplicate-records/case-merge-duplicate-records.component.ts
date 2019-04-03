@@ -18,11 +18,9 @@ import * as moment from 'moment';
 import { Constants } from '../../../../core/models/constants';
 import { NgForm } from '@angular/forms';
 import { EntityType } from '../../../../core/models/entity-type';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
-import { pipe } from 'rxjs/internal-compatibility';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs/internal/observable/throwError';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-case-merge-duplicate-records',

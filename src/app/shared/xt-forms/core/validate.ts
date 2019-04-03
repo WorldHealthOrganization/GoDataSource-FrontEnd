@@ -6,8 +6,7 @@ import {
     ValidatorFn,
 } from '@angular/forms';
 
-import { Observable } from 'rxjs';
-
+import { of } from 'rxjs';
 
 export interface ValidationResult { [validator: string]: string | boolean; }
 
@@ -56,7 +55,7 @@ export const validate =
         return (control: AbstractControl) => {
 
             if (!control) {
-                return Observable.of(null);
+                return of(null);
             }
 
             const synchronousValid = () => composeValidators(validators)(control);
@@ -75,9 +74,9 @@ export const validate =
             }
 
             if (validators) {
-                return Observable.of(synchronousValid());
+                return of(synchronousValid());
             }
 
-            return Observable.of(null);
+            return of(null);
         };
     };

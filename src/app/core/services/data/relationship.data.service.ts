@@ -267,6 +267,7 @@ export class RelationshipDataService {
     /**
      * Get metrics for contacts per case
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<MetricContactsPerCaseModel>}
      */
     getMetricsOfContactsPerCase(
@@ -292,6 +293,7 @@ export class RelationshipDataService {
     /**
      * Get count and ids of cases with less than x contacts
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<MetricCasesWithContactsModel>}
      */
     getCountIdsOfCasesLessThanXContacts(
@@ -308,7 +310,7 @@ export class RelationshipDataService {
     /**
      * Get count of cases outside the transmission chains
      * @param {string} outbreakId
-     * @param {number} noDaysInChains
+     * @param queryBuilder
      * @returns {Observable<MetricCasesTransmissionChainsModel>}
      */
     getCountOfCasesOutsideTheTransmissionChains(
@@ -325,6 +327,7 @@ export class RelationshipDataService {
     /**
      * Get count and ids of new cases among known contacts
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<MetricNewCasesWithContactsModel>}
      */
     getCountIdsOfCasesAmongKnownContacts(

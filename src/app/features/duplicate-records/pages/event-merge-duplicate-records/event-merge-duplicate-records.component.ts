@@ -12,10 +12,9 @@ import { EntityModel } from '../../../../core/models/entity.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { AddressModel } from '../../../../core/models/address.model';
 import * as _ from 'lodash';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { EntityType } from '../../../../core/models/entity-type';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs/internal/observable/throwError';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-event-merge-duplicate-records',

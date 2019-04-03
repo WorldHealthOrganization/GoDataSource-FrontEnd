@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { UserRoleModel } from '../../../../core/models/user-role.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -17,6 +16,8 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-modify-user',
@@ -76,7 +77,6 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
     }
 
     modifyUser(form: NgForm) {
-
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
         // remove password confirm
@@ -95,11 +95,13 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.userDataService
                 .modifyUser(this.userId, dirtyFields)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    loadingDialog.close();
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        loadingDialog.close();
+                        return throwError(err);
+                    })
+                )
                 .subscribe((modifiedUser: UserModel) => {
                     // update model
                     this.user = modifiedUser;
@@ -109,11 +111,13 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
                     // reload user auth data in case he's changing the active outbreak
                     this.authDataService
                         .reloadAndPersistAuthUser()
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            loadingDialog.close();
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                loadingDialog.close();
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             // mark form as pristine
                             form.form.markAsPristine();

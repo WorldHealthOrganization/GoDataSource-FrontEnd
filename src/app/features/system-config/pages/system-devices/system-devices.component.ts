@@ -8,12 +8,12 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { LoadingDialogModel } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Observable } from 'rxjs';
-
 import { DeviceDataService } from '../../../../core/services/data/device.data.service';
 import { DeviceModel } from '../../../../core/models/device.model';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-system-devices-list',
@@ -143,11 +143,13 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
                     this.showLoadingDialog();
                     this.deviceDataService
                         .deleteDevice(device.id)
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err);
-                            this.closeLoadingDialog();
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                this.closeLoadingDialog();
+                                return throwError(err);
+                            })
+                        )
                         .subscribe( () => {
                             this.snackbarService.showSuccess(`LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE_SUCCESS_MESSAGE`);
 
@@ -167,11 +169,13 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
         this.showLoadingDialog();
         this.deviceDataService
             .wipeDevice(device.id)
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
-                this.closeLoadingDialog();
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    this.closeLoadingDialog();
+                    return throwError(err);
+                })
+            )
             .subscribe( () => {
                 this.needsRefreshList();
                 this.closeLoadingDialog();

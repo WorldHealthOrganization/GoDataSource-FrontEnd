@@ -62,7 +62,7 @@ export class CaseChronology {
         chronologyEntries.push.apply(
             chronologyEntries,
             caseData.dateRanges
-            // keep only end dates
+                // keep only end dates
                 .filter((dateRange) => !_.isEmpty(dateRange.endDate))
                 // transform date ranges to ChronologyItem structure
                 .map((dateRange) => {

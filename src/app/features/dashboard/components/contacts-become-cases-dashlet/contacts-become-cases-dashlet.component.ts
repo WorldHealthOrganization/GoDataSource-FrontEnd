@@ -5,8 +5,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { Constants } from '../../../../core/models/constants';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
-
-import { Observable ,  Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-contacts-become-cases-dashlet',
@@ -110,14 +109,15 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
 
             // retrieve data
             this.displayLoading = true;
-            this.previousSubscriber = Observable.forkJoin([
+            this.previousSubscriber = forkJoin(
                 this.caseDataService.getCasesCount(this.outbreakId, qb),
                 this.caseDataService.getCasesCount(this.outbreakId)
-            ]).subscribe(([qbCountResult, countResult]) => {
-                this.contactsBecomeCasesCount = qbCountResult.count;
-                this.casesCount = countResult.count;
-                this.displayLoading = false;
-            });
+            )
+                .subscribe(([qbCountResult, countResult]) => {
+                    this.contactsBecomeCasesCount = qbCountResult.count;
+                    this.casesCount = countResult.count;
+                    this.displayLoading = false;
+                });
         }
     }
 }

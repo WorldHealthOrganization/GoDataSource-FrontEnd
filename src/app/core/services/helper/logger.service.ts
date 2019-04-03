@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { LoggingDataService } from '../data/logging.data.service';
 import { environment } from '../../../../environments/environment';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs/internal/observable/throwError';
+import { throwError } from 'rxjs';
 
 @Injectable()
 export class LoggerService {
@@ -13,7 +13,8 @@ export class LoggerService {
 
     constructor(
         private loggingDataService: LoggingDataService
-    ) {}
+    ) {
+    }
 
     /**
      * Add a log message

@@ -5,9 +5,9 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
 import { HttpClient } from '@angular/common/http';
-
 import * as _ from 'lodash';
 import { EntityModel } from '../../models/entity.model';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class GlobalEntitySearchDataService {
@@ -42,11 +42,13 @@ export class GlobalEntitySearchDataService {
         const filter = qb.buildQuery();
 
         return this.http.get(`outbreaks/${outbreakId}/people?filter=${filter}`)
-            .map((peopleList) => {
-                return _.map(peopleList, (entity) => {
-                    return new EntityModel(entity).model;
-                });
-            });
+            .pipe(
+                map((peopleList) => {
+                    return _.map(peopleList, (entity) => {
+                        return new EntityModel(entity).model;
+                    });
+                })
+            );
     }
 }
 

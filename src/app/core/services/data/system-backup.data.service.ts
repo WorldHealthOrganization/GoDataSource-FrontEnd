@@ -13,7 +13,8 @@ export class SystemBackupDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {}
+    ) {
+    }
 
     /**
      * Create backup

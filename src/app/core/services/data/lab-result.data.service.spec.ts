@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { LabResultModel } from '../../models/lab-result.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import * as moment from 'moment';
@@ -27,11 +27,10 @@ export const LabResultDataServiceMock: {
 
     getCaseLabResults: (
         outbreakId: string,
-        caseId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+        caseId: string
     ): Observable<LabResultModel[]> => {
         // finished
-        return Observable.of(LabResultDataServiceMock.labResults[outbreakId] && LabResultDataServiceMock.labResults[outbreakId][caseId] ?
+        return of(LabResultDataServiceMock.labResults[outbreakId] && LabResultDataServiceMock.labResults[outbreakId][caseId] ?
             LabResultDataServiceMock.labResults[outbreakId][caseId] :
             []
         );

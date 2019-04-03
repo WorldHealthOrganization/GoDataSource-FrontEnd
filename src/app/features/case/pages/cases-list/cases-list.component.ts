@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Observable ,  Subscription } from 'rxjs';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -31,8 +30,9 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { EntityModel } from '../../../../core/models/entity.model';
-import { tap } from 'rxjs/operators';
+import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-cases-list',
@@ -155,13 +155,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // reference data
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
-        this.caseClassifications$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION).share();
-        this.caseClassificationsList$ = this.caseClassifications$.map((data: ReferenceDataCategoryModel) => {
-            return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
-                new LabelValuePair(entry.value, entry.id, null, null, entry.iconUrl)
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
+        this.caseClassifications$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION).pipe(share());
+        this.caseClassificationsList$ = this.caseClassifications$
+            .pipe(
+                map((data: ReferenceDataCategoryModel) => {
+                    return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
+                        new LabelValuePair(entry.value, entry.id, null, null, entry.iconUrl)
+                    );
+                })
             );
-        });
         this.caseClassifications$.subscribe((caseClassificationCategory: ReferenceDataCategoryModel) => {
             this.caseClassificationsListMap = _.transform(
                 caseClassificationCategory.entries,
@@ -462,15 +465,18 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             // retrieve the list of Cases
             this.casesList$ = this.caseDataService
                 .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
-                .map((cases: CaseModel[]) => {
-                    // refresh badges list with applied filter
-                    this.getCasesGroupedByClassification();
+                .pipe(
+                    map((cases: CaseModel[]) => {
+                        // refresh badges list with applied filter
+                        this.getCasesGroupedByClassification();
 
-                    return EntityModel.determineAlertness(
-                        this.selectedOutbreak.caseInvestigationTemplate,
-                        cases
-                    );
-                }).pipe(tap(this.checkEmptyList.bind(this)));
+                        return EntityModel.determineAlertness(
+                            this.selectedOutbreak.caseInvestigationTemplate,
+                            cases
+                        );
+                    }),
+                    tap(this.checkEmptyList.bind(this))
+                );
         }
     }
 
@@ -482,7 +488,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.casesListCount$ = this.caseDataService.getCasesCount(this.selectedOutbreak.id, countQueryBuilder).share();
+            this.casesListCount$ = this.caseDataService.getCasesCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }
 
@@ -491,23 +497,27 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      */
     getCasesGroupedByClassification() {
         this.countedCasesGroupedByClassification$ = this.caseClassifications$
-            .mergeMap((refClassificationData: ReferenceDataCategoryModel) => {
-                return this.caseDataService
-                    .getCasesGroupedByClassification(this.selectedOutbreak.id, this.queryBuilder)
-                    .map((data) => {
-                        return _.map(data ? data.classification : [], (item, itemId) => {
-                            const refItem: ReferenceDataEntryModel = _.find(refClassificationData.entries, {id: itemId});
-                            return new CountedItemsListItem(
-                                item.count,
-                                itemId,
-                                item.caseIDs,
-                                refItem ?
-                                    refItem.getColorCode() :
-                                    Constants.DEFAULT_COLOR_REF_DATA
-                            );
-                        });
-                    });
-            });
+            .pipe(
+                mergeMap((refClassificationData: ReferenceDataCategoryModel) => {
+                    return this.caseDataService
+                        .getCasesGroupedByClassification(this.selectedOutbreak.id, this.queryBuilder)
+                        .pipe(
+                            map((data) => {
+                                return _.map(data ? data.classification : [], (item, itemId) => {
+                                    const refItem: ReferenceDataEntryModel = _.find(refClassificationData.entries, {id: itemId});
+                                    return new CountedItemsListItem(
+                                        item.count,
+                                        itemId as any,
+                                        item.caseIDs,
+                                        refItem ?
+                                            refItem.getColorCode() :
+                                            Constants.DEFAULT_COLOR_REF_DATA
+                                    );
+                                });
+                            })
+                        );
+                })
+            );
     }
 
 
@@ -573,11 +583,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                                 // delete case
                                 this.caseDataService
                                     .deleteCase(this.selectedOutbreak.id, caseModel.id)
-                                    .catch((err) => {
-                                        this.snackbarService.showError(err.message);
-
-                                        return ErrorObservable.create(err);
-                                    })
+                                    .pipe(
+                                        catchError((err) => {
+                                            this.snackbarService.showApiError(err);
+                                            return throwError(err);
+                                        })
+                                    )
                                     .subscribe(() => {
                                         this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE');
 
@@ -600,10 +611,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.caseDataService
                         .restoreCase(this.selectedOutbreak.id, caseModel.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
                             // reload data
@@ -624,10 +637,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.caseDataService
                         .convertToContact(this.selectedOutbreak.id, caseModel.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
                             // reload data

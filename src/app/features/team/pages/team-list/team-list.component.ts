@@ -11,7 +11,6 @@ import * as _ from 'lodash';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -19,7 +18,8 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
-import { tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-team-list',
@@ -146,11 +146,12 @@ export class TeamListComponent extends ListComponent implements OnInit {
                             // delete the team
                             this.teamDataService
                                 .deleteTeam(team.id)
-                                .catch((err) => {
-                                    this.snackbarService.showError(err.message);
-
-                                    return ErrorObservable.create(err);
-                                })
+                                .pipe(
+                                    catchError((err) => {
+                                        this.snackbarService.showError(err.message);
+                                        return throwError(err);
+                                    })
+                                )
                                 .subscribe(() => {
                                     this.snackbarService.showSuccess('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_SUCCESS_MESSAGE');
                                     // reload data

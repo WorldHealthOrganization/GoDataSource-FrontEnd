@@ -12,8 +12,9 @@ import { PERMISSION } from '../../../core/models/permission.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { EntityDataService } from '../../../core/services/data/entity.data.service';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 export abstract class RelationshipsListComponent extends ListComponent implements OnInit {
     // Entities Map for specific data
@@ -129,14 +130,16 @@ export abstract class RelationshipsListComponent extends ListComponent implement
         // get person data
         this.entityDataService
             .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
 
-                // Entity not found; navigate back to Entities list
-                this.router.navigate([this.entityMap[this.entityType].link]);
+                    // Entity not found; navigate back to Entities list
+                    this.router.navigate([this.entityMap[this.entityType].link]);
 
-                return ErrorObservable.create(err);
-            })
+                    return throwError(err);
+                })
+            )
             .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
                 this.entity = entityData;
 

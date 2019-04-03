@@ -1,16 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-
 import * as _ from 'lodash';
 import { LoggerService } from '../helper/logger.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Router } from '@angular/router';
 import { StorageKey, StorageService } from '../helper/storage.service';
 import { SnackbarService } from '../helper/snackbar.service';
 import { catchError, tap } from 'rxjs/operators';
-import { throwError } from 'rxjs/internal/observable/throwError';
+import { throwError } from 'rxjs';
 
 @Injectable()
 export class ResponseInterceptor implements HttpInterceptor {

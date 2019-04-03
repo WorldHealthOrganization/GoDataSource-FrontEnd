@@ -1,8 +1,6 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
@@ -13,6 +11,8 @@ import { Observable } from 'rxjs';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-create-role',
@@ -42,7 +42,6 @@ export class CreateRoleComponent extends ConfirmOnFormChanges {
     }
 
     createNewRole(form: NgForm) {
-
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
         if (form.valid && !_.isEmpty(dirtyFields)) {
@@ -50,11 +49,12 @@ export class CreateRoleComponent extends ConfirmOnFormChanges {
             // try to authenticate the user
             this.userRoleDataService
                 .createRole(dirtyFields)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    })
+                )
                 .subscribe((newRole: UserRoleModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_USER_ROLE_ACTION_CREATE_USER_ROLE_SUCCESS_MESSAGE');
 

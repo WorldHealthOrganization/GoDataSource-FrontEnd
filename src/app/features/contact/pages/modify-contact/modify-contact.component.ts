@@ -7,7 +7,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
@@ -30,6 +29,8 @@ import { MatDialogRef } from '@angular/material';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { RelationshipPersonModel } from '../../../../core/models/relationship.model';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-modify-contact',
@@ -221,25 +222,29 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                 ...this.contactData,
                 ...dirtyFields
             })
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
 
-                // hide dialog
-                loadingDialog.close();
+                    // hide dialog
+                    loadingDialog.close();
 
-                return ErrorObservable.create(err);
-            })
+                    return throwError(err);
+                })
+            )
             .subscribe((contactDuplicates: EntityDuplicatesModel) => {
                 // modify Contact
                 const runModifyContact = (finishCallBack?: () => void) => {
                     // modify the contact
                     this.contactDataService
                         .modifyContact(this.selectedOutbreak.id, this.contactId, dirtyFields)
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err);
-                            loadingDialog.close();
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                loadingDialog.close();
+                                return throwError(err);
+                            })
+                        )
                         .subscribe((modifiedContact: ContactModel) => {
                             // update model
                             this.contactData = modifiedContact;

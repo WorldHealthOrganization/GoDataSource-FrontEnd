@@ -1,10 +1,9 @@
 import { Directive, forwardRef, Input } from '@angular/core';
 import { AsyncValidator, AbstractControl, NG_ASYNC_VALIDATORS, ValidationErrors } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, timer, of } from 'rxjs';
 import * as _ from 'lodash';
-
-
 import { Constants } from '../../../core/models/constants';
+import { map, switchMap } from 'rxjs/operators';
 
 export interface IGeneralAsyncValidatorResponse {
     isValid: boolean;
@@ -37,31 +36,36 @@ export class GeneralAsyncValidatorDirective implements AsyncValidator {
             !this.asyncValidatorObservable ||
             _.isEmpty(control.value)
         ) {
-            return Observable.of(null);
+            return of(null);
         } else {
-            return Observable.timer(Constants.DEFAULT_DEBOUNCE_TIME_MILLISECONDS).switchMap(() => {
-                return this.asyncValidatorObservable
-                    .map((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                        if (_.isBoolean(isValid)) {
-                            return isValid ?
-                                null : {
-                                    generalAsyncValidatorDirective: {
-                                        err: this.asyncValidatorErrMsg,
-                                        details: this.asyncValidatorErrMsgTranslateData
+            return timer(Constants.DEFAULT_DEBOUNCE_TIME_MILLISECONDS)
+                .pipe(
+                    switchMap(() => {
+                        return this.asyncValidatorObservable
+                            .pipe(
+                                map((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                                    if (_.isBoolean(isValid)) {
+                                        return isValid ?
+                                            null : {
+                                                generalAsyncValidatorDirective: {
+                                                    err: this.asyncValidatorErrMsg,
+                                                    details: this.asyncValidatorErrMsgTranslateData
+                                                }
+                                            };
+                                    } else {
+                                        const data: IGeneralAsyncValidatorResponse = isValid as IGeneralAsyncValidatorResponse;
+                                        return data.isValid ?
+                                            null : {
+                                                generalAsyncValidatorDirective: {
+                                                    err: data.errMsg ? data.errMsg : this.asyncValidatorErrMsg,
+                                                    details: data.errMsgData ? data.errMsgData : this.asyncValidatorErrMsgTranslateData
+                                                }
+                                            };
                                     }
-                                };
-                        } else {
-                            const data: IGeneralAsyncValidatorResponse = isValid as IGeneralAsyncValidatorResponse;
-                            return data.isValid ?
-                                null : {
-                                    generalAsyncValidatorDirective: {
-                                        err: data.errMsg ? data.errMsg : this.asyncValidatorErrMsg,
-                                        details: data.errMsgData ? data.errMsgData : this.asyncValidatorErrMsgTranslateData
-                                    }
-                                };
-                        }
-                    });
-            });
+                                })
+                            );
+                    })
+                );
         }
     }
 }

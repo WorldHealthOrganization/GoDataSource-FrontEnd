@@ -10,12 +10,11 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 import { catchError, tap } from 'rxjs/operators';
-import { throwError } from 'rxjs/internal/observable/throwError';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-outbreak-templates-list',

@@ -1,4 +1,4 @@
-import {throwError as observableThrowError,  Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ModelHelperService } from '../helper/model-helper.service';
@@ -18,9 +18,8 @@ import { Constants } from '../../models/constants';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import { MetricCasesCountStratifiedOutcome } from '../../models/metrics/metric-cases-count-stratified-outcome.model';
 import { MetricCasesBasedOnContactStatusModel } from '../../models/metrics/metric-cases-based-on-contact-status.model';
-import { catchError } from 'rxjs/operators';
-import { of } from 'rxjs/internal/observable/of';
-import { throwError } from 'rxjs/internal/observable/throwError';
+import { catchError, map } from 'rxjs/operators';
+import { throwError, of } from 'rxjs';
 
 @Injectable()
 export class CaseDataService {
@@ -28,7 +27,8 @@ export class CaseDataService {
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private listFilterDataService: ListFilterDataService
-    ) {}
+    ) {
+    }
 
     /**
      * Retrieve the list of Cases for an Outbreak
@@ -80,6 +80,7 @@ export class CaseDataService {
      * Find case duplicates
      * @param outbreakId
      * @param caseData
+     * @param queryBuilder
      */
     findDuplicates(
         outbreakId: string,
@@ -167,6 +168,7 @@ export class CaseDataService {
     /**
      * Return count of deceased cases
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<any>}
      */
     getDeceasedCasesCount(
@@ -194,6 +196,8 @@ export class CaseDataService {
     /**
      * Return count of hospitalised cases
      * @param {string} outbreakId
+     * @param date
+     * @param queryBuilder
      * @returns {Observable<any>}
      */
     getHospitalisedCasesCount(
@@ -222,6 +226,8 @@ export class CaseDataService {
     /**
      * Return count of isolated cases
      * @param {string} outbreakId
+     * @param date
+     * @param queryBuilder
      * @returns {Observable<any>}
      */
     getIsolatedCasesCount(
@@ -250,6 +256,7 @@ export class CaseDataService {
     /**
      * Return count of suspect cases pending lab result
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<any>}
      */
     getCasesPendingLabResultCount(
@@ -269,10 +276,10 @@ export class CaseDataService {
         return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 
-
     /**
      * Return count of cases refusing to be transferred to a treatment unit
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<any>}
      */
     getCasesRefusingTreatmentCount(
@@ -304,17 +311,20 @@ export class CaseDataService {
     ): Observable<MetricCasesCountStratified[]> {
         const filter = queryBuilder.buildQuery();
         const obs = this.http.get(`outbreaks/${outbreakId}/cases/classification-over-time/count?filter=${filter}`);
-        return obs.map(
-            (listResult) => {
-                const results = [];
-                Object.keys(listResult).forEach((key) => {
-                    // const metricResult = new MetricCasesCountStratified(listResult[key]);
-                    const metricResult = listResult[key];
-                    results.push(metricResult);
-                });
-                return results;
-            }
-        );
+        return obs
+            .pipe(
+                map(
+                    (listResult) => {
+                        const results = [];
+                        Object.keys(listResult).forEach((key) => {
+                            // const metricResult = new MetricCasesCountStratified(listResult[key]);
+                            const metricResult = listResult[key];
+                            results.push(metricResult);
+                        });
+                        return results;
+                    }
+                )
+            );
     }
 
     /**
@@ -329,16 +339,19 @@ export class CaseDataService {
     ): Observable<MetricCasesCountStratified[]> {
         const filter = queryBuilder.buildQuery();
         const obs = this.http.get(`outbreaks/${outbreakId}/cases/classification-over-reporting-time/count?filter=${filter}`);
-        return obs.map(
-            (listResult) => {
-                const results = [];
-                Object.keys(listResult).forEach((key) => {
-                    const metricResult = listResult[key];
-                    results.push(metricResult);
-                });
-                return results;
-            }
-        );
+        return obs
+            .pipe(
+                map(
+                    (listResult) => {
+                        const results = [];
+                        Object.keys(listResult).forEach((key) => {
+                            const metricResult = listResult[key];
+                            results.push(metricResult);
+                        });
+                        return results;
+                    }
+                )
+            );
     }
 
     /**
@@ -353,21 +366,25 @@ export class CaseDataService {
     ): Observable<MetricCasesCountStratifiedOutcome[]> {
         const filter = queryBuilder.buildQuery();
         const obs = this.http.get(`outbreaks/${outbreakId}/cases/outcome-over-time/count?filter=${filter}`);
-        return obs.map(
-            (listResult) => {
-                const results = [];
-                Object.keys(listResult).forEach((key) => {
-                    const metricResult = listResult[key];
-                    results.push(metricResult);
-                });
-                return results;
-            }
-        );
+        return obs
+            .pipe(
+                map(
+                    (listResult) => {
+                        const results = [];
+                        Object.keys(listResult).forEach((key) => {
+                            const metricResult = listResult[key];
+                            results.push(metricResult);
+                        });
+                        return results;
+                    }
+                )
+            );
     }
 
     /**
      * Retrieve cases per location metrics
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<MetricCasesPerLocationCountsModel>}
      */
     getCasesPerLocation(
@@ -427,19 +444,20 @@ export class CaseDataService {
     ): Observable<MetricCasesBasedOnContactStatusModel[]> {
         const filter = queryBuilder.buildQuery();
         const obs = this.http.get(`outbreaks/${outbreakId}/cases/per-period-per-contact-status/count?filter=${filter}`);
-        return obs.map(
-            (listResult: any) => {
-                const results: MetricCasesBasedOnContactStatusModel[] = [];
-                if (listResult.period) {
-
-                    _.forEach(listResult.period, (result) => {
-                        const metricResult: any = result;
-                        results.push(metricResult);
-                    });
-                }
-                return results;
-            }
-        );
+        return obs
+            .pipe(
+                map(
+                    (listResult: any) => {
+                        const results: MetricCasesBasedOnContactStatusModel[] = [];
+                        if (listResult.period) {
+                            _.forEach(listResult.period, (result) => {
+                                results.push(result);
+                            });
+                        }
+                        return results;
+                    }
+                )
+            );
     }
 
     /**
@@ -515,18 +533,21 @@ export class CaseDataService {
             outbreakId,
             visualIdMask,
             personId
-        ).map((visualID: string | VisualIdErrorModel) => {
-            return _.isString(visualID) ?
-                true : {
-                    isValid: false,
-                    errMsg: (visualID as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ?
-                        'LNG_API_ERROR_CODE_INVALID_VISUAL_ID_MASK' :
-                        'LNG_API_ERROR_CODE_DUPLICATE_VISUAL_ID',
-                    errMsgData: {
-                        mask: visualIdRealMask
-                    }
-                };
-        });
+        )
+            .pipe(
+                map((visualID: string | VisualIdErrorModel) => {
+                    return _.isString(visualID) ?
+                        true : {
+                            isValid: false,
+                            errMsg: (visualID as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ?
+                                'LNG_API_ERROR_CODE_INVALID_VISUAL_ID_MASK' :
+                                'LNG_API_ERROR_CODE_DUPLICATE_VISUAL_ID',
+                            errMsgData: {
+                                mask: visualIdRealMask
+                            }
+                        };
+                })
+            );
     }
 
 }

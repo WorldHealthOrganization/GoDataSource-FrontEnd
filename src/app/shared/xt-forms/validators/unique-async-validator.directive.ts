@@ -1,6 +1,7 @@
-import {Attribute, Directive, forwardRef} from '@angular/core';
-import {AsyncValidator, AbstractControl, NG_ASYNC_VALIDATORS, ValidationErrors} from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Attribute, Directive, forwardRef } from '@angular/core';
+import { AsyncValidator, AbstractControl, NG_ASYNC_VALIDATORS, ValidationErrors } from '@angular/forms';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Directive({
     selector: '[app-unique-async-validator][ngModel]',
@@ -25,14 +26,16 @@ export class UniqueAsyncValidatorDirective implements AsyncValidator {
 
     validate(control: AbstractControl): Observable<ValidationErrors> {
 
-        const someAsyncCall = Observable.of(true);
+        const someAsyncCall = of(true);
 
         return someAsyncCall
-            .map((res: boolean) => {
-                // return error KEY (string) or null (for success)
-                return {
-                    uniqueEmail: true
-                };
-            });
+            .pipe(
+                map(() => {
+                    // return error KEY (string) or null (for success)
+                    return {
+                        uniqueEmail: true
+                    };
+                })
+            );
     }
 }

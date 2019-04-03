@@ -11,7 +11,6 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { NgForm, NgModel } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { v4 as uuid } from 'uuid';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FormSelectChangeDetectionPushComponent } from '../../../../shared/components/form-select-change-detection-push/form-select-change-detection-push.component';
@@ -28,6 +27,8 @@ import {
 import { Observable } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { MatDialogRef } from '@angular/material';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 export enum ImportDataExtension {
     CSV = '.csv',
@@ -97,6 +98,7 @@ export class ImportDataComponent implements OnInit {
             this.uploader.options.allowedMimeType = this.allowedMimeTypes;
         }
     }
+
     get allowedExtensions(): string[] {
         return this._allowedExtensions ? this._allowedExtensions : [];
     }
@@ -121,6 +123,7 @@ export class ImportDataComponent implements OnInit {
             this.uploader.options.additionalParameter.model = this._model;
         }
     }
+
     get model(): string {
         return this._model;
     }
@@ -165,11 +168,13 @@ export class ImportDataComponent implements OnInit {
      */
     private _displayLoading: boolean = false;
     private _displayLoadingLocked: boolean = false;
+
     @Input() set displayLoading(value: boolean) {
         if (!this._displayLoadingLocked) {
             this._displayLoading = value;
         }
     }
+
     get displayLoading(): boolean {
         return this._displayLoading;
     }
@@ -201,6 +206,7 @@ export class ImportDataComponent implements OnInit {
             this.uploader.options.url = `${environment.apiUrl}/${this.importFileUrl}`;
         }
     }
+
     get importFileUrl(): string {
         return this._importFileUrl;
     }
@@ -233,6 +239,7 @@ export class ImportDataComponent implements OnInit {
             this.requiredDestinationFieldsMap[v] = true;
         });
     }
+
     get requiredDestinationFields(): string[] {
         return this._requiredDestinationFields;
     }
@@ -464,7 +471,10 @@ export class ImportDataComponent implements OnInit {
             } else {
                 // we should get a ImportableFileModel object
                 let jsonResponse;
-                try { jsonResponse = JSON.parse(response); } catch {}
+                try {
+                    jsonResponse = JSON.parse(response);
+                } catch {
+                }
                 if (
                     !response ||
                     !jsonResponse
@@ -535,7 +545,7 @@ export class ImportDataComponent implements OnInit {
                     value: string | ImportableFilePropertiesModel,
                     property: string,
                     parentPath: string = ''
-                )  => {
+                ) => {
                     // if object we need to go further into it
                     if (_.isObject(value)) {
                         _.each(value, (childValue: string | ImportableFilePropertiesModel, childProperty: string) => {
@@ -797,21 +807,25 @@ export class ImportDataComponent implements OnInit {
                     }), true)
                 .subscribe((answer: DialogAnswer) => {
                     if (answer.button === DialogAnswerButton.Yes) {
-                        this.savedImportMappingService.createImportMapping (new SavedImportMappingModel({
+                        this.savedImportMappingService.createImportMapping(new SavedImportMappingModel({
                             name: answer.inputValue.value.mappingImportName,
                             isPublic: answer.inputValue.value.isPublic,
                             mappingKey: this.savedImportPage,
                             mappingData: this.getMappedImportFieldsForSaving()
-                        })).catch((err) => {
-                            this.snackbarService.showApiError(err);
-                            return ErrorObservable.create(err);
-                        }).subscribe((data) => {
-                            this.getImportMappings();
+                        }))
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showApiError(err);
+                                    return throwError(err);
+                                })
+                            )
+                            .subscribe((data) => {
+                                this.getImportMappings();
 
-                            this.loadedImportMapping = new SavedImportMappingModel(data);
+                                this.loadedImportMapping = new SavedImportMappingModel(data);
 
-                            this.snackbarService.showSuccess(`LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_SUCCESS_MESSAGE`);
-                        });
+                                this.snackbarService.showSuccess(`LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_SUCCESS_MESSAGE`);
+                            });
                     }
                 });
         };
@@ -844,17 +858,21 @@ export class ImportDataComponent implements OnInit {
                             this.loadedImportMapping.id, {
                                 mappingData: this.getMappedImportFieldsForSaving()
                             }
-                        ).catch((err) => {
-                            this.snackbarService.showApiError(err);
-                            return ErrorObservable.create(err);
-                        }).subscribe((data) => {
-                            this.getImportMappings();
+                        )
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showApiError(err);
+                                    return throwError(err);
+                                })
+                            )
+                            .subscribe((data) => {
+                                this.getImportMappings();
 
-                            // update import mapping
-                            this.loadedImportMapping = new SavedImportMappingModel(data);
-                            // display message
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
-                        });
+                                // update import mapping
+                                this.loadedImportMapping = new SavedImportMappingModel(data);
+                                // display message
+                                this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
+                            });
                     } else if (answer.button === DialogAnswerButton.Extra_1) {
                         createImportMapping();
                     }
@@ -883,7 +901,7 @@ export class ImportDataComponent implements OnInit {
             if (!_.isEmpty(fieldOptions)) {
                 _.each(fieldOptions, (fieldOption) => {
                     mappedFieldOptions.push(new SavedImportOption({
-                        source: fieldOption.sourceOption ? fieldOption.sourceOption : '' ,
+                        source: fieldOption.sourceOption ? fieldOption.sourceOption : '',
                         destination: fieldOption.destinationOption ? fieldOption.destinationOption : ''
                     }));
                 });
@@ -1102,7 +1120,7 @@ export class ImportDataComponent implements OnInit {
      * @param index
      * @param item
      */
-    trackByFieldID(index: number, item: {id: string}): string {
+    trackByFieldID(index: number, item: { id: string }): string {
         return item.id;
     }
 
@@ -1224,25 +1242,27 @@ export class ImportDataComponent implements OnInit {
                         this.importDataUrl,
                         importJSON
                     )
-                        .catch((err) => {
-                            // display error message
-                            if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
-                                // construct custom message
-                                this.errMsgDetails = err;
+                        .pipe(
+                            catchError((err) => {
+                                // display error message
+                                if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
+                                    // construct custom message
+                                    this.errMsgDetails = err;
 
-                                // display error
-                                this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
-                            } else {
-                                this.snackbarService.showApiError(err);
-                            }
+                                    // display error
+                                    this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
+                                } else {
+                                    this.snackbarService.showApiError(err);
+                                }
 
-                            // reset loading
-                            this._displayLoading = false;
-                            this._displayLoadingLocked = false;
+                                // reset loading
+                                this._displayLoading = false;
+                                this._displayLoadingLocked = false;
 
-                            // propagate err
-                            return ErrorObservable.create(err);
-                        })
+                                // propagate err
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             // display success
                             this.snackbarService.showSuccess(

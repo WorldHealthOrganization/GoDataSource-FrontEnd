@@ -1,10 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable ,  BehaviorSubject ,  Subject } from 'rxjs';
+import { Observable, BehaviorSubject, Subject } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
-
-
-
 import { OutbreakModel } from '../../models/outbreak.model';
 import { UserRoleModel } from '../../models/user-role.model';
 import { StorageKey, StorageService } from '../helper/storage.service';
@@ -16,13 +13,11 @@ import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
 import * as _ from 'lodash';
-
 import { HierarchicalLocationModel } from '../../models/hierarchical-location.model';
 import { PeoplePossibleDuplicateModel } from '../../models/people-possible-duplicate.model';
 import { EntityType } from '../../models/entity-type';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
-import { pipe } from 'rxjs/internal-compatibility';
-import { catchError, map, takeUntil, tap } from 'rxjs/operators';
+import { catchError, map, mergeMap, takeUntil, tap } from 'rxjs/operators';
 
 @Injectable()
 export class OutbreakDataService {
@@ -36,7 +31,8 @@ export class OutbreakDataService {
         private storageService: StorageService,
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService
-    ) {}
+    ) {
+    }
 
     /**
      * Retrieve the list of Outbreaks
@@ -69,14 +65,18 @@ export class OutbreakDataService {
      */
     deleteOutbreak(outbreakId: string): Observable<any> {
         return this.http.delete(`outbreaks/${outbreakId}`)
-            .mergeMap((res) => {
-                // re-determine the selected Outbreak
-                return this.determineSelectedOutbreak()
-                    .map(() => {
-                        // preserve the output of the main request
-                        return res;
-                    });
-            });
+            .pipe(
+                mergeMap((res) => {
+                    // re-determine the selected Outbreak
+                    return this.determineSelectedOutbreak()
+                        .pipe(
+                            map(() => {
+                                // preserve the output of the main request
+                                return res;
+                            })
+                        );
+                })
+            );
     }
 
     /**
@@ -90,19 +90,23 @@ export class OutbreakDataService {
 
     /**
      * Create a new Outbreak
-     * @param {OutbreakModle} outbreak
+     * @param { OutbreakModel } outbreak
      * @returns {Observable<UserRoleModel[]>}
      */
     createOutbreak(outbreak: OutbreakModel): Observable<any> {
         return this.http.post('outbreaks', outbreak)
-            .mergeMap((res) => {
-                // re-determine the selected Outbreak
-                return this.determineSelectedOutbreak()
-                    .map(() => {
-                        // preserve the output of the main request
-                        return res;
-                    });
-            });
+            .pipe(
+                mergeMap((res) => {
+                    // re-determine the selected Outbreak
+                    return this.determineSelectedOutbreak()
+                        .pipe(
+                            map(() => {
+                                // preserve the output of the main request
+                                return res;
+                            })
+                        );
+                })
+            );
     }
 
     /**
@@ -120,19 +124,24 @@ export class OutbreakDataService {
     /**
      * Modify an existing Outbreak
      * @param {string} outbreakId
+     * @param data
      * @returns {Observable<OutbreakModel>}
      */
     modifyOutbreak(outbreakId: string, data: any): Observable<OutbreakModel> {
         return this.modelHelper.mapObservableToModel(
             this.http.patch(`outbreaks/${outbreakId}`, data)
-                .mergeMap((res) => {
-                    // re-determine the selected Outbreak
-                    return this.determineSelectedOutbreak()
-                        .map(() => {
-                            // preserve the output of the main request
-                            return res;
-                        });
-                }),
+                .pipe(
+                    mergeMap((res) => {
+                        // re-determine the selected Outbreak
+                        return this.determineSelectedOutbreak()
+                            .pipe(
+                                map(() => {
+                                    // preserve the output of the main request
+                                    return res;
+                                })
+                            );
+                    })
+                ),
             OutbreakModel
         );
     }
@@ -268,21 +277,23 @@ export class OutbreakDataService {
         // condition for modify outbreak
         if (outbreakId) {
             qb.filter.where({
-                'id' : {
-                    neq : outbreakId
+                'id': {
+                    neq: outbreakId
                 }
             });
         }
 
         // check if we have duplicates
         return this.getOutbreaksCount(qb)
-            .map((countData: { count: number }) => {
-                return !countData.count ?
-                    true : {
-                        isValid: false,
-                        errMsg: 'LNG_FORM_VALIDATION_ERROR_OUTBREAK_NAME_NOT_UNIQUE'
-                    };
-            });
+            .pipe(
+                map((countData: { count: number }) => {
+                    return !countData.count ?
+                        true : {
+                            isValid: false,
+                            errMsg: 'LNG_FORM_VALIDATION_ERROR_OUTBREAK_NAME_NOT_UNIQUE'
+                        };
+                })
+            );
     }
 
     /**
@@ -316,6 +327,7 @@ export class OutbreakDataService {
     /**
      * Get people inconsistencies
      * @param outbreakId
+     * @param queryBuilder
      */
     getPeopleInconsistencies(
         outbreakId: string,
@@ -323,11 +335,13 @@ export class OutbreakDataService {
     ): Observable<(CaseModel | ContactModel | EventModel)[]> {
         const filter = queryBuilder.buildQuery();
         return this.http.get(`outbreaks/${outbreakId}/people/inconsistencies-in-key-dates?filter=${filter}`)
-            .map((peopleList) => {
-                return _.map(peopleList, (entity) => {
-                    return new EntityModel(entity).model;
-                });
-            });
+            .pipe(
+                map((peopleList) => {
+                    return _.map(peopleList, (entity) => {
+                        return new EntityModel(entity).model;
+                    });
+                })
+            );
     }
 
     /**

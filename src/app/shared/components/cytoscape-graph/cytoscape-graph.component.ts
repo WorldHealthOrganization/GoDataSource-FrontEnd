@@ -14,9 +14,7 @@ import { WorldMapComponent, WorldMapMarker, WorldMapMarkerType, WorldMapPath, Wo
 import { IConvertChainToGraphElements } from '../../../core/services/data/transmission-chain.data.service';
 import { TransmissionChainModel } from '../../../core/models/transmission-chain.model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../core/models/reference-data.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
-
 import { AddressModel, AddressType } from '../../../core/models/address.model';
 import { EntityModel } from '../../../core/models/entity.model';
 import { GraphNodeModel } from '../../../core/models/graph-node.model';
@@ -39,7 +37,7 @@ import { UserModel } from '../../../core/models/user.model';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../core/models/permission.model';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs/internal/observable/throwError';
+import { throwError, forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -878,235 +876,236 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
             !_.isEmpty(this.elements) &&
             !_.isEmpty(this.selectedOutbreak)
         ) {
-            Observable.forkJoin([
+            forkJoin(
                 this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE),
                 this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CERTAINTY_LEVEL),
                 this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION)
-            ]).subscribe(([
-                              personTypes,
-                              certaintyLevels,
-                              caseClassification
-                          ]: [
-                ReferenceDataCategoryModel,
-                ReferenceDataCategoryModel,
-                ReferenceDataCategoryModel
-                ]) => {
-                // map colors to types
-                const typeToColorMap = {};
-                _.each(personTypes.entries, (entry: ReferenceDataEntryModel) => {
-                    typeToColorMap[entry.id] = entry.colorCode;
-                });
-
-                // map certainty level to color
-                const certaintyLevelToColorMap = {};
-                _.each(certaintyLevels.entries, (entry: ReferenceDataEntryModel) => {
-                    certaintyLevelToColorMap[entry.id] = entry.colorCode;
-                });
-
-                // map case classification to color
-                const caseClassificationToColorMap = {};
-                _.each(caseClassification.entries, (entry: ReferenceDataEntryModel) => {
-                    caseClassificationToColorMap[entry.id] = entry.colorCode;
-                });
-
-                // reset data
-                const markersMap: {
-                    [idEntityModel: string]: WorldMapMarker
-                } = {};
-                this.markers = [];
-                this.lines = [];
-
-                // add valid address to marked
-                const markerCircleRadius: number = 7;
-                const addValidAddressToMarker = (
-                    address: AddressModel,
-                    entity: EntityModel,
-                    gNode: { data: GraphNodeModel }
-                ) => {
-                    // validate address
-                    if (
-                        _.isEmpty(address) ||
-                        _.isEmpty(address.geoLocation) ||
-                        !_.isNumber(address.geoLocation.lat) ||
-                        !_.isNumber(address.geoLocation.lng)
-                    ) {
-                        return;
-                    }
-
-                    // create marker
-                    const marker: WorldMapMarker = new WorldMapMarker({
-                        point: new WorldMapPoint(
-                            address.geoLocation.lat,
-                            address.geoLocation.lng
-                        ),
-                        type: WorldMapMarkerType.CIRCLE,
-                        radius: markerCircleRadius,
-                        color: typeToColorMap[entity.type] ? typeToColorMap[entity.type] : Constants.DEFAULT_COLOR_CHAINS,
-                        label: gNode.data.name,
-                        labelColor: (entity.model as CaseModel).classification && caseClassificationToColorMap[(entity.model as CaseModel).classification] ?
-                            caseClassificationToColorMap[(entity.model as CaseModel).classification] :
-                            Constants.DEFAULT_COLOR_CHAINS,
-                        data: entity,
-                        selected: (map: WorldMapComponent, mark: WorldMapMarker) => {
-                            // clear selected
-                            map.clearSelectedItems();
-
-                            // display entity information ( case / contact / event )
-                            const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
-                            const localEntity: EntityModel = mark.data;
-                            this.entityDataService
-                                .getEntity(localEntity.type, this.selectedOutbreak.id, localEntity.model.id)
-                                .pipe(
-                                    catchError((err) => {
-                                        this.snackbarService.showApiError(err);
-                                        loadingDialog.close();
-                                        return throwError(err);
-                                    })
-                                )
-                                .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
-                                    // hide loading dialog
-                                    loadingDialog.close();
-
-                                    // show node information
-                                    this.dialogService.showCustomDialog(
-                                        ViewCotNodeDialogComponent,
-                                        {
-                                            ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
-                                            ...{
-                                                data: {
-                                                    entity: entityData
-                                                }
-                                            }
-                                        }
-                                    );
-                                });
-                        }
+            )
+                .subscribe(([
+                                personTypes,
+                                certaintyLevels,
+                                caseClassification
+                            ]: [
+                    ReferenceDataCategoryModel,
+                    ReferenceDataCategoryModel,
+                    ReferenceDataCategoryModel
+                    ]) => {
+                    // map colors to types
+                    const typeToColorMap = {};
+                    _.each(personTypes.entries, (entry: ReferenceDataEntryModel) => {
+                        typeToColorMap[entry.id] = entry.colorCode;
                     });
 
-                    // add marker
-                    this.markers.push(marker);
+                    // map certainty level to color
+                    const certaintyLevelToColorMap = {};
+                    _.each(certaintyLevels.entries, (entry: ReferenceDataEntryModel) => {
+                        certaintyLevelToColorMap[entry.id] = entry.colorCode;
+                    });
 
-                    // add marker to map list
-                    markersMap[entity.model.id] = marker;
-                };
+                    // map case classification to color
+                    const caseClassificationToColorMap = {};
+                    _.each(caseClassification.entries, (entry: ReferenceDataEntryModel) => {
+                        caseClassificationToColorMap[entry.id] = entry.colorCode;
+                    });
 
-                // go through nodes that are rendered on COT graph and determine what we can render on geo-map
-                const firstChain: TransmissionChainModel = this.chainElements[0];
-                _.each(this.elements.nodes, (gNode: { data: GraphNodeModel }) => {
-                    // get case / contact / event ...
-                    const entity: EntityModel = firstChain.nodes[gNode.data.id];
-                    if (!_.isEmpty(entity)) {
-                        switch (entity.type) {
-                            // events
-                            case EntityType.EVENT:
-                                addValidAddressToMarker(
-                                    (entity.model as EventModel).address,
-                                    entity,
-                                    gNode
-                                );
-                                break;
+                    // reset data
+                    const markersMap: {
+                        [idEntityModel: string]: WorldMapMarker
+                    } = {};
+                    this.markers = [];
+                    this.lines = [];
 
-                            // contacts ( same as case )
-                            case EntityType.CONTACT:
-                                addValidAddressToMarker(
-                                    _.find(
-                                        (entity.model as ContactModel).addresses,
-                                        {
-                                            typeId: AddressType.CURRENT_ADDRESS
-                                        }
-                                    ),
-                                    entity,
-                                    gNode
-                                );
-                                break;
-
-                            // cases ( same as contact )
-                            case EntityType.CASE:
-                                addValidAddressToMarker(
-                                    _.find(
-                                        (entity.model as CaseModel).addresses,
-                                        {
-                                            typeId: AddressType.CURRENT_ADDRESS
-                                        }
-                                    ),
-                                    entity,
-                                    gNode
-                                );
-                                break;
+                    // add valid address to marked
+                    const markerCircleRadius: number = 7;
+                    const addValidAddressToMarker = (
+                        address: AddressModel,
+                        entity: EntityModel,
+                        gNode: { data: GraphNodeModel }
+                    ) => {
+                        // validate address
+                        if (
+                            _.isEmpty(address) ||
+                            _.isEmpty(address.geoLocation) ||
+                            !_.isNumber(address.geoLocation.lat) ||
+                            !_.isNumber(address.geoLocation.lng)
+                        ) {
+                            return;
                         }
-                    }
-                });
 
-                // map relationships
-                const relationshipMap: {
-                    [idRelationship: string]: RelationshipModel
-                } = {};
-                _.each(firstChain.relationships, (relationship: RelationshipModel) => {
-                    relationshipMap[relationship.id] = relationship;
-                });
-
-                // render relationships
-                _.each(this.elements.edges, (gEdge: { data: GraphEdgeModel }) => {
-                    // render relation
-                    const relationship: RelationshipModel = relationshipMap[gEdge.data.id];
-                    if (
-                        !_.isEmpty(relationship) &&
-                        markersMap[gEdge.data.source] &&
-                        markersMap[gEdge.data.target]
-                    ) {
-                        this.lines.push(new WorldMapPath({
-                            points: [
-                                markersMap[gEdge.data.source].point,
-                                markersMap[gEdge.data.target].point
-                            ],
-                            color: certaintyLevelToColorMap[relationship.certaintyLevelId] ? certaintyLevelToColorMap[relationship.certaintyLevelId] : Constants.DEFAULT_COLOR_CHAINS,
-                            type: WorldMapPathType.ARROW,
-                            lineWidth: 5,
-                            offsetX: -(markerCircleRadius * 2 + 3),
-                            data: relationship,
-                            selected: (map: WorldMapComponent, path: WorldMapPath) => {
+                        // create marker
+                        const marker: WorldMapMarker = new WorldMapMarker({
+                            point: new WorldMapPoint(
+                                address.geoLocation.lat,
+                                address.geoLocation.lng
+                            ),
+                            type: WorldMapMarkerType.CIRCLE,
+                            radius: markerCircleRadius,
+                            color: typeToColorMap[entity.type] ? typeToColorMap[entity.type] : Constants.DEFAULT_COLOR_CHAINS,
+                            label: gNode.data.name,
+                            labelColor: (entity.model as CaseModel).classification && caseClassificationToColorMap[(entity.model as CaseModel).classification] ?
+                                caseClassificationToColorMap[(entity.model as CaseModel).classification] :
+                                Constants.DEFAULT_COLOR_CHAINS,
+                            data: entity,
+                            selected: (map: WorldMapComponent, mark: WorldMapMarker) => {
                                 // clear selected
                                 map.clearSelectedItems();
 
-                                // display relationship information
+                                // display entity information ( case / contact / event )
                                 const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
-                                const localRelationship: RelationshipModel = path.data;
-                                this.relationshipDataService
-                                    .getEntityRelationship(
-                                        this.selectedOutbreak.id,
-                                        localRelationship.sourcePerson.type,
-                                        localRelationship.sourcePerson.id,
-                                        localRelationship.id
-                                    )
+                                const localEntity: EntityModel = mark.data;
+                                this.entityDataService
+                                    .getEntity(localEntity.type, this.selectedOutbreak.id, localEntity.model.id)
                                     .pipe(
                                         catchError((err) => {
-                                            this.snackbarService.showError(err.message);
+                                            this.snackbarService.showApiError(err);
                                             loadingDialog.close();
                                             return throwError(err);
                                         })
                                     )
-                                    .subscribe((relationshipData) => {
+                                    .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
                                         // hide loading dialog
                                         loadingDialog.close();
 
-                                        // show edge information
+                                        // show node information
                                         this.dialogService.showCustomDialog(
-                                            ViewCotEdgeDialogComponent,
+                                            ViewCotNodeDialogComponent,
                                             {
-                                                ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+                                                ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
                                                 ...{
                                                     data: {
-                                                        relationship: relationshipData
+                                                        entity: entityData
                                                     }
                                                 }
                                             }
                                         );
                                     });
                             }
-                        }));
-                    }
+                        });
+
+                        // add marker
+                        this.markers.push(marker);
+
+                        // add marker to map list
+                        markersMap[entity.model.id] = marker;
+                    };
+
+                    // go through nodes that are rendered on COT graph and determine what we can render on geo-map
+                    const firstChain: TransmissionChainModel = this.chainElements[0];
+                    _.each(this.elements.nodes, (gNode: { data: GraphNodeModel }) => {
+                        // get case / contact / event ...
+                        const entity: EntityModel = firstChain.nodes[gNode.data.id];
+                        if (!_.isEmpty(entity)) {
+                            switch (entity.type) {
+                                // events
+                                case EntityType.EVENT:
+                                    addValidAddressToMarker(
+                                        (entity.model as EventModel).address,
+                                        entity,
+                                        gNode
+                                    );
+                                    break;
+
+                                // contacts ( same as case )
+                                case EntityType.CONTACT:
+                                    addValidAddressToMarker(
+                                        _.find(
+                                            (entity.model as ContactModel).addresses,
+                                            {
+                                                typeId: AddressType.CURRENT_ADDRESS
+                                            }
+                                        ),
+                                        entity,
+                                        gNode
+                                    );
+                                    break;
+
+                                // cases ( same as contact )
+                                case EntityType.CASE:
+                                    addValidAddressToMarker(
+                                        _.find(
+                                            (entity.model as CaseModel).addresses,
+                                            {
+                                                typeId: AddressType.CURRENT_ADDRESS
+                                            }
+                                        ),
+                                        entity,
+                                        gNode
+                                    );
+                                    break;
+                            }
+                        }
+                    });
+
+                    // map relationships
+                    const relationshipMap: {
+                        [idRelationship: string]: RelationshipModel
+                    } = {};
+                    _.each(firstChain.relationships, (relationship: RelationshipModel) => {
+                        relationshipMap[relationship.id] = relationship;
+                    });
+
+                    // render relationships
+                    _.each(this.elements.edges, (gEdge: { data: GraphEdgeModel }) => {
+                        // render relation
+                        const relationship: RelationshipModel = relationshipMap[gEdge.data.id];
+                        if (
+                            !_.isEmpty(relationship) &&
+                            markersMap[gEdge.data.source] &&
+                            markersMap[gEdge.data.target]
+                        ) {
+                            this.lines.push(new WorldMapPath({
+                                points: [
+                                    markersMap[gEdge.data.source].point,
+                                    markersMap[gEdge.data.target].point
+                                ],
+                                color: certaintyLevelToColorMap[relationship.certaintyLevelId] ? certaintyLevelToColorMap[relationship.certaintyLevelId] : Constants.DEFAULT_COLOR_CHAINS,
+                                type: WorldMapPathType.ARROW,
+                                lineWidth: 5,
+                                offsetX: -(markerCircleRadius * 2 + 3),
+                                data: relationship,
+                                selected: (map: WorldMapComponent, path: WorldMapPath) => {
+                                    // clear selected
+                                    map.clearSelectedItems();
+
+                                    // display relationship information
+                                    const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+                                    const localRelationship: RelationshipModel = path.data;
+                                    this.relationshipDataService
+                                        .getEntityRelationship(
+                                            this.selectedOutbreak.id,
+                                            localRelationship.sourcePerson.type,
+                                            localRelationship.sourcePerson.id,
+                                            localRelationship.id
+                                        )
+                                        .pipe(
+                                            catchError((err) => {
+                                                this.snackbarService.showError(err.message);
+                                                loadingDialog.close();
+                                                return throwError(err);
+                                            })
+                                        )
+                                        .subscribe((relationshipData) => {
+                                            // hide loading dialog
+                                            loadingDialog.close();
+
+                                            // show edge information
+                                            this.dialogService.showCustomDialog(
+                                                ViewCotEdgeDialogComponent,
+                                                {
+                                                    ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+                                                    ...{
+                                                        data: {
+                                                            relationship: relationshipData
+                                                        }
+                                                    }
+                                                }
+                                            );
+                                        });
+                                }
+                            }));
+                        }
+                    });
                 });
-            });
         }
     }
 }

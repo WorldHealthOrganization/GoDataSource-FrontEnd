@@ -1,6 +1,6 @@
 import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
 import { HostListener, Injectable, QueryList, ViewChildren } from '@angular/core';
-import { Observable ,  Observer } from 'rxjs';
+import { Observable, Observer } from 'rxjs';
 import * as _ from 'lodash';
 import { DialogService } from '../helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../shared/components/dialog/dialog.component';
@@ -71,8 +71,9 @@ export class ConfirmOnFormChanges {
 @Injectable()
 export class PageChangeConfirmationGuard implements CanDeactivate<ConfirmOnFormChanges> {
     constructor(
-       private dialogService: DialogService
-    ) {}
+        private dialogService: DialogService
+    ) {
+    }
 
     /**
      * Handle can deactivate
@@ -127,9 +128,9 @@ export class PageChangeConfirmationGuard implements CanDeactivate<ConfirmOnFormC
         this.dialogService
             .showConfirm('LNG_DIALOG_CONFIRM_UNSAVED_DATA')
             .subscribe((dialogAnswer: DialogAnswer) => {
-                observer.next(dialogAnswer.button === DialogAnswerButton.Yes);
-                observer.complete();
-            }
-        );
+                    observer.next(dialogAnswer.button === DialogAnswerButton.Yes);
+                    observer.complete();
+                }
+            );
     }
 }

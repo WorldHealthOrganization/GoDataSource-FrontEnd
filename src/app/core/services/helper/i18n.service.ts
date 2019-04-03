@@ -143,7 +143,7 @@ export class I18nService {
      * @param {{}} data Parameters to be replaced in translated message
      * @returns {Observable<string | any>}
      */
-    get(token, data = {}) {
+    get(token, data = {}): Observable<string | any> {
         return this.translateService.get(token, data);
     }
 

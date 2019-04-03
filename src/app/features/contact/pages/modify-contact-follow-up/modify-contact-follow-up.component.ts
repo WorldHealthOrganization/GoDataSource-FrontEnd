@@ -6,7 +6,6 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { NgForm } from '@angular/forms';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
@@ -24,6 +23,8 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { FollowUpPage } from '../../typings/follow-up-page';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-modify-follow-up',
@@ -116,15 +117,18 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
             // retrieve root case information
             this.caseDataService
                 .getCase(this.selectedOutbreak.id, this.rootCaseId)
-                .catch((err) => {
-                    // show error message
-                    this.snackbarService.showApiError(err);
+                .pipe(
+                    catchError((err) => {
+                        // show error message
+                        this.snackbarService.showApiError(err);
 
-                    // redirect
-                    this.disableDirtyConfirm();
-                    this.router.navigate([this.rootPageUrl]);
-                    return ErrorObservable.create(err);
-                })
+                        // redirect
+                        this.disableDirtyConfirm();
+                        this.router.navigate([this.rootPageUrl]);
+
+                        return throwError(err);
+                    })
+                )
                 .subscribe((caseData) => {
                     this.rootCaseData = caseData;
 
@@ -142,15 +146,18 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
             // retrieve follow-up information
             this.followUpsDataService
                 .getFollowUp(this.selectedOutbreak.id, this.contactId, this.followUpId)
-                .catch((err) => {
-                    // show error message
-                    this.snackbarService.showApiError(err);
+                .pipe(
+                    catchError((err) => {
+                        // show error message
+                        this.snackbarService.showApiError(err);
 
-                    // redirect
-                    this.disableDirtyConfirm();
-                    this.router.navigate([this.rootPageUrl]);
-                    return ErrorObservable.create(err);
-                })
+                        // redirect
+                        this.disableDirtyConfirm();
+                        this.router.navigate([this.rootPageUrl]);
+
+                        return throwError(err);
+                    })
+                )
                 .subscribe((followUpData: FollowUpModel) => {
                     this.followUpData = new FollowUpModel(followUpData);
 
@@ -248,11 +255,13 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.followUpsDataService
             .modifyFollowUp(this.selectedOutbreak.id, this.followUpData.personId, this.followUpData.id, dirtyFields)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
             .subscribe((followUpData) => {
                 // update model
                 this.followUpData = followUpData;

@@ -5,14 +5,14 @@ import { LocationDataService } from '../../../core/services/data/location.data.s
 import { HierarchicalLocationModel } from '../../../core/models/hierarchical-location.model';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
-
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { Subject ,  Subscription } from 'rxjs';
 import { ErrorMessage } from '../../xt-forms/core/error-message';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { NgOption, NgSelectComponent } from '@ng-select/ng-select';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 export class LocationAutoItem {
     constructor(
@@ -228,10 +228,12 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
 
         // retrieve hierarchic location list
         const request = locationsList$
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    return throwError(err);
+                })
+            )
             .subscribe((hierarchicalLocation: HierarchicalLocationModel[]) => {
                 // list to check
                 const locationItems = [];
