@@ -20,6 +20,11 @@ export const EnglishUsLang = {
         'LNG_APP_PAGE_IMPORT_LOCATION_DATA': 'Locations',
 
         /**
+         * uiGeneralTooltips
+         */
+        'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION' : 'Regenerate visual ID',
+
+        /**
          * REMOVE the tokens from below
          */
         // ...

@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { NgForm } from '@angular/forms';
+import { NgForm, NgModel } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -66,6 +66,9 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
 
     contactIdMaskValidator: Observable<boolean>;
 
+    displayRefresh: boolean = false;
+    @ViewChild('visualId') visualId: NgModel;
+
     constructor(
         private referenceDataDataService: ReferenceDataDataService,
         protected route: ActivatedRoute,
@@ -109,7 +112,9 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                     .getSelectedOutbreak()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.selectedOutbreak = selectedOutbreak;
-
+                        if (!_.isEmpty(this.selectedOutbreak.contactIdMask)) {
+                            this.displayRefresh = true;
+                        }
                         // get contact
                         this.retrieveContactData();
 
@@ -364,5 +369,15 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                 this.contactData
             )
         );
+    }
+
+    /**
+     * Generate visual ID for contact
+     */
+    generateVisualId() {
+        if (!_.isEmpty(this.selectedOutbreak.contactIdMask)) {
+            this.contactData.visualId = this.selectedOutbreak.contactIdMask;
+            this.visualId.control.markAsDirty();
+        }
     }
 }

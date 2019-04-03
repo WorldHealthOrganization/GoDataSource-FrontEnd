@@ -69,6 +69,7 @@
             'menu': '&#xe90a;',
             'home': '&#xe901;',
             'info': '&#xe923;',
+            'refresh': '&#xe92e;',
             'lab': '&#xe9aa;',
             'arrowADown': '&#xe922;',
             'arrowAUp': '&#xe921;',
