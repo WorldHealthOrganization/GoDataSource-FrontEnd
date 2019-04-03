@@ -913,6 +913,7 @@ export class ImportDataComponent implements OnInit {
         // keep loaded import mapping reference
         this.loadedImportMapping = savedImportMapping;
 
+        const mapOfRequiredDestinationFields = this.requiredDestinationFieldsMap ? _.clone(this.requiredDestinationFieldsMap) : {};
         this.mappedFields = [];
         _.each(savedImportMapping.mappingData, (option: SavedImportField) => {
             const mapField = new ImportableMapField(
@@ -927,7 +928,29 @@ export class ImportDataComponent implements OnInit {
                 };
             });
             mapField.sourceDestinationLevel = option.levels;
+
+            // required ?
+            if (mapOfRequiredDestinationFields[mapField.destinationField]) {
+                mapField.readonly = true;
+                delete mapOfRequiredDestinationFields[mapField.destinationField];
+            }
+
+            // add it to the list
             this.mappedFields.push(mapField);
+        });
+
+        // add missing required fields
+        _.each(mapOfRequiredDestinationFields, (n: boolean, property: string) => {
+            // create
+            const importableItem = new ImportableMapField(
+                property
+            );
+
+            // make it readonly
+            importableItem.readonly = true;
+
+            // add to list
+            this.mappedFields.push(importableItem);
         });
     }
 
