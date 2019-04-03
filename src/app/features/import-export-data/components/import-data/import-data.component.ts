@@ -271,12 +271,6 @@ export class ImportDataComponent implements OnInit {
     initialImportMapping: ImportableMapField[] = [];
 
     /**
-     * Mapped fields for saving
-     * @type {Array}
-     */
-    mappedImportFieldsForSaving: SavedImportField[] = [];
-
-    /**
      * Keep err msg details
      */
     errMsgDetails: {
@@ -897,11 +891,11 @@ export class ImportDataComponent implements OnInit {
 
             return mappedFieldOptions;
         };
-        // reset all mapped import fields for saving
-        this.mappedImportFieldsForSaving = [];
+        // create array of mapped import fields for saving
+        const mappedImportFieldsForSaving = [];
 
         _.each(this.mappedFields, (mappedField: ImportableMapField) => {
-            this.mappedImportFieldsForSaving.push(new SavedImportField({
+            mappedImportFieldsForSaving.push(new SavedImportField({
                 source: mappedField.sourceField,
                 destination: mappedField.destinationField,
                 options: mappedFiledOptions(mappedField.mappedOptions),
@@ -909,7 +903,7 @@ export class ImportDataComponent implements OnInit {
             }));
         });
 
-        return this.mappedImportFieldsForSaving;
+        return mappedImportFieldsForSaving;
     }
 
     /**
