@@ -61,7 +61,7 @@
                                 <!-- [maxlength]="255" -->
                                 <app-form-input
                                     name="visualId"
-                                    #visualId
+                                    #visualId="ngModel"
                                     [(ngModel)]="contactData.visualId"
                                     [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
                                     tooltip="LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"

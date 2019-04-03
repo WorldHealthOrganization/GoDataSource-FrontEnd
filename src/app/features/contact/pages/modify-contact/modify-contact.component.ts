@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { FormControlName, NgForm } from '@angular/forms';
+import { NgForm, NgModel } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -67,7 +67,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     contactIdMaskValidator: Observable<boolean>;
 
     displayRefresh: boolean = false;
-    @ViewChild('visualId') visualId: FormControlName;
+    @ViewChild('visualId') visualId: NgModel;
 
     constructor(
         private referenceDataDataService: ReferenceDataDataService,

@@ -4,7 +4,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { FormControlName, NgForm } from '@angular/forms';
+import { NgForm, NgModel } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -76,7 +76,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     caseIdMaskValidator: Observable<boolean>;
 
     displayRefresh: boolean = false;
-    @ViewChild('visualId') visualId: FormControlName;
+    @ViewChild('visualId') visualId: NgModel;
 
     constructor(
         private router: Router,
