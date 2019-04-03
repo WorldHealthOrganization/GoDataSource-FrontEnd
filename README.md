@@ -1,6 +1,6 @@
 # Go.Data - Front End application
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.4, using Angular v5.2.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.7, using Angular v7.2.11.
 
 ## Installation (Development Environment)
 
@@ -8,7 +8,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
     
 Install latest LTS versions of Node.js and npm on your machine (https://nodejs.org/download/).
 
-- Current Node.js version for development: 8.12.0
+- Current Node.js version for development: 10.13.0
 - Current npm version for development: 6.4.1
     
 Install git on your machine

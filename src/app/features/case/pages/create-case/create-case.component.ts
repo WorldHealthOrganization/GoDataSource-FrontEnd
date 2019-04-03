@@ -225,7 +225,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                             // add link
                             possibleDuplicates.push(new DialogField({
                                 name: 'link',
-                                placeholder: (index + 1 ) + '. ' + EntityModel.getNameWithDOBAge(
+                                placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
                                     caseData,
                                     this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
                                     this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
@@ -242,14 +242,14 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                             customInput: true,
                             fieldsList: possibleDuplicates,
                         }))
-                        .subscribe((answer) => {
-                            if (answer.button === DialogAnswerButton.Yes) {
-                                runCreateCase();
-                            } else {
-                                // hide dialog
-                                loadingDialog.close();
-                            }
-                        });
+                            .subscribe((answer) => {
+                                if (answer.button === DialogAnswerButton.Yes) {
+                                    runCreateCase();
+                                } else {
+                                    // hide dialog
+                                    loadingDialog.close();
+                                }
+                            });
                     } else {
                         runCreateCase();
                     }
