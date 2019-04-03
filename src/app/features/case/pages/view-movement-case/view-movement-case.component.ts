@@ -6,8 +6,8 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel } from '../../../../core/models/address.model';
-import 'rxjs/add/observable/forkJoin';
-import { Observable } from 'rxjs/Observable';
+
+import { Observable } from 'rxjs';
 import { WorldMapMovementComponent } from '../../../../shared/components/world-map-movement/world-map-movement.component';
 import { EntityType } from '../../../../core/models/entity-type';
 

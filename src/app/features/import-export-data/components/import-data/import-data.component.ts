@@ -25,7 +25,7 @@ import {
     SavedImportField, SavedImportMappingModel,
     SavedImportOption
 } from '../../../../core/models/saved-import-mapping.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { MatDialogRef } from '@angular/material';
 

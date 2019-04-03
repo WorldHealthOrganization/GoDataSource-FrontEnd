@@ -9,7 +9,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { LabResultModel } from '../../../../core/models/lab-result.model';

@@ -12,9 +12,7 @@ import { Icon, Style, Text, Fill, Stroke, Circle as CircleStyle } from 'ol/style
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { MapServerModel } from '../../../core/models/map-server.model';
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
-import { Subscription } from 'rxjs/Subscription';
+import { Observable ,  Subscriber ,  Subscription } from 'rxjs';
 
 export class WorldMapPoint {
     constructor(

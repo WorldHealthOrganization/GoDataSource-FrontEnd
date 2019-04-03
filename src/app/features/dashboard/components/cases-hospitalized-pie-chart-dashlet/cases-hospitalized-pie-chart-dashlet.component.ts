@@ -3,15 +3,13 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { MetricChartDataModel } from '../../../../core/models/metrics/metric-chart-data.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable ,  Subscription ,  Subscriber } from 'rxjs';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import 'rxjs/add/observable/forkJoin';
+
 import { Moment } from 'moment';
-import { Subscription } from 'rxjs/Subscription';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Subscriber } from 'rxjs/Subscriber';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({

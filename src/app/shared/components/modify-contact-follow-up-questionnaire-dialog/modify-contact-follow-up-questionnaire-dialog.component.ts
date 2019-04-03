@@ -10,7 +10,7 @@ import { SnackbarService } from '../../../core/services/helper/snackbar.service'
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 
 export class ModifyContactFollowUpQuestionnaireData {

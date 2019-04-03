@@ -15,11 +15,11 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
-import 'rxjs/add/operator/filter';
+
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/forkJoin';
+import { Observable } from 'rxjs';
+
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';

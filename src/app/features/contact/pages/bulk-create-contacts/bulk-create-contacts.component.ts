@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -27,7 +27,7 @@ import { EntityModel } from '../../../../core/models/entity.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { NgModel } from '@angular/forms';
 import { ContactModel } from '../../../../core/models/contact.model';
-import 'rxjs/add/operator/mergeMap';
+
 
 @Component({
     selector: 'app-bulk-create-contacts',

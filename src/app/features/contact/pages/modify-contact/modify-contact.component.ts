@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm, NgModel } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ActivatedRoute, Router } from '@angular/router';

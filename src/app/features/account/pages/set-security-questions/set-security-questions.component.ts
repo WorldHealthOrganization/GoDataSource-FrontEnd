@@ -8,7 +8,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SecurityQuestionModel } from '../../../../core/models/securityQuestion.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 @Component({

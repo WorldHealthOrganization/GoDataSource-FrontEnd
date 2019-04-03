@@ -1,6 +1,7 @@
+
+import {throwError as observableThrowError,  Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { ContactModel } from '../../models/contact.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
@@ -240,7 +241,7 @@ export class ContactDataService {
                             response
                         )
                     ) :
-                    Observable.throw(response);
+                    observableThrowError(response);
             });
     }
 

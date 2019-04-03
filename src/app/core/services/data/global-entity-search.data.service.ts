@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { CaseModel } from '../../models/case.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
 import { HttpClient } from '@angular/common/http';
-import 'rxjs/add/operator/mergeMap';
+
 import * as _ from 'lodash';
 import { EntityModel } from '../../models/entity.model';
 

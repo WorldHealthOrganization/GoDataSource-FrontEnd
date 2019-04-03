@@ -13,8 +13,8 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import 'rxjs/add/observable/forkJoin';
-import { Observable } from 'rxjs/Observable';
+
+import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { TeamModel } from '../../../../core/models/team.model';

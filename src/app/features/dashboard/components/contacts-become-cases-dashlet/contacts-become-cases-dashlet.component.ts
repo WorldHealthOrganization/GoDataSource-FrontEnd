@@ -5,9 +5,8 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { Constants } from '../../../../core/models/constants';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
-import 'rxjs/add/observable/forkJoin';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+
+import { Observable ,  Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-contacts-become-cases-dashlet',

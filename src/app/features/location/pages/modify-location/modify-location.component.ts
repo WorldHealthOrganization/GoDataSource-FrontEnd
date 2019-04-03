@@ -13,7 +13,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import * as _ from 'lodash';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { LocationBreadcrumbsComponent } from '../../../../shared/components/location-breadcrumbs/location-breadcrumbs.component';

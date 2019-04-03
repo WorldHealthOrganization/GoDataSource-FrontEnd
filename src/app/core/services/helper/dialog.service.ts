@@ -5,7 +5,7 @@ import {
     DialogComponent,
     DialogConfiguration, DialogField
 } from '../../../shared/components/dialog/dialog.component';
-import { Observable } from 'rxjs/Observable';
+import { Observable ,  Subscriber } from 'rxjs';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../models/label-value-pair';
 import { ImportExportDataService } from '../data/import-export.data.service';
@@ -13,7 +13,6 @@ import { SnackbarService } from './snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import * as FileSaver from 'file-saver';
-import { Subscriber } from 'rxjs/Subscriber';
 import { LoadingDialogComponent, LoadingDialogModel } from '../../../shared/components/loading-dialog/loading-dialog.component';
 
 export enum ExportDataExtension {

@@ -1,6 +1,6 @@
 import { Component, Inject, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { HelpItemModel } from '../../../core/models/help-item.model';
 import { ListComponent } from '../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';

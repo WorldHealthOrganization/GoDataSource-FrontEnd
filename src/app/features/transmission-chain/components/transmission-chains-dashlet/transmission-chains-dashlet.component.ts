@@ -10,11 +10,10 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { forkJoin } from 'rxjs/observable/forkJoin';
+import { forkJoin ,  Observable ,  Subscription } from 'rxjs';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -26,7 +25,6 @@ import * as moment from 'moment';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { Moment } from 'moment';
-import { Subscription } from 'rxjs/Subscription';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { TransmissionChainFilters } from '../transmission-chains-filters/transmission-chains-filters.component';
 

@@ -8,10 +8,10 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { IconModel } from '../../../../core/models/icon.model';
 import { IconDataService } from '../../../../core/services/data/icon.data.service';
-import 'rxjs/add/operator/switchMap';
+
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({

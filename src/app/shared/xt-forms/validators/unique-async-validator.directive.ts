@@ -1,6 +1,6 @@
 import {Attribute, Directive, forwardRef} from '@angular/core';
 import {AsyncValidator, AbstractControl, NG_ASYNC_VALIDATORS, ValidationErrors} from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 @Directive({
     selector: '[app-unique-async-validator][ngModel]',

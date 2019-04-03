@@ -3,7 +3,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable ,  Subscription } from 'rxjs';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { Constants } from '../../../../core/models/constants';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
@@ -30,7 +30,6 @@ import { TeamDataService } from '../../../../core/services/data/team.data.servic
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { NgModel } from '@angular/forms';
-import { Subscription } from 'rxjs/Subscription';
 import { tap } from 'rxjs/operators';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';

@@ -7,7 +7,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import * as _ from 'lodash';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { PeoplePossibleDuplicateModel } from '../../../../core/models/people-possible-duplicate.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { AddressModel } from '../../../../core/models/address.model';

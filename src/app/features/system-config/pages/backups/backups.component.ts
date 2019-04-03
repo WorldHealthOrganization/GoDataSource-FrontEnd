@@ -11,7 +11,7 @@ import { SystemSettingsModel } from '../../../../core/models/system-settings.mod
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { BackupModel } from '../../../../core/models/backup.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { SystemBackupDataService } from '../../../../core/services/data/system-backup.data.service';

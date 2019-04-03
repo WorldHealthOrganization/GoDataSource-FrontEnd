@@ -6,7 +6,7 @@ import { MetricContactsLostToFollowUpModel } from '../../../../core/models/metri
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import * as moment from 'moment';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 

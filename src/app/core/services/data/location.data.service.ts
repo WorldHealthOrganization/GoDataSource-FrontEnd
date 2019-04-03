@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { LocationModel } from '../../models/location.model';
 import { CacheKey, CacheService } from '../helper/cache.service';
-import 'rxjs/add/operator/share';
+
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { HierarchicalLocationModel } from '../../models/hierarchical-location.model';

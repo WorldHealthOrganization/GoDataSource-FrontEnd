@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import * as Handsontable from 'handsontable';
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Observable ,  Subscriber } from 'rxjs';
 import { AbstractSheetColumn, DropdownSheetColumn } from '../../models/sheet/sheet.model';
 import * as _ from 'lodash';
 import { SheetCellType } from '../../models/sheet/sheet-cell-type';
 import { I18nService } from './i18n.service';
-import 'rxjs/add/observable/forkJoin';
+
 import { GridSettings } from 'handsontable';
 
 export interface InvalidTableData {

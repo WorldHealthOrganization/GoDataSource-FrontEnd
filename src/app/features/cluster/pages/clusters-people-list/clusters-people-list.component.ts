@@ -5,7 +5,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { ActivatedRoute } from '@angular/router';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';

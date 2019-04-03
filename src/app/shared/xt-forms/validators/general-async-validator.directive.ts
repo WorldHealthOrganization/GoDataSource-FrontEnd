@@ -1,9 +1,9 @@
 import { Directive, forwardRef, Input } from '@angular/core';
 import { AsyncValidator, AbstractControl, NG_ASYNC_VALIDATORS, ValidationErrors } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import * as _ from 'lodash';
-import 'rxjs/add/observable/timer';
-import 'rxjs/add/operator/switchMap';
+
+
 import { Constants } from '../../../core/models/constants';
 
 export interface IGeneralAsyncValidatorResponse {

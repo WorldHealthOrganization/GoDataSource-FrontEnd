@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { SheetCellValidator } from './sheet-cell-validator';
 import { SheetCellType } from './sheet-cell-type';
 import { SheetCellValidationType } from './sheet-cell-validation-type';

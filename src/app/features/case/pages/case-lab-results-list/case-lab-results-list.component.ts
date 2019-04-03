@@ -7,7 +7,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ActivatedRoute } from '@angular/router';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';

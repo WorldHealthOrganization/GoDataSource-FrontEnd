@@ -1,24 +1,22 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable ,  BehaviorSubject ,  Subject } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/takeUntil';
-import 'rxjs/add/operator/catch';
+
+
+
 import { OutbreakModel } from '../../models/outbreak.model';
 import { UserRoleModel } from '../../models/user-role.model';
 import { StorageKey, StorageService } from '../helper/storage.service';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { AuthDataService } from './auth.data.service';
-import { Subject } from 'rxjs/Subject';
 import { SnackbarService } from '../helper/snackbar.service';
 import { EntityModel } from '../../models/entity.model';
 import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
 import * as _ from 'lodash';
-import 'rxjs/add/observable/throw';
+
 import { HierarchicalLocationModel } from '../../models/hierarchical-location.model';
 import { PeoplePossibleDuplicateModel } from '../../models/people-possible-duplicate.model';
 import { EntityType } from '../../models/entity-type';

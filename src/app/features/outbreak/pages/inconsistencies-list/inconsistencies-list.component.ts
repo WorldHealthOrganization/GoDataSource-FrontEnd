@@ -7,7 +7,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';

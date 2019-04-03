@@ -9,7 +9,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 import * as _ from 'lodash';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { SecurityQuestionModel } from '../../../../core/models/securityQuestion.model';
 
 @Component({

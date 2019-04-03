@@ -19,7 +19,7 @@ import { LabelValuePair } from '../../../core/models/label-value-pair';
 import * as moment from 'moment';
 import { OnInit } from '@angular/core';
 import { I18nService } from '../../../core/services/helper/i18n.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { TeamDataService } from '../../../core/services/data/team.data.service';
 
 export abstract class FollowUpsListComponent extends ListComponent implements OnInit {

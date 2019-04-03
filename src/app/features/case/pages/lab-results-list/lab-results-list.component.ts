@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';

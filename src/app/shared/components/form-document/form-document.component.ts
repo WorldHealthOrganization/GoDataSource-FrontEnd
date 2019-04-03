@@ -1,7 +1,7 @@
 import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { GroupBase } from '../../xt-forms/core';
 import { DocumentModel } from '../../../core/models/document.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { OutbreakDataService } from './outbreak.data.service';
 import { FollowUpsDataService } from './follow-ups.data.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { GenericDataService } from './generic.data.service';
 import { RelationshipDataService } from './relationship.data.service';

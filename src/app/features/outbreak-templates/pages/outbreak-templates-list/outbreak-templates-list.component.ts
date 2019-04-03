@@ -4,7 +4,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';

@@ -10,7 +10,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
@@ -225,7 +225,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                             // add link
                             possibleDuplicates.push(new DialogField({
                                 name: 'link',
-                                placeholder: (index + 1 ) + '. ' + EntityModel.getNameWithDOBAge(
+                                placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
                                     caseData,
                                     this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
                                     this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
@@ -242,14 +242,14 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                             customInput: true,
                             fieldsList: possibleDuplicates,
                         }))
-                        .subscribe((answer) => {
-                            if (answer.button === DialogAnswerButton.Yes) {
-                                runCreateCase();
-                            } else {
-                                // hide dialog
-                                loadingDialog.close();
-                            }
-                        });
+                            .subscribe((answer) => {
+                                if (answer.button === DialogAnswerButton.Yes) {
+                                    runCreateCase();
+                                } else {
+                                    // hide dialog
+                                    loadingDialog.close();
+                                }
+                            });
                     } else {
                         runCreateCase();
                     }

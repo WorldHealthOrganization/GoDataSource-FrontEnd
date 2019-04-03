@@ -5,7 +5,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-cases-not-identified-through-contacts-dashlet',

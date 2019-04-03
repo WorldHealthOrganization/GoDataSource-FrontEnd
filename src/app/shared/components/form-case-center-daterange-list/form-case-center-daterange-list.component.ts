@@ -2,7 +2,7 @@ import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit,
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { GroupFilteredValue, ListBase } from '../../xt-forms/core';
 import { DialogService } from '../../../core/services/helper/dialog.service';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Subscriber } from 'rxjs';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { Moment } from 'moment';
 import { CaseCenterDateRangeModel } from '../../../core/models/case-center-date-range.model';

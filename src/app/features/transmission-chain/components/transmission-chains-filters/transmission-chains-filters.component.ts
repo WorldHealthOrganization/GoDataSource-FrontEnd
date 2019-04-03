@@ -1,7 +1,7 @@
 import { Component, HostBinding, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { Moment } from 'moment';
 import { AgeModel } from '../../../../core/models/age.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';

@@ -7,7 +7,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
@@ -15,7 +15,7 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
-import 'rxjs/add/operator/switchMap';
+
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 

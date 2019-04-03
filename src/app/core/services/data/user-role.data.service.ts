@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { UserRoleModel } from '../../models/user-role.model';
 import { PermissionModel } from '../../models/permission.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { CacheKey, CacheService } from '../helper/cache.service';
 import * as _ from 'lodash';
-import 'rxjs/add/operator/share';
+
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 
 @Injectable()

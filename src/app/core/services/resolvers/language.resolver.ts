@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { Resolve } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { I18nService } from '../helper/i18n.service';
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Observable ,  Subscriber } from 'rxjs';
 
 @Injectable()
 export class LanguageResolver implements Resolve<any> {

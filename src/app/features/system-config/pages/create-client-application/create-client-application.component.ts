@@ -10,7 +10,7 @@ import * as _ from 'lodash';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';

@@ -12,7 +12,7 @@ import { AnswerModel, QuestionModel } from '../../../core/models/question.model'
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../dialog/dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Subscriber ,  Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
@@ -24,8 +24,6 @@ import { DomService } from '../../../core/services/helper/dom.service';
 import { v4 as uuid } from 'uuid';
 import { FormInputComponent } from '../../xt-forms/components/form-input/form-input.component';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
-import 'rxjs/add/observable/forkJoin';
-import { Observable } from 'rxjs/Observable';
 import { HoverRowActions, HoverRowActionsType } from '../hover-row-actions/hover-row-actions.component';
 
 /**
