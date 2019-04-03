@@ -38,6 +38,14 @@
             help
         </span>
 
+        <span
+            *ngIf="displayRefresh"
+            class="xt-icon refresh-icon"
+            [matTooltip]="'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION' | translate"
+            (click)="onRefreshPressed()">
+            refresh
+        </span>
+
         <span *ngIf="type === 'password'" [matTooltip]="" class="xt-icon form-password-icon" (click)="togglePasswordDisplay()">visibility</span>
         <span *ngIf="tempTypeOverwritten === 'password'" [matTooltip]="" class="xt-icon form-password-icon" (click)="togglePasswordDisplay()">visibilityOf</span>
 
