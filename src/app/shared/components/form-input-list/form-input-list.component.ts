@@ -1,7 +1,7 @@
 import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { ListBase } from '../../xt-forms/core';
-import { Subscriber ,  Observable } from 'rxjs';
+import { Subscriber, Observable } from 'rxjs';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import * as _ from 'lodash';
@@ -50,7 +50,9 @@ export class FormInputListComponent extends ListBase<string | number> implements
         // refresh custom list items
         const valuesData = (this.value ? this.value : []) as any[];
         valuesData.forEach((value, index) => {
-            if (!this._values[index]) { this._values.push({}); }
+            if (!this._values[index]) {
+                this._values.push({});
+            }
             this._values[index].value = value;
         });
 
@@ -82,7 +84,9 @@ export class FormInputListComponent extends ListBase<string | number> implements
             this._values = [];
             const valuesData = (this.value ? this.value : []) as any[];
             valuesData.forEach((value, index2) => {
-                if (!this._values[index2]) { this._values.push({}); }
+                if (!this._values[index2]) {
+                    this._values.push({});
+                }
                 this._values[index2].value = value;
             });
         };
@@ -94,7 +98,7 @@ export class FormInputListComponent extends ListBase<string | number> implements
         }
 
         // show confirm dialog to confirm the action
-        if (!_.values(this._values[index]).some(x => x !== undefined && x !== '') || overrideConfirm ) {
+        if (!_.values(this._values[index]).some(x => x !== undefined && x !== '') || overrideConfirm) {
             deleteItem();
         } else {
             new Observable((observer) => {
