@@ -14,6 +14,8 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-create-outbreak-template',
@@ -59,11 +61,13 @@ export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implem
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.outbreakTemplateDataService
                 .createOutbreakTemplate(outbreakTemplateData)
-                .catch((err) => {
-                    this.snackbarService.showError((err.message));
-                    loadingDialog.close();
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showError((err.message));
+                        loadingDialog.close();
+                        return throwError(err);
+                    })
+                )
                 .subscribe((newOutbreakTemplate) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_TEMPLATES_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
 

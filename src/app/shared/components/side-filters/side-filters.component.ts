@@ -20,6 +20,8 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { Observable } from 'rxjs';
 import { RequestFilter } from '../../../core/helperClasses/request-query-builder/request-filter';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-side-filters',
@@ -40,6 +42,7 @@ export class SideFiltersComponent implements OnInit {
         // sort options
         this.updateSortFields();
     }
+
     get filterOptions(): FilterModel[] {
         return this._filterOptions;
     }
@@ -56,6 +59,7 @@ export class SideFiltersComponent implements OnInit {
         // sort options
         this.updateSortFields();
     }
+
     get extraSortOptions(): SortModel[] {
         return this._extraSortOptions;
     }
@@ -97,8 +101,8 @@ export class SideFiltersComponent implements OnInit {
 
     // sort directions
     sortDirections: any[] = [
-        { label: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER', value: RequestSortDirection.ASC },
-        { label: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER', value: RequestSortDirection.DESC }
+        {label: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER', value: RequestSortDirection.ASC},
+        {label: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER', value: RequestSortDirection.DESC}
     ];
 
     @ViewChild('sideNav') sideNav: MatSidenav;
@@ -189,19 +193,23 @@ export class SideFiltersComponent implements OnInit {
                                 filterKey: this.savedFiltersType,
                                 filterData: this.toSaveData()
                             })
-                        ).catch((err) => {
-                            this.snackbarService.showApiError(err);
-                            return ErrorObservable.create(err);
-                        }).subscribe((data) => {
-                            // select this filter
-                            this.loadedFilter = new SavedFilterModel(data);
+                        )
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showApiError(err);
+                                    return throwError(err);
+                                })
+                            )
+                            .subscribe((data) => {
+                                // select this filter
+                                this.loadedFilter = new SavedFilterModel(data);
 
-                            // update filters
-                            this.getAvailableSavedFilters();
+                                // update filters
+                                this.getAvailableSavedFilters();
 
-                            // display message
-                            this.snackbarService.showSuccess('LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE');
-                        });
+                                // display message
+                                this.snackbarService.showSuccess('LNG_SIDE_FILTERS_SAVE_FILTER_SUCCESS_MESSAGE');
+                            });
                     }
                 });
         };
@@ -236,19 +244,23 @@ export class SideFiltersComponent implements OnInit {
                             this.loadedFilter.id, {
                                 filterData: this.toSaveData()
                             }
-                        ).catch((err) => {
-                            this.snackbarService.showApiError(err);
-                            return ErrorObservable.create(err);
-                        }).subscribe((data) => {
-                            // select this filter
-                            this.loadedFilter = new SavedFilterModel(data);
+                        )
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showApiError(err);
+                                    return throwError(err);
+                                })
+                            )
+                            .subscribe((data) => {
+                                // select this filter
+                                this.loadedFilter = new SavedFilterModel(data);
 
-                            // update filters
-                            this.getAvailableSavedFilters();
+                                // update filters
+                                this.getAvailableSavedFilters();
 
-                            // display message
-                            this.snackbarService.showSuccess('LNG_SIDE_FILTERS_MODIFY_FILTER_SUCCESS_MESSAGE');
-                        });
+                                // display message
+                                this.snackbarService.showSuccess('LNG_SIDE_FILTERS_MODIFY_FILTER_SUCCESS_MESSAGE');
+                            });
                     } else if (answer.button === DialogAnswerButton.Extra_1) {
                         createFilter();
                     }
@@ -263,7 +275,7 @@ export class SideFiltersComponent implements OnInit {
      */
     toSaveData(): SavedFilterData {
         // exclude required filters
-        this.appliedFilters = _.filter(this.appliedFilters, appliedFilter =>  !appliedFilter.filter.required );
+        this.appliedFilters = _.filter(this.appliedFilters, appliedFilter => !appliedFilter.filter.required);
 
         return new SavedFilterData({
             appliedFilters: _.map(this.appliedFilters, (filter) => filter.sanitizeForSave()),
@@ -397,7 +409,7 @@ export class SideFiltersComponent implements OnInit {
         const sortableFields = _.filter(this.filterOptions, (filter: FilterModel) => filter.sortable);
         _.each(sortableFields, (filter: FilterModel) => {
             // add only if no already in the list
-            if (!_.includes(this.sortOptions, { fieldName: filter.fieldName })) {
+            if (!_.includes(this.sortOptions, {fieldName: filter.fieldName})) {
                 this.sortOptions.push(new SortModel(
                     filter.fieldName,
                     filter.fieldLabel
@@ -408,7 +420,7 @@ export class SideFiltersComponent implements OnInit {
         // add filter extra sort fields
         _.each(this.extraSortOptions, (sort: SortModel) => {
             // add only if no already in the list
-            if (!_.includes(this.sortOptions, { fieldName: sort.fieldName })) {
+            if (!_.includes(this.sortOptions, {fieldName: sort.fieldName})) {
                 this.sortOptions.push(sort);
             }
         });

@@ -18,6 +18,9 @@ import { Constants } from '../../models/constants';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import { MetricCasesCountStratifiedOutcome } from '../../models/metrics/metric-cases-count-stratified-outcome.model';
 import { MetricCasesBasedOnContactStatusModel } from '../../models/metrics/metric-cases-based-on-contact-status.model';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs/internal/observable/of';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Injectable()
 export class CaseDataService {
@@ -477,17 +480,22 @@ export class CaseDataService {
                     visualIdMask: visualIdMask,
                     personId: personId
                 }
-            ).catch((response: Error | VisualIdErrorModel) => {
-                return (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ||
-                (response as VisualIdErrorModel).code === VisualIdErrorModelCode.DUPLICATE_VISUAL_ID ?
-                    Observable.of(
-                        this.modelHelper.getModelInstance(
-                            VisualIdErrorModel,
-                            response
-                        )
-                    ) :
-                    observableThrowError(response);
-            });
+            )
+            .pipe(
+                catchError((response: Error | VisualIdErrorModel) => {
+                    return (
+                        (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ||
+                        (response as VisualIdErrorModel).code === VisualIdErrorModelCode.DUPLICATE_VISUAL_ID
+                    ) ?
+                        of(
+                            this.modelHelper.getModelInstance(
+                                VisualIdErrorModel,
+                                response
+                            )
+                        ) :
+                        throwError(response);
+                })
+            );
     }
 
     /**

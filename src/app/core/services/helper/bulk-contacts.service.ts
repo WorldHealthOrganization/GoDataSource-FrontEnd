@@ -27,7 +27,7 @@ export class BulkContactsService {
      * @param sheetCore
      */
     validateTable(sheetCore: Handsontable): Observable<InvalidTableData> {
-        return Observable.create((observer: Subscriber<InvalidTableData>) => {
+        return new Observable((observer: Subscriber<InvalidTableData>) => {
             // validate all cells
             sheetCore.validateCells((valid) => {
                 // if not valid, then we need to determine what rows / columns are invalid

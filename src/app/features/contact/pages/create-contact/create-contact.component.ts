@@ -142,7 +142,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                         this.contactData.visualId = this.visualIDTranslateData.mask;
 
                         // set visual ID validator
-                        this.contactIdMaskValidator = Observable.create((observer) => {
+                        this.contactIdMaskValidator = new Observable((observer) => {
                             this.contactDataService.checkContactVisualIDValidity(
                                 selectedOutbreak.id,
                                 this.visualIDTranslateData.mask,

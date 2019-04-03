@@ -21,6 +21,8 @@ import { HierarchicalLocationModel } from '../../models/hierarchical-location.mo
 import { PeoplePossibleDuplicateModel } from '../../models/people-possible-duplicate.model';
 import { EntityType } from '../../models/entity-type';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
+import { pipe } from 'rxjs/internal-compatibility';
+import { catchError, map, takeUntil, tap } from 'rxjs/operators';
 
 @Injectable()
 export class OutbreakDataService {
@@ -164,12 +166,14 @@ export class OutbreakDataService {
      * @returns {Observable<OutbreakModel>}
      */
     getSelectedOutbreak(): Observable<OutbreakModel> {
-        return Observable.create((observer) => {
+        return new Observable((observer) => {
 
             const selectedOutbreakCompleted$ = new Subject();
             // subscribe to the Subject stream
             this.getSelectedOutbreakSubject()
-                .takeUntil(selectedOutbreakCompleted$)
+                .pipe(
+                    takeUntil(selectedOutbreakCompleted$)
+                )
                 .subscribe((outbreak: OutbreakModel | null) => {
                     if (outbreak) {
                         // found the Selected Outbreak
@@ -195,44 +199,50 @@ export class OutbreakDataService {
         if (selectedOutbreakId) {
             // retrieve the Outbreak
             return this.getOutbreak(selectedOutbreakId)
-                .catch(() => {
-                    // Outbreak not found; clean it up from local storage since it's outdated
-                    this.storageService.remove(StorageKey.SELECTED_OUTBREAK_ID);
+                .pipe(
+                    catchError(() => {
+                        // Outbreak not found; clean it up from local storage since it's outdated
+                        this.storageService.remove(StorageKey.SELECTED_OUTBREAK_ID);
 
-                    // ...and re-run the routine
-                    return this.determineSelectedOutbreak();
-                })
-                .do((selectedOutbreak) => {
-                    // cache the selected Outbreak
-                    this.setSelectedOutbreak(selectedOutbreak);
-                });
+                        // ...and re-run the routine
+                        return this.determineSelectedOutbreak();
+                    }),
+                    tap((selectedOutbreak) => {
+                        // cache the selected Outbreak
+                        this.setSelectedOutbreak(selectedOutbreak);
+                    })
+                );
         }
 
         // check if the authenticated user has an Active Outbreak
         const authUser = this.authDataService.getAuthenticatedUser();
         if (authUser.activeOutbreakId) {
             return this.getOutbreak(authUser.activeOutbreakId)
-                .do((activeOutbreak) => {
-                    // cache the selected Outbreak
-                    this.setSelectedOutbreak(activeOutbreak);
-                });
+                .pipe(
+                    tap((activeOutbreak) => {
+                        // cache the selected Outbreak
+                        this.setSelectedOutbreak(activeOutbreak);
+                    })
+                );
         }
 
         // by default, use the first Outbreak in list
         const qb = new RequestQueryBuilder();
         qb.limit(1);
         return this.getOutbreaksList(qb)
-            .map((outbreaks: OutbreakModel[]) => {
-                if (outbreaks.length > 0) {
-                    // cache the selected Outbreak
-                    this.setSelectedOutbreak(outbreaks[0]);
+            .pipe(
+                map((outbreaks: OutbreakModel[]) => {
+                    if (outbreaks.length > 0) {
+                        // cache the selected Outbreak
+                        this.setSelectedOutbreak(outbreaks[0]);
 
-                    return outbreaks[0];
-                }
+                        return outbreaks[0];
+                    }
 
-                // there is no Outbreak in the system
-                return new OutbreakModel();
-            });
+                    // there is no Outbreak in the system
+                    return new OutbreakModel();
+                })
+            );
     }
 
     /**

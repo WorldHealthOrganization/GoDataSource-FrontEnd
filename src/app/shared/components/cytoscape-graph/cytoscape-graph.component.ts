@@ -5,7 +5,7 @@ import {
 import * as cytoscape from 'cytoscape';
 import * as cola from 'cytoscape-cola';
 import * as dagre from 'cytoscape-dagre';
-import { Observable ,  Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
 import { Constants } from '../../../core/models/constants';
 import * as _ from 'lodash';
@@ -38,6 +38,8 @@ import { RelationshipDataService } from '../../../core/services/data/relationshi
 import { UserModel } from '../../../core/models/user.model';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../core/models/permission.model';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -54,6 +56,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
         // init geospatial map data
         this.initGeospatialMap();
     }
+
     get elements(): IConvertChainToGraphElements {
         return this._elements;
     }
@@ -66,6 +69,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
         // init geospatial map data
         this.initGeospatialMap();
     }
+
     get chainElements(): TransmissionChainModel[] {
         return this._chainElements;
     }
@@ -298,7 +302,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private relationshipDataService: RelationshipDataService
-    ) {}
+    ) {
+    }
 
     ngOnInit() {
         // authenticated user
@@ -878,14 +883,14 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                 this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CERTAINTY_LEVEL),
                 this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION)
             ]).subscribe(([
-              personTypes,
-              certaintyLevels,
-              caseClassification
-            ]: [
+                              personTypes,
+                              certaintyLevels,
+                              caseClassification
+                          ]: [
                 ReferenceDataCategoryModel,
                 ReferenceDataCategoryModel,
                 ReferenceDataCategoryModel
-            ]) => {
+                ]) => {
                 // map colors to types
                 const typeToColorMap = {};
                 _.each(personTypes.entries, (entry: ReferenceDataEntryModel) => {
@@ -951,11 +956,13 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                             const localEntity: EntityModel = mark.data;
                             this.entityDataService
                                 .getEntity(localEntity.type, this.selectedOutbreak.id, localEntity.model.id)
-                                .catch((err) => {
-                                    this.snackbarService.showApiError(err);
-                                    loadingDialog.close();
-                                    return ErrorObservable.create(err);
-                                })
+                                .pipe(
+                                    catchError((err) => {
+                                        this.snackbarService.showApiError(err);
+                                        loadingDialog.close();
+                                        return throwError(err);
+                                    })
+                                )
                                 .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
                                     // hide loading dialog
                                     loadingDialog.close();
@@ -1070,11 +1077,14 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                                         localRelationship.sourcePerson.type,
                                         localRelationship.sourcePerson.id,
                                         localRelationship.id
-                                    ).catch((err) => {
-                                    this.snackbarService.showError(err.message);
-                                    loadingDialog.close();
-                                    return ErrorObservable.create(err);
-                                })
+                                    )
+                                    .pipe(
+                                        catchError((err) => {
+                                            this.snackbarService.showError(err.message);
+                                            loadingDialog.close();
+                                            return throwError(err);
+                                        })
+                                    )
                                     .subscribe((relationshipData) => {
                                         // hide loading dialog
                                         loadingDialog.close();

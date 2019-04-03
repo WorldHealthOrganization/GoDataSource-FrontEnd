@@ -135,7 +135,7 @@ export class CreateTeamComponent extends ConfirmOnFormChanges implements OnInit 
      * @returns {Observable<boolean>}
      */
     private checkTeamsInSameLocations(locationIds: string[]): Observable<boolean> {
-        return Observable.create((observer) => {
+        return new Observable((observer) => {
             // check if there are existing teams in the same locations
             const qb = new RequestQueryBuilder();
 

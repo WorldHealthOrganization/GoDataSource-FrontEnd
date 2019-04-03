@@ -79,7 +79,7 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                 }
             });
 
-        this.outbreakNameValidator$ = Observable.create((observer) => {
+        this.outbreakNameValidator$ = new Observable((observer) => {
            this.outbreakDataService.checkOutbreakNameUniquenessValidity(this.newOutbreak.name)
                .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
                     observer.next(isValid);

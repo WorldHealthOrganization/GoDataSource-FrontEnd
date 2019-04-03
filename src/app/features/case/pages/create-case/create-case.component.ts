@@ -119,7 +119,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                 this.caseData.visualId = this.visualIDTranslateData.mask;
 
                 // set visual ID validator
-                this.caseIdMaskValidator = Observable.create((observer) => {
+                this.caseIdMaskValidator = new Observable((observer) => {
                     this.caseDataService.checkCaseVisualIDValidity(
                         this.selectedOutbreak.id,
                         this.visualIDTranslateData.mask,

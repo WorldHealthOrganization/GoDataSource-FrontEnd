@@ -133,7 +133,7 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
         if (!_.values(this.values[index]).some(x => x !== undefined && x !== '') || overrideConfirm ) {
             deleteItem();
         } else {
-            Observable.create((observer) => {
+            new Observable((observer) => {
                 this.deleteConfirm.emit(observer);
             }).subscribe(() => {
                 deleteItem();

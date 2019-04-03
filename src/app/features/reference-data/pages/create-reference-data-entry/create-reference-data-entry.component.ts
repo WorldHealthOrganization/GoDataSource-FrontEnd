@@ -13,6 +13,8 @@ import { IconModel } from '../../../../core/models/icon.model';
 import { IconDataService } from '../../../../core/services/data/icon.data.service';
 
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-create-reference-data-entry',
@@ -86,15 +88,19 @@ export class CreateReferenceDataEntryComponent extends ConfirmOnFormChanges impl
         // create new entry
         this.referenceDataDataService
             .createEntry(dirtyFields)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                return ErrorObservable.create(err);
-            })
-            .switchMap((newReferenceDataEntry) => {
-                // re-load language tokens
-                return this.i18nService.loadUserLanguage()
-                    .map(() => newReferenceDataEntry);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    return throwError(err);
+                }),
+                switchMap((newReferenceDataEntry) => {
+                    // re-load language tokens
+                    return this.i18nService.loadUserLanguage()
+                        .pipe(
+                            map(() => newReferenceDataEntry)
+                        );
+                })
+            )
             .subscribe((newReferenceDataEntry) => {
                 this.snackbarService.showSuccess('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_ACTION_CREATE_ENTRY_SUCCESS_MESSAGE');
 

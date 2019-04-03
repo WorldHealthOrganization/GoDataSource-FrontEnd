@@ -14,7 +14,8 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
-import { tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-outbreak-templates-list',
@@ -121,10 +122,12 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.outbreakTemplateDataService
                         .deleteOutbreakTemplate(outbreakTemplate.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             // reload user data to get the updated data regarding active outbreak
                             this.authDataService

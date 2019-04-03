@@ -278,7 +278,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                     };
 
                     // set visual ID validator
-                    this.caseIdMaskValidator = Observable.create((observer) => {
+                    this.caseIdMaskValidator = new Observable((observer) => {
                         this.caseDataService.checkCaseVisualIDValidity(
                             this.selectedOutbreak.id,
                             this.visualIDTranslateData.mask,

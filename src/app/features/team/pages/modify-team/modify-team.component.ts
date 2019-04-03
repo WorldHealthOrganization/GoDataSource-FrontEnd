@@ -18,6 +18,8 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-modify-team',
@@ -195,7 +197,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
      * @returns {Observable<boolean>}
      */
     private checkTeamsInSameLocations(locationIds: string[]): Observable<boolean> {
-        return Observable.create((observer) => {
+        return new Observable((observer) => {
             // check if there are existing teams in the same locations
             const qb = new RequestQueryBuilder();
 
@@ -207,10 +209,12 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                 }, true);
 
             this.teamDataService.getTeamsList(qb)
-                .catch((err) => {
-                    observer.error(err);
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        observer.error(err);
+                        return throwError(err);
+                    })
+                )
                 .subscribe((teamsList) => {
                     if (teamsList.length > 0) {
                         const teamNames = _.map(teamsList, (team) => team.name);

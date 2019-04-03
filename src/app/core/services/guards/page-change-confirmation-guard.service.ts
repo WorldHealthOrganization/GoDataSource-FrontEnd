@@ -99,14 +99,14 @@ export class PageChangeConfirmationGuard implements CanDeactivate<ConfirmOnFormC
                 return true;
             } else {
                 // display confirmation popup
-                return Observable.create((observer: Observer<boolean>) => {
+                return new Observable((observer: Observer<boolean>) => {
                     this.displayConfirmationPopup(observer);
                 });
             }
         }
 
         // observer
-        return Observable.create((observer: Observer<boolean>) => {
+        return new Observable((observer: Observer<boolean>) => {
             (canDeactivate as Observable<boolean>).subscribe((obsCanDeactivate: boolean) => {
                 if (obsCanDeactivate) {
                     observer.next(true);

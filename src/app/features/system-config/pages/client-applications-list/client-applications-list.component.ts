@@ -280,7 +280,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
 
         // define api async check
         let apiURL: string;
-        const apiObserver = Observable.create((subscriber: Subscriber<boolean>) => {
+        const apiObserver = new Observable((subscriber: Subscriber<boolean>) => {
             if (
                 _.isString(apiURL) &&
                 apiURL.includes('localhost')

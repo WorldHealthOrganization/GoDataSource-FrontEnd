@@ -34,7 +34,7 @@ export class DomService {
      * @returns {Observable<string>}
      */
     getPNGBase64(selector: string, tempCanvasSelector: string, splitFactor: number = 1): Observable<string> {
-        return Observable.create((observer) => {
+        return new Observable((observer) => {
             // server page size
             const pageSize = {
                 width: 1190,

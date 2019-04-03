@@ -97,7 +97,7 @@ export class FormInputListComponent extends ListBase<string | number> implements
         if (!_.values(this._values[index]).some(x => x !== undefined && x !== '') || overrideConfirm ) {
             deleteItem();
         } else {
-            Observable.create((observer) => {
+            new Observable((observer) => {
                 this.deleteConfirm.emit(observer);
             }).subscribe(() => {
                 deleteItem();

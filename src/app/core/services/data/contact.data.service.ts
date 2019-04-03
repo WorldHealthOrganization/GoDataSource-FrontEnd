@@ -16,6 +16,9 @@ import * as _ from 'lodash';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import { MetricCasesCountStratified } from '../../models/metrics/metric-cases-count-stratified.model';
 import { MetricContactsFollowedUpReportModel } from '../../models/metrics/metric-contacts-followed-up-report.model';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs/internal/observable/of';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Injectable()
 export class ContactDataService {
@@ -232,17 +235,22 @@ export class ContactDataService {
                     visualIdMask: visualIdMask,
                     personId: personId
                 }
-            ).catch((response: Error | VisualIdErrorModel) => {
-                return (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ||
-                    (response as VisualIdErrorModel).code === VisualIdErrorModelCode.DUPLICATE_VISUAL_ID ?
-                    Observable.of(
-                        this.modelHelper.getModelInstance(
-                            VisualIdErrorModel,
-                            response
-                        )
-                    ) :
-                    observableThrowError(response);
-            });
+            )
+            .pipe(
+                catchError((response: Error | VisualIdErrorModel) => {
+                    return (
+                        (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ||
+                        (response as VisualIdErrorModel).code === VisualIdErrorModelCode.DUPLICATE_VISUAL_ID
+                    ) ?
+                        of(
+                            this.modelHelper.getModelInstance(
+                                VisualIdErrorModel,
+                                response
+                            )
+                        ) :
+                        throwError(response);
+                })
+            );
     }
 
     /**

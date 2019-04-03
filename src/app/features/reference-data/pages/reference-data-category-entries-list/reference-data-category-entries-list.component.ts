@@ -13,10 +13,11 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { tap } from 'rxjs/operators';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-reference-data-category-entries-list',
@@ -86,14 +87,16 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                     // delete entry
                     this.referenceDataDataService
                         .deleteEntry(entry.id)
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err, {entryValue: entry.value});
-                            return ErrorObservable.create(err);
-                        })
-                        .switchMap(() => {
-                            // re-load language tokens
-                            return this.i18nService.loadUserLanguage();
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err, {entryValue: entry.value});
+                                return throwError(err);
+                            }),
+                            switchMap(() => {
+                                // re-load language tokens
+                                return this.i18nService.loadUserLanguage();
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY_SUCCESS_MESSAGE');
 
@@ -138,10 +141,14 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                 refEntry.id, {
                     order: order ? order : null
                 }
-            ).catch((err) => {
-                this.snackbarService.showApiError(err);
-                return ErrorObservable.create(err);
-            }).subscribe(() => {
+            )
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                })
+            )
+            .subscribe(() => {
                 // update loaded ref data
                 refEntry.order = order ? order : null;
 

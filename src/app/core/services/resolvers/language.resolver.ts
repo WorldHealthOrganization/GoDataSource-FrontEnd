@@ -15,7 +15,7 @@ export class LanguageResolver implements Resolve<any> {
      * Language loaded, we can display the website pages
      */
     resolve(): Observable<any> {
-        return Observable.create((observer: Subscriber<void>) => {
+        return new Observable((observer: Subscriber<void>) => {
             if (this.translateService.currentLang) {
                 observer.next();
                 observer.complete();

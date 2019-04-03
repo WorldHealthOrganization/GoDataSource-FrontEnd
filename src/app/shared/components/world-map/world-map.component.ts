@@ -773,7 +773,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      * Print map to blob
      */
     printToBlob(): Observable<Blob> {
-        return Observable.create((observer: Subscriber<Blob>) => {
+        return new Observable((observer: Subscriber<Blob>) => {
             // map initialized
             if (this.map) {
                 // wait for map render

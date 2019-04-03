@@ -20,6 +20,9 @@ import { NgForm } from '@angular/forms';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
+import { pipe } from 'rxjs/internal-compatibility';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-case-merge-duplicate-records',
@@ -515,11 +518,15 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
                         EntityType.CASE,
                         this.mergeRecordIds,
                         dirtyFields
-                    ).catch((err) => {
-                        this.displayLoading = false;
-                        this.snackbarService.showError(err.message);
-                        return ErrorObservable.create(err);
-                    }).subscribe(() => {
+                    )
+                    .pipe(
+                        catchError((err) => {
+                            this.displayLoading = false;
+                            this.snackbarService.showError(err.message);
+                            return throwError(err);
+                        })
+                    )
+                    .subscribe(() => {
                         this.snackbarService.showSuccess('LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASES_SUCCESS_MESSAGE');
 
                         // navigate to listing page

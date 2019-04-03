@@ -19,6 +19,8 @@ import * as moment from 'moment';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-contact-merge-duplicate-records',
@@ -335,11 +337,15 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
                         EntityType.CONTACT,
                         this.mergeRecordIds,
                         dirtyFields
-                    ).catch((err) => {
-                        this.displayLoading = false;
-                        this.snackbarService.showError(err.message);
-                        return ErrorObservable.create(err);
-                    }).subscribe(() => {
+                    )
+                    .pipe(
+                        catchError((err) => {
+                            this.displayLoading = false;
+                            this.snackbarService.showError(err.message);
+                            return throwError(err);
+                        })
+                    )
+                    .subscribe(() => {
                         this.snackbarService.showSuccess('LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE');
 
                         // navigate to listing page

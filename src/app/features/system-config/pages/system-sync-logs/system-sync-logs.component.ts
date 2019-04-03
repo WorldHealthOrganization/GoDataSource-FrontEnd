@@ -22,7 +22,8 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-system-sync-logs-list',
@@ -243,10 +244,12 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                             .modifySystemSettings({
                                 sync: answer.inputValue.value
                             })
-                            .catch((err) => {
-                                this.snackbarService.showApiError(err);
-                                return ErrorObservable.create(err);
-                            })
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showApiError(err);
+                                    return throwError(err);
+                                })
+                            )
                             .subscribe((settings: SystemSettingsModel) => {
                                 this.settings = new SystemSettingsModel(settings);
 
@@ -271,10 +274,12 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.systemSyncLogDataService
                         .deleteSyncLog(systemSyncLogModel.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             // display success message
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SUCCESS_MESSAGE');
@@ -338,10 +343,12 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                     // send request
                     this.systemSyncLogDataService
                         .deleteSyncLogs(qb)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             // display success message
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SERVER_SUCCESS_MESSAGE');

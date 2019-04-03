@@ -16,6 +16,8 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-modify-outbreak-template',
@@ -82,11 +84,13 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.outbreakTemplateDataService
             .modifyOutbreakTemplate(this.outbreakTemplateId, dirtyFields)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
             .subscribe((modifiedOutbreakTemplate) => {
                 // update model
                 this.outbreakTemplate = modifiedOutbreakTemplate;

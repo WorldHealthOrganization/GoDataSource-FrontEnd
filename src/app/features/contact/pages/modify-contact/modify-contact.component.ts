@@ -144,7 +144,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                     };
 
                     // set visual ID validator
-                    this.contactIdMaskValidator = Observable.create((observer) => {
+                    this.contactIdMaskValidator = new Observable((observer) => {
                         this.contactDataService.checkContactVisualIDValidity(
                             this.selectedOutbreak.id,
                             this.visualIDTranslateData.mask,

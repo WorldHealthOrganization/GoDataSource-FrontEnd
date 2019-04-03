@@ -78,7 +78,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         // update breadcrumbs
         this.createBreadcrumbs();
 
-        this.outbreakNameValidator$ = Observable.create((observer) => {
+        this.outbreakNameValidator$ = new Observable((observer) => {
             this.outbreakDataService.checkOutbreakNameUniquenessValidity(this.outbreak.name, this.outbreakId)
                 .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
                     observer.next(isValid);

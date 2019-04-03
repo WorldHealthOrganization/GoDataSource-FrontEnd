@@ -186,7 +186,7 @@ export class HelpDataService {
      * @param {string} url
      */
     getContextHelpItems(url: string): Observable<string[]> {
-        return Observable.create((observer) => {
+        return new Observable((observer) => {
             // get help items list from cache
             const helpItemsList = this.cacheService.get(CacheKey.HELP_ITEMS);
             if (helpItemsList) {
