@@ -28,6 +28,7 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
     @Input() relatedObject: any;
+    @Input() existingRelationship: boolean = false;
 
     @Input() displayCopyField: boolean = false;
     @Input() displayCopyFieldDescription: string;
@@ -102,16 +103,18 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
         // call parent
         super.ngAfterViewInit();
 
-        setTimeout(() => {
-            // set default values on relationship
-            this.certaintyLevelOptions$
-                .subscribe((options: LabelValuePair[]) => {
-                    if (!_.isEmpty(options)) {
-                        // get the last option selected by default (high)
-                        this.value.certaintyLevelId = Constants.CERTAINITY_LEVEL.HIGH;
-                    }
-                });
-        });
+        if (!this.existingRelationship) {
+            setTimeout(() => {
+                // set default values on relationship
+                this.certaintyLevelOptions$
+                    .subscribe((options: LabelValuePair[]) => {
+                        if (!_.isEmpty(options)) {
+                            // get the last option selected by default (high)
+                            this.value.certaintyLevelId = Constants.CERTAINITY_LEVEL.HIGH;
+                        }
+                    });
+            });
+        }
     }
 
     /**

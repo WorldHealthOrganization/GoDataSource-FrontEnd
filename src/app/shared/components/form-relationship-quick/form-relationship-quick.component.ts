@@ -26,6 +26,7 @@ import { Constants } from '../../../core/models/constants';
 export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel> implements OnInit, AfterViewInit, GroupDirtyFields {
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
+    @Input() existingRelationship: boolean = false;
 
     certaintyLevelOptions$: Observable<any[]>;
     exposureTypeOptions$: Observable<any[]>;
@@ -79,16 +80,18 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
         // call parent
         super.ngAfterViewInit();
 
-        setTimeout(() => {
-            // set default values on relationship
-            this.certaintyLevelOptions$
-                .subscribe((options: LabelValuePair[]) => {
-                    if (!_.isEmpty(options)) {
-                        // get the last option selected by default (high)
-                        this.value.certaintyLevelId = Constants.CERTAINITY_LEVEL.HIGH;
-                    }
-                });
-        });
+        if (!this.existingRelationship) {
+            setTimeout(() => {
+                // set default values on relationship
+                this.certaintyLevelOptions$
+                    .subscribe((options: LabelValuePair[]) => {
+                        if (!_.isEmpty(options)) {
+                            // get the last option selected by default (high)
+                            this.value.certaintyLevelId = Constants.CERTAINITY_LEVEL.HIGH;
+                        }
+                    });
+            });
+        }
     }
 
     /**
