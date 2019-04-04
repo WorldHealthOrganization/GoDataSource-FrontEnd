@@ -42,7 +42,11 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
     followUpsDataExportFileName: string = moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
     allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
+        ExportDataExtension.XLS,
+        ExportDataExtension.XLSX,
         ExportDataExtension.XML,
+        ExportDataExtension.JSON,
+        ExportDataExtension.ODS,
         ExportDataExtension.PDF
     ];
     anonymizeFields: LabelValuePair[] = [
@@ -81,7 +85,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             this.followUpsDataExportFileName;
 
         // print follow-ups file name
-        this.printFollowUpsFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME') + '.pdf';
+        this.printFollowUpsFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME');
 
         // load teams list
         // using share does the job, but it takes a bit to see the changes in the list
