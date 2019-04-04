@@ -46,6 +46,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     genderList$: Observable<LabelValuePair[]>;
     occupationsList$: Observable<LabelValuePair[]>;
     riskLevelsList$: Observable<LabelValuePair[]>;
+    finalFollowUpStatus$: Observable<LabelValuePair[]>;
 
     // sheet widget configuration
     sheetWidth = 500;
@@ -101,6 +102,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION).share();
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).share();
+        this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
 
         // configure Sheet widget
         this.configureSheetWidget();
@@ -278,6 +280,10 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL')
                 .setProperty('riskLevel')
                 .setOptions(this.riskLevelsList$, this.i18nService),
+            new DropdownSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS')
+                .setProperty('followUp.status')
+                .setOptions(this.finalFollowUpStatus$, this.i18nService),
             new TextSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_REASON')
                 .setProperty('riskReason'),
