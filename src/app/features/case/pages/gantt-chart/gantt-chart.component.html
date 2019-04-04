@@ -15,6 +15,7 @@
 
                         <button
                             mat-menu-item
+                            [disabled]="x32Architecture"
                             (click)="generateGanttChartReport()">
                             {{'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL' | translate}}
                         </button>

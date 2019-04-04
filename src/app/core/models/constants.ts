@@ -387,6 +387,14 @@ export class Constants {
     };
 
     /**
+     * Platform architecture
+     */
+    static PLATFORM_ARCH = {
+        X64: 'x64',
+        X32: 'x32'
+    };
+
+    /**
      * Use to match outcome status in the logic
      */
     static OUTCOME_STATUS = {
