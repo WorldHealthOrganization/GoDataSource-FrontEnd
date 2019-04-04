@@ -60,7 +60,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
         mask: string
     };
 
-    caseIdMaskValidator: Observable<boolean>;
+    caseIdMaskValidator: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
     constructor(
         private router: Router,

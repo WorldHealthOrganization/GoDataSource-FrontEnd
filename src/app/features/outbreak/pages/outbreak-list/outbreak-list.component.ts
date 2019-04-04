@@ -84,14 +84,17 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
-            (countries) => _.map(countries, (country: LabelValuePair) => {
-                country.value = {
-                    id: country.value
-                };
-                return country;
-            })
-        );
+        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY)
+            .pipe(
+                map(
+                    (countries) => _.map(countries, (country: LabelValuePair) => {
+                        country.value = {
+                            id: country.value
+                        };
+                        return country;
+                    })
+                )
+            );
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();

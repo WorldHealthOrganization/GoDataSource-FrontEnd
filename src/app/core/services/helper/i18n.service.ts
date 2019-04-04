@@ -153,7 +153,7 @@ export class I18nService {
      * @param {{}} data Parameters to be replaced in translated message
      * @returns String
      */
-    instant(token, data = {}) {
+    instant(token, data = {}): string {
         return this.translateService.instant(token, data);
     }
 

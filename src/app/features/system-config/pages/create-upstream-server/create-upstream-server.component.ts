@@ -58,7 +58,7 @@ export class CreateUpstreamServerComponent extends ConfirmOnFormChanges implemen
                 this.duplicateUrls = _.transform(settings.upstreamServers, (result, upstreamServer: SystemUpstreamServerModel, index: number) => {
                     result[index + 'url'] = {
                         value: upstreamServer.url
-                    };
+                    } as any;
                 }, {});
             });
     }

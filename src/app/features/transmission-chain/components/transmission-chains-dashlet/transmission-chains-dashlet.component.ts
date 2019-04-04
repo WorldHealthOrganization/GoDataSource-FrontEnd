@@ -322,7 +322,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             if (this.sizeOfChainsFilter) {
                 requestQueryBuilder.filter.byEquality(
                     'size',
-                    _.parseInt(this.sizeOfChainsFilter)
+                    _.parseInt(this.sizeOfChainsFilter as string)
                 );
             }
 

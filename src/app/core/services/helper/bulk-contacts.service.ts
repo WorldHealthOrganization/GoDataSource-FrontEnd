@@ -175,7 +175,7 @@ export class BulkContactsService {
     ) {
         return _.map(
             response.invalidColumns,
-            (columns: GridSettings[], row: number) => {
+            (columns: GridSettings[], row: string) => {
                 // initialize
                 const data: {
                     row: number,

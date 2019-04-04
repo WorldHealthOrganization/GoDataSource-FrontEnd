@@ -27,7 +27,7 @@ export class ListFilterDataService {
         private contactDataService: ContactDataService
     ) {}
 
-    private handleFilteringOfLists(callback): Observable<RequestQueryBuilder> {
+    private handleFilteringOfLists(callback): Observable<RequestQueryBuilder> | any {
         return this.outbreakDataService
             .getSelectedOutbreakSubject()
             .pipe(

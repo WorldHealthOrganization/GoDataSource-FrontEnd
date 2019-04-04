@@ -199,7 +199,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
      * Get translation token from language
      */
     getModuleTranslation(module: string) {
-        const moduleItem: LabelValuePair = _.find(this.moduleList, {value: module});
+        const moduleItem: LabelValuePair = _.find(this.moduleList, {value: module}) as LabelValuePair;
         return moduleItem ?
             moduleItem.label :
             '';

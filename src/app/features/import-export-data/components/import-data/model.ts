@@ -175,7 +175,7 @@ export class ImportableFileModel {
                 // this is already translated
                 return item.label;
             })
-            .value();
+            .value() as ImportableLabelValuePair[];
 
         this.distinctFileColumnValuesKeyValue = {};
         _.each(this.distinctFileColumnValues, (values: string[], property: string) => {

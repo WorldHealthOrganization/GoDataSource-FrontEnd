@@ -63,7 +63,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
     serverToday: Moment = null;
 
-    parentOnsetDates: [Moment, string][] = [];
+    parentOnsetDates: (string | Moment)[][] = [];
 
     queryParams: {
         onset: boolean,
@@ -74,7 +74,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         mask: string
     };
 
-    caseIdMaskValidator: Observable<boolean>;
+    caseIdMaskValidator: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
     displayRefresh: boolean = false;
     @ViewChild('visualId') visualId: NgModel;
@@ -250,9 +250,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                     // determine parent onset dates
                     const uniqueDates: {} = {};
-                    _.each(this.caseData.relationships, (relationship: RelationshipModel) => {
-                        const parentPerson = _.find(relationship.persons, { source: true });
-                        const parentCase: CaseModel = _.find(relationship.people, { id: parentPerson.id });
+                    _.each(this.caseData.relationships, (relationship: any) => {
+                        const parentPerson: any = _.find(relationship.persons, { source: true });
+                        const parentCase: CaseModel = _.find(relationship.people, { id: parentPerson.id }) as CaseModel;
                         if (
                             parentCase &&
                             parentCase.dateOfOnset
@@ -264,7 +264,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                     // convert unique object of dates to array
                     this.parentOnsetDates = _.map(Object.keys(uniqueDates), (date: string) => {
                         return [
-                            moment(date),
+                            moment(date) as Moment,
                             this.i18nService.instant(
                                 'LNG_PAGE_MODIFY_CASE_INVALID_CHILD_DATE_OF_ONSET', {
                                     date: moment(date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)

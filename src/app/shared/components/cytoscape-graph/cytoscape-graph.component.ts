@@ -367,10 +367,11 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
             minZoom: this.defaultZoom.min,
             maxZoom: this.defaultZoom.max,
             wheelSensitivity: 0.3,
-            ready: () => {
-                // show spinner when layout starts to draw
-                this.showLoading = true;
-            }
+            // #TODO replace with new cytoscape version equivalent?
+            // ready: () => {
+            //     // show spinner when layout starts to draw
+            //     this.showLoading = true;
+            // }
         });
         // add node tap event
         this.cy.on('tap', 'node', (evt) => {

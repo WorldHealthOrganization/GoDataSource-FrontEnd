@@ -133,7 +133,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     exportChain() {
         this.showLoadingDialog();
 
-        domtoimage.toPng(this.chartContainer.nativeElement)
+        (domtoimage as any).toPng(this.chartContainer.nativeElement)
             .then((dataUrl) => {
                 const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
 

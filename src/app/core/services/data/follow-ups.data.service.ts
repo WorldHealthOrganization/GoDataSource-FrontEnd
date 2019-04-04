@@ -123,7 +123,7 @@ export class FollowUpsDataService {
             FollowUpModel
         )
             .pipe(
-                mergeMap(followUps => followUps)
+                map((followUps: FollowUpModel[]) => followUps.pop())
             );
     }
 

@@ -204,7 +204,7 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
             // keep only teams with id
             const teams = _.filter(metricTeamsFollowups.teams, (teamMetricData) => {
                 return teamMetricData.id && teamsMap[teamMetricData.id];
-            });
+            }) as any[];
 
             // go through teams and create list of date information
             _.forEach(teams, (team) => {
