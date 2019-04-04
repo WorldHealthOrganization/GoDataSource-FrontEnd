@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -15,6 +14,8 @@ import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { AddressType } from '../../../../core/models/address.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-create-event',
@@ -82,11 +83,13 @@ export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.eventDataService
                 .createEvent(this.outbreakId, dirtyFields)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    loadingDialog.close();
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        loadingDialog.close();
+                        return throwError(err);
+                    })
+                )
                 .subscribe((newEvent: EventModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE');
 

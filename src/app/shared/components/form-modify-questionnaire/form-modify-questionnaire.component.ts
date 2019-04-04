@@ -12,7 +12,7 @@ import { AnswerModel, QuestionModel } from '../../../core/models/question.model'
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../dialog/dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
-import { Subscriber ,  Observable } from 'rxjs';
+import { Subscriber, forkJoin } from 'rxjs';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
@@ -33,7 +33,8 @@ export class FormModifyQuestionnaireBreadcrumbsData {
     constructor(
         public outbreak: OutbreakModel | OutbreakTemplateModel,
         public type: OutbreakQestionnaireTypeEnum
-    ) {}
+    ) {
+    }
 }
 
 /**
@@ -45,7 +46,8 @@ export class FormModifyQuestionnaireUpdateData {
         public type: OutbreakQestionnaireTypeEnum,
         public questionnaire: QuestionModel[],
         public finishSubscriber: Subscriber<boolean>
-    ) {}
+    ) {
+    }
 }
 
 @Component({
@@ -80,6 +82,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // init questionnaire data
         this.initQuestionnaireData();
     }
+
     get parent(): OutbreakModel | OutbreakTemplateModel {
         return this._parent;
     }
@@ -263,19 +266,19 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         });
 
         // retrieve data
-        Observable.forkJoin([
+        forkJoin(
             this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.QUESTION_CATEGORY),
             this.genericDataService.getAnswerTypesList(),
             this.genericDataService.getAnswersDisplayOrientationsList(),
-        ]).subscribe(([
-            questionCategoriesList,
-            answerTypesInstantList,
-            answersDisplayInstantList
-        ]: [
+        ).subscribe(([
+                         questionCategoriesList,
+                         answerTypesInstantList,
+                         answersDisplayInstantList
+                     ]: [
             LabelValuePair[],
             any[],
             any[]
-        ]) => {
+            ]) => {
             // set edit options
             this.questionCategoriesInstantList = questionCategoriesList;
             this.answerTypesInstantList = answerTypesInstantList;
@@ -510,7 +513,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         const maps: {
             [uuid: string]: string
         } = {};
-        this.questionVariables = { ...this.extraQuestionVariables };
+        this.questionVariables = {...this.extraQuestionVariables};
 
         // add variables to array of variables
         const getQuestionVariables = (questions: QuestionModel[]) => {
@@ -1599,7 +1602,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 fieldType: DialogFieldType.TEXT,
                 type: 'number',
                 value: isNewQuestion ?
-                    ( this.questionnaireData ? this.questionnaireData.length + 1 : 1 ) :
+                    (this.questionnaireData ? this.questionnaireData.length + 1 : 1) :
                     questionIndex + 1
             })]
         })).subscribe((answer) => {
@@ -1638,7 +1641,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 fieldType: DialogFieldType.TEXT,
                 type: 'number',
                 value: isNewAnswer ?
-                    ( this.questionInEditModeClone && this.questionInEditModeClone.answers ? this.questionInEditModeClone.answers.length + 1 : 1 ) :
+                    (this.questionInEditModeClone && this.questionInEditModeClone.answers ? this.questionInEditModeClone.answers.length + 1 : 1) :
                     answerIndex + 1
             })]
         })).subscribe((answer) => {

@@ -11,15 +11,15 @@ import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { DialogAnswer, DialogAnswerButton, DialogField, DialogFieldType, LoadingDialogModel } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { Observable ,  Subscriber } from 'rxjs';
-
+import { Observable, Subscriber } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { environment } from '../../../../../environments/environment';
+import { catchError } from 'rxjs/operators';
+import { throwError, of, forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-client-applications-list',
@@ -124,44 +124,49 @@ export class ClientApplicationsListComponent extends ListComponent implements On
      */
     refreshList() {
         this.clientApplicationsServerList = [];
-        Observable.forkJoin([
-            this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK) ?
-                this.outbreakDataService.getOutbreaksList() :
-                Observable.of([]),
+
+        const outbreaksList$: Observable<OutbreakModel[]> = this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK) ?
+            this.outbreakDataService.getOutbreaksList() :
+            of([]);
+
+        forkJoin(
+            outbreaksList$,
             this.systemSettingsDataService.getSystemSettings()
-        ]).catch((err) => {
-            this.snackbarService.showApiError(err);
-            return ErrorObservable.create(err);
-        }).subscribe(([outbreaksList, systemSettings]: [OutbreakModel[], SystemSettingsModel]) => {
-            // map outbreaks
-            const mappedOutbreaks: {
-                [outbreakID: string]: OutbreakModel
-            } = _.groupBy(outbreaksList, 'id');
+        )
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                })
+            )
+            .subscribe(([outbreaksList, systemSettings]: [OutbreakModel[], SystemSettingsModel]) => {
+                // map outbreaks
+                const mappedOutbreaks = _.groupBy(outbreaksList, 'id');
 
-            // get settings
-            this.settings = systemSettings;
-            this.clientApplicationsServerList = _.map(
-                _.get(this.settings, 'clientApplications', []),
-                (item: SystemClientApplicationModel) => {
-                    // set outbreak
-                    item.outbreaks = _.transform(
-                        item.outbreakIDs,
-                        (result, outbreakID: string) => {
-                            // outbreak not deleted ?
-                            if (!_.isEmpty(mappedOutbreaks[outbreakID])) {
-                                result.push(mappedOutbreaks[outbreakID][0]);
-                            }
-                        },
-                        []
-                    );
+                // get settings
+                this.settings = systemSettings;
+                this.clientApplicationsServerList = _.map(
+                    _.get(this.settings, 'clientApplications', []),
+                    (item: SystemClientApplicationModel) => {
+                        // set outbreak
+                        item.outbreaks = _.transform(
+                            item.outbreakIDs,
+                            (result, outbreakID: string) => {
+                                // outbreak not deleted ?
+                                if (!_.isEmpty(mappedOutbreaks[outbreakID])) {
+                                    result.push(mappedOutbreaks[outbreakID][0]);
+                                }
+                            },
+                            []
+                        );
 
-                    // finished
-                    return item;
-                });
+                        // finished
+                        return item;
+                    });
 
-            // flag if list is empty
-            this.checkEmptyList(this.clientApplicationsServerList);
-        });
+                // flag if list is empty
+                this.checkEmptyList(this.clientApplicationsServerList);
+            });
     }
 
     /**
@@ -182,10 +187,12 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.systemSettingsDataService
                         .getSystemSettings()
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe((settings: SystemSettingsModel) => {
                             // remove client application
                             const cleanClientApplication: SystemClientApplicationModel = _.cloneDeep(clientApplication);
@@ -200,10 +207,12 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                                     .modifySystemSettings({
                                         clientApplications: settings.clientApplications
                                     })
-                                    .catch((err) => {
-                                        this.snackbarService.showApiError(err);
-                                        return ErrorObservable.create(err);
-                                    })
+                                    .pipe(
+                                        catchError((err) => {
+                                            this.snackbarService.showApiError(err);
+                                            return throwError(err);
+                                        })
+                                    )
                                     .subscribe(() => {
                                         // display success message
                                         this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
@@ -229,10 +238,12 @@ export class ClientApplicationsListComponent extends ListComponent implements On
         // save
         this.systemSettingsDataService
             .getSystemSettings()
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    return throwError(err);
+                })
+            )
             .subscribe((settings: SystemSettingsModel) => {
                 // client application
                 const cleanClientApplication: SystemClientApplicationModel = _.cloneDeep(clientApplication);
@@ -248,10 +259,12 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                         .modifySystemSettings({
                             clientApplications: settings.clientApplications
                         })
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             // display success message
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE');
@@ -273,14 +286,14 @@ export class ClientApplicationsListComponent extends ListComponent implements On
         let apiUrl: string = environment.apiUrl;
         apiUrl = apiUrl.indexOf('http://') === 0 || apiUrl.indexOf('https://') === 0 ?
             apiUrl : (
-                ( apiUrl.indexOf('/') === 0 ? '' : '/') +
+                (apiUrl.indexOf('/') === 0 ? '' : '/') +
                 window.location.origin +
                 apiUrl
             );
 
         // define api async check
         let apiURL: string;
-        const apiObserver = Observable.create((subscriber: Subscriber<boolean>) => {
+        const apiObserver = new Observable((subscriber: Subscriber<boolean>) => {
             if (
                 _.isString(apiURL) &&
                 apiURL.includes('localhost')
@@ -290,12 +303,14 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             } else {
                 this.systemSettingsDataService
                     .getAPIVersion(apiURL)
-                    .catch(() => {
-                        subscriber.next(false);
-                        subscriber.complete();
-                        return [];
-                    })
-                    .subscribe((versionData) => {
+                    .pipe(
+                        catchError((err) => {
+                            subscriber.next(false);
+                            subscriber.complete();
+                            return throwError(err);
+                        })
+                    )
+                    .subscribe((versionData: any) => {
                         if (_.get(versionData, 'version')) {
                             subscriber.next(true);
                             subscriber.complete();
@@ -338,8 +353,12 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                 })
             ],
             fileExtension: 'png',
-            exportStart: () => { this.showLoadingDialog(); },
-            exportFinished: () => { this.closeLoadingDialog(); }
+            exportStart: () => {
+                this.showLoadingDialog();
+            },
+            exportFinished: () => {
+                this.closeLoadingDialog();
+            }
         });
     }
 
@@ -349,6 +368,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
     showLoadingDialog() {
         this.loadingDialog = this.dialogService.showLoadingDialog();
     }
+
     /**
      * Hide loading dialog
      */

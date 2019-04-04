@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../models/reference-data.model';
 import { CacheKey, CacheService } from '../helper/cache.service';
 import * as _ from 'lodash';
 import { RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/request-query-builder';
 import { LabelValuePair } from '../../models/label-value-pair';
-
-
+import { map, mergeMap, share, tap } from 'rxjs/operators';
 
 @Injectable()
 export class ReferenceDataDataService {
@@ -21,27 +20,33 @@ export class ReferenceDataDataService {
         private modelHelper: ModelHelperService,
         private cacheService: CacheService
     ) {
-        this.categoriesList$ = this.http.get(`reference-data/available-categories`).share();
+        this.categoriesList$ = this.http.get(`reference-data/available-categories`).pipe(share());
 
         // retrieve categories
         this.referenceDataListMap$ = this.getCategoriesList()
-            .mergeMap((categories: ReferenceDataCategoryModel[]) => {
-                return this.getEntries()
-                    .map((referenceData: ReferenceDataEntryModel[]) => {
-                        // map entries by category id
-                        const entriesMap = _.groupBy(referenceData, 'categoryId');
+            .pipe(
+                mergeMap((categories: ReferenceDataCategoryModel[]) => {
+                    return this.getEntries()
+                        .pipe(
+                            map((referenceData: ReferenceDataEntryModel[]) => {
+                                // map entries by category id
+                                const entriesMap = _.groupBy(referenceData, 'categoryId');
 
-                        // group entries by category
-                        return _.map(categories, (category: ReferenceDataCategoryModel) => {
-                            // find all entries for current category
-                            category.entries = entriesMap[category.id];
+                                // group entries by category
+                                return _.map(categories, (category: ReferenceDataCategoryModel) => {
+                                    // find all entries for current category
+                                    category.entries = entriesMap[category.id];
 
-                            return category;
-                        });
-                    }).do((referenceDataResult) => {
-                        this.cacheService.set(CacheKey.REFERENCE_DATA, referenceDataResult);
-                    });
-            }).share();
+                                    return category;
+                                });
+                            }),
+                            tap((referenceDataResult) => {
+                                this.cacheService.set(CacheKey.REFERENCE_DATA, referenceDataResult);
+                            })
+                        );
+                }),
+                share()
+            );
     }
 
     /**
@@ -63,7 +68,7 @@ export class ReferenceDataDataService {
         // get reference data from cache
         const referenceDataCache = this.cacheService.get(CacheKey.REFERENCE_DATA);
         if (referenceDataCache) {
-            return Observable.of(referenceDataCache);
+            return of(referenceDataCache);
         } else {
             // get reference data entries from API
             return this.referenceDataListMap$;
@@ -78,10 +83,12 @@ export class ReferenceDataDataService {
     getReferenceDataByCategory(categoryId: string): Observable<ReferenceDataCategoryModel> {
         // get reference data entries
         return this.getReferenceData()
-            .map((entries) => {
-                // find the category
-                return _.find(entries, {id: categoryId});
-            });
+            .pipe(
+                map((entries) => {
+                    // find the category
+                    return _.find(entries, {id: categoryId});
+                })
+            );
     }
 
     /**
@@ -91,17 +98,19 @@ export class ReferenceDataDataService {
      */
     getReferenceDataByCategoryAsLabelValue(categoryId: ReferenceDataCategory): Observable<LabelValuePair[]> {
         return this.getReferenceDataByCategory(categoryId)
-            .map((data: ReferenceDataCategoryModel) => {
-                return _.map(_.get(data, 'entries'), (entry: ReferenceDataEntryModel) =>
-                    new LabelValuePair(
-                        entry.value,
-                        entry.id,
-                        !entry.active,
-                        entry.active,
-                        entry.iconUrl
-                    )
-                );
-            });
+            .pipe(
+                map((data: ReferenceDataCategoryModel) => {
+                    return _.map(_.get(data, 'entries'), (entry: ReferenceDataEntryModel) =>
+                        new LabelValuePair(
+                            entry.value,
+                            entry.id,
+                            !entry.active,
+                            entry.active,
+                            entry.iconUrl
+                        )
+                    );
+                })
+            );
     }
 
     getEntries(): Observable<ReferenceDataEntryModel[]> {
@@ -142,10 +151,12 @@ export class ReferenceDataDataService {
      */
     createEntry(entry): Observable<any> {
         return this.http.post(`reference-data`, entry)
-            .do(() => {
-                // invalidate list cache
-                this.clearReferenceDataCache();
-            });
+            .pipe(
+                tap(() => {
+                    // invalidate list cache
+                    this.clearReferenceDataCache();
+                })
+            );
     }
 
     /**
@@ -157,10 +168,12 @@ export class ReferenceDataDataService {
     modifyEntry(entryId: string, entryData): Observable<ReferenceDataEntryModel> {
         return this.modelHelper.mapObservableToModel(
             this.http.put(`reference-data/${entryId}`, entryData)
-                .do(() => {
-                    // invalidate list cache
-                    this.clearReferenceDataCache();
-                }),
+                .pipe(
+                    tap(() => {
+                        // invalidate list cache
+                        this.clearReferenceDataCache();
+                    })
+                ),
             ReferenceDataEntryModel
         );
     }
@@ -172,10 +185,12 @@ export class ReferenceDataDataService {
      */
     deleteEntry(entryId: string): Observable<any> {
         return this.http.delete(`reference-data/${entryId}`)
-            .do(() => {
-                // invalidate list cache
-                this.clearReferenceDataCache();
-            });
+            .pipe(
+                tap(() => {
+                    // invalidate list cache
+                    this.clearReferenceDataCache();
+                })
+            );
     }
 
     /**

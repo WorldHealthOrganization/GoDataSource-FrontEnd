@@ -5,7 +5,6 @@ import { UserModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -16,7 +15,8 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import * as _ from 'lodash';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-user-list',
@@ -92,7 +92,7 @@ export class UserListComponent extends ListComponent implements OnInit {
         // remove paginator from query builder
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
-        this.usersListCount$ = this.userDataService.getUsersCount(countQueryBuilder).share();
+        this.usersListCount$ = this.userDataService.getUsersCount(countQueryBuilder).pipe(share());
     }
 
     /**
@@ -121,11 +121,12 @@ export class UserListComponent extends ListComponent implements OnInit {
                     // delete the user
                     this.userDataService
                         .deleteUser(user.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_USERS_ACTION_DELETE_USER_SUCCESS_MESSAGE');
 

@@ -3,14 +3,13 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { MetricChartDataModel } from '../../../../core/models/metrics/metric-chart-data.model';
-import { Observable ,  Subscription ,  Subscriber } from 'rxjs';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { Subscription, Subscriber, throwError, forkJoin } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-
 import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-cases-hospitalized-pie-chart-dashlet',
@@ -27,6 +26,7 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
         this._globalFilterDate = globalFilterDate;
         this.refreshDataCaller.call();
     }
+
     get globalFilterDate(): Moment {
         return this._globalFilterDate;
     }
@@ -37,6 +37,7 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
         this._globalFilterLocationId = globalFilterLocationId;
         this.refreshDataCaller.call();
     }
+
     get globalFilterLocationId(): string {
         return this._globalFilterLocationId;
     }
@@ -63,7 +64,8 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
         private caseDataService: CaseDataService,
         private i18nService: I18nService,
         protected snackbarService: SnackbarService
-    ) {}
+    ) {
+    }
 
     ngOnInit() {
         // outbreak
@@ -158,27 +160,31 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
 
             // retrieve data
             this.displayLoading = true;
-            this.previousSubscriber = Observable.forkJoin([
+            this.previousSubscriber = forkJoin(
                 this.caseDataService
                     .getHospitalisedCasesCount(this.outbreakId, this.globalFilterDate, qb),
                 this.caseDataService
                     .getIsolatedCasesCount(this.outbreakId, this.globalFilterDate, qb),
                 this.caseDataService
                     .getCasesCount(this.outbreakId, qb)
-            ]).catch((err) => {
-                this.snackbarService.showError(err.message);
-                return ErrorObservable.create(err);
-            }).subscribe(([hospitalizedCountResults, isolatedCountResults, casesCountResults]) => {
-                // construct chart
-                this.caseHospitalizationSummaryResults = this.buildChartData(
-                    hospitalizedCountResults.count,
-                    isolatedCountResults.count,
-                    casesCountResults.count
-                );
+            )
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showError(err.message);
+                        return throwError(err);
+                    })
+                )
+                .subscribe(([hospitalizedCountResults, isolatedCountResults, casesCountResults]) => {
+                    // construct chart
+                    this.caseHospitalizationSummaryResults = this.buildChartData(
+                        hospitalizedCountResults.count,
+                        isolatedCountResults.count,
+                        casesCountResults.count
+                    );
 
-                // finished
-                this.displayLoading = false;
-            });
+                    // finished
+                    this.displayLoading = false;
+                });
         }
     }
 }

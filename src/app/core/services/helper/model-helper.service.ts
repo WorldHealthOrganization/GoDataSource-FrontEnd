@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
 import { UserModel } from '../../models/user.model';
 import { UserRoleModel } from '../../models/user-role.model';
 import { PermissionModel } from '../../models/permission.model';
@@ -10,6 +9,7 @@ import { LocationModel } from '../../models/location.model';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { MetricCasesPerLocationCountsModel } from '../../models/metrics/metric-cases-per-location-counts.model';
 import { MetricLocationCasesCountsModel } from '../../models/metrics/metric-location-cases-count.model';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class ModelHelperService {
@@ -21,13 +21,14 @@ export class ModelHelperService {
      * @returns {Observable<any[]>}
      */
     mapObservableListToModel(obs: Observable<any>, modelClass): Observable<any> {
-        return obs.map(
-         (listResult) => {
-                return listResult.map((item) => {
-                    return this.getModelInstance(modelClass, item);
-                });
-            }
-        );
+        return obs
+            .pipe(
+                map((listResult) => {
+                    return listResult.map((item) => {
+                        return this.getModelInstance(modelClass, item);
+                    });
+                })
+            );
     }
 
     /**
@@ -37,11 +38,12 @@ export class ModelHelperService {
      * @returns {Observable<any>}
      */
     mapObservableToModel(obs: Observable<any>, modelClass): Observable<any> {
-        return obs.map(
-            (itemResult) => {
-                return this.getModelInstance(modelClass, itemResult);
-            }
-        );
+        return obs
+            .pipe(
+                map((itemResult) => {
+                    return this.getModelInstance(modelClass, itemResult);
+                })
+            );
     }
 
     /**
@@ -76,9 +78,10 @@ export class ModelHelperService {
                 );
 
                 // collect all User permissions from its assigned Roles
-                const permissionIdsFromRoles = _.flatten(_.map(user.roles, (role) => {
+                const rolesPermissions: any = _.map(user.roles, (role) => {
                     return role.permissionIds;
-                }));
+                });
+                const permissionIdsFromRoles = _.flatten(rolesPermissions);
 
                 // keep only unique permissions
                 user.permissionIds = _.uniq(permissionIdsFromRoles);

@@ -6,7 +6,6 @@ import { Observable } from 'rxjs';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserSettings } from '../../../../core/models/user.model';
@@ -18,10 +17,11 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -76,7 +76,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         this.exposuresFrequencyList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY);
         this.exposureDurationList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION);
         this.relationshipTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION);
-        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).share();
+        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
         personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
             this.personTypesListMap = _.transform(
                 personTypeCategory.entries,
@@ -238,7 +238,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                     this.entityType,
                     this.entityId,
                     countQueryBuilder
-                ).share();
+                ).pipe(share());
             } else {
                 // count the contacts
                 this.relationshipsListCount$ = this.relationshipDataService.getEntityContactsCount(
@@ -246,7 +246,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                     this.entityType,
                     this.entityId,
                     countQueryBuilder
-                ).share();
+                ).pipe(share());
             }
         }
     }
@@ -254,7 +254,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     /**
      * Retrieve Person Type color
      */
-    getPersonTypeColor(personType) {
+    getPersonTypeColor(personType: string) {
         const personTypeData = _.get(this.personTypesListMap, personType);
         return _.get(personTypeData, 'colorCode', '');
     }
@@ -276,11 +276,12 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                     // delete relationship
                     this.relationshipDataService
                         .deleteRelationship(this.selectedOutbreak.id, this.entityType, this.entityId, relatedEntity.relationship.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
 

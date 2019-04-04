@@ -6,13 +6,13 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
 import * as _ from 'lodash';
 import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
-import { tap } from 'rxjs/operators';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { catchError, share, tap } from 'rxjs/operators';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-saved-filters',
@@ -70,7 +70,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
     refreshListCount() {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
-        this.savedFiltersListCount$ = this.savedFiltersService.getSavedFiltersListCount(countQueryBuilder).share();
+        this.savedFiltersListCount$ = this.savedFiltersService.getSavedFiltersListCount(countQueryBuilder).pipe(share());
     }
 
     /**
@@ -95,10 +95,12 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
      */
     setPublicItem(savedFilterId: string, isPublic: boolean) {
         this.savedFiltersService.modifyFilter(savedFilterId, {isPublic : isPublic})
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                })
+            )
             .subscribe(() => {
                 this.snackbarService.showSuccess(`LNG_PAGE_LIST_SAVED_FILTERS_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE`);
             });
@@ -113,11 +115,12 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.savedFiltersService.deleteFilter(filterId)
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err);
-
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE');
 

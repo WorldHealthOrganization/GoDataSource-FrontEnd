@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -24,6 +23,8 @@ import { EntityModel } from '../../../../core/models/entity.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-create-case',
@@ -119,7 +120,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                 this.caseData.visualId = this.visualIDTranslateData.mask;
 
                 // set visual ID validator
-                this.caseIdMaskValidator = Observable.create((observer) => {
+                this.caseIdMaskValidator = new Observable((observer) => {
                     this.caseDataService.checkCaseVisualIDValidity(
                         this.selectedOutbreak.id,
                         this.visualIDTranslateData.mask,
@@ -177,31 +178,35 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.caseDataService
                 .findDuplicates(this.selectedOutbreak.id, dirtyFields)
-                .catch((err) => {
-                    if (_.includes(_.get(err, 'details.codes.id'), `uniqueness`)) {
-                        this.snackbarService.showError('LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID');
-                    } else {
-                        this.snackbarService.showApiError(err);
-                    }
+                .pipe(
+                    catchError((err) => {
+                        if (_.includes(_.get(err, 'details.codes.id'), `uniqueness`)) {
+                            this.snackbarService.showError('LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID');
+                        } else {
+                            this.snackbarService.showApiError(err);
+                        }
 
-                    // hide dialog
-                    loadingDialog.close();
+                        // hide dialog
+                        loadingDialog.close();
 
-                    return ErrorObservable.create(err);
-                })
+                        return throwError(err);
+                    })
+                )
                 .subscribe((caseDuplicates: EntityDuplicatesModel) => {
                     // add the new Case
                     const runCreateCase = () => {
                         this.caseDataService
                             .createCase(this.selectedOutbreak.id, dirtyFields)
-                            .catch((err) => {
-                                this.snackbarService.showApiError(err);
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showApiError(err);
 
-                                // hide dialog
-                                loadingDialog.close();
+                                    // hide dialog
+                                    loadingDialog.close();
 
-                                return ErrorObservable.create(err);
-                            })
+                                    return throwError(err);
+                                })
+                            )
                             .subscribe((newCase: CaseModel) => {
                                 this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
 

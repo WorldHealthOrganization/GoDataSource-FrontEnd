@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import * as _ from 'lodash';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
@@ -10,6 +9,8 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { SecurityQuestionModel } from '../../../../core/models/securityQuestion.model';
 import { Observable } from 'rxjs';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import { catchError, share } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-set-security-questions',
@@ -39,7 +40,7 @@ export class SetSecurityQuestionsComponent implements OnInit {
 
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
-        this.securityQuestionsList$ = this.userDataService.getSecurityQuestionsList().share();
+        this.securityQuestionsList$ = this.userDataService.getSecurityQuestionsList().pipe(share());
 
         // check if user has security questions set
         if (
@@ -60,10 +61,12 @@ export class SetSecurityQuestionsComponent implements OnInit {
 
             this.userDataService
                 .modifyUser(this.authUser.id, fields)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showError(err.message);
+                        return throwError(err);
+                    })
+                )
                 .subscribe(() => {
                     this.authDataService
                         .reloadAndPersistAuthUser()

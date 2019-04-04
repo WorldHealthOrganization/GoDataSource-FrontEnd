@@ -4,7 +4,6 @@ import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
@@ -18,6 +17,8 @@ import * as _ from 'lodash';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { LocationBreadcrumbsComponent } from '../../../../shared/components/location-breadcrumbs/location-breadcrumbs.component';
 import { DialogAnswer, DialogAnswerButton, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-modify-location',
@@ -27,7 +28,7 @@ import { DialogAnswer, DialogAnswerButton, DialogConfiguration } from '../../../
 })
 export class ModifyLocationComponent extends ViewModifyComponent implements OnInit {
     // breadcrumb header
-    public breadcrumbs: BreadcrumbItemModel[] =  [];
+    public breadcrumbs: BreadcrumbItemModel[] = [];
 
     locationId: string;
     locationData: LocationModel = new LocationModel();
@@ -69,12 +70,15 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
 
                 this.locationDataService
                     .getLocation(this.locationId)
-                    .catch((err) => {
-                        this.snackbarService.showError(err.message);
-                        this.disableDirtyConfirm();
-                        this.router.navigate(['/locations']);
-                        return ErrorObservable.create(err);
-                    })
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            this.disableDirtyConfirm();
+                            this.router.navigate(['/locations']);
+
+                            return throwError(err);
+                        })
+                    )
                     .subscribe((locationData: {}) => {
                         // location data
                         this.locationData = new LocationModel(locationData);
@@ -122,11 +126,13 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.locationDataService
             .modifyLocation(this.locationId, dirtyFields)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
             .subscribe((modifiedLocation: LocationModel) => {
                 // update model
                 this.locationData = modifiedLocation;
@@ -153,12 +159,15 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                                     if (answer.button === DialogAnswerButton.Yes) {
                                         // propagate values to all the entities that have in use this location
                                         this.locationDataService.propagateGeoLocation(modifiedLocation.id)
-                                            .catch((err) => {
-                                                this.snackbarService.showApiError(err);
-                                                return ErrorObservable.create(err);
-                                            }).subscribe(() => {
+                                            .pipe(
+                                                catchError((err) => {
+                                                    this.snackbarService.showApiError(err);
+                                                    return throwError(err);
+                                                })
+                                            )
+                                            .subscribe(() => {
                                                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE');
-                                        });
+                                            });
                                     }
                                 });
                             }

@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { UserRoleModel } from '../../../../core/models/user-role.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -16,6 +15,8 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-create-user',
@@ -70,11 +71,12 @@ export class CreateUserComponent extends ConfirmOnFormChanges implements OnInit 
             // try to authenticate the user
             this.userDataService
                 .createUser(dirtyFields)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showError(err.message);
+                        return throwError(err);
+                    })
+                )
                 .subscribe((newUser: UserModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_SUCCESS_MESSAGE');
 

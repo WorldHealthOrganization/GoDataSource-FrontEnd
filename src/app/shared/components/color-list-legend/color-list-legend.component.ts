@@ -4,6 +4,7 @@ import { ReferenceDataDataService } from '../../../core/services/data/reference-
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
 import { LegendDot } from '../../../core/models/legend-dot.model';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-color-list-legend',
@@ -21,7 +22,8 @@ export class ColorListLegendComponent implements OnInit {
 
     constructor(
         private referenceDataDataService: ReferenceDataDataService
-    ) {}
+    ) {
+    }
 
     ngOnInit() {
         this.getDots();
@@ -32,10 +34,12 @@ export class ColorListLegendComponent implements OnInit {
      */
     getDots() {
         this.optionsList$ = this.referenceDataDataService.getReferenceDataByCategory(this.referenceDataCategory)
-            .map((response) => {
-                return _.map(response.entries, (entry: ReferenceDataEntryModel) => {
-                    return new LegendDot(entry.id, entry.value, entry.colorCode);
-                });
-            });
+            .pipe(
+                map((response) => {
+                    return _.map(response.entries, (entry: ReferenceDataEntryModel) => {
+                        return new LegendDot(entry.id, entry.value, entry.colorCode);
+                    });
+                })
+            );
     }
 }

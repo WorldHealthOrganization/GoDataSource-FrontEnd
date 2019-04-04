@@ -5,15 +5,16 @@ import {
     DialogComponent,
     DialogConfiguration, DialogField
 } from '../../../shared/components/dialog/dialog.component';
-import { Observable ,  Subscriber } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../models/label-value-pair';
 import { ImportExportDataService } from '../data/import-export.data.service';
 import { SnackbarService } from './snackbar.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import * as FileSaver from 'file-saver';
 import { LoadingDialogComponent, LoadingDialogModel } from '../../../shared/components/loading-dialog/loading-dialog.component';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 export enum ExportDataExtension {
     CSV = 'csv',
@@ -34,7 +35,8 @@ export class DialogService {
         private dialog: MatDialog,
         private importExportDataService: ImportExportDataService,
         private snackbarService: SnackbarService,
-    ) {}
+    ) {
+    }
 
     /**
      * Show a Confirm Dialog
@@ -245,10 +247,10 @@ export class DialogService {
 
         // display dialog
         this.showInput(new DialogConfiguration({
-                message: data.message,
-                yesLabel: data.yesLabel,
-                fieldsList: fieldsList
-            }))
+            message: data.message,
+            yesLabel: data.yesLabel,
+            fieldsList: fieldsList
+        }))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // call export start
@@ -257,43 +259,48 @@ export class DialogService {
                     }
 
                     // export
-                    (data.isPOST ?
-                        this.importExportDataService.exportPOSTData(
-                            data.url,
-                            _.merge(
-                                answer.inputValue.value,
-                                data.extraAPIData
-                            ),
-                            qb
-                        ) :
-                        this.importExportDataService.exportData(
-                            data.url,
-                            _.merge(
-                                answer.inputValue.value,
-                                data.extraAPIData
-                            ),
-                            qb
+                    (
+                        data.isPOST ?
+                            this.importExportDataService.exportPOSTData(
+                                data.url,
+                                _.merge(
+                                    answer.inputValue.value,
+                                    data.extraAPIData
+                                ),
+                                qb
+                            ) :
+                            this.importExportDataService.exportData(
+                                data.url,
+                                _.merge(
+                                    answer.inputValue.value,
+                                    data.extraAPIData
+                                ),
+                                qb
+                            )
+                    )
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+
+                                // call dialog closed
+                                if (data.exportFinished) {
+                                    data.exportFinished(answer);
+                                }
+
+                                return throwError(err);
+                            })
                         )
-                    ).catch((err) => {
-                        this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+                        .subscribe((blob) => {
+                            FileSaver.saveAs(
+                                blob,
+                                `${data.fileName}.${data.fileExtension ? data.fileExtension : answer.inputValue.value[data.allowedExportTypesKey]}`
+                            );
 
-                        // call dialog closed
-                        if (data.exportFinished) {
-                            data.exportFinished(answer);
-                        }
-
-                        return ErrorObservable.create(err);
-                    }).subscribe((blob) => {
-                        FileSaver.saveAs(
-                            blob,
-                            `${data.fileName}.${data.fileExtension ? data.fileExtension : answer.inputValue.value[data.allowedExportTypesKey]}`
-                        );
-
-                        // call dialog closed
-                        if (data.exportFinished) {
-                            data.exportFinished(answer);
-                        }
-                    });
+                            // call dialog closed
+                            if (data.exportFinished) {
+                                data.exportFinished(answer);
+                            }
+                        });
                 } else {
                     // call dialog closed
                     if (data.exportFinished) {

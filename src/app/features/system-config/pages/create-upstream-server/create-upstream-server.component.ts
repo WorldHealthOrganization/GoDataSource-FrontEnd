@@ -9,8 +9,9 @@ import { SystemUpstreamServerModel } from '../../../../core/models/system-upstre
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import * as _ from 'lodash';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-create-upstream-server',
@@ -78,11 +79,13 @@ export class CreateUpstreamServerComponent extends ConfirmOnFormChanges implemen
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.systemSettingsDataService
                 .getSystemSettings()
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    loadingDialog.close();
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showError(err.message);
+                        loadingDialog.close();
+                        return throwError(err);
+                    })
+                )
                 .subscribe((settings: SystemSettingsModel) => {
                     // add the new upstream server
                     settings.upstreamServers.push(dirtyFields);
@@ -92,11 +95,13 @@ export class CreateUpstreamServerComponent extends ConfirmOnFormChanges implemen
                         .modifySystemSettings({
                             upstreamServers: settings.upstreamServers
                         })
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err);
-                            loadingDialog.close();
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                loadingDialog.close();
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             // display success message
                             this.snackbarService.showSuccess('LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_ACTION_CREATE_UPSTREAM_SERVER_SUCCESS_MESSAGE');

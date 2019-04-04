@@ -25,6 +25,7 @@ import { RangeFollowUpsModel } from '../../../../core/models/range-follow-ups.mo
 import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { Observable } from 'rxjs';
 import { DateRangeModel } from '../../../../core/models/date-range.model';
+import { share } from 'rxjs/operators';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -288,7 +289,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.followUpsGroupedByContactCount$ = this.followUpsDataService.getRangeFollowUpsListCount(this.selectedOutbreak.id, countQueryBuilder).share();
+            this.followUpsGroupedByContactCount$ = this.followUpsDataService.getRangeFollowUpsListCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }
 

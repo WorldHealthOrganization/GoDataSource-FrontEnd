@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -16,6 +15,8 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-create-team',
@@ -62,10 +63,12 @@ export class CreateTeamComponent extends ConfirmOnFormChanges implements OnInit 
                     if (createTeam) {
                         this.teamDataService
                             .createTeam(dirtyFields)
-                            .catch((err) => {
-                                this.snackbarService.showError(err.message);
-                                return ErrorObservable.create(err);
-                            })
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showError(err.message);
+                                    return throwError(err);
+                                })
+                            )
                             .subscribe((newTeam: TeamModel) => {
                                 this.snackbarService.showSuccess('LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_SUCCESS_MESSAGE');
 
@@ -135,7 +138,7 @@ export class CreateTeamComponent extends ConfirmOnFormChanges implements OnInit 
      * @returns {Observable<boolean>}
      */
     private checkTeamsInSameLocations(locationIds: string[]): Observable<boolean> {
-        return Observable.create((observer) => {
+        return new Observable((observer) => {
             // check if there are existing teams in the same locations
             const qb = new RequestQueryBuilder();
 

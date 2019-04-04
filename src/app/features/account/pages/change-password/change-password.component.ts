@@ -7,8 +7,9 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { ModelHelperService } from '../../../../core/services/helper/model-helper.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Router } from '@angular/router';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-change-password',
@@ -47,11 +48,12 @@ export class ChangePasswordComponent {
             // try to authenticate the user
             this.userDataService
                 .changePassword(data)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    })
+                )
                 .subscribe(() => {
 
                     const refreshUserAndShowMessage = () => {

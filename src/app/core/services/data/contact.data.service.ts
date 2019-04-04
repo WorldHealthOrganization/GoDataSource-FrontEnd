@@ -1,5 +1,3 @@
-
-import {throwError as observableThrowError,  Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ModelHelperService } from '../helper/model-helper.service';
@@ -14,8 +12,9 @@ import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import * as _ from 'lodash';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
-import { MetricCasesCountStratified } from '../../models/metrics/metric-cases-count-stratified.model';
 import { MetricContactsFollowedUpReportModel } from '../../models/metrics/metric-contacts-followed-up-report.model';
+import { catchError } from 'rxjs/operators';
+import { Observable, throwError, of } from 'rxjs';
 
 @Injectable()
 export class ContactDataService {
@@ -232,17 +231,22 @@ export class ContactDataService {
                     visualIdMask: visualIdMask,
                     personId: personId
                 }
-            ).catch((response: Error | VisualIdErrorModel) => {
-                return (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ||
-                    (response as VisualIdErrorModel).code === VisualIdErrorModelCode.DUPLICATE_VISUAL_ID ?
-                    Observable.of(
-                        this.modelHelper.getModelInstance(
-                            VisualIdErrorModel,
-                            response
-                        )
-                    ) :
-                    observableThrowError(response);
-            });
+            )
+            .pipe(
+                catchError((response: Error | VisualIdErrorModel) => {
+                    return (
+                        (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ||
+                        (response as VisualIdErrorModel).code === VisualIdErrorModelCode.DUPLICATE_VISUAL_ID
+                    ) ?
+                        of(
+                            this.modelHelper.getModelInstance(
+                                VisualIdErrorModel,
+                                response
+                            )
+                        ) :
+                        throwError(response);
+                })
+            );
     }
 
     /**

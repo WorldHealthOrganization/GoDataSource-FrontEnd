@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 import { SheetCellValidator } from './sheet-cell-validator';
 import { SheetCellType } from './sheet-cell-type';
 import { SheetCellValidationType } from './sheet-cell-validation-type';
+import { map } from 'rxjs/operators';
 
 export abstract class AbstractSheetColumn {
     // translation key for column name
@@ -66,8 +67,7 @@ export abstract class AbstractSheetColumn {
  * Free text cell
  */
 export class TextSheetColumn extends AbstractSheetColumn {
-    constructor(
-    ) {
+    constructor() {
         super(SheetCellType.TEXT);
     }
 }
@@ -76,8 +76,7 @@ export class TextSheetColumn extends AbstractSheetColumn {
  * Date picker cell
  */
 export class DateSheetColumn extends AbstractSheetColumn {
-    constructor(
-    ) {
+    constructor() {
         super(SheetCellType.DATE);
     }
 }
@@ -120,8 +119,7 @@ export class DropdownSheetColumn extends AbstractSheetColumn {
     // list of translated labels to be used as dropdown options ('handsontable' expects a list of strings)
     public optionLabels$: Observable<string[]>;
 
-    constructor(
-    ) {
+    constructor() {
         super(SheetCellType.DROPDOWN);
     }
 
@@ -129,7 +127,10 @@ export class DropdownSheetColumn extends AbstractSheetColumn {
         // keep the observable of LabelValue options
         this.options$ = options$;
         // get the list of string labels
-        this.optionLabels$ = this.options$.map((items) => items.map((item) => i18nService.instant(item.label)));
+        this.optionLabels$ = this.options$
+            .pipe(
+                map((items) => items.map((item) => i18nService.instant(item.label)))
+            );
 
         return this;
     }

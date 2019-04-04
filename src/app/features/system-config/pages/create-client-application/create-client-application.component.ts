@@ -8,7 +8,6 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import * as _ from 'lodash';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
 import { Observable } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -19,6 +18,8 @@ import { Constants } from '../../../../core/models/constants';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-create-client-application',
@@ -85,11 +86,13 @@ export class CreateClientApplicationComponent extends ConfirmOnFormChanges imple
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.systemSettingsDataService
                 .getSystemSettings()
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    loadingDialog.close();
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showError(err.message);
+                        loadingDialog.close();
+                        return throwError(err);
+                    })
+                )
                 .subscribe((settings: SystemSettingsModel) => {
                     // add the new client application
                     settings.clientApplications.push(dirtyFields);
@@ -99,11 +102,13 @@ export class CreateClientApplicationComponent extends ConfirmOnFormChanges imple
                         .modifySystemSettings({
                             clientApplications: settings.clientApplications
                         })
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err);
-                            loadingDialog.close();
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                loadingDialog.close();
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             // display success message
                             this.snackbarService.showSuccess('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE');

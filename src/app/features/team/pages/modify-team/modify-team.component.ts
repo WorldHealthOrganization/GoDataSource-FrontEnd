@@ -2,7 +2,6 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
@@ -18,6 +17,8 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-modify-team',
@@ -69,11 +70,13 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                 if (this.teamId) {
                     this.teamDataService
                         .getTeam(this.teamId)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            this.router.navigate(['/teams']);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                this.router.navigate(['/teams']);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe((teamData: {}) => {
                             // location data
                             this.teamData = new TeamModel(teamData);
@@ -96,20 +99,24 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
 
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.checkTeamsInSameLocations(this.teamData.locationIds)
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
             .subscribe((createTeam: boolean) => {
                 if (createTeam) {
                     this.teamDataService
                         .modifyTeam(this.teamId, dirtyFields)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            loadingDialog.close();
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                loadingDialog.close();
+                                return throwError(err);
+                            })
+                        )
                         .subscribe((modifiedTeam: TeamModel) => {
                             // update model
                             this.teamData = modifiedTeam;
@@ -195,7 +202,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
      * @returns {Observable<boolean>}
      */
     private checkTeamsInSameLocations(locationIds: string[]): Observable<boolean> {
-        return Observable.create((observer) => {
+        return new Observable((observer) => {
             // check if there are existing teams in the same locations
             const qb = new RequestQueryBuilder();
 
@@ -207,11 +214,13 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                 }, true);
 
             this.teamDataService.getTeamsList(qb)
-                .catch((err) => {
-                    observer.error(err);
-                    return ErrorObservable.create(err);
-                })
-                .subscribe((teamsList) => {
+                .pipe(
+                    catchError((err) => {
+                        observer.error(err);
+                        return throwError(err);
+                    })
+                )
+                .subscribe((teamsList: TeamModel[]) => {
                     if (teamsList.length > 0) {
                         const teamNames = _.map(teamsList, (team) => team.name);
                         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_SAVE_SAME_LOCATIONS_TEAM', {teamNames: teamNames.join(', ')})

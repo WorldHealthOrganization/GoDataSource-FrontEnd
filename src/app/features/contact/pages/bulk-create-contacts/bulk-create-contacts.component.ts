@@ -1,6 +1,5 @@
 import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -27,7 +26,8 @@ import { EntityModel } from '../../../../core/models/entity.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { NgModel } from '@angular/forms';
 import { ContactModel } from '../../../../core/models/contact.model';
-
+import { throwError } from 'rxjs';
+import { catchError, map, mergeMap, share } from 'rxjs/operators';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -101,16 +101,16 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         this.setSheetWidth();
 
         // reference data
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
-        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION).share();
-        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).share();
-        this.addressTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.ADDRESS_TYPE).share();
-        this.documentTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DOCUMENT_TYPE).share();
-        this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL).share();
-        this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE).share();
-        this.exposureFrequencyOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY).share();
-        this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION).share();
-        this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).share();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION).pipe(share());
+        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).pipe(share());
+        this.addressTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.ADDRESS_TYPE).pipe(share());
+        this.documentTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DOCUMENT_TYPE).pipe(share());
+        this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL).pipe(share());
+        this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE).pipe(share());
+        this.exposureFrequencyOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY).pipe(share());
+        this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION).pipe(share());
+        this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).pipe(share());
 
         // configure Sheet widget
         this.configureSheetWidget();
@@ -134,14 +134,16 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         // get selected outbreak
         this.outbreakDataService
             .getSelectedOutbreak()
-            .catch((err) => {
-                // show error message
-                this.snackbarService.showError(err.message);
+            .pipe(
+                catchError((err) => {
+                    // show error message
+                    this.snackbarService.showApiError(err);
 
-                // navigate to Cases/Events listing page
-                this.redirectToRelatedEntityList();
-                return ErrorObservable.create(err);
-            })
+                    // navigate to Cases/Events listing page
+                    this.redirectToRelatedEntityList();
+                    return throwError(err);
+                })
+            )
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
 
@@ -404,15 +406,17 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             // retrieve related person information
             this.entityDataService
                 .getEntity(this.relatedEntityType, this.selectedOutbreak.id, this.relatedEntityId)
-                .catch((err) => {
-                    // show error message
-                    this.snackbarService.showError(err.message);
+                .pipe(
+                    catchError((err) => {
+                        // show error message
+                        this.snackbarService.showApiError(err);
 
-                    // navigate to Cases/Events listing page
-                    this.redirectToRelatedEntityList();
+                        // navigate to Cases/Events listing page
+                        this.redirectToRelatedEntityList();
 
-                    return ErrorObservable.create(err);
-                })
+                        return throwError(err);
+                    })
+                )
                 .subscribe((relatedEntityData: CaseModel | EventModel) => {
                     // keep person data
                     this.relatedEntityData = relatedEntityData;
@@ -480,29 +484,33 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 } else {
                     // collect data from table
                     this.bulkContactsService.getData(sheetCore, this.sheetColumns)
-                        .mergeMap((data) => {
-                            // get Contact mask configured on outbreak
-                            const contactMask = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);
+                        .pipe(
+                            mergeMap((data) => {
+                                // get Contact mask configured on outbreak
+                                const contactMask = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);
 
-                            return this.contactDataService.checkContactVisualIDValidity(
-                                this.selectedOutbreak.id,
-                                contactMask,
-                                contactMask
-                            )
-                                .map((isValid) => {
-                                    if (isValid === true) {
-                                        // add mask on all contacts
-                                        data = data.map((contactEntry) => {
-                                            contactEntry.contact.visualId = contactMask;
-                                            return contactEntry;
-                                        });
-                                    } else {
-                                        // do nothing; the mask will be omitted and the contacts will be created without a visual ID
-                                    }
+                                return this.contactDataService.checkContactVisualIDValidity(
+                                    this.selectedOutbreak.id,
+                                    contactMask,
+                                    contactMask
+                                )
+                                    .pipe(
+                                        map((isValid) => {
+                                            if (isValid === true) {
+                                                // add mask on all contacts
+                                                data = data.map((contactEntry) => {
+                                                    contactEntry.contact.visualId = contactMask;
+                                                    return contactEntry;
+                                                });
+                                            } else {
+                                                // do nothing; the mask will be omitted and the contacts will be created without a visual ID
+                                            }
 
-                                    return data;
-                                });
-                        })
+                                            return data;
+                                        })
+                                    );
+                            })
+                        )
                         .subscribe((data) => {
                             // no data to save ?
                             if (_.isEmpty(data)) {
@@ -512,11 +520,13 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                             } else {
                                 // create contacts
                                 this.contactDataService.bulkAddContacts(this.selectedOutbreak.id, this.relatedEntityType, this.relatedEntityId, data)
-                                    .catch((err) => {
-                                        loadingDialog.close();
-                                        this.snackbarService.showError(err.message);
-                                        return ErrorObservable.create(err);
-                                    })
+                                    .pipe(
+                                        catchError((err) => {
+                                            loadingDialog.close();
+                                            this.snackbarService.showApiError(err.message);
+                                            return throwError(err);
+                                        })
+                                    )
                                     .subscribe(() => {
                                         this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
 

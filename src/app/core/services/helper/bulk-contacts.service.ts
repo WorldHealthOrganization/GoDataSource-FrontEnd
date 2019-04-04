@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import * as Handsontable from 'handsontable';
-import { Observable ,  Subscriber } from 'rxjs';
+import { Observable, Subscriber, forkJoin } from 'rxjs';
 import { AbstractSheetColumn, DropdownSheetColumn } from '../../models/sheet/sheet.model';
 import * as _ from 'lodash';
 import { SheetCellType } from '../../models/sheet/sheet-cell-type';
 import { I18nService } from './i18n.service';
-
 import { GridSettings } from 'handsontable';
+import { map, tap } from 'rxjs/operators';
 
 export interface InvalidTableData {
     isValid: boolean;
@@ -20,14 +20,15 @@ export class BulkContactsService {
 
     constructor(
         private i18nService: I18nService
-    ) {}
+    ) {
+    }
 
     /**
      * Validate all table cells
      * @param sheetCore
      */
     validateTable(sheetCore: Handsontable): Observable<InvalidTableData> {
-        return Observable.create((observer: Subscriber<InvalidTableData>) => {
+        return new Observable((observer: Subscriber<InvalidTableData>) => {
             // validate all cells
             sheetCore.validateCells((valid) => {
                 // if not valid, then we need to determine what rows / columns are invalid
@@ -77,47 +78,49 @@ export class BulkContactsService {
     getData(sheetCore: Handsontable, sheetColumns: AbstractSheetColumn[]): Observable<any[]> {
         // get the label-value map of Reference Data dropdowns (so we can replaced the labels used in the Sheet with the actual values)
         return this.getDropdownsLabelValueMap((sheetColumns as any))
-            .map((dropdownsMap) => {
-                const data = [];
+            .pipe(
+                map((dropdownsMap) => {
+                    const data = [];
 
-                // get table data
-                const tableCellsData = sheetCore.getData();
+                    // get table data
+                    const tableCellsData = sheetCore.getData();
 
-                // get data row by row
-                _.each(tableCellsData, (rowData, rowIndex) => {
-                    // check if row has any data
-                    if (!sheetCore.isEmptyRow(rowIndex)) {
-                        // create new object for current row
-                        const rowObj = {};
+                    // get data row by row
+                    _.each(tableCellsData, (rowData, rowIndex) => {
+                        // check if row has any data
+                        if (!sheetCore.isEmptyRow(rowIndex)) {
+                            // create new object for current row
+                            const rowObj = {};
 
-                        // get row data cell by cell
-                        _.each(rowData, (columnValue, columnIndex) => {
-                            // omit empty cells
-                            if (
-                                columnValue !== null &&
-                                columnValue !== ''
-                            ) {
-                                // by default, keep the value as it is
-                                let cellValue = columnValue;
+                            // get row data cell by cell
+                            _.each(rowData, (columnValue, columnIndex) => {
+                                // omit empty cells
+                                if (
+                                    columnValue !== null &&
+                                    columnValue !== ''
+                                ) {
+                                    // by default, keep the value as it is
+                                    let cellValue = columnValue;
 
-                                // check if column is a dropdown
-                                if (sheetColumns[columnIndex].type === SheetCellType.DROPDOWN) {
-                                    // get cell value from dropdowns map
-                                    cellValue = dropdownsMap[columnIndex][columnValue];
+                                    // check if column is a dropdown
+                                    if (sheetColumns[columnIndex].type === SheetCellType.DROPDOWN) {
+                                        // get cell value from dropdowns map
+                                        cellValue = dropdownsMap[columnIndex][columnValue];
+                                    }
+
+                                    // add cell data to the row object
+                                    _.set(rowObj, sheetColumns[columnIndex].property, cellValue);
                                 }
+                            });
 
-                                // add cell data to the row object
-                                _.set(rowObj, sheetColumns[columnIndex].property, cellValue);
-                            }
-                        });
+                            // add row data
+                            data.push(rowObj);
+                        }
+                    });
 
-                        // add row data
-                        data.push(rowObj);
-                    }
-                });
-
-                return data;
-            });
+                    return data;
+                })
+            );
     }
 
     /**
@@ -139,22 +142,26 @@ export class BulkContactsService {
                 ((index) => {
                     dropdownItemsObservables.push(
                         sheetColumn.options$
-                            .do((dropdownItems) => {
-                                // go through all items of each dropdown
-                                _.each(dropdownItems, (item) => {
-                                    // keep the value associated to each translated label
-                                    const label = this.i18nService.instant(item.label);
-                                    dropdownsMap[index][label] = item.value;
-                                });
-                            })
+                            .pipe(
+                                tap((dropdownItems) => {
+                                    // go through all items of each dropdown
+                                    _.each(dropdownItems, (item) => {
+                                        // keep the value associated to each translated label
+                                        const label = this.i18nService.instant(item.label);
+                                        dropdownsMap[index][label] = item.value;
+                                    });
+                                })
+                            )
                     );
                 })(i);
             }
         }
 
         // retrieve all dropdowns items
-        return Observable.forkJoin(dropdownItemsObservables)
-            .map(() => dropdownsMap);
+        return forkJoin(dropdownItemsObservables)
+            .pipe(
+                map(() => dropdownsMap)
+            );
     }
 
     /**

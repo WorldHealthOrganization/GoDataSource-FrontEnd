@@ -7,13 +7,14 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-create-outbreak-template',
@@ -59,11 +60,13 @@ export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implem
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.outbreakTemplateDataService
                 .createOutbreakTemplate(outbreakTemplateData)
-                .catch((err) => {
-                    this.snackbarService.showError((err.message));
-                    loadingDialog.close();
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showError((err.message));
+                        loadingDialog.close();
+                        return throwError(err);
+                    })
+                )
                 .subscribe((newOutbreakTemplate) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_TEMPLATES_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
 

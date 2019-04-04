@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
-import { Observable ,  Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { UserModel } from '../../../core/models/user.model';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../core/models/permission.model';
@@ -10,6 +10,7 @@ import { LanguageModel } from '../../../core/models/language.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-topnav',
@@ -94,17 +95,19 @@ export class TopnavComponent implements OnInit, OnDestroy {
         if (this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK)) {
             this.outbreakDataService
                 .getOutbreaksList()
-                .map((outbreaksList) => {
-                    return _.map(outbreaksList, (outbreak: OutbreakModel) => {
-                        // do we need to update name of the outbreak ?
-                        if (outbreak.id === this.authUser.activeOutbreakId) {
-                            outbreak.name = this.i18nService.instant('LNG_LAYOUT_ACTIVE_OUTBREAK_LABEL', outbreak);
-                        }
+                .pipe(
+                    map((outbreaksList) => {
+                        return _.map(outbreaksList, (outbreak: OutbreakModel) => {
+                            // do we need to update name of the outbreak ?
+                            if (outbreak.id === this.authUser.activeOutbreakId) {
+                                outbreak.name = this.i18nService.instant('LNG_LAYOUT_ACTIVE_OUTBREAK_LABEL', outbreak);
+                            }
 
-                        // finished
-                        return outbreak;
-                    });
-                })
+                            // finished
+                            return outbreak;
+                        });
+                    })
+                )
                 .subscribe((outbreaksList) => {
                     this.outbreaksList = outbreaksList;
                 });

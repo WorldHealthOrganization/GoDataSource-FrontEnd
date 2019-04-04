@@ -7,6 +7,7 @@ import { HelpCategoryModel } from '../../models/help-category.model';
 import { HelpItemModel } from '../../models/help-item.model';
 import * as _ from 'lodash';
 import { CacheKey, CacheService } from '../helper/cache.service';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class HelpDataService {
@@ -92,18 +93,23 @@ export class HelpDataService {
     /**
      * Get the list of help items
      * @param {RequestQueryBuilder} queryBuilder
+     * @param searchedTerm
      * @returns {Observable<HelpItemModel[]>}
      */
-    getHelpItemsListSearch(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(), searchedTerm: string): Observable<HelpItemModel[]> {
+    getHelpItemsListSearch(
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
+        searchedTerm: string
+    ): Observable<HelpItemModel[]> {
         queryBuilder.include('category', true);
         let filter = queryBuilder.buildQuery(false);
         // add condition for search term - this needs to be on the first level of where (not in 'and')
-        const tokenFilter = { $text: { search: searchedTerm } };
-        filter.where.token = tokenFilter;
+        filter.where.token = { $text: { search: searchedTerm } };
         filter = JSON.stringify(filter);
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`help-categories/search-help-items?filter=${filter}`)
-                .map((res) => _.get(res, 'items', [])),
+                .pipe(
+                    map((res) => _.get(res, 'items', []))
+                ),
             HelpItemModel
         );
     }
@@ -186,7 +192,7 @@ export class HelpDataService {
      * @param {string} url
      */
     getContextHelpItems(url: string): Observable<string[]> {
-        return Observable.create((observer) => {
+        return new Observable((observer) => {
             // get help items list from cache
             const helpItemsList = this.cacheService.get(CacheKey.HELP_ITEMS);
             if (helpItemsList) {

@@ -12,7 +12,8 @@ export class SystemSyncDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {}
+    ) {
+    }
 
     /**
      * Start sync process

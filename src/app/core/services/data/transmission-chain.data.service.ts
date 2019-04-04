@@ -14,6 +14,7 @@ import * as moment from 'moment';
 import * as _ from 'lodash';
 import { LocationModel } from '../../models/location.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
+import { map } from 'rxjs/operators';
 
 export interface IConvertChainToGraphElements {
     nodes: {
@@ -35,7 +36,8 @@ export class TransmissionChainDataService {
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private i18nService: I18nService
-    ) {}
+    ) {
+    }
 
     /**
      * Map Transmission chain to Chain model
@@ -70,10 +72,7 @@ export class TransmissionChainDataService {
     /**
      * Retrieve the list of Independent Transmission Chains, nodes, edges
      * @param {string} outbreakId
-     * @param {number} size
-     * @param {string} personId
      * @param {RequestQueryBuilder} queryBuilder
-     * @param {string} dateGlobalFilter
      * @returns {Observable<TransmissionChainModel[]>}
      */
     getIndependentTransmissionChainData(
@@ -84,7 +83,10 @@ export class TransmissionChainDataService {
         const filter = queryBuilder.buildQuery();
         return this.http.get(
             `outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`
-        ).map(this.mapTransmissionChainDataToModel);
+        )
+            .pipe(
+                map(this.mapTransmissionChainDataToModel)
+            );
     }
 
     /**
@@ -100,7 +102,10 @@ export class TransmissionChainDataService {
         const filter = queryBuilder.buildQuery();
         return this.http.get(
             `outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`
-        ).map(this.mapTransmissionChainToModel);
+        )
+            .pipe(
+                map(this.mapTransmissionChainToModel)
+            );
     }
 
 
@@ -117,12 +122,16 @@ export class TransmissionChainDataService {
         const filter = queryBuilder.buildQuery();
         return this.http.get(
             `outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases?filter=${filter}`
-        ).map(this.mapTransmissionChainToModel);
+        )
+            .pipe(
+                map(this.mapTransmissionChainToModel)
+            );
     }
 
     /**
      * Get length of independent transmission chains
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<MetricIndependentTransmissionChainsModel>}
      */
     getCountIndependentTransmissionChains(
@@ -148,6 +157,7 @@ export class TransmissionChainDataService {
     /**
      * Get the number of new chains of transmission from registered contacts who became cases
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<MetricIndependentTransmissionChainsModel>}
      */
     getCountNewChainsOfTransmissionFromRegContactsWhoBecameCase(
@@ -207,7 +217,7 @@ export class TransmissionChainDataService {
                     if (node.type === EntityType.CONTACT && filters.showContacts) {
                         allowAdd = true;
                         if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-                                || selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value ) {
+                            || selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value) {
                             if (!_.isEmpty(node.model.dateOfLastContact)) {
                                 nodeProps.dateTimeline = node.model.dateOfLastContact;
                             } else {
@@ -225,7 +235,7 @@ export class TransmissionChainDataService {
                     } else if (node.type === EntityType.EVENT && filters.showEvents) {
                         allowAdd = true;
                         if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-                                || selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value) {
+                            || selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value) {
                             if (!_.isEmpty(node.model.date)) {
                                 nodeProps.dateTimeline = node.model.date;
                             } else {
@@ -288,8 +298,8 @@ export class TransmissionChainDataService {
                         // set node shape
                         if (!_.isEmpty(colorCriteria.nodeShape)) {
 
-                            if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.TYPE.value ) {
-                               nodeData.setNodeShapeType(node);
+                            if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.TYPE.value) {
+                                nodeData.setNodeShapeType(node);
                             } else if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.CLASSIFICATION.value) {
                                 nodeData.setNodeShapeClassification(node);
                             }
@@ -387,7 +397,7 @@ export class TransmissionChainDataService {
                                     }
                                 }
                                 const onset = !_.isEmpty(node.model.dateOfOnset) && node.type === EntityType.CASE ?
-                                    '\n' + onsetLabel + ' ' + moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) + ( node.model.isDateOfOnsetApproximate ? onsetApproximateLabel : '' ) :
+                                    '\n' + onsetLabel + ' ' + moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) + (node.model.isDateOfOnsetApproximate ? onsetApproximateLabel : '') :
                                     '';
                                 // concatenate results
                                 nodeData.label = lastName + ' ' + firstName + visualId + '\n' + age + ' - ' + gender + classification + '\n' + outcome + locationName + onset;

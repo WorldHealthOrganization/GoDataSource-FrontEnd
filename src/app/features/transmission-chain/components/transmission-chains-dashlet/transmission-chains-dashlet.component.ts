@@ -5,12 +5,11 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { IConvertChainToGraphElements, TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { Constants } from '../../../../core/models/constants';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { forkJoin ,  Observable ,  Subscription } from 'rxjs';
+import { forkJoin, Observable, Subscription } from 'rxjs';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
@@ -27,6 +26,8 @@ import { ActivatedRoute } from '@angular/router';
 import { Moment } from 'moment';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { TransmissionChainFilters } from '../transmission-chains-filters/transmission-chains-filters.component';
+import { catchError, tap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -180,7 +181,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         private locationDataService: LocationDataService,
         private clusterDataService: ClusterDataService,
         protected route: ActivatedRoute
-    ) {}
+    ) {
+    }
 
     ngOnInit() {
         // init filters - only show cases and events first
@@ -231,10 +233,12 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         });
 
         this.initializeReferenceData()
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    return throwError(err);
+                })
+            )
             .subscribe(() => {
                 // outbreak subscriber
                 if (this.outbreakSubscriber) {
@@ -422,11 +426,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.legend.edgeColorField = this.colorCriteria.edgeColorCriteria;
         this.legend.edgeLabelField = this.colorCriteria.edgeLabelCriteria;
         this.legend.edgeIconField = this.colorCriteria.edgeIconCriteria;
-        if (this.legend.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value ) {
+        if (this.legend.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
             this.legend.edgeLabelContextTransmissionEntries = {};
             const refDataEntries = this.referenceDataEntries[this.referenceDataLabelMap[Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value].refDataCateg];
             _.forEach(refDataEntries.entries, (entry) => {
-               this.legend.edgeLabelContextTransmissionEntries[entry.value] = this.i18nService.instant(entry.value);
+                this.legend.edgeLabelContextTransmissionEntries[entry.value] = this.i18nService.instant(entry.value);
             });
         }
         this.legend.nodeIconField = this.colorCriteria.nodeIconCriteria;
@@ -534,9 +538,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             this.referenceDataCategories,
             (refDataCategory) => {
                 return this.referenceDataDataService.getReferenceDataByCategory(refDataCategory)
-                    .do((results) => {
-                        this.referenceDataEntries[refDataCategory] = results;
-                    });
+                    .pipe(
+                        tap((results) => {
+                            this.referenceDataEntries[refDataCategory] = results;
+                        })
+                    );
             }
         );
         return forkJoin(referenceDataCategories$);

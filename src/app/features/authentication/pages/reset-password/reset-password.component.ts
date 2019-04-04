@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
@@ -9,6 +8,8 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 import * as _ from 'lodash';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-reset-password',
@@ -68,11 +69,13 @@ export class ResetPasswordComponent implements OnInit {
             // reset user's password
             this.userDataService
                 .resetPassword(dirtyFields, this.passwordResetToken)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showError(err.message);
 
-                    return ErrorObservable.create(err);
-                })
+                        return throwError(err);
+                    })
+                )
                 .subscribe(() => {
 
                     this.snackbarService.showSuccess('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');

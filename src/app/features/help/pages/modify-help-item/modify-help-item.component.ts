@@ -2,7 +2,6 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
@@ -17,6 +16,8 @@ import { Observable } from 'rxjs';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-modify-help-item',
@@ -140,21 +141,25 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.helpDataService
             .modifyHelpItem(this.categoryId, this.itemId, dirtyFields)
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
-            .switchMap((helpItemData) => {
-                // update language tokens to get the translation of name and description
-                return this.i18nService.loadUserLanguage()
-                    .catch((err) => {
-                        this.snackbarService.showApiError(err);
-                        loadingDialog.close();
-                        return ErrorObservable.create(err);
-                    })
-                    .map(() => helpItemData);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    loadingDialog.close();
+                    return throwError(err);
+                }),
+                switchMap((helpItemData) => {
+                    // update language tokens to get the translation of name and description
+                    return this.i18nService.loadUserLanguage()
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                loadingDialog.close();
+                                return throwError(err);
+                            }),
+                            map(() => helpItemData)
+                        );
+                })
+            )
             .subscribe((helpItemData) => {
                 // update model
                 this.helpItemData = helpItemData;

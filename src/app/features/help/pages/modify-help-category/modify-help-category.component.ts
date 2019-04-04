@@ -2,7 +2,6 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
@@ -12,8 +11,9 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { throwError } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-modify-help-category',
@@ -90,21 +90,25 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.helpDataService
             .modifyHelpCategory(this.categoryId, dirtyFields)
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
-            .switchMap((helpCategoryData) => {
-                // update language tokens to get the translation of name and description
-                return this.i18nService.loadUserLanguage()
-                    .catch((err) => {
-                        this.snackbarService.showApiError(err);
-                        loadingDialog.close();
-                        return ErrorObservable.create(err);
-                    })
-                    .map(() => helpCategoryData);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    loadingDialog.close();
+                    return throwError(err);
+                }),
+                switchMap((helpCategoryData) => {
+                    // update language tokens to get the translation of name and description
+                    return this.i18nService.loadUserLanguage()
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                loadingDialog.close();
+                                return throwError(err);
+                            }),
+                            map(() => helpCategoryData)
+                        );
+                })
+            )
             .subscribe((helpCategoryData) => {
                 // update model
                 this.helpCategoryData = helpCategoryData;

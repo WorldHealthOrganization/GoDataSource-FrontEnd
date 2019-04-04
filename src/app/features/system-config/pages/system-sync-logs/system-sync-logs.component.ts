@@ -12,7 +12,6 @@ import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.mode
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField } from '../../../../shared/components';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -22,7 +21,8 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { tap } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-system-sync-logs-list',
@@ -176,25 +176,27 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
         // sync logs
         this.syncLogsList$ = this.systemSyncLogDataService
             .getSyncLogList(this.queryBuilder)
-            .map((syncLogs: SystemSyncLogModel[]) => {
-                return _.map(syncLogs, (log: SystemSyncLogModel) => {
-                    // add list of outbreaks
-                    log.outbreaks = _.transform(
-                        log.outbreakIDs,
-                        (result, outbreakID: string) => {
-                            // outbreak not deleted ?
-                            if (!_.isEmpty(this.mappedOutbreaks[outbreakID])) {
-                                result.push(this.mappedOutbreaks[outbreakID]);
-                            }
-                        },
-                        []
-                    );
+            .pipe(
+                map((syncLogs: SystemSyncLogModel[]) => {
+                    return _.map(syncLogs, (log: SystemSyncLogModel) => {
+                        // add list of outbreaks
+                        log.outbreaks = _.transform(
+                            log.outbreakIDs,
+                            (result, outbreakID: string) => {
+                                // outbreak not deleted ?
+                                if (!_.isEmpty(this.mappedOutbreaks[outbreakID])) {
+                                    result.push(this.mappedOutbreaks[outbreakID]);
+                                }
+                            },
+                            []
+                        );
 
-                    // finished
-                    return log;
-                });
-            })
-            .pipe(tap(this.checkEmptyList.bind(this)));
+                        // finished
+                        return log;
+                    });
+                }),
+                tap(this.checkEmptyList.bind(this))
+            );
     }
 
     /**
@@ -243,10 +245,12 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                             .modifySystemSettings({
                                 sync: answer.inputValue.value
                             })
-                            .catch((err) => {
-                                this.snackbarService.showApiError(err);
-                                return ErrorObservable.create(err);
-                            })
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showApiError(err);
+                                    return throwError(err);
+                                })
+                            )
                             .subscribe((settings: SystemSettingsModel) => {
                                 this.settings = new SystemSettingsModel(settings);
 
@@ -271,10 +275,12 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.systemSyncLogDataService
                         .deleteSyncLog(systemSyncLogModel.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             // display success message
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SUCCESS_MESSAGE');
@@ -338,10 +344,12 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                     // send request
                     this.systemSyncLogDataService
                         .deleteSyncLogs(qb)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             // display success message
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SERVER_SUCCESS_MESSAGE');

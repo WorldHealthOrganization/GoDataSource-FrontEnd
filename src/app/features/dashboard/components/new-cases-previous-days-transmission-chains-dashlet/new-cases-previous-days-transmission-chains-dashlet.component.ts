@@ -4,7 +4,7 @@ import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Subscriber ,  Subscription } from 'rxjs';
+import { Subscriber, Subscription } from 'rxjs';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import * as moment from 'moment';
@@ -100,7 +100,7 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
             qb.filter.firstLevelConditions();
 
             // convert
-            let xPreviousDays: number = _.isNumber(this.xPreviousDays) || _.isEmpty(this.xPreviousDays) ? this.xPreviousDays  : _.parseInt(this.xPreviousDays);
+            let xPreviousDays: number = _.isNumber(this.xPreviousDays) || _.isEmpty(this.xPreviousDays) ? this.xPreviousDays : _.parseInt(this.xPreviousDays);
             if (_.isNumber(xPreviousDays)) {
                 // add number of days until current day
                 if (this.globalFilterDate) {

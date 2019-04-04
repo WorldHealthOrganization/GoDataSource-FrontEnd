@@ -6,9 +6,10 @@ import { FormModifyQuestionnaireBreadcrumbsData, FormModifyQuestionnaireComponen
 import { OutbreakQestionnaireTypeEnum } from '../../../../core/enums/outbreak-qestionnaire-type.enum';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { throwError } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-outbreak-questionnaire',
@@ -106,29 +107,33 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
             .modifyOutbreak(questionnaireData.parent.id, {
                 [questionnaireData.type]: questionnaireData.questionnaire
             })
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
 
-                // finished
-                questionnaireData.finishSubscriber.next(false);
-                questionnaireData.finishSubscriber.complete();
+                    // finished
+                    questionnaireData.finishSubscriber.next(false);
+                    questionnaireData.finishSubscriber.complete();
 
-                return ErrorObservable.create(err);
-            })
-            .switchMap((modifiedOutbreak) => {
-                // update language tokens to get the translation of submitted questions and answers
-                return this.i18nService.loadUserLanguage()
-                    .catch((err) => {
-                        this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                switchMap((modifiedOutbreak) => {
+                    // update language tokens to get the translation of submitted questions and answers
+                    return this.i18nService.loadUserLanguage()
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
 
-                        // finished
-                        questionnaireData.finishSubscriber.next(false);
-                        questionnaireData.finishSubscriber.complete();
+                                // finished
+                                questionnaireData.finishSubscriber.next(false);
+                                questionnaireData.finishSubscriber.complete();
 
-                        return ErrorObservable.create(err);
-                    })
-                    .map(() => modifiedOutbreak);
-            })
+                                return throwError(err);
+                            }),
+                            map(() => modifiedOutbreak)
+                        );
+                })
+            )
             .subscribe(() => {
                 // display message - this might flood the user, so for now we won't display anything
                 // #TODO

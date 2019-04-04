@@ -46,7 +46,7 @@ export class SavedImportMappingService {
      * @param importMappingData
      * @returns {Observable<Object>}
      */
-    createImportMapping (importMappingData: SavedImportMappingModel) {
+    createImportMapping(importMappingData: SavedImportMappingModel) {
         return this.http.post(`import-mappings`, importMappingData);
     }
 
