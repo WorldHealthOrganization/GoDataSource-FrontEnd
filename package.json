@@ -5,8 +5,7 @@
     "scripts": {
         "ng": "ng",
         "start": "ng serve --disable-host-check --port 4550",
-        "build": "ng build --prod",
-        "build-high-memory": "node --max_old_space_size=4000 ./node_modules/@angular/cli/bin/ng build --prod",
+        "build": "node --max_old_space_size=4000 ./node_modules/@angular/cli/bin/ng build --prod",
         "test": "ng test",
         "test-debug": "ng test --config karma.conf.dev.js",
         "lint": "ng lint",
