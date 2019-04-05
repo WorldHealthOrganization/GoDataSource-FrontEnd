@@ -108,7 +108,7 @@ export class ImportableFileModel {
             .sortBy((item: { label: string }) => {
                 return item.label;
             })
-            .value();
+            .value() as ImportableLabelValuePair[];
 
         // recursive add value pair
         const createImportableLabelValuePair = (

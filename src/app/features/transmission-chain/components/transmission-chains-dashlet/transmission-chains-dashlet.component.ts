@@ -39,7 +39,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     @ViewChild(CytoscapeGraphComponent) cytoscapeChild;
 
-    @Input() sizeOfChainsFilter: number = null;
+    @Input() sizeOfChainsFilter: string = null;
     @Input() personId: string = null;
     @Input() selectedEntityType: EntityType = null;
 
@@ -322,7 +322,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             if (this.sizeOfChainsFilter) {
                 requestQueryBuilder.filter.byEquality(
                     'size',
-                    _.parseInt(this.sizeOfChainsFilter as string)
+                    _.parseInt(this.sizeOfChainsFilter)
                 );
             }
 

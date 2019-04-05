@@ -71,7 +71,10 @@
         </app-side-filters>
 
         <!-- Dashboard items -->
-        <div class="page-content">
+        <div
+            class="page-content"
+            fxLayout="column"
+        >
 
             <div
                 fxFlex fxLayout="row" fxLayoutAlign="space-between">
@@ -138,6 +141,7 @@
                 </app-histogram-transmission-chains-size-dashlet>
             </mat-card>
 
+            <!-- Epidemiological Curve -->
             <mat-card
                 *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                 class="page-section">

@@ -14,7 +14,8 @@ export class DateValidatorFieldComparator {
     constructor(
         public compareItemValue: string | Moment | ElementBase<any>,
         public fieldLabel: string = null
-    ) {}
+    ) {
+    }
 }
 
 /**
@@ -70,7 +71,8 @@ export class DateValidatorDirective implements Validator {
     constructor(
         private i18nService: I18nService,
         private controlContainer: ControlContainer
-    ) {}
+    ) {
+    }
 
     /**
      * Compare control date with provided dates
@@ -186,7 +188,7 @@ export class DateValidatorDirective implements Validator {
                     element &&
                     element.invalid !== (invalid ? true : false)
                 ) {
-                    (function(localElement: ElementBase<any>) {
+                    (function (localElement: ElementBase<any>) {
                         setTimeout(() => {
                             // trigger validation
                             localElement.control.updateValueAndValidity();
@@ -219,9 +221,10 @@ export class DateValidatorDirective implements Validator {
         }
 
         // validate date
-        const value: string = control.value instanceof moment ?
-            ( _.isObject(control.value._i) ? control.value : control.value._i ) :
-            control.value;
+        let value: any = control.value;
+        if (control.value instanceof moment) {
+            value = _.isObject(value._i) ? value : value._i;
+        }
 
         // check if we have a valid date
         let controlDate: Moment;

@@ -12,7 +12,8 @@ import * as _ from 'lodash';
 export class ReferenceDataLabelComponent {
     @Input() listSplitter: string = ' / ';
     @Input() category: ReferenceDataCategory;
-    @Input() set value(entriesIds: string | string[]| {id: string}[]) {
+
+    @Input() set value(entriesIds: string | string[] | { id: string }[]) {
         // get the category
         this.referenceDataDataService
             .getReferenceDataByCategory(this.category)
@@ -20,8 +21,15 @@ export class ReferenceDataLabelComponent {
                 // find the entry
                 const hasObjects: boolean = !_.isEmpty(entriesIds) && _.isObject(entriesIds[Object.keys(entriesIds)[0]]);
                 let entries: ReferenceDataEntryModel | ReferenceDataEntryModel[] = _.isArray(entriesIds) ?
-                    _.filter(category.entries, (entry) => hasObjects ? _.find(entriesIds, {id: entry.id}) : (_.indexOf(entriesIds, entry.id) > -1)) :
-                    _.find(category.entries, { id: entriesIds as string });
+                    _.filter(
+                        category.entries,
+                        (entry) => {
+                            return hasObjects ?
+                                _.isEmpty(_.find(entriesIds as {id: any}[], {id: entry.id})) :
+                                (_.indexOf(entriesIds as any[], entry.id) > -1);
+                        }
+                    ) :
+                    _.find(category.entries, {id: entriesIds as string});
 
                 if (
                     entries &&
