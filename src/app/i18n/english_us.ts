@@ -25,6 +25,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION' : 'Regenerate visual ID',
 
         /**
+         * uiDialogInfo
+         */
+        'LNG_DIALOG_EXPORT_CHAIN_OF_TRANSMISSION_SCALE_INFO': 'The higher the scale, the longer it can take to export Chains of Transmission'
+
+        /**
          * REMOVE the tokens from below
          */
         // ...
