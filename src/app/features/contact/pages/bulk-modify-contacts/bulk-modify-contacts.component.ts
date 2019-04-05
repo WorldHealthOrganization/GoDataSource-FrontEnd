@@ -277,13 +277,13 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH')
                 .setProperty('dob'),
             new DropdownSheetColumn()
-                .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL')
-                .setProperty('riskLevel')
-                .setOptions(this.riskLevelsList$, this.i18nService),
-            new DropdownSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS')
                 .setProperty('followUp.status')
                 .setOptions(this.finalFollowUpStatus$, this.i18nService),
+            new DropdownSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL')
+                .setProperty('riskLevel')
+                .setOptions(this.riskLevelsList$, this.i18nService),
             new TextSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_REASON')
                 .setProperty('riskReason'),
