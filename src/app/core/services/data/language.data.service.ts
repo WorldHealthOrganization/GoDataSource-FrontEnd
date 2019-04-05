@@ -92,8 +92,13 @@ export class LanguageDataService {
      * @returns {Observable<LanguageTokenModel[]>}
      */
     getLanguageTokens(lang: LanguageModel): Observable<LanguageTokenModel[]> {
+        // retrieve only token and translation fields to reduce the payload
+        const qb = new RequestQueryBuilder();
+        qb.fields('token', 'translation');
+        const filter = qb.buildQuery();
+
         return this.modelHelper.mapObservableListToModel(
-            this.http.get(`languages/${lang.id}/language-tokens`),
+            this.http.get(`languages/${lang.id}/language-tokens?filter=${filter}`),
             LanguageTokenModel
         )
             .pipe(
