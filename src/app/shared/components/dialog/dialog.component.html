@@ -7,6 +7,7 @@
     </div>
 
     <div
+        *ngIf="confirmData?.additionalInfo"
         class="dialog-additional-info"
         [innerHTML]="confirmData?.additionalInfo| translate:confirmData?.translateData">
     </div>
