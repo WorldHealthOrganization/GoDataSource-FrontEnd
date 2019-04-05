@@ -188,7 +188,7 @@
         <ng-container matColumnDef="contact.lastName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME' | translate }}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="contactLastName"
@@ -211,7 +211,7 @@
         <ng-container matColumnDef="contact.firstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME' | translate }}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="contactFirstName"
@@ -233,7 +233,7 @@
         <ng-container matColumnDef="contact.visualId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_VISUAL_ID' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_VISUAL_ID' | translate }}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="contactVisualId"
@@ -292,13 +292,11 @@
             </mat-cell>
         </ng-container>
 
-        <!--Day of Follow-up -->
+        <!-- Day of Follow-up -->
         <ng-container matColumnDef="dayOfFollowUp">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP' | translate
-                        }}
-                    </div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP' | translate }}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="dayOfFollowUpFilter"
