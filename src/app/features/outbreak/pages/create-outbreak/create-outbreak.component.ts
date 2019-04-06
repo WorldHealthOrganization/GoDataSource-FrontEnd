@@ -16,7 +16,7 @@ import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
 @Component({
@@ -39,7 +39,7 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
 
     newOutbreak: OutbreakModel = new OutbreakModel();
 
-    outbreakNameValidator$: Observable<boolean>;
+    outbreakNameValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -57,14 +57,17 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
     ngOnInit() {
         this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
-        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
-            (countries) => _.map(countries, (country: LabelValuePair) => {
-                country.value = {
-                    id: country.value
-                };
-                return country;
-            })
-        );
+        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY)
+            .pipe(
+                map(
+                    (countries) => _.map(countries, (country: LabelValuePair) => {
+                        country.value = {
+                            id: country.value
+                        };
+                        return country;
+                    })
+                )
+            );
         // get the outbreak template
         this.route.queryParams
             .subscribe((queryParams: { outbreakTemplateId }) => {

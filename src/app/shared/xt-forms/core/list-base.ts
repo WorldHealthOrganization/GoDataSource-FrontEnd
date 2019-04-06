@@ -23,7 +23,7 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
     @Output() changed = new EventEmitter<T[]>();
 
     // allow each component to decide if we need to display a confirmation dialog or just remove it
-    @Output() deleteConfirm = new EventEmitter<T[]>();
+    @Output() deleteConfirm = new EventEmitter<any>();
 
     /**
      * Constructor

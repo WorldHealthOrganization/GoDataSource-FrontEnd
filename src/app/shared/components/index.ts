@@ -17,8 +17,6 @@ import { FormFillQuestionnaireComponent } from './form-fill-questionnaire/form-f
 import { ReferenceDataLabelComponent } from './reference-data-label/reference-data-label.component';
 import { FormInputListComponent } from './form-input-list/form-input-list.component';
 import { FormLocationDropdownComponent } from './form-location-dropdown/form-location-dropdown.component';
-import { CytoscapeGraphComponent } from './cytoscape-graph/cytoscape-graph.component';
-import { DashboardCustomMetricDashletComponent } from './dashboard-custom-metric-dashlet/dashboard-custom-metric-dashlet.component';
 import { ChronologyComponent } from './chronology/chronology.component';
 import { ExportButtonComponent } from './export-button/export-button.component';
 import { LocationBreadcrumbsComponent } from './location-breadcrumbs/location-breadcrumbs.component';
@@ -26,9 +24,6 @@ import { SideColumnsComponent } from './side-columns/side-columns.component';
 import { FormAgeComponent } from './form-age/form-age.component';
 import { AgeLabelComponent } from './age-label/age-label.component';
 import { FormAgeDobComponent } from './form-age-dob/form-age-dob.component';
-import { C3StackedBarChartComponent } from './c3-stacked-bar-chart/c3-stacked-bar-chart.component';
-import { WorldMapComponent } from './world-map/world-map.component';
-import { WorldMapMovementComponent } from './world-map-movement/world-map-movement.component';
 import { FormNameUrlListComponent } from './form-name-url-list/form-name-url-list.component';
 import { FormRelationshipQuickComponent } from './form-relationship-quick/form-relationship-quick.component';
 import { ModifyContactFollowUpQuestionnaireDialogComponent } from './modify-contact-follow-up-questionnaire-dialog/modify-contact-follow-up-questionnaire-dialog.component';
@@ -51,7 +46,6 @@ import { FormLocationIdentifierComponent } from './form-location-identifier/form
 import { FormCaseQuickComponent } from './form-case-quick/form-case-quick.component';
 import { FormEventQuickComponent } from './form-event-quick/form-event-quick.component';
 import { FormSelectChangeDetectionPushComponent } from './form-select-change-detection-push/form-select-change-detection-push.component';
-import { C3CombinationStackedBarChartComponent } from './c3-combination-stacked-bar-chart/c3-combination-stacked-bar-chart.component';
 import { ListItemLabelComponent } from './list-item-label/list-item-label.component';
 
 // export necessary components individually
@@ -78,16 +72,6 @@ export const components: any[] = [
     SideFiltersComponent,
     SideColumnsComponent,
     GlobalEntitySearchComponent,
-
-    // dashboard
-    DashboardCustomMetricDashletComponent,
-    CytoscapeGraphComponent,
-    C3StackedBarChartComponent,
-    C3CombinationStackedBarChartComponent,
-
-    // world map
-    WorldMapComponent,
-    WorldMapMovementComponent,
 
     // authentication - #TODO - this needs to be refactored & removed
     NotAuthTemplateComponent,

@@ -337,7 +337,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
      */
     generateKpisReport() {
         this.showLoadingDialog();
-        domtoimage.toPng(this.kpiSection.nativeElement)
+        (domtoimage as any).toPng(this.kpiSection.nativeElement)
             .then((dataUrl) => {
                 const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
 

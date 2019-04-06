@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UserModel } from '../../models/user.model';
 import { UserRoleModel } from '../../models/user-role.model';
-import { PermissionModel } from '../../models/permission.model';
+import { PERMISSION, PermissionModel } from '../../models/permission.model';
 import * as _ from 'lodash';
 import { TeamModel } from '../../models/team.model';
 import { LocationModel } from '../../models/location.model';
@@ -81,7 +81,7 @@ export class ModelHelperService {
                 const rolesPermissions: any = _.map(user.roles, (role) => {
                     return role.permissionIds;
                 });
-                const permissionIdsFromRoles = _.flatten(rolesPermissions);
+                const permissionIdsFromRoles = _.flatten(rolesPermissions) as PERMISSION[];
 
                 // keep only unique permissions
                 user.permissionIds = _.uniq(permissionIdsFromRoles);

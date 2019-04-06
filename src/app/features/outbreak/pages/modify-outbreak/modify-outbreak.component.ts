@@ -17,7 +17,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
 @Component({
@@ -42,7 +42,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     // list of geographical levels
     geographicalLevelsList$: Observable<any[]>;
 
-    outbreakNameValidator$: Observable<boolean>;
+    outbreakNameValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -62,14 +62,17 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     ngOnInit() {
         this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
-        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
-            (countries) => _.map(countries, (country: LabelValuePair) => {
-                country.value = {
-                    id: country.value
-                };
-                return country;
-            })
-        );
+        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY)
+            .pipe(
+                map(
+                    (countries) => _.map(countries, (country: LabelValuePair) => {
+                        country.value = {
+                            id: country.value
+                        };
+                        return country;
+                    })
+                )
+            );
 
         // get outbreak
         this.outbreak = this.route.snapshot.data.outbreak;

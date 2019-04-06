@@ -25,6 +25,9 @@ import { EpiCurveOutcomeDashletComponent } from './epi-curve-outcome-dashlet/epi
 import { EpiCurveReportingDashletComponent } from './epi-curve-reporting-dashlet/epi-curve-reporting-dashlet.component';
 import { ContactFollowUpOverviewDashletComponent } from './contact-follow-up-overview-dashlet/contact-follow-up-overview-dashlet.component';
 import { CasesBasedOnContactStatusDashletComponent } from './cases-based-on-contact-status-dashlet/cases-based-on-contact-status-dashlet.component';
+import { C3CombinationStackedBarChartComponent } from './c3-combination-stacked-bar-chart/c3-combination-stacked-bar-chart.component';
+import { C3StackedBarChartComponent } from './c3-stacked-bar-chart/c3-stacked-bar-chart.component';
+import { DashboardCustomMetricDashletComponent } from './dashboard-custom-metric-dashlet/dashboard-custom-metric-dashlet.component';
 
 // export the list of all page components
 export const components: any[] = [
@@ -53,6 +56,9 @@ export const components: any[] = [
     CasesByGeographicLocationDashletComponent,
     CasesNotIdentifiedThroughContactsDashletComponent,
     ContactFollowUpOverviewDashletComponent,
-    CasesBasedOnContactStatusDashletComponent
+    CasesBasedOnContactStatusDashletComponent,
+    C3StackedBarChartComponent,
+    C3CombinationStackedBarChartComponent,
+    DashboardCustomMetricDashletComponent,
 ];
 

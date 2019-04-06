@@ -27,8 +27,13 @@
                             "src/favicon.ico"
                         ],
                         "styles": [
-                            "src/styles/general.less",
-                            "src/styles/material-theme.scss"
+                            "src/styles/external/materialdesignicons.min.css",
+                            "src/styles/external/googleapisfont.css",
+                            "src/styles/material-theme.scss",
+                            "src/assets/fonts/xtIcon/style.css",
+                            "node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+                            "node_modules/@ng-select/ng-select/themes/material.theme.css",
+                            "src/styles/general.less"
                         ],
                         "scripts": []
                     },
@@ -48,8 +53,7 @@
                             "aot": true,
                             "extractLicenses": true,
                             "vendorChunk": false,
-                            "buildOptimizer": true,
-                            "serviceWorker": true
+                            "buildOptimizer": true
                         }
                     }
                 },

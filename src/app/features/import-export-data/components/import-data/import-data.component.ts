@@ -732,13 +732,13 @@ export class ImportDataComponent implements OnInit {
                     ) {
                         return false;
                     } else {
-                        return _.find(
-                            item.mappedOptions,
-                            (option: {
-                                sourceOption: string
-                            }): boolean => {
-                                return option.sourceOption === distinctVal.value;
-                            }
+                        return !_.isEmpty(
+                            _.find(
+                                item.mappedOptions,
+                                (option: { sourceOption: string }): boolean => {
+                                    return option.sourceOption === distinctVal.value;
+                                }
+                            )
                         );
                     }
                 }
@@ -760,7 +760,7 @@ export class ImportDataComponent implements OnInit {
             // check if we can find a proper destination option
             const sourceOptReduced: string = _.camelCase(mapOpt.sourceOption).toLowerCase();
             const modelPropertyValues = this.importableObject.modelPropertyValuesMap[importableItem.destinationField];
-            const destinationOpt = _.find(
+            const destinationOpt: any = _.find(
                 modelPropertyValues,
                 (modelItem: { id: string, label: string }) => {
                     return sourceOptReduced === _.camelCase(this.i18nService.instant(modelItem.label)).toLowerCase() ||

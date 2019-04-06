@@ -13,9 +13,9 @@ export class OutbreakTemplateModel {
     noLessContacts: number;
     noDaysNewContacts: number;
     longPeriodsBetweenCaseOnset: number;
-    caseInvestigationTemplate: QuestionModel;
-    contactFollowUpTemplate: QuestionModel;
-    labResultsTemplate: QuestionModel;
+    caseInvestigationTemplate: QuestionModel[];
+    contactFollowUpTemplate: QuestionModel[];
+    labResultsTemplate: QuestionModel[];
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
