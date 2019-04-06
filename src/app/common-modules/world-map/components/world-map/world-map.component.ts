@@ -9,9 +9,9 @@ import { Select as InteractionSelect } from 'ol/interaction';
 import Feature from 'ol/Feature';
 import { Point, LineString } from 'ol/geom';
 import { Icon, Style, Text, Fill, Stroke, Circle as CircleStyle } from 'ol/style';
-import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
-import { OutbreakModel } from '../../../core/models/outbreak.model';
-import { MapServerModel } from '../../../core/models/map-server.model';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { MapServerModel } from '../../../../core/models/map-server.model';
 import { Observable ,  Subscriber ,  Subscription } from 'rxjs';
 import { addCommon as addCommonProjections } from 'ol/proj.js';
 

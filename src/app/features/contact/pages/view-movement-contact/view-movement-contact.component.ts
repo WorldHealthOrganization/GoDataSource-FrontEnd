@@ -7,7 +7,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { forkJoin } from 'rxjs';
 import { AddressModel } from '../../../../core/models/address.model';
-import { WorldMapMovementComponent } from '../../../../shared/components/world-map-movement/world-map-movement.component';
+import { WorldMapMovementComponent } from '../../../../common-modules/world-map-movement/components/world-map-movement/world-map-movement.component';
 import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
