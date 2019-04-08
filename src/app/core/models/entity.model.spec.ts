@@ -2,8 +2,8 @@ import { CaseModel } from './case.model';
 import { ContactModel } from './contact.model';
 import { EventModel } from './event.model';
 import { EntityModel } from './entity.model';
-import { RelationshipPersonModel } from './relationship.model';
 import { EntityType } from './entity-type';
+import { RelationshipPersonModel } from './relationship-person.model';
 
 describe('EntityModel', () => {
     it(`should generate link to the view page of a Case, Contact or Event`, () => {

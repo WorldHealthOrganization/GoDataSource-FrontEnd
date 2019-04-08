@@ -12,7 +12,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { Observable } from 'rxjs/Observable';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { RelationshipModel, RelationshipPersonModel } from '../../../../core/models/relationship.model';
+import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -28,6 +28,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
 import { EntityModel } from '../../../../core/models/entity.model';
+import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 
 @Component({
     selector: 'app-create-contact',

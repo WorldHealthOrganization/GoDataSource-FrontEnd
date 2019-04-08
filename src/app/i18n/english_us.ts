@@ -13,6 +13,11 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiAvailableEntitiesForRelationshipPage
+         */
+        'LNG_PAGE_LIST_AVAILABLE_ENTITIES_HAS_POSSIBLE_RELATIONSHIP_DUPLICATE': 'Possible Duplicate ?',
+
+        /**
          * savedImportMappingsPages
          */
         'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA': 'Lab data',
