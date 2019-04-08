@@ -27,6 +27,7 @@ import { SnackbarService } from '../../../core/services/helper/snackbar.service'
 import 'rxjs/add/observable/forkJoin';
 import { Observable } from 'rxjs/Observable';
 import { HoverRowActions, HoverRowActionsType } from '../hover-row-actions/hover-row-actions.component';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 /**
  * Used to initialize breadcrumbs
@@ -69,6 +70,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
     // authenticated user
     authUser: UserModel;
+
+    /**
+     * Refresh language tokens before loading questionnaire data
+     */
+    private _refreshLanguageTokensDisabled: boolean = false;
+    @Input() refreshLanguageTokens: boolean = true;
 
     // outbreak / outbreak template to modify
     private _parent: OutbreakModel | OutbreakTemplateModel;
@@ -293,11 +300,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
                 // init questionnaire data
                 this.initQuestionnaireData();
-
-                // finished loading data
-                setTimeout(() => {
-                    this.loadingData = false;
-                });
             });
         });
     }
@@ -460,6 +462,29 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             !_.isEmpty(this.parent) &&
             !_.isEmpty(this.questionnaireType)
         ) {
+            // make sure we have the latest questionnaire language tokens ?
+            if (
+                this.refreshLanguageTokens &&
+                !this._refreshLanguageTokensDisabled
+            ) {
+                // refresh language tokens
+                this.loadingData = true;
+                this.i18nService.loadUserLanguage()
+                    .catch((err) => {
+                        this.snackbarService.showApiError(err);
+                        return ErrorObservable.create(err);
+                    })
+                    .subscribe(() => {
+                        // init questionnaire data
+                        this._refreshLanguageTokensDisabled = true;
+                        this.initQuestionnaireData();
+                        this._refreshLanguageTokensDisabled = false;
+                    });
+
+                // no point in continuing
+                return;
+            }
+
             // retrieve questionnaire data
             this.questionnaireData = _.isEmpty(this.parent[this.questionnaireType]) ?
                 [] :
@@ -480,6 +505,9 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
             // init question answer actions
             this.initQuestionAnswerActions();
+
+            // finished loading data
+            this.loadingData = false;
         }
     }
 
