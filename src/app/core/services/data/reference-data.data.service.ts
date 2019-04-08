@@ -9,6 +9,8 @@ import { RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/r
 import { LabelValuePair } from '../../models/label-value-pair';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/map';
+import { I18nService } from '../helper/i18n.service';
 
 @Injectable()
 export class ReferenceDataDataService {
@@ -19,7 +21,8 @@ export class ReferenceDataDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
-        private cacheService: CacheService
+        private cacheService: CacheService,
+        private i18nService: I18nService
     ) {
         this.categoriesList$ = this.http.get(`reference-data/available-categories`).share();
 
@@ -114,7 +117,30 @@ export class ReferenceDataDataService {
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`reference-data?filter=${filter}`),
             ReferenceDataEntryModel
-        );
+        )
+            .map((entries: ReferenceDataEntryModel[]) => {
+                return entries
+                    .sort((a, b) => {
+                        if (
+                            !_.isNumber(a.order) &&
+                            !_.isNumber(b.order)
+                        ) {
+                            // order by name
+                            return (this.i18nService.instant(a.value) <= this.i18nService.instant(b.value)) ? -1 : 1;
+                        }
+
+                        if (!_.isNumber(a.order)) {
+                            return 1;
+                        }
+
+                        if (!_.isNumber(b.order)) {
+                            return -1;
+                        }
+
+                        // order by 'order' field
+                        return a.order - b.order;
+                    });
+            });
     }
 
     /**
