@@ -406,7 +406,7 @@ export class RelationshipDataService {
     }
 
     /**
-     * Retrieve Relationships of a Case / Contact / Event
+     * Retrieve available people of a Case / Contact / Event
      * @param {string} outbreakId
      * @param {EntityType} entityType
      * @param {string} entityId
@@ -430,7 +430,7 @@ export class RelationshipDataService {
     }
 
     /**
-     * Retrieve Relationships of a Case / Contact / Event
+     * Count available people of a Case / Contact / Event
      * @param {string} outbreakId
      * @param {EntityType} entityType
      * @param {string} entityId
