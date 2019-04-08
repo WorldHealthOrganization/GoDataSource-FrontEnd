@@ -87,19 +87,25 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
         // retrieve dirty fields
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
-        // even if we set value to float, some browser might get it as a string sicne we use form for this...
+        // even if we set value to float, some browser might get it as a string since we use form for this...
         // so..we need to force again the geo location to have numbers
         const lat: number | string = _.get(dirtyFields, 'geoLocation.lat');
         if (
-            !_.isNumber(lat) &&
-            !_.isEmpty(lat)
+            (
+                !_.isNumber(lat) &&
+                !_.isEmpty(lat)
+            ) ||
+            _.isUndefined(lat)
         ) {
             _.set(dirtyFields, 'geoLocation.lat', parseFloat(lat as string));
         }
         const lng: number | string = _.get(dirtyFields, 'geoLocation.lng');
         if (
-            !_.isNumber(lng) &&
-            !_.isEmpty(lng)
+            (
+                !_.isNumber(lng) &&
+                !_.isEmpty(lng)
+            ) ||
+            _.isUndefined(lng)
         ) {
             _.set(dirtyFields, 'geoLocation.lng', parseFloat(lng as string));
         }
