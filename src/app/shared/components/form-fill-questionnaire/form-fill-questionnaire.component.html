@@ -245,8 +245,9 @@
                                             [componentTitle]="'LNG_QUESTIONNAIRE_SUB_QUESTIONS_TITLE' | translate"
                                             [parentDate]="answerData.date"
                                             [childValueIndex]="determineChildIndex(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex), answer)"
-                                            [uploadersData]="uploadersData">
-                                        </app-form-fill-questionnaire>
+                                            [uploadersData]="uploadersData"
+                                            [skipRequired]="skipRequired"
+                                        ></app-form-fill-questionnaire>
                                     </div>
                                 </div>
                             </div>
