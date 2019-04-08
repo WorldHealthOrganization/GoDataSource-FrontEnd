@@ -39,7 +39,8 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
     [variable: string]: IAnswerData[]
 }> implements OnInit, GroupFilteredValue<any> {
     @Input() disabled: boolean = false;
-
+    // skip validation for required questions?
+    @Input() skipRequired: boolean = false;
     @Input() componentTitle: string;
 
     private _parentDate: string | Moment;
