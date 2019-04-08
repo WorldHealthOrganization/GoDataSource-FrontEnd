@@ -25,7 +25,8 @@ import { v4 as uuid } from 'uuid';
 import { FormInputComponent } from '../../xt-forms/components/form-input/form-input.component';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { HoverRowActions, HoverRowActionsType } from '../hover-row-actions/hover-row-actions.component';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 /**
  * Used to initialize breadcrumbs
@@ -471,10 +472,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 // refresh language tokens
                 this.loadingData = true;
                 this.i18nService.loadUserLanguage()
-                    .catch((err) => {
-                        this.snackbarService.showApiError(err);
-                        return ErrorObservable.create(err);
-                    })
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            return throwError(err);
+                        })
+                    )
                     .subscribe(() => {
                         // init questionnaire data
                         this._refreshLanguageTokensDisabled = true;

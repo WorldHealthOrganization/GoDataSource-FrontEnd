@@ -19,6 +19,7 @@ import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache
 import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class RelationshipDataService {
@@ -425,11 +426,13 @@ export class RelationshipDataService {
         const filter = queryBuilder.buildQuery();
         return this.http
             .get(`outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/available-people?filter=${filter}`)
-            .map((peopleList) => {
-                return _.map(peopleList, (entity) => {
-                    return new EntityModel(entity).model;
-                });
-            });
+            .pipe(
+                map((peopleList) => {
+                    return _.map(peopleList, (entity) => {
+                        return new EntityModel(entity).model;
+                    });
+                })
+            );
     }
 
     /**
