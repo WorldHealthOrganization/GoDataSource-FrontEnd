@@ -201,10 +201,11 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
         }
 
         // bulk insert relationships
-        const relationshipsBulkData = {sources: [], targets: [], relationship: {}};
-        relationshipsBulkData.sources = relationshipSources;
-        relationshipsBulkData.targets = relationshipTargets;
-        relationshipsBulkData.relationship = this.relationship;
+        const relationshipsBulkData = {
+            sources: relationshipSources,
+            targets: relationshipTargets,
+            relationship: this.relationship
+        };
         this.relationshipDataService.createBulkRelationships(this.selectedOutbreak.id, relationshipsBulkData)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
