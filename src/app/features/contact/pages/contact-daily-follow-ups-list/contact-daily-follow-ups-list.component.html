@@ -439,8 +439,8 @@
                     *ngIf="hasFollowUpsWriteAccess()"
                     name="targeted"
                     [(ngModel)]="item.targeted"
-                    [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
-                    tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
+                    [label]="item.targeted ? ('LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate) : ('LNG_FOLLOW_UP_FIELD_LABEL_NOT_TARGETED' | translate)"
+                    [tooltip]="item.targeted ? ('LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION' | translate ): ('LNG_FOLLOW_UP_FIELD_LABEL_NOT_TARGETED_DESCRIPTION' | translate)"
                     (optionChanged)="setTargetedItem(item, $event)">
                 </app-form-slide-toggle>
                 <app-yes-no-label

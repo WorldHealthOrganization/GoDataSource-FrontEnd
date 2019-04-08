@@ -27,8 +27,13 @@ export const EnglishUsLang = {
         /**
          * uiDialogInfo
          */
-        'LNG_DIALOG_EXPORT_CHAIN_OF_TRANSMISSION_SCALE_INFO': 'The higher the scale, the longer it can take to export Chains of Transmission'
+        'LNG_DIALOG_EXPORT_CHAIN_OF_TRANSMISSION_SCALE_INFO': 'The higher the scale, the longer it can take to export Chains of Transmission',
 
+        /**
+         * uiFollowUpFields
+         */
+        'LNG_FOLLOW_UP_FIELD_LABEL_NOT_TARGETED': 'Not targeted',
+        'LNG_FOLLOW_UP_FIELD_LABEL_NOT_TARGETED_DESCRIPTION': '',
         /**
          * REMOVE the tokens from below
          */
