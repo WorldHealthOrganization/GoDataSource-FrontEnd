@@ -151,6 +151,7 @@ export class DialogField {
 
 export class DialogConfiguration {
     public message: string;
+    public additionalInfo: string;
     public yesLabel: string = 'LNG_DIALOG_CONFIRM_BUTTON_YES';
     public yesCssClass: string;
     public cancelLabel: string = 'LNG_DIALOG_CONFIRM_BUTTON_CANCEL';
@@ -167,6 +168,7 @@ export class DialogConfiguration {
 
     constructor(data: string | {
         message: string,
+        additionalInfo?: string,
         yesLabel?: string,
         cancelLabel?: string,
         placeholder?: string,

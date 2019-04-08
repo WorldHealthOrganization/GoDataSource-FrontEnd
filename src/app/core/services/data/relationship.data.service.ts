@@ -16,6 +16,9 @@ import * as moment from 'moment';
 import * as _ from 'lodash';
 import { EntityModel } from '../../models/entity.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
+import { CaseModel } from '../../models/case.model';
+import { ContactModel } from '../../models/contact.model';
+import { EventModel } from '../../models/event.model';
 
 @Injectable()
 export class RelationshipDataService {
@@ -162,28 +165,6 @@ export class RelationshipDataService {
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships?filter=${filter}`),
             RelationshipModel
-        );
-    }
-
-    /**
-     * Retrieve the total number of Relationships of a Case / Contact / Event
-     * @param {string} outbreakId
-     * @param {EntityType} entityType
-     * @param {string} entityId
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
-     */
-    getEntityRelationshipsCount(
-        outbreakId: string,
-        entityType: EntityType,
-        entityId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
-
-        const filter = queryBuilder.buildQuery();
-
-        return this.http.get(
-            `outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/filtered-count?filter=${filter}`
         );
     }
 
@@ -425,6 +406,48 @@ export class RelationshipDataService {
         ));
 
         return lightObject;
+    }
+
+    /**
+     * Retrieve available people of a Case / Contact / Event
+     * @param {string} outbreakId
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<(CaseModel | ContactModel | EventModel)[]>}
+     */
+    getEntityAvailablePeople(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<(CaseModel | ContactModel | EventModel)[]> {
+        const filter = queryBuilder.buildQuery();
+        return this.http
+            .get(`outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/available-people?filter=${filter}`)
+            .map((peopleList) => {
+                return _.map(peopleList, (entity) => {
+                    return new EntityModel(entity).model;
+                });
+            });
+    }
+
+    /**
+     * Count available people of a Case / Contact / Event
+     * @param {string} outbreakId
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getEntityAvailablePeopleCount(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/available-people/count?where=${whereFilter}`);
     }
 }
 

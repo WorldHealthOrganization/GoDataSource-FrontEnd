@@ -593,8 +593,7 @@
                                                         [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ORDER' | translate"
                                                         tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ORDER_DESCRIPTION"
                                                         [required]="false"
-                                                        (optionChanged)="setOrderValue(questionAnswerInEditModeClone, $event)"
-                                                        [disabled]="childQuestionIsInEditMode">
+                                                        (optionChanged)="setOrderValue(questionAnswerInEditModeClone, $event)">
                                                     </app-form-input>
                                                 </div>
 
@@ -607,8 +606,7 @@
                                                         [(ngModel)]="questionAnswerInEditModeClone.label"
                                                         [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL' | translate"
                                                         tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL_DESCRIPTION"
-                                                        required="true"
-                                                        [disabled]="childQuestionIsInEditMode">
+                                                        required="true">
                                                     </app-form-input>
                                                 </div>
 
@@ -621,7 +619,6 @@
                                                         [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE' | translate"
                                                         tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE_DESCRIPTION"
                                                         required="true"
-                                                        [disabled]="childQuestionIsInEditMode"
                                                         app-has-property-validator
                                                         [checkObject]="getCheckAnswerDuplicates(questionInEditModeClone.answers)"
                                                         checkErrorMsg="LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_ANSWER_VALUE"
@@ -650,8 +647,7 @@
                                                         [(ngModel)]="questionAnswerInEditModeClone.alert"
                                                         [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT' | translate"
                                                         tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT_DESCRIPTION"
-                                                        required="false"
-                                                        [disabled]="childQuestionIsInEditMode">
+                                                        required="false">
                                                     </app-form-slide-toggle>
                                                 </div>
                                             </div>
@@ -665,7 +661,8 @@
                                                 (questionEditModeChanged)="questionEditModeChangedHandler($event)"
                                                 [extraQuestionVariables]="questionVariables"
                                                 [allowQuestionVariableChange]="allowQuestionVariableChange"
-                                                [cleanQuestionAndAnswerFlagsOnSave]="false">
+                                                [cleanQuestionAndAnswerFlagsOnSave]="false"
+                                                [refreshLanguageTokens]="false">
                                             </app-form-modify-questionnaire>
                                         </form>
                                     </mat-card>

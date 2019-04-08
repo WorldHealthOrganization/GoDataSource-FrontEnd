@@ -53,7 +53,7 @@ export abstract class RelationshipsListComponent extends ListComponent implement
         protected route: ActivatedRoute,
         protected authDataService: AuthDataService,
         protected outbreakDataService: OutbreakDataService,
-        protected entityDataService: EntityDataService,
+        protected entityDataService: EntityDataService
     ) {
         super(
             snackbarService

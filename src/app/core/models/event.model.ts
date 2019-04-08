@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import { AddressModel } from './address.model';
 import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
+import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
 
 export class EventModel {
     id: string;
@@ -18,6 +19,8 @@ export class EventModel {
 
     inconsistencies: InconsistencyModel[];
     relationship: any;
+
+    matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -40,6 +43,11 @@ export class EventModel {
         });
 
         this.relationship = _.get(data, 'relationship');
+
+        this.matchedDuplicateRelationships = _.get(data, 'matchedDuplicateRelationships', []);
+        _.each(this.matchedDuplicateRelationships, (matchedRelationship, index) => {
+            this.matchedDuplicateRelationships[index] = new EntityMatchedRelationshipModel(matchedRelationship);
+        });
     }
 
     get firstName(): string {

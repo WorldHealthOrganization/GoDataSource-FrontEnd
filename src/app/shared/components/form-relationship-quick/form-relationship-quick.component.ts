@@ -84,7 +84,7 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
             // set default values on relationship
             this.certaintyLevelOptions$
                 .subscribe((options: LabelValuePair[]) => {
-                    if (!_.isEmpty(options)) {
+                    if (!_.isEmpty(options) && _.isEmpty(this.value.certaintyLevelId)) {
                         // get the last option selected by default (high)
                         this.value.certaintyLevelId = Constants.CERTAINITY_LEVEL.HIGH;
                     }

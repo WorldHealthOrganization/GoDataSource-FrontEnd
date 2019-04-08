@@ -6,6 +6,12 @@
         [innerHTML]="confirmData?.message | translate:confirmData?.translateData">
     </div>
 
+    <div
+        *ngIf="confirmData?.additionalInfo"
+        class="dialog-additional-info"
+        [innerHTML]="confirmData?.additionalInfo| translate:confirmData?.translateData">
+    </div>
+
     <form #form="ngForm">
         <div *ngIf="confirmData?.customInput">
             <!-- Single input -->

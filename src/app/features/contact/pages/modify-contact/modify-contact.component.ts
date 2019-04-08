@@ -28,6 +28,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { MatDialogRef } from '@angular/material';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
