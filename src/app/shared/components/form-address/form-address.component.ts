@@ -1,8 +1,5 @@
-import {
-    Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Output, EventEmitter,
-    ViewChild
-} from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, NgModel } from '@angular/forms';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Output, EventEmitter} from '@angular/core';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { GroupBase, GroupFilteredValue } from '../../xt-forms/core';
 import { AddressModel } from '../../../core/models/address.model';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
