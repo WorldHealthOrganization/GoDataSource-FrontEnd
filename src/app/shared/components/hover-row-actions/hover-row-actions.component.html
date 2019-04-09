@@ -14,7 +14,8 @@
     [class.right]="realPosition === HoverRowActionsPosition.RIGHT"
     [ngStyle]="hoverActionsStyle"
     (mouseenter)="actionsMouseEnter()"
-    (mouseleave)="actionsMouseLeave()">
+    (mouseleave)="actionsMouseLeave()"
+>
     <ng-container
         *ngFor="let buttonData of realActions">
         <!-- Icon button -->

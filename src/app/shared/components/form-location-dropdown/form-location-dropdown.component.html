@@ -1,7 +1,7 @@
 <div class="form-element"
      [id]="identifier" [ngClass]="{ invalid: (invalid), 'form-locations-select-tooltip': tooltip }">
 
-    <form #groupForm="ngForm">
+    <form class="ng-select-form" #groupForm="ngForm">
         <ng-select
             #locationHandler
             [name]="name"

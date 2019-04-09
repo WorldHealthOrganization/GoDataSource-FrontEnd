@@ -1,6 +1,5 @@
-<div class="chain-settings">
-    <div
-        fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+<div class="chain-settings" fxLayout="column">
+    <div fxLayout="row" fxLayoutAlign="space-between center">
         <!-- settings toggle -->
         <button
             mat-raised-button
@@ -9,8 +8,7 @@
         </button>
 
         <!-- Date - moment in time -->
-        <div
-            fxFlex="150px">
+        <div fxFlex="150px">
             <app-form-datepicker
                 class="global-date-filter"
                 [(ngModel)]="dateGlobalFilter"
@@ -24,11 +22,10 @@
     <!-- settings panel -->
     <div
         *ngIf="showSettings"
-        fxFlex fxLayout="column"
-        class="settings-container">
-
-        <div
-            fxFlex fxLayout="row" fxLayoutGap="10px">
+        fxLayout="column"
+        class="settings-container"
+    >
+        <div fxLayout="row" fxLayoutGap="10px">
             <!-- entity type filter - events -->
             <app-form-checkbox
                 fxFlex="150px"
@@ -46,10 +43,10 @@
             </app-form-checkbox>
         </div>
 
-        <div
-            fxFlex fxLayout="row wrap" fxLayoutGap="20px">
+        <div fxLayout="row wrap" fxLayoutGap="20px">
             <!-- Filters -->
             <app-transmission-chain-filters
+                fxFlex
                 title="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTERS_TITLE"
                 [filters]="filters">
             </app-transmission-chain-filters>
@@ -57,21 +54,17 @@
             <!-- Right Side => Node Settings & Edge Settings -->
             <div
                 *ngIf="selectedViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value"
-                fxFlex fxLayout="column" fxLayoutGap="20px">
+                fxFlex fxLayout="column" fxLayoutGap="20px"
+            >
                 <!-- Node Settings -->
-                <mat-card
-                    fxFlex fxLayout="column" fxLayoutGap="10px">
-                    <div
-                        fxFlex
-                        class="settings-container-title">
+                <mat-card fxLayout="column" fxLayoutGap="10px">
+                    <div class="settings-container-title">
                         {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SETTINGS_TITLE' | translate }}
                     </div>
 
                     <!-- Node Label -->
-                    <div
-                        fxFlex fxLayout="column">
-                        <div
-                            fxFlex>
+                    <div fxLayout="column">
+                        <div>
                             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_TITLE' | translate }}
                         </div>
 
@@ -83,10 +76,8 @@
                     </div>
 
                     <!-- Node Label Color -->
-                    <div
-                        fxFlex fxLayout="column">
-                        <div
-                            fxFlex>
+                    <div fxLayout="column">
+                        <div>
                             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate }}
                         </div>
 
@@ -98,10 +89,8 @@
                     </div>
 
                     <!-- Node Color -->
-                    <div
-                        fxFlex fxLayout="column">
-                        <div
-                            fxFlex>
+                    <div fxLayout="column">
+                        <div>
                             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate }}
                         </div>
 
@@ -113,10 +102,8 @@
                     </div>
 
                     <!-- Node Icon -->
-                    <div
-                        fxFlex fxLayout="column">
-                        <div
-                            fxFlex>
+                    <div fxLayout="column">
+                        <div>
                             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate }}
                         </div>
 
@@ -128,10 +115,8 @@
                     </div>
 
                     <!-- Node Shape -->
-                    <div
-                        fxFlex fxLayout="column">
-                        <div
-                            fxFlex>
+                    <div fxLayout="column">
+                        <div>
                             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE' | translate }}
                         </div>
 
@@ -145,19 +130,14 @@
                 </mat-card>
 
                 <!-- Edge Settings -->
-                <mat-card
-                    fxFlex fxLayout="column" fxLayoutGap="10px">
-                    <div
-                        fxFlex
-                        class="settings-container-title">
+                <mat-card fxLayout="column" fxLayoutGap="10px">
+                    <div class="settings-container-title">
                         {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_SETTINGS_TITLE' | translate }}
                     </div>
 
                     <!-- Edge Label -->
-                    <div
-                        fxFlex fxLayout="column">
-                        <div
-                            fxFlex>
+                    <div fxLayout="column">
+                        <div>
                             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_LABEL_TITLE' | translate }}
                         </div>
 
@@ -170,10 +150,8 @@
                     </div>
 
                     <!-- Edge Icon -->
-                    <div
-                        fxFlex fxLayout="column">
-                        <div
-                            fxFlex>
+                    <div fxLayout="column">
+                        <div>
                             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE' | translate }}
                         </div>
 
@@ -186,10 +164,8 @@
                     </div>
 
                     <!-- Edge Color -->
-                    <div
-                        fxFlex fxLayout="column">
-                        <div
-                            fxFlex>
+                    <div fxLayout="column">
+                        <div>
                             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate }}
                         </div>
 
@@ -203,8 +179,7 @@
             </div>
         </div>
 
-        <div
-            fxFlex fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
+        <div fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
             <!-- Reset filters -->
             <button
                 fxFlex="150px"

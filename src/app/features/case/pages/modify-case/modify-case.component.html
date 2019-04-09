@@ -259,60 +259,59 @@
 
                 <!-- Outcome section -->
                 <mat-card class="page-section">
-                    <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                        <app-form-select
-                            name="outcomeId"
-                            [(ngModel)]="caseData.outcomeId"
-                            [placeholder]="'LNG_CASE_FIELD_LABEL_OUTCOME' | translate"
-                            tooltip="LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION"
-                            [options]="outcomeList$ | async">
-                        </app-form-select>
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-select
+                                name="outcomeId"
+                                [(ngModel)]="caseData.outcomeId"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_OUTCOME' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION"
+                                [options]="outcomeList$ | async">
+                            </app-form-select>
 
-                        <app-form-datepicker
-                            name="dateOfOutcome"
-                            [(ngModel)]="caseData.dateOfOutcome"
-                            [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME' | translate"
-                            tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION"
-                            [disabled]="viewOnly"
-                            [maxDate]="serverToday"
-                            app-date-validator
-                            [dateSameOrBefore]="serverToday"
-                            [dateSameOrAfter]="[
-                                'dateOfOnset'
-                            ]">
-                        </app-form-datepicker>
-
-                        <div fxFlex><!-- placeholder --></div>
-                        <div fxFlex><!-- placeholder --></div>
-                    </div>
-
-                    <div fxLayout="row" fxLayoutGap="20px" fxFlex *ngIf="caseData.outcomeId === Constants.OUTCOME_STATUS.DECEASED">
-                        <app-form-slide-toggle
-                            name="safeBurial"
-                            [(ngModel)]="caseData.safeBurial"
-                            [label]="'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL' | translate"
-                            tooltip="LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION"
-                            [disabled]="viewOnly">
-                        </app-form-slide-toggle>
-
-                        <div fxFlex>
                             <app-form-datepicker
-                                name="dateOfBurial"
-                                [(ngModel)]="caseData.dateOfBurial"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION"
+                                name="dateOfOutcome"
+                                [(ngModel)]="caseData.dateOfOutcome"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION"
+                                [disabled]="viewOnly"
                                 [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="serverToday"
                                 [dateSameOrAfter]="[
-                                    'dateOfOutcome'
-                                ]"
-                                [disabled]="viewOnly">
+                                'dateOfOnset'
+                            ]">
                             </app-form-datepicker>
-                        </div>
 
-                        <div fxFlex><!-- placeholder --></div>
-                        <div fxFlex><!-- placeholder --></div>
+                            <ng-container *ngIf="caseData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED">
+                                <div fxFlex><!-- placeholder --></div>
+                                <div fxFlex><!-- placeholder --></div>
+                            </ng-container>
+
+                            <ng-container *ngIf="caseData.outcomeId === Constants.OUTCOME_STATUS.DECEASED">
+                                <app-form-slide-toggle
+                                    name="safeBurial"
+                                    [(ngModel)]="caseData.safeBurial"
+                                    [label]="'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION"
+                                    [disabled]="viewOnly">
+                                </app-form-slide-toggle>
+
+                                <app-form-datepicker
+                                    name="dateOfBurial"
+                                    [(ngModel)]="caseData.dateOfBurial"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION"
+                                    [maxDate]="serverToday"
+                                    app-date-validator
+                                    [dateSameOrBefore]="serverToday"
+                                    [dateSameOrAfter]="[
+                                        'dateOfOutcome'
+                                    ]"
+                                    [disabled]="viewOnly">
+                                </app-form-datepicker>
+                            </ng-container>
+                        </div>
                     </div>
                 </mat-card>
 
