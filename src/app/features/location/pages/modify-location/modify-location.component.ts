@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { NgForm } from '@angular/forms';
+import { NgForm, NgModel } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
@@ -38,6 +38,8 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
     backToCurrent: boolean = false;
 
     @ViewChild('locationBreadcrumbs') locationBreadcrumbs: LocationBreadcrumbsComponent;
+    @ViewChild('latInput') latInput: NgModel;
+    @ViewChild('lngInput') lngInput: NgModel;
 
     constructor(
         private locationDataService: LocationDataService,
@@ -91,21 +93,15 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
         // so..we need to force again the geo location to have numbers
         const lat: number | string = _.get(dirtyFields, 'geoLocation.lat');
         if (
-            (
-                !_.isNumber(lat) &&
-                !_.isEmpty(lat)
-            ) ||
-            _.isUndefined(lat)
+            !_.isNumber(lat) &&
+            !_.isEmpty(lat)
         ) {
             _.set(dirtyFields, 'geoLocation.lat', parseFloat(lat as string));
         }
         const lng: number | string = _.get(dirtyFields, 'geoLocation.lng');
         if (
-            (
-                !_.isNumber(lng) &&
-                !_.isEmpty(lng)
-            ) ||
-            _.isUndefined(lng)
+            !_.isNumber(lng) &&
+            !_.isEmpty(lng)
         ) {
             _.set(dirtyFields, 'geoLocation.lng', parseFloat(lng as string));
         }
@@ -198,6 +194,8 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             `geoLocation.${property}`,
             value ? parseFloat(value) : undefined
         );
+        this.latInput.control.markAsDirty();
+        this.lngInput.control.markAsDirty();
     }
 
     /**
