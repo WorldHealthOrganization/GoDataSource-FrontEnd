@@ -1,7 +1,10 @@
 <div class="form-element "
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
-    <form #groupForm="ngForm">
+    <form
+        #groupForm="ngForm"
+        fxLayout="column"
+    >
         <div
             *ngFor="let item of values; let i = index"
             fxFlex fxLayout="row" fxLayoutAlign="start center"
@@ -22,8 +25,10 @@
             </button>
         </div>
 
-        <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
-            {{'LNG_INPUT_LABEL_ADD_INPUT' | translate}}
-        </button>
+        <div fxLayout="row">
+            <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
+                {{'LNG_INPUT_LABEL_ADD_INPUT' | translate}}
+            </button>
+        </div>
     </form>
 </div>
