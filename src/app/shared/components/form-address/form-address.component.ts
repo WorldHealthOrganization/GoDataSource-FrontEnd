@@ -38,9 +38,6 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
     @Input() displayCopyFieldDescription: string;
     @Output() copyValue = new EventEmitter<string>();
 
-    @ViewChild('latInput') latInput: NgModel;
-    @ViewChild('lngInput') lngInput: NgModel;
-
     serverToday: Moment = null;
 
     constructor(
