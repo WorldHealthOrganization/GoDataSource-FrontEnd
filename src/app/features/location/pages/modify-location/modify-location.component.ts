@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { NgForm } from '@angular/forms';
+import { NgForm, NgModel } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
@@ -38,6 +38,8 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
     backToCurrent: boolean = false;
 
     @ViewChild('locationBreadcrumbs') locationBreadcrumbs: LocationBreadcrumbsComponent;
+    @ViewChild('latInput') latInput: NgModel;
+    @ViewChild('lngInput') lngInput: NgModel;
 
     constructor(
         private locationDataService: LocationDataService,
@@ -87,7 +89,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
         // retrieve dirty fields
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
-        // even if we set value to float, some browser might get it as a string sicne we use form for this...
+        // even if we set value to float, some browser might get it as a string since we use form for this...
         // so..we need to force again the geo location to have numbers
         const lat: number | string = _.get(dirtyFields, 'geoLocation.lat');
         if (
@@ -192,6 +194,8 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             `geoLocation.${property}`,
             value ? parseFloat(value) : undefined
         );
+        this.latInput.control.markAsDirty();
+        this.lngInput.control.markAsDirty();
     }
 
     /**
