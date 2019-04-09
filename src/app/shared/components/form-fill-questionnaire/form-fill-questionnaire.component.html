@@ -97,7 +97,7 @@
                                                         [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                                         [(ngModel)]="answerData.value"
                                                         [placeholder]="(question.answerType === Constants.ANSWER_TYPES.NUMERIC.value ? 'LNG_QUESTIONNAIRE_LABEL_WRITE_NUMERIC_ANSWER' : 'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER') | translate"
-                                                        [required]="question.required"
+                                                        [required]="!skipRequired && question.required"
                                                         (optionChanged)="onChange()"
                                                         [disabled]="disabled"
                                                         [type]="question.answerType === Constants.ANSWER_TYPES.NUMERIC.value ? 'number' : 'text'">
@@ -110,7 +110,7 @@
                                                         [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                                         [(ngModel)]="answerData.value"
                                                         [placeholder]="'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE' | translate"
-                                                        [required]="question.required"
+                                                        [required]="!skipRequired && question.required"
                                                         [disabled]="disabled"
                                                         (optionChanged)="onChange()"
                                                         app-date-validator>
@@ -123,7 +123,7 @@
                                                         [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                                         [ngModel]="answerData.value"
                                                         [placeholder]="(question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ? 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER' : 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS') | translate"
-                                                        [required]="question.required"
+                                                        [required]="!skipRequired && question.required"
                                                         [options]="question.answers"
                                                         optionLabelKey="label"
                                                         optionValueKey="value"
@@ -163,7 +163,7 @@
                                                                     [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                                                     [placeholder]="'LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE' | translate"
                                                                     [ngModel]="answerData.value"
-                                                                    [required]="uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploading || question.required">
+                                                                    [required]="uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploading || (!skipRequired && question.required)">
                                                                 </app-form-hidden-input>
                                                             </div>
 
@@ -245,8 +245,9 @@
                                             [componentTitle]="'LNG_QUESTIONNAIRE_SUB_QUESTIONS_TITLE' | translate"
                                             [parentDate]="answerData.date"
                                             [childValueIndex]="determineChildIndex(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex), answer)"
-                                            [uploadersData]="uploadersData">
-                                        </app-form-fill-questionnaire>
+                                            [uploadersData]="uploadersData"
+                                            [skipRequired]="skipRequired"
+                                        ></app-form-fill-questionnaire>
                                     </div>
                                 </div>
                             </div>

@@ -84,8 +84,9 @@
                 <app-form-fill-questionnaire
                     name="questionnaireAnswers"
                     [ngModel]="followUp.questionnaireAnswers"
-                    [questions]="selectedOutbreak?.contactFollowUpTemplate">
-                </app-form-fill-questionnaire>
+                    [questions]="selectedOutbreak?.contactFollowUpTemplate"
+                    [skipRequired]="true"
+                ></app-form-fill-questionnaire>
 
                 <div class="stepper-wrapper">
                     <button mat-raised-button type="button" matStepperPrevious>
