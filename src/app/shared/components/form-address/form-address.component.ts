@@ -132,9 +132,6 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
             value ? parseFloat(value) : undefined
         );
 
-        this.latInput.control.markAsDirty();
-        this.lngInput.control.markAsDirty();
-
         // on change trigger
         setTimeout(() => {
             super.onChange();
