@@ -3,9 +3,8 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
@@ -23,8 +22,9 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { Router } from '@angular/router';
 import { TopnavComponent } from '../../../../shared/components/topnav/topnav.component';
-import { tap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -84,14 +84,17 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
-            (countries) => _.map(countries, (country: LabelValuePair) => {
-                country.value = {
-                    id: country.value
-                };
-                return country;
-            })
-        );
+        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY)
+            .pipe(
+                map(
+                    (countries) => _.map(countries, (country: LabelValuePair) => {
+                        country.value = {
+                            id: country.value
+                        };
+                        return country;
+                    })
+                )
+            );
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
@@ -168,10 +171,12 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.outbreakDataService
                         .deleteOutbreak(outbreak.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             // reload user data to get the updated data regarding active outbreak
                             this.authDataService
@@ -198,11 +203,12 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                     // delete follow up
                     this.outbreakDataService
                         .restoreOutbreak(outbreak.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_RESTORE_SUCCESS_MESSAGE');
 
@@ -213,7 +219,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
             });
     }
 
-
     setActive(outbreak) {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE')
             .subscribe((answer: DialogAnswer) => {
@@ -222,10 +227,12 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                     const userId = this.authUser.id;
                     this.userDataService
                         .modifyUser(userId, userData)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             // reload user data to save the new active outbreak
                             this.authDataService
@@ -357,21 +364,25 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                             // show loading
                             const loadingDialog = this.dialogService.showLoadingDialog();
                             this.outbreakDataService.createOutbreak(outbreak)
-                                .catch((err) => {
-                                    this.snackbarService.showError(err.message);
-                                    loadingDialog.close();
-                                    return ErrorObservable.create(err);
-                                })
-                                .switchMap((clonedOutbreak) => {
-                                    // update language tokens to get the translation of submitted questions and answers
-                                    return this.i18nService.loadUserLanguage()
-                                        .catch((err) => {
-                                            this.snackbarService.showError(err.message);
-                                            loadingDialog.close();
-                                            return ErrorObservable.create(err);
-                                        })
-                                        .map(() => clonedOutbreak);
-                                })
+                                .pipe(
+                                    catchError((err) => {
+                                        this.snackbarService.showApiError(err);
+                                        loadingDialog.close();
+                                        return throwError(err);
+                                    }),
+                                    switchMap((clonedOutbreak) => {
+                                        // update language tokens to get the translation of submitted questions and answers
+                                        return this.i18nService.loadUserLanguage()
+                                            .pipe(
+                                                catchError((err) => {
+                                                    this.snackbarService.showError(err.message);
+                                                    loadingDialog.close();
+                                                    return throwError(err);
+                                                }),
+                                                map(() => clonedOutbreak)
+                                            );
+                                    })
+                                )
                                 .subscribe((clonedOutbreak) => {
                                     this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
 
@@ -380,7 +391,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
 
                                     // navigate to modify page of the new outbreak
                                     this.router.navigate([`/outbreaks/${clonedOutbreak.id}/modify`]);
-                            });
+                                });
                         }
                     });
             });

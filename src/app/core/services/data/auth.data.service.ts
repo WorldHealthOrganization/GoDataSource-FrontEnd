@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/switchMap';
+import { Observable } from 'rxjs';
+
+
+
+
 import * as _ from 'lodash';
 import { StorageService, StorageKey } from '../helper/storage.service';
 import { UserDataService } from './user.data.service';
 import { AuthModel } from '../../models/auth.model';
 import { UserModel, UserSettings } from '../../models/user.model';
 import { ModelHelperService } from '../helper/model-helper.service';
+import { map, mergeMap, switchMap, tap } from 'rxjs/operators';
 
 @Injectable()
 export class AuthDataService {
@@ -30,25 +31,29 @@ export class AuthDataService {
      */
     login(user): Observable<AuthModel> {
         return this.http.post(`users/login`, user)
-            .switchMap((authRes) => {
-                // keep auth info
-                const auth = this.modelHelperService.getModelInstance(AuthModel, authRes);
+            .pipe(
+                switchMap((authRes) => {
+                    // keep auth info
+                    const auth = this.modelHelperService.getModelInstance(AuthModel, authRes);
 
-                // cache auth data so the Auth Token will be added on the next request
-                this.storageService.set(StorageKey.AUTH_DATA, auth);
+                    // cache auth data so the Auth Token will be added on the next request
+                    this.storageService.set(StorageKey.AUTH_DATA, auth);
 
-                // get user info
-                return this.userDataService.getUser(auth.userId)
-                    .map((userInstance: UserModel) => {
-                        // keep user info
-                        auth.user = userInstance;
+                    // get user info
+                    return this.userDataService.getUser(auth.userId)
+                        .pipe(
+                            map((userInstance: UserModel) => {
+                                // keep user info
+                                auth.user = userInstance;
 
-                        // cache auth data with authenticated user information
-                        this.storageService.set(StorageKey.AUTH_DATA, auth);
+                                // cache auth data with authenticated user information
+                                this.storageService.set(StorageKey.AUTH_DATA, auth);
 
-                        return auth;
-                    });
-            });
+                                return auth;
+                            })
+                        );
+                })
+            );
     }
 
     reloadAndPersistAuthUser(): Observable<AuthModel> {
@@ -56,13 +61,15 @@ export class AuthDataService {
         const userId = _.get(authData, 'user.id', '');
         // get user info
         return this.userDataService.getUser(userId)
-            .map((userInstance: UserModel) => {
-                // keep user info
-                authData.user = userInstance;
-                // cache auth data with authenticated user information
-                this.storageService.set(StorageKey.AUTH_DATA, authData);
-                return authData;
-            });
+            .pipe(
+                map((userInstance: UserModel) => {
+                    // keep user info
+                    authData.user = userInstance;
+                    // cache auth data with authenticated user information
+                    this.storageService.set(StorageKey.AUTH_DATA, authData);
+                    return authData;
+                })
+            );
     }
 
     /**
@@ -82,10 +89,13 @@ export class AuthDataService {
                 authUser.id,
                 settingsKey,
                 data
-            ).mergeMap(() => {
-                // update user data in local storage
-                return this.reloadAndPersistAuthUser();
-            });
+            )
+            .pipe(
+                mergeMap(() => {
+                    // update user data in local storage
+                    return this.reloadAndPersistAuthUser();
+                })
+            );
     }
 
     /**
@@ -94,12 +104,14 @@ export class AuthDataService {
      */
     logout(): Observable<any> {
         return this.http.post(`users/logout`, null)
-            .do(() => {
-                // remove auth info from local storage
-                this.storageService.remove(StorageKey.AUTH_DATA);
-                // remove selected outbreak from local storage
-                this.storageService.remove(StorageKey.SELECTED_OUTBREAK_ID);
-            });
+            .pipe(
+                tap(() => {
+                    // remove auth info from local storage
+                    this.storageService.remove(StorageKey.AUTH_DATA);
+                    // remove selected outbreak from local storage
+                    this.storageService.remove(StorageKey.SELECTED_OUTBREAK_ID);
+                })
+            );
     }
 
     /**

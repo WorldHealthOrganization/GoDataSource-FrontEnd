@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ReportDifferenceOnsetRelationshipModel, RelationshipModel } from '../../models/relationship.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
@@ -19,6 +19,7 @@ import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache
 import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class RelationshipDataService {
@@ -248,6 +249,7 @@ export class RelationshipDataService {
     /**
      * Get metrics for contacts per case
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<MetricContactsPerCaseModel>}
      */
     getMetricsOfContactsPerCase(
@@ -273,6 +275,7 @@ export class RelationshipDataService {
     /**
      * Get count and ids of cases with less than x contacts
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<MetricCasesWithContactsModel>}
      */
     getCountIdsOfCasesLessThanXContacts(
@@ -289,7 +292,7 @@ export class RelationshipDataService {
     /**
      * Get count of cases outside the transmission chains
      * @param {string} outbreakId
-     * @param {number} noDaysInChains
+     * @param queryBuilder
      * @returns {Observable<MetricCasesTransmissionChainsModel>}
      */
     getCountOfCasesOutsideTheTransmissionChains(
@@ -306,6 +309,7 @@ export class RelationshipDataService {
     /**
      * Get count and ids of new cases among known contacts
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<MetricNewCasesWithContactsModel>}
      */
     getCountIdsOfCasesAmongKnownContacts(
@@ -422,11 +426,13 @@ export class RelationshipDataService {
         const filter = queryBuilder.buildQuery();
         return this.http
             .get(`outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/available-people?filter=${filter}`)
-            .map((peopleList) => {
-                return _.map(peopleList, (entity) => {
-                    return new EntityModel(entity).model;
-                });
-            });
+            .pipe(
+                map((peopleList) => {
+                    return _.map(peopleList, (entity) => {
+                        return new EntityModel(entity).model;
+                    });
+                })
+            );
     }
 
     /**

@@ -12,15 +12,15 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import 'rxjs/add/observable/forkJoin';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { IAnswerData } from '../../../../core/models/question.model';
+import { throwError, forkJoin } from 'rxjs';
+import { catchError, share } from 'rxjs/operators';
 
 @Component({
     selector: 'app-modify-contact-follow-ups-list',
@@ -74,9 +74,8 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
 
     ngOnInit() {
         // dropdowns
-        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS).share();
-        this.teamsList$ = this.teamDataService.getTeamsList().share();
-
+        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS).pipe(share());
+        this.teamsList$ = this.teamDataService.getTeamsList().pipe(share());
 
         // read route query params
         this.route.queryParams
@@ -198,11 +197,13 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         );
 
         // execute observables in parallel
-        Observable.forkJoin(observableList$)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                return ErrorObservable.create(err);
-            })
+        forkJoin(observableList$)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    return throwError(err);
+                })
+            )
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE');
 

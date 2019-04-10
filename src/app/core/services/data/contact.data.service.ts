@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { ContactModel } from '../../models/contact.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
@@ -13,8 +12,9 @@ import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import * as _ from 'lodash';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
-import { MetricCasesCountStratified } from '../../models/metrics/metric-cases-count-stratified.model';
 import { MetricContactsFollowedUpReportModel } from '../../models/metrics/metric-contacts-followed-up-report.model';
+import { catchError, map } from 'rxjs/operators';
+import { Observable, throwError, of } from 'rxjs';
 
 @Injectable()
 export class ContactDataService {
@@ -210,7 +210,7 @@ export class ContactDataService {
      * @returns {Observable<any>}
      */
     convertContactToCase(outbreakId: string, contactId: string): Observable<any> {
-       return this.http.post(`outbreaks/${outbreakId}/contacts/${contactId}/convert-to-case`, {});
+        return this.http.post(`outbreaks/${outbreakId}/contacts/${contactId}/convert-to-case`, {});
     }
 
     /**
@@ -231,17 +231,22 @@ export class ContactDataService {
                     visualIdMask: visualIdMask,
                     personId: personId
                 }
-            ).catch((response: Error | VisualIdErrorModel) => {
-                return (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ||
-                    (response as VisualIdErrorModel).code === VisualIdErrorModelCode.DUPLICATE_VISUAL_ID ?
-                    Observable.of(
-                        this.modelHelper.getModelInstance(
-                            VisualIdErrorModel,
-                            response
-                        )
-                    ) :
-                    Observable.throw(response);
-            });
+            )
+            .pipe(
+                catchError((response: Error | VisualIdErrorModel) => {
+                    return (
+                        (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ||
+                        (response as VisualIdErrorModel).code === VisualIdErrorModelCode.DUPLICATE_VISUAL_ID
+                    ) ?
+                        of(
+                            this.modelHelper.getModelInstance(
+                                VisualIdErrorModel,
+                                response
+                            )
+                        ) :
+                        throwError(response);
+                })
+            );
     }
 
     /**
@@ -261,18 +266,21 @@ export class ContactDataService {
             outbreakId,
             visualIdMask,
             personId
-        ).map((visualID: string | VisualIdErrorModel) => {
-            return _.isString(visualID) ?
-                true : {
-                    isValid: false,
-                    errMsg: (visualID as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ?
-                        'LNG_API_ERROR_CODE_INVALID_VISUAL_ID_MASK' :
-                        'LNG_API_ERROR_CODE_DUPLICATE_VISUAL_ID',
-                    errMsgData: {
-                        mask: visualIdRealMask
-                    }
-                };
-        });
+        )
+            .pipe(
+                map((visualID: string | VisualIdErrorModel) => {
+                    return _.isString(visualID) ?
+                        true : {
+                            isValid: false,
+                            errMsg: (visualID as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ?
+                                'LNG_API_ERROR_CODE_INVALID_VISUAL_ID_MASK' :
+                                'LNG_API_ERROR_CODE_DUPLICATE_VISUAL_ID',
+                            errMsgData: {
+                                mask: visualIdRealMask
+                            }
+                        };
+                })
+            );
     }
 
     /**
@@ -289,21 +297,23 @@ export class ContactDataService {
     ): Observable<MetricContactsFollowedUpReportModel[]> {
         const filter = queryBuilder.buildQuery();
         const obs = this.http.post(`outbreaks/${outbreakId}/contacts/follow-up-report?filter=${filter}`, reportData);
-        return obs.map(
-            (listResult: any) => {
-                const results: MetricContactsFollowedUpReportModel[] = [];
-                const listReport: any = listResult.report;
-                if (listReport.days) {
-
-                    Object.keys(listReport.days).forEach((key) => {
-                        const metricResult: any = listReport.days[key];
-                        metricResult.day = key;
-                        results.push(metricResult);
-                    });
-                }
-                return results;
-            }
-        );
+        return obs
+            .pipe(
+                map(
+                    (listResult: any) => {
+                        const results: MetricContactsFollowedUpReportModel[] = [];
+                        const listReport: any = listResult.report;
+                        if (listReport.days) {
+                            Object.keys(listReport.days).forEach((key) => {
+                                const metricResult: any = listReport.days[key];
+                                metricResult.day = key;
+                                results.push(metricResult);
+                            });
+                        }
+                        return results;
+                    }
+                )
+            );
     }
 
 }

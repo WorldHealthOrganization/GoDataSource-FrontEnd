@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
@@ -19,13 +19,13 @@ import { SheetCellValidator } from '../../../../core/models/sheet/sheet-cell-val
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { NgModel } from '@angular/forms';
-import 'rxjs/add/operator/mergeMap';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { BulkContactsService } from '../../../../core/services/helper/bulk-contacts.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import * as moment from 'moment';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
+import { throwError } from 'rxjs';
+import { catchError, share } from 'rxjs/operators';
 
 @Component({
     selector: 'app-bulk-modify-contacts',
@@ -99,9 +99,9 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         this.setSheetWidth();
 
         // reference data
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
-        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION).share();
-        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).share();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION).pipe(share());
+        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).pipe(share());
         this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
 
         // configure Sheet widget
@@ -110,11 +110,13 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         // get selected outbreak
         this.outbreakDataService
             .getSelectedOutbreak()
-            .catch((err) => {
-                // show error message
-                this.snackbarService.showError(err.message);
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    // show error message
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                })
+            )
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 // selected outbreak
                 this.selectedOutbreak = selectedOutbreak;
@@ -452,11 +454,13 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                                     this.selectedOutbreak.id,
                                     data
                                 )
-                                .catch((err) => {
-                                    loadingDialog.close();
-                                    this.snackbarService.showError(err.message);
-                                    return ErrorObservable.create(err);
-                                })
+                                .pipe(
+                                    catchError((err) => {
+                                        loadingDialog.close();
+                                        this.snackbarService.showApiError(err);
+                                        return throwError(err);
+                                    })
+                                )
                                 .subscribe(() => {
                                     this.snackbarService.showSuccess('LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE');
 

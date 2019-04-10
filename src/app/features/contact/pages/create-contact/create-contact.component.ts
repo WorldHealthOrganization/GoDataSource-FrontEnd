@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -10,7 +9,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -29,6 +28,8 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-create-contact',
@@ -122,15 +123,17 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                 // get selected outbreak
                 this.outbreakDataService
                     .getSelectedOutbreak()
-                    .catch((err) => {
-                        // show error message
-                        this.snackbarService.showError(err.message);
+                    .pipe(
+                        catchError((err) => {
+                            // show error message
+                            this.snackbarService.showError(err.message);
 
-                        // redirect to cases
-                        this.disableDirtyConfirm();
-                        this.router.navigate(['/cases']);
-                        return ErrorObservable.create(err);
-                    })
+                            // redirect to cases
+                            this.disableDirtyConfirm();
+                            this.router.navigate(['/cases']);
+                            return throwError(err);
+                        })
+                    )
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.outbreakId = selectedOutbreak.id;
 
@@ -143,7 +146,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                         this.contactData.visualId = this.visualIDTranslateData.mask;
 
                         // set visual ID validator
-                        this.contactIdMaskValidator = Observable.create((observer) => {
+                        this.contactIdMaskValidator = new Observable((observer) => {
                             this.contactDataService.checkContactVisualIDValidity(
                                 selectedOutbreak.id,
                                 this.visualIDTranslateData.mask,
@@ -157,20 +160,22 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                         // retrieve Case/Event information
                         this.entityDataService
                             .getEntity(this.entityType, selectedOutbreak.id, this.entityId)
-                            .catch((err) => {
-                                // show error message
-                                this.snackbarService.showError(err.message);
+                            .pipe(
+                                catchError((err) => {
+                                    // show error message
+                                    this.snackbarService.showError(err.message);
 
-                                // navigate to Cases/Events listing page
-                                this.disableDirtyConfirm();
-                                if (this.entityType === EntityType.EVENT) {
-                                    this.router.navigate(['/events']);
-                                } else {
-                                    this.router.navigate(['/cases']);
-                                }
+                                    // navigate to Cases/Events listing page
+                                    this.disableDirtyConfirm();
+                                    if (this.entityType === EntityType.EVENT) {
+                                        this.router.navigate(['/events']);
+                                    } else {
+                                        this.router.navigate(['/cases']);
+                                    }
 
-                                return ErrorObservable.create(err);
-                            })
+                                    return throwError(err);
+                                })
+                            )
                             .subscribe((relatedEntityData: CaseModel|EventModel) => {
                                 // initialize Case/Event
                                 this.relatedEntityData = relatedEntityData;
@@ -239,28 +244,32 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.contactDataService
                 .findDuplicates(this.outbreakId, dirtyFields)
-                .catch((err) => {
-                    this.snackbarService.showApiError(err);
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
 
-                    // hide dialog
-                    loadingDialog.close();
+                        // hide dialog
+                        loadingDialog.close();
 
-                    return ErrorObservable.create(err);
-                })
+                        return throwError(err);
+                    })
+                )
                 .subscribe((contactDuplicates: EntityDuplicatesModel) => {
                     // add the new Contact
                     const runCreateContact = () => {
                         // add the new Contact
                         this.contactDataService
                             .createContact(this.outbreakId, dirtyFields)
-                            .catch((err) => {
-                                this.snackbarService.showApiError(err);
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showApiError(err);
 
-                                // hide dialog
-                                loadingDialog.close();
+                                    // hide dialog
+                                    loadingDialog.close();
 
-                                return ErrorObservable.create(err);
-                            })
+                                    return throwError(err);
+                                })
+                            )
                             .subscribe((contactData: ContactModel) => {
                                 this.relationshipDataService
                                     .createRelationship(
@@ -269,24 +278,23 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                                         contactData.id,
                                         relationship
                                     )
-                                    .catch((err) => {
-                                        // display error message
-                                        this.snackbarService.showApiError(err);
+                                    .pipe(
+                                        catchError((err) => {
+                                            // display error message
+                                            this.snackbarService.showApiError(err);
 
-                                        // remove contact
-                                        this.contactDataService
-                                            .deleteContact(this.outbreakId, contactData.id)
-                                            .catch((errDC) => {
-                                                return ErrorObservable.create(errDC);
-                                            })
-                                            .subscribe();
+                                            // remove contact
+                                            this.contactDataService
+                                                .deleteContact(this.outbreakId, contactData.id)
+                                                .subscribe();
 
-                                        // hide dialog
-                                        loadingDialog.close();
+                                            // hide dialog
+                                            loadingDialog.close();
 
-                                        // finished
-                                        return ErrorObservable.create(err);
-                                    })
+                                            // finished
+                                            return throwError(err);
+                                        })
+                                    )
                                     .subscribe(() => {
                                         this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
 

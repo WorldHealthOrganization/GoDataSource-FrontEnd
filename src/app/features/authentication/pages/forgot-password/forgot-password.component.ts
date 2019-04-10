@@ -1,7 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
@@ -9,6 +7,8 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 import * as _ from 'lodash';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-forgot-password',
@@ -48,13 +48,13 @@ export class ForgotPasswordComponent implements OnInit {
             // send the "password reset" e-mail
             this.userDataService
                 .forgotPassword(dirtyFields)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showError(err.message);
+                        return throwError(err);
+                    })
+                )
                 .subscribe(() => {
-
                     this.snackbarService.showSuccess(
                         `LNG_PAGE_FORGOT_PASSWORD_ACTION_SEND_EMAIL_SUCCESS_MESSAGE`,
                         {email: dirtyFields.email}

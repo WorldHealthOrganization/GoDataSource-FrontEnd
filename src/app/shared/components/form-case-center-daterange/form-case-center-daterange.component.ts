@@ -5,7 +5,7 @@ import { CaseCenterDateRangeModel } from '../../../core/models/case-center-date-
 import { Moment } from 'moment';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { DateType } from '../../../core/enums/date-types.enum';
 
 @Component({

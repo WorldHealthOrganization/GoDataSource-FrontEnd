@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 import { LoggingDataService } from '../data/logging.data.service';
 import { environment } from '../../../../environments/environment';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Injectable()
 export class LoggerService {
@@ -11,7 +13,8 @@ export class LoggerService {
 
     constructor(
         private loggingDataService: LoggingDataService
-    ) {}
+    ) {
+    }
 
     /**
      * Add a log message
@@ -51,12 +54,14 @@ export class LoggerService {
             !this.apiLoggerCrashed
         ) {
             this.loggingDataService.log([logMessage])
-                .catch((err) => {
-                    // do not make API calls for next logs
-                    this.apiLoggerCrashed = true;
+                .pipe(
+                    catchError((err) => {
+                        // do not make API calls for next logs
+                        this.apiLoggerCrashed = true;
 
-                    return err;
-                })
+                        return throwError(err);
+                    })
+                )
                 .subscribe();
         }
     }

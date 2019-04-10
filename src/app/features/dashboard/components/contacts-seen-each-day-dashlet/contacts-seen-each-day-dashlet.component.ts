@@ -3,7 +3,7 @@ import { MetricContactsSeenEachDays } from '../../../../core/models/metrics/metr
 import { Constants } from '../../../../core/models/constants';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-contacts-seen-each-day-dashlet',

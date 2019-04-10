@@ -2,9 +2,8 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -15,7 +14,8 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import * as _ from 'lodash';
-import { tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-clusters-list',
@@ -84,7 +84,7 @@ export class ClustersListComponent extends ListComponent implements OnInit {
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.clustersListCount$ = this.clusterDataService.getClustersCount(this.selectedOutbreak.id, countQueryBuilder).share();
+            this.clustersListCount$ = this.clusterDataService.getClustersCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }
 
@@ -137,11 +137,12 @@ export class ClustersListComponent extends ListComponent implements OnInit {
                     // delete cluster
                     this.clusterDataService
                         .deleteCluster(this.selectedOutbreak.id, clusterModel.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_SUCCESS_MESSAGE');
 

@@ -2,9 +2,9 @@ import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ActivatedRoute, Router } from '@angular/router';
-import 'rxjs/add/operator/filter';
+
 import { LocationModel } from '../../../../core/models/location.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -12,7 +12,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { DialogAnswerButton, LoadingDialogModel } from '../../../../shared/components';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
@@ -20,11 +19,12 @@ import { ErrorCodes } from '../../../../core/enums/error-codes.enum';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { FormLocationDropdownComponent, LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
-import { tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-locations-list',
@@ -168,7 +168,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         // remove paginator from query builder
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
-        this.locationsListCount$ = this.locationDataService.getLocationsCountByParent(this.parentId, countQueryBuilder).share();
+        this.locationsListCount$ = this.locationDataService.getLocationsCountByParent(this.parentId, countQueryBuilder).pipe(share());
     }
 
     /**
@@ -182,31 +182,33 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                     // delete record
                     this.locationDataService
                         .deleteLocation(location.id)
-                        .catch((err: {
-                            message: string,
-                            code: ErrorCodes,
-                            details: {
-                                id: string,
-                                model: string
-                            }
-                        }) => {
-                            // check if we have a model in use error
-                            if (err.code === ErrorCodes.MODEL_IN_USE) {
-                                this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_LOCATION_USED', location)
-                                    .subscribe((answerC: DialogAnswer) => {
-                                        if (answerC.button === DialogAnswerButton.Yes) {
-                                            // redirect to usage page where we can make changes
-                                            this.router.navigate(['/locations', err.details.id, 'usage']);
-                                        }
-                                    });
-                            } else if (err.code === ErrorCodes.DELETE_PARENT_MODEL) {
-                                this.snackbarService.showError('LNG_DIALOG_CONFIRM_LOCATION_HAS_CHILDREN', location);
-                            } else {
-                                this.snackbarService.showError(err.message);
-                            }
+                        .pipe(
+                            catchError((err: {
+                                message: string,
+                                code: ErrorCodes,
+                                details: {
+                                    id: string,
+                                    model: string
+                                }
+                            }) => {
+                                // check if we have a model in use error
+                                if (err.code === ErrorCodes.MODEL_IN_USE) {
+                                    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_LOCATION_USED', location)
+                                        .subscribe((answerC: DialogAnswer) => {
+                                            if (answerC.button === DialogAnswerButton.Yes) {
+                                                // redirect to usage page where we can make changes
+                                                this.router.navigate(['/locations', err.details.id, 'usage']);
+                                            }
+                                        });
+                                } else if (err.code === ErrorCodes.DELETE_PARENT_MODEL) {
+                                    this.snackbarService.showError('LNG_DIALOG_CONFIRM_LOCATION_HAS_CHILDREN', location);
+                                } else {
+                                    this.snackbarService.showError(err.message);
+                                }
 
-                            return ErrorObservable.create(err);
-                        })
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
 

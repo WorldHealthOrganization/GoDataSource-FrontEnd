@@ -1,20 +1,18 @@
 import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Input, Output, EventEmitter, HostBinding, ViewChild, OnDestroy } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
-import { GroupBase } from '../../xt-forms/core';
+import { ElementBaseFailure, GroupBase } from '../../xt-forms/core';
 import { LocationDataService } from '../../../core/services/data/location.data.service';
 import { HierarchicalLocationModel } from '../../../core/models/hierarchical-location.model';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
-import 'rxjs/add/operator/debounceTime';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
-import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/operator/debounceTime';
-import { Subscription } from 'rxjs/Subscription';
+import { Subject ,  Subscription } from 'rxjs';
 import { ErrorMessage } from '../../xt-forms/core/error-message';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { NgOption, NgSelectComponent } from '@ng-select/ng-select';
+import { catchError, debounceTime } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 export class LocationAutoItem {
     constructor(
@@ -127,7 +125,9 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
 
         // handle server side search
         this.locationInput$
-            .debounceTime(500)
+            .pipe(
+                debounceTime(500)
+            )
             .subscribe((searchTerm: string) => {
                 // display loading while getting data
                 this.locationLoading = true;
@@ -230,10 +230,12 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
 
         // retrieve hierarchic location list
         const request = locationsList$
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    return throwError(err);
+                })
+            )
             .subscribe((hierarchicalLocation: HierarchicalLocationModel[]) => {
                 // list to check
                 const locationItems = [];
@@ -344,12 +346,15 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     /**
      * Failure messages
      */
-    get ngFailureMessages(): string[] {
+    get ngFailureMessages(): ElementBaseFailure[] {
         const errors = this.groupForm && this.groupForm.controls[this.name] ?
             this.groupForm.controls[this.name].errors :
             null;
         return errors ?
-            _.map(_.keys(errors), (errorKey) => new ErrorMessage(null, errorKey).getMessage()) :
+            _.map(
+                _.keys(errors),
+                (errorKey) => new ErrorMessage(null, errorKey).getMessage()
+            ) :
             [];
     }
 

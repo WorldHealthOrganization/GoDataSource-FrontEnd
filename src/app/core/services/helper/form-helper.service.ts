@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import 'rxjs/add/operator/map';
+
 import { AbstractControl, FormControl, NgForm } from '@angular/forms';
 import * as _ from 'lodash';
 import { SnackbarService } from './snackbar.service';
@@ -11,7 +11,8 @@ export class FormHelperService {
     constructor(
         private snackbarService: SnackbarService,
         private i18nService: I18nService
-    ) {}
+    ) {
+    }
 
     /**
      * Retrieve control value
@@ -151,7 +152,7 @@ export class FormHelperService {
                         !_.isEmpty(name)
                     ) {
                         // determine directive
-                        const directive = _.find((controlsForm as any)._directives, { name: name });
+                        const directive = _.find((controlsForm as any)._directives, {name: name}) as any;
                         if (
                             directive &&
                             directive.valueAccessor

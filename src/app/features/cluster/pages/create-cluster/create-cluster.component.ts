@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -12,6 +11,8 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-create-cluster',
@@ -51,7 +52,6 @@ export class CreateClusterComponent extends ConfirmOnFormChanges implements OnIn
     }
 
     createNewCluster(stepForms: NgForm[]) {
-
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
@@ -63,11 +63,13 @@ export class CreateClusterComponent extends ConfirmOnFormChanges implements OnIn
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.clusterDataService
                 .createCluster(this.selectedOutbreak.id, dirtyFields)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    loadingDialog.close();
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        loadingDialog.close();
+                        return throwError(err);
+                    })
+                )
                 .subscribe((newCluser: ClusterModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_SUCCESS_MESSAGE');
 

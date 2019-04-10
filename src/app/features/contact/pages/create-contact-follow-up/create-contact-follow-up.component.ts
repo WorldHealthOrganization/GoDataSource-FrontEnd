@@ -8,17 +8,18 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { NgForm } from '@angular/forms';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { EntityType } from '../../../../core/models/entity-type';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { Constants } from '../../../../core/models/constants';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-create-follow-up',
@@ -90,13 +91,16 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
             // retrieve contact information
             this.contactDataService
                 .getContact(this.selectedOutbreak.id, this.contactId)
-                .catch((err) => {
-                    this.snackbarService.showApiError(err);
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
 
-                    this.disableDirtyConfirm();
-                    this.router.navigate(['/contacts']);
-                    return ErrorObservable.create(err);
-                })
+                        this.disableDirtyConfirm();
+                        this.router.navigate(['/contacts']);
+
+                        return throwError(err);
+                    })
+                )
                 .subscribe((contactData: ContactModel) => {
                     this.contactData = contactData;
 
@@ -133,11 +137,13 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.followUpsDataService
                 .createFollowUp(this.selectedOutbreak.id, this.contactData.id, dirtyFields)
-                .catch((err) => {
-                    this.snackbarService.showApiError(err);
-                    loadingDialog.close();
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        loadingDialog.close();
+                        return throwError(err);
+                    })
+                )
                 .subscribe((newContactFollowup: FollowUpModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE');
 

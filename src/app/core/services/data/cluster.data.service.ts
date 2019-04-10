@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { ClusterModel } from '../../models/cluster.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
@@ -10,6 +10,7 @@ import { ContactModel } from '../../models/contact.model';
 import { EntityModel } from '../../models/entity.model';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../models/label-value-pair';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class ClusterDataService {
@@ -46,11 +47,13 @@ export class ClusterDataService {
      */
     getClusterListAsLabelValue(outbreakId: string): Observable<LabelValuePair[]> {
         return this.getClusterList(outbreakId)
-                .map((clusters) => {
+            .pipe(
+                map((clusters) => {
                     return _.map(clusters, (cluster: ClusterModel) => {
                         return new LabelValuePair(cluster.name, cluster.id);
                     });
-                });
+                })
+            );
     }
 
     /**
@@ -123,7 +126,7 @@ export class ClusterDataService {
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<(CaseModel | ContactModel | EventModel)[]>}
      */
-    getClusterPeople (
+    getClusterPeople(
         outbreakId: string,
         clusterId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
@@ -140,11 +143,13 @@ export class ClusterDataService {
         const filter = qb.buildQuery();
 
         return this.http.get(`/outbreaks/${outbreakId}/clusters/${clusterId}/people?filter=${filter}`)
-            .map((peopleList) => {
-                return _.map(peopleList, (entity) => {
-                    return new EntityModel(entity).model;
-                });
-            });
+            .pipe(
+                map((peopleList) => {
+                    return _.map(peopleList, (entity) => {
+                        return new EntityModel(entity).model;
+                    });
+                })
+            );
     }
 
     /**

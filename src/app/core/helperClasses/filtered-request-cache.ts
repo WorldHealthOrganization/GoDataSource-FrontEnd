@@ -1,4 +1,5 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
+import { share, tap } from 'rxjs/operators';
 
 export class FilteredRequestCache {
     private static sharedRequests: {
@@ -24,9 +25,13 @@ export class FilteredRequestCache {
             }
 
             // create observer handler
-            observer = observerCreator().do(() => {
-                delete FilteredRequestCache.sharedRequests[key][filter];
-            }).share();
+            observer = observerCreator()
+                .pipe(
+                    tap(() => {
+                        delete FilteredRequestCache.sharedRequests[key][filter];
+                    }),
+                    share()
+                );
 
             // cache request
             FilteredRequestCache.sharedRequests[key][filter] = observer;

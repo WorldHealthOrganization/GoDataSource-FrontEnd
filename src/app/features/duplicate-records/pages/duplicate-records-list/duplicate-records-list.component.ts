@@ -7,7 +7,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import * as _ from 'lodash';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { PeoplePossibleDuplicateModel } from '../../../../core/models/people-possible-duplicate.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { AddressModel } from '../../../../core/models/address.model';
@@ -15,9 +15,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { FormControl, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { EntityModel } from '../../../../core/models/entity.model';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { tap } from 'rxjs/operators';
+import { share, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-duplicate-records-list',
@@ -62,9 +60,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
         private router: Router,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
-        private outbreakDataService: OutbreakDataService,
-        private dialogService: DialogService,
-        private genericDataService: GenericDataService
+        private outbreakDataService: OutbreakDataService
     ) {
         super(
             snackbarService
@@ -114,7 +110,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.duplicatesListCount$ = this.outbreakDataService.getPeoplePossibleDuplicatesCount(this.selectedOutbreak.id, countQueryBuilder).share();
+            this.duplicatesListCount$ = this.outbreakDataService.getPeoplePossibleDuplicatesCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }
 

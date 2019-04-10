@@ -3,7 +3,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -18,7 +18,7 @@ import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { tap } from 'rxjs/operators';
+import { map, share, tap } from 'rxjs/operators';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 
@@ -74,15 +74,18 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         super.ngOnInit();
 
         // reference data
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
-        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).share();
-        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION).share();
-        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).share();
-        this.personTypesList$ = personTypes$.map((data: ReferenceDataCategoryModel) => {
-            return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
-                new LabelValuePair(entry.value, entry.id)
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
+        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).pipe(share());
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION).pipe(share());
+        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
+        this.personTypesList$ = personTypes$
+            .pipe(
+                map((data: ReferenceDataCategoryModel) => {
+                    return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
+                        new LabelValuePair(entry.value, entry.id)
+                    );
+                })
             );
-        });
         personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
             this.personTypesListMap = _.transform(
                 personTypeCategory.entries,
@@ -198,7 +201,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
                     this.entityId,
                     this.queryBuilder
                 )
-                .share();
+                .pipe(share());
         }
     }
 
@@ -265,8 +268,6 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
 
     /**
      * @Overrides parent method
-     *
-     * @param data
      */
     public sortBy(
         data: any,
@@ -310,7 +311,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     /**
      * Retrieve Person Type color
      */
-    getPersonTypeColor(personType) {
+    getPersonTypeColor(personType: string) {
         const personTypeData = _.get(this.personTypesListMap, personType);
         return _.get(personTypeData, 'colorCode', '');
     }

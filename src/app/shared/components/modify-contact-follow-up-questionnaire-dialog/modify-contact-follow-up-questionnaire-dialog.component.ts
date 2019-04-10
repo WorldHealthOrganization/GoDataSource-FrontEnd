@@ -7,17 +7,19 @@ import { FollowUpsDataService } from '../../../core/services/data/follow-ups.dat
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 export class ModifyContactFollowUpQuestionnaireData {
     constructor(
         public followUp: FollowUpModel,
         public outbreak: OutbreakModel
-    ) {}
+    ) {
+    }
 }
 
 @Component({
@@ -50,7 +52,8 @@ export class ModifyContactFollowUpQuestionnaireDialogComponent implements OnInit
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService
-    ) {}
+    ) {
+    }
 
     ngOnInit() {
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
@@ -88,24 +91,28 @@ export class ModifyContactFollowUpQuestionnaireDialogComponent implements OnInit
             this.data.followUp.personId,
             this.data.followUp.id,
             dirtyFields
-        ).catch((err) => {
-            this.loading = false;
-            this.snackbarService.showError(err.message);
-            return ErrorObservable.create(err);
-        }).subscribe(() => {
-            this.snackbarService.showSuccess('LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_BUTTON_SAVE_SUCCESS_MESSAGE');
+        )
+            .pipe(
+                catchError((err) => {
+                    this.loading = false;
+                    this.snackbarService.showError(err.message);
+                    return throwError(err);
+                })
+            )
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_BUTTON_SAVE_SUCCESS_MESSAGE');
 
-            // close popup
-            this.dialogRef.close(new DialogAnswer(
-                DialogAnswerButton.Yes,
-                new DialogAnswerInputValue(
-                    new FollowUpModel({
-                        ...this.data.followUp,
-                        ...dirtyFields
-                    })
-                )
-            ));
-        });
+                // close popup
+                this.dialogRef.close(new DialogAnswer(
+                    DialogAnswerButton.Yes,
+                    new DialogAnswerInputValue(
+                        new FollowUpModel({
+                            ...this.data.followUp,
+                            ...dirtyFields
+                        })
+                    )
+                ));
+            });
 
     }
 }

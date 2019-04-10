@@ -1,7 +1,10 @@
 <div class="form-element"
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
-    <form #groupForm="ngForm">
+    <form
+        #groupForm="ngForm"
+        fxLayout="column"
+    >
         <div *ngFor="let inputValue of inputValues; let i = index" fxFlex fxLayout="row"
              fxLayoutAlign="start center">
             <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
@@ -36,6 +39,8 @@
             </button>
         </div>
 
-        <button type="button" mat-button color="primary" (click)="add()">{{ 'LNG_INPUT_LABEL_ADD_INPUT' | translate }}</button>
+        <div fxLayout="row">
+            <button type="button" mat-button color="primary" (click)="add()">{{ 'LNG_INPUT_LABEL_ADD_INPUT' | translate }}</button>
+        </div>
     </form>
 </div>

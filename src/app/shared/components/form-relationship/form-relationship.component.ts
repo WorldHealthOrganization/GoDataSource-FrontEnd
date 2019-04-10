@@ -3,7 +3,7 @@ import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, 
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, FormControl } from '@angular/forms';
 import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
 import { RelationshipModel } from '../../../core/models/relationship.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ClusterDataService } from '../../../core/services/data/cluster.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
@@ -12,6 +12,7 @@ import { ReferenceDataDataService } from '../../../core/services/data/reference-
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { EntityType } from '../../../core/models/entity-type';
 import { Constants } from '../../../core/models/constants';
+import { share } from 'rxjs/operators';
 
 @Component({
     selector: 'app-form-relationship',
@@ -69,7 +70,7 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
 
         // reference data
         if (!this.certaintyLevelOptions$) {
-            this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL).share();
+            this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL).pipe(share());
         }
         if (!this.exposureTypeOptions$) {
             this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE);

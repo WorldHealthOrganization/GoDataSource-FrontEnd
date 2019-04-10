@@ -11,7 +11,7 @@
             [matDatepicker]="pickerStartDate"
             [disabled]="disabled"
             (blur)="onBlur()"
-            (input)="onChange()"
+            (dateInput)="onChange()"
             (click)="showDatePickerDialog(pickerStartDate)"
             (focus)="showDatePickerDialog(pickerStartDate)"
             [max]="maxDate"

@@ -4,17 +4,17 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
-import { tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-outbreak-templates-list',
@@ -121,10 +121,12 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.outbreakTemplateDataService
                         .deleteOutbreakTemplate(outbreakTemplate.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             // reload user data to get the updated data regarding active outbreak
                             this.authDataService

@@ -2,7 +2,6 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
@@ -13,6 +12,8 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-modify-language',
@@ -79,24 +80,28 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.languageDataService
             .modifyLanguage(this.languageId, dirtyFields)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
-            .switchMap((modifiedLanguage) => {
-                // remove help items from cache
-                this.cacheService.remove(CacheKey.LANGUAGES);
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    loadingDialog.close();
+                    return throwError(err);
+                }),
+                switchMap((modifiedLanguage) => {
+                    // remove help items from cache
+                    this.cacheService.remove(CacheKey.LANGUAGES);
 
-                // update language tokens
-                return this.languageDataService.getLanguagesList()
-                    .catch((err) => {
-                        this.snackbarService.showApiError(err);
-                        loadingDialog.close();
-                        return ErrorObservable.create(err);
-                    })
-                    .map(() => modifiedLanguage);
-            })
+                    // update language tokens
+                    return this.languageDataService.getLanguagesList()
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                loadingDialog.close();
+                                return throwError(err);
+                            }),
+                            map(() => modifiedLanguage)
+                        );
+                })
+            )
             .subscribe((modifiedLanguage: LanguageModel) => {
                 // update model
                 this.languageData = modifiedLanguage;

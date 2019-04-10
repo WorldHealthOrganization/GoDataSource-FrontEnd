@@ -6,7 +6,7 @@ import { NgForm } from '@angular/forms';
 import { Constants } from '../../../core/models/constants';
 import * as moment from 'moment';
 import { Moment } from 'moment';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 export enum DialogAnswerButton {
     Yes = 'Yes',

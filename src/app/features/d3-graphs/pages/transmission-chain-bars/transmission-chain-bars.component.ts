@@ -10,13 +10,14 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TransmissionChainBarsDataService } from '../../services/transmission-chain-bars.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-transmission-chain-bars',
@@ -132,17 +133,19 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     exportChain() {
         this.showLoadingDialog();
 
-        domtoimage.toPng(this.chartContainer.nativeElement)
+        (domtoimage as any).toPng(this.chartContainer.nativeElement)
             .then((dataUrl) => {
                 const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
 
                 this.importExportDataService
                     .exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
-                    .catch((err) => {
-                        this.snackbarService.showApiError(err);
-                        this.closeLoadingDialog();
-                        return ErrorObservable.create(err);
-                    })
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            this.closeLoadingDialog();
+                            return throwError(err);
+                        })
+                    )
                     .subscribe((blob) => {
                         const fileName = this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE');
                         FileSaver.saveAs(

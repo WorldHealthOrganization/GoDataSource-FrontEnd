@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import * as _ from 'lodash';
 import { CaseModel } from '../../models/case.model';
 import * as moment from 'moment';
@@ -48,7 +48,7 @@ export const CaseDataServiceMock: {
         outbreakId: string,
         caseId: string
     ): Observable<CaseModel> => {
-        return Observable.of(
+        return of(
             CaseDataServiceMock.cases[outbreakId] ?
                 _.find(CaseDataServiceMock.cases[outbreakId], { id: caseId }) :
                 undefined

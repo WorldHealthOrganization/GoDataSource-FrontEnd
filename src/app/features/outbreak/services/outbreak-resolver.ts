@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { ActivatedRouteSnapshot, Resolve } from '@angular/router';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';

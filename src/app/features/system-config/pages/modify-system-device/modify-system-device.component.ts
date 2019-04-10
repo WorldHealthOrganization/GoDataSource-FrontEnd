@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -9,6 +8,8 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DeviceModel } from '../../../../core/models/device.model';
 import { DeviceDataService } from '../../../../core/services/data/device.data.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-modify-system-device',
@@ -95,11 +96,13 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.deviceDataService
             .modifyDevice(this.deviceId, dirtyFields)
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
             .subscribe((modifiedDevice: DeviceModel) => {
                 // update model
                 this.deviceData = modifiedDevice;

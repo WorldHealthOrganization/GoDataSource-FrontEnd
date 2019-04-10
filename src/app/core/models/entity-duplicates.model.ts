@@ -6,11 +6,10 @@ export class EntityDuplicatesModel {
 
     constructor(data = null) {
         this.duplicates = _.map(
-            _.get(data, 'duplicates'),
+            _.get(data, 'duplicates', []),
             (childData) => {
                 return new EntityModel(childData);
-            },
-            []
+            }
         );
     }
 }

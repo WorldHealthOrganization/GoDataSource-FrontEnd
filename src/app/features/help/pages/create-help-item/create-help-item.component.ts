@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -12,8 +11,9 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import * as _ from 'lodash';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
-import 'rxjs/add/operator/switchMap';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-create-help-item',
@@ -99,21 +99,25 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnI
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.helpDataService
                 .createHelpItem(this.categoryId, dirtyFields)
-                .catch((err) => {
-                    this.snackbarService.showApiError(err);
-                    loadingDialog.close();
-                    return ErrorObservable.create(err);
-                })
-                .switchMap((newHelpItem) => {
-                    // update language tokens to get the translation of name and description
-                    return this.i18nService.loadUserLanguage()
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err);
-                            loadingDialog.close();
-                            return ErrorObservable.create(err);
-                        })
-                        .map(() => newHelpItem);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        loadingDialog.close();
+                        return throwError(err);
+                    }),
+                    switchMap((newHelpItem) => {
+                        // update language tokens to get the translation of name and description
+                        return this.i18nService.loadUserLanguage()
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showApiError(err);
+                                    loadingDialog.close();
+                                    return throwError(err);
+                                }),
+                                map(() => newHelpItem)
+                            );
+                    })
+                )
                 .subscribe((newHelpItem) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_HELP_ITEM_SUCCESS_MESSAGE');
 

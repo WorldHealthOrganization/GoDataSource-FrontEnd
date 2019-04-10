@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -11,8 +10,10 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-create-location',
@@ -115,11 +116,13 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.locationDataService
                 .createLocation(dirtyFields)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    loadingDialog.close();
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showError(err.message);
+                        loadingDialog.close();
+                        return throwError(err);
+                    })
+                )
                 .subscribe((newLocation: LocationModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_SUCCESS_MESSAGE');
 

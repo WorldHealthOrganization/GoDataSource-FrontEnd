@@ -9,8 +9,7 @@ import { Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Subscriber } from 'rxjs/Subscriber';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscriber, Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
@@ -29,6 +28,7 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
         this._globalFilterDate = globalFilterDate;
         this.refreshDataCaller.call();
     }
+
     get globalFilterDate(): Moment {
         return this._globalFilterDate;
     }
@@ -39,6 +39,7 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
         this._globalFilterLocationId = globalFilterLocationId;
         this.refreshDataCaller.call();
     }
+
     get globalFilterLocationId(): string {
         return this._globalFilterLocationId;
     }
@@ -66,7 +67,8 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
         private referenceDataDataService: ReferenceDataDataService,
         private outbreakDataService: OutbreakDataService,
         private router: Router
-    ) {}
+    ) {
+    }
 
     ngOnInit() {
         // get case person type color
@@ -174,7 +176,7 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
 
         // do we need to include global filters ?
         if (_.isEmpty(global)) {
-            this.router.navigate(['/transmission-chains'], { queryParams: otherParams });
+            this.router.navigate(['/transmission-chains'], {queryParams: otherParams});
         } else {
             this.router.navigate(['/transmission-chains'], {
                 queryParams: {

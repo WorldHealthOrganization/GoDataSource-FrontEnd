@@ -14,10 +14,11 @@ import { LoadingDialogModel } from '../../../../shared/components/index';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { GanttChartDelayOnsetDashletComponent } from '../../components/gantt-chart-delay-onset-dashlet/gantt-chart-delay-onset-dashlet.component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Constants } from '../../../../core/models/constants';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-gantt-chart',
@@ -128,11 +129,13 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
                 .subscribe((pngBase64) => {
                     this.importExportDataService
                         .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err);
-                            this.closeLoadingDialog();
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                this.closeLoadingDialog();
+                                return throwError(err);
+                            })
+                        )
                         .subscribe((blob) => {
                             this.downloadFile(blob, 'LNG_PAGE_GANTT_CHART_REPORT_LABEL');
                             this.closeLoadingDialog();

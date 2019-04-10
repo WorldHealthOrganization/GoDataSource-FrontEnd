@@ -7,14 +7,15 @@ import { FormHelperService } from '../../../core/services/helper/form-helper.ser
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { GlobalEntitySearchDataService } from '../../../core/services/data/global-entity-search.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { EntityModel } from '../../../core/models/entity.model';
 import { Router } from '@angular/router';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { LoadingDialogModel } from '../loading-dialog/loading-dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-global-entity-search',
@@ -92,12 +93,14 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                 this.showLoadingDialog();
                 // search for the entity
                 this.globalEntitySearchDataService.searchEntity(this.selectedOutbreak.id, fields.globalSearchValue)
-                    .catch((err) => {
-                        this.closeLoadingDialog();
-                        this.snackbarService.showApiError(err);
+                    .pipe(
+                        catchError((err) => {
+                            this.closeLoadingDialog();
+                            this.snackbarService.showApiError(err);
 
-                        return ErrorObservable.create(err);
-                    })
+                            return throwError(err);
+                        })
+                    )
                     .subscribe((results) => {
                         if (!_.isEmpty(results)) {
                             const foundEntity = results[0];

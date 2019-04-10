@@ -9,10 +9,9 @@ import { SVGGantt, CanvasGantt, StrGantt } from 'gantt';
 import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../../../core/models/metrics/metric-cases-delay-between-onset-lab-test.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import * as _ from 'lodash';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription ,  Subscriber } from 'rxjs';
 import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Subscriber } from 'rxjs/Subscriber';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({

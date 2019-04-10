@@ -1,6 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -11,6 +10,8 @@ import { LanguageModel } from '../../../../core/models/language.model';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-create-language',
@@ -53,11 +54,13 @@ export class CreateLanguageComponent extends ConfirmOnFormChanges {
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.languageDataService
                 .createLanguage(dirtyFields)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    loadingDialog.close();
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showError(err.message);
+                        loadingDialog.close();
+                        return throwError(err);
+                    })
+                )
                 .subscribe((newLanguage: LanguageModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_SUCCESS_MESSAGE');
 

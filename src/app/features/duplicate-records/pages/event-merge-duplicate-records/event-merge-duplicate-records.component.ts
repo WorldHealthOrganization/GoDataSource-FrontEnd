@@ -12,8 +12,9 @@ import { EntityModel } from '../../../../core/models/entity.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { AddressModel } from '../../../../core/models/address.model';
 import * as _ from 'lodash';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { EntityType } from '../../../../core/models/entity-type';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-event-merge-duplicate-records',
@@ -191,11 +192,15 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
                         EntityType.EVENT,
                         this.mergeRecordIds,
                         dirtyFields
-                    ).catch((err) => {
-                        this.displayLoading = false;
-                        this.snackbarService.showError(err.message);
-                        return ErrorObservable.create(err);
-                    }).subscribe(() => {
+                    )
+                    .pipe(
+                        catchError((err) => {
+                            this.displayLoading = false;
+                            this.snackbarService.showError(err.message);
+                            return throwError(err);
+                        })
+                    )
+                    .subscribe(() => {
                         this.snackbarService.showSuccess('LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENTS_SUCCESS_MESSAGE');
 
                         // navigate to listing page
