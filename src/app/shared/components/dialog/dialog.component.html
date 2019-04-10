@@ -1,13 +1,23 @@
 <div
     class="dialog-main app-theme"
+    fxLayout="column"
 >
     <div
         class="dialog-main-msg"
         [innerHTML]="confirmData?.message | translate:confirmData?.translateData">
     </div>
 
-    <form #form="ngForm">
-        <div *ngIf="confirmData?.customInput">
+    <div
+        *ngIf="confirmData?.additionalInfo"
+        class="dialog-additional-info"
+        [innerHTML]="confirmData?.additionalInfo| translate:confirmData?.translateData">
+    </div>
+
+    <form #form="ngForm" fxLayout="column">
+        <div
+            *ngIf="confirmData?.customInput"
+            fxLayout="column"
+        >
             <!-- Single input -->
             <ng-container *ngIf="!confirmData?.fieldsList || confirmData?.fieldsList.length < 1">
                 <ng-container *ngIf="confirmData?.customInputOptions">
@@ -39,7 +49,7 @@
                     *ngFor="let field of confirmData.fieldsList">
                     <div
                         *ngIf="field.isVisible(dialogAnswerInputValue.value)"
-                        fxFlex fxLayout="column" fxLayoutGap="20px">
+                        fxLayout="column" fxLayoutGap="20px">
 
                         <!-- Select -->
                         <app-form-select
@@ -146,7 +156,7 @@
             </ng-container>
         </div>
 
-        <div fxFlex fxLayout="row" fxLayoutAlign="end">
+        <div fxLayout="row" fxLayoutAlign="end">
             <button
                 *ngFor="let dialogButton of confirmData?.buttons"
                 mat-button

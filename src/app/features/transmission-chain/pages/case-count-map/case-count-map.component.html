@@ -44,13 +44,16 @@
 </app-topnav>
 
 <mat-card
-    class="page-section page-content">
+    class="page-section page-content"
+    fxLayout="column"
+>
 
     <div
-        class="app-case-count-map-filters">
+        class="app-case-count-map-filters"
+        fxLayout="column"
+    >
         <!-- panel toggle -->
-        <div
-            fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxLayout="row" fxLayoutAlign="space-between center">
             <!-- settings toggle -->
             <button
                 mat-raised-button
@@ -62,7 +65,8 @@
         <!-- settings panel -->
         <div
             *ngIf="showSettings"
-            fxFlex fxLayout="column">
+            fxLayout="column"
+        >
             <!-- Filters -->
             <app-transmission-chain-filters
                 title="LNG_PAGE_CASE_COUNT_MAP_FILTERS_TITLE"
@@ -70,8 +74,7 @@
             </app-transmission-chain-filters>
 
             <!-- Buttons -->
-            <div
-                fxFlex fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
+            <div fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
                 <!-- Reset filters -->
                 <button
                     fxFlex="150px"
@@ -92,8 +95,7 @@
         </div>
     </div>
 
-    <div
-        fxFlex fxLayout="row" fxLayoutGap="20px">
+    <div fxLayout="row" fxLayoutGap="20px">
         <div fxFlex="200px">
             {{ 'LNG_PAGE_CASE_COUNT_MAP_DISTANCE_LABEL' | translate }} ( {{ clusterDistance }} )
         </div>

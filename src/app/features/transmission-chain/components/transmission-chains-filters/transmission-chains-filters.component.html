@@ -1,13 +1,9 @@
-<mat-card
-    fxFlex fxLayout="column" fxLayoutGap="20px">
-    <div
-        fxFlex
-        class="app-transmission-chain-filters-title">
+<mat-card fxLayout="column" fxLayoutGap="20px">
+    <div class="app-transmission-chain-filters-title">
         {{ title | translate }}
     </div>
 
-    <div
-        fxFlex fxLayout="row" fxLayoutGap="20px">
+    <div fxLayout="row" fxLayoutGap="20px">
         <!-- case classification -->
         <app-form-select
             name="classification"
@@ -33,8 +29,7 @@
         </app-form-select>
     </div>
 
-    <div
-        fxFlex fxLayout="row" fxLayoutGap="20px">
+    <div fxLayout="row" fxLayoutGap="20px">
         <!-- first name -->
         <app-form-input
             name="firstName"
@@ -52,8 +47,7 @@
         </app-form-input>
     </div>
 
-    <div
-        fxFlex fxLayout="row" fxLayoutGap="20px">
+    <div fxLayout="row" fxLayoutGap="20px">
         <!-- gender -->
         <app-form-select
             name="gender"
@@ -73,10 +67,8 @@
     </div>
 
     <!-- Age -->
-    <div
-        fxFlex fxLayout="column" fxLayoutGap="10px">
-        <div
-            fxFlex>
+    <div fxLayout="column" fxLayoutGap="10px">
+        <div>
             {{ 'LNG_ENTITY_FIELD_LABEL_AGE' | translate }}
         </div>
 
@@ -88,10 +80,8 @@
     </div>
 
     <!-- Date -->
-    <div
-        fxFlex fxLayout="column" fxLayoutGap="10px">
-        <div
-            fxFlex>
+    <div fxLayout="column" fxLayoutGap="10px">
+        <div>
             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_DATE' | translate }}
         </div>
 

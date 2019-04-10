@@ -20,9 +20,13 @@ html, body, ul, li, div, span {
     opacity: 0;
 }
 
-.stepper-wrapper {
+.stepper-navigation-buttons {
     display: flex;
     justify-content: flex-end;
+
+    >*:not(:first-child) {
+        margin-left: 5px;
+    }
 }
 
 /* Commonly used styles */
@@ -88,6 +92,7 @@ html, body, ul, li, div, span {
         @cell-padding-left: 20px;
 
         .mat-row {
+            display: flex;
             align-items: center !important;
             padding: 2px 0 !important;
             min-height: 40px !important;
@@ -149,6 +154,7 @@ html, body, ul, li, div, span {
                 }
 
                 .table-header-cell {
+                    flex: 1 1;
                     display: flex;
                     flex-direction: column;
 

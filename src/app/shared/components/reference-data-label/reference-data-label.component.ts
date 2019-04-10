@@ -18,18 +18,21 @@ export class ReferenceDataLabelComponent {
         this.referenceDataDataService
             .getReferenceDataByCategory(this.category)
             .subscribe((category: ReferenceDataCategoryModel) => {
-                // find the entry
+                // find the entries
                 const hasObjects: boolean = !_.isEmpty(entriesIds) && _.isObject(entriesIds[Object.keys(entriesIds)[0]]);
-                let entries: ReferenceDataEntryModel | ReferenceDataEntryModel[] = _.isArray(entriesIds) ?
-                    _.filter(
+                let entries: ReferenceDataEntryModel | ReferenceDataEntryModel[];
+                if (Array.isArray(entriesIds)) {
+                    entries = _.filter(
                         category.entries,
                         (entry) => {
                             return hasObjects ?
-                                _.isEmpty(_.find(entriesIds as {id: any}[], {id: entry.id})) :
+                                !_.isEmpty(_.find(entriesIds as {id: any}[], {id: entry.id})) :
                                 (_.indexOf(entriesIds as any[], entry.id) > -1);
                         }
-                    ) :
-                    _.find(category.entries, {id: entriesIds as string});
+                    );
+                } else {
+                    entries = _.find(category.entries, {id: entriesIds as string});
+                }
 
                 if (
                     entries &&

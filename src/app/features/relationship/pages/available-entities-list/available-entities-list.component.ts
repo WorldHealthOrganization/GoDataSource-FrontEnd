@@ -20,6 +20,7 @@ import { FilterModel, FilterType } from '../../../../shared/components/side-filt
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { map, share, tap } from 'rxjs/operators';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -60,7 +61,8 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         protected outbreakDataService: OutbreakDataService,
         protected entityDataService: EntityDataService,
         private genericDataService: GenericDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private relationshipDataService: RelationshipDataService
     ) {
         super(
             snackbarService, router, route,
@@ -130,13 +132,6 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         // clear query builder
         this.queryBuilder.clear();
 
-        // apply default criterias
-        // exclude current person from the list
-        this.queryBuilder.filter.where({
-            id: {
-                'neq': this.entityId
-            }
-        });
         // retrieve only available entity types
         const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(this.entityType, this.relationshipType);
         this.queryBuilder.filter.where({
@@ -176,10 +171,13 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
             this.selectedOutbreak
         ) {
             // retrieve the list of Relationships
-            this.entitiesList$ = this.entityDataService.getEntitiesList(
-                this.selectedOutbreak.id,
-                this.queryBuilder
-            )
+            this.entitiesList$ = this.relationshipDataService
+                .getEntityAvailablePeople(
+                    this.selectedOutbreak.id,
+                    this.entityType,
+                    this.entityId,
+                    this.queryBuilder
+                )
                 .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
@@ -196,7 +194,14 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.entitiesListCount$ = this.entityDataService.getEntitiesCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
+            this.entitiesListCount$ = this.relationshipDataService
+                .getEntityAvailablePeopleCount(
+                    this.selectedOutbreak.id,
+                    this.entityType,
+                    this.entityId,
+                    this.queryBuilder
+                )
+                .pipe(share());
         }
     }
 
@@ -318,6 +323,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     getTableColumns(): string[] {
         const columns = [
             'checkbox',
+            'hasDuplicate',
             'lastName',
             'firstName',
             'visualId',

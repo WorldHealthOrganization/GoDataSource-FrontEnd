@@ -180,6 +180,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
         this.dialogService.showInput(
             new DialogConfiguration({
                 message: 'LNG_DIALOG_CONFIRM_EXPORT_CHAINS_OF_TRANSMISSION',
+                additionalInfo: 'LNG_DIALOG_EXPORT_CHAIN_OF_TRANSMISSION_SCALE_INFO',
                 yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_YES',
                 required: true,
                 fieldsList: [new DialogField({
