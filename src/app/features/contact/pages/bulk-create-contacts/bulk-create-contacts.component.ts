@@ -28,6 +28,8 @@ import { NgModel } from '@angular/forms';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { throwError } from 'rxjs';
 import { catchError, map, mergeMap, share } from 'rxjs/operators';
+import { LocationModel } from '../../../../core/models/location.model';
+import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -55,8 +57,11 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     exposureFrequencyOptions$: Observable<LabelValuePair[]>;
     exposureDurationOptions$: Observable<LabelValuePair[]>;
     socialRelationshipOptions$: Observable<LabelValuePair[]>;
+    locationsListOptions$: Observable<LabelValuePair[]>;
 
     relatedEntityData: CaseModel | EventModel;
+
+    selectedLocations: LocationModel[];
 
     // sheet widget configuration
     sheetWidth = 500;
@@ -112,9 +117,6 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION).pipe(share());
         this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).pipe(share());
 
-        // configure Sheet widget
-        this.configureSheetWidget();
-
         // retrieve query params
         this.route.queryParams
             .subscribe((params: { entityType, entityId }) => {
@@ -152,6 +154,30 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     }
 
     /**
+     * Save selected locations for mapping them later
+     * @param {LocationModel[]} locations
+     */
+    setSelectedLocations(locations: LocationModel[]) {
+        this.selectedLocations = locations;
+    }
+
+    /**
+     * Set the locations list options as label value pair based on what locations are selected
+     */
+    publishLocationsAtLabelValue() {
+        this.locationsListOptions$ = new Observable((observer) => {
+            const labelValueLocations = _.map(this.selectedLocations, (location: LocationAutoItem) => {
+                return new LabelValuePair(location.label, location.id);
+            });
+            observer.next(labelValueLocations);
+            observer.complete();
+        });
+
+        // configure Sheet widget
+        this.configureSheetWidget();
+    }
+
+    /**
      * Init breadcrumbs
      */
     initBreadcrumbs() {
@@ -177,7 +203,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
      */
     @HostListener('window:resize')
     private setSheetWidth() {
-        this.sheetWidth = window.innerWidth - 340;
+        this.sheetWidth = window.innerWidth - 220;
     }
 
     /**
@@ -241,6 +267,10 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_TYPE')
                 .setProperty('contact.addresses[0].typeId')
                 .setOptions(this.addressTypesList$, this.i18nService),
+            new DropdownSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
+                .setProperty('contact.addresses[0].locationId')
+                .setOptions(this.locationsListOptions$, this.i18nService),
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
                 .setProperty('contact.addresses[0].addressLine1'),

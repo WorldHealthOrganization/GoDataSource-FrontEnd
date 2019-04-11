@@ -39,6 +39,13 @@ export const EnglishUsLang = {
          */
         'LNG_FOLLOW_UP_FIELD_LABEL_NOT_TARGETED': 'Not targeted',
         'LNG_FOLLOW_UP_FIELD_LABEL_NOT_TARGETED_DESCRIPTION': '',
+
+        /**
+         * uiBulkAddContactsPage
+         */
+        'LNG_PAGE_BULK_ADD_CONTACTS_TAB_PICK_LOCATIONS': 'Pick locations',
+        'LNG_PAGE_BULK_ADD_CONTACTS_TAB_ADD_CONTACTS': 'Add contacts'
+
         /**
          * REMOVE the tokens from below
          */
