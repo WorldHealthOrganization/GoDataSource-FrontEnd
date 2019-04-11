@@ -66,7 +66,7 @@ export const FollowUpsDataServiceMock: {
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<FollowUpModel[]> => {
         // retrieve all follow-ups from this outbreak
-        const items = FollowUpsDataServiceMock.followUps[outbreakId] ?
+        const items: FollowUpModel[] = FollowUpsDataServiceMock.followUps[outbreakId] ?
             _.transform(FollowUpsDataServiceMock.followUps[outbreakId], (accumulator, followUps) => {
                 _.each(followUps, (followUp) => {
                     accumulator.push(followUp);

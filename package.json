@@ -7,7 +7,7 @@
         "start": "ng serve --disable-host-check --port 4550",
         "build": "node --max_old_space_size=4000 ./node_modules/@angular/cli/bin/ng build --prod",
         "test": "ng test",
-        "test-debug": "ng test --config karma.conf.dev.js",
+        "test-debug": "ng run go-data-front-end:test-debug",
         "lint": "ng lint",
         "e2e": "ng e2e"
     },
