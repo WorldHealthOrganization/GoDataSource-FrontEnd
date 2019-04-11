@@ -1,10 +1,13 @@
 <div class="form-element "
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
-    <form #groupForm="ngForm">
+    <form
+        #groupForm="ngForm"
+        fxLayout="column"
+    >
         <div
             *ngFor="let item of values; let i = index"
-            fxFlex fxLayout="row" fxLayoutAlign="start center"
+            fxLayout="row" fxLayoutAlign="start center"
         >
             <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
                 <app-form-case-center-daterange
@@ -22,11 +25,12 @@
                 ></app-form-case-center-daterange>
             </mat-card>
 
-            <button *ngIf="!disabled" type="button" mat-icon-button (click)="delete(i)">
-                <span class="xt-icon">delete</span>
-            </button>
+            <div fxLayout="column">
+                <button *ngIf="!disabled" type="button" mat-icon-button (click)="delete(i)">
+                    <span class="xt-icon">delete</span>
+                </button>
+            </div>
         </div>
-
 
         <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
             {{'LNG_COMMON_BUTTON_ADD_DATE_RANGE' | translate}}
