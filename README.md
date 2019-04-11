@@ -6,9 +6,9 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ### Pre-Requisites
     
-Install latest LTS versions of Node.js and npm on your machine (https://nodejs.org/download/).
+Install latest LTS versions of Node.js v10.x and compatible npm on your machine (https://nodejs.org/download/).
 
-- Current Node.js version for development: 8.12.0 / 10.13.0
+- Current Node.js version for development: 10.x
 - Current npm version for development: 6.4.1
     
 Install git on your machine
