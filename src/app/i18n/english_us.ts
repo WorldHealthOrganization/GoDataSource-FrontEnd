@@ -44,7 +44,10 @@ export const EnglishUsLang = {
          * uiBulkAddContactsPage
          */
         'LNG_PAGE_BULK_ADD_CONTACTS_TAB_PICK_LOCATIONS': 'Pick locations',
-        'LNG_PAGE_BULK_ADD_CONTACTS_TAB_ADD_CONTACTS': 'Add contacts'
+        'LNG_PAGE_BULK_ADD_CONTACTS_TAB_ADD_CONTACTS': 'Add contacts',
+        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_LOCATIONS': 'Locations',
+        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_LOCATIONS_DESCRIPTION': '',
+
 
         /**
          * REMOVE the tokens from below
