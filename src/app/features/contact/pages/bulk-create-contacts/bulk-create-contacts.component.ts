@@ -57,7 +57,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     exposureFrequencyOptions$: Observable<LabelValuePair[]>;
     exposureDurationOptions$: Observable<LabelValuePair[]>;
     socialRelationshipOptions$: Observable<LabelValuePair[]>;
-    locationsListOptions$: Observable<LabelValuePair[]>;
+    locationsListOptions$: Observable<any>;
 
     relatedEntityData: CaseModel | EventModel;
 
