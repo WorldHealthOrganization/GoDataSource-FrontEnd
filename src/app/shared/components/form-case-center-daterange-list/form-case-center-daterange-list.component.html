@@ -32,8 +32,10 @@
             </div>
         </div>
 
-        <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
-            {{'LNG_COMMON_BUTTON_ADD_DATE_RANGE' | translate}}
-        </button>
+        <div fxLayout="row">
+            <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
+                {{'LNG_COMMON_BUTTON_ADD_DATE_RANGE' | translate}}
+            </button>
+        </div>
     </form>
 </div>
