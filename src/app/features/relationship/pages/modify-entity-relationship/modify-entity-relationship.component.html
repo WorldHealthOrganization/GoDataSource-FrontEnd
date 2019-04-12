@@ -11,11 +11,11 @@
 
             <mat-tab [label]="'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TAB_DETAILS' | translate">
 
-                <mat-card class="page-section">
-
+                <mat-card class="page-section" fxLayout="column">
                     <div
-                        fxLayout="row" fxLayoutGap="20px" fxFlex
-                        class="follow-ups-title">
+                        class="follow-ups-title"
+                        fxLayout="row" fxLayoutGap="20px"
+                    >
                         <div>{{ relationship.relatedEntity(entityId)?.type | translate }}</div>
                         <a
                             *ngIf="relationship.relatedEntity(entityId)"
@@ -52,7 +52,7 @@
             <button mat-raised-button color="accent">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
-            <button type="button" [routerLink]="['/relationships', entityType, entityId]" mat-raised-button>
+            <button type="button" [routerLink]="['/relationships', entityType, entityId, relationshipTypeRoutePath]" mat-raised-button>
                 {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
             </button>
         </ng-container>
