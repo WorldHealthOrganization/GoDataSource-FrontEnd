@@ -24,7 +24,6 @@ import { FollowUpPage } from '../../typings/follow-up-page';
 import { RangeFollowUpsModel } from '../../../../core/models/range-follow-ups.model';
 import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { Observable } from 'rxjs';
-import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { share } from 'rxjs/operators';
 
 @Component({
