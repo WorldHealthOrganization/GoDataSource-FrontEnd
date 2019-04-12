@@ -18,7 +18,6 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { Constants } from '../../../../core/models/constants';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 
