@@ -1,16 +1,9 @@
 @import '~handsontable/dist/handsontable.full.min.css';
+@import '~styles/common';
 
 app-bulk-create-contacts {
-    .bulk-add-contacts-page-content {
-        margin-left: 76px;
-
-        .page-content {
-            margin-left: 0 !important;
-        }
-
-        .min-height-location {
-            min-height: 350px !important;
-        }
+    .min-height-location {
+        min-height: @min-height-for-drop-down-containers;
     }
 
     .form-content {

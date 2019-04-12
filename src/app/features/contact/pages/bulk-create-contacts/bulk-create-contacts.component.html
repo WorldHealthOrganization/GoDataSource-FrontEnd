@@ -4,7 +4,7 @@
     </ng-container>
 </app-topnav>
 
-<div class="bulk-add-contacts-page-content">
+<div class="page-content">
 
     <mat-horizontal-stepper linear #stepper>
         <!--Pick location step-->
@@ -13,14 +13,14 @@
                 <div class="min-height-location">
                     <mat-card class="page-section">
                         <div fxLayout="column">
-                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <div fxLayout="row" fxLayoutGap="20px">
                                 <app-form-location-dropdown
                                     fxFlex
                                     name="locationIds"
                                     [placeholder]="'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_LOCATIONS' | translate"
                                     tooltip="LNG_PAGE_BULK_ADD_CONTACTS_LABEL_LOCATIONS_DESCRIPTION"
                                     multiple="true"
-                                    (itemChanged)="setSelectedLocations($event)">
+                                    (itemChanged)="publishLocationsAtLabelValue($event)">
                                 </app-form-location-dropdown>
 
                                 <div fxFlex><!-- placeholder --></div>
@@ -31,14 +31,14 @@
                     </mat-card>
 
                     <div class="stepper-navigation-buttons">
-                        <button mat-raised-button color="accent" matStepperNext (click)="publishLocationsAtLabelValue()" >{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                        <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                     </div>
                 </div>
         </mat-step>
 
         <mat-step>
             <ng-template matStepLabel>{{'LNG_PAGE_BULK_ADD_CONTACTS_TAB_ADD_CONTACTS' | translate }}</ng-template>
-                <form class="page-content form-section" (submit)="addContacts(sheetTable)">
+                <form class="form-section" (submit)="addContacts(sheetTable)">
                     <div class="form-content">
                         <mat-card class="page-section" fxLayout="column">
                             <ng-container

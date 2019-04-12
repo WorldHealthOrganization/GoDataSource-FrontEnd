@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -28,7 +28,6 @@ import { NgModel } from '@angular/forms';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { throwError } from 'rxjs';
 import { catchError, map, mergeMap, share } from 'rxjs/operators';
-import { LocationModel } from '../../../../core/models/location.model';
 import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 
 @Component({
@@ -57,11 +56,9 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     exposureFrequencyOptions$: Observable<LabelValuePair[]>;
     exposureDurationOptions$: Observable<LabelValuePair[]>;
     socialRelationshipOptions$: Observable<LabelValuePair[]>;
-    locationsListOptions$: Observable<any>;
+    locationsListOptions$: Observable<LabelValuePair[]> = of([]);
 
     relatedEntityData: CaseModel | EventModel;
-
-    selectedLocations: LocationModel[];
 
     // sheet widget configuration
     sheetWidth = 500;
@@ -117,6 +114,9 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION).pipe(share());
         this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).pipe(share());
 
+        // configure Sheet widget
+        this.configureSheetWidget();
+
         // retrieve query params
         this.route.queryParams
             .subscribe((params: { entityType, entityId }) => {
@@ -154,24 +154,14 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     }
 
     /**
-     * Save selected locations for mapping them later
-     * @param {LocationModel[]} locations
-     */
-    setSelectedLocations(locations: LocationModel[]) {
-        this.selectedLocations = locations;
-    }
-
-    /**
      * Set the locations list options as label value pair based on what locations are selected
      */
-    publishLocationsAtLabelValue() {
-        this.locationsListOptions$ = new Observable((observer) => {
-            const labelValueLocations = _.map(this.selectedLocations, (location: LocationAutoItem) => {
+    publishLocationsAtLabelValue(locations: LocationAutoItem[]) {
+        this.locationsListOptions$ = of<LabelValuePair[]>(
+            _.map(locations, (location: LocationAutoItem) => {
                 return new LabelValuePair(location.label, location.id);
-            });
-            observer.next(labelValueLocations);
-            observer.complete();
-        });
+            })
+        );
 
         // configure Sheet widget
         this.configureSheetWidget();

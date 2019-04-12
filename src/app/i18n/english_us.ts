@@ -46,7 +46,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_BULK_ADD_CONTACTS_TAB_PICK_LOCATIONS': 'Pick locations',
         'LNG_PAGE_BULK_ADD_CONTACTS_TAB_ADD_CONTACTS': 'Add contacts',
         'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_LOCATIONS': 'Locations',
-        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_LOCATIONS_DESCRIPTION': '',
+        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_LOCATIONS_DESCRIPTION': 'Select the locations to be assigned to contacts in the next step',
 
 
         /**
