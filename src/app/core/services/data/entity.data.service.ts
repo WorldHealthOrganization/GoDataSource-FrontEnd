@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { CaseModel } from '../../models/case.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { CaseDataService } from './case.data.service';
@@ -9,14 +9,13 @@ import { EntityType } from '../../models/entity-type';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
 import { HttpClient } from '@angular/common/http';
-import 'rxjs/add/operator/mergeMap';
 import * as _ from 'lodash';
 import { EntityModel } from '../../models/entity.model';
 import { LabelValuePair } from '../../models/label-value-pair';
 import * as moment from 'moment';
 import { Constants } from '../../models/constants';
 import { I18nService } from '../helper/i18n.service';
-import { RelationshipModel } from '../../models/relationship.model';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class EntityDataService {
@@ -73,11 +72,13 @@ export class EntityDataService {
         const filter = qb.buildQuery();
 
         return this.http.get(`outbreaks/${outbreakId}/people?filter=${filter}`)
-            .map((peopleList) => {
-                return _.map(peopleList, (entity) => {
-                    return new EntityModel(entity).model;
-                });
-            });
+            .pipe(
+                map((peopleList) => {
+                    return _.map(peopleList, (entity) => {
+                        return new EntityModel(entity).model;
+                    });
+                })
+            );
     }
 
     /**
@@ -212,26 +213,26 @@ export class EntityDataService {
             lightObject.push(new LabelValuePair(
                 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
                 entity.dateOfOnset ?
-                        moment(entity.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-                        ''
+                    moment(entity.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                    ''
             ));
             lightObject.push(new LabelValuePair(
                 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
                 entity.dateBecomeCase ?
-                        moment(entity.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-                        ''
+                    moment(entity.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                    ''
             ));
             lightObject.push(new LabelValuePair(
                 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
                 entity.dateOfInfection ?
-                        moment(entity.dateOfInfection).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-                        ''
+                    moment(entity.dateOfInfection).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                    ''
             ));
             lightObject.push(new LabelValuePair(
                 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
                 entity.dateOfReporting ?
-                        moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-                        ''
+                    moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                    ''
             ));
         }
 
@@ -273,8 +274,8 @@ export class EntityDataService {
             lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
                 entity.dateOfReporting ?
-                        moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-                        ''
+                    moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                    ''
             ));
             lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
@@ -305,8 +306,8 @@ export class EntityDataService {
             lightObject.push(new LabelValuePair(
                 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
                 entity.dateOfReporting ?
-                        moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-                        ''
+                    moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                    ''
             ));
         }
 

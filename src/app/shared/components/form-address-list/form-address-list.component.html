@@ -1,8 +1,12 @@
-<div class="address-list-container form-element "
+<div class="address-list-container form-element"
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <!-- Edit Mode -->
-    <form *ngIf="!disabled" #groupForm="ngForm">
+    <form
+        *ngIf="!disabled"
+        #groupForm="ngForm"
+        fxLayout="column"
+    >
         <div *ngFor="let address of values; let i = index" fxFlex fxLayout="row"
              fxLayoutAlign="start center">
             <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
@@ -22,7 +26,9 @@
             </button>
         </div>
 
-        <button class="margin-bottom" type="button" mat-button color="primary" (click)="add()">{{ 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS' | translate }}</button>
+        <div fxLayout="row">
+            <button class="margin-bottom" type="button" mat-button color="primary" (click)="add()">{{ 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS' | translate }}</button>
+        </div>
     </form>
     <!-- End of Edit Mode -->
 

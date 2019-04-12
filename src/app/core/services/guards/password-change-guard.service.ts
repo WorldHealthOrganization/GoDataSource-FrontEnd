@@ -9,7 +9,8 @@ export class PasswordChangeGuard implements CanActivate {
     constructor(
         private authDataService: AuthDataService,
         private router: Router
-    ) {}
+    ) {
+    }
 
     canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
         // get the authenticated user

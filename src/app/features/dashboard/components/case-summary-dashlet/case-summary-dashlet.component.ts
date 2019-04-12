@@ -9,8 +9,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
 import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Subscriber } from 'rxjs/Subscriber';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscriber, Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Constants } from '../../../../core/models/constants';
 
@@ -30,6 +29,7 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
         this._globalFilterDate = globalFilterDate;
         this.refreshDataCaller.call();
     }
+
     get globalFilterDate(): Moment {
         return this._globalFilterDate;
     }
@@ -40,6 +40,7 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
         this._globalFilterLocationId = globalFilterLocationId;
         this.refreshDataCaller.call();
     }
+
     get globalFilterLocationId(): string {
         return this._globalFilterLocationId;
     }
@@ -67,7 +68,8 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
         private referenceDataDataService: ReferenceDataDataService,
         private caseDataService: CaseDataService,
         private i18nService: I18nService
-    ) {}
+    ) {
+    }
 
     ngOnInit() {
         // case classification

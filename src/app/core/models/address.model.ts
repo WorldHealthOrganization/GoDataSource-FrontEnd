@@ -30,7 +30,7 @@ export class AddressModel {
         return _.find(addresses, { typeId: AddressType.CURRENT_ADDRESS });
     }
 
-    constructor(data = null, locationsList = []) {
+    constructor(data = null, locationsList: LocationModel[] = []) {
         this.typeId = _.get(data, 'typeId');
         this.city = _.get(data, 'city');
         this.postalCode = _.get(data, 'postalCode');

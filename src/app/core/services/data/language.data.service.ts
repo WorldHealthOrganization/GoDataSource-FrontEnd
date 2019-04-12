@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { LanguageModel, LanguageTokenModel } from '../../models/language.model';
 import { CacheKey, CacheService } from '../helper/cache.service';
-import 'rxjs/add/operator/share';
-import 'rxjs/add/observable/of';
 import * as _ from 'lodash';
 import { localLanguages } from '../../../i18n';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { map, share, tap } from 'rxjs/operators';
 
 @Injectable()
 export class LanguageDataService {
@@ -20,7 +19,7 @@ export class LanguageDataService {
         private modelHelper: ModelHelperService,
         private cacheService: CacheService
     ) {
-        this.languageList$ = this.http.get('languages').share();
+        this.languageList$ = this.http.get('languages').pipe(share());
     }
 
     /**
@@ -42,7 +41,7 @@ export class LanguageDataService {
         // get languages list from cache
         const languagesList = this.cacheService.get(CacheKey.LANGUAGES);
         if (languagesList) {
-            return Observable.of(languagesList);
+            return of(languagesList);
         } else {
             // get languages list from API
             return this.modelHelper
@@ -50,10 +49,12 @@ export class LanguageDataService {
                     this.languageList$,
                     LanguageModel
                 )
-                .do((languages) => {
-                    // cache the list
-                    this.cacheService.set(CacheKey.LANGUAGES, languages);
-                });
+                .pipe(
+                    tap((languages) => {
+                        // cache the list
+                        this.cacheService.set(CacheKey.LANGUAGES, languages);
+                    })
+                );
         }
     }
 
@@ -64,9 +65,11 @@ export class LanguageDataService {
     getLanguage(languageId: string): Observable<LanguageModel> {
         // get the list of languages and find the one with the given ID
         return this.getLanguagesList()
-            .map((languages: LanguageModel[]) => {
-                return _.find(languages, {id: languageId});
-            });
+            .pipe(
+                map((languages: LanguageModel[]) => {
+                    return _.find(languages, {id: languageId});
+                })
+            );
     }
 
     /**
@@ -89,18 +92,26 @@ export class LanguageDataService {
      * @returns {Observable<LanguageTokenModel[]>}
      */
     getLanguageTokens(lang: LanguageModel): Observable<LanguageTokenModel[]> {
+        // retrieve only token and translation fields to reduce the payload
+        const qb = new RequestQueryBuilder();
+        qb.fields('token', 'translation');
+        const filter = qb.buildQuery();
+
         return this.modelHelper.mapObservableListToModel(
-            this.http.get(`languages/${lang.id}/language-tokens`),
+            this.http.get(`languages/${lang.id}/language-tokens?filter=${filter}`),
             LanguageTokenModel
-        ).map((tokens) => {
-            // get the local language tokens
-            const localLanguageTokens = _.get(this.getLocalLanguageTokens(), lang.id, []);
+        )
+            .pipe(
+                map((tokens) => {
+                    // get the local language tokens
+                    const localLanguageTokens = _.get(this.getLocalLanguageTokens(), lang.id, []);
 
-            // merge local tokens with the tokens received from server
-            tokens = [...tokens, ...localLanguageTokens as any[]];
+                    // merge local tokens with the tokens received from server
+                    tokens = [...tokens, ...localLanguageTokens as any[]];
 
-            return tokens;
-        });
+                    return tokens;
+                })
+            );
     }
 
     /**

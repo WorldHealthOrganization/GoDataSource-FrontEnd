@@ -10,9 +10,8 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { Moment } from 'moment';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription ,  Subscriber } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Subscriber } from 'rxjs/Subscriber';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { MetricCasesCountStratifiedOutcome } from '../../../../core/models/metrics/metric-cases-count-stratified-outcome.model';
 

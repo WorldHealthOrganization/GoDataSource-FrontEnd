@@ -2,7 +2,11 @@
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <!-- Edit Mode -->
-    <form *ngIf="!disabled" #groupForm="ngForm">
+    <form
+        *ngIf="!disabled"
+        #groupForm="ngForm"
+        fxLayout="column"
+    >
         <div *ngFor="let document of values; let i = index" fxFlex fxLayout="row"
              fxLayoutAlign="start center">
             <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
@@ -22,7 +26,9 @@
             </button>
         </div>
 
-        <button type="button" mat-button color="primary" (click)="add()">{{ 'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT' | translate }}</button>
+        <div fxLayout="row">
+            <button type="button" mat-button color="primary" (click)="add()">{{ 'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT' | translate }}</button>
+        </div>
     </form>
     <!-- End of Edit Mode -->
 

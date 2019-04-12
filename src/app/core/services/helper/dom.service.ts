@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class DomService {
@@ -7,6 +7,7 @@ export class DomService {
     /**
      * Scroll to the end of the list of elements with the given css selector
      * @param selector
+     * @param block
      */
     scrollItemIntoView(
         selector,
@@ -21,7 +22,7 @@ export class DomService {
                 item.scrollIntoView({
                     behavior: 'smooth',
                     block: block
-                });
+                } as ScrollIntoViewOptions);
             }
         });
     }
@@ -34,7 +35,7 @@ export class DomService {
      * @returns {Observable<string>}
      */
     getPNGBase64(selector: string, tempCanvasSelector: string, splitFactor: number = 1): Observable<string> {
-        return Observable.create((observer) => {
+        return new Observable((observer) => {
             // server page size
             const pageSize = {
                 width: 1190,
@@ -86,7 +87,7 @@ export class DomService {
                 observer.complete();
 
             };
-             img.src = url;
+            img.src = url;
         });
     }
 

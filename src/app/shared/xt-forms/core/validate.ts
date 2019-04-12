@@ -5,9 +5,8 @@ import {
     Validators,
     ValidatorFn,
 } from '@angular/forms';
-
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
+import { of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface ValidationResult { [validator: string]: string | boolean; }
 
@@ -16,12 +15,12 @@ export type AsyncValidatorArray = Array<Validator | AsyncValidatorFn>;
 export type ValidatorArray = Array<Validator | ValidatorFn>;
 
 const normalizeValidator =
-    (validator: Validator | ValidatorFn): ValidatorFn | AsyncValidatorFn => {
+    (validator: Validator | ValidatorFn): ValidatorFn => {
         const func = (validator as Validator).validate.bind(validator);
         if (typeof func === 'function') {
             return (c: AbstractControl) => func(c);
         } else {
-            return <ValidatorFn | AsyncValidatorFn> validator;
+            return <ValidatorFn> validator;
         }
     };
 
@@ -34,7 +33,7 @@ export const composeValidators =
     };
 
 const normalizeAsyncValidator =
-    (validator: Validator | ValidatorFn): AsyncValidatorFn => {
+    (validator: Validator | AsyncValidatorFn): AsyncValidatorFn => {
         const func = (validator as Validator).validate.bind(validator);
         if (typeof func === 'function') {
             return (c: AbstractControl) => func(c);
@@ -44,7 +43,7 @@ const normalizeAsyncValidator =
     };
 
 export const composeAsyncValidators =
-    (validators: ValidatorArray): AsyncValidatorFn => {
+    (validators: AsyncValidatorArray): AsyncValidatorFn => {
         if (validators == null || validators.length === 0) {
             return null;
         }
@@ -56,7 +55,7 @@ export const validate =
         return (control: AbstractControl) => {
 
             if (!control) {
-                return Observable.of(null);
+                return of(null);
             }
 
             const synchronousValid = () => composeValidators(validators)(control);
@@ -65,19 +64,22 @@ export const validate =
 
                 const asyncValidator: any = composeAsyncValidators(asyncValidators);
 
-                return asyncValidator(control).map(v => {
-                    const secondary = synchronousValid();
-                    if (secondary || v) {
-                        // compose async and sync validator results
-                        return Object.assign({}, secondary, v);
-                    }
-                });
+                return asyncValidator(control)
+                    .pipe(
+                        map(v => {
+                            const secondary = synchronousValid();
+                            if (secondary || v) {
+                                // compose async and sync validator results
+                                return Object.assign({}, secondary, v);
+                            }
+                        })
+                    );
             }
 
             if (validators) {
-                return Observable.of(synchronousValid());
+                return of(synchronousValid());
             }
 
-            return Observable.of(null);
+            return of(null);
         };
     };

@@ -13,7 +13,7 @@ import * as moment from 'moment';
 import * as _ from 'lodash';
 import { Moment } from 'moment';
 import { FormDateRangeSliderData } from '../../../../shared/xt-forms/components/form-date-range-slider/form-date-range-slider.component';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { TeamModel } from '../../../../core/models/team.model';
 
 @Component({
@@ -204,7 +204,7 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
             // keep only teams with id
             const teams = _.filter(metricTeamsFollowups.teams, (teamMetricData) => {
                 return teamMetricData.id && teamsMap[teamMetricData.id];
-            });
+            }) as any[];
 
             // go through teams and create list of date information
             _.forEach(teams, (team) => {

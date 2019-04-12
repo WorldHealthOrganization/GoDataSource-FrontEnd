@@ -1,9 +1,14 @@
 <div class="daterange-list-container form-element "
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
-    <form #groupForm="ngForm">
-        <div *ngFor="let daterange of values; let i = index" fxFlex fxLayout="row"
-             fxLayoutAlign="start center">
+    <form
+        #groupForm="ngForm"
+        fxLayout="column"
+    >
+        <div
+            *ngFor="let daterange of values; let i = index"
+            fxLayout="row" fxLayoutAlign="start center"
+        >
             <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
                 <div fxFlex fxLayout="row">
                     <app-form-daterange
@@ -26,8 +31,10 @@
 
         </div>
 
-        <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
-            {{'LNG_COMMON_BUTTON_ADD_DATE_RANGE' | translate}}
-        </button>
+        <div fxLayout="row">
+            <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
+                {{'LNG_COMMON_BUTTON_ADD_DATE_RANGE' | translate}}
+            </button>
+        </div>
     </form>
 </div>

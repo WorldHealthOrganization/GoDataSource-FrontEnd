@@ -4,7 +4,6 @@ import { NgForm } from '@angular/forms';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { EventModel } from '../../../../core/models/event.model';
@@ -17,6 +16,8 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Moment } from 'moment';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-modify-event',
@@ -97,11 +98,13 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.eventDataService
             .modifyEvent(this.outbreakId, this.eventId, dirtyFields)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
             .subscribe((modifiedEvent: EventModel) => {
                 // update model
                 this.eventData = modifiedEvent;

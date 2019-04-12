@@ -2,7 +2,7 @@ import { RequestFilter, RequestFilterOperator, RequestQueryBuilder } from './req
 import * as _ from 'lodash';
 import { ListFilterDataService } from '../services/data/list-filter.data.service';
 import { Params } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+import { Observable, Subscriber } from 'rxjs';
 import { ApplyListFilter, Constants } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -11,7 +11,6 @@ import { ResetInputOnSideFilterDirective } from '../../shared/directives/reset-i
 import { MatPaginator, MatSort, MatSortable, PageEvent } from '@angular/material';
 import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
 import { DebounceTimeCaller } from './debounce-time-caller';
-import { Subscriber } from '../../../../node_modules/rxjs/Subscriber';
 import { Moment } from 'moment';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
 import * as moment from 'moment';

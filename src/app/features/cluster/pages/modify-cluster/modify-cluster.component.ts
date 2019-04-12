@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -14,6 +13,8 @@ import { UserModel } from '../../../../core/models/user.model';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-modify-cluster',
@@ -108,11 +109,13 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.clusterDataService
             .modifyCluster(this.selectedOutbreak.id, this.clusterId, dirtyFields)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
             .subscribe((modifiedCluster: ClusterModel) => {
                 // update model
                 this.clusterData = modifiedCluster;
@@ -130,6 +133,7 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
                 loadingDialog.close();
             });
     }
+
     /**
      * Create breadcrumbs
      */

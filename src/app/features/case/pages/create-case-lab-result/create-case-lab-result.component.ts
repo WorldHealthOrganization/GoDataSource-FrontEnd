@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -9,7 +8,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { NgForm } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
@@ -19,6 +18,8 @@ import { LabResultDataService } from '../../../../core/services/data/lab-result.
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { Moment } from 'moment';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-create-case-relationship',
@@ -87,15 +88,17 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
                         // get case data
                         this.caseDataService
                             .getCase(this.selectedOutbreak.id, params.caseId)
-                            .catch((err) => {
-                                this.snackbarService.showError(err.message);
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showError(err.message);
 
-                                // Case not found; navigate back to Cases list
-                                this.disableDirtyConfirm();
-                                this.router.navigate(['/cases']);
+                                    // Case not found; navigate back to Cases list
+                                    this.disableDirtyConfirm();
+                                    this.router.navigate(['/cases']);
 
-                                return ErrorObservable.create(err);
-                            })
+                                    return throwError(err);
+                                })
+                            )
                             .subscribe((caseData: CaseModel) => {
                                 this.caseId = caseData.id;
 
@@ -127,14 +130,16 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.labResultDataService
                 .createLabResult(this.selectedOutbreak.id, this.caseId, dirtyFields)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
 
-                    // hide dialog
-                    loadingDialog.close();
+                        // hide dialog
+                        loadingDialog.close();
 
-                    return ErrorObservable.create(err);
-                })
+                        return throwError(err);
+                    })
+                )
                 .subscribe((newLabResult: LabResultModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_LAB_RESULT_ACTION_CREATE_CASE_LAB_RESULT_SUCCESS_MESSAGE');
 

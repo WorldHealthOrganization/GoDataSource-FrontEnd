@@ -1,8 +1,6 @@
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Injectable } from '@angular/core';
-
 import * as _ from 'lodash';
-
 import { AuthDataService } from '../data/auth.data.service';
 
 @Injectable()

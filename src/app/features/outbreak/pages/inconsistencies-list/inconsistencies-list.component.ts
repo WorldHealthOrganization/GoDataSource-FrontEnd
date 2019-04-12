@@ -7,7 +7,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
@@ -19,7 +19,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ActivatedRoute } from '@angular/router';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { tap } from 'rxjs/operators';
+import { share, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-inconsistencies-list',
@@ -70,7 +70,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
         this.initBreadcrumbs();
 
         // reference data
-        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).share();
+        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
         personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
             this.personTypesListMap = _.transform(
                 personTypeCategory.entries,
@@ -154,7 +154,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
     /**
      * Retrieve Person Type color
      */
-    getPersonTypeColor(personType) {
+    getPersonTypeColor(personType: string) {
         const personTypeData = _.get(this.personTypesListMap, personType);
         return _.get(personTypeData, 'colorCode', '');
     }

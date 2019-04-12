@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { UserRoleModel } from '../../models/user-role.model';
 import { PermissionModel } from '../../models/permission.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { CacheKey, CacheService } from '../helper/cache.service';
 import * as _ from 'lodash';
-import 'rxjs/add/operator/share';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { map, share, switchMap, tap } from 'rxjs/operators';
 
 @Injectable()
 export class UserRoleDataService {
@@ -20,8 +20,8 @@ export class UserRoleDataService {
         private modelHelper: ModelHelperService,
         private cacheService: CacheService
     ) {
-        this.userRoleList$ = this.http.get('roles').share();
-        this.availablePermissions$ = this.http.get(`roles/available-permissions`).share();
+        this.userRoleList$ = this.http.get('roles').pipe(share());
+        this.availablePermissions$ = this.http.get(`roles/available-permissions`).pipe(share());
     }
 
     /**
@@ -32,7 +32,7 @@ export class UserRoleDataService {
         // get roles list from cache
         const rolesList = this.cacheService.get(CacheKey.AUTH_ROLES);
         if (queryBuilder.isEmpty() && rolesList) {
-            return Observable.of(rolesList);
+            return of(rolesList);
         } else {
 
             let userRolesList$ = this.userRoleList$;
@@ -43,29 +43,32 @@ export class UserRoleDataService {
 
             // firstly, retrieve available permissions so we can add them for each Role
             return this.getAvailablePermissions()
-                .switchMap((availablePermissions: PermissionModel[]) => {
+                .pipe(
+                    switchMap((availablePermissions: PermissionModel[]) => {
+                        // get roles list from API
+                        return this.modelHelper
+                            .mapObservableListToModel(
+                                userRolesList$
+                                    .pipe(
+                                        map((rolesResult: any[]) => {
+                                            // include available permissions on each Role object
+                                            return _.map(rolesResult, (role) => {
+                                                role.availablePermissions = availablePermissions;
 
-                    // get roles list from API
-                    return this.modelHelper
-                        .mapObservableListToModel(
-                            userRolesList$
-                                .map((rolesResult: any[]) => {
-                                    // include available permissions on each Role object
-                                    return _.map(rolesResult, (role) => {
-                                        role.availablePermissions = availablePermissions;
-
-                                        return role;
-                                    });
-                                }),
-                            UserRoleModel
-                        );
-                })
-                .do((roles) => {
-                    // cache the list
-                    if (queryBuilder.isEmpty()) {
-                        this.cacheService.set(CacheKey.AUTH_ROLES, roles);
-                    }
-                });
+                                                return role;
+                                            });
+                                        })
+                                    ),
+                                UserRoleModel
+                            );
+                    }),
+                    tap((roles) => {
+                        // cache the list
+                        if (queryBuilder.isEmpty()) {
+                            this.cacheService.set(CacheKey.AUTH_ROLES, roles);
+                        }
+                    })
+                );
 
         }
     }
@@ -90,25 +93,30 @@ export class UserRoleDataService {
     createRole(userRole): Observable<any> {
         return this.http
             .post('roles', userRole)
-            .do(() => {
-                // invalidate the Roles List cache
-                this.cacheService.remove(CacheKey.AUTH_ROLES);
-            });
+            .pipe(
+                tap(() => {
+                    // invalidate the Roles List cache
+                    this.cacheService.remove(CacheKey.AUTH_ROLES);
+                })
+            );
     }
 
     /**
      * Modify an existing User Role
      * @param {string} roleId
+     * @param data
      * @returns {Observable<UserRoleModel>}
      */
     modifyRole(roleId: string, data: any): Observable<UserRoleModel> {
         return this.modelHelper.mapObservableToModel(
             this.http
                 .patch(`roles/${roleId}`, data)
-                .do(() => {
-                    // invalidate the cache for Roles List
-                    this.cacheService.remove(CacheKey.AUTH_ROLES);
-                }),
+                .pipe(
+                    tap(() => {
+                        // invalidate the cache for Roles List
+                        this.cacheService.remove(CacheKey.AUTH_ROLES);
+                    })
+                ),
             UserRoleModel
         );
     }
@@ -121,10 +129,12 @@ export class UserRoleDataService {
     deleteRole(roleId: string): Observable<any> {
         return this.http
             .delete(`roles/${roleId}`)
-            .do(() => {
-                // invalidate the cache for Roles List
-                this.cacheService.remove(CacheKey.AUTH_ROLES);
-            });
+            .pipe(
+                tap(() => {
+                    // invalidate the cache for Roles List
+                    this.cacheService.remove(CacheKey.AUTH_ROLES);
+                })
+            );
     }
 
     /**
@@ -135,7 +145,7 @@ export class UserRoleDataService {
         // get permissions list from cache
         const permissionsList = this.cacheService.get(CacheKey.PERMISSIONS);
         if (permissionsList) {
-            return Observable.of(permissionsList);
+            return of(permissionsList);
         } else {
             // get permissions list from API
             return this.modelHelper
@@ -143,10 +153,12 @@ export class UserRoleDataService {
                     this.availablePermissions$,
                     PermissionModel
                 )
-                .do((permissions) => {
-                    // cache the list
-                    this.cacheService.set(CacheKey.PERMISSIONS, permissions);
-                });
+                .pipe(
+                    tap((permissions) => {
+                        // cache the list
+                        this.cacheService.set(CacheKey.PERMISSIONS, permissions);
+                    })
+                );
         }
     }
 }

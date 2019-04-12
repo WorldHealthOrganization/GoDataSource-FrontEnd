@@ -5,7 +5,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { ActivatedRoute } from '@angular/router';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -16,7 +16,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Constants } from '../../../../core/models/constants';
-import { tap } from 'rxjs/operators';
+import { share, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -69,7 +69,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         // retrieve cluster info
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
-        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).share();
+        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
         personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
             this.personTypesListMap = _.transform(
                 personTypeCategory.entries,
@@ -127,7 +127,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         // remove paginator from query builder
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
-        this.clusterPeopleListCount$ = this.clusterDataService.getClusterPeopleCount(this.selectedOutbreak.id, this.cluster.id, countQueryBuilder).share();
+        this.clusterPeopleListCount$ = this.clusterDataService.getClusterPeopleCount(this.selectedOutbreak.id, this.cluster.id, countQueryBuilder).pipe(share());
     }
 
     /**
@@ -202,7 +202,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     /**
      * Retrieve Person Type color
      */
-    getPersonTypeColor(personType) {
+    getPersonTypeColor(personType: string) {
         const personTypeData = _.get(this.personTypesListMap, personType);
         return _.get(personTypeData, 'colorCode', '');
     }

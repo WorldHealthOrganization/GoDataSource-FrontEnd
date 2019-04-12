@@ -3,16 +3,16 @@ import { SavedImportMappingService } from '../../../../core/services/data/saved-
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { SavedImportMappingModel } from '../../../../core/models/saved-import-mapping.model';
-import { tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { Constants } from '../../../../core/models/constants';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-saved-import-mapping',
@@ -68,7 +68,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
     refreshListCount() {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
-        this.savedImportMappingsListCount$ = this.savedImportMappingService.getImportMappingsListCount(countQueryBuilder).share();
+        this.savedImportMappingsListCount$ = this.savedImportMappingService.getImportMappingsListCount(countQueryBuilder).pipe(share());
     }
 
     /**
@@ -96,11 +96,12 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete contact
                     this.savedImportMappingService.deleteImportMapping(savedImportId)
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err);
-
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_DELETE_SUCCESS_MESSAGE');
 
@@ -118,10 +119,12 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
      */
     setPublicItem(savedImportMappingId: string, isPublic: boolean) {
         this.savedImportMappingService.modifyImportMapping(savedImportMappingId, {isPublic : isPublic})
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                })
+            )
             .subscribe(() => {
                 this.snackbarService.showSuccess(`LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE`);
             });

@@ -16,7 +16,7 @@ export class DashletSettingsModel {
 }
 
 export class UserSettingsDashboardModel {
-    dashlets: any[];
+    dashlets: DashletSettingsModel[];
 
     constructor(data = null) {
         this.dashlets = _.map(

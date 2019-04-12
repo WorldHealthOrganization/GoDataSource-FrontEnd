@@ -5,8 +5,9 @@ import * as _ from 'lodash';
 import { HierarchicalLocationModel } from '../../../core/models/hierarchical-location.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LocationModel } from '../../../core/models/location.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-location-breadcrumbs',
@@ -59,11 +60,13 @@ export class LocationBreadcrumbsComponent implements OnInit {
             if (this.locationId) {
                 this.locationDataService
                     .getLocation(this.locationId)
-                    .catch((err) => {
-                        this.snackbarService.showError(err.message);
-                        this.router.navigate(['/locations']);
-                        return ErrorObservable.create(err);
-                    })
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showError(err.message);
+                            this.router.navigate(['/locations']);
+                            return throwError(err);
+                        })
+                    )
                     .subscribe((locationData) => {
                         // location data
                         this.locationData = new LocationModel(locationData);

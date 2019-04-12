@@ -3,15 +3,15 @@
 
 module.exports = function (config) {
     config.set({
-        basePath: '',
-        frameworks: ['parallel', 'jasmine', '@angular/cli'],
+        basePath: '..',
+        frameworks: ['parallel', 'jasmine', '@angular-devkit/build-angular'],
         plugins: [
             require('karma-parallel'),
             require('karma-jasmine'),
-            require('karma-phantomjs-launcher'),
+            require('karma-chrome-launcher'),
             require('karma-coverage-istanbul-reporter'),
             require('karma-spec-reporter'),
-            require('@angular/cli/plugins/karma')
+            require('@angular-devkit/build-angular/plugins/karma')
         ],
         client: {
             clearContext: false, // leave Jasmine Spec Runner output visible in browser
@@ -45,11 +45,11 @@ module.exports = function (config) {
         browserDisconnectTimeout: 5000,
         browserDisconnectTolerance: 2,
         parallelOptions: {
-            executors: require('os').cpus().length - 1,
+            // executors: require('os').cpus().length - 1,
             shardStrategy: 'round-robin'
         },
         autoWatch: true,
-        browsers: ['PhantomJS'],
+        browsers: ['ChromeHeadless'],
         singleRun: true
     });
 };

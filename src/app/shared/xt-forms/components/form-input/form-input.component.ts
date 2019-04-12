@@ -67,11 +67,14 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
     @Input() min: number;
     @Input() max: number;
 
+    @Input() displayRefresh: boolean = false;
+
     @ViewChild('inputElement') inputElement: ElementRef;
 
     @Output() optionChanged = new EventEmitter<any>();
     @Output() initialized = new EventEmitter<any>();
     @Output() blur = new EventEmitter<any>();
+    @Output() refresh = new EventEmitter<any>();
 
     public identifier = `form-input-${FormInputComponent.identifier++}`;
 
@@ -105,6 +108,13 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
     onChange() {
         // emit the current value
         return this.optionChanged.emit(this.value);
+    }
+
+    /**
+     * Trigger to emit when refresh icon is pressed
+     */
+    onRefreshPressed() {
+        this.refresh.emit();
     }
 
     ngAfterViewInit() {

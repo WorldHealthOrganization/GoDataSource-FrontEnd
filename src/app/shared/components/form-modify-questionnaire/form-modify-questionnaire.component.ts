@@ -12,7 +12,7 @@ import { AnswerModel, QuestionModel } from '../../../core/models/question.model'
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../dialog/dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Subscriber, forkJoin } from 'rxjs';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
@@ -24,9 +24,9 @@ import { DomService } from '../../../core/services/helper/dom.service';
 import { v4 as uuid } from 'uuid';
 import { FormInputComponent } from '../../xt-forms/components/form-input/form-input.component';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
-import 'rxjs/add/observable/forkJoin';
-import { Observable } from 'rxjs/Observable';
 import { HoverRowActions, HoverRowActionsType } from '../hover-row-actions/hover-row-actions.component';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 /**
  * Used to initialize breadcrumbs
@@ -35,7 +35,8 @@ export class FormModifyQuestionnaireBreadcrumbsData {
     constructor(
         public outbreak: OutbreakModel | OutbreakTemplateModel,
         public type: OutbreakQestionnaireTypeEnum
-    ) {}
+    ) {
+    }
 }
 
 /**
@@ -47,7 +48,8 @@ export class FormModifyQuestionnaireUpdateData {
         public type: OutbreakQestionnaireTypeEnum,
         public questionnaire: QuestionModel[],
         public finishSubscriber: Subscriber<boolean>
-    ) {}
+    ) {
+    }
 }
 
 @Component({
@@ -70,6 +72,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     // authenticated user
     authUser: UserModel;
 
+    /**
+     * Refresh language tokens before loading questionnaire data
+     */
+    private _refreshLanguageTokensDisabled: boolean = false;
+    @Input() refreshLanguageTokens: boolean = true;
+
     // outbreak / outbreak template to modify
     private _parent: OutbreakModel | OutbreakTemplateModel;
     @Input() set parent(value: OutbreakModel | OutbreakTemplateModel) {
@@ -82,6 +90,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // init questionnaire data
         this.initQuestionnaireData();
     }
+
     get parent(): OutbreakModel | OutbreakTemplateModel {
         return this._parent;
     }
@@ -265,19 +274,19 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         });
 
         // retrieve data
-        Observable.forkJoin([
+        forkJoin(
             this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.QUESTION_CATEGORY),
             this.genericDataService.getAnswerTypesList(),
             this.genericDataService.getAnswersDisplayOrientationsList(),
-        ]).subscribe(([
-            questionCategoriesList,
-            answerTypesInstantList,
-            answersDisplayInstantList
-        ]: [
+        ).subscribe(([
+                         questionCategoriesList,
+                         answerTypesInstantList,
+                         answersDisplayInstantList
+                     ]: [
             LabelValuePair[],
             any[],
             any[]
-        ]) => {
+            ]) => {
             // set edit options
             this.questionCategoriesInstantList = questionCategoriesList;
             this.answerTypesInstantList = answerTypesInstantList;
@@ -293,11 +302,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
                 // init questionnaire data
                 this.initQuestionnaireData();
-
-                // finished loading data
-                setTimeout(() => {
-                    this.loadingData = false;
-                });
             });
         });
     }
@@ -460,6 +464,31 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             !_.isEmpty(this.parent) &&
             !_.isEmpty(this.questionnaireType)
         ) {
+            // make sure we have the latest questionnaire language tokens ?
+            if (
+                this.refreshLanguageTokens &&
+                !this._refreshLanguageTokensDisabled
+            ) {
+                // refresh language tokens
+                this.loadingData = true;
+                this.i18nService.loadUserLanguage()
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            return throwError(err);
+                        })
+                    )
+                    .subscribe(() => {
+                        // init questionnaire data
+                        this._refreshLanguageTokensDisabled = true;
+                        this.initQuestionnaireData();
+                        this._refreshLanguageTokensDisabled = false;
+                    });
+
+                // no point in continuing
+                return;
+            }
+
             // retrieve questionnaire data
             this.questionnaireData = _.isEmpty(this.parent[this.questionnaireType]) ?
                 [] :
@@ -480,6 +509,9 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
             // init question answer actions
             this.initQuestionAnswerActions();
+
+            // finished loading data
+            this.loadingData = false;
         }
     }
 
@@ -512,7 +544,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         const maps: {
             [uuid: string]: string
         } = {};
-        this.questionVariables = { ...this.extraQuestionVariables };
+        this.questionVariables = {...this.extraQuestionVariables};
 
         // add variables to array of variables
         const getQuestionVariables = (questions: QuestionModel[]) => {
@@ -1601,7 +1633,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 fieldType: DialogFieldType.TEXT,
                 type: 'number',
                 value: isNewQuestion ?
-                    ( this.questionnaireData ? this.questionnaireData.length + 1 : 1 ) :
+                    (this.questionnaireData ? this.questionnaireData.length + 1 : 1) :
                     questionIndex + 1
             })]
         })).subscribe((answer) => {
@@ -1640,7 +1672,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 fieldType: DialogFieldType.TEXT,
                 type: 'number',
                 value: isNewAnswer ?
-                    ( this.questionInEditModeClone && this.questionInEditModeClone.answers ? this.questionInEditModeClone.answers.length + 1 : 1 ) :
+                    (this.questionInEditModeClone && this.questionInEditModeClone.answers ? this.questionInEditModeClone.answers.length + 1 : 1) :
                     answerIndex + 1
             })]
         })).subscribe((answer) => {

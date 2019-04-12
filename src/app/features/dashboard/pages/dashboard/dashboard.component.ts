@@ -6,7 +6,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { DashboardDashlet, DashboardKpiGroup } from '../../../../core/enums/dashboard.enum';
 import * as _ from 'lodash';
 import { DashletSettingsModel, UserSettingsDashboardModel } from '../../../../core/models/user-settings-dashboard.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable ,  Subscription } from 'rxjs';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -20,11 +20,11 @@ import { Moment } from 'moment';
 import * as moment from 'moment';
 import { LoadingDialogModel } from '../../../../shared/components';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { Subscription } from 'rxjs/Subscription';
 import { Constants } from '../../../../core/models/constants';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 
@@ -331,11 +331,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
             .subscribe((pngBase64) => {
                 this.importExportDataService
                     .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
-                    .catch((err) => {
-                        this.snackbarService.showApiError(err);
-                        this.closeLoadingDialog();
-                        return ErrorObservable.create(err);
-                    })
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            this.closeLoadingDialog();
+                            return throwError(err);
+                        })
+                    )
                     .subscribe((blob) => {
                         this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
                     });
@@ -347,17 +349,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
      */
     generateKpisReport() {
         this.showLoadingDialog();
-        domtoimage.toPng(this.kpiSection.nativeElement)
+        (domtoimage as any).toPng(this.kpiSection.nativeElement)
             .then((dataUrl) => {
                 const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
 
                 this.importExportDataService
                     .exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
-                    .catch((err) => {
-                        this.snackbarService.showApiError(err);
-                        this.closeLoadingDialog();
-                        return ErrorObservable.create(err);
-                    })
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            this.closeLoadingDialog();
+                            return throwError(err);
+                        })
+                    )
                     .subscribe((blob) => {
                         this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL');
                     });

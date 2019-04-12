@@ -5,6 +5,7 @@ import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import * as moment from 'moment';
+import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
 
 export class ContactModel {
     id: string;
@@ -40,6 +41,8 @@ export class ContactModel {
 
     inconsistencies: InconsistencyModel[];
     relationship: any;
+
+    matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -81,6 +84,11 @@ export class ContactModel {
         });
 
         this.relationship = _.get(data, 'relationship');
+
+        this.matchedDuplicateRelationships = _.get(data, 'matchedDuplicateRelationships', []);
+        _.each(this.matchedDuplicateRelationships, (matchedRelationship, index) => {
+            this.matchedDuplicateRelationships[index] = new EntityMatchedRelationshipModel(matchedRelationship);
+        });
     }
 
     /**

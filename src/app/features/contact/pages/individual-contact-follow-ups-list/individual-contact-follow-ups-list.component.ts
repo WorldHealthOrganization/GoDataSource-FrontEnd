@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable, Subscription } from 'rxjs';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { Constants } from '../../../../core/models/constants';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
@@ -22,8 +22,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { Subscription } from 'rxjs/Subscription';
-import { tap } from 'rxjs/operators';
+import { map, share, tap } from 'rxjs/operators';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { DialogField } from '../../../../shared/components';
 import { FollowUpPage } from '../../typings/follow-up-page';
@@ -326,7 +325,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_WEEK_NUMBER',
                 type: FilterType.NUMBER,
                 allowedComparators: [
-                    _.find(AppliedFilterModel.allowedComparators[FilterType.NUMBER], { value: FilterComparator.IS })
+                    _.find(AppliedFilterModel.allowedComparators[FilterType.NUMBER], {value: FilterComparator.IS})
                 ],
                 flagIt: true
             }),
@@ -335,7 +334,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TIME_FILTER',
                 type: FilterType.DATE,
                 allowedComparators: [
-                    _.find(AppliedFilterModel.allowedComparators[FilterType.DATE], { value: FilterComparator.IS })
+                    _.find(AppliedFilterModel.allowedComparators[FilterType.DATE], {value: FilterComparator.IS})
                 ],
                 flagIt: true
             })
@@ -359,12 +358,15 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService
                 .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
-                .map((followUps: FollowUpModel[]) => {
-                    return FollowUpModel.determineAlertness(
-                        this.selectedOutbreak.contactFollowUpTemplate,
-                        followUps
-                    );
-                }).pipe(tap(this.checkEmptyList.bind(this)));
+                .pipe(
+                    map((followUps: FollowUpModel[]) => {
+                        return FollowUpModel.determineAlertness(
+                            this.selectedOutbreak.contactFollowUpTemplate,
+                            followUps
+                        );
+                    }),
+                    tap(this.checkEmptyList.bind(this))
+                );
         }
     }
 
@@ -391,7 +393,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             countQueryBuilder.paginator.clear();
             this.followUpsListCount$ = this.followUpsDataService
                 .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
-                .share();
+                .pipe(
+                    share()
+                );
         }
     }
 }

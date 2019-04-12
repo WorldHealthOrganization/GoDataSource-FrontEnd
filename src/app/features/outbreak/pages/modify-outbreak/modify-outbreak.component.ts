@@ -4,21 +4,21 @@ import { ActivatedRoute } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import * as _ from 'lodash';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import 'rxjs/add/operator/switchMap';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { catchError, map } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -42,7 +42,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     // list of geographical levels
     geographicalLevelsList$: Observable<any[]>;
 
-    outbreakNameValidator$: Observable<boolean>;
+    outbreakNameValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -62,14 +62,17 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     ngOnInit() {
         this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
-        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
-            (countries) => _.map(countries, (country: LabelValuePair) => {
-                country.value = {
-                    id: country.value
-                };
-                return country;
-            })
-        );
+        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY)
+            .pipe(
+                map(
+                    (countries) => _.map(countries, (country: LabelValuePair) => {
+                        country.value = {
+                            id: country.value
+                        };
+                        return country;
+                    })
+                )
+            );
 
         // get outbreak
         this.outbreak = this.route.snapshot.data.outbreak;
@@ -78,7 +81,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         // update breadcrumbs
         this.createBreadcrumbs();
 
-        this.outbreakNameValidator$ = Observable.create((observer) => {
+        this.outbreakNameValidator$ = new Observable((observer) => {
             this.outbreakDataService.checkOutbreakNameUniquenessValidity(this.outbreak.name, this.outbreakId)
                 .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
                     observer.next(isValid);
@@ -113,11 +116,13 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.outbreakDataService
             .modifyOutbreak(this.outbreakId, dirtyFields)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
             .subscribe((modifiedOutbreak) => {
                 // update model
                 this.outbreak = modifiedOutbreak;

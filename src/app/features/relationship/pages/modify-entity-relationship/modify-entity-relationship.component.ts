@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -23,6 +22,8 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityModel } from '../../../../core/models/entity.model';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-modify-entity-relationship',
@@ -125,14 +126,16 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             // get person data
             this.entityDataService
                 .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showError(err.message);
 
-                    // Entity not found; navigate back to Entities list
-                    this.router.navigate([this.entityMap[this.entityType].link]);
+                        // Entity not found; navigate back to Entities list
+                        this.router.navigate([this.entityMap[this.entityType].link]);
 
-                    return ErrorObservable.create(err);
-                })
+                        return throwError(err);
+                    })
+                )
                 .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
                     this.entity = entityData;
 
@@ -151,15 +154,17 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             // get relationship data
             this.relationshipDataService
                 .getEntityRelationship(this.selectedOutbreak.id, this.entityType, this.entityId, this.relationshipId)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showError(err.message);
 
-                    // Relationship not found; navigate back to Entity Relationships list
-                    this.disableDirtyConfirm();
-                    this.router.navigate([`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`]);
+                        // Relationship not found; navigate back to Entity Relationships list
+                        this.disableDirtyConfirm();
+                        this.router.navigate([`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`]);
 
-                    return ErrorObservable.create(err);
-                })
+                        return throwError(err);
+                    })
+                )
                 .subscribe((relationshipData) => {
                     this.relationship = relationshipData;
 
@@ -224,11 +229,13 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                 this.relationshipId,
                 dirtyFields.relationship
             )
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
             .subscribe((relationshipData) => {
                 // update model
                 this.loadRelationship();

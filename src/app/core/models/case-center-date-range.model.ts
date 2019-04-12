@@ -11,7 +11,7 @@ export class CaseCenterDateRangeModel {
     location: LocationModel;
     comments: string;
 
-    constructor(data = null, locationsList = []) {
+    constructor(data = null, locationsList: LocationModel[] = []) {
         this.typeId = _.get(data, 'typeId');
         this.startDate = _.get(data, 'startDate');
         this.endDate = _.get(data, 'endDate');

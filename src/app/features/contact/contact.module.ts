@@ -4,6 +4,7 @@ import { HotTableModule } from '@handsontable/angular';
 // modules
 import { routing } from './contact.module.routing';
 import { SharedModule } from '../../shared/shared.module';
+import { WorldMapMovementModule } from '../../common-modules/world-map-movement/world-map-movement.module';
 
 // components
 import * as fromPages from './pages';
@@ -13,7 +14,8 @@ import * as fromComponents from './components';
     imports: [
         routing,
         SharedModule,
-        HotTableModule.forRoot()
+        HotTableModule.forRoot(),
+        WorldMapMovementModule
     ],
     declarations: [
         ...fromPages.pageComponents,

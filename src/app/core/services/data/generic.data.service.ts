@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { Constants } from '../../models/constants';
 import { EntityType } from '../../models/entity-type';
 import * as _ from 'lodash';
@@ -8,6 +8,7 @@ import * as moment from 'moment';
 import { Moment } from 'moment';
 import { LabelValuePair } from '../../models/label-value-pair';
 import { RelationshipType } from '../../enums/relationship-type.enum';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class GenericDataService {
@@ -21,9 +22,11 @@ export class GenericDataService {
      */
     getServerUTCCurrentDateTime(): Observable<string> {
         return this.http.get('system-settings/utc-date')
-            .map((dateObject: { date }) => {
-                return _.get(dateObject, 'date');
-            });
+            .pipe(
+                map((dateObject: { date }) => {
+                    return _.get(dateObject, 'date');
+                })
+            );
     }
 
     /**
@@ -32,9 +35,11 @@ export class GenericDataService {
      */
     getServerUTCToday(): Observable<Moment> {
         return this.getServerUTCCurrentDateTime()
-            .map((serverDateTime: string) => {
-                return moment(serverDateTime).startOf('day');
-            });
+            .pipe(
+                map((serverDateTime: string) => {
+                    return moment(serverDateTime).startOf('day');
+                })
+            );
     }
 
     /**
@@ -42,7 +47,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getFilterYesNoOptions(withoutAll: boolean = false): Observable<any[]> {
-        return Observable.of(Object.values(withoutAll ? _.filter(Constants.FILTER_YES_NO_OPTIONS, (o) => o.value !== '' ) : Constants.FILTER_YES_NO_OPTIONS));
+        return of(Object.values(withoutAll ? _.filter(Constants.FILTER_YES_NO_OPTIONS, (o) => o.value !== '' ) : Constants.FILTER_YES_NO_OPTIONS));
     }
 
     /**
@@ -50,7 +55,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getAnswerTypesList(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.ANSWER_TYPES));
+        return of(Object.values(Constants.ANSWER_TYPES));
     }
 
     /**
@@ -58,7 +63,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getAnswersDisplayOrientationsList(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.ANSWERS_DISPLAY));
+        return of(Object.values(Constants.ANSWERS_DISPLAY));
     }
 
     /**
@@ -66,7 +71,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getProgressOptionsList(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.PROGRESS_OPTIONS));
+        return of(Object.values(Constants.PROGRESS_OPTIONS));
     }
 
     /**
@@ -105,7 +110,7 @@ export class GenericDataService {
      * Get entity type options
      */
     getEntityTypeOptions(): Observable<any[]> {
-        return Observable.of([
+        return of([
             new LabelValuePair(
                 EntityType.CASE,
                 EntityType.CASE
@@ -126,7 +131,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getTransmissionChainViewTypes(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_VIEW_TYPES));
+        return of(Object.values(Constants.TRANSMISSION_CHAIN_VIEW_TYPES));
     }
 
     /**
@@ -134,28 +139,28 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getEpiCurvesTypes(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.EPI_CURVE_TYPES));
+        return of(Object.values(Constants.EPI_CURVE_TYPES));
     }
 
     /**
      * Retrieve backup module list
      */
     getBackupModuleList(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.SYSTEM_BACKUP_MODULES));
+        return of(Object.values(Constants.SYSTEM_BACKUP_MODULES));
     }
 
     /**
      * Retrieve backup status list
      */
     getBackupStatusList(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.SYSTEM_BACKUP_STATUS));
+        return of(Object.values(Constants.SYSTEM_BACKUP_STATUS));
     }
 
     /**
      * Retrieve backup status list
      */
     getSyncLogStatusList(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.SYSTEM_SYNC_LOG_STATUS));
+        return of(Object.values(Constants.SYSTEM_SYNC_LOG_STATUS));
     }
 
     /**
@@ -163,7 +168,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getTransmissionChainNodeColorCriteriaOptions(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS));
+        return of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS));
     }
 
     /**
@@ -171,7 +176,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getTransmissionChainEdgeColorCriteriaOptions(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS));
+        return of(Object.values(Constants.TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS));
     }
 
     /**
@@ -179,7 +184,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getTransmissionChainEdgeLabelCriteriaOptions(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS));
+        return of(Object.values(Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS));
     }
 
     /**
@@ -187,7 +192,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getTransmissionChainEdgeIconCriteriaOptions(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS));
+        return of(Object.values(Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS));
     }
 
     /**
@@ -195,7 +200,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getTransmissionChainNodeIconCriteriaOptions(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS));
+        return of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS));
     }
 
     /**
@@ -203,7 +208,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getTransmissionChainNodeShapeCriteriaOptions(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS));
+        return of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS));
     }
 
     /**
@@ -211,7 +216,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getTransmissionChainNodeLabelCriteriaOptions(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS));
+        return of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS));
     }
 
     /**
@@ -219,7 +224,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getAuditLogActionOptions(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.AUDIT_LOG_ACTION_OPTIONS));
+        return of(Object.values(Constants.AUDIT_LOG_ACTION_OPTIONS));
     }
 
     /**
@@ -227,7 +232,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getDataModuleOptions(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.DATA_MODULES));
+        return of(Object.values(Constants.DATA_MODULES));
     }
 
     /**
@@ -235,7 +240,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getSyncPackageModuleOptions(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.SYNC_PACKAGE_EXPORT_MODULES));
+        return of(Object.values(Constants.SYNC_PACKAGE_EXPORT_MODULES));
     }
 
     /**
@@ -243,7 +248,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getSyncPackageExportTypeOptions(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.SYNC_PACKAGE_EXPORT_TYPES));
+        return of(Object.values(Constants.SYNC_PACKAGE_EXPORT_TYPES));
     }
 
     /**
@@ -255,7 +260,7 @@ export class GenericDataService {
         if (removeRisk) {
             delete options.RISK;
         }
-        return Observable.of(Object.values(options));
+        return of(Object.values(options));
     }
 
     /**
@@ -263,7 +268,7 @@ export class GenericDataService {
      * @returns {Observable<any[]>}
      */
     getGanttChartTypes(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.GANTT_CHART_TYPES));
+        return of(Object.values(Constants.GANTT_CHART_TYPES));
     }
 }
 

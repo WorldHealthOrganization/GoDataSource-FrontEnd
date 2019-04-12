@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { BackupModel } from '../../models/backup.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
@@ -13,7 +13,8 @@ export class SystemBackupDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {}
+    ) {
+    }
 
     /**
      * Create backup
