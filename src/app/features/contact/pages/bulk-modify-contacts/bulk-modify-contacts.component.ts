@@ -142,11 +142,11 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
      */
     @HostListener('window:resize')
     private setSheetWidth() {
-        this.sheetWidth = window.innerWidth - 340;
+        this.sheetWidth = window.innerWidth - 220;
     }
 
     /**
-     * Set the locations list options as label value pair based on what locations are selected
+     * Set the locations list options as label value pair based on what locations are selected by the user
      */
     publishLocationsAtLabelValue(locations: LocationAutoItem[]) {
         this.locationsListOptions$ = of<LabelValuePair[]>(
@@ -159,6 +159,10 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         this.configureSheetWidget();
     }
 
+    /**
+     * Emit all locations (the initial ones and the selected ones)
+     * @returns {Observable<LabelValuePair[]>}
+     */
     get allLocationsListOptions(): Observable<LabelValuePair[]> {
         return new Observable((observer) => {
             this.locationsListOptions$.subscribe((selectedLocations) => {
@@ -171,6 +175,10 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         });
     }
 
+    /**
+     * Get existing locations and publish them in the location drop
+     * @param {ContactModel[]} contactModels
+     */
     getExistingLocationsAsLabelValueKey(contactModels: ContactModel[]) {
         const locationIds = [];
         // get location ids
@@ -310,7 +318,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 .setOptions(this.genderList$, this.i18nService),
             new DropdownSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
-                .setProperty('contact.addresses[0].locationId')
+                .setProperty('addresses.locationId')
                 .setOptions(this.allLocationsListOptions, this.i18nService),
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
