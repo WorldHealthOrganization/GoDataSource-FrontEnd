@@ -39,7 +39,7 @@
         </span>
 
         <span
-            *ngIf="displayRefresh"
+            *ngIf="displayRefresh && !disabled"
             class="xt-icon refresh-icon"
             [matTooltip]="'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION' | translate"
             (click)="onRefreshPressed()">
