@@ -29,6 +29,7 @@ import { catchError, share } from 'rxjs/operators';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import {map, switchMap} from "rxjs/internal/operators";
 
 @Component({
     selector: 'app-bulk-modify-contacts',
@@ -236,82 +237,95 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         // retrieve contacts
         this.contactDataService
             .getContactsList(this.selectedOutbreak.id, qb)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                switchMap((contactModels) => {
+                    // retrieve the existing locations
+                    return this.getExistingLocationsAsLabelValueKey(contactModels)
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            }),
+                            map((locationsData) => {
+                                this.existingLocations = _.map(locationsData, (location: LocationModel) => {
+                                        return new LabelValuePair(location.name, location.id);
+                                    });
+                                return contactModels;
+                            })
+                        );
+                })
+            )
             .subscribe((contactModels) => {
-                // get locations
-                this.getExistingLocationsAsLabelValueKey(contactModels)
-                    .subscribe((locationsData: LocationModel[]) => {
-                        // configure locations
-                        this.existingLocations = _.map(locationsData, (location: LocationModel) => {
-                            return new LabelValuePair(location.name, location.id);
-                        });
+            // construct hot table data
+                this.extraContactData = [];
+                this.data = (contactModels || []).map((contact: ContactModel) => {
+                    // determine contact data
+                    const contactData = [];
+                    this.sheetColumns.forEach((column: AbstractSheetColumn) => {
+                        // retrieve property
+                        const property = column.property;
 
-                        // construct hot table data
-                        this.extraContactData = [];
-                        this.data = (contactModels || []).map((contact: ContactModel) => {
-                            // determine contact data
-                            const contactData = [];
-                            this.sheetColumns.forEach((column: AbstractSheetColumn) => {
-                                // retrieve property
-                                const property = column.property;
+                        // retrieve value
+                        let value;
+                        let addressModel: AddressModel;
+                        switch (property) {
+                            case 'addresses.phoneNumber':
+                                addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                                value = addressModel ? addressModel.phoneNumber : null;
+                                break;
+                            case 'addresses.city':
+                                addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                                value = addressModel ? addressModel.city : null;
+                                break;
+                            case 'addresses.locationId':
+                                addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                                value = addressModel ? _.find(this.existingLocations, { value: addressModel.locationId }) : null;
+                                value = value ? value.label : null;
+                                break;
+                            case 'addresses.addressLine1':
+                                addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                                value = addressModel ? addressModel.addressLine1 : null;
+                                break;
+                            default:
+                                value = _.get(contact, property);
+                        }
 
-                                // retrieve value
-                                let value;
-                                let addressModel: AddressModel;
-                                switch (property) {
-                                    case 'addresses.phoneNumber':
-                                        addressModel = AddressModel.getCurrentAddress(contact.addresses);
-                                        value = addressModel ? addressModel.phoneNumber : null;
-                                        break;
-                                    case 'addresses.city':
-                                        addressModel = AddressModel.getCurrentAddress(contact.addresses);
-                                        value = addressModel ? addressModel.city : null;
-                                        break;
-                                    case 'addresses.locationId':
-                                        addressModel = AddressModel.getCurrentAddress(contact.addresses);
-                                        value = addressModel ? _.find(this.existingLocations, { value: addressModel.locationId }) : null;
-                                        value = value ? value.label : null;
-                                        break;
-                                    case 'addresses.addressLine1':
-                                        addressModel = AddressModel.getCurrentAddress(contact.addresses);
-                                        value = addressModel ? addressModel.addressLine1 : null;
-                                        break;
-                                    default:
-                                        value = _.get(contact, property);
-                                }
+                        // format value
+                        switch (column.type) {
+                            case SheetCellType.NUMERIC:
+                                value = value ? parseFloat(value) : null;
+                                break;
+                            case SheetCellType.DATE:
+                                value = value ? moment(value).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : null;
+                                break;
+                            case SheetCellType.TEXT:
+                                // NOTHING
+                                break;
+                            case SheetCellType.DROPDOWN:
+                                value = value ? this.i18nService.instant(value) : null;
+                                break;
+                        }
 
-                                // format value
-                                switch (column.type) {
-                                    case SheetCellType.NUMERIC:
-                                        value = value ? parseFloat(value) : null;
-                                        break;
-                                    case SheetCellType.DATE:
-                                        value = value ? moment(value).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : null;
-                                        break;
-                                    case SheetCellType.TEXT:
-                                        // NOTHING
-                                        break;
-                                    case SheetCellType.DROPDOWN:
-                                        value = value ? this.i18nService.instant(value) : null;
-                                        break;
-                                }
-
-                                // finished
-                                contactData.push(value !== undefined ? value : null);
-                            });
-
-                            // return spreadsheet data
-                            this.extraContactData.push({
-                                id: contact.id,
-                                addresses: contact.addresses
-                            });
-
-                            // finished
-                            return contactData;
-                        });
-
-                        // init table columns
-                        this.configureSheetWidget();
+                        // finished
+                        contactData.push(value !== undefined ? value : null);
                     });
+
+                    // return spreadsheet data
+                    this.extraContactData.push({
+                        id: contact.id,
+                        addresses: contact.addresses
+                    });
+
+                    // finished
+                    return contactData;
+                });
+
+                // init table columns
+                this.configureSheetWidget();
             });
     }
 
