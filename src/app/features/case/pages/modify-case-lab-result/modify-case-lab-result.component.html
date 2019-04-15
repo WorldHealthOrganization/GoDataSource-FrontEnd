@@ -14,11 +14,11 @@
                 <mat-card class="page-section">
                     <div fxLayout="column">
                         <div
-                            class="follow-ups-title"
+                            class="lab-result-case-title"
                             fxLayout="row" fxLayoutGap="20px">
                             <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
                             <a
-                                [routerLink]="['/contacts', followUpData.contact.id, 'view']">
+                                [routerLink]="['/cases', caseData.id, 'view']">
                                 {{ caseData.name}}
                             </a>
                         </div>
