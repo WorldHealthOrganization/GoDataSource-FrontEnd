@@ -29,7 +29,7 @@ import { catchError, share } from 'rxjs/operators';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import {map, switchMap} from "rxjs/internal/operators";
+import { map, switchMap } from 'rxjs/internal/operators';
 
 @Component({
     selector: 'app-bulk-modify-contacts',
