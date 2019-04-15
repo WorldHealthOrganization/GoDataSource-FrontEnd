@@ -32,7 +32,10 @@
     </ng-container>
 </app-topnav>
 
-<mat-card class="page-section page-content">
+<mat-card
+    class="page-section page-content"
+    fxLayout="column"
+>
 
     <div class="filters" fxLayout="column" fxLayoutGap="10px">
         <div>
@@ -105,18 +108,14 @@
         </div>
     </div>
 
-    <div
-        fxFlex fxLayout="column" fxLayoutGap="5px">
-        <div
-            fxFlex>
+    <div fxLayout="column" fxLayoutGap="5px">
+        <div>
             {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_NO_DATA_LABEL' | translate }}
         </div>
-        <div
-            fxFlex>
+        <div>
             {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_CLICK_TO_VIEW_FOLLOW_UP_LABEL' | translate }}
         </div>
-        <div
-            fxFlex>
+        <div>
             {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_QUESTIONNAIRE_ALERT_LABEL' | translate }}
         </div>
     </div>
@@ -167,11 +166,11 @@
         </div>
 
         <div
-            class="follow-up-range-table-content">
+            class="follow-up-range-table-content"
+            fxLayout="column"
+        >
             <!-- Table headers -->
-            <div
-                fxFlex fxLayout="row">
-
+            <div fxLayout="row">
                 <!-- Contact Name -->
                 <div
                     fxFlex="270px"
@@ -212,13 +211,14 @@
 
             <!-- Table Rows -->
             <div
-                fxFlex fxLayout="column" fxLayoutGap="2px"
-                class="follow-up-range-records">
+                class="follow-up-range-records"
+                fxLayout="column" fxLayoutGap="2px"
+            >
                 <div
                     *ngFor="let contactFollowUpData of followUpsGroupedByContact"
-                    fxFlex fxLayout="row"
-                    class="follow-up-range-records-row">
-
+                    class="follow-up-range-records-row"
+                    fxLayout="row"
+                >
                     <!-- Contact Name -->
                     <div
                         fxFlex="270px"
