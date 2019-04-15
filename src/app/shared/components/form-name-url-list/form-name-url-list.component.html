@@ -6,7 +6,7 @@
         fxLayout="column"
     >
         <div
-            *ngFor="let inputValue of values; let i = index"
+            *ngFor="let inputValue of values; let i = index; trackBy: trackByIndex"
             fxFlex fxLayout="row" fxLayoutAlign="start center">
             <mat-card
                 fxFlex
