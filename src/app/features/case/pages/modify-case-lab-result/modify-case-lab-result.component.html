@@ -13,6 +13,15 @@
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
+                        <div
+                            class="follow-ups-title"
+                            fxLayout="row" fxLayoutGap="20px">
+                            <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
+                            <!--<a-->
+                                <!--[routerLink]="['/contacts', followUpData.contact.id, 'view']">-->
+                                <!--{{ followUpData.contact.name }}-->
+                            <!--</a>-->
+                        </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
