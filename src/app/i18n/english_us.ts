@@ -39,6 +39,12 @@ export const EnglishUsLang = {
          */
         'LNG_FOLLOW_UP_FIELD_LABEL_NOT_TARGETED': 'Not targeted',
         'LNG_FOLLOW_UP_FIELD_LABEL_NOT_TARGETED_DESCRIPTION': '',
+
+        /**
+         * uiModifyCaseLabResultPage
+         */
+        'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE': 'Case'
+
         /**
          * REMOVE the tokens from below
          */
