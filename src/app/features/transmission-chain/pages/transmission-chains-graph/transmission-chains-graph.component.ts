@@ -131,7 +131,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
         this.systemSettingsDataService
             .getAPIVersion()
             .subscribe((versionData: SystemSettingsVersionModel) => {
-                if (versionData.process.arch === Constants.PLATFORM_ARCH.X32 ) {
+                if (versionData.arch === Constants.PLATFORM_ARCH.X32 ) {
                     this.x32Architecture = true;
                  }
             });

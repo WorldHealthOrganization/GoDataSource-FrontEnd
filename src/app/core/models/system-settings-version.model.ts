@@ -5,16 +5,13 @@ export class SystemSettingsVersionModel {
     type: string;
     version: string;
     build: string;
-    process: {
-        platform: string,
-        arch: string
-    };
+    arch: string;
 
     constructor(data = null) {
         this.platform = _.get(data, 'platform');
         this.type = _.get(data, 'type');
         this.version = _.get(data, 'version');
         this.build = _.get(data, 'build');
-        this.process = _.get(data, 'process', {});
+        this.arch = _.get(data, 'arch');
     }
 }
