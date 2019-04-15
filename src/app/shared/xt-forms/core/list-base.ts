@@ -102,6 +102,14 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
     }
 
     /**
+     * Track by
+     * @param index
+     */
+    trackByIndex(index: number) {
+        return index;
+    }
+
+    /**
      * Remove an existing model
      */
     delete(index, overrideConfirm: boolean = false) {

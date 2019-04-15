@@ -7,7 +7,7 @@
         #groupForm="ngForm"
         fxLayout="column"
     >
-        <div *ngFor="let document of values; let i = index" fxFlex fxLayout="row"
+        <div *ngFor="let document of values; let i = index; trackBy: trackByIndex" fxFlex fxLayout="row"
              fxLayoutAlign="start center">
             <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
                 <app-form-document

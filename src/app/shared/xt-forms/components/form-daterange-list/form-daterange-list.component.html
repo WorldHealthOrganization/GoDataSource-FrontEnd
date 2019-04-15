@@ -6,7 +6,7 @@
         fxLayout="column"
     >
         <div
-            *ngFor="let daterange of values; let i = index"
+            *ngFor="let daterange of values; let i = index; trackBy: trackByIndex"
             fxLayout="row" fxLayoutAlign="start center"
         >
             <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
