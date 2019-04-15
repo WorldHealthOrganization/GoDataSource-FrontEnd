@@ -110,7 +110,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).pipe(share());
         this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
 
-        // configure Sheet widget
+        // init table columns
         this.configureSheetWidget();
 
         // get selected outbreak
@@ -146,20 +146,6 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     }
 
     /**
-     * Set the locations list options as label value pair based on what locations are selected by the user
-     */
-    publishLocationsAtLabelValue(locations: LocationAutoItem[]) {
-        this.locationsListOptions$ = of<LabelValuePair[]>(
-            _.map(locations, (location: LocationAutoItem) => {
-                return new LabelValuePair(location.label, location.id);
-            })
-        );
-
-        // configure Sheet widget
-        this.configureSheetWidget();
-    }
-
-    /**
      * Emit all locations (the initial ones and the selected ones)
      * @returns {Observable<LabelValuePair[]>}
      */
@@ -176,33 +162,46 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     }
 
     /**
-     * Get existing locations and publish them in the location drop
+     * Set the locations list options as label value pair based on what locations are selected by the user
+     */
+    publishLocationsAtLabelValue(locations: LocationAutoItem[]) {
+        this.locationsListOptions$ = of<LabelValuePair[]>(
+            _.map(locations, (location: LocationAutoItem) => {
+                return new LabelValuePair(location.label, location.id);
+            })
+        );
+
+        // configure Sheet widget
+        this.configureSheetWidget();
+    }
+
+    /**
+     * Return existing locations to publish them in the location drop-down
      * @param {ContactModel[]} contactModels
      */
-    getExistingLocationsAsLabelValueKey(contactModels: ContactModel[]) {
-        const locationIds = [];
+    getExistingLocationsAsLabelValueKey(contactModels: ContactModel[]): Observable<LocationModel[]> {
         // get location ids
+        const locationIds = [];
         _.map(contactModels, (contact: ContactModel) => {
-            _.each(contact.addresses, (address: AddressModel) => {
-                locationIds.push(address.locationId);
-            });
+            const currentAddress: AddressModel = AddressModel.getCurrentAddress(contact.addresses);
+            if (
+                currentAddress &&
+                currentAddress.locationId
+            ) {
+                locationIds.push(currentAddress.locationId);
+            }
         });
-        // retrieve locations for displaying the in template
-        const qb = new RequestQueryBuilder();
 
+        // retrieve locations for displaying them in template
+        const qb = new RequestQueryBuilder();
         qb.filter.where({
             id: {
                 inq: locationIds
             }
         });
 
-        this.locationDataService.getLocationsList(qb)
-            .subscribe((locationsData: LocationModel[]) => {
-                this.existingLocations = _.map(locationsData, (location: LocationModel) => {
-                    return new LabelValuePair(location.name, location.id);
-                });
-                this.configureSheetWidget();
-            });
+        // get existing locations info and return them
+        return this.locationDataService.getLocationsList(qb);
     }
 
     /**
@@ -238,63 +237,81 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         this.contactDataService
             .getContactsList(this.selectedOutbreak.id, qb)
             .subscribe((contactModels) => {
-                this.extraContactData = [];
                 // get locations
-                this.getExistingLocationsAsLabelValueKey(contactModels);
-                this.data = (contactModels || []).map((contact: ContactModel) => {
-                    // determine contact data
-                    const contactData = [];
-                    this.sheetColumns.forEach((column: AbstractSheetColumn) => {
-                        // retrieve property
-                        const property = column.property;
+                this.getExistingLocationsAsLabelValueKey(contactModels)
+                    .subscribe((locationsData: LocationModel[]) => {
+                        // configure locations
+                        this.existingLocations = _.map(locationsData, (location: LocationModel) => {
+                            return new LabelValuePair(location.name, location.id);
+                        });
 
-                        // retrieve value
-                        let value;
-                        let addressModel: AddressModel;
-                        switch (property) {
-                            case 'addresses.phoneNumber':
-                                addressModel = AddressModel.getCurrentAddress(contact.addresses);
-                                value = addressModel ? addressModel.phoneNumber : null;
-                                break;
-                            case 'addresses.city':
-                                addressModel = AddressModel.getCurrentAddress(contact.addresses);
-                                value = addressModel ? addressModel.city : null;
-                                break;
-                            case 'addresses.addressLine1':
-                                addressModel = AddressModel.getCurrentAddress(contact.addresses);
-                                value = addressModel ? addressModel.addressLine1 : null;
-                                break;
-                            default:
-                                value = _.get(contact, property);
-                        }
+                        // construct hot table data
+                        this.extraContactData = [];
+                        this.data = (contactModels || []).map((contact: ContactModel) => {
+                            // determine contact data
+                            const contactData = [];
+                            this.sheetColumns.forEach((column: AbstractSheetColumn) => {
+                                // retrieve property
+                                const property = column.property;
 
-                        // format value
-                        switch (column.type) {
-                            case SheetCellType.NUMERIC:
-                                value = value ? parseFloat(value) : null;
-                                break;
-                            case SheetCellType.DATE:
-                                value = value ? moment(value).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : null;
-                                break;
-                            case SheetCellType.TEXT:
-                                // NOTHING
-                                break;
-                            case SheetCellType.DROPDOWN:
-                                value = value ? this.i18nService.instant(value) : null;
-                                break;
-                        }
+                                // retrieve value
+                                let value;
+                                let addressModel: AddressModel;
+                                switch (property) {
+                                    case 'addresses.phoneNumber':
+                                        addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                                        value = addressModel ? addressModel.phoneNumber : null;
+                                        break;
+                                    case 'addresses.city':
+                                        addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                                        value = addressModel ? addressModel.city : null;
+                                        break;
+                                    case 'addresses.locationId':
+                                        addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                                        value = addressModel ? _.find(this.existingLocations, { value: addressModel.locationId }) : null;
+                                        value = value ? value.label : null;
+                                        break;
+                                    case 'addresses.addressLine1':
+                                        addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                                        value = addressModel ? addressModel.addressLine1 : null;
+                                        break;
+                                    default:
+                                        value = _.get(contact, property);
+                                }
 
-                        // finished
-                        contactData.push(value !== undefined ? value : null);
+                                // format value
+                                switch (column.type) {
+                                    case SheetCellType.NUMERIC:
+                                        value = value ? parseFloat(value) : null;
+                                        break;
+                                    case SheetCellType.DATE:
+                                        value = value ? moment(value).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : null;
+                                        break;
+                                    case SheetCellType.TEXT:
+                                        // NOTHING
+                                        break;
+                                    case SheetCellType.DROPDOWN:
+                                        value = value ? this.i18nService.instant(value) : null;
+                                        break;
+                                }
+
+                                // finished
+                                contactData.push(value !== undefined ? value : null);
+                            });
+
+                            // return spreadsheet data
+                            this.extraContactData.push({
+                                id: contact.id,
+                                addresses: contact.addresses
+                            });
+
+                            // finished
+                            return contactData;
+                        });
+
+                        // init table columns
+                        this.configureSheetWidget();
                     });
-
-                    // return spreadsheet data
-                    this.extraContactData.push({
-                        id: contact.id,
-                        addresses: contact.addresses
-                    });
-                    return contactData;
-                });
             });
     }
 
@@ -508,6 +525,11 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                                     // replace city
                                     if (contactData.addresses.city !== undefined) {
                                         address.city = contactData.addresses.city;
+                                    }
+
+                                    // replace locationId
+                                    if (contactData.addresses.locationId !== undefined) {
+                                        address.locationId = contactData.addresses.locationId;
                                     }
 
                                     // replace address1
