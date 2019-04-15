@@ -33,10 +33,12 @@
     <!-- End of Edit Mode -->
 
     <!-- View Only Mode -->
-    <ng-container *ngIf="disabled">
+    <div fxLayout="column" *ngIf="disabled">
         <ng-container *ngIf="values && values.length > 0; else noDocuments">
-            <div *ngFor="let document of values; let i = index" fxFlex fxLayout="row"
-                 fxLayoutAlign="start center">
+            <div
+                *ngFor="let document of values; let i = index"
+                fxLayout="row" fxLayoutAlign="start center"
+            >
                 <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
                     <app-form-document
                         [name]="name + '[' + i + ']'"
@@ -49,6 +51,6 @@
         <ng-template #noDocuments>
             {{ 'LNG_DOCUMENT_LABEL_NO_DOCUMENTS' | translate }}
         </ng-template>
-    </ng-container>
+    </div>
     <!-- End of View Only Mode -->
 </div>
