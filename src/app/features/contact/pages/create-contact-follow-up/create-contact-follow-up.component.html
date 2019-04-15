@@ -14,48 +14,47 @@
                 <ng-template matStepLabel>{{'LNG_PAGE_CREATE_FOLLOW_UP_TAB_DETAILS_TITLE'| translate}}</ng-template>
 
                 <!-- Details section -->
-                <mat-card class="page-section">
-                    <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <div>{{EntityType.CONTACT | translate}}</div>
-                            <a [routerLink]="['/contacts', contactData?.id, 'modify']">{{ contactData?.name }}</a>
-                        </div>
+                <mat-card class="page-section" fxLayout="column">
+                    <div fxLayout="row" fxLayoutGap="20px">
+                        <div>{{EntityType.CONTACT | translate}}</div>
+                        <a [routerLink]="['/contacts', contactData?.id, 'modify']">{{ contactData?.name }}</a>
+                    </div>
 
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-datepicker
-                                name="date"
-                                [(ngModel)]="followUpData.date"
-                                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
-                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION"
-                                required="true"
-                                app-date-validator>
-                            </app-form-datepicker>
+                    <div fxLayout="row" fxLayoutGap="20px">
+                        <app-form-datepicker
+                            name="date"
+                            [(ngModel)]="followUpData.date"
+                            [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
+                            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION"
+                            required="true"
+                            app-date-validator>
+                        </app-form-datepicker>
 
-                            <app-form-slide-toggle
-                                name="targeted"
-                                [(ngModel)]="followUpData.targeted"
-                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
-                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION">
-                            </app-form-slide-toggle>
+                        <app-form-slide-toggle
+                            name="targeted"
+                            [(ngModel)]="followUpData.targeted"
+                            [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
+                            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION">
+                        </app-form-slide-toggle>
 
-                            <app-form-select
-                                name="statusId"
-                                [(ngModel)]="followUpData.statusId"
-                                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate"
-                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION"
-                                [options]="dailyStatusTypeOptions$ | async"
-                                [required]="true"
-                                optionLabelKey="label"
-                                optionValueKey="value">
-                            </app-form-select>
+                        <app-form-select
+                            name="statusId"
+                            [(ngModel)]="followUpData.statusId"
+                            [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate"
+                            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION"
+                            [options]="dailyStatusTypeOptions$ | async"
+                            [required]="true"
+                            optionLabelKey="label"
+                            optionValueKey="value">
+                        </app-form-select>
 
-                            <div fxFlex><!-- placeholder --></div>
-                        </div>
+                        <div fxFlex><!-- placeholder --></div>
                     </div>
                 </mat-card>
 
                 <div class="stepper-navigation-buttons">
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}
+                    </button>
                 </div>
             </form>
         </mat-step>
@@ -63,7 +62,8 @@
         <!-- Questionnaire step -->
         <mat-step [stepControl]="questionnaireForm">
             <form #questionnaireForm="ngForm">
-                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate }}</ng-template>
+                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate }}
+                </ng-template>
 
                 <!-- Questionnaire section -->
                 <app-form-fill-questionnaire
@@ -73,8 +73,11 @@
                 </app-form-fill-questionnaire>
 
                 <div class="stepper-navigation-buttons">
-                    <button matStepperPrevious mat-raised-button type="button">{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
+                    <button matStepperPrevious mat-raised-button type="button">{{'LNG_STEPPER_BUTTON_BACK' |
+                        translate}}
+                    </button>
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}
+                    </button>
                 </div>
             </form>
         </mat-step>
@@ -84,8 +87,10 @@
             <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL'| translate}}</ng-template>
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
             <div class="stepper-navigation-buttons">
-                <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK'| translate}}</button>
-                <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent" (click)="createNewFollowUp([detailsForm, questionnaireForm])">
+                <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK'| translate}}
+                </button>
+                <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent"
+                        (click)="createNewFollowUp([detailsForm, questionnaireForm])">
                     {{'LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_BUTTON' | translate}}
                 </button>
             </div>
