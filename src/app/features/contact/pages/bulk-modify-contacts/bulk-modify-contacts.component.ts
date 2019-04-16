@@ -155,7 +155,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
             this.locationsListOptions$.subscribe((selectedLocations) => {
                 if (this.existingLocations) {
                     const allLocations = this.existingLocations.concat(selectedLocations);
-                    observer.next(allLocations);
+                    observer.next(_.uniqWith(allLocations, _.isEqual));
                     observer.complete();
                 }
            });
@@ -237,12 +237,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         // retrieve contacts
         this.contactDataService
             .getContactsList(this.selectedOutbreak.id, qb)
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    return throwError(err);
-                }),
-                switchMap((contactModels) => {
+            .pipe(switchMap((contactModels) => {
                     // retrieve the existing locations
                     return this.getExistingLocationsAsLabelValueKey(contactModels)
                         .pipe(
@@ -259,8 +254,12 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                         );
                 })
             )
+            .pipe(catchError((err) => {
+                this.snackbarService.showApiError(err);
+                return throwError(err);
+            }))
             .subscribe((contactModels) => {
-            // construct hot table data
+                // construct hot table data
                 this.extraContactData = [];
                 this.data = (contactModels || []).map((contact: ContactModel) => {
                     // determine contact data

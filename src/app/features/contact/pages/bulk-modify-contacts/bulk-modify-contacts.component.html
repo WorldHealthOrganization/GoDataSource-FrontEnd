@@ -19,6 +19,7 @@
                                 [placeholder]="'LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_LOCATIONS' | translate"
                                 tooltip="LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_LOCATIONS_DESCRIPTION"
                                 multiple="true"
+                                [useOutbreakLocations]="true"
                                 (itemChanged)="publishLocationsAtLabelValue($event)">
                             </app-form-location-dropdown>
 
