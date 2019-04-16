@@ -23,6 +23,13 @@
                             </a>
                         </div>
 
+                        <div
+                            *ngIf="displayOnsetDateWarningMessage"
+                            class="warning-message"
+                            fxLayout="row">
+                            {{ 'LNG_PAGE_VIEW_CASE_LAB_RESULT_WARNING_CASE_DATEOFONSET_AFTER_SAMPLE_TAKEN' | translate }}
+                        </div>
+
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="sampleIdentifier"
@@ -34,7 +41,7 @@
 
                             <app-form-datepicker
                                 name="dateSampleTaken"
-                                [ngModel]="labResultData.dateSampleTaken"
+                                [(ngModel)]="labResultData.dateSampleTaken"
                                 required="true"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN' | translate"
                                 tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN_DESCRIPTION"
@@ -149,14 +156,13 @@
                                 [disabled]="viewOnly">
                             </app-form-select>
 
-                            <app-form-textarea
-                                name="notes"
-                                [ngModel]="labResultData.notes"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES' | translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES_DESCRIPTION"
-                                minRows="1"
+                            <app-form-input
+                                name="testedFor"
+                                [ngModel]="labResultData.testedFor"
+                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_TESTED_FOR' | translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_TESTED_FOR_DESCRIPTION"
                                 [disabled]="viewOnly">
-                            </app-form-textarea>
+                            </app-form-input>
 
                             <app-form-select
                                 name="status"
@@ -179,6 +185,16 @@
                             </app-form-textarea>
                         </div>
 
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-textarea
+                                name="notes"
+                                [ngModel]="labResultData.notes"
+                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES' | translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES_DESCRIPTION"
+                                minRows="1"
+                                [disabled]="viewOnly">
+                            </app-form-textarea>
+                        </div>
                     </div>
                 </mat-card>
 

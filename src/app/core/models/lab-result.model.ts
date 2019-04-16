@@ -22,6 +22,7 @@ export class LabResultModel {
         [variable: string]: IAnswerData[];
     };
     personId: string;
+    testedFor: string;
     deleted: boolean;
 
     constructor(data = null) {
@@ -40,6 +41,7 @@ export class LabResultModel {
         this.status = _.get(data, 'status', Constants.PROGRESS_OPTIONS.IN_PROGRESS.value);
         this.quantitativeResult = _.get(data, 'quantitativeResult');
         this.personId = _.get(data, 'personId');
+        this.testedFor = _.get(data, 'testedFor');
         this.deleted = _.get(data, 'deleted');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});

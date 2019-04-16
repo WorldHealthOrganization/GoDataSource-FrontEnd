@@ -20,6 +20,7 @@ import { Moment } from 'moment';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-create-case-relationship',
@@ -43,9 +44,21 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
-    caseId: string;
+    // case data
+    caseData: CaseModel = new CaseModel();
 
     serverToday: Moment = null;
+
+    /**
+     * Check if we need to display warning message that case date of onset is after sample taken date
+     */
+    get displayOnsetDateWarningMessage(): boolean {
+        return this.caseData &&
+            this.labResultData &&
+            this.caseData.dateOfOnset &&
+            this.labResultData.dateSampleTaken &&
+            moment(this.caseData.dateOfOnset).startOf('day').isAfter(moment(this.labResultData.dateSampleTaken).startOf('day'));
+    }
 
     constructor(
         private route: ActivatedRoute,
@@ -100,15 +113,15 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
                                 })
                             )
                             .subscribe((caseData: CaseModel) => {
-                                this.caseId = caseData.id;
+                                this.caseData = caseData;
 
                                 // add new breadcrumb: Case Modify page
                                 this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/view`),
+                                    new BreadcrumbItemModel(caseData.name, `/cases/${this.caseData.id}/view`),
                                 );
                                 // add new breadcrumb: Lab Results list page
                                 this.breadcrumbs.push(
-                                    new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', `/cases/${this.caseId}/lab-results`)
+                                    new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', `/cases/${this.caseData.id}/lab-results`)
                                 );
                                 // add new breadcrumb : page title
                                 this.breadcrumbs.push(
@@ -129,7 +142,7 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
             // add new Lab Result
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.labResultDataService
-                .createLabResult(this.selectedOutbreak.id, this.caseId, dirtyFields)
+                .createLabResult(this.selectedOutbreak.id, this.caseData.id, dirtyFields)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
@@ -148,7 +161,7 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate([`/cases/${this.caseId}/lab-results/${newLabResult.id}/modify`]);
+                    this.router.navigate([`/cases/${this.caseData.id}/lab-results/${newLabResult.id}/modify`]);
                 });
         }
     }

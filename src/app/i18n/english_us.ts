@@ -44,6 +44,13 @@ export const EnglishUsLang = {
          * uiModifyCaseLabResultPage
          */
         'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE': 'Case',
+        'LNG_PAGE_VIEW_CASE_LAB_RESULT_WARNING_CASE_DATEOFONSET_AFTER_SAMPLE_TAKEN': 'Warning: Date of onset is after sample taken date',
+
+        /**
+         * uiCreateCaseLabResultPage
+         */
+        'LNG_PAGE_CREATE_CASE_LAB_RESULT_FIELD_LABEL_CASE': 'Case',
+        'LNG_PAGE_CREATE_CASE_LAB_RESULT_WARNING_CASE_DATEOFONSET_AFTER_SAMPLE_TAKEN': 'Warning: Date of onset is after sample taken date',
 
         /**
          * uiHelpItemFields

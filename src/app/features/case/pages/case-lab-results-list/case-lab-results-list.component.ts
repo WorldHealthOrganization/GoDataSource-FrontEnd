@@ -156,6 +156,10 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                 label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT'
             }),
             new VisibleColumnModel({
+                field: 'testedFor',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TESTED_FOR'
+            }),
+            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DELETED',
                 visible: false
@@ -177,7 +181,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                 fieldName: 'sampleIdentifier',
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
                 type: FilterType.TEXT,
-                sortable: true,
+                sortable: true
             }),
             new FilterModel({
                 fieldName: 'dateSampleTaken',
@@ -228,19 +232,25 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                 fieldName: 'dateTesting',
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
                 type: FilterType.RANGE_DATE,
-                sortable: true,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'testedFor',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
+                type: FilterType.TEXT,
+                sortable: true
             }),
             new FilterModel({
                 fieldName: 'notes',
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES',
                 type: FilterType.TEXT,
-                sortable: true,
+                sortable: true
             }),
             new FilterModel({
                 fieldName: 'status',
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS',
                 type: FilterType.TEXT,
-                sortable: true,
+                sortable: true
             })
         ];
     }
