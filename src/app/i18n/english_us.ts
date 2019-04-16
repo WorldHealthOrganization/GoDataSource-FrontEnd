@@ -50,8 +50,6 @@ export const EnglishUsLang = {
          */
         'LNG_HELP_ITEM_FIELD_LABEL_ORDER': 'Order',
         'LNG_HELP_ITEM_FIELD_LABEL_ORDER_DESCRIPTION': '',
-        'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE': 'Case',
-
 
         /**
          * uiBulkAddContactsPage
