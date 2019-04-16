@@ -32,6 +32,8 @@ import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import * as _ from 'lodash';
 import { catchError, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 
 enum NodeAction {
     MODIFY_PERSON = 'modify-person',
@@ -77,6 +79,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
     newRelationship = new RelationshipModel();
     // new contact model
     newContact = new ContactModel();
+    // do architecture is x32?
+    x86Architecture: boolean = false;
 
     // provide constants to template
     Constants = Constants;
@@ -95,7 +99,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,
         private contactDataService: ContactDataService,
-        private domService: DomService
+        private domService: DomService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {}
 
     ngOnInit() {
@@ -120,6 +125,15 @@ export class TransmissionChainsGraphComponent implements OnInit {
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+            });
+
+        // check if platform architecture is x32
+        this.systemSettingsDataService
+            .getAPIVersion()
+            .subscribe((versionData: SystemSettingsVersionModel) => {
+                if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
+                    this.x86Architecture = true;
+                 }
             });
     }
 

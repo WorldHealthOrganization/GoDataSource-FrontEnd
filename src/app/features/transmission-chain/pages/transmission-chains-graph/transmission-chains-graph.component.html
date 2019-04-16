@@ -12,6 +12,7 @@
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <button
+                        [disabled]="x86Architecture"
                         mat-menu-item
                         (click)="exportVisualizedMapOrGraph()">
                         {{ buttonText | translate}}

@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Router } from '@angular/router';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { Moment } from 'moment';
 import { AppliedFilterModel, FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
@@ -19,6 +18,8 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { Constants } from '../../../../core/models/constants';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 
 @Component({
     selector: 'app-gantt-chart',
@@ -50,14 +51,17 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
 
     Constants = Constants;
 
+    // do architecture is x32?
+    x86Architecture: boolean = false;
+
     constructor(
-        private router: Router,
         private domService: DomService,
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService,
         private dialogService: DialogService,
         private genericDataService: GenericDataService,
-        protected snackbarService: SnackbarService
+        protected snackbarService: SnackbarService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {
         super();
     }
@@ -67,6 +71,14 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
         this.initializeSideFilters();
         // load gantt types
         this.ganttChartTypes = this.genericDataService.getGanttChartTypes();
+        // check if platform architecture is x32
+        this.systemSettingsDataService
+            .getAPIVersion()
+            .subscribe((versionData: SystemSettingsVersionModel) => {
+                if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
+                    this.x86Architecture = true;
+                }
+            });
     }
 
     /**

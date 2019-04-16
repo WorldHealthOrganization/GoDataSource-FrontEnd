@@ -6,7 +6,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { DashboardDashlet, DashboardKpiGroup } from '../../../../core/enums/dashboard.enum';
 import * as _ from 'lodash';
 import { DashletSettingsModel, UserSettingsDashboardModel } from '../../../../core/models/user-settings-dashboard.model';
-import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Observable ,  Subscription } from 'rxjs';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -26,6 +25,8 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -91,6 +92,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     // flag if there aren't any outbreaks in the system
     noOutbreaksInSystem: boolean = false;
+    // do architecture is x32?
+    x86Architecture: boolean = false;
 
     // constants
     ExportDataExtension = ExportDataExtension;
@@ -119,14 +122,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     constructor(
         private authDataService: AuthDataService,
-        private userDataService: UserDataService,
         private outbreakDataService: OutbreakDataService,
         private domService: DomService,
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService,
         private genericDataService: GenericDataService,
         private dialogService: DialogService,
-        protected snackbarService: SnackbarService
+        protected snackbarService: SnackbarService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {}
 
     ngOnInit() {
@@ -147,6 +150,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
                     this.selectedOutbreak = selectedOutbreak;
                     this.casesByClassificationAndLocationReportUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/per-classification-per-location-level-report/download/`;
                     this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
+                }
+            });
+
+        // check if platform architecture is x32
+        this.systemSettingsDataService
+            .getAPIVersion()
+            .subscribe((versionData: SystemSettingsVersionModel) => {
+                if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
+                    this.x86Architecture = true;
                 }
             });
 
