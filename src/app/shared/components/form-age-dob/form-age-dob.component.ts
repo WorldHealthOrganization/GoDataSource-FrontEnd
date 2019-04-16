@@ -62,7 +62,7 @@ export class FormAgeDobComponent extends GroupBase<CaseModel | ContactModel> imp
 
         setTimeout(() => {
             // tell parent that data changed
-            super.onChange();
+            super.validateGroup();
         });
     }
 

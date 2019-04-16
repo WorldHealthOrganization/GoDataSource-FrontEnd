@@ -16,8 +16,8 @@
                 app-min-max-validator
                 [minNumber]="0"
                 [min]="0"
-                [maxNumber]="Constants.DEFAULT_AGE_MAX_YEARS"
-                [max]="Constants.DEFAULT_AGE_MAX_YEARS">
+                [maxNumber]="ageType === AgeType.MONTHS ? 11 : Constants.DEFAULT_AGE_MAX_YEARS"
+                [max]="ageType === AgeType.MONTHS ? 11 : Constants.DEFAULT_AGE_MAX_YEARS">
             </app-form-input>
 
             <app-form-input
