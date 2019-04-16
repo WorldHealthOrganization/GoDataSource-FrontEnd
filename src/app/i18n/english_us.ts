@@ -45,6 +45,11 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE': 'Case',
 
+        /**
+         * uiHelpItemFields
+         */
+        'LNG_HELP_ITEM_FIELD_LABEL_ORDER': 'Order',
+        'LNG_HELP_ITEM_FIELD_LABEL_ORDER_DESCRIPTION': '',
 
         /**
          * uiBulkAddContactsPage

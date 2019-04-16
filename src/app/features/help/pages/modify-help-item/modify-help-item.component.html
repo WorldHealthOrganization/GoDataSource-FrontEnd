@@ -71,6 +71,17 @@
                             </app-form-input>
                         </div>
 
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="order"
+                                [ngModel]="helpItemData.order"
+                                [placeholder]="'LNG_HELP_ITEM_FIELD_LABEL_ORDER' | translate"
+                                tooltip="LNG_HELP_ITEM_FIELD_LABEL_ORDER_DESCRIPTION"
+                                maxlength="200"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+                        </div>
+
                     </div>
                 </mat-card>
 
