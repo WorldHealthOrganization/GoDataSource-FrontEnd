@@ -23,6 +23,7 @@ import * as _ from 'lodash';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-modify-case-relationship',
@@ -56,6 +57,17 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
     progressOptionsList$: Observable<any[]>;
 
     serverToday: Moment = null;
+
+    /**
+     * Check if we need to display warning message that case date of onset is after sample taken date
+     */
+    get displayOnsetDateWarningMessage(): boolean {
+        return this.caseData &&
+            this.labResultData &&
+            this.caseData.dateOfOnset &&
+            this.labResultData.dateSampleTaken &&
+            moment(this.caseData.dateOfOnset).startOf('day').isAfter(moment(this.labResultData.dateSampleTaken).startOf('day'));
+    }
 
     constructor(
         protected route: ActivatedRoute,

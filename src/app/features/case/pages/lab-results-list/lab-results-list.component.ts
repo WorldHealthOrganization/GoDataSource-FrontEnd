@@ -150,6 +150,10 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
                 label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT'
             }),
             new VisibleColumnModel({
+                field: 'testedFor',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TESTED_FOR'
+            }),
+            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DELETED',
                 visible: false
@@ -170,7 +174,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
                 fieldName: 'sampleIdentifier',
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
                 type: FilterType.TEXT,
-                sortable: true,
+                sortable: true
             }),
             new FilterModel({
                 fieldName: 'dateSampleTaken',
@@ -216,6 +220,12 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT',
                 type: FilterType.SELECT,
                 options$: this.labTestResultsList$,
+            }),
+            new FilterModel({
+                fieldName: 'testedFor',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
+                type: FilterType.TEXT,
+                sortable: true
             })
         ];
     }
