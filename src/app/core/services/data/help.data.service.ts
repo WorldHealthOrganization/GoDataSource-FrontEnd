@@ -81,7 +81,6 @@ export class HelpDataService {
      * @returns {Observable<HelpItemModel[]>}
      */
     getHelpItemsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
-        queryBuilder.include('category', true);
         queryBuilder.filter.where({approved: true}, true);
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableListToModel(
@@ -100,7 +99,6 @@ export class HelpDataService {
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
         searchedTerm: string
     ): Observable<HelpItemModel[]> {
-        queryBuilder.include('category', true);
         let filter = queryBuilder.buildQuery(false);
         // add condition for search term - this needs to be on the first level of where (not in 'and')
         filter.where.token = { $text: { search: searchedTerm } };
