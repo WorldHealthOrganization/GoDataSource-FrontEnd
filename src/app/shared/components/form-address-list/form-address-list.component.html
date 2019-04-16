@@ -7,7 +7,7 @@
         #groupForm="ngForm"
         fxLayout="column"
     >
-        <div *ngFor="let address of values; let i = index" fxFlex fxLayout="row"
+        <div *ngFor="let address of values; let i = index; trackBy: trackByIndex" fxFlex fxLayout="row"
              fxLayoutAlign="start center">
             <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
                 <app-form-address
@@ -33,10 +33,12 @@
     <!-- End of Edit Mode -->
 
     <!-- View Only Mode -->
-    <ng-container *ngIf="disabled">
+    <div fxLayout="column" *ngIf="disabled">
         <ng-container *ngIf="values && values.length > 0; else noAddresses">
-            <div *ngFor="let address of values; let i = index" fxFlex fxLayout="row"
-                 fxLayoutAlign="start center">
+            <div
+                *ngFor="let address of values; let i = index"
+                fxLayout="row" fxLayoutAlign="start center"
+            >
                 <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
                     <app-form-address
                         [name]="name + '[' + i + ']'"
@@ -49,6 +51,6 @@
         <ng-template #noAddresses>
             {{ 'LNG_ADDRESS_LABEL_NO_ADDRESSES' | translate }}
         </ng-template>
-    </ng-container>
+    </div>
     <!-- End of View Only Mode -->
 </div>

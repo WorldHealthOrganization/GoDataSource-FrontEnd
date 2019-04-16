@@ -255,6 +255,7 @@
                     <form
                         #questionForm="ngForm"
                         [id]="uniqueIDQuestionForm"
+                        class="modify-questionnaire-form"
                         fxFlex fxLayout="column"
                         (submit)="saveModifyQuestion()">
                         <!-- Dummy field used to make form dirty -->
@@ -266,7 +267,7 @@
 
                         <!-- Question Inputs -->
                         <div
-                            fxLayout="row"
+                            fxLayout="row wrap"
                             fxLayoutGap="5px">
                             <!-- question order -->
                             <div
@@ -579,6 +580,7 @@
                                         <!-- Answer Form -->
                                         <form
                                             #answerForm="ngForm"
+                                            class="modify-questionnaire-form"
                                             [id]="uniqueIDAnswerForm"
                                             fxFlex fxLayout="column"
                                             (submit)="updateAnswerData()">
@@ -591,7 +593,7 @@
 
                                             <!-- Edit Answer Form -->
                                             <div
-                                                fxLayout="row"
+                                                fxLayout="row wrap"
                                                 fxLayoutGap="5px">
                                                 <!-- answer order -->
                                                 <div

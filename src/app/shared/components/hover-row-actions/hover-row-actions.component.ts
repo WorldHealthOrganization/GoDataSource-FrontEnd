@@ -144,9 +144,10 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
             this.mouseEvent &&
             this.elementRef
         ) {
+            const scrolledX: number = this.determineParentScrollX();
             const bounding: HoverRowActionsRect = this.elementRef.nativeElement.getBoundingClientRect();
-            const leftDistance = this.mouseEvent.clientX - bounding.left;
-            const rightDistance = bounding.left + bounding.width - this.mouseEvent.clientX;
+            const leftDistance = this.mouseEvent.clientX - (bounding.left + scrolledX);
+            const rightDistance = (bounding.left + scrolledX) + bounding.width - this.mouseEvent.clientX;
             if (leftDistance < rightDistance) {
                 // left
                 position = HoverRowActionsPosition.LEFT;
@@ -259,6 +260,22 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Determine scroll position
+     */
+    determineParentScrollX(): number {
+        // determine scroll position
+        let scrolledX: number = 0;
+        let parent = this.elementRef.nativeElement;
+        while (parent) {
+            scrolledX += parent.scrollLeft;
+            parent = parent.parentElement;
+        }
+
+        // finished
+        return scrolledX;
+    }
+
+    /**
      * Determine row bounding
      */
     determineBounding() {
@@ -271,7 +288,8 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
         const bounding: HoverRowActionsRect = this.elementRef.nativeElement.getBoundingClientRect();
 
         // determine hover row bounding
-        this.hoverRowRect.left = bounding.left;
+        const scrolledX: number = this.determineParentScrollX();
+        this.hoverRowRect.left = scrolledX + bounding.left;
         this.hoverRowRect.top = bounding.top;
         this.hoverRowRect.width = bounding.width;
         this.hoverRowRect.height = bounding.height;
@@ -282,12 +300,12 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
         switch (this.realPosition) {
             // left
             case HoverRowActionsPosition.LEFT:
-                this.hoverActionsRect.left = bounding.left;
+                this.hoverActionsRect.left = bounding.left + scrolledX;
                 break;
 
             // right
             case HoverRowActionsPosition.RIGHT:
-                this.hoverActionsRect.left = bounding.left + bounding.width;
+                this.hoverActionsRect.left = bounding.left + bounding.width + scrolledX;
                 break;
         }
 

@@ -39,6 +39,29 @@ export const EnglishUsLang = {
          */
         'LNG_FOLLOW_UP_FIELD_LABEL_NOT_TARGETED': 'Not targeted',
         'LNG_FOLLOW_UP_FIELD_LABEL_NOT_TARGETED_DESCRIPTION': '',
+
+        /**
+         * uiModifyCaseLabResultPage
+         */
+        'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE': 'Case',
+
+
+        /**
+         * uiBulkAddContactsPage
+         */
+        'LNG_PAGE_BULK_ADD_CONTACTS_TAB_PICK_LOCATIONS': 'Pick locations',
+        'LNG_PAGE_BULK_ADD_CONTACTS_TAB_ADD_CONTACTS': 'Add contacts',
+        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_LOCATIONS': 'Locations',
+        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_LOCATIONS_DESCRIPTION': 'Select the locations to be assigned to contacts in the next step',
+
+        /**
+         * uiBulkModifyContactsPage
+         */
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_TAB_PICK_LOCATIONS': 'Pick locations',
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_TAB_MODIFY_CONTACTS': 'Modify contacts',
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_LOCATIONS': 'Locations',
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_LOCATIONS_DESCRIPTION': 'Select the locations to be assigned to contacts in the next step'
+
         /**
          * REMOVE the tokens from below
          */
