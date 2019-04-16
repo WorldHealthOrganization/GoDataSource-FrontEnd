@@ -10,6 +10,9 @@
                     [(ngModel)]="centerDateRange.typeId"
                     [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID' | translate"
                     [options]="dateTypeList$ | async"
+                    [disabled]="disabled"
+                    [required]="required"
+                    [clearable]="false"
                     optionLabelKey="label"
                     optionValueKey="value"
                     (optionChanged)="onChange()">
