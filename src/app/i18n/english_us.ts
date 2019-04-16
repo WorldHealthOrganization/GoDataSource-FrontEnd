@@ -43,7 +43,13 @@ export const EnglishUsLang = {
         /**
          * uiModifyCaseLabResultPage
          */
-        'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE': 'Case'
+        'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE': 'Case',
+
+        /**
+         * uiHelpItemFields
+         */
+        'LNG_HELP_ITEM_FIELD_LABEL_ORDER': 'Order',
+        'LNG_HELP_ITEM_FIELD_LABEL_ORDER_DESCRIPTION': ''
 
         /**
          * REMOVE the tokens from below

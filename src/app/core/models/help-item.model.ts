@@ -14,6 +14,7 @@ export class HelpItemModel {
     user: UserModel;
     category: HelpCategoryModel;
     page: string;
+    order: number;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -27,6 +28,7 @@ export class HelpItemModel {
         this.user = _.get(data, 'user');
         this.category = _.get(data, 'category');
         this.page = _.get(data, 'page');
+        this.order = _.get(data, 'order');
 
     }
 
