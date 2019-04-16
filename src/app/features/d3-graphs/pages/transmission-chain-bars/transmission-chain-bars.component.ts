@@ -49,7 +49,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     // show filters?
     filtersVisible: boolean = false;
     // do architecture is x32?
-    x32Architecture: boolean = false;
+    x86Architecture: boolean = false;
     // models for filters form elements
     filters = {
         dateOfOnset: null,
@@ -88,8 +88,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         this.systemSettingsDataService
             .getAPIVersion()
             .subscribe((versionData: SystemSettingsVersionModel) => {
-                if (versionData.arch === Constants.PLATFORM_ARCH.X32 ) {
-                    this.x32Architecture = true;
+                if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
+                    this.x86Architecture = true;
                 }
             });
     }

@@ -93,7 +93,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // flag if there aren't any outbreaks in the system
     noOutbreaksInSystem: boolean = false;
     // do architecture is x32?
-    x32Architecture: boolean = false;
+    x86Architecture: boolean = false;
 
     // constants
     ExportDataExtension = ExportDataExtension;
@@ -157,8 +157,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.systemSettingsDataService
             .getAPIVersion()
             .subscribe((versionData: SystemSettingsVersionModel) => {
-                if (versionData.arch === Constants.PLATFORM_ARCH.X32 ) {
-                    this.x32Architecture = true;
+                if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
+                    this.x86Architecture = true;
                 }
             });
 

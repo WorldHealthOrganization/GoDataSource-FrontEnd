@@ -80,7 +80,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
     // new contact model
     newContact = new ContactModel();
     // do architecture is x32?
-    x32Architecture: boolean = false;
+    x86Architecture: boolean = false;
 
     // provide constants to template
     Constants = Constants;
@@ -131,8 +131,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
         this.systemSettingsDataService
             .getAPIVersion()
             .subscribe((versionData: SystemSettingsVersionModel) => {
-                if (versionData.arch === Constants.PLATFORM_ARCH.X32 ) {
-                    this.x32Architecture = true;
+                if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
+                    this.x86Architecture = true;
                  }
             });
     }

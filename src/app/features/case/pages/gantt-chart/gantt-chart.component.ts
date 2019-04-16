@@ -52,7 +52,7 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
     Constants = Constants;
 
     // do architecture is x32?
-    x32Architecture: boolean = false;
+    x86Architecture: boolean = false;
 
     constructor(
         private domService: DomService,
@@ -75,8 +75,8 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
         this.systemSettingsDataService
             .getAPIVersion()
             .subscribe((versionData: SystemSettingsVersionModel) => {
-                if (versionData.arch === Constants.PLATFORM_ARCH.X32 ) {
-                    this.x32Architecture = true;
+                if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
+                    this.x86Architecture = true;
                 }
             });
     }

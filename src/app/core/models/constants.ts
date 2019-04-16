@@ -391,7 +391,7 @@ export class Constants {
      */
     static PLATFORM_ARCH = {
         X64: 'x64',
-        X32: 'x86'
+        X86: 'x86'
     };
 
     /**

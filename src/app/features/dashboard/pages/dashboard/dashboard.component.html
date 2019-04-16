@@ -40,14 +40,14 @@
                             <button
                                 *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                                 mat-menu-item
-                                [disabled]="x32Architecture"
+                                [disabled]="x86Architecture"
                                 (click)="generateEpiCurveReport()">
                                 {{'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL' | translate}}
                             </button>
 
                             <button
                                 mat-menu-item
-                                [disabled]="x32Architecture"
+                                [disabled]="x86Architecture"
                                 (click)="generateKpisReport()">
                                 {{'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL' | translate}}
                             </button>
