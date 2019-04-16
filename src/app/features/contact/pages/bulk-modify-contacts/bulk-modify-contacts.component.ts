@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
@@ -26,6 +26,10 @@ import * as moment from 'moment';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
+import { LocationModel } from '../../../../core/models/location.model';
+import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { map, switchMap } from 'rxjs/internal/operators';
 
 @Component({
     selector: 'app-bulk-modify-contacts',
@@ -41,12 +45,14 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
 
     // selected outbreak
     selectedOutbreak: OutbreakModel;
+    existingLocations: LabelValuePair[];
 
     // options for dropdown cells
     genderList$: Observable<LabelValuePair[]>;
     occupationsList$: Observable<LabelValuePair[]>;
     riskLevelsList$: Observable<LabelValuePair[]>;
     finalFollowUpStatus$: Observable<LabelValuePair[]>;
+    locationsListOptions$: Observable<LabelValuePair[]> = of([]);
 
     // sheet widget configuration
     sheetWidth = 500;
@@ -89,7 +95,8 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         private referenceDataDataService: ReferenceDataDataService,
         private i18nService: I18nService,
         private dialogService: DialogService,
-        private bulkContactsService: BulkContactsService
+        private bulkContactsService: BulkContactsService,
+        private locationDataService: LocationDataService
     ) {
         super();
     }
@@ -104,7 +111,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).pipe(share());
         this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
 
-        // configure Sheet widget
+        // init table columns
         this.configureSheetWidget();
 
         // get selected outbreak
@@ -136,7 +143,66 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
      */
     @HostListener('window:resize')
     private setSheetWidth() {
-        this.sheetWidth = window.innerWidth - 340;
+        this.sheetWidth = window.innerWidth - 220;
+    }
+
+    /**
+     * Emit all locations (the initial ones and the selected ones)
+     * @returns {Observable<LabelValuePair[]>}
+     */
+    get allLocationsListOptions(): Observable<LabelValuePair[]> {
+        return new Observable((observer) => {
+            this.locationsListOptions$.subscribe((selectedLocations) => {
+                if (this.existingLocations) {
+                    const allLocations = this.existingLocations.concat(selectedLocations);
+                    observer.next(_.uniqWith(allLocations, _.isEqual));
+                    observer.complete();
+                }
+           });
+        });
+    }
+
+    /**
+     * Set the locations list options as label value pair based on what locations are selected by the user
+     */
+    publishLocationsAtLabelValue(locations: LocationAutoItem[]) {
+        this.locationsListOptions$ = of<LabelValuePair[]>(
+            _.map(locations, (location: LocationAutoItem) => {
+                return new LabelValuePair(location.label, location.id);
+            })
+        );
+
+        // configure Sheet widget
+        this.configureSheetWidget();
+    }
+
+    /**
+     * Return existing locations to publish them in the location drop-down
+     * @param {ContactModel[]} contactModels
+     */
+    getExistingLocationsAsLabelValueKey(contactModels: ContactModel[]): Observable<LocationModel[]> {
+        // get location ids
+        const locationIds = [];
+        _.map(contactModels, (contact: ContactModel) => {
+            const currentAddress: AddressModel = AddressModel.getCurrentAddress(contact.addresses);
+            if (
+                currentAddress &&
+                currentAddress.locationId
+            ) {
+                locationIds.push(currentAddress.locationId);
+            }
+        });
+
+        // retrieve locations for displaying them in template
+        const qb = new RequestQueryBuilder();
+        qb.filter.where({
+            id: {
+                inq: locationIds
+            }
+        });
+
+        // get existing locations info and return them
+        return this.locationDataService.getLocationsList(qb);
     }
 
     /**
@@ -171,7 +237,29 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         // retrieve contacts
         this.contactDataService
             .getContactsList(this.selectedOutbreak.id, qb)
+            .pipe(switchMap((contactModels) => {
+                    // retrieve the existing locations
+                    return this.getExistingLocationsAsLabelValueKey(contactModels)
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            }),
+                            map((locationsData) => {
+                                this.existingLocations = _.map(locationsData, (location: LocationModel) => {
+                                        return new LabelValuePair(location.name, location.id);
+                                    });
+                                return contactModels;
+                            })
+                        );
+                })
+            )
+            .pipe(catchError((err) => {
+                this.snackbarService.showApiError(err);
+                return throwError(err);
+            }))
             .subscribe((contactModels) => {
+                // construct hot table data
                 this.extraContactData = [];
                 this.data = (contactModels || []).map((contact: ContactModel) => {
                     // determine contact data
@@ -191,6 +279,11 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                             case 'addresses.city':
                                 addressModel = AddressModel.getCurrentAddress(contact.addresses);
                                 value = addressModel ? addressModel.city : null;
+                                break;
+                            case 'addresses.locationId':
+                                addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                                value = addressModel ? _.find(this.existingLocations, { value: addressModel.locationId }) : null;
+                                value = value ? value.label : null;
                                 break;
                             case 'addresses.addressLine1':
                                 addressModel = AddressModel.getCurrentAddress(contact.addresses);
@@ -225,8 +318,13 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                         id: contact.id,
                         addresses: contact.addresses
                     });
+
+                    // finished
                     return contactData;
                 });
+
+                // init table columns
+                this.configureSheetWidget();
             });
     }
 
@@ -248,6 +346,10 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
                 .setProperty('gender')
                 .setOptions(this.genderList$, this.i18nService),
+            new DropdownSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
+                .setProperty('addresses.locationId')
+                .setOptions(this.allLocationsListOptions, this.i18nService),
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
                 .setProperty('addresses.city'),
@@ -436,6 +538,11 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                                     // replace city
                                     if (contactData.addresses.city !== undefined) {
                                         address.city = contactData.addresses.city;
+                                    }
+
+                                    // replace locationId
+                                    if (contactData.addresses.locationId !== undefined) {
+                                        address.locationId = contactData.addresses.locationId;
                                     }
 
                                     // replace address1
