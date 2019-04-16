@@ -104,7 +104,7 @@ export class FormAgeComponent extends GroupBase<AgeModel> {
 
         setTimeout(() => {
             // parent handler
-            super.onChange();
+            super.validateGroup();
         });
 
         // set initial state
@@ -121,6 +121,12 @@ export class FormAgeComponent extends GroupBase<AgeModel> {
      * Age Model
      */
     get age(): AgeModel {
+        if (this.value && this.value.months > 0) {
+            this._ageType = AgeType.MONTHS;
+        } else {
+            this._ageType = AgeType.YEARS;
+        }
+
         // finished
         return this.value ?
             this.value :

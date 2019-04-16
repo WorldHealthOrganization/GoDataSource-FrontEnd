@@ -27,7 +27,7 @@
             <div
                 fxFlex>
                 <app-form-age
-                    *ngIf="ageSelected"
+                    [fxShow]="ageSelected"
                     name="age"
                     [(ngModel)]="ageDob.age"
                     [disabled]="disabled"
@@ -37,7 +37,7 @@
                 </app-form-age>
 
                 <app-form-datepicker
-                    *ngIf="!ageSelected"
+                    [fxShow]="!ageSelected"
                     #dob
                     name="dob"
                     [(ngModel)]="ageDob.dob"
