@@ -18,6 +18,9 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-transmission-chain-bars',
@@ -45,6 +48,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     loadingDialog: LoadingDialogModel;
     // show filters?
     filtersVisible: boolean = false;
+    // do architecture is x32?
+    x86Architecture: boolean = false;
     // models for filters form elements
     filters = {
         dateOfOnset: null,
@@ -63,7 +68,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         private dialogService: DialogService,
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService,
-        protected snackbarService: SnackbarService
+        protected snackbarService: SnackbarService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {
     }
 
@@ -77,6 +83,14 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
                 this.selectedOutbreak = selectedOutbreak;
 
                 this.loadGraph();
+            });
+        // check if platform architecture is x32
+        this.systemSettingsDataService
+            .getAPIVersion()
+            .subscribe((versionData: SystemSettingsVersionModel) => {
+                if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
+                    this.x86Architecture = true;
+                }
             });
     }
 

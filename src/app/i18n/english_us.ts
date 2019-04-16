@@ -53,6 +53,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CASE_LAB_RESULT_WARNING_CASE_DATEOFONSET_AFTER_SAMPLE_TAKEN': 'Warning: Date of onset is after sample taken date',
 
         /**
+         * uiHelpItemFields
+         */
+        'LNG_HELP_ITEM_FIELD_LABEL_ORDER': 'Order',
+        'LNG_HELP_ITEM_FIELD_LABEL_ORDER_DESCRIPTION': '',
+
+        /**
          * uiBulkAddContactsPage
          */
         'LNG_PAGE_BULK_ADD_CONTACTS_TAB_PICK_LOCATIONS': 'Pick locations',
