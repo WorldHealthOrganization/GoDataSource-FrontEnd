@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -28,6 +28,7 @@ import { NgModel } from '@angular/forms';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { throwError } from 'rxjs';
 import { catchError, map, mergeMap, share } from 'rxjs/operators';
+import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -55,6 +56,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     exposureFrequencyOptions$: Observable<LabelValuePair[]>;
     exposureDurationOptions$: Observable<LabelValuePair[]>;
     socialRelationshipOptions$: Observable<LabelValuePair[]>;
+    locationsListOptions$: Observable<LabelValuePair[]> = of([]);
 
     relatedEntityData: CaseModel | EventModel;
 
@@ -152,6 +154,20 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     }
 
     /**
+     * Set the locations list options as label value pair based on what locations are selected
+     */
+    publishLocationsAtLabelValue(locations: LocationAutoItem[]) {
+        this.locationsListOptions$ = of<LabelValuePair[]>(
+            _.map(locations, (location: LocationAutoItem) => {
+                return new LabelValuePair(location.label, location.id);
+            })
+        );
+
+        // configure Sheet widget
+        this.configureSheetWidget();
+    }
+
+    /**
      * Init breadcrumbs
      */
     initBreadcrumbs() {
@@ -177,7 +193,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
      */
     @HostListener('window:resize')
     private setSheetWidth() {
-        this.sheetWidth = window.innerWidth - 340;
+        this.sheetWidth = window.innerWidth - 220;
     }
 
     /**
@@ -241,6 +257,10 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_TYPE')
                 .setProperty('contact.addresses[0].typeId')
                 .setOptions(this.addressTypesList$, this.i18nService),
+            new DropdownSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
+                .setProperty('contact.addresses[0].locationId')
+                .setOptions(this.locationsListOptions$, this.i18nService),
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
                 .setProperty('contact.addresses[0].addressLine1'),

@@ -49,7 +49,25 @@ export const EnglishUsLang = {
          * uiHelpItemFields
          */
         'LNG_HELP_ITEM_FIELD_LABEL_ORDER': 'Order',
-        'LNG_HELP_ITEM_FIELD_LABEL_ORDER_DESCRIPTION': ''
+        'LNG_HELP_ITEM_FIELD_LABEL_ORDER_DESCRIPTION': '',
+        'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE': 'Case',
+
+
+        /**
+         * uiBulkAddContactsPage
+         */
+        'LNG_PAGE_BULK_ADD_CONTACTS_TAB_PICK_LOCATIONS': 'Pick locations',
+        'LNG_PAGE_BULK_ADD_CONTACTS_TAB_ADD_CONTACTS': 'Add contacts',
+        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_LOCATIONS': 'Locations',
+        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_LOCATIONS_DESCRIPTION': 'Select the locations to be assigned to contacts in the next step',
+
+        /**
+         * uiBulkModifyContactsPage
+         */
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_TAB_PICK_LOCATIONS': 'Pick locations',
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_TAB_MODIFY_CONTACTS': 'Modify contacts',
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_LOCATIONS': 'Locations',
+        'LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_LOCATIONS_DESCRIPTION': 'Select the locations to be assigned to contacts in the next step'
 
         /**
          * REMOVE the tokens from below
