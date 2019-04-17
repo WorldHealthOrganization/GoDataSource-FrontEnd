@@ -17,7 +17,7 @@ export class TransmissionChainBarsService {
     // date cell width (first column)
     private dateCellWidth = 120;
     // case visual ID cell height (first row)
-    private visualIdCellHeight = 80;
+    private visualIdCellHeight = 100;
 
     // keeping this config centralized in case we need to make the graph configurable by the user
     private graphConfig = {
@@ -187,7 +187,7 @@ export class TransmissionChainBarsService {
 
         // draw the visual ID cell
         const visualIdGroup = caseColumnContainer.append('g')
-            .attr('transform', 'rotate(-58, 25, 40)');
+            .attr('transform', `translate(-8 0) rotate(-50, ${this.cellWidth / 2}, ${this.visualIdCellHeight / 2})`);
         visualIdGroup.append('text')
             .text(caseData.visualId)
             .attr('fill', 'black')
@@ -229,9 +229,11 @@ export class TransmissionChainBarsService {
          * draw the lab results cells
          */
         (caseData.labResults || []).forEach((labResult) => {
-            let result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_NEGATIVE_LABEL');
+            let result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_UNKNOWN_LABEL');
             if (labResult.result === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_POSITIVE') {
                 result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_POSITIVE_LABEL');
+            } else if (labResult.result === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_NEGATIVE') {
+                result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_NEGATIVE_LABEL');
             }
 
             const labResultDate = moment(labResult.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
