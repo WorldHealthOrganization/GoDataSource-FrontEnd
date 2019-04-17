@@ -1,5 +1,7 @@
 export interface CaseBarModel {
     id: string;
+    firstName: string;
+    lastName?: string;
     visualId?: string;
     dateOfOnset: string;
     addresses?: {
