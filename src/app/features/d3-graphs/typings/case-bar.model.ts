@@ -19,5 +19,6 @@ export interface CaseBarModel {
         testType: string;
         result: string;
     }[];
+    firstGraphDate: string;
     lastGraphDate: string;
 }
