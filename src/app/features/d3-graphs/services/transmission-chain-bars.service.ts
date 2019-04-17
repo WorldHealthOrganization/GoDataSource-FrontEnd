@@ -172,7 +172,8 @@ export class TransmissionChainBarsService {
         // keep case data for later use
         const caseData = this.graphData.casesMap[caseId] as CaseBarModel;
         // keep date of onset for later use
-        const dateOfOnset = moment(caseData.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        const dateOfOnsetMoment = moment(caseData.dateOfOnset);
+        const dateOfOnset = dateOfOnsetMoment.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
         if (!caseData) {
             return;
@@ -217,7 +218,7 @@ export class TransmissionChainBarsService {
             // draw a cell for each isolation date
             isolationDates.forEach((isolationDate) => {
                 // check if date is before date of onset
-                const opacity = (isolationDate < dateOfOnset) ? this.graphConfig.beforeDateOfOnsetOpacity : 1;
+                const opacity = (moment(isolationDate).isBefore(dateOfOnsetMoment)) ? this.graphConfig.beforeDateOfOnsetOpacity : 1;
 
                 const isolationGroup = caseColumnContainer.append('g')
                     .attr('transform', `translate(0, ${this.visualIdCellHeight + (this.datesMap[isolationDate] * this.cellHeight)})`);
@@ -252,7 +253,7 @@ export class TransmissionChainBarsService {
             const labResultDate = moment(labResult.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
             // check if date is before date of onset
-            const opacity = (labResultDate < dateOfOnset) ? this.graphConfig.beforeDateOfOnsetOpacity : 1;
+            const opacity = (moment(labResultDate).isBefore(dateOfOnsetMoment)) ? this.graphConfig.beforeDateOfOnsetOpacity : 1;
 
             const labResultGroup = caseColumnContainer.append('g')
                 .attr('transform', `translate(0, ${this.visualIdCellHeight + (this.datesMap[labResultDate] * this.cellHeight)})`);
@@ -291,14 +292,13 @@ export class TransmissionChainBarsService {
             .attr('y', this.cellHeight / 2);
 
         // draw the case bar container (to show the border)
-        const caseDateOfOnset = moment(caseData.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
         const caseBar = caseColumnContainer.append('svg')
             .attr('class', 'case-bar')
             .attr('x', 0)
-            .attr('y', this.visualIdCellHeight + (this.datesMap[caseDateOfOnset] * this.cellHeight));
+            .attr('y', this.visualIdCellHeight + (this.datesMap[dateOfOnset] * this.cellHeight));
         caseBar.append('rect')
             .attr('width', this.cellWidth)
-            .attr('height', (moment(caseData.lastGraphDate).diff(moment(caseData.dateOfOnset), 'days') + 1) * this.cellHeight)
+            .attr('height', (moment(caseData.lastGraphDate).diff(dateOfOnsetMoment, 'days') + 1) * this.cellHeight)
             .attr('fill', 'transparent')
             .attr('stroke', 'black')
             .attr('stroke-width', '1')

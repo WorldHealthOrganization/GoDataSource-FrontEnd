@@ -84,6 +84,6 @@ export class FormCaseCenterDaterangeListComponent extends ListBase<CaseCenterDat
             return false;
         }
 
-        return moment(startDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) < moment(this.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        return moment(startDate).isBefore(moment(this.dateOfOnset));
     }
 }
