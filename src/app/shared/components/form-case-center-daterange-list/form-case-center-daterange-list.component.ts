@@ -7,6 +7,8 @@ import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { Moment } from 'moment';
 import { CaseCenterDateRangeModel } from '../../../core/models/case-center-date-range.model';
 import * as _ from 'lodash';
+import * as moment from 'moment';
+import { Constants } from '../../../core/models/constants';
 
 @Component({
     selector: 'app-form-case-center-daterange-list',
@@ -22,15 +24,15 @@ import * as _ from 'lodash';
 export class FormCaseCenterDaterangeListComponent extends ListBase<CaseCenterDateRangeModel> implements OnInit, GroupFilteredValue<any[]> {
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
+    @Input() minDate: Moment | string;
+    @Input() componentTitle: string;
+    // case date of onset used to display a warning if the date range start date is before date of onset
+    @Input() dateOfOnset: Moment | string;
 
     @Input() fromTooltip: string;
     @Input() toTooltip: string;
     @Input() centerNameLabel: string;
     @Input() centerNameTooltip: string;
-
-    @Input() componentTitle: string;
-
-    @Input() minDate: Moment;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -72,5 +74,16 @@ export class FormCaseCenterDaterangeListComponent extends ListBase<CaseCenterDat
                 }
             ) :
             this.value;
+    }
+
+    /**
+     * Display a warning message if date range start date is before date of onset
+     */
+    displayOnsetDateWarningMessage(startDate: any): boolean {
+        if (!startDate || !this.dateOfOnset) {
+            return false;
+        }
+
+        return moment(startDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) < moment(this.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
     }
 }

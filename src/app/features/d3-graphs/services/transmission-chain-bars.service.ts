@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import { Constants } from '../../../core/models/constants';
 import { TransmissionChainBarsModel } from '../typings/transmission-chain-bars.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
+import { CaseBarModel } from '../typings/case-bar.model';
 
 @Injectable()
 export class TransmissionChainBarsService {
@@ -26,7 +27,9 @@ export class TransmissionChainBarsService {
         labResultColor: 'darkred',
         labResultTextColor: 'white',
         dateOfOnsetColor: 'white',
-        dateOfOnsetTextColor: 'black'
+        dateOfOnsetTextColor: 'black',
+        // opacity for cells that are before date of onset
+        beforeDateOfOnsetOpacity: 0.35
     };
 
     // data used to draw the graph
@@ -166,7 +169,10 @@ export class TransmissionChainBarsService {
      * Draw a case block
      */
     private drawCase(caseId) {
-        const caseData = this.graphData.casesMap[caseId];
+        // keep case data for later use
+        const caseData = this.graphData.casesMap[caseId] as CaseBarModel;
+        // keep date of onset for later use
+        const dateOfOnset = moment(caseData.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
         if (!caseData) {
             return;
@@ -204,19 +210,26 @@ export class TransmissionChainBarsService {
             let isolationLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_ISOLATED_CASE_LABEL');
             if (isolation.typeId === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_HOSPITALIZATION') {
                 isolationLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_CASE_LABEL');
+            } else if (isolation.typeId === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_HOSPITALIZATION_FOR_OTHER_MEDICAL_CONDITIONS') {
+                isolationLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_FOR_OTHER_CONDITIONS_CASE_LABEL');
             }
 
             // draw a cell for each isolation date
             isolationDates.forEach((isolationDate) => {
+                // check if date is before date of onset
+                const opacity = (isolationDate < dateOfOnset) ? this.graphConfig.beforeDateOfOnsetOpacity : 1;
+
                 const isolationGroup = caseColumnContainer.append('g')
                     .attr('transform', `translate(0, ${this.visualIdCellHeight + (this.datesMap[isolationDate] * this.cellHeight)})`);
                 isolationGroup.append('rect')
                     .attr('width', this.cellWidth)
                     .attr('height', this.cellHeight)
-                    .attr('fill', this.graphConfig.isolationColor);
+                    .attr('fill', this.graphConfig.isolationColor)
+                    .attr('fill-opacity', opacity);
                 isolationGroup.append('text')
                     .text(isolationLabel)
                     .attr('fill', this.graphConfig.isolationTextColor)
+                    .attr('fill-opacity', opacity)
                     .attr('alignment-baseline', 'central')
                     .attr('text-anchor', 'middle')
                     // center the text
@@ -238,12 +251,16 @@ export class TransmissionChainBarsService {
 
             const labResultDate = moment(labResult.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
+            // check if date is before date of onset
+            const opacity = (labResultDate < dateOfOnset) ? this.graphConfig.beforeDateOfOnsetOpacity : 1;
+
             const labResultGroup = caseColumnContainer.append('g')
                 .attr('transform', `translate(0, ${this.visualIdCellHeight + (this.datesMap[labResultDate] * this.cellHeight)})`);
             labResultGroup.append('rect')
                 .attr('width', this.cellWidth)
                 .attr('height', this.cellHeight)
-                .attr('fill', this.graphConfig.labResultColor);
+                .attr('fill', this.graphConfig.labResultColor)
+                .attr('fill-opacity', opacity);
             labResultGroup.append('text')
                 .text(result)
                 .attr('fill', this.graphConfig.labResultTextColor)
@@ -258,7 +275,6 @@ export class TransmissionChainBarsService {
          * draw the date of onset cell
          */
         const dateOfOnsetLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_CASE_ONSET_LABEL');
-        const dateOfOnset = moment(caseData.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
         const dateOfOnsetGroup = caseColumnContainer.append('g')
             .attr('transform', `translate(0, ${this.visualIdCellHeight + (this.datesMap[dateOfOnset] * this.cellHeight)})`);
         dateOfOnsetGroup.append('rect')

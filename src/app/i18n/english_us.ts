@@ -14,8 +14,15 @@ export const EnglishUsLang = {
 
         /**
          * uiChainsOfTransmissionBars
+         * NEW GROUP
+         */
+        'LNG_HOSPITALISATION_ISOLATION_DATE_RANGE_WARNING_CASE_DATEOFONSET_AFTER_START_DATE': 'Warning: Date of onset is after start date',
+
+        /**
+         * uiChainsOfTransmissionBars
          */
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_UNKNOWN_LABEL': 'Lab?',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_FOR_OTHER_CONDITIONS_CASE_LABEL': 'hsp',
 
         /**
          * uiAvailableEntitiesForRelationshipPage
