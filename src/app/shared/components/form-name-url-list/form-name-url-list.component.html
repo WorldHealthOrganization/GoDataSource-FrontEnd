@@ -7,10 +7,11 @@
     >
         <div
             *ngFor="let inputValue of values; let i = index; trackBy: trackByIndex"
-            fxFlex fxLayout="row" fxLayoutAlign="start center">
+            fxLayout="row" fxLayoutAlign="start center">
             <mat-card
-                fxFlex
-                class="page-section">
+                class="page-section"
+                fxFlex fxLayout="column"
+            >
                 <div
                     fxLayout="row" fxLayoutGap="20px">
                     <app-form-input

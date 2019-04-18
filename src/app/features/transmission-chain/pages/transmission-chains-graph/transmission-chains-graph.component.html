@@ -96,7 +96,7 @@
     <mat-card
         *ngIf="selectedNodes.canCreateRelationship && hasCaseWriteAccess()"
         class="page-section quick-action create-relationship"
-        fxFlex
+        fxFlex fxLayout="column"
     >
         <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_TITLE' | translate}}</h1>
 
@@ -141,7 +141,7 @@
     <mat-card
         *ngIf="selectedNodes.nodes.length === 1 && currentNodeAction === NodeAction.MODIFY_PERSON && canModifySelectedNode()"
         class="page-section quick-action modify-person"
-        fxFlex
+        fxFlex fxLayout="column"
     >
         <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_TITLE' | translate}}</h1>
 
@@ -176,7 +176,8 @@
     <mat-card
         *ngIf="selectedRelationship && currentNodeAction === NodeAction.MODIFY_EDGE"
         class="page-section quick-action modify-person"
-        fxFlex>
+        fxFlex fxLayout="column"
+    >
 
         <form #form="ngForm" (submit)="modifyRelationship(form)">
             <app-form-relationship-quick
@@ -198,7 +199,7 @@
     <mat-card
         *ngIf="selectedNodes.canCreateContact && currentNodeAction === NodeAction.CREATE_CONTACT"
         class="page-section quick-action create-contact"
-        fxFlex
+        fxFlex fxLayout="column"
     >
         <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_TITLE' | translate}}</h1>
 

@@ -7,9 +7,9 @@
     </div>
     <div
         *ngIf="!loading">
-        <form #form="ngForm">
+        <form #form="ngForm" fxLayout="column">
             <div
-                fxFlex fxLayout="row" fxLayoutGap="20px">
+                fxLayout="row" fxLayoutGap="20px">
                 <div fxFlex>
                     <app-form-select
                         name="statusId"
@@ -27,15 +27,13 @@
             </div>
 
             <app-form-fill-questionnaire
-                fxFlex
                 name="questionnaireAnswers"
                 [ngModel]="data.followUp.questionnaireAnswers"
                 [questions]="data.outbreak.contactFollowUpTemplate"
                 [componentTitle]="'LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_TITLE' | translate">
             </app-form-fill-questionnaire>
 
-            <div
-                 fxFlex fxLayout="row" fxLayoutAlign="end">
+            <div fxLayout="row" fxLayoutAlign="end">
                 <button
                     mat-button
                     type="button"

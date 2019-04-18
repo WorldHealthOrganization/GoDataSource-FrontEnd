@@ -5,16 +5,12 @@
 
     <!-- Label -->
     <div
-        fxFlex
         *ngIf="label">
         {{ label | translate }}
     </div>
 
-    <div
-        *ngIf="allowMinMaxToBeChanged"
-        fxFlex>
-        <form
-            fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+    <div *ngIf="allowMinMaxToBeChanged" fxLayout="column">
+        <form fxLayout="row" fxLayoutAlign="space-between center">
             <!-- Min Input -->
             <app-form-datepicker
                 fxFlex="150px"
@@ -36,7 +32,7 @@
     </div>
 
     <div
-        fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
+        fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
         <!-- Slider -->
         <ng5-slider
             fxFlex

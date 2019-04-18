@@ -1,7 +1,7 @@
 <div
     fxFlex fxLayout="column"
     class="page-section">
-    <div fxFlex fxGrow="0">
+    <div fxGrow="0">
         <app-form-input
             name="helpSearchFilter"
             [(ngModel)]="searchedTerm"
@@ -11,7 +11,7 @@
         </app-form-input>
     </div>
 
-    <div fxFlex>
+    <div>
         <mat-table #table [dataSource]="helpItemsList$ | async" matSort (matSortChange)="sortBy($event)">
             <!-- Title -->
             <ng-container matColumnDef="title">
@@ -90,7 +90,7 @@
     </div>
 
     <div
-        fxFlex fxGrow="0" fxLayout="row" fxLayoutAlign="end"
+        fxGrow="0" fxLayout="row" fxLayoutAlign="end"
         class="view-help-dialog-buttons">
         <button
             mat-button
