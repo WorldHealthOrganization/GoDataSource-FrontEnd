@@ -68,11 +68,13 @@
                             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_TITLE' | translate }}
                         </div>
 
-                        <app-form-radio
-                            name="nodeLabelCriteria"
-                            [(ngModel)]="colorCriteria.nodeLabelCriteria"
-                            [options]="nodeLabelCriteriaOptions$ | async">
-                        </app-form-radio>
+                        <div fxLayout="row">
+                            <app-form-radio
+                                name="nodeLabelCriteria"
+                                [(ngModel)]="colorCriteria.nodeLabelCriteria"
+                                [options]="nodeLabelCriteriaOptions$ | async">
+                            </app-form-radio>
+                        </div>
                     </div>
 
                     <!-- Node Label Color -->
@@ -81,11 +83,13 @@
                             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate }}
                         </div>
 
-                        <app-form-radio
-                            name="nodeNameColorCriteria"
-                            [(ngModel)]="colorCriteria.nodeNameColorCriteria"
-                            [options]="nodeColorCriteriaOptions$ | async">
-                        </app-form-radio>
+                        <div fxLayout="row">
+                            <app-form-radio
+                                name="nodeNameColorCriteria"
+                                [(ngModel)]="colorCriteria.nodeNameColorCriteria"
+                                [options]="nodeColorCriteriaOptions$ | async">
+                            </app-form-radio>
+                        </div>
                     </div>
 
                     <!-- Node Color -->
@@ -94,11 +98,13 @@
                             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate }}
                         </div>
 
-                        <app-form-radio
-                            name="nodeColorCriteria"
-                            [(ngModel)]="colorCriteria.nodeColorCriteria"
-                            [options]="nodeColorCriteriaOptions$ | async">
-                        </app-form-radio>
+                        <div fxLayout="row">
+                            <app-form-radio
+                                name="nodeColorCriteria"
+                                [(ngModel)]="colorCriteria.nodeColorCriteria"
+                                [options]="nodeColorCriteriaOptions$ | async">
+                            </app-form-radio>
+                        </div>
                     </div>
 
                     <!-- Node Icon -->
@@ -107,11 +113,13 @@
                             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate }}
                         </div>
 
-                        <app-form-radio
-                            name="nodeIconCriteria"
-                            [(ngModel)]="colorCriteria.nodeIconCriteria"
-                            [options]="nodeIconCriteriaOptions$ | async">
-                        </app-form-radio>
+                        <div fxLayout="row">
+                            <app-form-radio
+                                name="nodeIconCriteria"
+                                [(ngModel)]="colorCriteria.nodeIconCriteria"
+                                [options]="nodeIconCriteriaOptions$ | async">
+                            </app-form-radio>
+                        </div>
                     </div>
 
                     <!-- Node Shape -->
@@ -120,11 +128,13 @@
                             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE' | translate }}
                         </div>
 
-                        <app-form-radio
-                            name="nodeShapeCriteria"
-                            [(ngModel)]="colorCriteria.nodeShapeCriteria"
-                            [options]="nodeShapeCriteriaOptions$ | async">
-                        </app-form-radio>
+                        <div fxLayout="row">
+                            <app-form-radio
+                                name="nodeShapeCriteria"
+                                [(ngModel)]="colorCriteria.nodeShapeCriteria"
+                                [options]="nodeShapeCriteriaOptions$ | async">
+                            </app-form-radio>
+                        </div>
                     </div>
 
                 </mat-card>
@@ -141,12 +151,14 @@
                             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_LABEL_TITLE' | translate }}
                         </div>
 
-                        <app-form-radio
-                            name="edgeLabelCriteria"
-                            [(ngModel)]="colorCriteria.edgeLabelCriteria"
-                            [options]="edgeLabelCriteriaOptions$ | async"
-                            (optionChanged)="changeEdgeLabelIconSelection('label',$event)">
-                        </app-form-radio>
+                        <div fxLayout="row">
+                            <app-form-radio
+                                name="edgeLabelCriteria"
+                                [(ngModel)]="colorCriteria.edgeLabelCriteria"
+                                [options]="edgeLabelCriteriaOptions$ | async"
+                                (optionChanged)="changeEdgeLabelIconSelection('label',$event)">
+                            </app-form-radio>
+                        </div>
                     </div>
 
                     <!-- Edge Icon -->
@@ -155,12 +167,14 @@
                             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE' | translate }}
                         </div>
 
-                        <app-form-radio
-                            name="edgeIconCriteria"
-                            [(ngModel)]="colorCriteria.edgeIconCriteria"
-                            [options]="edgeIconCriteriaOptions$ | async"
-                            (optionChanged)="changeEdgeLabelIconSelection('icon',$event)">
-                        </app-form-radio>
+                        <div fxLayout="row">
+                            <app-form-radio
+                                name="edgeIconCriteria"
+                                [(ngModel)]="colorCriteria.edgeIconCriteria"
+                                [options]="edgeIconCriteriaOptions$ | async"
+                                (optionChanged)="changeEdgeLabelIconSelection('icon',$event)">
+                            </app-form-radio>
+                        </div>
                     </div>
 
                     <!-- Edge Color -->
@@ -169,11 +183,13 @@
                             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate }}
                         </div>
 
-                        <app-form-radio
-                            name="edgeColorCriteria"
-                            [(ngModel)]="colorCriteria.edgeColorCriteria"
-                            [options]="edgeColorCriteriaOptions$ | async">
-                        </app-form-radio>
+                        <div fxLayout="row">
+                            <app-form-radio
+                                name="edgeColorCriteria"
+                                [(ngModel)]="colorCriteria.edgeColorCriteria"
+                                [options]="edgeColorCriteriaOptions$ | async">
+                            </app-form-radio>
+                        </div>
                     </div>
                 </mat-card>
             </div>

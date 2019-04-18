@@ -9,13 +9,15 @@
             <div fxLayout="row" fxLayoutAlign="center" class="not-auth-content-limited">
                 <div fxLayout="column" fxFlex>
 
-                    <app-form-input
-                        name="email"
-                        [(ngModel)]="user.email"
-                        [placeholder]="'LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS' | translate"
-                        required="true"
-                        app-email-validator
-                    ></app-form-input>
+                    <div fxLayout="row">
+                        <app-form-input
+                            name="email"
+                            [(ngModel)]="user.email"
+                            [placeholder]="'LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS' | translate"
+                            required="true"
+                            app-email-validator
+                        ></app-form-input>
+                    </div>
 
                     <div fxLayoutAlign="row">
                         <app-form-input

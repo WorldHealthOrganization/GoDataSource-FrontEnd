@@ -30,13 +30,14 @@
                             <div fxFlex><!-- placeholder --></div>
                         </div>
 
-                        <app-form-textarea
-                            name="description"
-                            [ngModel]="clusterData.description"
-                            [placeholder]="'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION' | translate"
-                            tooltip="LNG_CLUSTER_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
-                        </app-form-textarea>
-
+                        <div fxLayout="column">
+                            <app-form-textarea
+                                name="description"
+                                [ngModel]="clusterData.description"
+                                [placeholder]="'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION' | translate"
+                                tooltip="LNG_CLUSTER_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
+                            </app-form-textarea>
+                        </div>
                     </div>
                 </mat-card>
 
