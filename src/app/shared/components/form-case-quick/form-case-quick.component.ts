@@ -32,6 +32,7 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
 
     // selected outbreak
     selectedOutbreak: OutbreakModel;
+    displayRefresh: boolean = false;
 
     visualIDTranslateData: {
         mask: string
@@ -66,6 +67,10 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+                // if case id mask is not empty show refresh case id mask button
+                if (!_.isEmpty(this.selectedOutbreak.caseIdMask)) {
+                    this.displayRefresh = true;
+                }
 
                 // set visual ID translate data
                 this.visualIDTranslateData = {
@@ -80,6 +85,17 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
      */
     get case(): CaseModel {
         return this.value;
+    }
+
+    /**
+     * Generate visual ID for case
+     */
+    generateVisualId() {
+        if (!_.isEmpty(this.selectedOutbreak.caseIdMask)) {
+            this.case.visualId = CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask);
+            this.groupForm.controls.visualId.markAsDirty();
+            this.onChange();
+        }
     }
 
     /**
