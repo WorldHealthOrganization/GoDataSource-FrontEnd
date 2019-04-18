@@ -140,6 +140,12 @@
         </button>
     </div>
 
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+        leftClass=""
+    ></app-hover-row-actions>
+
     <mat-table #table [dataSource]="casesList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
         <!-- Checkbox -->
         <ng-container matColumnDef="checkbox">
@@ -502,132 +508,14 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Inline Actions -->
-        <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-
-            <mat-cell *matCellDef="let item" fxFlex="70px">
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
-
-                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-
-                    <ng-container *ngIf="!item.deleted">
-                        <button
-                            mat-menu-item
-                            [routerLink]="['.', item.id, 'view']">
-                            {{ 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE' | translate }}
-                        </button>
-
-                        <ng-container *app-selected-outbreak-is-active>
-                            <ng-container *ngIf="hasCaseWriteAccess()">
-                                <button
-                                    mat-menu-item
-                                    [routerLink]="['.', item.id, 'modify']">
-                                    {{ 'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE' | translate }}
-                                </button>
-
-                                <button
-                                    *ngIf="hasContactWriteAccess()"
-                                    mat-menu-item
-                                    class="mat-menu-item-delete"
-                                    (click)="convertCaseToContact(item)">
-                                    {{'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT' | translate}}
-                                </button>
-
-                                <button
-                                    mat-menu-item
-                                    class="mat-menu-item-delete"
-                                    (click)="deleteCase(item)">
-                                    {{ 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE' | translate }}
-                                </button>
-                            </ng-container>
-                        </ng-container>
-
-                        <mat-divider></mat-divider>
-
-                        <ng-container *app-selected-outbreak-is-active>
-                            <ng-container *ngIf="hasContactWriteAccess()">
-                                <button
-                                    mat-menu-item
-                                    routerLink="/contacts/create"
-                                    [queryParams]="{ entityType: EntityType.CASE, entityId: item.id }">
-                                    {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
-                                </button>
-
-                                <button
-                                    mat-menu-item
-                                    routerLink="/contacts/create-bulk"
-                                    [queryParams]="{ entityType: EntityType.CASE, entityId: item.id }">
-                                    {{'LNG_PAGE_ACTION_BULK_ADD_CONTACTS' | translate}}
-                                </button>
-
-                                <mat-divider></mat-divider>
-                            </ng-container>
-                        </ng-container>
-
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/relationships', EntityType.CASE, item.id, 'contacts']">
-                            {{'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM' | translate}}
-                        </button>
-
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/relationships', EntityType.CASE, item.id, 'exposures']">
-                            {{'LNG_PAGE_ACTION_SEE_EXPOSURES_TO' | translate}}
-                        </button>
-
-                        <mat-divider></mat-divider>
-
-                        <button
-                            *ngIf="hasCaseWriteAccess()"
-                            mat-menu-item
-                            [routerLink]="['.', item.id, 'lab-results']">
-                            {{ 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS' | translate }}
-                        </button>
-
-                        <button mat-menu-item [routerLink]="['/contacts/case-related-follow-ups', item.id]">
-                            {{ 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS' | translate }}
-                        </button>
-
-                        <mat-divider></mat-divider>
-
-                        <button mat-menu-item [routerLink]="['.', item.id, 'movement']">
-                            {{ 'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT' | translate }}
-                        </button>
-
-                        <button mat-menu-item [routerLink]="['.', item.id, 'chronology']">
-                            {{ 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY' | translate }}
-                        </button>
-
-                        <ng-container *ngIf="hasReportAccess() && hasContactReadAccess()">
-                            <mat-divider></mat-divider>
-
-                            <button
-                                mat-menu-item
-                                (click)="exportCaseInvestigationForm(item)">
-                                {{ 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASE_INVESTIGATION_FORM' | translate }}
-                            </button>
-                        </ng-container>
-                    </ng-container>
-
-                    <ng-container *app-selected-outbreak-is-active>
-                        <button
-                            *ngIf="item.deleted && hasCaseWriteAccess()"
-                            mat-menu-item
-                            class="mat-menu-item-restore"
-                            (click)="restoreCase(item)">
-                            {{'LNG_PAGE_LIST_CASES_ACTION_RESTORE_CASE' | translate}}
-                        </button>
-                    </ng-container>
-                </mat-menu>
-            </mat-cell>
-        </ng-container>
-
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
+        <mat-row
+            *matRowDef="let item; columns: visibleTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
     </mat-table>
 
     <div

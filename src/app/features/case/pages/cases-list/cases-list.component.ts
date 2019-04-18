@@ -10,7 +10,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, DialogField, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, HoverRowActions, LoadingDialogModel } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
@@ -121,6 +121,15 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     outbreakSubscriber: Subscription;
 
     loadingDialog: LoadingDialogModel;
+
+    recordActions: HoverRowActions[] = [
+        new HoverRowActions({
+            icon: 'settings',
+            click: (data) => {
+                console.log(data);
+            }
+        })
+    ];
 
     constructor(
         private caseDataService: CaseDataService,
@@ -286,11 +295,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 field: 'deleted',
                 label: 'LNG_CASE_FIELD_LABEL_DELETED',
                 visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
             })
         ];
     }

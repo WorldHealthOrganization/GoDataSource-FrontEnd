@@ -119,6 +119,11 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     } = {};
 
     /**
+     * Left class
+     */
+    @Input() leftClass: string = '';
+
+    /**
      * Actions Position
      */
     private _position: HoverRowActionsPosition = HoverRowActionsPosition.CLOSEST;
