@@ -200,6 +200,29 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Retrieve classes
+     */
+    get rowClasses(): {
+        [className: string]: boolean
+    } {
+        // default classes
+        const classes = {
+            'record-hover-actions': true
+        };
+
+        // add left side class
+        if (
+            !!this.leftSideClass &&
+            this.realPosition === HoverRowActionsPosition.LEFT
+        ) {
+            classes[this.leftSideClass] = true;
+        }
+
+        // finished
+        return classes;
+    }
+
+    /**
      * Actions row
      */
     @ViewChild('actionsRow') actionsRow: ElementRef;

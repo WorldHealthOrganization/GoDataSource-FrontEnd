@@ -8,10 +8,10 @@
 <!-- Hover actions -->
 <div
     #actionsRow
-    class="record-hover-actions"
     [class.partial-visible]="visible && !visibleActions"
     [class.full-visible]="visible && visibleActions"
     [class.right]="realPosition === HoverRowActionsPosition.RIGHT"
+    [ngClass]="rowClasses"
     [ngStyle]="hoverActionsStyle"
     (mouseenter)="actionsMouseEnter()"
     (mouseleave)="actionsMouseLeave()"
