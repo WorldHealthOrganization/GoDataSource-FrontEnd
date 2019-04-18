@@ -43,8 +43,7 @@
                 <div fxFlex><!-- placeholder --></div>
             </div>
 
-            <div
-                fxFlex fxLayout="column" fxLayoutGap="12px">
+            <div fxLayout="column" fxLayoutGap="12px">
                 <div>
                     <input
                         hidden
@@ -55,7 +54,7 @@
                         [accept]="allowedExtensions"/>
 
                     <div
-                        fxFlex fxLayoutAlign="center center"
+                        fxLayoutAlign="center center"
                         class="manage-icon-drop-zone"
                         [class.manage-icon-file-over]="hasFileOver"
                         ng2FileDrop
@@ -73,7 +72,7 @@
 
                 <div
                     class="manage-icon-file-input"
-                    fxFlex fxLayout="row"
+                    fxLayout="row"
                     (click)="importDataBtn.click()">
                     <div
                         class="manage-icon-file-input-label">

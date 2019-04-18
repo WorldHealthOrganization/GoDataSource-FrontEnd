@@ -1,17 +1,21 @@
 <div
     fxFlex fxLayout="column"
-    class="page-section">
-    <div fxFlex fxGrow="0" fxLayout="column"
-         class="view-item-title">
+    class="page-section"
+>
+    <div
+        fxGrow="0" fxLayout="column"
+        class="view-item-title"
+    >
         {{ helpItemData.title | translate }}
     </div>
 
-    <div fxFlex fxLayout="column"
-         [innerHtml]="helpItemData.content | translate">
+    <div
+        fxLayout="column"
+        [innerHtml]="helpItemData.content | translate">
     </div>
 
     <div
-        fxFlex fxGrow="0" fxLayout="row" fxLayoutAlign="end"
+        fxGrow="0" fxLayout="row" fxLayoutAlign="end"
         class="view-help-details-dialog-buttons">
         <button
             mat-button

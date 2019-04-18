@@ -33,8 +33,10 @@
 
                     <div
                         *ngIf="!fixedFilters"
-                        class="actions">
-                        <div fxFlex fxLayout="row" class="switch-buttons">
+                        class="actions"
+                        fxLayout="column"
+                    >
+                        <div fxLayout="row" class="switch-buttons">
                             <button fxFlex type="button" mat-raised-button
                                     [color]="isFilterOperator(RequestFilterOperator.AND) ? 'primary' : ''"
                                     (click)="setFilterOperator(RequestFilterOperator.AND)">
@@ -249,28 +251,32 @@
                             fxLayoutAlign="start center">
                             <mat-card
                                 class="sort-details"
-                                fxFlex>
+                                fxFlex fxLayout="column"
+                            >
+                                <div fxLayout="row">
+                                    <!-- Sort By Field -->
+                                    <app-form-select
+                                        [name]="'sortBy[items][' + i + '][sort]'"
+                                        [(ngModel)]="sort.sort"
+                                        [placeholder]="'LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER' | translate"
+                                        [options]="sortOptions"
+                                        optionLabelKey="fieldLabel"
+                                        optionValueKey="self"
+                                        [clearable]="false">
+                                    </app-form-select>
+                                </div>
 
-                                <!-- Sort By Field -->
-                                <app-form-select
-                                    [name]="'sortBy[items][' + i + '][sort]'"
-                                    [(ngModel)]="sort.sort"
-                                    [placeholder]="'LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER' | translate"
-                                    [options]="sortOptions"
-                                    optionLabelKey="fieldLabel"
-                                    optionValueKey="self"
-                                    [clearable]="false">
-                                </app-form-select>
-
-                                <!-- Sort Direction ( ASC / DESC ) -->
-                                <app-form-select
-                                    *ngIf="sort.sort"
-                                    [name]="'sortBy[items][' + i + '][direction]'"
-                                    [(ngModel)]="sort.direction"
-                                    [placeholder]="'LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL' | translate"
-                                    [options]="sortDirections"
-                                    [clearable]="false">
-                                </app-form-select>
+                                <div fxLayout="row">
+                                    <!-- Sort Direction ( ASC / DESC ) -->
+                                    <app-form-select
+                                        *ngIf="sort.sort"
+                                        [name]="'sortBy[items][' + i + '][direction]'"
+                                        [(ngModel)]="sort.direction"
+                                        [placeholder]="'LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL' | translate"
+                                        [options]="sortDirections"
+                                        [clearable]="false">
+                                    </app-form-select>
+                                </div>
                             </mat-card>
 
                             <!-- Delete sort item -->

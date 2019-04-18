@@ -15,38 +15,44 @@
                 <mat-card class="page-section">
                     <div fxLayout="column">
 
-                        <app-form-input
-                            name="name"
-                            [(ngModel)]="teamData.name"
-                            [placeholder]="'LNG_TEAM_FIELD_LABEL_NAME' | translate"
-                            tooltip="LNG_TEAM_FIELD_LABEL_NAME_DESCRIPTION"
-                            required="true">
-                        </app-form-input>
+                        <div fxLayout="row">
+                            <app-form-input
+                                name="name"
+                                [(ngModel)]="teamData.name"
+                                [placeholder]="'LNG_TEAM_FIELD_LABEL_NAME' | translate"
+                                tooltip="LNG_TEAM_FIELD_LABEL_NAME_DESCRIPTION"
+                                required="true">
+                            </app-form-input>
+                        </div>
 
-                        <app-form-select
-                            name="userIds"
-                            [(ngModel)]="teamData.userIds"
-                            [placeholder]="'LNG_TEAM_FIELD_LABEL_USERS' | translate"
-                            tooltip="LNG_TEAM_FIELD_LABEL_USERS_DESCRIPTION"
-                            required="true"
-                            [options]="usersList$ | async"
-                            optionLabelKey="name"
-                            optionValueKey="id"
-                            optionTooltipKey="description"
-                            multiple="true"
-                            (optionChanged)="usersChanged($event)">
-                        </app-form-select>
+                        <div fxLayout="row">
+                            <app-form-select
+                                name="userIds"
+                                [(ngModel)]="teamData.userIds"
+                                [placeholder]="'LNG_TEAM_FIELD_LABEL_USERS' | translate"
+                                tooltip="LNG_TEAM_FIELD_LABEL_USERS_DESCRIPTION"
+                                required="true"
+                                [options]="usersList$ | async"
+                                optionLabelKey="name"
+                                optionValueKey="id"
+                                optionTooltipKey="description"
+                                multiple="true"
+                                (optionChanged)="usersChanged($event)">
+                            </app-form-select>
+                        </div>
 
-                        <app-form-location-dropdown
-                            fxFlex
-                            name="locationIds"
-                            [(ngModel)]="teamData.locationIds"
-                            [placeholder]="'LNG_TEAM_FIELD_LABEL_LOCATIONS' | translate"
-                            tooltip="LNG_TEAM_FIELD_LABEL_LOCATIONS_DESCRIPTION"
-                            [disabled]="false"
-                            [required]="true"
-                            [multiple]="true">
-                        </app-form-location-dropdown>
+                        <div fxLayout="row">
+                            <app-form-location-dropdown
+                                fxFlex
+                                name="locationIds"
+                                [(ngModel)]="teamData.locationIds"
+                                [placeholder]="'LNG_TEAM_FIELD_LABEL_LOCATIONS' | translate"
+                                tooltip="LNG_TEAM_FIELD_LABEL_LOCATIONS_DESCRIPTION"
+                                [disabled]="false"
+                                [required]="true"
+                                [multiple]="true">
+                            </app-form-location-dropdown>
+                        </div>
 
                     </div>
                 </mat-card>
