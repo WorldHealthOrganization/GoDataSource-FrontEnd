@@ -12,7 +12,6 @@
     [class.partial-visible]="visible && !visibleActions"
     [class.full-visible]="visible && visibleActions"
     [class.right]="realPosition === HoverRowActionsPosition.RIGHT"
-<!--    [ngClass]="leftClass ? {[leftClass]: realPosition === HoverRowActionsPosition.LEFT}"-->
     [ngStyle]="hoverActionsStyle"
     (mouseenter)="actionsMouseEnter()"
     (mouseleave)="actionsMouseLeave()"

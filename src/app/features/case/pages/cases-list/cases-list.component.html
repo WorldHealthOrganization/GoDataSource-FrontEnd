@@ -143,7 +143,7 @@
     <!-- Hover question effects / actions -->
     <app-hover-row-actions
         #hoverRow
-        leftClass=""
+        leftSideClass="hover-row-actions-mat-table-left"
     ></app-hover-row-actions>
 
     <mat-table #table [dataSource]="casesList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">

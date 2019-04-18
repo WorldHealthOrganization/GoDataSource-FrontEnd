@@ -119,9 +119,9 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     } = {};
 
     /**
-     * Left class
+     * Left side class
      */
-    @Input() leftClass: string = '';
+    @Input() leftSideClass: string = '';
 
     /**
      * Actions Position
