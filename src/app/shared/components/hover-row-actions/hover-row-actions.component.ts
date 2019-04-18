@@ -436,4 +436,12 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     onWindowResize() {
         this.hideEverything();
     }
+
+    /**
+     * Clicked Button or Menu option
+     * @param buttonData
+     */
+    clickedButton(buttonData: HoverRowActions) {
+        buttonData.click(this.actionData);
+    }
 }

@@ -25,7 +25,7 @@
             color="accent"
             type="button"
             [ngClass]="buttonData.class"
-            (click)="buttonData.click(actionData)">
+            (click)="clickedButton(buttonData)">
             <span class="xt-icon">{{ buttonData.icon }}</span>
         </button>
 
@@ -55,7 +55,7 @@
                         mat-menu-item
                         type="button"
                         [ngClass]="menuOptionData.class"
-                        (click)="menuOptionData.click(actionData)">
+                        (click)="clickedButton(menuOptionData)">
                         {{ menuOptionData.menuOptionLabel | translate }}
                     </button>
 
