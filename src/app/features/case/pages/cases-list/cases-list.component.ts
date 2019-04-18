@@ -155,6 +155,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             type: HoverRowActionsType.MENU,
             icon: 'moreVertical',
             menuOptions: [
+                // Convert Case To Contact
                 new HoverRowActions({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT',
                     click: (item: CaseModel) => {
@@ -169,6 +170,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     },
                     class: 'mat-menu-item-delete'
                 }),
+
+                // Delete Case
                 new HoverRowActions({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE',
                     click: (item: CaseModel) => {
@@ -182,6 +185,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     },
                     class: 'mat-menu-item-delete'
                 }),
+
+                // Divider
                 new HoverRowActions({
                     type: HoverRowActionsType.DIVIDER,
                     visible: (item: CaseModel): boolean => {
@@ -192,6 +197,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             this.hasCaseWriteAccess();
                     }
                 }),
+
+                // Add Contact to Case
                 new HoverRowActions({
                     menuOptionLabel: 'LNG_PAGE_ACTION_ADD_CONTACT',
                     click: (item: CaseModel) => {
@@ -209,6 +216,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             this.hasContactWriteAccess();
                     }
                 }),
+
+                // Bulk add contacts to case
                 new HoverRowActions({
                     menuOptionLabel: 'LNG_PAGE_ACTION_BULK_ADD_CONTACTS',
                     click: (item: CaseModel) => {
@@ -226,6 +235,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             this.hasContactWriteAccess();
                     }
                 }),
+
+                // Divider
                 new HoverRowActions({
                     type: HoverRowActionsType.DIVIDER,
                     visible: (item: CaseModel): boolean => {
@@ -236,6 +247,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             this.hasContactWriteAccess();
                     }
                 }),
+
+                // See case contacts..
                 new HoverRowActions({
                     menuOptionLabel: 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM',
                     click: (item: CaseModel) => {
@@ -245,6 +258,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         return !item.deleted;
                     }
                 }),
+
+                // See case exposures
                 new HoverRowActions({
                     menuOptionLabel: 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO',
                     click: (item: CaseModel) => {
@@ -254,6 +269,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         return !item.deleted;
                     }
                 }),
+
+                // Divider
                 new HoverRowActions({
                     type: HoverRowActionsType.DIVIDER,
                     visible: (item: CaseModel): boolean => {
@@ -261,6 +278,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         return !item.deleted;
                     }
                 }),
+
+                // See case lab results
                 new HoverRowActions({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS',
                     click: (item: CaseModel) => {
@@ -271,6 +290,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             this.hasCaseWriteAccess();
                     }
                 }),
+
+                // See contacts follow-us belonging to this case
                 new HoverRowActions({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS',
                     click: (item: CaseModel) => {
@@ -281,6 +302,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             this.hasContactFollowUpReadAccess();
                     }
                 }),
+
+                // Divider
                 new HoverRowActions({
                     type: HoverRowActionsType.DIVIDER,
                     visible: (item: CaseModel): boolean => {
@@ -291,6 +314,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         );
                     }
                 }),
+
+                // View Case movement map
                 new HoverRowActions({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT',
                     click: (item: CaseModel) => {
@@ -300,6 +325,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         return !item.deleted;
                     }
                 }),
+
+                // View case chronology timeline
                 new HoverRowActions({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY',
                     click: (item: CaseModel) => {
@@ -309,12 +336,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         return !item.deleted;
                     }
                 }),
+
+                // Divider
                 new HoverRowActions({
                     type: HoverRowActionsType.DIVIDER,
                     visible: (item: CaseModel): boolean => {
                         return !item.deleted;
                     }
                 }),
+
+                // Download case investigation form
                 new HoverRowActions({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASE_INVESTIGATION_FORM',
                     click: (item: CaseModel) => {
@@ -326,6 +357,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             this.hasContactReadAccess();
                     }
                 }),
+
+                // Restore a deleted case
                 new HoverRowActions({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_RESTORE_CASE',
                     click: (item: CaseModel) => {
