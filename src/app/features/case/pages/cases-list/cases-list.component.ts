@@ -10,14 +10,14 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, DialogField, HoverRowActions, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, HoverRowActions, HoverRowActionsType, LoadingDialogModel } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import * as moment from 'moment';
@@ -123,15 +123,227 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     loadingDialog: LoadingDialogModel;
 
     recordActions: HoverRowActions[] = [
+        // View Case
+        new HoverRowActions({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE',
+            click: (item: CaseModel) => {
+                this.router.navigate(['/cases', item.id, 'view']);
+            },
+            visible: (item: CaseModel): boolean => {
+                return !item.deleted;
+            }
+        }),
+
+        // Modify Case
         new HoverRowActions({
             icon: 'settings',
-            click: (data) => {
-                console.log(data);
+            iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE',
+            click: (item: CaseModel) => {
+                this.router.navigate(['/cases', item.id, 'modify']);
+            },
+            visible: (item: CaseModel): boolean => {
+                return !item.deleted &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.hasCaseWriteAccess();
             }
+        }),
+
+        // Other actions
+        new HoverRowActions({
+            type: HoverRowActionsType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                new HoverRowActions({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT',
+                    click: (item: CaseModel) => {
+                        this.convertCaseToContact(item);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasCaseWriteAccess() &&
+                            this.hasContactWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+                new HoverRowActions({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE',
+                    click: (item: CaseModel) => {
+                        this.deleteCase(item);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasCaseWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+                new HoverRowActions({
+                    type: HoverRowActionsType.DIVIDER,
+                    visible: (item: CaseModel): boolean => {
+                        // visible only if at least one of the first two items is visible
+                        return !item.deleted &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasCaseWriteAccess();
+                    }
+                }),
+                new HoverRowActions({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_ADD_CONTACT',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/contacts', 'create'], {
+                            queryParams: {
+                                entityType: EntityType.CASE,
+                                entityId: item.id
+                            }
+                        });
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasContactWriteAccess();
+                    }
+                }),
+                new HoverRowActions({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_BULK_ADD_CONTACTS',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/contacts', 'create-bulk'], {
+                            queryParams: {
+                                entityType: EntityType.CASE,
+                                entityId: item.id
+                            }
+                        });
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasContactWriteAccess();
+                    }
+                }),
+                new HoverRowActions({
+                    type: HoverRowActionsType.DIVIDER,
+                    visible: (item: CaseModel): boolean => {
+                        // visible only if at least one of the previous two items is visible
+                        return !item.deleted &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasContactWriteAccess();
+                    }
+                }),
+                new HoverRowActions({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/relationships', EntityType.CASE, item.id, 'contacts']);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+                new HoverRowActions({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/relationships', EntityType.CASE, item.id, 'exposures']);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+                new HoverRowActions({
+                    type: HoverRowActionsType.DIVIDER,
+                    visible: (item: CaseModel): boolean => {
+                        // visible only if at least one of the previous two items is visible
+                        return !item.deleted;
+                    }
+                }),
+                new HoverRowActions({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/cases', item.id, 'lab-results']);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            this.hasCaseWriteAccess();
+                    }
+                }),
+                new HoverRowActions({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/contacts', 'case-related-follow-ups', item.id]);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            this.hasContactFollowUpReadAccess();
+                    }
+                }),
+                new HoverRowActions({
+                    type: HoverRowActionsType.DIVIDER,
+                    visible: (item: CaseModel): boolean => {
+                        // visible only if at least one of the previous two items is visible
+                        return !item.deleted && (
+                            this.hasCaseWriteAccess() ||
+                            this.hasContactFollowUpReadAccess()
+                        );
+                    }
+                }),
+                new HoverRowActions({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/cases', item.id, 'movement']);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+                new HoverRowActions({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/cases', item.id, 'chronology']);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+                new HoverRowActions({
+                    type: HoverRowActionsType.DIVIDER,
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+                new HoverRowActions({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASE_INVESTIGATION_FORM',
+                    click: (item: CaseModel) => {
+                        this.exportCaseInvestigationForm(item);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            this.hasReportAccess() &&
+                            this.hasContactReadAccess();
+                    }
+                }),
+                new HoverRowActions({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_RESTORE_CASE',
+                    click: (item: CaseModel) => {
+                        this.restoreCase(item);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return item.deleted &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasCaseWriteAccess();
+                    },
+                    class: 'mat-menu-item-restore'
+                })
+            ]
         })
     ];
 
     constructor(
+        private router: Router,
         private caseDataService: CaseDataService,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
@@ -539,6 +751,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      */
     hasContactReadAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
+    }
+
+    /**
+     * Check if we have access view a contact follow-up
+     * @returns {boolean}
+     */
+    hasContactFollowUpReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP);
     }
 
     /**

@@ -21,7 +21,6 @@ import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
-import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { DialogService } from '../../../../core/services/helper/dialog.service';

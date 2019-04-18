@@ -17,8 +17,10 @@ export class HoverRowActions {
     // fields
     type: HoverRowActionsType = HoverRowActionsType.BUTTON;
     icon: string;
+    iconTooltip: string;
     click: (item: any) => void;
     class: string;
+    visible: (item: any) => boolean;
 
     menuOptions: HoverRowActions[];
     menuOptionLabel: string;
@@ -29,11 +31,13 @@ export class HoverRowActions {
     constructor(data: {
         // optional
         icon?: string,
+        iconTooltip?: string,
         click?: (item: any) => void,
         type?: HoverRowActionsType,
         menuOptions?: HoverRowActions[],
         menuOptionLabel?: string,
-        class?: string
+        class?: string,
+        visible?: (item: any) => boolean
     }) {
         Object.assign(this, data);
     }
