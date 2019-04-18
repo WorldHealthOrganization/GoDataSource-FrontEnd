@@ -16,36 +16,42 @@
 
                     <div fxLayout="column">
 
-                        <app-form-input
-                            name="name"
-                            [(ngModel)]="userRole.name"
-                            [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate"
-                            tooltip="LNG_USER_ROLE_FIELD_LABEL_NAME_DESCRIPTION"
-                            required="true"
-                            [disabled]="viewOnly">
-                        </app-form-input>
+                        <div fxLayout="row">
+                            <app-form-input
+                                name="name"
+                                [(ngModel)]="userRole.name"
+                                [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate"
+                                tooltip="LNG_USER_ROLE_FIELD_LABEL_NAME_DESCRIPTION"
+                                required="true"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+                        </div>
 
-                        <app-form-textarea
-                            name="description"
-                            [(ngModel)]="userRole.description"
-                            [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate"
-                            tooltip="LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
-                            [disabled]="viewOnly">
-                        </app-form-textarea>
+                        <div fxLayout="row">
+                            <app-form-textarea
+                                name="description"
+                                [(ngModel)]="userRole.description"
+                                [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate"
+                                tooltip="LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-textarea>
+                        </div>
 
-                        <app-form-select
-                            name="permissionIds"
-                            [(ngModel)]="userRole.permissionIds"
-                            [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate"
-                            tooltip="LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS_DESCRIPTION"
-                            required="true"
-                            [options]="availablePermissions$ | async"
-                            optionLabelKey="label"
-                            optionValueKey="id"
-                            optionTooltipKey="description"
-                            multiple="true"
-                            [disabled]="viewOnly">
-                        </app-form-select>
+                        <div fxLayout="row">
+                            <app-form-select
+                                name="permissionIds"
+                                [(ngModel)]="userRole.permissionIds"
+                                [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate"
+                                tooltip="LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS_DESCRIPTION"
+                                required="true"
+                                [options]="availablePermissions$ | async"
+                                optionLabelKey="label"
+                                optionValueKey="id"
+                                optionTooltipKey="description"
+                                multiple="true"
+                                [disabled]="viewOnly">
+                            </app-form-select>
+                        </div>
                     </div>
                 </mat-card>
             </mat-tab>

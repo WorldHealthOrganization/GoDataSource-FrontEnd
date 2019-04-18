@@ -72,11 +72,13 @@
             {{ 'LNG_ENTITY_FIELD_LABEL_AGE' | translate }}
         </div>
 
-        <app-form-range
-            name="age"
-            [ngModel]="filters.age"
-            (changed)="filters.age = $event">
-        </app-form-range>
+        <div fxLayout="row">
+            <app-form-range
+                name="age"
+                [ngModel]="filters.age"
+                (changed)="filters.age = $event">
+            </app-form-range>
+        </div>
     </div>
 
     <!-- Date -->
@@ -85,10 +87,12 @@
             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_DATE' | translate }}
         </div>
 
-        <app-form-daterange
-            name="date"
-            [ngModel]="filters.date"
-            (changed)="filters.date = $event">
-        </app-form-daterange>
+        <div fxLayout="row">
+            <app-form-daterange
+                name="date"
+                [ngModel]="filters.date"
+                (changed)="filters.date = $event">
+            </app-form-daterange>
+        </div>
     </div>
 </mat-card>
