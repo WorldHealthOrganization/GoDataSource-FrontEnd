@@ -3,8 +3,7 @@
 
     <form #groupForm="ngForm">
         <div fxLayout="column" fxFlex>
-            <div fxFlex fxLayout="row" fxLayoutGap="20px">
-
+            <div fxLayout="row" fxLayoutGap="20px">
                 <app-form-select
                     [name]="name + '[typeId]'"
                     [(ngModel)]="centerDateRange.typeId"
@@ -56,7 +55,7 @@
 
             </div>
 
-            <div fxLayout="row" fxFlex>
+            <div fxLayout="row">
                 <app-form-textarea
                     [name]="name + '[comments]'"
                     [(ngModel)]="centerDateRange.comments"

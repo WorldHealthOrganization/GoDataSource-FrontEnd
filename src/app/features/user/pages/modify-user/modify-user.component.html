@@ -14,7 +14,7 @@
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="firstName"
                                 [(ngModel)]="user.firstName"
@@ -60,7 +60,7 @@
 
                         <div
                             *ngIf="hasOutbreakReadAccess()"
-                            fxLayout="row" fxLayoutGap="20px" fxFlex
+                            fxLayout="row" fxLayoutGap="20px"
                         >
                             <app-form-select
                                 name="outbreakIds"
@@ -95,7 +95,7 @@
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 type="password"
                                 name="password"
