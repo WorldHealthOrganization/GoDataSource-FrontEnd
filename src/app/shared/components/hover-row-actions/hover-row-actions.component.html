@@ -18,60 +18,54 @@
 >
     <ng-container
         *ngFor="let buttonData of realActions">
+        <!-- Icon button -->
+        <button
+            *ngIf="buttonData.type === HoverRowActionType.BUTTON"
+            mat-icon-button
+            color="accent"
+            type="button"
+            [ngClass]="buttonData.class"
+            (click)="clickedButton(buttonData)"
+            [matTooltip]="buttonData.iconTooltip | translate">
+            <span class="xt-icon">{{ buttonData.icon }}</span>
+        </button>
+
+        <!-- Menu -->
         <ng-container
-            *ngIf="buttonData.visible === undefined || buttonData.visible(actionData)">
-            <!-- Icon button -->
+            *ngIf="buttonData.type === HoverRowActionType.MENU">
             <button
-                *ngIf="buttonData.type === HoverRowActionsType.BUTTON"
                 mat-icon-button
                 color="accent"
                 type="button"
                 [ngClass]="buttonData.class"
-                (click)="clickedButton(buttonData)"
-                [matTooltip]="buttonData.iconTooltip | translate">
+                [matMenuTriggerFor]="actionsMenu">
                 <span class="xt-icon">{{ buttonData.icon }}</span>
             </button>
 
-            <!-- Menu -->
-            <ng-container
-                *ngIf="buttonData.type === HoverRowActionsType.MENU">
-                <button
-                    mat-icon-button
-                    color="accent"
-                    type="button"
-                    [ngClass]="buttonData.class"
-                    [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">{{ buttonData.icon }}</span>
-                </button>
+            <mat-menu
+                #actionsMenu="matMenu"
+                class="table-max-sized-menu">
 
-                <mat-menu
-                    #actionsMenu="matMenu"
-                    class="table-max-sized-menu">
+                <!-- Menu Options -->
+                <ng-container
+                    *ngFor="let menuOptionData of buttonData.menuOptions">
+                    <!-- Menu Button -->
+                    <button
+                        *ngIf="menuOptionData.type === HoverRowActionType.BUTTON"
+                        mat-menu-item
+                        type="button"
+                        [ngClass]="menuOptionData.class"
+                        (click)="clickedButton(menuOptionData)">
+                        {{ menuOptionData.menuOptionLabel | translate }}
+                    </button>
 
-                    <!-- Menu Options -->
-                    <ng-container
-                        *ngFor="let menuOptionData of buttonData.menuOptions">
-                        <ng-container
-                            *ngIf="menuOptionData.visible === undefined || menuOptionData.visible(actionData)">
-                            <!-- Menu Button -->
-                            <button
-                                *ngIf="menuOptionData.type === HoverRowActionsType.BUTTON"
-                                mat-menu-item
-                                type="button"
-                                [ngClass]="menuOptionData.class"
-                                (click)="clickedButton(menuOptionData)">
-                                {{ menuOptionData.menuOptionLabel | translate }}
-                            </button>
-
-                            <!-- Menu Divider -->
-                            <mat-divider
-                                *ngIf="menuOptionData.type === HoverRowActionsType.DIVIDER"
-                                [ngClass]="menuOptionData.class">
-                            </mat-divider>
-                        </ng-container>
-                    </ng-container>
-                </mat-menu>
-            </ng-container>
+                    <!-- Menu Divider -->
+                    <mat-divider
+                        *ngIf="menuOptionData.type === HoverRowActionType.DIVIDER"
+                        [ngClass]="menuOptionData.class">
+                    </mat-divider>
+                </ng-container>
+            </mat-menu>
         </ng-container>
     </ng-container>
 </div>

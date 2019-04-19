@@ -1,5 +1,6 @@
 import { Directive, ElementRef, HostListener, Input } from '@angular/core';
-import { HoverRowActions, HoverRowActionsComponent } from '../../components';
+import { HoverRowAction, HoverRowActionsComponent } from '../../components';
+import * as _ from 'lodash';
 
 @Directive({
     selector: '[app-hover-row-actions]',
@@ -14,7 +15,7 @@ export class HoverRowActionsDirective {
     /**
      * Actions
      */
-    @Input() hoverRowActions: HoverRowActions[] = [];
+    @Input() hoverRowActions: HoverRowAction[] = [];
 
     /**
      * Actions Data
@@ -29,19 +30,66 @@ export class HoverRowActionsDirective {
     ) { }
 
     /**
-     * Mouse enter row
+     * Construct list of visible actions
      */
-    @HostListener('mouseenter', ['$event'])
-    mouseEnter(event) {
-        // display actions
+    private getVisibleActions(): HoverRowAction[] {
+        // construct list of visible actions
+        const visibleActions: HoverRowAction[] = [];
+        _.each(this.hoverRowActions, (action: HoverRowAction) => {
+            // action visible ?
+            if (
+                action.visible !== undefined &&
+                !action.visible(this.hoverRowActionData)
+            ) {
+                return;
+            }
+
+            // clone action
+            const clonedAction = new HoverRowAction(action);
+            clonedAction.menuOptions = clonedAction.menuOptions ? [] : clonedAction.menuOptions;
+            _.each(action.menuOptions, (menuOption: HoverRowAction) => {
+                // action visible ?
+                if (
+                    menuOption.visible !== undefined &&
+                    !menuOption.visible(this.hoverRowActionData)
+                ) {
+                    return;
+                }
+
+                // add menu option
+                clonedAction.menuOptions.push(new HoverRowAction(menuOption));
+            });
+
+            // add action
+            visibleActions.push(clonedAction);
+        });
+
+        // finished
+        return visibleActions;
+    }
+
+    /**
+     * Display actions
+     * @param event
+     */
+    private show(event) {
         if (this.hoverRowActionsComponent) {
+            // display actions
             this.hoverRowActionsComponent.show(
                 this.elementRef,
-                this.hoverRowActions,
+                this.getVisibleActions(),
                 this.hoverRowActionData,
                 event
             );
         }
+    }
+
+    /**
+     * Mouse enter row
+     */
+    @HostListener('mouseenter', ['$event'])
+    mouseEnter(event) {
+        this.show(event);
     }
 
     /**
@@ -62,15 +110,7 @@ export class HoverRowActionsDirective {
      */
     @HostListener('click', ['$event'])
     mouseClick(event) {
-        // display actions
-        if (this.hoverRowActionsComponent) {
-            this.hoverRowActionsComponent.show(
-                this.elementRef,
-                this.hoverRowActions,
-                this.hoverRowActionData,
-                event
-            );
-        }
+        this.show(event);
     }
 
     /**

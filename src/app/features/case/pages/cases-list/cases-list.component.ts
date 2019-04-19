@@ -10,7 +10,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, DialogField, HoverRowActions, HoverRowActionsType, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
@@ -122,9 +122,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
     loadingDialog: LoadingDialogModel;
 
-    recordActions: HoverRowActions[] = [
+    recordActions: HoverRowAction[] = [
         // View Case
-        new HoverRowActions({
+        new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE',
             click: (item: CaseModel) => {
@@ -136,7 +136,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         }),
 
         // Modify Case
-        new HoverRowActions({
+        new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE',
             click: (item: CaseModel) => {
@@ -151,12 +151,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         }),
 
         // Other actions
-        new HoverRowActions({
-            type: HoverRowActionsType.MENU,
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
             icon: 'moreVertical',
             menuOptions: [
                 // Convert Case To Contact
-                new HoverRowActions({
+                new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT',
                     click: (item: CaseModel) => {
                         this.convertCaseToContact(item);
@@ -172,7 +172,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }),
 
                 // Delete Case
-                new HoverRowActions({
+                new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE',
                     click: (item: CaseModel) => {
                         this.deleteCase(item);
@@ -187,8 +187,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }),
 
                 // Divider
-                new HoverRowActions({
-                    type: HoverRowActionsType.DIVIDER,
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
                     visible: (item: CaseModel): boolean => {
                         // visible only if at least one of the first two items is visible
                         return !item.deleted &&
@@ -199,7 +199,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }),
 
                 // Add Contact to Case
-                new HoverRowActions({
+                new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_ACTION_ADD_CONTACT',
                     click: (item: CaseModel) => {
                         this.router.navigate(['/contacts', 'create'], {
@@ -218,7 +218,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }),
 
                 // Bulk add contacts to case
-                new HoverRowActions({
+                new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_ACTION_BULK_ADD_CONTACTS',
                     click: (item: CaseModel) => {
                         this.router.navigate(['/contacts', 'create-bulk'], {
@@ -237,8 +237,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }),
 
                 // Divider
-                new HoverRowActions({
-                    type: HoverRowActionsType.DIVIDER,
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
                     visible: (item: CaseModel): boolean => {
                         // visible only if at least one of the previous two items is visible
                         return !item.deleted &&
@@ -249,7 +249,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }),
 
                 // See case contacts..
-                new HoverRowActions({
+                new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM',
                     click: (item: CaseModel) => {
                         this.router.navigate(['/relationships', EntityType.CASE, item.id, 'contacts']);
@@ -260,7 +260,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }),
 
                 // See case exposures
-                new HoverRowActions({
+                new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO',
                     click: (item: CaseModel) => {
                         this.router.navigate(['/relationships', EntityType.CASE, item.id, 'exposures']);
@@ -271,8 +271,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }),
 
                 // Divider
-                new HoverRowActions({
-                    type: HoverRowActionsType.DIVIDER,
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
                     visible: (item: CaseModel): boolean => {
                         // visible only if at least one of the previous two items is visible
                         return !item.deleted;
@@ -280,7 +280,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }),
 
                 // See case lab results
-                new HoverRowActions({
+                new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS',
                     click: (item: CaseModel) => {
                         this.router.navigate(['/cases', item.id, 'lab-results']);
@@ -292,7 +292,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }),
 
                 // See contacts follow-us belonging to this case
-                new HoverRowActions({
+                new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS',
                     click: (item: CaseModel) => {
                         this.router.navigate(['/contacts', 'case-related-follow-ups', item.id]);
@@ -304,8 +304,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }),
 
                 // Divider
-                new HoverRowActions({
-                    type: HoverRowActionsType.DIVIDER,
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
                     visible: (item: CaseModel): boolean => {
                         // visible only if at least one of the previous two items is visible
                         return !item.deleted && (
@@ -316,7 +316,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }),
 
                 // View Case movement map
-                new HoverRowActions({
+                new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT',
                     click: (item: CaseModel) => {
                         this.router.navigate(['/cases', item.id, 'movement']);
@@ -327,7 +327,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }),
 
                 // View case chronology timeline
-                new HoverRowActions({
+                new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY',
                     click: (item: CaseModel) => {
                         this.router.navigate(['/cases', item.id, 'chronology']);
@@ -338,15 +338,15 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }),
 
                 // Divider
-                new HoverRowActions({
-                    type: HoverRowActionsType.DIVIDER,
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
                     visible: (item: CaseModel): boolean => {
                         return !item.deleted;
                     }
                 }),
 
                 // Download case investigation form
-                new HoverRowActions({
+                new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASE_INVESTIGATION_FORM',
                     click: (item: CaseModel) => {
                         this.exportCaseInvestigationForm(item);
@@ -359,7 +359,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }),
 
                 // Restore a deleted case
-                new HoverRowActions({
+                new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_RESTORE_CASE',
                     click: (item: CaseModel) => {
                         this.restoreCase(item);

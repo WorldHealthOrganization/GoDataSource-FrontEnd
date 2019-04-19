@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 /**
  * Action Type
  */
-export enum HoverRowActionsType {
+export enum HoverRowActionType {
     BUTTON = 'button',
     MENU = 'menu',
     DIVIDER = 'divider'
@@ -13,16 +13,16 @@ export enum HoverRowActionsType {
 /**
  * Action
  */
-export class HoverRowActions {
+export class HoverRowAction {
     // fields
-    type: HoverRowActionsType = HoverRowActionsType.BUTTON;
+    type: HoverRowActionType = HoverRowActionType.BUTTON;
     icon: string;
     iconTooltip: string;
     click: (item: any) => void;
     class: string;
     visible: (item: any) => boolean;
 
-    menuOptions: HoverRowActions[];
+    menuOptions: HoverRowAction[];
     menuOptionLabel: string;
 
     /**
@@ -33,8 +33,8 @@ export class HoverRowActions {
         icon?: string,
         iconTooltip?: string,
         click?: (item: any) => void,
-        type?: HoverRowActionsType,
-        menuOptions?: HoverRowActions[],
+        type?: HoverRowActionType,
+        menuOptions?: HoverRowAction[],
         menuOptionLabel?: string,
         class?: string,
         visible?: (item: any) => boolean
@@ -76,7 +76,7 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      * Constants
      */
     HoverRowActionsPosition = HoverRowActionsPosition;
-    HoverRowActionsType = HoverRowActionsType;
+    HoverRowActionType = HoverRowActionType;
 
     /**
      * Keep last reference element
@@ -244,17 +244,17 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     /**
      * Actions
      */
-    actions: HoverRowActions[] = [];
+    actions: HoverRowAction[] = [];
 
     /**
      * Actions reversed
      */
-    actionsReversed: HoverRowActions[] = [];
+    actionsReversed: HoverRowAction[] = [];
 
     /**
      * Actions rendered
      */
-    realActions: HoverRowActions[] = [];
+    realActions: HoverRowAction[] = [];
 
     /**
      * Action data
@@ -378,7 +378,7 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      */
     show(
         elementRef: ElementRef,
-        actions: HoverRowActions[],
+        actions: HoverRowAction[],
         actionData: any = null,
         mouseEvent: MouseEvent = null
     ) {
@@ -473,7 +473,7 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      * Clicked Button or Menu option
      * @param buttonData
      */
-    clickedButton(buttonData: HoverRowActions) {
+    clickedButton(buttonData: HoverRowAction) {
         buttonData.click(this.actionData);
     }
 }
