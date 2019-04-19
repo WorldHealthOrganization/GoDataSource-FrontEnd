@@ -144,6 +144,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             },
             visible: (item: CaseModel): boolean => {
                 return !item.deleted &&
+                    this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                     this.hasCaseWriteAccess();
@@ -163,6 +164,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     },
                     visible: (item: CaseModel): boolean => {
                         return !item.deleted &&
+                            this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                             this.hasCaseWriteAccess() &&
@@ -179,6 +181,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     },
                     visible: (item: CaseModel): boolean => {
                         return !item.deleted &&
+                            this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                             this.hasCaseWriteAccess();
@@ -192,6 +195,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     visible: (item: CaseModel): boolean => {
                         // visible only if at least one of the first two items is visible
                         return !item.deleted &&
+                            this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                             this.hasCaseWriteAccess();
@@ -211,6 +215,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     },
                     visible: (item: CaseModel): boolean => {
                         return !item.deleted &&
+                            this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                             this.hasContactWriteAccess();
@@ -230,6 +235,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     },
                     visible: (item: CaseModel): boolean => {
                         return !item.deleted &&
+                            this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                             this.hasContactWriteAccess();
@@ -242,6 +248,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     visible: (item: CaseModel): boolean => {
                         // visible only if at least one of the previous two items is visible
                         return !item.deleted &&
+                            this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                             this.hasContactWriteAccess();
@@ -366,6 +373,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     },
                     visible: (item: CaseModel): boolean => {
                         return item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                             this.hasCaseWriteAccess();
                     },
