@@ -148,7 +148,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                         this.router.navigate(['/outbreaks', item.id, 'case-questionnaire']);
                     },
                     visible: (item: OutbreakModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted &&
+                            this.hasOutbreakWriteAccess();
                     }
                 }),
 
@@ -159,7 +160,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                         this.router.navigate(['/outbreaks', item.id, 'contact-follow-up-questionnaire']);
                     },
                     visible: (item: OutbreakModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted &&
+                            this.hasOutbreakWriteAccess();
                     }
                 }),
 
@@ -170,7 +172,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                         this.router.navigate(['/outbreaks', item.id, 'case-lab-results-questionnaire']);
                     },
                     visible: (item: OutbreakModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted &&
+                            this.hasOutbreakWriteAccess();
                     }
                 }),
 
