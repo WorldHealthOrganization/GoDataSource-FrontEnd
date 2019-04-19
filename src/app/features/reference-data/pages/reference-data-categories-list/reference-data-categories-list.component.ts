@@ -9,7 +9,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { PERMISSION } from '../../../../core/models/permission.model';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { LoadingDialogModel } from '../../../../shared/components';
+import { HoverRowAction, LoadingDialogModel } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -35,6 +35,17 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
     referenceDataExporFileName: string = moment().format('YYYY-MM-DD');
 
     loadingDialog: LoadingDialogModel;
+
+    recordActions: HoverRowAction[] = [
+        // View Items
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_ACTION_VIEW_CATEGORY',
+            click: (item: ReferenceDataCategoryModel) => {
+                this.router.navigate(['/reference-data', item.id]);
+            }
+        })
+    ];
 
     constructor(
         private router: Router,
@@ -77,8 +88,7 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
     getTableColumns(): string[] {
         return [
             'categoryName',
-            'entries',
-            'actions'
+            'entries'
         ];
     }
 
