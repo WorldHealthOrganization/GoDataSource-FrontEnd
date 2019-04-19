@@ -67,6 +67,11 @@
         </button>
     </div>
 
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+    ></app-hover-row-actions>
+
     <mat-table #table [dataSource]="labResultsList$ | async" matSort (matSortChange)="sortBy($event)">
 
         <!-- Case Last Name -->
@@ -365,52 +370,14 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Inline Actions -->
-        <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-            <mat-cell *matCellDef="let item" fxFlex="70px">
-                <div>
-                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                        <span class="xt-icon">moreVertical</span>
-                    </button>
-
-                    <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-                        <button *ngIf="!item.deleted"
-                                mat-menu-item
-                                [routerLink]="['/cases', item.personId, 'lab-results', item.id, 'view']"
-                                [queryParams]="{ fromLabResultsList: true }">
-                            {{ 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_VIEW_LAB_RESULT' | translate }}
-                        </button>
-
-                        <ng-container *app-selected-outbreak-is-active>
-                            <button *ngIf="hasLabResultWriteAccess() && !item.deleted"
-                                    mat-menu-item
-                                    [routerLink]="['/cases', item.personId, 'lab-results', item.id, 'modify']"
-                                    [queryParams]="{ fromLabResultsList: true }">
-                                {{'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT' | translate}}
-                            </button>
-
-                            <button
-                                *ngIf="hasLabResultWriteAccess() && !item.deleted"
-                                mat-menu-item class="mat-menu-item-delete"
-                                (click)="deleteLabResult(item)">
-                                {{'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_LAB_RESULT' | translate}}
-                            </button>
-
-                            <button *ngIf="item.deleted && hasLabResultWriteAccess()"
-                                    mat-menu-item class="mat-menu-item-restore"
-                                    (click)="restoreLabResult(item)">
-                                {{ 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT' | translate}}
-                            </button>
-                        </ng-container>
-
-                    </mat-menu>
-                </div>
-            </mat-cell>
-        </ng-container>
-
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
+        <mat-row
+            *matRowDef="let item; columns: visibleTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
     </mat-table>
 
     <div
