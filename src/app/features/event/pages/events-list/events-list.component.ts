@@ -10,13 +10,13 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
@@ -77,7 +77,165 @@ export class EventsListComponent extends ListComponent implements OnInit {
         new LabelValuePair('LNG_EVENT_FIELD_LABEL_DELETED', 'deleted'),
     ];
 
+    recordActions: HoverRowAction[] = [
+        // View Event
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_EVENTS_ACTION_VIEW_EVENT',
+            click: (item: EventModel) => {
+                this.router.navigate(['/events', item.id, 'view']);
+            },
+            visible: (item: EventModel): boolean => {
+                return !item.deleted;
+            }
+        }),
+
+        // Modify Event
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_EVENTS_ACTION_MODIFY_EVENT',
+            click: (item: EventModel) => {
+                this.router.navigate(['/events', item.id, 'modify']);
+            },
+            visible: (item: EventModel): boolean => {
+                return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.hasEventWriteAccess();
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Event
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_EVENT',
+                    click: (item: EventModel) => {
+                        this.deleteEvent(item);
+                    },
+                    visible: (item: EventModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasEventWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: EventModel): boolean => {
+                        // visible only if at least one of the previous...
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasEventWriteAccess();
+                    }
+                }),
+
+                // Add Contact to Event
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_ADD_CONTACT',
+                    click: (item: EventModel) => {
+                        this.router.navigate(['/contacts', 'create'], {
+                            queryParams: {
+                                entityType: EntityType.EVENT,
+                                entityId: item.id
+                            }
+                        });
+                    },
+                    visible: (item: EventModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasContactWriteAccess();
+                    }
+                }),
+
+                // Bulk add contacts to event
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_BULK_ADD_CONTACTS',
+                    click: (item: EventModel) => {
+                        this.router.navigate(['/contacts', 'create-bulk'], {
+                            queryParams: {
+                                entityType: EntityType.EVENT,
+                                entityId: item.id
+                            }
+                        });
+                    },
+                    visible: (item: EventModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasContactWriteAccess();
+                    }
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: EventModel): boolean => {
+                        // visible only if at least one of the previous...
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasContactWriteAccess();
+                    }
+                }),
+
+                // See event contacts..
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM',
+                    click: (item: EventModel) => {
+                        this.router.navigate(['/relationships', EntityType.EVENT, item.id, 'contacts']);
+                    },
+                    visible: (item: EventModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+
+                // See event exposures
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO',
+                    click: (item: EventModel) => {
+                        this.router.navigate(['/relationships', EntityType.EVENT, item.id, 'exposures']);
+                    },
+                    visible: (item: EventModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+
+                // Restore a deleted event
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_EVENT',
+                    click: (item: EventModel) => {
+                        this.restoreEvent(item);
+                    },
+                    visible: (item: EventModel): boolean => {
+                        return item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasEventWriteAccess();
+                    },
+                    class: 'mat-menu-item-restore'
+                })
+            ]
+        })
+    ];
+
     constructor(
+        private router: Router,
         private eventDataService: EventDataService,
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
@@ -152,11 +310,6 @@ export class EventsListComponent extends ListComponent implements OnInit {
             new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_EVENT_FIELD_LABEL_DELETED'
-            }),
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
             })
         ];
     }
