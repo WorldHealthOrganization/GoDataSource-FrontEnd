@@ -65,6 +65,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     relationship: RelationshipModel = new RelationshipModel();
     // route data
     relationshipType: RelationshipType;
+    canReverseRelation: boolean = true;
 
     // provide constants to template
     EntityModel = EntityModel;
@@ -167,6 +168,11 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                 )
                 .subscribe((relationshipData) => {
                     this.relationship = relationshipData;
+                    _.map(this.relationship.persons, (person) => {
+                            if (person.type === EntityType.CONTACT) {
+                                this.canReverseRelation = false;
+                            }
+                    });
 
                     this.initializeBreadcrumbs();
                 });
@@ -248,6 +254,30 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
 
                 // hide dialog
                 loadingDialog.close();
+            });
+    }
+
+    reverseExistingRelationship() {
+        const relationshipPersons = {
+            sourceId: _.find(this.relationship.persons, {target: true}).id,
+            targetId: this.relationship.sourcePerson.id
+        };
+        this.relationshipDataService
+            .reverseExistingRelationship(
+                this.selectedOutbreak.id,
+                this.relationshipId,
+                relationshipPersons
+            )
+            .subscribe((relationshipData: RelationshipModel) => {
+                const targetPerson = _.find(relationshipData.persons, {target: true});
+                switch (this.relationshipType) {
+                    case RelationshipType.EXPOSURE:
+                        this.router.navigate([`/relationships/${this.entityType}/${targetPerson.id}/contacts/${relationshipData.id}/modify`]);
+                        break;
+                    case RelationshipType.CONTACT:
+                        this.router.navigate([`/relationships/${this.entityType}/${targetPerson.id}/exposures/${relationshipData.id}/modify`]);
+                        break;
+                }
             });
     }
 

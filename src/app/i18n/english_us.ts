@@ -22,7 +22,12 @@ export const EnglishUsLang = {
          * uiChainsOfTransmissionBars
          */
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_UNKNOWN_LABEL': 'Lab?',
-        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_FOR_OTHER_CONDITIONS_CASE_LABEL': 'hsp'
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_FOR_OTHER_CONDITIONS_CASE_LABEL': 'hsp',
+
+        /**
+         * uiModifyEntityRelationshipPage
+         */
+        'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_REVERSE_RELATIONSHIP': 'Reverse persons'
 
         /**
          * REMOVE the tokens from below
