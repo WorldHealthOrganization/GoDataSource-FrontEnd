@@ -47,12 +47,14 @@
                             </app-form-input>
                         </div>
 
-                        <app-form-textarea
-                            name="description"
-                            [(ngModel)]="upstreamServerData.description"
-                            [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION' | translate"
-                            tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
-                        </app-form-textarea>
+                        <div fxLayout="row">
+                            <app-form-textarea
+                                name="description"
+                                [(ngModel)]="upstreamServerData.description"
+                                [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION' | translate"
+                                tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
+                            </app-form-textarea>
+                        </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input

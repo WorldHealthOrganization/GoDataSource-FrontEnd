@@ -133,13 +133,15 @@
                                 </app-form-select>
                             </div>
 
-                            <app-form-select
-                                name="riskReason"
-                                [(ngModel)]="uniqueOptions?.riskReason.value"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION"
-                                [options]="uniqueOptions?.riskReason.options">
-                            </app-form-select>
+                            <div fxLayout="row">
+                                <app-form-select
+                                    name="riskReason"
+                                    [(ngModel)]="uniqueOptions?.riskReason.value"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION"
+                                    [options]="uniqueOptions?.riskReason.options">
+                                </app-form-select>
+                            </div>
                         </div>
                     </mat-card>
 
@@ -294,7 +296,6 @@
                                     [options]="uniqueOptions?.dateOfBurial.options">
                                 </app-form-select>
                             </div>
-
                         </div>
                     </mat-card>
 
