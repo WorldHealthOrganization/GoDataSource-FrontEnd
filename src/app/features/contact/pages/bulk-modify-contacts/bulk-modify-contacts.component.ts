@@ -112,7 +112,9 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
 
         // init table columns
-        this.configureSheetWidget();
+        setTimeout(() => {
+            this.configureSheetWidget();
+        });
 
         // get selected outbreak
         this.outbreakDataService
@@ -156,8 +158,10 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 if (this.existingLocations) {
                     const allLocations = this.existingLocations.concat(selectedLocations);
                     observer.next(_.uniqWith(allLocations, _.isEqual));
-                    observer.complete();
+                } else {
+                    observer.next(selectedLocations);
                 }
+                observer.complete();
            });
         });
     }
@@ -261,7 +265,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
             .subscribe((contactModels) => {
                 // construct hot table data
                 this.extraContactData = [];
-                this.data = (contactModels || []).map((contact: ContactModel) => {
+                this.data = (contactModels as ContactModel[] || []).map((contact: ContactModel) => {
                     // determine contact data
                     const contactData = [];
                     this.sheetColumns.forEach((column: AbstractSheetColumn) => {
