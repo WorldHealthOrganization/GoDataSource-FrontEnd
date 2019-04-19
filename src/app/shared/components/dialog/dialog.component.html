@@ -55,10 +55,12 @@
                         *ngIf="field.isVisible(dialogAnswerInputValue.value)"
                         fxLayout="column" fxLayoutGap="20px">
 
-                        <div fxLayout="row">
+                        <div
+                            *ngIf="field.fieldType === DialogFieldType.SELECT"
+                            fxLayout="row"
+                        >
                             <!-- Select -->
                             <app-form-select
-                                *ngIf="field.fieldType === DialogFieldType.SELECT"
                                 [name]="field.name"
                                 [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                                 [placeholder]="field.placeholder | translate:confirmData?.translateData"
@@ -73,10 +75,12 @@
                             </app-form-select>
                         </div>
 
-                        <div fxLayout="row">
+                        <div
+                            *ngIf="field.fieldType === DialogFieldType.TEXT && field.type !== 'number'"
+                            fxLayout="row"
+                        >
                             <!-- Text -->
                             <app-form-input
-                                *ngIf="field.fieldType === DialogFieldType.TEXT && field.type !== 'number'"
                                 [name]="field.name"
                                 [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                                 [placeholder]="field.placeholder | translate:confirmData?.translateData"
@@ -87,10 +91,12 @@
                             </app-form-input>
                         </div>
 
-                        <div fxLayout="row">
+                        <div
+                            *ngIf="field.fieldType === DialogFieldType.TEXT && field.type === 'number'"
+                            fxLayout="row"
+                        >
                             <!-- Number -->
                             <app-form-input
-                                *ngIf="field.fieldType === DialogFieldType.TEXT && field.type === 'number'"
                                 [name]="field.name"
                                 [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                                 [placeholder]="field.placeholder | translate:confirmData?.translateData"
@@ -106,10 +112,12 @@
                             </app-form-input>
                         </div>
 
-                        <div fxLayout="row">
+                        <div
+                            *ngIf="field.fieldType === DialogFieldType.BOOLEAN"
+                            fxLayout="row"
+                        >
                             <!-- Boolean -->
                             <app-form-slide-toggle
-                                *ngIf="field.fieldType === DialogFieldType.BOOLEAN"
                                 [name]="field.name"
                                 [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                                 [label]="field.placeholder | translate:confirmData?.translateData"
@@ -118,10 +126,12 @@
                             </app-form-slide-toggle>
                         </div>
 
-                        <div fxLayout="row">
+                        <div
+                            *ngIf="field.fieldType === DialogFieldType.DATE"
+                            fxLayout="row"
+                        >
                             <!-- Date -->
                             <app-form-datepicker
-                                *ngIf="field.fieldType === DialogFieldType.DATE"
                                 [name]="field.name"
                                 [ngModel]="dialogAnswerInputValue.value[field.name]"
                                 [placeholder]="field.placeholder | translate:confirmData?.translateData"
@@ -133,10 +143,12 @@
                             ></app-form-datepicker>
                         </div>
 
-                        <div fxLayout="row">
+                        <div
+                            *ngIf="field.fieldType === DialogFieldType.DATE_RANGE"
+                            fxLayout="row"
+                        >
                             <!-- Date range -->
                             <app-form-daterange
-                                *ngIf="field.fieldType === DialogFieldType.DATE_RANGE"
                                 [name]="field.name"
                                 [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                                 [required]="field.required"
@@ -153,10 +165,12 @@
                             {{ field.placeholder | translate }}
                         </a>
 
-                        <div fxLayout="row">
+                        <div
+                            *ngIf="field.fieldType === DialogFieldType.URL"
+                            fxLayout="row"
+                        >
                             <!-- Url -->
                             <app-form-input
-                                *ngIf="field.fieldType === DialogFieldType.URL"
                                 [name]="field.name"
                                 [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                                 [placeholder]="field.placeholder | translate:confirmData?.translateData"
