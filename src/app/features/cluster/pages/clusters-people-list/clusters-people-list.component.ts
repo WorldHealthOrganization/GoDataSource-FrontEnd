@@ -2,7 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs';
@@ -17,6 +17,10 @@ import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { share, tap } from 'rxjs/operators';
+import { HoverRowAction } from '../../../../shared/components';
+import { CaseModel } from '../../../../core/models/case.model';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { EventModel } from '../../../../core/models/event.model';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -49,7 +53,38 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     ReferenceDataCategory = ReferenceDataCategory;
     Constants = Constants;
 
+    recordActions: HoverRowAction[] = [
+        // View Person
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_ACTION_VIEW',
+            click: (item: CaseModel | ContactModel | EventModel) => {
+                this.router.navigateByUrl(this.getItemRouterLink(item, 'view'));
+            },
+            visible: (item: CaseModel | ContactModel | EventModel): boolean => {
+                return !item.deleted;
+            }
+        }),
+
+        // Modify Person
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
+            click: (item: CaseModel | ContactModel | EventModel) => {
+                this.router.navigateByUrl(this.getItemRouterLink(item, 'modify'));
+            },
+            visible: (item: CaseModel | ContactModel | EventModel): boolean => {
+                return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.getAccessPermissions(item);
+            }
+        })
+    ];
+
     constructor(
+        private router: Router,
         private route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
         private clusterDataService: ClusterDataService,
@@ -96,7 +131,10 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
 
                                 // pushing the new breadcrumbs
                                 this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(clusterData.name),
+                                    new BreadcrumbItemModel(
+                                        clusterData.name,
+                                        `/clusters/${clusterData.id}/view`
+                                    ),
                                     new BreadcrumbItemModel('LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE', '.', true)
                                 );
 
@@ -135,11 +173,15 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = [
-            'lastName', 'firstName', 'age', 'gender', 'riskLevel',
-            'place', 'address', 'actions'
+        return [
+            'lastName',
+            'firstName',
+            'age',
+            'gender',
+            'riskLevel',
+            'place',
+            'address'
         ];
-        return columns;
     }
 
     /**
@@ -148,7 +190,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      * @param {string} action
      * @returns {string}
      */
-    getItemRouterLink (item, action: string) {
+    getItemRouterLink (item, action: string): string {
         switch (item.type) {
             case EntityType.CASE:
                 return `/cases/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
