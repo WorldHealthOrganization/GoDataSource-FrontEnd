@@ -27,6 +27,8 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
 
     relationshipLink: string;
 
+    canReverseRelation: boolean = true;
+
     constructor(
         private authDataService: AuthDataService,
         private relationshipDataService: RelationshipDataService
@@ -58,6 +60,10 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
         }
 
         return null;
+    }
+
+    reverseExistingRelationship() {
+        console.log(this.relationship);
     }
 
     updateRelationshipData(relationship: RelationshipModel) {

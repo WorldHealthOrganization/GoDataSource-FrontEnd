@@ -22,6 +22,11 @@
         <div
             *ngIf="hasCaseWriteAccess() || hasContactWriteAccess()"
             fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
+
+            <button mat-raised-button type="button" (click)="reverseExistingRelationship()" [disabled]="!canReverseRelation">
+                {{ 'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_REVERSE_RELATIONSHIP' | translate }}
+            </button>
+
             <a
                 mat-raised-button
                 color="accent"
