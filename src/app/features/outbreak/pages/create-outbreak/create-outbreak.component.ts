@@ -39,6 +39,8 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
 
     newOutbreak: OutbreakModel = new OutbreakModel();
 
+    creatingOutbreakFromTemplate: boolean = false;
+
     outbreakNameValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
     constructor(
@@ -76,8 +78,12 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                         .subscribe((outbreakTemplate: OutbreakTemplateModel) => {
                             // delete the id of the outbreak template
                             delete outbreakTemplate.id;
+
                             // make the new outbreak which is merged with the outbreak template
                             this.newOutbreak = new OutbreakModel(outbreakTemplate);
+
+                            // creating clone, we need to keep data from the template
+                            this.creatingOutbreakFromTemplate = true;
                         });
                 }
             });
@@ -102,14 +108,23 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
 
     createOutbreak(stepForms: NgForm[]) {
         // get forms fields
-        const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+        let dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
+        // validate outbreak
         if (
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
         ) {
-            const outbreakData = new OutbreakModel(dirtyFields);
+            // are we creating an outbreak from a template ?
+            if (this.creatingOutbreakFromTemplate) {
+                dirtyFields = {
+                    ...this.newOutbreak,
+                    ...dirtyFields
+                };
+            }
 
+            // create outbreak
+            const outbreakData = new OutbreakModel(dirtyFields);
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.outbreakDataService
                 .createOutbreak(outbreakData)
