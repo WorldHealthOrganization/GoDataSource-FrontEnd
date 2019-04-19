@@ -18,6 +18,8 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { catchError, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-create-outbreak',
@@ -51,7 +53,8 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
         private formHelper: FormHelperService,
         private route: ActivatedRoute,
         private outbreakTemplateDataService: OutbreakTemplateDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private i18nService: I18nService
     ) {
         super();
     }
@@ -81,6 +84,40 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
 
                             // make the new outbreak which is merged with the outbreak template
                             this.newOutbreak = new OutbreakModel(outbreakTemplate);
+
+                            // translate questionnaire questions
+                            const translateQuestionnaire = (questions: QuestionModel[]) => {
+                                _.each(questions, (question: QuestionModel) => {
+                                    // translate question
+                                    question.text = this.i18nService.instant(question.text);
+
+                                    // translate answers & sub questions
+                                    _.each(question.answers, (answer: AnswerModel) => {
+                                        // translate answer
+                                        answer.label = this.i18nService.instant(answer.label);
+
+                                        // translate sub-question
+                                        if (!_.isEmpty(answer.additionalQuestions)) {
+                                            translateQuestionnaire(answer.additionalQuestions);
+                                        }
+                                    });
+                                });
+                            };
+
+                            // translate questionnaire questions - Case Form
+                            if (!_.isEmpty(this.newOutbreak.caseInvestigationTemplate)) {
+                                translateQuestionnaire(this.newOutbreak.caseInvestigationTemplate);
+                            }
+
+                            // translate questionnaire questions - Lab Results Form
+                            if (!_.isEmpty(this.newOutbreak.labResultsTemplate)) {
+                                translateQuestionnaire(this.newOutbreak.labResultsTemplate);
+                            }
+
+                            // translate questionnaire questions - Contact Follow-up
+                            if (!_.isEmpty(this.newOutbreak.contactFollowUpTemplate)) {
+                                translateQuestionnaire(this.newOutbreak.contactFollowUpTemplate);
+                            }
 
                             // creating clone, we need to keep data from the template
                             this.creatingOutbreakFromTemplate = true;
