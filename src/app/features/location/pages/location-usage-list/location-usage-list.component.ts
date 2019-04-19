@@ -4,7 +4,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationUsageModel, UsageDetails, UsageDetailsItem, UsageDetailsItemType } from '../../../../core/models/location-usage.model';
 import { LocationModel } from '../../../../core/models/location.model';
@@ -13,6 +13,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import * as _ from 'lodash';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Constants } from '../../../../core/models/constants';
+import { HoverRowAction } from '../../../../shared/components';
 
 @Component({
     selector: 'app-location-usage-list',
@@ -35,7 +36,31 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
         total: number
     };
 
+    recordActions: HoverRowAction[] = [
+        // View Item
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_ACTION_VIEW',
+            click: (item: UsageDetailsItem) => {
+                this.router.navigateByUrl(item.viewUrl);
+            }
+        }),
+
+        // Modify Item
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
+            click: (item: UsageDetailsItem) => {
+                this.router.navigateByUrl(item.modifyUrl);
+            },
+            visible: (item: UsageDetailsItem): boolean => {
+                return this.hasWriteAccess(item);
+            }
+        })
+    ];
+
     constructor(
+        private router: Router,
         protected snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private locationDataService: LocationDataService,
@@ -177,8 +202,7 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
         return [
             'type',
             'name',
-            'outbreakName',
-            'actions'
+            'outbreakName'
         ];
     }
 }

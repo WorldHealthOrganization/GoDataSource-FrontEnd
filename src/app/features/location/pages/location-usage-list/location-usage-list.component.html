@@ -18,6 +18,11 @@
         </button>
     </div>
 
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+    ></app-hover-row-actions>
+
     <mat-table #table [dataSource]="usageDetailsList">
         <!-- Type -->
         <ng-container matColumnDef="type">
@@ -58,38 +63,14 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Inline Actions -->
-        <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-
-            <mat-cell *matCellDef="let item" fxFlex="70px">
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
-
-                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-
-                    <button
-                        mat-menu-item
-                        [routerLink]="item.viewUrl">
-                        {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
-                    </button>
-
-                    <mat-divider></mat-divider>
-
-                    <button
-                        *ngIf="hasWriteAccess(item)"
-                        mat-menu-item
-                        [routerLink]="item.modifyUrl">
-                        {{'LNG_PAGE_ACTION_MODIFY' | translate}}
-                    </button>
-
-                </mat-menu>
-            </mat-cell>
-        </ng-container>
-
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+        <mat-row
+            *matRowDef="let item; columns: getTableColumns()"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
     </mat-table>
 
     <div

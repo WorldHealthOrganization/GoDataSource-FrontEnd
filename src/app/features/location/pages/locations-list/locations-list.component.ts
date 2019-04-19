@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ActivatedRoute, Router } from '@angular/router';
-
 import { LocationModel } from '../../../../core/models/location.model';
 import { Observable } from 'rxjs';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
@@ -11,7 +10,7 @@ import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { DialogAnswerButton, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswerButton, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
@@ -65,6 +64,74 @@ export class LocationsListComponent extends ListComponent implements OnInit {
     loadingDialog: LoadingDialogModel;
 
     geographicalLevelsList$: Observable<any[]>;
+
+    recordActions: HoverRowAction[] = [
+        // View Location
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_VIEW_LOCATION',
+            click: (item: LocationModel) => {
+                this.router.navigate(['/locations', item.id, 'view']);
+            }
+        }),
+
+        // Modify Location
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_MODIFY_LOCATION',
+            click: (item: LocationModel) => {
+                this.router.navigate(['/locations', item.id, 'modify']);
+            },
+            visible: (): boolean => {
+                return this.hasLocationWriteAccess();
+            }
+        }),
+
+        // View Location Children
+        new HoverRowAction({
+            icon: 'groupWork',
+            iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN',
+            click: (item: LocationModel) => {
+                this.router.navigate(['/locations', item.id, 'children']);
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Location
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_LOCATION',
+                    click: (item: LocationModel) => {
+                        this.deleteLocation(item);
+                    },
+                    visible: (): boolean => {
+                        return this.hasLocationWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (): boolean => {
+                        // visible only if at least one of the previous...
+                        return this.hasLocationWriteAccess();
+                    }
+                }),
+
+                // See Location usage
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE',
+                    click: (item: LocationModel) => {
+                        this.router.navigate(['/locations', item.id, 'usage']);
+                    }
+                })
+            ]
+        })
+    ];
 
     constructor(
         private authDataService: AuthDataService,
@@ -144,11 +211,6 @@ export class LocationsListComponent extends ListComponent implements OnInit {
             new VisibleColumnModel({
                 field: 'geographicalLevelId',
                 label: 'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL'
-            }),
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
             })
         ];
     }
