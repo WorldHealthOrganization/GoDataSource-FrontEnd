@@ -678,4 +678,21 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 }
             });
     }
+
+
+    reverseRelationshipPersons() {
+        // refresh graph
+        this.cotDashletChild.refreshChain();
+
+        // reset selected relationship
+        this.selectedRelationship = undefined;
+
+        // reset form
+        this.resetFormModels();
+
+        // reset selected nodes
+        this.resetNodes();
+
+        // reset node action
+        this.currentNodeAction = null;    }
 }
