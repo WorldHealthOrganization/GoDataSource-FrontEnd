@@ -7,7 +7,7 @@ import { IconDataService } from '../../../../core/services/data/icon.data.servic
 import { IconModel } from '../../../../core/models/icon.model';
 import { Observable } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { catchError, tap } from 'rxjs/operators';
@@ -34,6 +34,24 @@ export class ManageIconsListComponent extends ListComponent implements OnInit {
      * Icons
      */
     iconsList$: Observable<IconModel[]>;
+
+    recordActions: HoverRowAction[] = [
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Icon
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
+                    click: (item: IconModel) => {
+                        this.deleteIcon(item);
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        })
+    ];
 
     /**
      * Constructor
@@ -134,8 +152,7 @@ export class ManageIconsListComponent extends ListComponent implements OnInit {
     getTableColumns(): string[] {
         return [
             'name',
-            'icon',
-            'actions'
+            'icon'
         ];
     }
 
