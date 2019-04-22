@@ -80,7 +80,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             type: HoverRowActionType.MENU,
             icon: 'moreVertical',
             menuOptions: [
-                // Delete User
+                // Delete Relationship
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP',
                     click: (item: EntityModel) => {
