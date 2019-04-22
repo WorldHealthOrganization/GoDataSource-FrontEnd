@@ -10,7 +10,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import * as _ from 'lodash';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
@@ -49,6 +49,54 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     ReferenceDataCategory = ReferenceDataCategory;
     EntityType = EntityType;
     UserSettings = UserSettings;
+
+    recordActions: HoverRowAction[] = [
+        // View Relationship
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_VIEW_RELATIONSHIP',
+            click: (item: EntityModel) => {
+                this.router.navigate(['/relationships', this.entityType, this.entityId, this.relationshipTypeRoutePath, item.relationship.id, 'view']);
+            }
+        }),
+
+        // Modify Relationship
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_MODIFY_RELATIONSHIP',
+            click: (item: EntityModel) => {
+                this.router.navigate(['/relationships', this.entityType, this.entityId, this.relationshipTypeRoutePath, item.relationship.id, 'modify']);
+            },
+            visible: (): boolean => {
+                return this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.hasEntityWriteAccess();
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete User
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP',
+                    click: (item: EntityModel) => {
+                        this.deleteRelationship(item);
+                    },
+                    visible: (): boolean => {
+                        return this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasEntityWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        })
+    ];
 
     constructor(
         protected snackbarService: SnackbarService,
@@ -176,11 +224,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             new VisibleColumnModel({
                 field: 'socialRelationshipTypeId',
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION'
-            }),
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
             })
         ];
     }
