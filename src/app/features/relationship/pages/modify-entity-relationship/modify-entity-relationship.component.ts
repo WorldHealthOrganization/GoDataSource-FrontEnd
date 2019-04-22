@@ -258,7 +258,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     }
 
     /**
-     * Reverse relationship persons(source person person became target person and vice-versa)
+     * Reverse relation persons(source person person became target person and vice-versa)
      */
     reverseExistingRelationship() {
         const relationshipPersons = {
