@@ -13,6 +13,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { throwError } from 'rxjs';
+import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 
 @Component({
     selector: 'app-saved-filters',
@@ -34,6 +35,27 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
 
     savedFiltersList$: Observable<SavedFilterModel[]>;
     savedFiltersListCount$: Observable<any>;
+
+    recordActions: HoverRowAction[] = [
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Saved Filter
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER',
+                    click: (item: SavedFilterModel) => {
+                        this.deleteFilter(item.id);
+                    },
+                    visible: (item: SavedFilterModel): boolean => {
+                        return !item.readOnly;
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        })
+    ];
 
     constructor(
         private savedFiltersService: SavedFiltersService,
@@ -78,14 +100,11 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = [
+        return [
             'name',
             'public',
-            'filter-keys',
-            'actions'
+            'filter-keys'
         ];
-
-        return columns;
     }
 
     /**
