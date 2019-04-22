@@ -19,12 +19,18 @@ export class HoverRowAction {
     type: HoverRowActionType = HoverRowActionType.BUTTON;
     icon: string;
     iconTooltip: string;
+    iconTooltipTranslateData: (item: any) => {
+        [key: string]: any
+    };
     click: (item: any, handler: any) => void;
     class: string;
     visible: (item: any) => boolean;
 
     menuOptions: HoverRowAction[];
     menuOptionLabel: string;
+    menuOptionLabelTranslateData: (item: any) => {
+        [key: string]: any
+    };
 
     /**
      * Constructor
@@ -33,10 +39,16 @@ export class HoverRowAction {
         // optional
         icon?: string,
         iconTooltip?: string,
+        iconTooltipTranslateData?: (item: any) => {
+            [key: string]: any
+        },
         click?: (item: any, handler: any) => void,
         type?: HoverRowActionType,
         menuOptions?: HoverRowAction[],
         menuOptionLabel?: string,
+        menuOptionLabelTranslateData?: (item: any) => {
+            [key: string]: any
+        },
         class?: string,
         visible?: (item: any) => boolean
     }) {

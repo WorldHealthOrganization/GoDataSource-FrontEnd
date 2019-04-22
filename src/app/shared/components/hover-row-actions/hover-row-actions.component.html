@@ -26,7 +26,7 @@
             type="button"
             [ngClass]="buttonData.class"
             (click)="clickedButton(buttonData)"
-            [matTooltip]="buttonData.iconTooltip | translate">
+            [matTooltip]="buttonData.iconTooltip | translate:buttonData.iconTooltipTranslateData ? buttonData.iconTooltipTranslateData(actionData) : null">
             <span class="xt-icon">{{ buttonData.icon }}</span>
         </button>
 
@@ -56,7 +56,7 @@
                         type="button"
                         [ngClass]="menuOptionData.class"
                         (click)="clickedButton(menuOptionData)">
-                        {{ menuOptionData.menuOptionLabel | translate }}
+                        {{ menuOptionData.menuOptionLabel | translate:menuOptionData.menuOptionLabelTranslateData ? menuOptionData.menuOptionLabelTranslateData(actionData) : null }}
                     </button>
 
                     <!-- Menu Divider -->
