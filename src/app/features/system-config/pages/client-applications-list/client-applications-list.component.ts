@@ -9,7 +9,7 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { PERMISSION } from '../../../../core/models/permission.model';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { DialogAnswer, DialogAnswerButton, DialogField, DialogFieldType, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -20,6 +20,8 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { environment } from '../../../../../environments/environment';
 import { catchError } from 'rxjs/operators';
 import { throwError, of, forkJoin } from 'rxjs';
+import { Router } from '@angular/router';
+import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 
 @Component({
     selector: 'app-client-applications-list',
@@ -49,10 +51,69 @@ export class ClientApplicationsListComponent extends ListComponent implements On
 
     loadingDialog: LoadingDialogModel;
 
+    recordActions: HoverRowAction[] = [
+        // Download Client Application Conf File
+        new HoverRowAction({
+            icon: 'fileCopy',
+            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE',
+            click: (item: SystemClientApplicationModel) => {
+                this.downloadConfFile(item);
+            }
+        }),
+
+        // Disable Client Application
+        new HoverRowAction({
+            icon: 'visibilityOf',
+            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE',
+            click: (item: SystemClientApplicationModel, handler: HoverRowActionsDirective) => {
+                this.toggleActiveFlag(item);
+                handler.redraw();
+            },
+            visible: (item: SystemClientApplicationModel): boolean => {
+                return this.hasSysConfigWriteAccess() &&
+                    item.active;
+            }
+        }),
+
+        // Enable Client Application
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE',
+            click: (item: SystemClientApplicationModel, handler: HoverRowActionsDirective) => {
+                this.toggleActiveFlag(item);
+                handler.redraw();
+            },
+            visible: (item: SystemClientApplicationModel): boolean => {
+                return this.hasSysConfigWriteAccess() &&
+                    !item.active;
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Client Application
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE',
+                    click: (item: SystemClientApplicationModel) => {
+                        this.deleteClientApplication(item);
+                    },
+                    visible: (): boolean => {
+                        return this.hasSysConfigWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        })
+    ];
+
     /**
      * Constructor
      */
     constructor(
+        private router: Router,
         private authDataService: AuthDataService,
         private systemSettingsDataService: SystemSettingsDataService,
         protected snackbarService: SnackbarService,
@@ -108,15 +169,6 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                 })
             );
         }
-
-        // actions
-        this.tableColumns.push(
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
-            })
-        );
     }
 
     /**
@@ -235,6 +287,9 @@ export class ClientApplicationsListComponent extends ListComponent implements On
      * @param upstreamServer
      */
     toggleActiveFlag(clientApplication: SystemClientApplicationModel) {
+        // toggle flag
+        clientApplication.active = !clientApplication.active;
+
         // save
         this.systemSettingsDataService
             .getSystemSettings()
@@ -247,11 +302,11 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             .subscribe((settings: SystemSettingsModel) => {
                 // client application
                 const cleanClientApplication: SystemClientApplicationModel = _.cloneDeep(clientApplication);
+                cleanClientApplication.active = !clientApplication.active;
                 delete cleanClientApplication.outbreaks;
                 const clientApplicationItem: SystemClientApplicationModel = _.find(settings.clientApplications, cleanClientApplication);
                 if (clientApplicationItem) {
                     // set flag
-                    clientApplication.active = !clientApplication.active;
                     clientApplicationItem.active = clientApplication.active;
 
                     // save client applications
