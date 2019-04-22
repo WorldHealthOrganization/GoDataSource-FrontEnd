@@ -83,11 +83,11 @@ export class HoverRowActionsDirective {
      * @param event
      */
     private show(event) {
-        // keep an instance of the event
-        this._previousEvent = event;
-
         // trigger show
         if (this.hoverRowActionsComponent) {
+            // keep an instance of the event
+            this._previousEvent = event;
+
             // display actions
             this.hoverRowActionsComponent.show(
                 this,
@@ -119,11 +119,12 @@ export class HoverRowActionsDirective {
      */
     @HostListener('mousemove', ['$event'])
     mouseMove(event) {
-        // keep an instance of the event
-        this._previousEvent = event;
-
         // display actions
         if (this.hoverRowActionsComponent) {
+            // keep an instance of the event
+            this._previousEvent = event;
+
+            // update
             this.hoverRowActionsComponent.updateMouseEvent(
                 event
             );
