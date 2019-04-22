@@ -3,7 +3,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
-import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
@@ -24,6 +24,7 @@ import { catchError, map, share, tap } from 'rxjs/operators';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import * as moment from 'moment';
 import { throwError } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-backups',
@@ -63,13 +64,44 @@ export class BackupsComponent extends ListComponent implements OnInit {
     mappedCollections: LabelValuePair[];
     mappedExportTypes: LabelValuePair[];
 
-    // constants
-    Constants = Constants;
+    recordActions: HoverRowAction[] = [
+        // Restore backup
+        new HoverRowAction({
+            icon: 'swapVertical',
+            iconTooltip: 'LNG_PAGE_SYSTEM_BACKUPS_ACTION_RESTORE_BACKUP',
+            click: (item: BackupModel) => {
+                this.restoreBackup(item);
+            },
+            visible: (item: BackupModel): boolean => {
+                return item.status === Constants.SYSTEM_BACKUP_STATUS.SUCCESS.value;
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Backup
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_SYSTEM_BACKUPS_ACTION_DELETE_BACKUP',
+                    click: (item: BackupModel) => {
+                        this.deleteBackup(item);
+                    },
+                    visible: (): boolean => {
+                        return this.hasSysConfigWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        })
+    ];
 
     /**
      * Constructor
      */
     constructor(
+        private router: Router,
         private authDataService: AuthDataService,
         private dialogService: DialogService,
         private systemSettingsDataService: SystemSettingsDataService,
@@ -190,8 +222,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
             'date',
             'status',
             'error',
-            'user',
-            'actions'
+            'user'
         ];
     }
 
