@@ -55,10 +55,16 @@ app-cytoscape-graph {
 
         .legend-item {
             margin-left: 10px;
-        }
+            display: flex;
+            align-items: center;
 
-        .legend-item div {
-            float: left;
+            >:first-child {
+                margin-right: 3px;
+            }
+
+            .xt-icon {
+                font-size: 18px;
+            }
         }
 
         .legend-item:after {
