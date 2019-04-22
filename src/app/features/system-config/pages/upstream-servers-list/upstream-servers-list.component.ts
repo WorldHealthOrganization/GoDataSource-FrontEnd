@@ -10,7 +10,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SystemSyncDataService } from '../../../../core/services/data/system-sync.data.service';
 import { SystemSyncModel } from '../../../../core/models/system-sync.model';
@@ -19,6 +19,8 @@ import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.mode
 import { Constants } from '../../../../core/models/constants';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 
 @Component({
     selector: 'app-upstream-servers-list',
@@ -49,10 +51,72 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
     // constants
     UserSettings = UserSettings;
 
+    recordActions: HoverRowAction[] = [
+        // Start sync
+        new HoverRowAction({
+            icon: 'swapVertical',
+            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_START_SYNC',
+            click: (item: SystemUpstreamServerModel) => {
+                this.startSync(item);
+            },
+            visible: (): boolean => {
+                return this.hasSysConfigWriteAccess();
+            }
+        }),
+
+        // Disable sync
+        new HoverRowAction({
+            icon: 'visibilityOf',
+            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DISABLE_SYNC',
+            click: (item: SystemUpstreamServerModel, handler: HoverRowActionsDirective) => {
+                this.toggleSyncEnableFlag(item);
+                handler.redraw();
+            },
+            visible: (item: SystemUpstreamServerModel): boolean => {
+                return this.hasSysConfigWriteAccess() &&
+                    item.syncEnabled;
+            }
+        }),
+
+        // Enable sync
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_ENABLE_SYNC',
+            click: (item: SystemUpstreamServerModel, handler: HoverRowActionsDirective) => {
+                this.toggleSyncEnableFlag(item);
+                handler.redraw();
+            },
+            visible: (item: SystemUpstreamServerModel): boolean => {
+                return this.hasSysConfigWriteAccess() &&
+                    !item.syncEnabled;
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Upstream Server
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SERVER',
+                    click: (item: SystemUpstreamServerModel) => {
+                        this.deleteUpstreamServer(item);
+                    },
+                    visible: (): boolean => {
+                        return this.hasSysConfigWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        })
+    ];
+
     /**
      * Constructor
      */
     constructor(
+        private router: Router,
         private authDataService: AuthDataService,
         private systemSettingsDataService: SystemSettingsDataService,
         protected snackbarService: SnackbarService,
@@ -116,11 +180,6 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
             new VisibleColumnModel({
                 field: 'syncEnabled',
                 label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ENABLED'
-            }),
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
             })
         ];
     }

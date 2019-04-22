@@ -38,6 +38,11 @@
             </button>
         </div>
 
+        <!-- Hover question effects / actions -->
+        <app-hover-row-actions
+            #hoverRow
+        ></app-hover-row-actions>
+
         <mat-table #table [dataSource]="upstreamServerList">
             <!-- Name -->
             <ng-container matColumnDef="name">
@@ -143,43 +148,14 @@
                 </mat-cell>
             </ng-container>
 
-            <!-- Inline Actions -->
-            <ng-container matColumnDef="actions">
-                <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-
-                <mat-cell *matCellDef="let item" fxFlex="70px">
-                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                        <span class="xt-icon">moreVertical</span>
-                    </button>
-
-                    <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-                        <ng-container
-                            *ngIf="hasSysConfigWriteAccess()">
-                            <button
-                                mat-menu-item
-                                (click)="startSync(item)">
-                                {{ 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_START_SYNC' | translate }}
-                            </button>
-
-                            <button
-                                mat-menu-item
-                                (click)="toggleSyncEnableFlag(item)">
-                                {{ (item.syncEnabled ? 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DISABLE_SYNC' : 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_ENABLE_SYNC') | translate }}
-                            </button>
-
-                            <button
-                                mat-menu-item
-                                class="mat-menu-item-delete"
-                                (click)="deleteUpstreamServer(item)">
-                                {{ 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SERVER' | translate }}
-                            </button>
-                        </ng-container>
-                    </mat-menu>
-                </mat-cell>
-            </ng-container>
-
             <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
-            <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
+            <mat-row
+                *matRowDef="let item; columns: visibleTableColumns"
+                app-hover-row-actions
+                [hoverRowActionsComponent]="hoverRow"
+                [hoverRowActions]="recordActions"
+                [hoverRowActionData]="item"
+            ></mat-row>
         </mat-table>
 
         <div

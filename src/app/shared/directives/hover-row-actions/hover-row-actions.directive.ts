@@ -23,6 +23,11 @@ export class HoverRowActionsDirective {
     @Input() hoverRowActionData: any;
 
     /**
+     * Previous event
+     */
+    private _previousEvent: MouseEvent;
+
+    /**
      * Constructor
      */
     constructor(
@@ -78,15 +83,27 @@ export class HoverRowActionsDirective {
      * @param event
      */
     private show(event) {
+        // keep an instance of the event
+        this._previousEvent = event;
+
+        // trigger show
         if (this.hoverRowActionsComponent) {
             // display actions
             this.hoverRowActionsComponent.show(
+                this,
                 this.elementRef,
                 this.getVisibleActions(),
                 this.hoverRowActionData,
                 event
             );
         }
+    }
+
+    /**
+     * For redraw of actions
+     */
+    public redraw() {
+        this.show(this._previousEvent);
     }
 
     /**
@@ -102,6 +119,9 @@ export class HoverRowActionsDirective {
      */
     @HostListener('mousemove', ['$event'])
     mouseMove(event) {
+        // keep an instance of the event
+        this._previousEvent = event;
+
         // display actions
         if (this.hoverRowActionsComponent) {
             this.hoverRowActionsComponent.updateMouseEvent(
@@ -123,6 +143,9 @@ export class HoverRowActionsDirective {
      */
     @HostListener('mouseleave', ['$event'])
     mouseLeave() {
+        // keep an instance of the event
+        this._previousEvent = null;
+
         // hide actions
         if (this.hoverRowActionsComponent) {
             this.hoverRowActionsComponent.hide();

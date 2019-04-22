@@ -19,7 +19,7 @@ export class HoverRowAction {
     type: HoverRowActionType = HoverRowActionType.BUTTON;
     icon: string;
     iconTooltip: string;
-    click: (item: any) => void;
+    click: (item: any, handler: any) => void;
     class: string;
     visible: (item: any) => boolean;
 
@@ -33,7 +33,7 @@ export class HoverRowAction {
         // optional
         icon?: string,
         iconTooltip?: string,
-        click?: (item: any) => void,
+        click?: (item: any, handler: any) => void,
         type?: HoverRowActionType,
         menuOptions?: HoverRowAction[],
         menuOptionLabel?: string,
@@ -244,6 +244,11 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     actionData: any;
 
     /**
+     * Action handler
+     */
+    actionHandler: any;
+
+    /**
      * Mouse event data
      */
     mouseEvent: MouseEvent;
@@ -374,6 +379,7 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      * Show hover row
      */
     show(
+        handler: any,
         elementRef: ElementRef,
         actions: HoverRowAction[],
         actionData: any = null,
@@ -384,6 +390,9 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
             this.actions = actions;
             this.actionsReversed = actions ? _.cloneDeep(actions).reverse() : [];
         }
+
+        // set handler
+        this.actionHandler = handler;
 
         // set data
         this.actionData = actionData;
@@ -485,7 +494,10 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
         }
 
         // perform action
-        buttonData.click(this.actionData);
+        buttonData.click(
+            this.actionData,
+            this.actionHandler
+        );
     }
 
     /**
