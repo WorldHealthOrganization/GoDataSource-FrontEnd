@@ -65,6 +65,18 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
             }
         }),
 
+        // View Help Items
+        new HoverRowAction({
+            icon: 'groupWork',
+            iconTooltip: 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_ITEMS_BUTTON',
+            click: (item: HelpCategoryModel) => {
+                this.router.navigate(['/help', 'categories', item.id, 'items']);
+            },
+            visible: (item: HelpCategoryModel): boolean => {
+                return !item.deleted;
+            }
+        }),
+
         // Other actions
         new HoverRowAction({
             type: HoverRowActionType.MENU,
@@ -81,27 +93,6 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
                             this.hasHelpWriteAccess();
                     },
                     class: 'mat-menu-item-delete'
-                }),
-
-                // Divider
-                new HoverRowAction({
-                    type: HoverRowActionType.DIVIDER,
-                    visible: (item: HelpCategoryModel): boolean => {
-                        // visible only if at least one of the previous...
-                        return !item.deleted &&
-                            this.hasHelpWriteAccess();
-                    }
-                }),
-
-                // View Help Items
-                new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_ITEMS_BUTTON',
-                    click: (item: HelpCategoryModel) => {
-                        this.router.navigate(['/help', 'categories', item.id, 'items']);
-                    },
-                    visible: (item: HelpCategoryModel): boolean => {
-                        return !item.deleted;
-                    }
                 })
             ]
         })
