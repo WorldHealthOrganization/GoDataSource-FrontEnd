@@ -186,6 +186,17 @@ export class Constants {
         }
     };
 
+    static DEVICE_WIPE_STATUS = {
+        READY: {
+            label: 'LNG_DEVICE_WIPE_STATUS_READY',
+            value: 'LNG_DEVICE_WIPE_STATUS_READY'
+        },
+        PENDING: {
+            label: 'LNG_DEVICE_WIPE_STATUS_PENDING',
+            value: 'LNG_DEVICE_WIPE_STATUS_PENDING'
+        }
+    };
+
     /**
      * FollowUp status
      */

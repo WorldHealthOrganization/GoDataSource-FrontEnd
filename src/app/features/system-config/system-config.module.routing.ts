@@ -49,6 +49,15 @@ const routes: Routes = [
                 component: fromPages.SystemDevicesComponent
             },
             {
+                path: ':deviceId/view',
+                component: fromPages.ModifySystemDeviceComponent,
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [PERMISSION.READ_SYS_CONFIG],
+                    action: ViewModifyComponentAction.VIEW
+                }
+            },
+            {
                 path: ':deviceId/modify',
                 component: fromPages.ModifySystemDeviceComponent,
                 canActivate: [AuthGuard],

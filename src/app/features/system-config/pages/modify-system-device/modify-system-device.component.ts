@@ -40,7 +40,6 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
             .subscribe((params: { deviceId }) => {
                 this.deviceId = params.deviceId;
                 this.retrieveDeviceData();
-                this.buildBreadcrumbs();
             });
     }
 
@@ -57,7 +56,7 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
             // current page title
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
-                    'LNG_PAGE_MODIFY_SYSTEM_DEVICE_TITLE',
+                    this.viewOnly ? 'LNG_PAGE_VIEW_SYSTEM_DEVICE_TITLE' : 'LNG_PAGE_MODIFY_SYSTEM_DEVICE_TITLE',
                     '.',
                     true,
                     {},
@@ -78,7 +77,8 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
             this.deviceDataService
                 .getDevice(this.deviceId)
                 .subscribe( (device) => {
-                       this.deviceData = device;
+                    this.deviceData = device;
+                    this.buildBreadcrumbs();
                 });
         }
     }

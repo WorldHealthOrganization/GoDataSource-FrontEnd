@@ -6,7 +6,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { LoadingDialogModel } from '../../../../shared/components';
+import { HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { Observable } from 'rxjs';
 import { DeviceDataService } from '../../../../core/services/data/device.data.service';
@@ -14,6 +14,7 @@ import { DeviceModel } from '../../../../core/models/device.model';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-system-devices-list',
@@ -39,10 +40,84 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
 
     loadingDialog: LoadingDialogModel;
 
+    recordActions: HoverRowAction[] = [
+        // View Device
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW',
+            click: (item: DeviceModel) => {
+                this.router.navigate(['/system-config', 'devices', item.id, 'view']);
+            }
+        }),
+
+        // Modify Device
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_MODIFY',
+            click: (item: DeviceModel) => {
+                this.router.navigate(['/system-config', 'devices', item.id, 'modify']);
+            },
+            visible: (): boolean => {
+                return this.hasSysConfigWriteAccess();
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Device
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE',
+                    click: (item: DeviceModel) => {
+                        this.deleteDevice(item);
+                    },
+                    visible: (): boolean => {
+                        return this.hasSysConfigWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (): boolean => {
+                        // visible only if at least one of the previous...
+                        return this.hasSysConfigWriteAccess();
+                    }
+                }),
+
+                // Wipe Device
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE',
+                    click: (item: DeviceModel) => {
+                        this.wipeDevice(item);
+                    },
+                    visible: (item: DeviceModel): boolean => {
+                        // for now let use do another wipe even if one is in progress, because parse might fails..and status might remain pending..which might cause issues if we can't send a new notification
+                        // [Constants.DEVICE_WIPE_STATUS.READY.value, Constants.DEVICE_WIPE_STATUS.PENDING.value].includes(item.status)
+                        return this.hasSysConfigWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+
+                // View Device History
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW_HISTORY',
+                    click: (item: DeviceModel) => {
+                        this.router.navigate(['/system-config', 'devices', item.id, 'history']);
+                    }
+                })
+            ]
+        })
+    ];
+
     /**
      * Constructor
      */
     constructor(
+        private router: Router,
         private authDataService: AuthDataService,
         private deviceDataService: DeviceDataService,
         protected snackbarService: SnackbarService,
@@ -106,15 +181,6 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
                 label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_LAST_SEEN'
             })
         ];
-
-        // actions
-        this.tableColumns.push(
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
-            })
-        );
     }
 
     /**
@@ -166,19 +232,24 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
      * @param {DeviceModel} device
      */
     wipeDevice(device: DeviceModel) {
-        this.showLoadingDialog();
-        this.deviceDataService
-            .wipeDevice(device.id)
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    this.closeLoadingDialog();
-                    return throwError(err);
-                })
-            )
-            .subscribe( () => {
-                this.needsRefreshList();
-                this.closeLoadingDialog();
+        this.dialogService.showConfirm(`LNG_DIALOG_CONFIRM_WIPE_DEVICE`, device)
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.showLoadingDialog();
+                    this.deviceDataService
+                        .wipeDevice(device.id)
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                this.closeLoadingDialog();
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe(() => {
+                            this.needsRefreshList();
+                            this.closeLoadingDialog();
+                        });
+                }
             });
     }
 

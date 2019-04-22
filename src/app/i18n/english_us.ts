@@ -19,9 +19,20 @@ export const EnglishUsLang = {
         'LNG_HOSPITALISATION_ISOLATION_DATE_RANGE_WARNING_CASE_DATEOFONSET_AFTER_START_DATE': 'Warning: Date of onset is after start date',
 
         /**
-         * Delete team
+         * uiTeamsListPage
          */
         'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM': 'Delete team',
+
+        /**
+         * uiSystemDevicesPages
+         */
+        'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW': 'View device',
+        'LNG_PAGE_VIEW_SYSTEM_DEVICE_TITLE': 'View {{name}}',
+
+        /**
+         * uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_WIPE_DEVICE': 'Are you sure you want to wipe this device?',
 
         /**
          * uiChainsOfTransmissionBars
