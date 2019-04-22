@@ -60,6 +60,11 @@ export class HoverRowActionsDirective {
                 clonedAction.menuOptions.push(new HoverRowAction(menuOption));
             });
 
+            // no neu options, then we don't need to display menu options button
+            if (_.isEmpty(clonedAction.menuOptions)) {
+                clonedAction.menuOptions = undefined;
+            }
+
             // add action
             visibleActions.push(clonedAction);
         });
