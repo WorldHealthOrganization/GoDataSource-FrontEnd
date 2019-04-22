@@ -6,11 +6,11 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
@@ -39,7 +39,76 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
     // provide constants to template
     Constants = Constants;
 
+    recordActions: HoverRowAction[] = [
+        // View Help Category
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_CATEGORY',
+            click: (item: HelpCategoryModel) => {
+                this.router.navigate(['/help', 'categories', item.id, 'view']);
+            },
+            visible: (item: HelpCategoryModel): boolean => {
+                return !item.deleted;
+            }
+        }),
+
+        // Modify Help Category
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_MODIFY_HELP_CATEGORY',
+            click: (item: HelpCategoryModel) => {
+                this.router.navigate(['/help', 'categories', item.id, 'modify']);
+            },
+            visible: (item: HelpCategoryModel): boolean => {
+                return !item.deleted &&
+                    this.hasHelpWriteAccess();
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Help Category
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_DELETE_HELP_CATEGORY',
+                    click: (item: HelpCategoryModel) => {
+                        this.deleteHelpCategory(item);
+                    },
+                    visible: (item: HelpCategoryModel): boolean => {
+                        return !item.deleted &&
+                            this.hasHelpWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: HelpCategoryModel): boolean => {
+                        // visible only if at least one of the previous...
+                        return !item.deleted &&
+                            this.hasHelpWriteAccess();
+                    }
+                }),
+
+                // View Help Items
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_ITEMS_BUTTON',
+                    click: (item: HelpCategoryModel) => {
+                        this.router.navigate(['/help', 'categories', item.id, 'items']);
+                    },
+                    visible: (item: HelpCategoryModel): boolean => {
+                        return !item.deleted;
+                    }
+                })
+            ]
+        })
+    ];
+
     constructor(
+        private router: Router,
         private helpDataService: HelpDataService,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
@@ -80,11 +149,6 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
             new VisibleColumnModel({
                 field: 'order',
                 label: 'LNG_HELP_CATEGORY_FIELD_LABEL_ORDER'
-            }),
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
             })
         ];
     }
