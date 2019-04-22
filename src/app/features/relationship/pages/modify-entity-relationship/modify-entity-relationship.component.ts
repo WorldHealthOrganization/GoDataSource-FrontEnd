@@ -258,7 +258,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     }
 
     /**
-     * Reverse relationship persons(source person became target person and vice-versa)
+     * Reverse relationship persons(source person person became target person and vice-versa)
      */
     reverseExistingRelationship() {
         const relationshipPersons = {
@@ -273,15 +273,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             )
             .subscribe((relationshipData: RelationshipModel) => {
                 const targetPerson = _.find(relationshipData.persons, {target: true});
-                switch (this.relationshipType) {
-                    // redirecting to the new relationship path
-                    case RelationshipType.EXPOSURE:
-                        this.router.navigate([`/relationships/${targetPerson.type}/${targetPerson.id}/contacts/${relationshipData.id}/modify`]);
-                        break;
-                    case RelationshipType.CONTACT:
-                        this.router.navigate([`/relationships/${targetPerson.type}/${targetPerson.id}/exposures/${relationshipData.id}/modify`]);
-                        break;
-                }
+                this.router.navigate([`/relationships/${targetPerson.type}/${targetPerson.id}/${this.relationshipTypeRoutePath}/${relationshipData.id}/modify`]);
             });
     }
 
