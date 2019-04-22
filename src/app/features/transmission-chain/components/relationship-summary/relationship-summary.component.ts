@@ -5,10 +5,10 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import {OutbreakModel} from "../../../../core/models/outbreak.model";
-import {OutbreakDataService} from "../../../../core/services/data/outbreak.data.service";
+import {OutbreakModel} from '../../../../core/models/outbreak.model';
+import {OutbreakDataService} from '../../../../core/services/data/outbreak.data.service';
 import * as _ from 'lodash';
-import {EntityType} from "../../../../core/models/entity-type";
+import {EntityType} from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-relationship-summary',
