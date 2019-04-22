@@ -11,7 +11,7 @@ import { SystemSyncLogDataService } from '../../../../core/services/data/system-
 import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.model';
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
-import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -23,6 +23,7 @@ import { SystemUpstreamServerModel } from '../../../../core/models/system-upstre
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, map, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-system-sync-logs-list',
@@ -61,10 +62,44 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
     // constants
     UserSettings = UserSettings;
 
+    recordActions: HoverRowAction[] = [
+        // View Error
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_VIEW_ERROR',
+            click: (item: SystemSyncLogModel) => {
+                this.viewError(item);
+            },
+            visible: (item: SystemSyncLogModel): boolean => {
+                return !_.isEmpty(item.error);
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Log
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_LOG',
+                    click: (item: SystemSyncLogModel) => {
+                        this.deleteSyncLog(item);
+                    },
+                    visible: (): boolean => {
+                        return this.hasSysConfigWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        })
+    ];
+
     /**
      * Constructor
      */
     constructor(
+        private router: Router,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
@@ -160,11 +195,6 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
             new VisibleColumnModel({
                 field: 'informationStartDate',
                 label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_INFORMATION_START_DATE'
-            }),
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
             })
         ];
     }
