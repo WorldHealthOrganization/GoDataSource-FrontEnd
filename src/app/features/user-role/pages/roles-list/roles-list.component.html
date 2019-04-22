@@ -32,6 +32,11 @@
         </button>
     </div>
 
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+    ></app-hover-row-actions>
+
     <mat-table #table [dataSource]="rolesList$ | async" matSort (matSortChange)="sortBy($event)">
 
         <!-- Name -->
@@ -163,46 +168,14 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Inline Actions -->
-        <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-            <mat-cell *matCellDef="let item" fxFlex="70px">
-
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
-
-                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-
-                    <button
-                        mat-menu-item
-                        [routerLink]="['.', item.id, 'view']">
-                        {{'LNG_PAGE_LIST_USER_ROLES_ACTION_VIEW_ROLE' | translate}}
-                    </button>
-
-                    <span
-                        [matTooltip]="(authUser.hasRole(item.id) ? 'You cannot modify the role that is assigned to you' : '')">
-                        <button mat-menu-item [disabled]="authUser.hasRole(item.id)"
-                                [routerLink]="['.', item.id, 'modify']">
-                            {{'LNG_PAGE_LIST_USER_ROLES_ACTION_MODIFY_ROLE' | translate}}
-                        </button>
-                    </span>
-
-                    <span
-                        [matTooltip]="(authUser.hasRole(item.id) ? 'You cannot delete the role that is assigned to you' : '')">
-                        <button mat-menu-item [disabled]="authUser.hasRole(item.id)" (click)="deleteRole(item)"
-                                class="mat-menu-item-delete">
-                            {{'LNG_PAGE_LIST_USER_ROLES_ACTION_DELETE_ROLE' | translate}}
-                        </button>
-                    </span>
-
-                </mat-menu>
-
-            </mat-cell>
-        </ng-container>
-
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+        <mat-row
+            *matRowDef="let item; columns: getTableColumns()"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
     </mat-table>
 
     <div

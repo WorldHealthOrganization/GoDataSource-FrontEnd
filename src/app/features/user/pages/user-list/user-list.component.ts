@@ -59,8 +59,9 @@ export class UserListComponent extends ListComponent implements OnInit {
             click: (item: UserModel) => {
                 this.router.navigate(['/users', item.id, 'modify']);
             },
-            visible: (): boolean => {
-                return this.hasUserWriteAccess();
+            visible: (item: UserModel): boolean => {
+                return item.id !== this.authUser.id &&
+                    this.hasUserWriteAccess();
             }
         }),
 

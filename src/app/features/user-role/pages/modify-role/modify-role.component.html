@@ -61,7 +61,7 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button *ngIf="viewOnly && hasUserRoleWriteAccess()" mat-raised-button type="button" color="accent"
+        <button *ngIf="viewOnly && hasUserRoleWriteAccess() && userRole.id && !authUser.hasRole(userRole.id)" mat-raised-button type="button" color="accent"
                 [routerLink]="['/user-roles', userRoleId, 'modify']">{{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
 
