@@ -144,9 +144,6 @@ export class HoverRowActionsDirective {
      */
     @HostListener('mouseleave', ['$event'])
     mouseLeave() {
-        // keep an instance of the event
-        this._previousEvent = null;
-
         // hide actions
         if (this.hoverRowActionsComponent) {
             this.hoverRowActionsComponent.hide();
