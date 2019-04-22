@@ -27,7 +27,8 @@ export const EnglishUsLang = {
         /**
          * uiModifyEntityRelationshipPage
          */
-        'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_REVERSE_RELATIONSHIP': 'Reverse persons'
+        'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_REVERSE_RELATIONSHIP': 'Reverse persons',
+        'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_REVERSE_RELATIONSHIP_TOOLTIP': 'You can reverse a relationship only if is not involving a contact'
 
         /**
          * REMOVE the tokens from below

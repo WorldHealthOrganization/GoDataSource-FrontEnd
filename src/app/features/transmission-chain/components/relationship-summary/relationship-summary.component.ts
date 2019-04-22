@@ -43,12 +43,13 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes.relationship) {
-            console.log(changes)
+            // reset reversing action if the relationship was changed
+            this.canReverseRelation = true;
+
             const relationship: SimpleChange = changes.relationship;
             this.updateRelationshipData(relationship.currentValue);
             // condition the reversing persons action if any of them is contact type
             _.map(relationship.currentValue.persons, (person) => {
-                console.log(person);
                 if (person.type === EntityType.CONTACT) {
                     this.canReverseRelation = false;
                 }

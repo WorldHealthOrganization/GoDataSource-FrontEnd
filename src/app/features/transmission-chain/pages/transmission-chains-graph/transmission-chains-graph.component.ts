@@ -679,8 +679,10 @@ export class TransmissionChainsGraphComponent implements OnInit {
             });
     }
 
-
-    reverseRelationshipPersons() {
+    /**
+     * Refresh COT after a relationship was reversed
+     */
+    refreshAfterReverseRelationshipPersons() {
         // refresh graph
         this.cotDashletChild.refreshChain();
 
