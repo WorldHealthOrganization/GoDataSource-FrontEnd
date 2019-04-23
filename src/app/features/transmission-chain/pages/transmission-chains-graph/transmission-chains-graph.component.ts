@@ -15,7 +15,6 @@ import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -25,16 +24,21 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { SelectedNodes } from '../../classes/selected-nodes';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import 'rxjs/add/operator/switchMap';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import * as FileSaver from 'file-saver';
 import { DomService } from '../../../../core/services/helper/dom.service';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
+import * as _ from 'lodash';
+import { catchError, switchMap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 
 enum NodeAction {
     MODIFY_PERSON = 'modify-person',
-    CREATE_CONTACT = 'create-contact'
+    CREATE_CONTACT = 'create-contact',
+    MODIFY_EDGE = 'modify-edge'
 }
 
 @Component({
@@ -64,6 +68,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
     // nodes selected from graph
     selectedNodes: SelectedNodes = new SelectedNodes();
+    // selected relationship
+    selectedRelationship: RelationshipModel;
     // action to do on the selected node
     currentNodeAction: NodeAction = null;
 
@@ -73,6 +79,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
     newRelationship = new RelationshipModel();
     // new contact model
     newContact = new ContactModel();
+    // do architecture is x32?
+    x86Architecture: boolean = false;
 
     // provide constants to template
     Constants = Constants;
@@ -91,7 +99,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,
         private contactDataService: ContactDataService,
-        private domService: DomService
+        private domService: DomService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {}
 
     ngOnInit() {
@@ -117,6 +126,19 @@ export class TransmissionChainsGraphComponent implements OnInit {
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
             });
+
+        // check if platform architecture is x32
+        this.systemSettingsDataService
+            .getAPIVersion()
+            .subscribe((versionData: SystemSettingsVersionModel) => {
+                if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
+                    this.x86Architecture = true;
+                 }
+            });
+    }
+
+    hasCaseReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_CASE);
     }
 
     hasCaseWriteAccess(): boolean {
@@ -172,6 +194,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
         this.dialogService.showInput(
             new DialogConfiguration({
                 message: 'LNG_DIALOG_CONFIRM_EXPORT_CHAINS_OF_TRANSMISSION',
+                additionalInfo: 'LNG_DIALOG_EXPORT_CHAIN_OF_TRANSMISSION_SCALE_INFO',
                 yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_YES',
                 required: true,
                 fieldsList: [new DialogField({
@@ -179,7 +202,9 @@ export class TransmissionChainsGraphComponent implements OnInit {
                     placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_SPLIT_FACTOR',
                     required: true,
                     type: 'number',
-                    value: '1'
+                    value: 1,
+                    min: 1,
+                    max: 15
                 })],
             }), true)
             .subscribe((answer) => {
@@ -242,16 +267,19 @@ export class TransmissionChainsGraphComponent implements OnInit {
         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
         this.entityDataService
             .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
             .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
                 // hide loading dialog
                 loadingDialog.close();
 
                 if (this.editMode) {
+                    this.selectedRelationship = undefined;
                     // add node to selected persons list
                     this.selectedNodes.addNode(entityData);
 
@@ -283,32 +311,51 @@ export class TransmissionChainsGraphComponent implements OnInit {
         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
         this.relationshipDataService
             .getEntityRelationship(this.selectedOutbreak.id, relationship.sourceType, relationship.source, relationship.id)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
             .subscribe((relationshipData) => {
                 // hide loading dialog
                 loadingDialog.close();
 
-                // show edge information
-                this.dialogService.showCustomDialog(
-                    ViewCotEdgeDialogComponent,
-                    {
-                        ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
-                        ...{
-                            data: {
-                                relationship: relationshipData
+                if (this.editMode) {
+                    this.resetNodes();
+
+                    this.selectedRelationship = relationshipData;
+
+                    // focus box
+                    setTimeout(() => {
+                        this.domService.scrollItemIntoView(
+                            '.selected-relationship-details'
+                        );
+                    });
+                } else {
+                    // show edge information
+                    this.dialogService.showCustomDialog(
+                        ViewCotEdgeDialogComponent,
+                        {
+                            ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+                            ...{
+                                data: {
+                                    relationship: relationshipData
+                                }
                             }
                         }
-                    }
-                );
+                    );
+                }
             });
     }
 
     removeSelectedNode(index) {
         this.selectedNodes.removeNodeAtIndex(index);
+    }
+
+    removeRelationship() {
+        this.selectedRelationship = undefined;
     }
 
     swapSelectedNodes() {
@@ -328,6 +375,10 @@ export class TransmissionChainsGraphComponent implements OnInit {
         this.currentNodeAction = NodeAction.MODIFY_PERSON;
     }
 
+    modifySelectedRelationship() {
+        this.currentNodeAction = NodeAction.MODIFY_EDGE;
+    }
+
     createContactForSelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
         // remove other selected node(s) (if any)
         this.selectedNodes.keepNode(person);
@@ -344,11 +395,13 @@ export class TransmissionChainsGraphComponent implements OnInit {
                     // delete person
                     this.entityDataService
                         .deleteEntity(person.type, this.selectedOutbreak.id, person.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
 
-                            return ErrorObservable.create(err);
-                        })
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON_SUCCESS_MESSAGE');
 
@@ -402,11 +455,12 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 sourcePerson.id,
                 relationshipData
             )
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
-
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                })
+            )
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
 
@@ -446,37 +500,40 @@ export class TransmissionChainsGraphComponent implements OnInit {
         // add the new Contact
         this.contactDataService
             .createContact(this.selectedOutbreak.id, contactFields)
-            .switchMap((contactData: ContactModel) => {
-                relationshipFields.persons = [{
-                    id: contactData.id
-                }];
+            .pipe(
+                switchMap((contactData: ContactModel) => {
+                    relationshipFields.persons = [{
+                        id: contactData.id
+                    }];
 
-                // create the relationship between the source person and the new contact
-                return this.relationshipDataService
-                    .createRelationship(
-                        this.selectedOutbreak.id,
-                        sourcePerson.type,
-                        sourcePerson.id,
-                        relationshipFields
-                    )
-                    .catch((err) => {
-                        // display error message
-                        this.snackbarService.showApiError(err);
+                    // create the relationship between the source person and the new contact
+                    return this.relationshipDataService
+                        .createRelationship(
+                            this.selectedOutbreak.id,
+                            sourcePerson.type,
+                            sourcePerson.id,
+                            relationshipFields
+                        )
+                        .pipe(
+                            catchError((err) => {
+                                // display error message
+                                this.snackbarService.showApiError(err);
 
-                        // rollback - remove contact
-                        this.contactDataService
-                            .deleteContact(this.selectedOutbreak.id, contactData.id)
-                            .subscribe();
+                                // rollback - remove contact
+                                this.contactDataService
+                                    .deleteContact(this.selectedOutbreak.id, contactData.id)
+                                    .subscribe();
 
-                        // finished
-                        return ErrorObservable.create(err);
-                    });
-            })
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
-
-                return ErrorObservable.create(err);
-            })
+                                // finished
+                                return throwError(err);
+                            })
+                        );
+                }),
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                })
+            )
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
 
@@ -512,11 +569,12 @@ export class TransmissionChainsGraphComponent implements OnInit {
         // modify person
         this.entityDataService
             .modifyEntity(person.type, this.selectedOutbreak.id, person.id, dirtyFields)
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
-
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                })
+            )
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_SUCCESS_MESSAGE');
 
@@ -531,6 +589,93 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
                 // reset node action
                 this.currentNodeAction = null;
+            });
+    }
+
+    /**
+     * Modify a selected relationship relationship
+     * @param {NgForm} form
+     */
+    modifyRelationship(form: NgForm) {
+        if (!this.formHelper.validateForm(form)) {
+            return;
+        }
+
+        // get forms fields
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+        // create source person
+        const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
+        this.relationshipDataService
+            .modifyRelationship(
+                this.selectedOutbreak.id,
+                sourcePerson.type,
+                sourcePerson.id,
+                this.selectedRelationship.id,
+                dirtyFields.relationship
+            )
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+
+                    return throwError(err);
+                })
+            )
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
+
+                // refresh graph
+                this.cotDashletChild.refreshChain();
+
+                // reset selected relationship
+                this.selectedRelationship = undefined;
+
+                // reset form
+                this.resetFormModels();
+
+                // reset selected nodes
+                this.resetNodes();
+
+                // reset node action
+                this.currentNodeAction = null;
+            });
+    }
+
+    /**
+     * Delete selected relationship
+     */
+    deleteSelectedRelationship() {
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP_CHAIN_OF_TRANSMISSION')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
+                    // delete relationship
+                    this.relationshipDataService
+                        .deleteRelationship(this.selectedOutbreak.id, sourcePerson.type, sourcePerson.id, this.selectedRelationship.id)
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
+
+                            // refresh graph
+                            this.cotDashletChild.refreshChain();
+
+                            // reset selected relationship
+                            this.selectedRelationship = undefined;
+
+                            // reset form
+                            this.resetFormModels();
+
+                            // reset selected nodes
+                            this.resetNodes();
+
+                            // reset node action
+                            this.currentNodeAction = null;
+                        });
+                }
             });
     }
 }

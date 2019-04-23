@@ -6,8 +6,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { DashboardDashlet, DashboardKpiGroup } from '../../../../core/enums/dashboard.enum';
 import * as _ from 'lodash';
 import { DashletSettingsModel, UserSettingsDashboardModel } from '../../../../core/models/user-settings-dashboard.model';
-import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable ,  Subscription } from 'rxjs';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -21,9 +20,13 @@ import { Moment } from 'moment';
 import * as moment from 'moment';
 import { LoadingDialogModel } from '../../../../shared/components';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { Subscription } from 'rxjs/Subscription';
 import { Constants } from '../../../../core/models/constants';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -89,6 +92,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     // flag if there aren't any outbreaks in the system
     noOutbreaksInSystem: boolean = false;
+    // do architecture is x32?
+    x86Architecture: boolean = false;
 
     // constants
     ExportDataExtension = ExportDataExtension;
@@ -117,13 +122,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     constructor(
         private authDataService: AuthDataService,
-        private userDataService: UserDataService,
         private outbreakDataService: OutbreakDataService,
         private domService: DomService,
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService,
         private genericDataService: GenericDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        protected snackbarService: SnackbarService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {}
 
     ngOnInit() {
@@ -144,6 +150,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
                     this.selectedOutbreak = selectedOutbreak;
                     this.casesByClassificationAndLocationReportUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/per-classification-per-location-level-report/download/`;
                     this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
+                }
+            });
+
+        // check if platform architecture is x32
+        this.systemSettingsDataService
+            .getAPIVersion()
+            .subscribe((versionData: SystemSettingsVersionModel) => {
+                if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
+                    this.x86Architecture = true;
                 }
             });
 
@@ -314,7 +329,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.domService
             .getPNGBase64('app-epi-curve-dashlet svg', '#tempCanvas')
             .subscribe((pngBase64) => {
-                this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
+                this.importExportDataService
+                    .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            this.closeLoadingDialog();
+                            return throwError(err);
+                        })
+                    )
                     .subscribe((blob) => {
                         this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
                     });
@@ -326,11 +349,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
      */
     generateKpisReport() {
         this.showLoadingDialog();
-        domtoimage.toPng(this.kpiSection.nativeElement)
+        (domtoimage as any).toPng(this.kpiSection.nativeElement)
             .then((dataUrl) => {
                 const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
 
-                this.importExportDataService.exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
+                this.importExportDataService
+                    .exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            this.closeLoadingDialog();
+                            return throwError(err);
+                        })
+                    )
                     .subscribe((blob) => {
                         this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL');
                     });

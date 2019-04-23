@@ -1,9 +1,14 @@
-<mat-card class="page-section page-content">
+<mat-card
+    class="page-section page-content"
+    fxLayout="column"
+>
 
     <!-- Uploading / Saving data -->
     <div
+        *ngIf="displayLoading"
         class="import-data-loading"
-        *ngIf="displayLoading">
+        fxLayout="row" fxLayoutAlign="center"
+    >
         <mat-spinner></mat-spinner>
         <span
             *ngIf="progress !== null"
@@ -15,9 +20,10 @@
     <!-- Select / Upload file -->
     <div
         *ngIf="!displayLoading && !importableObject"
-        fxFlex fxLayout="column" fxLayoutGap="12px"
-        class="import-data">
-        <div>
+        fxLayout="column" fxLayoutGap="12px"
+        class="import-data"
+    >
+        <div fxLayout="column">
             <input
                 hidden
                 #importDataBtn
@@ -27,7 +33,7 @@
                 [accept]="allowedExtensions"/>
 
             <div
-                fxFlex fxLayoutAlign="center center"
+                fxLayout="row" fxLayoutAlign="center center"
                 class="import-data-drop-zone"
                 [class.import-data-file-over]="hasFileOver"
                 ng2FileDrop
@@ -45,7 +51,7 @@
 
         <div
             class="import-data-file-input"
-            fxFlex fxLayout="row"
+            fxLayout="row"
             (click)="importDataBtn.click()">
             <div
                 class="import-data-file-input-label">
@@ -62,8 +68,7 @@
             </div>
         </div>
 
-        <div
-            fxFlex fxLayout="row">
+        <div fxLayout="row">
             <app-form-input
                 name="decryptPassword"
                 [(ngModel)]="decryptPassword"
@@ -72,8 +77,7 @@
             </app-form-input>
         </div>
 
-        <div
-            fxFlex fxLayout="row" fxLayoutAlign="end">
+        <div fxLayout="row" fxLayoutAlign="end">
             <button
                 mat-raised-button
                 color="accent"
@@ -88,13 +92,13 @@
     <!-- Map fields -->
     <div
         *ngIf="!displayLoading && importableObject && !errMsgDetails"
-        fxFlex fxLayout="column" fxLayoutGap="30px"
-        class="import-data-map-fields">
-
+        fxLayout="column" fxLayoutGap="30px"
+        class="import-data-map-fields"
+    >
         <div
             *ngIf="savedImportPage"
-            fxLayout="row" fxLayoutGap="20px" fxFlex>
-
+            fxLayout="row" fxLayoutGap="20px"
+        >
             <app-form-select
                 name="loadImportMapping"
                 [ngModel]="loadedImportMapping?.id"
@@ -124,10 +128,13 @@
 
         <form
             #form="ngForm"
-            (submit)="importData(form)">
+            (submit)="importData(form)"
+            fxLayout="column"
+        >
             <div
-                fxFlex fxLayout="row" fxLayoutGap="20px"
-                class="import-data-map-fields-header-columns">
+                class="import-data-map-fields-header-columns"
+                fxLayout="row" fxLayoutGap="20px"
+            >
                 <div fxFlex>
                     {{ 'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION' | translate }}
                 </div>
@@ -139,9 +146,10 @@
                 </div>
             </div>
             <div
-                *ngFor="let item of mappedFields; trackBy: trackByFieldID; let indexMapField = index;">
-                <div
-                    fxFlex fxLayout="row" fxLayoutGap="20px">
+                *ngFor="let item of mappedFields; trackBy: trackByFieldID; let indexMapField = index;"
+                fxLayout="column"
+            >
+                <div fxLayout="row" fxLayoutGap="20px">
                     <app-form-select-change-detection-push
                         #sourceControl
                         [name]="'mapObject[' + item.id + '][source]'"
@@ -198,10 +206,13 @@
                         importableObject.distinctFileColumnValuesKeyValue &&
                         importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes] &&
                         !!importableObject.modelPropertyValuesMap[item.destinationField]"
-                        class="import-data-map-fields-children">
+                    class="import-data-map-fields-children"
+                    fxLayout="column"
+                >
                     <div
                         *ngFor="let mappedOpt of item.mappedOptions; trackBy: trackByFieldID; let indexMapOption = index"
-                        fxFlex fxLayout="row" fxLayoutGap="20px">
+                        fxLayout="row" fxLayoutGap="20px"
+                    >
                         <app-form-select-change-detection-push
                             [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][sourceOption]'"
                             app-unique-validator
@@ -234,8 +245,7 @@
                         </div>
                     </div>
 
-                    <div
-                        fxFlex fxLayout="row" fxLayoutAlign="center">
+                    <div fxLayout="row" fxLayoutAlign="center">
                         <button
                             *ngIf="item.mappedOptions.length < importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes].length"
                             mat-raised-button
@@ -249,8 +259,7 @@
                 </div>
             </div>
 
-            <div
-                fxFlex fxLayout="row" fxLayoutAlign="center">
+            <div fxLayout="row" fxLayoutAlign="center">
                 <button
                     *ngIf="
                         mappedFields.length < importableObject.fileHeadersKeyValue.length ||
@@ -265,8 +274,7 @@
                 </button>
             </div>
 
-            <div
-                fxFlex fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
+            <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
                 <button
                     *ngIf="savedImportPage"
                     (click)="saveImportMapping()"
@@ -290,15 +298,17 @@
     <!-- Import failed errors -->
     <div
         *ngIf="!displayLoading && importableObject && errMsgDetails"
-        fxFlex fxLayout="column" fxLayoutGap="5px"
-        class="import-data-errors">
-        <div
-            class="import-data-errors-title">
+        fxLayout="column" fxLayoutGap="5px"
+        class="import-data-errors"
+    >
+        <div class="import-data-errors-title">
             {{ 'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED' | translate }}
         </div>
         <div
             *ngFor="let err of errMsgDetails.details && errMsgDetails.details.failed ? errMsgDetails.details.failed : []"
-            class="import-data-errors-err">
+            class="import-data-errors-err"
+            fxLayout="column"
+        >
             <ng-container [ngSwitch]="err.error?.code">
                 <span *ngSwitchCase="ImportServerErrorCodes.DUPLICATE_RECORD">
                     {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_DUPLICATE' | translate:{ recordNo: err.recordNo } }}
@@ -320,8 +330,7 @@
                 </span>
             </ng-container>
         </div>
-        <div
-            fxFlex fxLayout="row" fxLayoutAlign="end">
+        <div fxLayout="row" fxLayoutAlign="end">
             <button
                 mat-raised-button
                 color="accent"

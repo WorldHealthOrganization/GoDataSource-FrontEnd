@@ -7,14 +7,14 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { XtFormsModule } from './xt-forms/xt-forms.module';
 import { AngularMaterialModule } from './angular-material/angular-material.module';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { MglTimelineModule } from 'angular-mgl-timeline';
+import { FileUploadModule } from 'ng2-file-upload';
+
+// components
 import * as fromSharedComponents from './components';
 import * as fromSharedDirectives from './directives';
 import * as fromSharedPipes from './pipes';
-import { NgSelectModule } from '@ng-select/ng-select';
-import { MglTimelineModule } from 'angular-mgl-timeline';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { FileUploadModule } from 'ng2-file-upload';
-import { NgxWigModule } from 'ngx-wig';
 
 @NgModule({
     imports: [
@@ -27,9 +27,7 @@ import { NgxWigModule } from 'ngx-wig';
         AngularMaterialModule,
         TranslateModule,
         MglTimelineModule,
-        NgxChartsModule,
-        FileUploadModule,
-        NgxWigModule
+        FileUploadModule
     ],
     declarations: [
         ...fromSharedComponents.components,
@@ -47,8 +45,6 @@ import { NgxWigModule } from 'ngx-wig';
         XtFormsModule,
         AngularMaterialModule,
         MglTimelineModule,
-        NgxChartsModule,
-        NgxWigModule,
         ...fromSharedDirectives.directives,
         ...fromSharedPipes.pipes,
         ...fromSharedComponents.components

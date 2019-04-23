@@ -2,7 +2,7 @@ import { EventEmitter, Host, Inject, Input, Optional, Output, SkipSelf } from '@
 import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS } from '@angular/forms';
 import { GroupValidator } from './group-validator';
 import * as _ from 'lodash';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 /**
  * Base class to be extended by components that implement lists of group components or single components
@@ -23,7 +23,7 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
     @Output() changed = new EventEmitter<T[]>();
 
     // allow each component to decide if we need to display a confirmation dialog or just remove it
-    @Output() deleteConfirm = new EventEmitter<T[]>();
+    @Output() deleteConfirm = new EventEmitter<any>();
 
     /**
      * Constructor
@@ -102,6 +102,14 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
     }
 
     /**
+     * Track by
+     * @param index
+     */
+    trackByIndex(index: number) {
+        return index;
+    }
+
+    /**
      * Remove an existing model
      */
     delete(index, overrideConfirm: boolean = false) {
@@ -133,7 +141,7 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
         if (!_.values(this.values[index]).some(x => x !== undefined && x !== '') || overrideConfirm ) {
             deleteItem();
         } else {
-            Observable.create((observer) => {
+            new Observable((observer) => {
                 this.deleteConfirm.emit(observer);
             }).subscribe(() => {
                 deleteItem();

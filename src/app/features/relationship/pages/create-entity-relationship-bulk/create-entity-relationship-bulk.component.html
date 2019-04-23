@@ -10,23 +10,20 @@
 
         <!-- Relationship data step -->
         <mat-step [stepControl]="relationshipsForm">
-            <form #relationshipsForm="ngForm">
+            <form #relationshipsForm="ngForm" fxLayout="column">
                 <ng-template matStepLabel>
                     {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TAB_RELATIONSHIPS' | translate}}
                 </ng-template>
 
-                    <mat-card
-                        fxFlex
-                        class="page-section">
+                <mat-card class="page-section">
+                    <app-form-relationship
+                        [name]="'relationship'"
+                        [ngModel]="relationship"
+                        required="true">
+                    </app-form-relationship>
+                </mat-card>
 
-                        <app-form-relationship
-                            [name]="'relationship'"
-                            [ngModel]="relationship"
-                            required="true">
-                        </app-form-relationship>
-                    </mat-card>
-
-                <div class="stepper-wrapper">
+                <div class="stepper-navigation-buttons">
                     <button mat-raised-button color="accent" matStepperNext>
                         {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
                     </button>
@@ -38,9 +35,16 @@
         <mat-step>
             <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}</ng-template>
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
-            <div class="stepper-wrapper">
-                <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                <button type="button" mat-raised-button color="accent" (click)="createNewRelationships(relationshipsForm)">
+            <div class="stepper-navigation-buttons">
+                <button mat-raised-button type="button" matStepperPrevious>
+                    {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+                </button>
+                <button
+                    type="button"
+                    mat-raised-button
+                    color="accent"
+                    (click)="createNewRelationships(relationshipsForm)"
+                >
                     {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_ACTION_CREATE_RELATIONSHIP_BUTTON' | translate}}
                 </button>
             </div>

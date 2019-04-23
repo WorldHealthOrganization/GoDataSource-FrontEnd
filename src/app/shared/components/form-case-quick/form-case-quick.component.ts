@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, FormControl } from '@angular/forms';
 import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
@@ -32,6 +32,7 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
 
     // selected outbreak
     selectedOutbreak: OutbreakModel;
+    displayRefresh: boolean = false;
 
     visualIDTranslateData: {
         mask: string
@@ -66,6 +67,10 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+                // if case id mask is not empty show refresh case id mask button
+                if (!_.isEmpty(this.selectedOutbreak.caseIdMask)) {
+                    this.displayRefresh = true;
+                }
 
                 // set visual ID translate data
                 this.visualIDTranslateData = {
@@ -80,6 +85,17 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
      */
     get case(): CaseModel {
         return this.value;
+    }
+
+    /**
+     * Generate visual ID for case
+     */
+    generateVisualId() {
+        if (!_.isEmpty(this.selectedOutbreak.caseIdMask)) {
+            this.case.visualId = CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask);
+            this.groupForm.controls.visualId.markAsDirty();
+            this.onChange();
+        }
     }
 
     /**

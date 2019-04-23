@@ -4,10 +4,9 @@ import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Subscriber, Subscription } from 'rxjs';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import { Subscription } from 'rxjs/Subscription';
 import * as moment from 'moment';
 import * as _ from 'lodash';
 
@@ -111,7 +110,7 @@ export class NewCasesPreviousDaysContactsDashletComponent extends DashletCompone
             }
 
             // convert
-            let noDaysAmongContacts: number = _.isNumber(this.xDaysAmongContacts) || _.isEmpty(this.xDaysAmongContacts) ? this.xDaysAmongContacts  : _.parseInt(this.xDaysAmongContacts);
+            let noDaysAmongContacts: number = _.isNumber(this.xDaysAmongContacts) || _.isEmpty(this.xDaysAmongContacts) ? this.xDaysAmongContacts : _.parseInt(this.xDaysAmongContacts);
             if (_.isNumber(noDaysAmongContacts)) {
                 // add number of days until current day
                 if (this.globalFilterDate) {

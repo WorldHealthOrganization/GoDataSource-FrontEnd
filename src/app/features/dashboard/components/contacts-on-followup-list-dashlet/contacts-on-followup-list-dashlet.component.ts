@@ -5,7 +5,7 @@ import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-contacts-on-followup-list-dashlet',

@@ -3,13 +3,15 @@
 
     <form #groupForm="ngForm">
         <div fxLayout="column" fxFlex>
-            <div fxFlex fxLayout="row" fxLayoutGap="20px">
-
+            <div fxLayout="row" fxLayoutGap="20px">
                 <app-form-select
                     [name]="name + '[typeId]'"
                     [(ngModel)]="centerDateRange.typeId"
                     [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID' | translate"
                     [options]="dateTypeList$ | async"
+                    [disabled]="disabled"
+                    [required]="required"
+                    [clearable]="false"
                     optionLabelKey="label"
                     optionValueKey="value"
                     (optionChanged)="onChange()">
@@ -53,7 +55,7 @@
 
             </div>
 
-            <div fxLayout="row" fxFlex>
+            <div fxLayout="row">
                 <app-form-textarea
                     [name]="name + '[comments]'"
                     [(ngModel)]="centerDateRange.comments"

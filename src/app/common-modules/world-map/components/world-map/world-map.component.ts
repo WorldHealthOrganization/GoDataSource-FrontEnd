@@ -9,12 +9,11 @@ import { Select as InteractionSelect } from 'ol/interaction';
 import Feature from 'ol/Feature';
 import { Point, LineString } from 'ol/geom';
 import { Icon, Style, Text, Fill, Stroke, Circle as CircleStyle } from 'ol/style';
-import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
-import { OutbreakModel } from '../../../core/models/outbreak.model';
-import { MapServerModel } from '../../../core/models/map-server.model';
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
-import { Subscription } from 'rxjs/Subscription';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { MapServerModel } from '../../../../core/models/map-server.model';
+import { Observable ,  Subscriber ,  Subscription } from 'rxjs';
+import { addCommon as addCommonProjections } from 'ol/proj.js';
 
 export class WorldMapPoint {
     constructor(
@@ -345,6 +344,9 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      * Init map
      */
     ngOnInit() {
+        // fix ol bug in production build: https://github.com/openlayers/openlayers/issues/9019#issuecomment-444441291
+        addCommonProjections();
+
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -775,7 +777,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      * Print map to blob
      */
     printToBlob(): Observable<Blob> {
-        return Observable.create((observer: Subscriber<Blob>) => {
+        return new Observable((observer: Subscriber<Blob>) => {
             // map initialized
             if (this.map) {
                 // wait for map render

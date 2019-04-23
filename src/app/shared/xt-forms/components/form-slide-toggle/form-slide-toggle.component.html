@@ -1,7 +1,13 @@
-<div class="form-slide-toggle-container form-element {{ tooltip ? 'form-slide-tooltip' : '' }}"
-     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+<div
+    class="form-slide-toggle-container form-element {{ tooltip ? 'form-slide-tooltip' : '' }}"
+    [id]="identifier" [ngClass]="{invalid: (invalid)}"
+    fxLayout="column"
+>
 
-    <div fxFlex fxLayout="row" fxLayoutAlign="start end">
+    <div
+        class="form-slide-toggle-inner"
+        fxLayout="row" fxLayoutAlign="start end"
+    >
         <mat-slide-toggle
             *ngIf="!readonly"
             [(ngModel)]="value"

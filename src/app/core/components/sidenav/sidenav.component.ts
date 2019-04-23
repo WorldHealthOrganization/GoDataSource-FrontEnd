@@ -76,6 +76,12 @@ export class SidenavComponent implements OnInit {
                 'LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE_LABEL',
                 [],
                 '/terms-of-use'
+            ),
+            new ChildNavItem(
+                'version',
+                'LNG_LAYOUT_MENU_ITEM_VERSION_LABEL',
+                [],
+                '/version'
             )
         ]
     );
@@ -263,6 +269,7 @@ export class SidenavComponent implements OnInit {
                     'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_COUNT_MAP_LABEL',
                     [
                         PERMISSION.READ_OUTBREAK,
+                        PERMISSION.READ_REPORT,
                         PERMISSION.READ_CASE
                     ],
                     '/transmission-chains/case-count-map',
@@ -377,12 +384,6 @@ export class SidenavComponent implements OnInit {
                     'LNG_LAYOUT_MENU_ITEM_BACKUPS_LABEL',
                     [PERMISSION.READ_SYS_CONFIG],
                     '/system-config/backups'
-                ),
-                new ChildNavItem(
-                    'version',
-                    'LNG_LAYOUT_MENU_ITEM_VERSION_LABEL',
-                    [],
-                    '/version'
                 )
             ]
         ),

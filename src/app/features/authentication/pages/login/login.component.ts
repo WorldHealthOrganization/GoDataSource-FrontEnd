@@ -1,13 +1,13 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { LoginModel } from '../../../../core/models/login.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { AuthModel } from '../../../../core/models/auth.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-login',
@@ -42,11 +42,12 @@ export class LoginComponent implements OnInit {
             // try to authenticate the user
             this.authDataService
                 .login(dirtyFields)
-                .catch((err) => {
-                    this.snackbarService.showApiError(err);
-
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    })
+                )
                 .subscribe((auth: AuthModel) => {
                     // successfully authenticated;
 

@@ -5,8 +5,7 @@ import { CaseCenterDateRangeModel } from '../../../core/models/case-center-date-
 import { Moment } from 'moment';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
-import { Observable } from 'rxjs/Observable';
-import { DateType } from '../../../core/enums/date-types.enum';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'app-form-case-center-daterange',
@@ -21,7 +20,6 @@ import { DateType } from '../../../core/enums/date-types.enum';
 })
 export class FormCaseCenterDaterangeComponent extends GroupBase<CaseCenterDateRangeModel> implements OnInit, GroupFilteredValue<any> {
     dateTypeList$: Observable<any>;
-    DATE_TYPES = DateType;
 
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;

@@ -1,5 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Subscriber } from 'rxjs';
 
 export class LoadingDialogModel {
     constructor(

@@ -104,6 +104,19 @@
                     </mat-cell>
                 </ng-container>
 
+                <!-- Possible duplicate -->
+                <ng-container matColumnDef="hasDuplicate">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div class="column-header">{{ 'LNG_PAGE_LIST_AVAILABLE_ENTITIES_HAS_POSSIBLE_RELATIONSHIP_DUPLICATE' | translate }}</div>
+                            <div class="column-filter"></div>
+                        </div>
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let item">
+                        <app-yes-no-label [value]="item.matchedDuplicateRelationships?.length > 0"></app-yes-no-label>
+                    </mat-cell>
+                </ng-container>
+
                 <!-- Last Name -->
                 <ng-container matColumnDef="lastName">
                     <mat-header-cell *matHeaderCellDef>
@@ -384,7 +397,7 @@
             color="accent">
             {{'LNG_COMMON_BUTTON_SELECT' | translate}}
         </button>
-        <button type="button" [routerLink]="['/relationships', entityType, this.entityId]" mat-raised-button>
+        <button type="button" [routerLink]="['/relationships', entityType, entityId, relationshipTypeRoutePath]" mat-raised-button>
             {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
         </button>
     </div>

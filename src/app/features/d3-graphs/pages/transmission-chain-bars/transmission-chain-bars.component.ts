@@ -10,9 +10,17 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TransmissionChainBarsDataService } from '../../services/transmission-chain-bars.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import * as _ from 'lodash';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-transmission-chain-bars',
@@ -25,6 +33,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         new BreadcrumbItemModel('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE', null, true)
     ];
 
+    // authenticated user
+    authUser: UserModel;
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
     outbreakSubscriber: Subscription;
@@ -38,6 +48,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     loadingDialog: LoadingDialogModel;
     // show filters?
     filtersVisible: boolean = false;
+    // do architecture is x32?
+    x86Architecture: boolean = false;
     // models for filters form elements
     filters = {
         dateOfOnset: null,
@@ -49,22 +61,36 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     @ViewChild('chart') chartContainer: ElementRef;
 
     constructor(
+        private authDataService: AuthDataService,
         private transmissionChainBarsService: TransmissionChainBarsService,
         private transmissionChainBarsDataService: TransmissionChainBarsDataService,
         private outbreakDataService: OutbreakDataService,
         private dialogService: DialogService,
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService,
+        protected snackbarService: SnackbarService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {
     }
 
     ngOnInit() {
+        // authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
 
                 this.loadGraph();
+            });
+        // check if platform architecture is x32
+        this.systemSettingsDataService
+            .getAPIVersion()
+            .subscribe((versionData: SystemSettingsVersionModel) => {
+                if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
+                    this.x86Architecture = true;
+                }
             });
     }
 
@@ -121,11 +147,19 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     exportChain() {
         this.showLoadingDialog();
 
-        domtoimage.toPng(this.chartContainer.nativeElement)
+        (domtoimage as any).toPng(this.chartContainer.nativeElement)
             .then((dataUrl) => {
                 const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
 
-                this.importExportDataService.exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
+                this.importExportDataService
+                    .exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            this.closeLoadingDialog();
+                            return throwError(err);
+                        })
+                    )
                     .subscribe((blob) => {
                         const fileName = this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE');
                         FileSaver.saveAs(
@@ -276,5 +310,9 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
 
         // rebuild graph
         this.loadGraph();
+    }
+
+    hasCaseReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_CASE);
     }
 }

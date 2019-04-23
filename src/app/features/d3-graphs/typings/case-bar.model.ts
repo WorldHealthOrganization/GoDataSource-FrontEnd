@@ -1,5 +1,7 @@
 export interface CaseBarModel {
     id: string;
+    firstName: string;
+    lastName?: string;
     visualId?: string;
     dateOfOnset: string;
     addresses?: {
@@ -19,5 +21,6 @@ export interface CaseBarModel {
         testType: string;
         result: string;
     }[];
+    firstGraphDate: string;
     lastGraphDate: string;
 }

@@ -11,25 +11,33 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
-                    <ng-container>
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/transmission-chains', 'list']">
-                            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_LIST_BUTTON' | translate}}
-                        </button>
+                    <button
+                        [disabled]="x86Architecture"
+                        mat-menu-item
+                        (click)="exportVisualizedMapOrGraph()">
+                        {{ buttonText | translate}}
+                    </button>
 
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/transmission-chains', 'case-count-map']">
-                            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CASE_COUNT_MAP_BUTTON' | translate}}
-                        </button>
+                    <mat-divider></mat-divider>
 
-                        <button
-                            mat-menu-item
-                            (click)="exportVisualizedMapOrGraph()">
-                            {{ buttonText | translate}}
-                        </button>
-                    </ng-container>
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/graphs/transmission-chain-bars']">
+                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAIN_BARS_LABEL' | translate}}
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/transmission-chains', 'list']">
+                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LIST_LABEL' | translate}}
+                    </button>
+
+                    <button
+                        *ngIf="hasCaseReadAccess()"
+                        mat-menu-item
+                        [routerLink]="['/transmission-chains', 'case-count-map']">
+                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_COUNT_MAP_LABEL' | translate}}
+                    </button>
                 </mat-menu>
 
             </div>
@@ -69,11 +77,26 @@
         </mat-card>
     </div>
 
+    <div
+        *ngIf="selectedRelationship"
+        class="selected-relationship-details"
+        fxFlex="400px"
+        fxLayout="column">
+        <mat-card class="page-section">
+            <app-relationship-summary
+                [relationship]="selectedRelationship"
+                (remove)="removeRelationship()"
+                (modifyRelationship)="modifySelectedRelationship($event)"
+                (deleteRelationship)="deleteSelectedRelationship($event)">
+            </app-relationship-summary>
+        </mat-card>
+    </div>
+
     <!-- Create relationship between 2 nodes -->
     <mat-card
         *ngIf="selectedNodes.canCreateRelationship && hasCaseWriteAccess()"
         class="page-section quick-action create-relationship"
-        fxFlex
+        fxFlex fxLayout="column"
     >
         <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_TITLE' | translate}}</h1>
 
@@ -118,7 +141,7 @@
     <mat-card
         *ngIf="selectedNodes.nodes.length === 1 && currentNodeAction === NodeAction.MODIFY_PERSON && canModifySelectedNode()"
         class="page-section quick-action modify-person"
-        fxFlex
+        fxFlex fxLayout="column"
     >
         <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_TITLE' | translate}}</h1>
 
@@ -149,11 +172,33 @@
         </form>
     </mat-card>
 
+    <!-- Modify Relationship -->
+    <mat-card
+        *ngIf="selectedRelationship && currentNodeAction === NodeAction.MODIFY_EDGE"
+        class="page-section quick-action modify-person"
+        fxFlex fxLayout="column"
+    >
+        <form #form="ngForm" (submit)="modifyRelationship(form)">
+            <app-form-relationship-quick
+                name="relationship"
+                [ngModel]="selectedRelationship"
+                required="true"
+            >
+            </app-form-relationship-quick>
+
+            <div fxLayout="row">
+                <button mat-raised-button color="accent" type="submit">
+                    {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+                </button>
+            </div>
+        </form>
+    </mat-card>
+
     <!-- Create new Contact for Case/Event -->
     <mat-card
         *ngIf="selectedNodes.canCreateContact && currentNodeAction === NodeAction.CREATE_CONTACT"
         class="page-section quick-action create-contact"
-        fxFlex
+        fxFlex fxLayout="column"
     >
         <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_TITLE' | translate}}</h1>
 

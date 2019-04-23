@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';

@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { LocationModel } from '../../models/location.model';
 import { CacheKey, CacheService } from '../helper/cache.service';
-import 'rxjs/add/operator/share';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { HierarchicalLocationModel } from '../../models/hierarchical-location.model';
 import { LocationUsageModel } from '../../models/location-usage.model';
+import { map, share, tap } from 'rxjs/operators';
 
 @Injectable()
 export class LocationDataService {
@@ -21,8 +21,8 @@ export class LocationDataService {
         private modelHelper: ModelHelperService,
         private cacheService: CacheService
     ) {
-        this.locationList$ = this.http.get(`locations`).share();
-        this.groupedLocations$ = this.http.get('locations/hierarchical?filter={"order":["name asc"]}').share();
+        this.locationList$ = this.http.get(`locations`).pipe(share());
+        this.groupedLocations$ = this.http.get('locations/hierarchical?filter={"order":["name asc"]}').pipe(share());
     }
 
     /**
@@ -35,16 +35,19 @@ export class LocationDataService {
             // get locations list from cache
             const locationsList = this.cacheService.get(CacheKey.LOCATIONS);
             if (locationsList) {
-                return Observable.of(locationsList);
+                return of(locationsList);
             } else {
                 // get locations list from API
                 return this.modelHelper.mapObservableListToModel(
                     this.locationList$,
                     LocationModel
-                ).do((locations) => {
-                    // cache the list
-                    this.cacheService.set(CacheKey.LOCATIONS, locations);
-                });
+                )
+                    .pipe(
+                        tap((locations) => {
+                            // cache the list
+                            this.cacheService.set(CacheKey.LOCATIONS, locations);
+                        })
+                    );
             }
         } else {
             const filter = queryBuilder.buildQuery();
@@ -83,14 +86,17 @@ export class LocationDataService {
         // are we using the cache or sending a request further ?
         if (qb.isEmpty()) {
             // retrieve locations from cache
-            return this.getLocationsList(qb).map((locations: LocationModel[]) =>
-                _.filter(locations, (location: LocationModel) => {
-                    return _.isEmpty(parentId) ?
-                        _.isEmpty(location.parentLocationId) :
-                        location.parentLocationId === parentId
-                        ;
-                })
-            );
+            return this.getLocationsList(qb)
+                .pipe(
+                    map((locations: LocationModel[]) =>
+                        _.filter(locations, (location: LocationModel) => {
+                            return _.isEmpty(parentId) ?
+                                _.isEmpty(location.parentLocationId) :
+                                location.parentLocationId === parentId
+                                ;
+                        })
+                    )
+                );
         } else {
             // filter / sort locations on server
             qb.filter.where(parentCondition, true);
@@ -168,10 +174,13 @@ export class LocationDataService {
      * @returns {Observable<any>}
      */
     createLocation(locationData: {}): Observable<any> {
-        return this.http.post('locations', locationData).do(() => {
-            // refresh location cache
-            this.cacheService.remove(CacheKey.LOCATIONS);
-        });
+        return this.http.post('locations', locationData)
+            .pipe(
+                tap(() => {
+                    // refresh location cache
+                    this.cacheService.remove(CacheKey.LOCATIONS);
+                })
+            );
     }
 
     /**
@@ -196,10 +205,12 @@ export class LocationDataService {
         return this.modelHelper.mapObservableToModel(
             this.http
                 .put(`locations/${locationId}`, locationData)
-                .do(() => {
-                    // refresh location cache
-                    this.cacheService.remove(CacheKey.LOCATIONS);
-                }),
+                .pipe(
+                    tap(() => {
+                        // refresh location cache
+                        this.cacheService.remove(CacheKey.LOCATIONS);
+                    })
+                ),
             LocationModel
         );
     }
@@ -210,10 +221,13 @@ export class LocationDataService {
      * @returns {Observable<any>}
      */
     deleteLocation(locationId: string): Observable<any> {
-        return this.http.delete(`locations/${locationId}`).do(() => {
-            // refresh location cache
-            this.cacheService.remove(CacheKey.LOCATIONS);
-        });
+        return this.http.delete(`locations/${locationId}`)
+            .pipe(
+                tap(() => {
+                    // refresh location cache
+                    this.cacheService.remove(CacheKey.LOCATIONS);
+                })
+            );
     }
 
     /**

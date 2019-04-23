@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -9,7 +8,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
@@ -22,6 +21,9 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { Moment } from 'moment';
 import * as _ from 'lodash';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-modify-case-relationship',
@@ -55,6 +57,17 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
     progressOptionsList$: Observable<any[]>;
 
     serverToday: Moment = null;
+
+    /**
+     * Check if we need to display warning message that case date of onset is after sample taken date
+     */
+    get displayOnsetDateWarningMessage(): boolean {
+        return this.caseData &&
+            this.labResultData &&
+            this.caseData.dateOfOnset &&
+            this.labResultData.dateSampleTaken &&
+            moment(this.caseData.dateOfOnset).startOf('day').isAfter(moment(this.labResultData.dateSampleTaken).startOf('day'));
+    }
 
     constructor(
         protected route: ActivatedRoute,
@@ -106,29 +119,33 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                         // get case data
                         this.caseDataService
                             .getCase(this.selectedOutbreak.id, params.caseId)
-                            .catch((err) => {
-                                this.snackbarService.showError(err.message);
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showError(err.message);
 
-                                // Case not found; navigate back to Cases list
-                                this.disableDirtyConfirm();
-                                this.router.navigate(['/cases']);
+                                    // Case not found; navigate back to Cases list
+                                    this.disableDirtyConfirm();
+                                    this.router.navigate(['/cases']);
 
-                                return ErrorObservable.create(err);
-                            })
+                                    return throwError(err);
+                                })
+                            )
                             .subscribe((caseData: CaseModel) => {
                                 this.caseData = caseData;
 
                                 // get relationship data
                                 this.labResultDataService
                                     .getLabResult(this.selectedOutbreak.id, params.caseId, params.labResultId)
-                                    .catch((err) => {
-                                        this.snackbarService.showError(err.message);
+                                    .pipe(
+                                        catchError((err) => {
+                                            this.snackbarService.showError(err.message);
 
-                                        this.disableDirtyConfirm();
-                                        this.router.navigate([`/cases/${params.caseId}/lab-results`]);
+                                            this.disableDirtyConfirm();
+                                            this.router.navigate([`/cases/${params.caseId}/lab-results`]);
 
-                                        return ErrorObservable.create(err);
-                                    })
+                                            return throwError(err);
+                                        })
+                                    )
                                     .subscribe((labResultData) => {
                                         this.labResultData = new LabResultModel(labResultData);
 
@@ -157,11 +174,13 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                 this.labResultData.id,
                 dirtyFields
             )
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
             .subscribe((modifiedLabResult: LabResultModel) => {
                 // update model
                 this.labResultData = modifiedLabResult;

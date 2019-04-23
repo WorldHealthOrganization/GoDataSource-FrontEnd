@@ -1,8 +1,8 @@
 <div class="relationship-container form-element "
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
-    <form #groupForm="ngForm">
-        <div fxLayout="column" fxFlex>
+    <form #groupForm="ngForm" fxLayout="column">
+        <div fxLayout="column">
             <div class="relationship-title" fxLayout="row" fxLayoutGap="20px">
                 <div>{{relatedObject?.type | translate}}</div>
 
@@ -19,9 +19,9 @@
                         [disabled]="disabled"
                         [required]="required"
                         (optionChanged)="onChange()"
-                        [maxDate]="serverToday"
+                        [maxDate]="currentDate"
                         app-date-validator
-                        [dateSameOrBefore]="serverToday">
+                        [dateSameOrBefore]="currentDate">
                     </app-form-datepicker>
                     <div
                         *ngIf="displayCopyField"

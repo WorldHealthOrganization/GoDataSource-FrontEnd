@@ -6,9 +6,8 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel } from '../../../../core/models/address.model';
-import 'rxjs/add/observable/forkJoin';
-import { Observable } from 'rxjs/Observable';
-import { WorldMapMovementComponent } from '../../../../shared/components/world-map-movement/world-map-movement.component';
+import { forkJoin } from 'rxjs';
+import { WorldMapMovementComponent } from '../../../../common-modules/world-map-movement/components/world-map-movement/world-map-movement.component';
 import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
@@ -31,37 +30,39 @@ export class ViewMovementCaseComponent implements OnInit {
         protected route: ActivatedRoute,
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService
-    ) {}
+    ) {
+    }
 
     ngOnInit() {
         this.route.params.subscribe((params: { caseId }) => {
             this.outbreakDataService
                 .getSelectedOutbreak()
                 .subscribe((selectedOutbreak: OutbreakModel) => {
-                    Observable.forkJoin([
+                    forkJoin(
                         this.caseDataService.getCase(selectedOutbreak.id, params.caseId),
                         this.caseDataService.getCaseMovement(selectedOutbreak.id, params.caseId)
-                    ]).subscribe((
-                        [caseData, movementData]: [CaseModel, AddressModel[]]
-                    ) => {
-                        // case data
-                        this.caseData = caseData;
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                this.caseData.name,
-                                `/cases/${this.caseData.id}/view`),
-                            new BreadcrumbItemModel(
-                                'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE',
-                                '.',
-                                true,
-                                {},
-                                this.caseData
-                            )
-                        );
+                    )
+                        .subscribe((
+                            [caseData, movementData]: [CaseModel, AddressModel[]]
+                        ) => {
+                            // case data
+                            this.caseData = caseData;
+                            this.breadcrumbs.push(
+                                new BreadcrumbItemModel(
+                                    this.caseData.name,
+                                    `/cases/${this.caseData.id}/view`),
+                                new BreadcrumbItemModel(
+                                    'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE',
+                                    '.',
+                                    true,
+                                    {},
+                                    this.caseData
+                                )
+                            );
 
-                        // movement data
-                        this.movementAddresses = movementData;
-                    });
+                            // movement data
+                            this.movementAddresses = movementData;
+                        });
                 });
         });
     }

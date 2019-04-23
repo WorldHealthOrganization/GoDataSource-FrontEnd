@@ -1,12 +1,25 @@
 <div class="form-element "
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
-    <form #groupForm="ngForm">
+    <form
+        #groupForm="ngForm"
+        fxLayout="column"
+    >
         <div
-            *ngFor="let item of values; let i = index"
-            fxFlex fxLayout="row" fxLayoutAlign="start center"
+            *ngFor="let item of values; let i = index; trackBy: trackByIndex"
+            fxLayout="row" fxLayoutAlign="start center"
         >
-            <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+            <mat-card
+                class="page-section"
+                fxFlex fxLayout="column"
+            >
+                <div
+                    *ngIf="displayOnsetDateWarningMessage(values[i].startDate)"
+                    class="warning-message"
+                    fxLayout="row">
+                    {{ 'LNG_HOSPITALISATION_ISOLATION_DATE_RANGE_WARNING_CASE_DATEOFONSET_AFTER_START_DATE' | translate }}
+                </div>
+
                 <app-form-case-center-daterange
                     [name]="name + '[' + i + ']'"
                     [(ngModel)]="values[i]"
@@ -22,14 +35,17 @@
                 ></app-form-case-center-daterange>
             </mat-card>
 
-            <button *ngIf="!disabled" type="button" mat-icon-button (click)="delete(i)">
-                <span class="xt-icon">delete</span>
-            </button>
+            <div fxLayout="column">
+                <button *ngIf="!disabled" type="button" mat-icon-button (click)="delete(i)">
+                    <span class="xt-icon">delete</span>
+                </button>
+            </div>
         </div>
 
-
-        <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
-            {{'LNG_COMMON_BUTTON_ADD_DATE_RANGE' | translate}}
-        </button>
+        <div fxLayout="row">
+            <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
+                {{'LNG_COMMON_BUTTON_ADD_DATE_RANGE' | translate}}
+            </button>
+        </div>
     </form>
 </div>

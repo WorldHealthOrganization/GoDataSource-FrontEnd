@@ -15,7 +15,7 @@
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="name"
                                 [(ngModel)]="newOutbreak.name"
@@ -62,7 +62,7 @@
                             </app-form-textarea>
                         </div>
 
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-datepicker
                                 name="startDate"
                                 [(ngModel)]="newOutbreak.startDate"
@@ -100,7 +100,7 @@
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="periodOfFollowup"
                                 [(ngModel)]="newOutbreak.periodOfFollowup"
@@ -135,7 +135,7 @@
                             </app-form-input>
                         </div>
 
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="noDaysNotSeen"
                                 [(ngModel)]="newOutbreak.noDaysNotSeen"
@@ -169,7 +169,7 @@
                             </app-form-input>
                         </div>
 
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
 
                             <app-form-select
                                 name="reportingGeographicalLevelId"
@@ -187,11 +187,10 @@
                             <div fxFlex><!-- placeholder --></div>
                             <div fxFlex><!-- placeholder --></div>
                         </div>
-
                     </div>
                 </mat-card>
 
-                <div class="stepper-wrapper">
+                <div class="stepper-navigation-buttons">
                     <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
 
@@ -216,7 +215,7 @@
                     urlTooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL_DESCRIPTION"
                     [required]="true">
                 </app-form-name-url-list>
-                <div class="stepper-wrapper">
+                <div class="stepper-navigation-buttons">
                     <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                     <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
@@ -231,7 +230,7 @@
                 {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
             </div>
             <br><br><br>
-            <div class="stepper-wrapper">
+            <div class="stepper-navigation-buttons">
                 <button matStepperPrevious mat-raised-button type="button">{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                 <button type="button" mat-raised-button color="accent"
                         (click)="createOutbreak([detailsForm, mapServersForm ])">

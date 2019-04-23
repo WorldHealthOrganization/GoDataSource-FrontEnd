@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { UserModel, UserSettings } from '../../models/user.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { PasswordChangeModel } from '../../models/password-change.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { SecurityQuestionModel } from '../../models/securityQuestion.model';
 import * as _ from 'lodash';
-import 'rxjs/add/operator/mergeMap';
+import { mergeMap } from 'rxjs/operators';
 
 @Injectable()
 export class UserDataService {
@@ -15,7 +15,8 @@ export class UserDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {}
+    ) {
+    }
 
     /**
      * Retrieve the list of Users
@@ -54,9 +55,13 @@ export class UserDataService {
     /**
      * Retrieve a User
      * @param {string} userId
+     * @param queryBuilder
      * @returns {Observable<UserRoleModel>}
      */
-    getUser(userId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<UserModel> {
+    getUser(
+        userId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<UserModel> {
 
         const qb = new RequestQueryBuilder();
         // include roles and permissions in response
@@ -74,7 +79,7 @@ export class UserDataService {
 
     /**
      * Create a new User
-     * @param any user
+     * @param user
      * @returns {Observable<UserModel[]>}
      */
     createUser(user): Observable<any> {
@@ -84,6 +89,7 @@ export class UserDataService {
     /**
      * Modify an existing UserRole
      * @param {string} userId
+     * @param data
      * @returns {Observable<UserModel>}
      */
     modifyUser(userId: string, data: any): Observable<UserModel> {
@@ -106,23 +112,25 @@ export class UserDataService {
         data: any
     ): Observable<any> {
         return this.getUser(userId)
-            .mergeMap((userData) => {
-                // retrieve current user settings
-                const currentUserSettings = _.get(
-                    userData,
-                    'settings'
-                );
+            .pipe(
+                mergeMap((userData) => {
+                    // retrieve current user settings
+                    const currentUserSettings = _.get(
+                        userData,
+                        'settings'
+                    );
 
-                // construct new settings
-                const userSettings = _.set(
-                    currentUserSettings,
-                    settingsKey,
-                    data
-                );
+                    // construct new settings
+                    const userSettings = _.set(
+                        currentUserSettings,
+                        settingsKey,
+                        data
+                    );
 
-                // save settings
-                return this.modifyUser(userId, { settings: userSettings });
-            });
+                    // save settings
+                    return this.modifyUser(userId, {settings: userSettings});
+                })
+            );
     }
 
     /**

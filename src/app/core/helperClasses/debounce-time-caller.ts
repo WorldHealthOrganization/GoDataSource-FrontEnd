@@ -1,5 +1,5 @@
 import { Constants } from '../models/constants';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Subscriber } from 'rxjs';
 
 export class DebounceTimeCaller {
     // The ID value of the timer

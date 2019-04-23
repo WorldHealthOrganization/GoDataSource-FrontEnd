@@ -2,7 +2,7 @@ import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, 
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { AddressModel } from '../../../core/models/address.model';
 import { GroupFilteredValue, ListBase } from '../../xt-forms/core';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Subscriber } from 'rxjs';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import * as _ from 'lodash';

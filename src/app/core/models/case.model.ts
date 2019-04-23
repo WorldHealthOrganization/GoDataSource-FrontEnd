@@ -6,6 +6,8 @@ import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { CaseCenterDateRangeModel } from './case-center-date-range.model';
 import * as moment from 'moment';
+import { IAnswerData } from './question.model';
+import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
 
 export class CaseModel {
     id: string;
@@ -27,7 +29,9 @@ export class CaseModel {
     safeBurial: boolean;
     dateOfBurial: string;
     dateRanges: CaseCenterDateRangeModel[];
-    questionnaireAnswers: {};
+    questionnaireAnswers: {
+        [variable: string]: IAnswerData[];
+    };
     type: EntityType = EntityType.CASE;
     dateOfReporting: string;
     dateOfLastContact: string;
@@ -58,6 +62,8 @@ export class CaseModel {
 
     alerted: boolean = false;
     relationship: any;
+
+    matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -119,6 +125,11 @@ export class CaseModel {
 
         this.classificationHistory = _.get(data, 'classificationHistory', []);
         this.relationship = _.get(data, 'relationship');
+
+        this.matchedDuplicateRelationships = _.get(data, 'matchedDuplicateRelationships', []);
+        _.each(this.matchedDuplicateRelationships, (matchedRelationship, index) => {
+            this.matchedDuplicateRelationships[index] = new EntityMatchedRelationshipModel(matchedRelationship);
+        });
     }
 
     /**

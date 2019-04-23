@@ -6,7 +6,7 @@ import { NgForm } from '@angular/forms';
 import { Constants } from '../../../core/models/constants';
 import * as moment from 'moment';
 import { Moment } from 'moment';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 export enum DialogAnswerButton {
     Yes = 'Yes',
@@ -77,8 +77,9 @@ export class DialogField {
     public inputOptionsMultiple: boolean = false;
     public inputOptionsClearable: boolean = true;
     public required: boolean = false;
+    public min: number;
+    public max: number;
     public type: string = 'text';
-    public requiredOneOfTwo: string;
     public value: any;
     public visible: boolean | ((dialogFieldsValues: any) => boolean) = true;
     public disabled: boolean = false;
@@ -104,8 +105,9 @@ export class DialogField {
         inputOptionsMultiple?: boolean,
         inputOptionsClearable?: boolean,
         required?: boolean,
+        min?: number,
+        max?: number,
         type?: string,
-        requiredOneOfTwo?: string,
         value?: any,
         visible?: boolean | ((dialogFieldsValues: any) => boolean),
         disabled?: boolean,
@@ -149,6 +151,7 @@ export class DialogField {
 
 export class DialogConfiguration {
     public message: string;
+    public additionalInfo: string;
     public yesLabel: string = 'LNG_DIALOG_CONFIRM_BUTTON_YES';
     public yesCssClass: string;
     public cancelLabel: string = 'LNG_DIALOG_CONFIRM_BUTTON_CANCEL';
@@ -165,6 +168,7 @@ export class DialogConfiguration {
 
     constructor(data: string | {
         message: string,
+        additionalInfo?: string,
         yesLabel?: string,
         cancelLabel?: string,
         placeholder?: string,

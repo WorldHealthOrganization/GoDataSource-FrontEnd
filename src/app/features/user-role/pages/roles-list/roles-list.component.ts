@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { Observable } from 'rxjs';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -12,7 +11,8 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-roles-list',
@@ -48,7 +48,7 @@ export class RolesListComponent extends ListComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.availablePermissions$ = this.userRoleDataService.getAvailablePermissions().share();
+        this.availablePermissions$ = this.userRoleDataService.getAvailablePermissions().pipe(share());
 
         this.needsRefreshList(true);
     }
@@ -70,11 +70,12 @@ export class RolesListComponent extends ListComponent implements OnInit {
                     // delete the role
                     this.userRoleDataService
                         .deleteRole(userRole.id)
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err, {userRoleName : userRole.name});
-
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err, {userRoleName : userRole.name});
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_USER_ROLES_ACTION_DELETE_USER_ROLE_SUCCESS_MESSAGE');
 

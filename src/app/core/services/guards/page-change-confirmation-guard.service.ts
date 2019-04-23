@@ -1,8 +1,7 @@
 import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
 import { HostListener, Injectable, QueryList, ViewChildren } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable, Observer } from 'rxjs';
 import * as _ from 'lodash';
-import { Observer } from 'rxjs/Observer';
 import { DialogService } from '../helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../shared/components/dialog/dialog.component';
 import { NgForm } from '@angular/forms';
@@ -72,8 +71,9 @@ export class ConfirmOnFormChanges {
 @Injectable()
 export class PageChangeConfirmationGuard implements CanDeactivate<ConfirmOnFormChanges> {
     constructor(
-       private dialogService: DialogService
-    ) {}
+        private dialogService: DialogService
+    ) {
+    }
 
     /**
      * Handle can deactivate
@@ -100,14 +100,14 @@ export class PageChangeConfirmationGuard implements CanDeactivate<ConfirmOnFormC
                 return true;
             } else {
                 // display confirmation popup
-                return Observable.create((observer: Observer<boolean>) => {
+                return new Observable((observer: Observer<boolean>) => {
                     this.displayConfirmationPopup(observer);
                 });
             }
         }
 
         // observer
-        return Observable.create((observer: Observer<boolean>) => {
+        return new Observable((observer: Observer<boolean>) => {
             (canDeactivate as Observable<boolean>).subscribe((obsCanDeactivate: boolean) => {
                 if (obsCanDeactivate) {
                     observer.next(true);
@@ -128,9 +128,9 @@ export class PageChangeConfirmationGuard implements CanDeactivate<ConfirmOnFormC
         this.dialogService
             .showConfirm('LNG_DIALOG_CONFIRM_UNSAVED_DATA')
             .subscribe((dialogAnswer: DialogAnswer) => {
-                observer.next(dialogAnswer.button === DialogAnswerButton.Yes);
-                observer.complete();
-            }
-        );
+                    observer.next(dialogAnswer.button === DialogAnswerButton.Yes);
+                    observer.complete();
+                }
+            );
     }
 }

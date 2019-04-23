@@ -3,7 +3,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -18,8 +18,9 @@ import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { tap } from 'rxjs/operators';
+import { map, share, tap } from 'rxjs/operators';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -60,7 +61,8 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         protected outbreakDataService: OutbreakDataService,
         protected entityDataService: EntityDataService,
         private genericDataService: GenericDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private relationshipDataService: RelationshipDataService
     ) {
         super(
             snackbarService, router, route,
@@ -72,15 +74,18 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         super.ngOnInit();
 
         // reference data
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
-        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).share();
-        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION).share();
-        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).share();
-        this.personTypesList$ = personTypes$.map((data: ReferenceDataCategoryModel) => {
-            return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
-                new LabelValuePair(entry.value, entry.id)
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
+        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).pipe(share());
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION).pipe(share());
+        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
+        this.personTypesList$ = personTypes$
+            .pipe(
+                map((data: ReferenceDataCategoryModel) => {
+                    return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
+                        new LabelValuePair(entry.value, entry.id)
+                    );
+                })
             );
-        });
         personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
             this.personTypesListMap = _.transform(
                 personTypeCategory.entries,
@@ -127,13 +132,6 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         // clear query builder
         this.queryBuilder.clear();
 
-        // apply default criterias
-        // exclude current person from the list
-        this.queryBuilder.filter.where({
-            id: {
-                'neq': this.entityId
-            }
-        });
         // retrieve only available entity types
         const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(this.entityType, this.relationshipType);
         this.queryBuilder.filter.where({
@@ -173,10 +171,13 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
             this.selectedOutbreak
         ) {
             // retrieve the list of Relationships
-            this.entitiesList$ = this.entityDataService.getEntitiesList(
-                this.selectedOutbreak.id,
-                this.queryBuilder
-            )
+            this.entitiesList$ = this.relationshipDataService
+                .getEntityAvailablePeople(
+                    this.selectedOutbreak.id,
+                    this.entityType,
+                    this.entityId,
+                    this.queryBuilder
+                )
                 .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
@@ -193,7 +194,14 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.entitiesListCount$ = this.entityDataService.getEntitiesCount(this.selectedOutbreak.id, countQueryBuilder).share();
+            this.entitiesListCount$ = this.relationshipDataService
+                .getEntityAvailablePeopleCount(
+                    this.selectedOutbreak.id,
+                    this.entityType,
+                    this.entityId,
+                    this.queryBuilder
+                )
+                .pipe(share());
         }
     }
 
@@ -260,8 +268,6 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
 
     /**
      * @Overrides parent method
-     *
-     * @param data
      */
     public sortBy(
         data: any,
@@ -305,7 +311,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     /**
      * Retrieve Person Type color
      */
-    getPersonTypeColor(personType) {
+    getPersonTypeColor(personType: string) {
         const personTypeData = _.get(this.personTypesListMap, personType);
         return _.get(personTypeData, 'colorCode', '');
     }
@@ -317,6 +323,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     getTableColumns(): string[] {
         const columns = [
             'checkbox',
+            'hasDuplicate',
             'lastName',
             'firstName',
             'visualId',

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { OutbreakDataService } from './outbreak.data.service';
 import { FollowUpsDataService } from './follow-ups.data.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { GenericDataService } from './generic.data.service';
 import { RelationshipDataService } from './relationship.data.service';
@@ -14,6 +14,7 @@ import { RequestFilterOperator } from '../../helperClasses/request-query-builder
 import { Moment } from 'moment';
 import { ContactDataService } from './contact.data.service';
 import { DateType } from '../../enums/date-types.enum';
+import { map, mergeMap } from 'rxjs/operators';
 
 @Injectable()
 export class ListFilterDataService {
@@ -26,17 +27,18 @@ export class ListFilterDataService {
         private contactDataService: ContactDataService
     ) {}
 
-
-    private handleFilteringOfLists(callback): Observable<RequestQueryBuilder> {
+    private handleFilteringOfLists(callback): Observable<RequestQueryBuilder> | any {
         return this.outbreakDataService
             .getSelectedOutbreakSubject()
-            .mergeMap((selectedOutbreak: OutbreakModel) => {
-                if (selectedOutbreak && selectedOutbreak.id) {
-                    return callback(selectedOutbreak);
-                } else {
-                    return Observable.of(new RequestQueryBuilder());
-                }
-            });
+            .pipe(
+                mergeMap((selectedOutbreak: OutbreakModel) => {
+                    if (selectedOutbreak && selectedOutbreak.id) {
+                        return callback(selectedOutbreak);
+                    } else {
+                        return of(new RequestQueryBuilder());
+                    }
+                })
+            );
     }
 
     /**
@@ -71,21 +73,25 @@ export class ListFilterDataService {
             // filter
             return this.followUpDataService
                 .getCountIdsOfContactsOnTheFollowUpList(selectedOutbreak.id, qb)
-                .map((result) => {
-                    // update queryBuilder filter with desired contacts ids
-                    const filterQueryBuilder = new RequestQueryBuilder();
-                    filterQueryBuilder.filter.where({
-                        id: {
-                            'inq': result.contactIDs
-                        }
-                    }, true);
-                    return filterQueryBuilder;
-                });
+                .pipe(
+                    map((result) => {
+                        // update queryBuilder filter with desired contacts ids
+                        const filterQueryBuilder = new RequestQueryBuilder();
+                        filterQueryBuilder.filter.where({
+                            id: {
+                                'inq': result.contactIDs
+                            }
+                        }, true);
+                        return filterQueryBuilder;
+                    })
+                );
         });
     }
 
     /**
      * Create the query builder for filtering the list of contacts
+     * @param date
+     * @param location
      * @param {number} noDaysNotSeen
      * @returns {Observable<RequestQueryBuilder>}
      */
@@ -129,16 +135,18 @@ export class ListFilterDataService {
 
             return this.followUpDataService
                 .getCountIdsOfContactsNotSeen(selectedOutbreak.id, qb)
-                .map((result) => {
-                    // update queryBuilder filter with desired contacts ids
-                    const filterQueryBuilder = new RequestQueryBuilder();
-                    filterQueryBuilder.filter.where({
-                        id: {
-                            'inq': result.contactIDs
-                        }
-                    }, true);
-                    return filterQueryBuilder;
-                });
+                .pipe(
+                    map((result) => {
+                        // update queryBuilder filter with desired contacts ids
+                        const filterQueryBuilder = new RequestQueryBuilder();
+                        filterQueryBuilder.filter.where({
+                            id: {
+                                'inq': result.contactIDs
+                            }
+                        }, true);
+                        return filterQueryBuilder;
+                    })
+                );
         });
     }
 
@@ -215,6 +223,8 @@ export class ListFilterDataService {
 
     /**
      * Create the query builder for filtering the list of cases
+     * @param date
+     * @param location
      * @param {number} noLessContacts
      * @returns {Observable<RequestQueryBuilder>}
      */
@@ -253,16 +263,18 @@ export class ListFilterDataService {
 
             return this.relationshipDataService
                 .getCountIdsOfCasesLessThanXContacts(selectedOutbreak.id, qb)
-                .map((result) => {
-                    // update queryBuilder filter with desired case ids
-                    const filterQueryBuilder = new RequestQueryBuilder();
-                    filterQueryBuilder.filter.where({
-                        id: {
-                            'inq': result.caseIDs
-                        }
-                    }, true);
-                    return filterQueryBuilder;
-                });
+                .pipe(
+                    map((result) => {
+                        // update queryBuilder filter with desired case ids
+                        const filterQueryBuilder = new RequestQueryBuilder();
+                        filterQueryBuilder.filter.where({
+                            id: {
+                                'inq': result.caseIDs
+                            }
+                        }, true);
+                        return filterQueryBuilder;
+                    })
+                );
         });
     }
 
@@ -294,21 +306,25 @@ export class ListFilterDataService {
 
             return this.followUpDataService
                 .getNumberOfContactsWhoAreLostToFollowUp(selectedOutbreak.id, qb)
-                .map((result: MetricContactsLostToFollowUpModel) => {
-                    // update queryBuilder filter with desired contacts ids
-                    const filterQueryBuilder = new RequestQueryBuilder();
-                    filterQueryBuilder.filter.where({
-                        id: {
-                            'inq': result.contactIDs
-                        }
-                    }, true);
-                    return filterQueryBuilder;
-                });
+                .pipe(
+                    map((result: MetricContactsLostToFollowUpModel) => {
+                        // update queryBuilder filter with desired contacts ids
+                        const filterQueryBuilder = new RequestQueryBuilder();
+                        filterQueryBuilder.filter.where({
+                            id: {
+                                'inq': result.contactIDs
+                            }
+                        }, true);
+                        return filterQueryBuilder;
+                    })
+                );
         });
     }
 
     /**
      * Create the query builder for filtering the list of cases
+     * @param date
+     * @param location
      * @param {number} noDaysInChains
      * @returns {Observable<RequestQueryBuilder>}
      */
@@ -352,21 +368,25 @@ export class ListFilterDataService {
 
             return this.relationshipDataService
                 .getCountOfCasesOutsideTheTransmissionChains(selectedOutbreak.id, qb)
-                .map((result) => {
-                    // update queryBuilder filter with desired case ids
-                    const filterQueryBuilder = new RequestQueryBuilder();
-                    filterQueryBuilder.filter.where({
-                        id: {
-                            'inq': result.caseIDs
-                        }
-                    }, true);
-                    return filterQueryBuilder;
-                });
+                .pipe(
+                    map((result) => {
+                        // update queryBuilder filter with desired case ids
+                        const filterQueryBuilder = new RequestQueryBuilder();
+                        filterQueryBuilder.filter.where({
+                            id: {
+                                'inq': result.caseIDs
+                            }
+                        }, true);
+                        return filterQueryBuilder;
+                    })
+                );
         });
     }
 
     /**
      * Create the query builder for filtering the list of cases
+     * @param date
+     * @param location
      * @param {number} noDaysAmongContacts
      * @returns {Observable<RequestQueryBuilder>}
      */
@@ -409,16 +429,18 @@ export class ListFilterDataService {
 
             return this.relationshipDataService
                 .getCountIdsOfCasesAmongKnownContacts(selectedOutbreak.id, qb)
-                .map((result) => {
-                    // update queryBuilder filter with desired contacts ids
-                    const filterQueryBuilder = new RequestQueryBuilder();
-                    filterQueryBuilder.filter.where({
-                        id: {
-                            'inq': result.newCasesAmongKnownContactsIDs
-                        }
-                    }, true);
-                    return filterQueryBuilder;
-                });
+                .pipe(
+                    map((result) => {
+                        // update queryBuilder filter with desired contacts ids
+                        const filterQueryBuilder = new RequestQueryBuilder();
+                        filterQueryBuilder.filter.where({
+                            id: {
+                                'inq': result.newCasesAmongKnownContactsIDs
+                            }
+                        }, true);
+                        return filterQueryBuilder;
+                    })
+                );
         });
     }
 
@@ -498,6 +520,7 @@ export class ListFilterDataService {
     /**
      * Create the query builder for filtering the contacts seen on selected date
      * @param {date} date
+     * @param {string} location
      * @returns {Observable<any>}
      */
     filterContactsSeen(date: Moment, location: string): Observable<any> {
@@ -531,8 +554,9 @@ export class ListFilterDataService {
     }
 
     /**
-     *
+     * Create the query builder for filtering the contacts that have been successfully followed up
      * @param {date} date
+     * @param {string} location
      * @returns {Observable<any>}
      */
     filterContactsWithSuccessfulFollowup(date: Moment, location: string): Observable<any> {
@@ -584,7 +608,9 @@ export class ListFilterDataService {
     /**
      * Global filters
      * @param dateFieldPath
+     * @param dateFieldValue
      * @param locationFieldPath
+     * @param locationFieldValue
      */
     getGlobalFilterQB(
         dateFieldPath: string,

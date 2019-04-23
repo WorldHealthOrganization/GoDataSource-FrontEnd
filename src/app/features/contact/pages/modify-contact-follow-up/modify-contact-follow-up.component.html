@@ -12,51 +12,50 @@
             <mat-tab [label]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_TITLE' | translate">
 
                 <!-- Details section -->
-                <mat-card class="page-section">
-                    <div fxLayout="column">
-                        <div
-                            fxLayout="row" fxLayoutGap="20px" fxFlex
-                            class="follow-ups-title">
-                            <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
-                            <a
-                                [routerLink]="['/contacts', followUpData.contact.id, 'view']"
-                            >
-                                {{ followUpData.contact.name }}
-                            </a>
-                        </div>
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-datepicker
-                                name="date"
-                                [(ngModel)]="followUpData.date"
-                                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
-                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION"
-                                required="true"
-                                [disabled]="true"
-                                app-date-validator>
-                            </app-form-datepicker>
+                <mat-card class="page-section" fxLayout="column">
+                    <div
+                        class="follow-ups-title"
+                        fxLayout="row" fxLayoutGap="20px"
+                    >
+                        <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
+                        <a
+                            [routerLink]="['/contacts', followUpData.contact.id, 'view']"
+                        >
+                            {{ followUpData.contact.name }}
+                        </a>
+                    </div>
+                    <div fxLayout="row" fxLayoutGap="20px">
+                        <app-form-datepicker
+                            name="date"
+                            [(ngModel)]="followUpData.date"
+                            [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
+                            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION"
+                            required="true"
+                            [disabled]="true"
+                            app-date-validator>
+                        </app-form-datepicker>
 
-                            <app-form-slide-toggle
-                                name="targeted"
-                                [(ngModel)]="followUpData.targeted"
-                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
-                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
-                                [disabled]="viewOnly">
-                            </app-form-slide-toggle>
+                        <app-form-slide-toggle
+                            name="targeted"
+                            [(ngModel)]="followUpData.targeted"
+                            [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
+                            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
+                            [disabled]="viewOnly">
+                        </app-form-slide-toggle>
 
-                            <app-form-select
-                                name="statusId"
-                                [(ngModel)]="followUpData.statusId"
-                                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate"
-                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION"
-                                [options]="dailyStatusTypeOptions$ | async"
-                                [disabled]="viewOnly"
-                                [required]="true"
-                                optionLabelKey="label"
-                                optionValueKey="value">
-                            </app-form-select>
+                        <app-form-select
+                            name="statusId"
+                            [(ngModel)]="followUpData.statusId"
+                            [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate"
+                            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION"
+                            [options]="dailyStatusTypeOptions$ | async"
+                            [disabled]="viewOnly"
+                            [required]="true"
+                            optionLabelKey="label"
+                            optionValueKey="value">
+                        </app-form-select>
 
-                            <div fxFlex><!-- placeholder --></div>
-                        </div>
+                        <div fxFlex><!-- placeholder --></div>
                     </div>
                 </mat-card>
 

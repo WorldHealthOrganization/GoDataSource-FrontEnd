@@ -4,10 +4,9 @@ import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Subscriber, Subscription } from 'rxjs';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import { Subscription } from 'rxjs/Subscription';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as moment from 'moment';
 import * as _ from 'lodash';
@@ -101,7 +100,7 @@ export class ContactsNotSeenDashletComponent extends DashletComponent implements
             qb.filter.firstLevelConditions();
 
             // convert
-            let xDaysNotSeen: number = _.isNumber(this.xDaysNotSeen) || _.isEmpty(this.xDaysNotSeen) ? this.xDaysNotSeen  : _.parseInt(this.xDaysNotSeen);
+            let xDaysNotSeen: number = _.isNumber(this.xDaysNotSeen) || _.isEmpty(this.xDaysNotSeen) ? this.xDaysNotSeen : _.parseInt(this.xDaysNotSeen);
             if (_.isNumber(xDaysNotSeen)) {
                 // add number of days until current day
                 if (this.globalFilterDate) {

@@ -24,7 +24,8 @@ import {
     MatCheckboxModule,
     MatProgressSpinnerModule,
     MatPaginatorModule,
-    MatRadioModule
+    MatRadioModule,
+    MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS
 } from '@angular/material';
 
 @NgModule({
@@ -53,6 +54,14 @@ import {
         MatProgressSpinnerModule,
         MatPaginatorModule,
         MatRadioModule
+    ],
+    providers: [
+        {
+            provide: MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,
+            useValue: {
+                _forceAnimations: true
+            }
+        }
     ],
     declarations: [],
     exports: [

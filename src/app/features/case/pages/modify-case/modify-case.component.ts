@@ -1,15 +1,14 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { NgForm } from '@angular/forms';
+import { NgForm, NgModel } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -32,6 +31,8 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { MatDialogRef } from '@angular/material';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-modify-case',
@@ -62,7 +63,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
     serverToday: Moment = null;
 
-    parentOnsetDates: [Moment, string][] = [];
+    parentOnsetDates: (string | Moment)[][] = [];
 
     queryParams: {
         onset: boolean,
@@ -73,7 +74,10 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         mask: string
     };
 
-    caseIdMaskValidator: Observable<boolean>;
+    caseIdMaskValidator: Observable<boolean | IGeneralAsyncValidatorResponse>;
+
+    displayRefresh: boolean = false;
+    @ViewChild('visualId') visualId: NgModel;
 
     constructor(
         private router: Router,
@@ -126,6 +130,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 // outbreak
                 this.selectedOutbreak = selectedOutbreak;
+                if (!_.isEmpty(this.selectedOutbreak.caseIdMask)) {
+                    this.displayRefresh = true;
+                }
 
                 // breadcrumbs
                 this.retrieveCaseData();
@@ -243,9 +250,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                     // determine parent onset dates
                     const uniqueDates: {} = {};
-                    _.each(this.caseData.relationships, (relationship: RelationshipModel) => {
-                        const parentPerson = _.find(relationship.persons, { source: true });
-                        const parentCase: CaseModel = _.find(relationship.people, { id: parentPerson.id });
+                    _.each(this.caseData.relationships, (relationship: any) => {
+                        const parentPerson: any = _.find(relationship.persons, { source: true });
+                        const parentCase: CaseModel = _.find(relationship.people, { id: parentPerson.id }) as CaseModel;
                         if (
                             parentCase &&
                             parentCase.dateOfOnset
@@ -257,7 +264,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                     // convert unique object of dates to array
                     this.parentOnsetDates = _.map(Object.keys(uniqueDates), (date: string) => {
                         return [
-                            moment(date),
+                            moment(date) as Moment,
                             this.i18nService.instant(
                                 'LNG_PAGE_MODIFY_CASE_INVALID_CHILD_DATE_OF_ONSET', {
                                     date: moment(date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
@@ -272,7 +279,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                     };
 
                     // set visual ID validator
-                    this.caseIdMaskValidator = Observable.create((observer) => {
+                    this.caseIdMaskValidator = new Observable((observer) => {
                         this.caseDataService.checkCaseVisualIDValidity(
                             this.selectedOutbreak.id,
                             this.visualIDTranslateData.mask,
@@ -329,25 +336,32 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                 ...this.caseData,
                 ...dirtyFields
             })
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
 
-                // hide dialog
-                loadingDialog.close();
+                    // hide dialog
+                    loadingDialog.close();
 
-                return ErrorObservable.create(err);
-            })
+                    return throwError(err);
+                })
+            )
             .subscribe((caseDuplicates: EntityDuplicatesModel) => {
                 // modify Case
                 const runModifyCase = (finishCallBack?: () => void) => {
                     // modify the Case
                     this.caseDataService
                         .modifyCase(this.selectedOutbreak.id, this.caseId, dirtyFields)
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err);
-                            loadingDialog.close();
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+
+                                // hide dialog
+                                loadingDialog.close();
+
+                                return throwError(err);
+                            })
+                        )
                         .subscribe((modifiedCase: CaseModel) => {
                             // update model
                             this.caseData = modifiedCase;
@@ -470,5 +484,15 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             ...this.parentOnsetDates,
             [this.caseData.dateOfInfection, this.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION')]
         ];
+    }
+
+    /**
+     * Generate visual ID for case
+     */
+    generateVisualId() {
+        if (!_.isEmpty(this.selectedOutbreak.caseIdMask)) {
+            this.caseData.visualId = CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask);
+            this.visualId.control.markAsDirty();
+        }
     }
 }

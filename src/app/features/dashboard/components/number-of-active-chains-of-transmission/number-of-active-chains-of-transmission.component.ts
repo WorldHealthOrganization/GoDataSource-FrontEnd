@@ -6,7 +6,7 @@ import { Constants } from '../../../../core/models/constants';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-number-of-active-chains-of-transmission-dashlet',

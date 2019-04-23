@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -9,7 +9,6 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, DialogField, LoadingDialogModel } from '../../../../shared/components';
@@ -18,7 +17,6 @@ import { CountedItemsListItem } from '../../../../shared/components/counted-item
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import 'rxjs/add/operator/filter';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
@@ -30,11 +28,11 @@ import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import 'rxjs/add/operator/mergeMap';
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
-import { tap } from 'rxjs/operators';
+import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-contacts-list',
@@ -184,15 +182,17 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
         this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
-
-        this.riskLevelRefData$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).share();
-        this.riskLevelsList$ = this.riskLevelRefData$.map((data: ReferenceDataCategoryModel) => {
-            return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
-                new LabelValuePair(entry.value, entry.id, null, null, entry.iconUrl)
+        this.riskLevelRefData$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).pipe(share());
+        this.riskLevelsList$ = this.riskLevelRefData$
+            .pipe(
+                map((data: ReferenceDataCategoryModel) => {
+                    return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
+                        new LabelValuePair(entry.value, entry.id, null, null, entry.iconUrl)
+                    );
+                })
             );
-        });
         this.riskLevelRefData$.subscribe((riskCategory: ReferenceDataCategoryModel) => {
             this.riskLevelsListMap = _.transform(
                 riskCategory.entries,
@@ -474,7 +474,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.contactsListCount$ = this.contactDataService.getContactsCount(this.selectedOutbreak.id, countQueryBuilder).share();
+            this.contactsListCount$ = this.contactDataService.getContactsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }
 
@@ -484,23 +484,27 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     getContactsGroupedByRiskLevel() {
         if (this.selectedOutbreak) {
             this.countedContactsByRiskLevel$ = this.riskLevelRefData$
-                .mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
-                    return this.contactDataService
-                        .getContactsGroupedByRiskLevel(this.selectedOutbreak.id, this.queryBuilder)
-                        .map((data: RiskLevelGroupModel) => {
-                            return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
-                                const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId});
-                                return new CountedItemsListItem(
-                                    item.count,
-                                    itemId,
-                                    item.contactIDs,
-                                    refItem ?
-                                        refItem.getColorCode() :
-                                        Constants.DEFAULT_COLOR_REF_DATA
-                                );
-                            });
-                        });
-                });
+                .pipe(
+                    mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
+                        return this.contactDataService
+                            .getContactsGroupedByRiskLevel(this.selectedOutbreak.id, this.queryBuilder)
+                            .pipe(
+                                map((data: RiskLevelGroupModel) => {
+                                    return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
+                                        const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId});
+                                        return new CountedItemsListItem(
+                                            item.count,
+                                            itemId as any,
+                                            item.contactIDs,
+                                            refItem ?
+                                                refItem.getColorCode() :
+                                                Constants.DEFAULT_COLOR_REF_DATA
+                                        );
+                                    });
+                                })
+                            );
+                    })
+                );
         }
     }
 
@@ -555,11 +559,12 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                     // delete contact
                     this.contactDataService
                         .deleteContact(this.selectedOutbreak.id, contact.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
@@ -577,10 +582,12 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.contactDataService
                         .restoreContact(this.selectedOutbreak.id, contact.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
                             // reload data
@@ -600,11 +607,12 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.contactDataService
                         .convertContactToCase(this.selectedOutbreak.id, contactModel.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
                             // reload data

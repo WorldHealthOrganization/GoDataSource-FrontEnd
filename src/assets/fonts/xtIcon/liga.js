@@ -25,6 +25,10 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'ellipse_shape': '&#xe92f;',
+            'pentagon_shape': '&#xe930;',
+            'rectangle_shape': '&#xe931;',
+            'star_shape': '&#xe932;',
             'contacts': '&#xe924;',
             'person_add': '&#xe925;',
             'turned_in': '&#xe926;',
@@ -69,6 +73,7 @@
             'menu': '&#xe90a;',
             'home': '&#xe901;',
             'info': '&#xe923;',
+            'refresh': '&#xe92e;',
             'lab': '&#xe9aa;',
             'arrowADown': '&#xe922;',
             'arrowAUp': '&#xe921;',

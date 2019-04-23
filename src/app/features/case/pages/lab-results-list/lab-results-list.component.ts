@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -10,7 +10,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import * as _ from 'lodash';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -21,7 +20,8 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-lab-results',
@@ -78,6 +78,12 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        this.labNamesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME).pipe(share());
+        this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE).pipe(share());
+        this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST).pipe(share());
+        this.labTestResultsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT).pipe(share());
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions().pipe(share());
+
         // subscribe to the Selected Outbreak
         this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -95,12 +101,6 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
 
         // initialize side filters
         this.initializeSideFilters();
-
-        this.labNamesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME).share();
-        this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE).share();
-        this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST).share();
-        this.labTestResultsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT).share();
-        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
     }
 
     /**
@@ -150,6 +150,10 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
                 label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT'
             }),
             new VisibleColumnModel({
+                field: 'testedFor',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TESTED_FOR'
+            }),
+            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DELETED',
                 visible: false
@@ -170,7 +174,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
                 fieldName: 'sampleIdentifier',
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
                 type: FilterType.TEXT,
-                sortable: true,
+                sortable: true
             }),
             new FilterModel({
                 fieldName: 'dateSampleTaken',
@@ -216,6 +220,12 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT',
                 type: FilterType.SELECT,
                 options$: this.labTestResultsList$,
+            }),
+            new FilterModel({
+                fieldName: 'testedFor',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
+                type: FilterType.TEXT,
+                sortable: true
             })
         ];
     }
@@ -239,7 +249,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.labResultsListCount$ = this.labResultDataService.getOutbreakLabResultsCount(this.selectedOutbreak.id, countQueryBuilder).share();
+            this.labResultsListCount$ = this.labResultDataService.getOutbreakLabResultsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }
 
@@ -262,11 +272,12 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete lab result
                     this.labResultDataService.deleteLabResult(this.selectedOutbreak.id, labResult.case.id, labResult.id)
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err);
-
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
@@ -279,7 +290,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
 
     /**
      * Restore a deleted lab result
-     * @param {string} labResultId
+     * @param labResult
      */
     restoreLabResult(labResult: LabResultModel) {
         // show confirm dialog to confirm de action
@@ -289,11 +300,12 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
                     // restore lab result
                     this.labResultDataService
                         .restoreLabResult(this.selectedOutbreak.id, labResult.personId, labResult.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT_SUCCESS_MESSAGE');
 

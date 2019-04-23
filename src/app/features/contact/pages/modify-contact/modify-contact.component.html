@@ -15,7 +15,7 @@
                 <mat-card class="page-section">
                     <div fxLayout="column">
 
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="firstName"
                                 [(ngModel)]="contactData.firstName"
@@ -61,10 +61,13 @@
                                 <!-- [maxlength]="255" -->
                                 <app-form-input
                                     name="visualId"
+                                    #visualId="ngModel"
                                     [(ngModel)]="contactData.visualId"
                                     [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
                                     tooltip="LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
                                     [tooltipTranslateData]="visualIDTranslateData"
+                                    [displayRefresh]="displayRefresh"
+                                    (refresh)="generateVisualId()"
                                     [maxlength]="255"
                                     [disabled]="viewOnly"
                                     app-general-async-validator

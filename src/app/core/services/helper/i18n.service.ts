@@ -3,12 +3,11 @@ import { TranslateService } from '@ngx-translate/core';
 import { LanguageModel, LanguageTokenModel } from '../../models/language.model';
 import { StorageKey, StorageService } from './storage.service';
 import { LanguageDataService } from '../data/language.data.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ModelHelperService } from './model-helper.service';
 import { UserDataService } from '../data/user.data.service';
 import { AuthDataService } from '../data/auth.data.service';
-import 'rxjs/add/operator/mergeMap';
-import { Subscriber } from 'rxjs/Subscriber';
+import { map, mergeMap } from 'rxjs/operators';
 
 @Injectable()
 export class I18nService {
@@ -25,7 +24,8 @@ export class I18nService {
         private modelHelperService: ModelHelperService,
         private userDataService: UserDataService,
         private authDataService: AuthDataService
-    ) {}
+    ) {
+    }
 
     /**
      * Get the ID of the language selected by User in UI
@@ -59,19 +59,21 @@ export class I18nService {
         // get the tokens for the selected language
         return this.languageDataService
             .getLanguageTokens(language)
-            .mergeMap((tokens: LanguageTokenModel[]) => {
-                // add the tokens to the Language object
-                const selectedLanguage = new LanguageModel({...language, tokens});
+            .pipe(
+                mergeMap((tokens: LanguageTokenModel[]) => {
+                    // add the tokens to the Language object
+                    const selectedLanguage = new LanguageModel({...language, tokens});
 
-                // configure the TranslateService
-                this.translateService.setTranslation(selectedLanguage.id, selectedLanguage.getTokensObject());
-                this.translateService.use(selectedLanguage.id);
+                    // configure the TranslateService
+                    this.translateService.setTranslation(selectedLanguage.id, selectedLanguage.getTokensObject());
+                    this.translateService.use(selectedLanguage.id);
 
-                // trigger language change events
-                this.languageChangedEvent.emit();
+                    // trigger language change events
+                    this.languageChangedEvent.emit();
 
-                return this.persistUserLanguage(language.id);
-            });
+                    return this.persistUserLanguage(language.id);
+                })
+            );
     }
 
     /**
@@ -88,9 +90,11 @@ export class I18nService {
 
         return this.userDataService
             .modifyUser(authUser.id, {languageId: languageId})
-            .mergeMap(() => {
-                return this.authDataService.reloadAndPersistAuthUser();
-            });
+            .pipe(
+                mergeMap(() => {
+                    return this.authDataService.reloadAndPersistAuthUser();
+                })
+            );
     }
 
     /**
@@ -108,25 +112,29 @@ export class I18nService {
         // retrieve the language data
         return this.languageDataService
             .getLanguage(langId)
-            .mergeMap((language: LanguageModel) => {
-                // get the tokens for the selected language
-                return this.languageDataService
-                    .getLanguageTokens(language)
-                    .map((tokens: LanguageTokenModel[]) => {
+            .pipe(
+                mergeMap((language: LanguageModel) => {
+                    // get the tokens for the selected language
+                    return this.languageDataService
+                        .getLanguageTokens(language)
+                        .pipe(
+                            map((tokens: LanguageTokenModel[]) => {
 
-                        // add the tokens to the Language object
-                        language = this.modelHelperService.getModelInstance(LanguageModel, {...language, tokens});
+                                // add the tokens to the Language object
+                                language = this.modelHelperService.getModelInstance(LanguageModel, {...language, tokens});
 
-                        // configure the TranslateService
-                        this.translateService.setTranslation(language.id, language.getTokensObject());
-                        this.translateService.use(language.id);
+                                // configure the TranslateService
+                                this.translateService.setTranslation(language.id, language.getTokensObject());
+                                this.translateService.use(language.id);
 
-                        // translation initialized
-                        this.languageLoadedEvent.emit();
+                                // translation initialized
+                                this.languageLoadedEvent.emit();
 
-                        return language;
-                    });
-            });
+                                return language;
+                            })
+                        );
+                })
+            );
     }
 
     /**
@@ -135,7 +143,7 @@ export class I18nService {
      * @param {{}} data Parameters to be replaced in translated message
      * @returns {Observable<string | any>}
      */
-    get(token, data = {}) {
+    get(token, data = {}): Observable<string | any> {
         return this.translateService.get(token, data);
     }
 
@@ -145,7 +153,7 @@ export class I18nService {
      * @param {{}} data Parameters to be replaced in translated message
      * @returns String
      */
-    instant(token, data = {}) {
+    instant(token, data = {}): string {
         return this.translateService.instant(token, data);
     }
 
@@ -153,12 +161,7 @@ export class I18nService {
      * Language loaded
      */
     public waitForLanguageInitialization(): Observable<void> {
-        return Observable.create((observer: Subscriber<void>) => {
-            this.languageLoadedEvent.subscribe(() => {
-                observer.next();
-                observer.complete();
-            });
-        });
+        return this.languageLoadedEvent;
     }
 }
 

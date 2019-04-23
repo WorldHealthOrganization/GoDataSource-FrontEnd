@@ -3,7 +3,7 @@ import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer
 import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { ListBase } from '../../core';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Subscriber } from 'rxjs';
 import { DialogAnswer, DialogAnswerButton } from '../../../components/dialog/dialog.component';
 import { Moment } from 'moment';
 

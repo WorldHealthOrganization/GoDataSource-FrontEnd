@@ -1,9 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { SystemSettingsModel } from '../../models/system-settings.model';
 import { SystemSettingsVersionModel } from '../../models/system-settings-version.model';
+import { CacheKey, CacheService } from '../helper/cache.service';
+import { tap } from 'rxjs/operators';
+import * as _ from 'lodash';
+import { of } from 'rxjs';
 
 @Injectable()
 export class SystemSettingsDataService {
@@ -12,8 +16,10 @@ export class SystemSettingsDataService {
      */
     constructor(
         private http: HttpClient,
-        private modelHelper: ModelHelperService
-    ) {}
+        private modelHelper: ModelHelperService,
+        private cacheService: CacheService
+    ) {
+    }
 
     /**
      * Retrieve System settings
@@ -46,20 +52,29 @@ export class SystemSettingsDataService {
      * @param apiUrl
      */
     getAPIVersion(
-        apiUrl: string
+        apiUrl: string = ''
     ): Observable<SystemSettingsVersionModel> {
-        return this.modelHelper.mapObservableToModel(
-            this.http.get(`${apiUrl}/system-settings/version`),
-            SystemSettingsVersionModel
-        );
-    }
-
-    /**
-     * Retrieve version number
-     * @returns {Observable<Object>}
-     */
-    getVersionNumber() {
-        return this.http.get('/system-settings/version');
+        const callingLocalAPI: boolean = _.isEmpty(apiUrl);
+        const cache = this.cacheService.get(CacheKey.API_VERSION);
+        if (
+            callingLocalAPI &&
+            cache
+        ) {
+            return of(cache);
+        } else {
+            return this.modelHelper
+                .mapObservableToModel(
+                    this.http.get(`${apiUrl}/system-settings/version`),
+                    SystemSettingsVersionModel
+                )
+                .pipe(
+                    tap((versionData) => {
+                        if (callingLocalAPI) {
+                            this.cacheService.set(CacheKey.API_VERSION, versionData);
+                        }
+                    })
+                );
+        }
     }
 }
 

@@ -1,7 +1,6 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm, NgModel } from '@angular/forms';
@@ -15,17 +14,20 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
-import 'rxjs/add/operator/filter';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/forkJoin';
+import { Observable } from 'rxjs';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { GroupBase } from '../../../../shared/xt-forms/core';
 import { v4 as uuid } from 'uuid';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { catchError, share } from 'rxjs/operators';
+import { throwError, forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-create-entity-relationship',
@@ -62,10 +64,18 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
     relationshipType: RelationshipType;
 
     selectedEntityIds: string[];
-    selectedEntities: (CaseModel|ContactModel|EventModel)[];
+    selectedEntities: (CaseModel | ContactModel | EventModel)[];
 
     relationships: RelationshipModel[] = [];
     relationshipsIds: string[] = [];
+
+    // reference data
+    certaintyLevelOptions$: Observable<any[]>;
+    exposureTypeOptions$: Observable<any[]>;
+    exposureFrequencyOptions$: Observable<any[]>;
+    exposureDurationOptions$: Observable<any[]>;
+    socialRelationshipOptions$: Observable<any[]>;
+    clusterOptions$: Observable<any[]>;
 
     constructor(
         private router: Router,
@@ -76,12 +86,21 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private clusterDataService: ClusterDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super();
     }
 
     ngOnInit() {
+        // reference data
+        this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL).pipe(share());
+        this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE).pipe(share());
+        this.exposureFrequencyOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY).pipe(share());
+        this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION).pipe(share());
+        this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).pipe(share());
+
         // get selected persons from query params
         this.route.queryParams
             .subscribe((queryParams: { selectedEntityIds }) => {
@@ -120,6 +139,9 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
 
+                // get clusters list
+                this.clusterOptions$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id).pipe(share());
+
                 this.loadPerson();
             });
     }
@@ -135,14 +157,16 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
             // get person data
             this.entityDataService
                 .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showError(err.message);
 
-                    // Entity not found; navigate back to Entities list
-                    this.router.navigate([this.entityMap[this.entityType].link]);
+                        // Entity not found; navigate back to Entities list
+                        this.router.navigate([this.entityMap[this.entityType].link]);
 
-                    return ErrorObservable.create(err);
-                })
+                        return throwError(err);
+                    })
+                )
                 .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
                     this.entity = entityData;
 
@@ -261,12 +285,13 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
             );
         });
 
-        return Observable.forkJoin(createRelationships$)
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
-
-                return ErrorObservable.create(err);
-            })
+        return forkJoin(createRelationships$)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                })
+            )
             .subscribe(() => {
                 if (createRelationships$.length > 1) {
                     // multiple relationships
@@ -292,7 +317,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
             (value) => {
                 return _.isObject(value) ?
                     this.isEmptyObject(value) :
-                    ( !_.isNumber(value) && _.isEmpty(value) );
+                    (!_.isNumber(value) && _.isEmpty(value));
             }
         );
     }
@@ -301,6 +326,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
      * Copy value from current record to all the other records
      * @param property
      * @param sourceRelationship
+     * @param form
      */
     copyValueToEmptyFields(
         property: string,

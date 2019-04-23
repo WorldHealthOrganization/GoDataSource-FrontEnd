@@ -59,6 +59,11 @@ export class FormAgeDobComponent extends GroupBase<CaseModel | ContactModel> imp
     switchAgeDob(ageSelected: boolean = true) {
         // switch element that we want to see
         this.ageSelected = ageSelected;
+
+        setTimeout(() => {
+            // tell parent that data changed
+            super.validateGroup();
+        });
     }
 
     /**
@@ -116,8 +121,10 @@ export class FormAgeDobComponent extends GroupBase<CaseModel | ContactModel> imp
             this.ageDob.age.years = 0;
         }
 
-        // tell parent that data changed
-        super.onChange();
+        setTimeout(() => {
+            // tell parent that data changed
+            super.onChange();
+        });
     }
 
     /**
@@ -127,8 +134,10 @@ export class FormAgeDobComponent extends GroupBase<CaseModel | ContactModel> imp
         // reset dob if we change number of months
         this.ageDob.dob = null;
 
-        // tell parent that data changed
-        super.onChange();
+        setTimeout(() => {
+            // tell parent that data changed
+            super.onChange();
+        });
     }
 }
 

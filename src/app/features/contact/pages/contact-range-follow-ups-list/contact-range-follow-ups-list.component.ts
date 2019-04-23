@@ -23,8 +23,8 @@ import { FormDateRangeSliderData } from '../../../../shared/xt-forms/components/
 import { FollowUpPage } from '../../typings/follow-up-page';
 import { RangeFollowUpsModel } from '../../../../core/models/range-follow-ups.model';
 import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
-import { Observable } from 'rxjs/Observable';
-import { DateRangeModel } from '../../../../core/models/date-range.model';
+import { Observable } from 'rxjs';
+import { share } from 'rxjs/operators';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -288,7 +288,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.followUpsGroupedByContactCount$ = this.followUpsDataService.getRangeFollowUpsListCount(this.selectedOutbreak.id, countQueryBuilder).share();
+            this.followUpsGroupedByContactCount$ = this.followUpsDataService.getRangeFollowUpsListCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }
 

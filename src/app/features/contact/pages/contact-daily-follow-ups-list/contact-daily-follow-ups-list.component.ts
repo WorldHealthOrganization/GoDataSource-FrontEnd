@@ -3,14 +3,13 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable, Subscription } from 'rxjs';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { Constants } from '../../../../core/models/constants';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswerButton, DialogField, DialogFieldType } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
@@ -30,11 +29,11 @@ import { TeamDataService } from '../../../../core/services/data/team.data.servic
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { NgModel } from '@angular/forms';
-import { Subscription } from 'rxjs/Subscription';
-import { tap } from 'rxjs/operators';
+import { catchError, map, share, tap } from 'rxjs/operators';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { FollowUpPage } from '../../typings/follow-up-page';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -353,7 +352,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_WEEK_NUMBER',
                 type: FilterType.NUMBER,
                 allowedComparators: [
-                    _.find(AppliedFilterModel.allowedComparators[FilterType.NUMBER], { value: FilterComparator.IS })
+                    _.find(AppliedFilterModel.allowedComparators[FilterType.NUMBER], {value: FilterComparator.IS})
                 ],
                 flagIt: true
             }),
@@ -362,7 +361,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TIME_FILTER',
                 type: FilterType.DATE,
                 allowedComparators: [
-                    _.find(AppliedFilterModel.allowedComparators[FilterType.DATE], { value: FilterComparator.IS })
+                    _.find(AppliedFilterModel.allowedComparators[FilterType.DATE], {value: FilterComparator.IS})
                 ],
                 flagIt: true
             })
@@ -661,12 +660,15 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService
                 .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
-                .map((followUps: FollowUpModel[]) => {
-                    return FollowUpModel.determineAlertness(
-                        this.selectedOutbreak.contactFollowUpTemplate,
-                        followUps
-                    );
-                }).pipe(tap(this.checkEmptyList.bind(this)));
+                .pipe(
+                    map((followUps: FollowUpModel[]) => {
+                        return FollowUpModel.determineAlertness(
+                            this.selectedOutbreak.contactFollowUpTemplate,
+                            followUps
+                        );
+                    }),
+                    tap(this.checkEmptyList.bind(this))
+                );
         }
     }
 
@@ -689,7 +691,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             countQueryBuilder.paginator.clear();
             this.followUpsListCount$ = this.followUpsDataService
                 .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
-                .share();
+                .pipe(
+                    share()
+                );
         }
     }
 
@@ -724,26 +728,30 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                                 value: true
                             })
                         ]
-                    })).subscribe((answer: DialogAnswer) => {
-                        if (answer.button === DialogAnswerButton.Yes) {
-                            this.followUpsDataService
-                                .generateFollowUps(
-                                    this.selectedOutbreak.id,
-                                    answer.inputValue.value.dates.startDate,
-                                    answer.inputValue.value.dates.endDate,
-                                    answer.inputValue.value.targeted
-                                ).catch((err) => {
-                                    this.snackbarService.showError(err.message);
-                                    return ErrorObservable.create(err);
-                                })
-                                .subscribe(() => {
-                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
+                    }))
+                        .subscribe((answer: DialogAnswer) => {
+                            if (answer.button === DialogAnswerButton.Yes) {
+                                this.followUpsDataService
+                                    .generateFollowUps(
+                                        this.selectedOutbreak.id,
+                                        answer.inputValue.value.dates.startDate,
+                                        answer.inputValue.value.dates.endDate,
+                                        answer.inputValue.value.targeted
+                                    )
+                                    .pipe(
+                                        catchError((err) => {
+                                            this.snackbarService.showApiError(err);
+                                            return throwError(err);
+                                        })
+                                    )
+                                    .subscribe(() => {
+                                        this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
-                                    // reload data
-                                    this.needsRefreshList(true);
-                                });
-                        }
-                    });
+                                        // reload data
+                                        this.needsRefreshList(true);
+                                    });
+                            }
+                        });
                 });
         }
     }
@@ -786,15 +794,17 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         if (this.selectedOutbreak) {
             this.countedFollowUpsGroupedByTeams$ = this.followUpsDataService
                 .getCountedFollowUpsGroupedByTeams(this.selectedOutbreak.id, this.queryBuilder)
-                    .map((data) => {
-                    return _.map(data.team, (teamData) => {
-                        return new CountedItemsListItem(
-                            teamData.count ? teamData.count : 0,
-                            teamData.team ? teamData.team.name : '',
-                            teamData.team ? teamData.team.id : []
-                        );
-                    });
-                });
+                .pipe(
+                    map((data) => {
+                        return _.map(data.team, (teamData) => {
+                            return new CountedItemsListItem(
+                                teamData.count ? teamData.count : 0,
+                                teamData.team ? teamData.team.name : '',
+                                teamData.team ? teamData.team.id : []
+                            );
+                        });
+                    })
+                );
         }
     }
 }

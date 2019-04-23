@@ -4,10 +4,9 @@ import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Subscriber, Subscription } from 'rxjs';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import { Subscription } from 'rxjs/Subscription';
 import * as moment from 'moment';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -101,7 +100,7 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
             qb.filter.firstLevelConditions();
 
             // convert
-            let xPreviousDays: number = _.isNumber(this.xPreviousDays) || _.isEmpty(this.xPreviousDays) ? this.xPreviousDays  : _.parseInt(this.xPreviousDays);
+            let xPreviousDays: number = _.isNumber(this.xPreviousDays) || _.isEmpty(this.xPreviousDays) ? this.xPreviousDays : _.parseInt(this.xPreviousDays);
             if (_.isNumber(xPreviousDays)) {
                 // add number of days until current day
                 if (this.globalFilterDate) {

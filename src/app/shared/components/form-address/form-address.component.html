@@ -3,7 +3,7 @@
 
     <form #groupForm="ngForm">
         <div fxLayout="column" fxFlex>
-            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+            <div fxLayout="row" fxLayoutGap="20px">
                 <div fxFlex fxLayout="row" fxLayoutGap="5px">
                     <app-form-select
                         [name]="name + '[typeId]'"
@@ -63,7 +63,7 @@
                 <div fxFlex><!-- placeholder --></div>
             </div>
 
-            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+            <div fxLayout="row" fxLayoutGap="20px">
                 <div fxFlex fxLayout="row" fxLayoutGap="5px">
                     <app-form-location-dropdown
                         fxFlex
@@ -148,7 +148,7 @@
                 </div>
             </div>
 
-            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+            <div fxLayout="row" fxLayoutGap="20px">
                 <div fxFlex fxLayout="row" fxLayoutGap="5px">
                     <app-form-input
                         [name]="name + '[addressLine1]'"
@@ -176,69 +176,71 @@
                 </div>
 
                 <div fxFlex fxLayout="row" fxLayoutGap="20px">
-                    <div fxFlex fxLayout="row" fxLayoutGap="5px">
-                        <app-form-input
-                            #latInput
-                            [name]="name + '[geoLocation][lat]'"
-                            [ngModel]="address.geoLocation?.lat"
-                            [placeholder]="'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT' | translate"
-                            tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT_DESCRIPTION"
-                            [disabled]="disabled"
-                            [required]="isLatLngRequired(lngInput.value)"
-                            app-min-max-validator
-                            [min]="-90"
-                            [minNumber]="-90"
-                            [max]="90"
-                            [maxNumber]="90"
-                            type="number"
-                            (optionChanged)="onChangeLatLng('lat', $event)">
-                        </app-form-input>
-                        <div
-                            *ngIf="displayCopyField"
-                            fxFlex="40px"
-                            fxLayout="column"
-                            fxLayoutAlign="center">
-                            <button
-                                class="copy-field-button"
-                                type="button"
-                                mat-icon-button
-                                [title]="displayCopyFieldDescription"
-                                (click)="triggerCopyValue('geoLocation[lat]')">
-                                <span class="xt-icon">fileCopy</span>
-                            </button>
+                    <div fxFlex fxLayout="row" fxLayoutGap="20px">
+                        <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                            <app-form-input
+                                #latInput
+                                [name]="name + '[geoLocation][lat]'"
+                                [ngModel]="address.geoLocation?.lat"
+                                [placeholder]="'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT' | translate"
+                                tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT_DESCRIPTION"
+                                [disabled]="disabled"
+                                [required]="isLatLngRequired(lngInput.value)"
+                                app-min-max-validator
+                                [min]="-90"
+                                [minNumber]="-90"
+                                [max]="90"
+                                [maxNumber]="90"
+                                type="number"
+                                (optionChanged)="onChangeLatLng('lat', $event)">
+                            </app-form-input>
+                            <div
+                                *ngIf="displayCopyField"
+                                fxFlex="40px"
+                                fxLayout="column"
+                                fxLayoutAlign="center">
+                                <button
+                                    class="copy-field-button"
+                                    type="button"
+                                    mat-icon-button
+                                    [title]="displayCopyFieldDescription"
+                                    (click)="triggerCopyValue('geoLocation[lat]')">
+                                    <span class="xt-icon">fileCopy</span>
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                    <div fxFlex fxLayout="row" fxLayoutGap="5px">
-                        <app-form-input
-                            #lngInput
-                            [name]="name + '[geoLocation][lng]'"
-                            [ngModel]="address.geoLocation?.lng"
-                            [placeholder]="'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG' | translate"
-                            tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG_DESCRIPTION"
-                            [disabled]="disabled"
-                            [required]="isLatLngRequired(latInput.value)"
-                            app-min-max-validator
-                            [min]="-180"
-                            [minNumber]="-180"
-                            [max]="180"
-                            [maxNumber]="180"
-                            type="number"
-                            (optionChanged)="onChangeLatLng('lng', $event)">
-                        </app-form-input>
-                        <div
-                            *ngIf="displayCopyField"
-                            fxFlex="40px"
-                            fxLayout="column"
-                            fxLayoutAlign="center">
-                            <button
-                                class="copy-field-button"
-                                type="button"
-                                mat-icon-button
-                                [title]="displayCopyFieldDescription"
-                                (click)="triggerCopyValue('geoLocation[lng]')">
-                                <span class="xt-icon">fileCopy</span>
-                            </button>
+                        <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                            <app-form-input
+                                #lngInput
+                                [name]="name + '[geoLocation][lng]'"
+                                [ngModel]="address.geoLocation?.lng"
+                                [placeholder]="'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG' | translate"
+                                tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG_DESCRIPTION"
+                                [disabled]="disabled"
+                                [required]="isLatLngRequired(latInput.value)"
+                                app-min-max-validator
+                                [min]="-180"
+                                [minNumber]="-180"
+                                [max]="180"
+                                [maxNumber]="180"
+                                type="number"
+                                (optionChanged)="onChangeLatLng('lng', $event)">
+                            </app-form-input>
+                            <div
+                                *ngIf="displayCopyField"
+                                fxFlex="40px"
+                                fxLayout="column"
+                                fxLayoutAlign="center">
+                                <button
+                                    class="copy-field-button"
+                                    type="button"
+                                    mat-icon-button
+                                    [title]="displayCopyFieldDescription"
+                                    (click)="triggerCopyValue('geoLocation[lng]')">
+                                    <span class="xt-icon">fileCopy</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -268,7 +270,7 @@
                 </div>
             </div>
 
-            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+            <div fxLayout="row" fxLayoutGap="20px">
                 <div fxFlex fxLayout="row" fxLayoutGap="5px">
                     <app-form-input
                         [name]="name + '[phoneNumber]'"

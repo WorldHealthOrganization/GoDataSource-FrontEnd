@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Router } from '@angular/router';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { Moment } from 'moment';
 import { AppliedFilterModel, FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
@@ -14,9 +13,13 @@ import { LoadingDialogModel } from '../../../../shared/components/index';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { GanttChartDelayOnsetDashletComponent } from '../../components/gantt-chart-delay-onset-dashlet/gantt-chart-delay-onset-dashlet.component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Constants } from '../../../../core/models/constants';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 
 @Component({
     selector: 'app-gantt-chart',
@@ -48,14 +51,17 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
 
     Constants = Constants;
 
+    // do architecture is x32?
+    x86Architecture: boolean = false;
+
     constructor(
-        private router: Router,
         private domService: DomService,
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService,
         private dialogService: DialogService,
         private genericDataService: GenericDataService,
-        protected snackbarService: SnackbarService
+        protected snackbarService: SnackbarService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {
         super();
     }
@@ -65,6 +71,14 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
         this.initializeSideFilters();
         // load gantt types
         this.ganttChartTypes = this.genericDataService.getGanttChartTypes();
+        // check if platform architecture is x32
+        this.systemSettingsDataService
+            .getAPIVersion()
+            .subscribe((versionData: SystemSettingsVersionModel) => {
+                if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
+                    this.x86Architecture = true;
+                }
+            });
     }
 
     /**
@@ -125,7 +139,15 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
             this.domService
                 .getPNGBase64(ganttChartName, '#tempCanvas')
                 .subscribe((pngBase64) => {
-                    this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
+                    this.importExportDataService
+                        .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                this.closeLoadingDialog();
+                                return throwError(err);
+                            })
+                        )
                         .subscribe((blob) => {
                             this.downloadFile(blob, 'LNG_PAGE_GANTT_CHART_REPORT_LABEL');
                             this.closeLoadingDialog();

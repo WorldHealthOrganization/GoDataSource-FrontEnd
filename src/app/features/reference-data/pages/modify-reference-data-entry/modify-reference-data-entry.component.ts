@@ -7,17 +7,17 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { NgForm } from '@angular/forms';
 import * as _ from 'lodash';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { IconModel } from '../../../../core/models/icon.model';
 import { IconDataService } from '../../../../core/services/data/icon.data.service';
-import 'rxjs/add/operator/switchMap';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { throwError } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-modify-reference-data-entry',
@@ -89,21 +89,25 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.referenceDataDataService
             .modifyEntry(this.entryId, dirtyFields)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
-            .switchMap((modifiedReferenceDataEntry) => {
-                // re-load language tokens
-                return this.i18nService.loadUserLanguage()
-                    .catch((err) => {
-                        this.snackbarService.showError(err.message);
-                        loadingDialog.close();
-                        return ErrorObservable.create(err);
-                    })
-                    .map(() => modifiedReferenceDataEntry);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    loadingDialog.close();
+                    return throwError(err);
+                }),
+                switchMap((modifiedReferenceDataEntry) => {
+                    // re-load language tokens
+                    return this.i18nService.loadUserLanguage()
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                loadingDialog.close();
+                                return throwError(err);
+                            }),
+                            map(() => modifiedReferenceDataEntry)
+                        );
+                })
+            )
             .subscribe((modifiedReferenceDataEntry) => {
                 // update model
                 this.entry = modifiedReferenceDataEntry;

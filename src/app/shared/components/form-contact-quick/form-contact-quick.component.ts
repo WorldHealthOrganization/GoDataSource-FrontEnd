@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, FormControl } from '@angular/forms';
 import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
@@ -31,6 +31,7 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
 
     // selected outbreak
     selectedOutbreak: OutbreakModel;
+    displayRefresh: boolean = false;
 
     visualIDTranslateData: {
         mask: string
@@ -64,6 +65,10 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+                // if contact id mask is not empty show refresh contact id mask button
+                if (!_.isEmpty(this.selectedOutbreak.contactIdMask)) {
+                    this.displayRefresh = true;
+                }
 
                 // set visual ID translate data
                 this.visualIDTranslateData = {
@@ -77,6 +82,17 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
      */
     get contact(): ContactModel {
         return this.value;
+    }
+
+    /**
+     * Generate visual ID for contact
+     */
+    generateVisualId() {
+        if (!_.isEmpty(this.selectedOutbreak.contactIdMask)) {
+            this.contact.visualId = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);
+            this.groupForm.controls.visualId.markAsDirty();
+            this.onChange();
+        }
     }
 
     /**

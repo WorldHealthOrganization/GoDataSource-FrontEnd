@@ -6,12 +6,14 @@
 
 <div class="page-content">
 
-    <mat-horizontal-stepper linear #stepper
-                            (selectionChange)="onChangeStep($event, [followDetailsForm, followQuestionnaireForm])">
-
+    <mat-horizontal-stepper
+        linear
+        #stepper
+        (selectionChange)="onChangeStep($event, [followDetailsForm, followQuestionnaireForm])"
+    >
         <!-- Details step -->
         <mat-step [stepControl]="followDetailsForm">
-            <form #followDetailsForm="ngForm">
+            <form #followDetailsForm="ngForm" fxLayout="column">
                 <ng-template matStepLabel>
                     {{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TAB_DETAILS_TITLE'| translate}}
                 </ng-template>
@@ -20,7 +22,7 @@
                     [contacts]="selectedContacts"
                 ></app-selected-contacts-list>
 
-                <mat-card fxFlex class="page-section">
+                <mat-card class="page-section">
                     <div fxLayout="column">
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-datepicker
@@ -61,7 +63,7 @@
                     </div>
                 </mat-card>
 
-                <div class="stepper-wrapper">
+                <div class="stepper-navigation-buttons">
                     <button mat-raised-button color="accent" matStepperNext>
                         {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
                     </button>
@@ -71,7 +73,7 @@
 
         <!-- Questionnaire step -->
         <mat-step [stepControl]="followQuestionnaireForm">
-            <form #followQuestionnaireForm="ngForm">
+            <form #followQuestionnaireForm="ngForm" fxLayout="column">
                 <ng-template matStepLabel>
                     {{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TAB_QUESTIONNAIRE_TITLE'| translate}}
                 </ng-template>
@@ -84,10 +86,11 @@
                 <app-form-fill-questionnaire
                     name="questionnaireAnswers"
                     [ngModel]="followUp.questionnaireAnswers"
-                    [questions]="selectedOutbreak?.contactFollowUpTemplate">
-                </app-form-fill-questionnaire>
+                    [questions]="selectedOutbreak?.contactFollowUpTemplate"
+                    [skipRequired]="true"
+                ></app-form-fill-questionnaire>
 
-                <div class="stepper-wrapper">
+                <div class="stepper-navigation-buttons">
                     <button mat-raised-button type="button" matStepperPrevious>
                         {{'LNG_STEPPER_BUTTON_BACK' | translate}}
                     </button>
@@ -167,15 +170,25 @@
                         *ngFor="let variable of Object.keys(currentDirtyFields.questionnaireAnswers)"
                         fxLayout="row" fxLayoutGap="15px"
                     >
-                        <span>{{variable}}:</span>
-                        <span>{{currentDirtyFields.questionnaireAnswers[variable]}}</span>
+                        <div>{{variable}}: </div>
+                        <div
+                            fxFlex>
+                            <div
+                                *ngFor="let answerData of currentDirtyFields.questionnaireAnswers[variable]"
+                                fxLayout="row" fxLayoutGap="15px"
+                            >
+                                <span
+                                    *ngIf="answerData.date">{{answerData.date | dateDefault}} :</span>
+                                <span>{{answerData.value}}</span>
+                            </div>
+                        </div>
                     </div>
                 </ng-container>
             </mat-card>
 
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
 
-            <div class="stepper-wrapper">
+            <div class="stepper-navigation-buttons">
                 <button mat-raised-button type="button" matStepperPrevious>
                     {{'LNG_STEPPER_BUTTON_BACK' | translate}}
                 </button>

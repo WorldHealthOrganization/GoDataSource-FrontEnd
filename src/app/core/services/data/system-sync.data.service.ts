@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { SystemSyncModel } from '../../models/system-sync.model';
 
@@ -12,7 +12,8 @@ export class SystemSyncDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {}
+    ) {
+    }
 
     /**
      * Start sync process

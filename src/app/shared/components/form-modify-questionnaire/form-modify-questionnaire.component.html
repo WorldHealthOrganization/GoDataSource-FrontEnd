@@ -8,12 +8,15 @@
 <!-- Display Table -->
 <div
     *ngIf="!loadingData"
-    class="modify-questionnaire-table">
+    class="modify-questionnaire-table"
+    fxLayout="column"
+>
     <!-- Question list general actions -->
     <div
         *ngIf="hasWriteAccess()"
-        fxFlex fxLayout="row" fxLayoutAlign="end"
-        class="modify-questionnaire-table-question-actions-top">
+        fxLayout="row" fxLayoutAlign="end"
+        class="modify-questionnaire-table-question-actions-top"
+    >
         <button
             type="button"
             mat-flat-button color="accent"
@@ -58,9 +61,7 @@
     </div>
 
     <!-- Question list headers -->
-    <div
-        fxFlex fxLayout="row">
-
+    <div fxLayout="row">
         <!-- Question Order -->
         <div
             fxFlex="70px"
@@ -96,6 +97,13 @@
             {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate }}
         </div>
 
+        <!-- Answer Display -->
+        <div
+            fxFlex="200px"
+            class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
+            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY' | translate }}
+        </div>
+
         <!-- Inactive ? -->
         <div
             fxFlex="100px"
@@ -109,12 +117,18 @@
             class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
             {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate }}
         </div>
+
+        <!-- Multi answer ? -->
+        <div
+            *ngIf="!displayChangeButton"
+            fxFlex="120px"
+            class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
+            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER' | translate }}
+        </div>
     </div>
 
     <!-- Question Data -->
-    <div
-        fxFlex fxLayout="column">
-
+    <div fxLayout="column">
         <!-- Hover question effects / actions -->
         <app-hover-row-actions
             #hoverRowQuestion
@@ -125,14 +139,16 @@
         <div
             *ngFor="let question of questionnaireData; let questionIndex = index"
             [class.question-in-edit-mode]="questionIndex === questionIndexInEditMode"
+            fxLayout="column"
             app-hover-row-actions
             [hoverRowActionsComponent]="hoverRowQuestion"
             [hoverRowActions]="questionActions"
-            [hoverRowActionData]="questionIndex">
+            [hoverRowActionData]="questionIndex"
+        >
 
             <!-- Question Row Data -->
             <div
-                fxFlex fxLayout="row"
+                fxLayout="row"
                 [class.question-in-edit-row]="questionIndex === questionIndexInEditMode"
                 [class.question-is-inactive]="questionIndex === questionIndexInEditMode ? questionInEditModeClone.inactive : question.inactive">
                 <!-- Order -->
@@ -170,6 +186,13 @@
                     {{ question.answerType | translate }}
                 </div>
 
+                <!-- Answers Display -->
+                <div
+                    fxFlex="200px"
+                    class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
+                    {{ question.answersDisplay | translate }}
+                </div>
+
                 <!-- Inactive ? -->
                 <div
                     fxFlex="100px"
@@ -183,17 +206,28 @@
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
                     {{ (question.required ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
                 </div>
+
+                <!-- Multi answer ? -->
+                <div
+                    *ngIf="!displayChangeButton"
+                    fxFlex="120px"
+                    class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
+                    {{ (question.multiAnswer ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
+                </div>
             </div>
 
             <!-- Question Edit Mode -->
             <div
                 *ngIf="questionIndex === questionIndexInEditMode"
                 class="modify-questionnaire-edit-question"
-                [id]="uniqueIDQuestion">
+                [id]="uniqueIDQuestion"
+                fxLayout="column"
+            >
                 <!-- Question Actions -->
                 <div
-                    fxFlex fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px"
-                    class="modify-questionnaire-edit-question-card-buttons">
+                    fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px"
+                    class="modify-questionnaire-edit-question-card-buttons"
+                >
                     <button
                         type="button"
                         mat-raised-button
@@ -219,8 +253,10 @@
                     <form
                         #questionForm="ngForm"
                         [id]="uniqueIDQuestionForm"
+                        class="modify-questionnaire-form"
                         fxFlex fxLayout="column"
-                        (submit)="saveModifyQuestion()">
+                        (submit)="saveModifyQuestion()"
+                    >
                         <!-- Dummy field used to make form dirty -->
                         <input
                             #inputQuestionForMakingFormDirty="ngModel"
@@ -230,7 +266,7 @@
 
                         <!-- Question Inputs -->
                         <div
-                            fxLayout="row"
+                            fxLayout="row wrap"
                             fxLayoutGap="5px">
                             <!-- question order -->
                             <div
@@ -308,6 +344,20 @@
                                 </app-form-select>
                             </div>
 
+                            <!-- question - answers display -->
+                            <div
+                                fxFlex="200px">
+                                <app-form-select
+                                    name="questionAnswersDisplay"
+                                    [(ngModel)]="questionInEditModeClone.answersDisplay"
+                                    [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY' | translate"
+                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY_DESCRIPTION"
+                                    [required]="true"
+                                    [clearable]="false"
+                                    [options]="answersDisplayInstantList">
+                                </app-form-select>
+                            </div>
+
                             <!-- question inactive -->
                             <div
                                 fxFlex="150px">
@@ -315,7 +365,8 @@
                                     name="questionInactive"
                                     [(ngModel)]="questionInEditModeClone.inactive"
                                     [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE' | translate"
-                                    [required]="false">
+                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE_DESCRIPTION"
+                                    required="false">
                                 </app-form-slide-toggle>
                             </div>
 
@@ -326,7 +377,21 @@
                                     name="questionRequired"
                                     [(ngModel)]="questionInEditModeClone.required"
                                     [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate"
-                                    [required]="false">
+                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED_DESCRIPTION"
+                                    required="false">
+                                </app-form-slide-toggle>
+                            </div>
+
+                            <!-- question multi answer -->
+                            <div
+                                *ngIf="!displayChangeButton"
+                                fxFlex="150px">
+                                <app-form-slide-toggle
+                                    name="questionMultiAnswer"
+                                    [(ngModel)]="questionInEditModeClone.multiAnswer"
+                                    [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER' | translate"
+                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER_DESCRIPTION"
+                                    required="false">
                                 </app-form-slide-toggle>
                             </div>
                         </div>
@@ -334,11 +399,11 @@
                         <!-- question answers -->
                         <div
                             *ngIf="questionInEditModeClone.answerType === answerTypes.MULTIPLE_OPTIONS.value || questionInEditModeClone.answerType === answerTypes.SINGLE_SELECTION.value"
-                            fxFlex fxLayout="column">
+                            fxLayout="column">
                             <!-- Answers list general actions -->
                             <div
                                 *ngIf="hasWriteAccess()"
-                                fxFlex fxLayout="row" fxLayoutAlign="end"
+                                fxLayout="row" fxLayoutAlign="end"
                                 class="modify-questionnaire-table-answer-actions-top">
                                 <button
                                     type="button"
@@ -384,8 +449,7 @@
                             </div>
 
                             <!-- Answer Headers -->
-                            <div
-                                fxFlex fxLayout="row">
+                            <div fxLayout="row">
                                 <!-- Answer Order -->
                                 <div
                                     fxFlex="70px"
@@ -432,14 +496,16 @@
                             <div
                                 *ngFor="let answer of questionInEditModeClone.answers; let answerIndex = index"
                                 [class.answer-in-edit-mode]="answerIndex === questionAnswerIndexInEditMode"
+                                fxLayout="column"
                                 app-hover-row-actions
                                 [hoverRowActionsComponent]="hoverRowAnswers"
                                 [hoverRowActions]="answerActions"
-                                [hoverRowActionData]="answerIndex">
+                                [hoverRowActionData]="answerIndex"
+                            >
 
                                 <!-- Answer Row Data -->
                                 <div
-                                    fxFlex fxLayout="row"
+                                    fxLayout="row"
                                     [class.answer-in-edit-row]="answerIndex === questionAnswerIndexInEditMode">
                                     <!-- Order -->
                                     <div
@@ -481,10 +547,12 @@
                                 <div
                                     *ngIf="answerIndex === questionAnswerIndexInEditMode"
                                     class="modify-questionnaire-edit-answer"
-                                    [id]="uniqueIDAnswer">
+                                    [id]="uniqueIDAnswer"
+                                    fxLayout="column"
+                                >
                                     <!-- Answer buttons -->
                                     <div
-                                        fxFlex fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px"
+                                        fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px"
                                         class="modify-questionnaire-edit-question-answer-card-buttons">
                                         <button
                                             type="button"
@@ -506,10 +574,13 @@
 
                                     <!-- Answer Data -->
                                     <mat-card
-                                        class="modify-questionnaire-edit-question-answer-card">
+                                        class="modify-questionnaire-edit-question-answer-card"
+                                        fxLayout="row"
+                                    >
                                         <!-- Answer Form -->
                                         <form
                                             #answerForm="ngForm"
+                                            class="modify-questionnaire-form"
                                             [id]="uniqueIDAnswerForm"
                                             fxFlex fxLayout="column"
                                             (submit)="updateAnswerData()">
@@ -522,7 +593,7 @@
 
                                             <!-- Edit Answer Form -->
                                             <div
-                                                fxLayout="row"
+                                                fxLayout="row wrap"
                                                 fxLayoutGap="5px">
                                                 <!-- answer order -->
                                                 <div
@@ -534,8 +605,7 @@
                                                         [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ORDER' | translate"
                                                         tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ORDER_DESCRIPTION"
                                                         [required]="false"
-                                                        (optionChanged)="setOrderValue(questionAnswerInEditModeClone, $event)"
-                                                        [disabled]="childQuestionIsInEditMode">
+                                                        (optionChanged)="setOrderValue(questionAnswerInEditModeClone, $event)">
                                                     </app-form-input>
                                                 </div>
 
@@ -548,8 +618,7 @@
                                                         [(ngModel)]="questionAnswerInEditModeClone.label"
                                                         [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL' | translate"
                                                         tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL_DESCRIPTION"
-                                                        required="true"
-                                                        [disabled]="childQuestionIsInEditMode">
+                                                        required="true">
                                                     </app-form-input>
                                                 </div>
 
@@ -562,7 +631,10 @@
                                                         [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE' | translate"
                                                         tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE_DESCRIPTION"
                                                         required="true"
-                                                        [disabled]="childQuestionIsInEditMode">
+                                                        app-has-property-validator
+                                                        [checkObject]="getCheckAnswerDuplicates(questionInEditModeClone.answers)"
+                                                        checkErrorMsg="LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_ANSWER_VALUE"
+                                                        [checkCompareValue]="questionAnswerIndexInEditMode">
                                                     </app-form-input>
                                                 </div>
 
@@ -573,6 +645,7 @@
                                                         name="answerAdditionalQuestionsShow"
                                                         [(ngModel)]="questionAnswerInEditModeClone.additionalQuestionsShow"
                                                         [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS' | translate"
+                                                        tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS_DESCRIPTION"
                                                         required="false"
                                                         [disabled]="childQuestionIsInEditMode">
                                                     </app-form-slide-toggle>
@@ -585,8 +658,8 @@
                                                         name="answerAlert"
                                                         [(ngModel)]="questionAnswerInEditModeClone.alert"
                                                         [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT' | translate"
-                                                        required="false"
-                                                        [disabled]="childQuestionIsInEditMode">
+                                                        tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT_DESCRIPTION"
+                                                        required="false">
                                                     </app-form-slide-toggle>
                                                 </div>
                                             </div>
@@ -600,7 +673,8 @@
                                                 (questionEditModeChanged)="questionEditModeChangedHandler($event)"
                                                 [extraQuestionVariables]="questionVariables"
                                                 [allowQuestionVariableChange]="allowQuestionVariableChange"
-                                                [cleanQuestionAndAnswerFlagsOnSave]="false">
+                                                [cleanQuestionAndAnswerFlagsOnSave]="false"
+                                                [refreshLanguageTokens]="false">
                                             </app-form-modify-questionnaire>
                                         </form>
                                     </mat-card>
@@ -610,7 +684,7 @@
                             <!-- Answers list general actions -->
                             <div
                                 *ngIf="hasWriteAccess()"
-                                fxFlex fxLayout="row" fxLayoutAlign="end"
+                                fxLayout="row" fxLayoutAlign="end"
                                 class="modify-questionnaire-table-answer-actions-bottom">
                                 <button
                                     type="button"
@@ -664,7 +738,7 @@
     <!-- Question list general actions -->
     <div
         *ngIf="hasWriteAccess()"
-        fxFlex fxLayout="row" fxLayoutAlign="end"
+        fxLayout="row" fxLayoutAlign="end"
         class="modify-questionnaire-table-question-actions-bottom">
         <button
             type="button"

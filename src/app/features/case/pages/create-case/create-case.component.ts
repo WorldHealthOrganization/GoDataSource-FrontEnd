@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -10,7 +9,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
@@ -24,6 +23,8 @@ import { EntityModel } from '../../../../core/models/entity.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-create-case',
@@ -59,7 +60,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
         mask: string
     };
 
-    caseIdMaskValidator: Observable<boolean>;
+    caseIdMaskValidator: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
     constructor(
         private router: Router,
@@ -119,7 +120,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                 this.caseData.visualId = this.visualIDTranslateData.mask;
 
                 // set visual ID validator
-                this.caseIdMaskValidator = Observable.create((observer) => {
+                this.caseIdMaskValidator = new Observable((observer) => {
                     this.caseDataService.checkCaseVisualIDValidity(
                         this.selectedOutbreak.id,
                         this.visualIDTranslateData.mask,
@@ -177,31 +178,35 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.caseDataService
                 .findDuplicates(this.selectedOutbreak.id, dirtyFields)
-                .catch((err) => {
-                    if (_.includes(_.get(err, 'details.codes.id'), `uniqueness`)) {
-                        this.snackbarService.showError('LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID');
-                    } else {
-                        this.snackbarService.showApiError(err);
-                    }
+                .pipe(
+                    catchError((err) => {
+                        if (_.includes(_.get(err, 'details.codes.id'), `uniqueness`)) {
+                            this.snackbarService.showError('LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID');
+                        } else {
+                            this.snackbarService.showApiError(err);
+                        }
 
-                    // hide dialog
-                    loadingDialog.close();
+                        // hide dialog
+                        loadingDialog.close();
 
-                    return ErrorObservable.create(err);
-                })
+                        return throwError(err);
+                    })
+                )
                 .subscribe((caseDuplicates: EntityDuplicatesModel) => {
                     // add the new Case
                     const runCreateCase = () => {
                         this.caseDataService
                             .createCase(this.selectedOutbreak.id, dirtyFields)
-                            .catch((err) => {
-                                this.snackbarService.showApiError(err);
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showApiError(err);
 
-                                // hide dialog
-                                loadingDialog.close();
+                                    // hide dialog
+                                    loadingDialog.close();
 
-                                return ErrorObservable.create(err);
-                            })
+                                    return throwError(err);
+                                })
+                            )
                             .subscribe((newCase: CaseModel) => {
                                 this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
 
@@ -225,7 +230,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                             // add link
                             possibleDuplicates.push(new DialogField({
                                 name: 'link',
-                                placeholder: (index + 1 ) + '. ' + EntityModel.getNameWithDOBAge(
+                                placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
                                     caseData,
                                     this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
                                     this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
@@ -242,14 +247,14 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                             customInput: true,
                             fieldsList: possibleDuplicates,
                         }))
-                        .subscribe((answer) => {
-                            if (answer.button === DialogAnswerButton.Yes) {
-                                runCreateCase();
-                            } else {
-                                // hide dialog
-                                loadingDialog.close();
-                            }
-                        });
+                            .subscribe((answer) => {
+                                if (answer.button === DialogAnswerButton.Yes) {
+                                    runCreateCase();
+                                } else {
+                                    // hide dialog
+                                    loadingDialog.close();
+                                }
+                            });
                     } else {
                         runCreateCase();
                     }

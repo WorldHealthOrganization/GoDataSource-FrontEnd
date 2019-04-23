@@ -1,16 +1,16 @@
 # Go.Data - Front End application
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.4, using Angular v5.2.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.7, using Angular v7.2.11.
 
 ## Installation (Development Environment)
 
 ### Pre-Requisites
-    
-Install latest LTS versions of Node.js and npm on your machine (https://nodejs.org/download/).
 
-- Current Node.js version for development: 8.12.0
+Install latest LTS versions of Node.js v10.x and compatible npm on your machine (https://nodejs.org/download/).
+
+- Current Node.js version for development: 10.x
 - Current npm version for development: 6.4.1
-    
+
 Install git on your machine
 - For Ubuntu:
 
@@ -18,29 +18,29 @@ Install git on your machine
    sudo apt-get update
    sudo apt-get install git
    ```
-    
+
 ### Installation steps
-    
+
 Get the code from GitHub
-    
+
     git clone https://bitbucket.org/clarisoft-technologies/go.data-front-end.git
 
 Install 3rd-party packages
-    
+
     npm install
-    
+
 ### Running with dev environment
-    
+
 Configure the application for dev environment
 
     cp src/environments/environment.ts.default src/environments/environment.ts
-    
+
 Update src/environments/environment.ts as necessary  
-    	
+
 Run the application (it will start on port 4550; you can change this from the package.json file)
-    
+
     npm start
-    	
+
 Open your browser on: http://localhost:4550
 
 ### Running with production environment
@@ -48,25 +48,25 @@ Open your browser on: http://localhost:4550
 Configure the application for production environment
 
     cp src/environments/environment.ts.default src/environments/environment.prod.ts
-    
+
 Update src/environments/environment.prod.ts as necessary  
-    	
+
 Create the production build
-    
+
     npm run build
-    
+
 Note: If you get an error related to memory usage, create the production build as following
 
     npm run build-high-memory
-    	
+
 This build will be served by the API. Check API documentation to get the path where the frontend build should be placed. 
-    
+
 ## Development
-    
+
 Use the IDE of your choice (Webstorm recommended).
-    
+
 ### Development cycle
-    
+
 1. Nobody can directly PUSH into master
 2. Every code change will be done in a separate branch and a Pull Request (PR) will be created for merging the code into master
     - Create a new branch from latest version of master. Use the OTPM/Jira activity ID for branch name (e.g. "```385484```")
@@ -87,11 +87,11 @@ Use the IDE of your choice (Webstorm recommended).
 Run the following command to check if the unit tests are passing:
 
     npm run test
-    
+
 If you want to debug or run the unit tests one by one, run the following command and use Chrome browser and Developer Tools for debugging (as usual):
 
     npm run test-debug
-     
+
 ### Managing Language Translations
 
 1. Go.Data supports multiple languages, the base language being English-US.
@@ -104,3 +104,10 @@ If you want to debug or run the unit tests one by one, run the following command
 7. **Before defining new Language Tokens in "english_us.ts" file, verify that there isn't already existing a similar token in the API language file (see item #4 from above), and that you are following the pattern.**. 
    - Note that all the Language Tokens are grouped based on some criterias (scope, page).
 8. If you want to remove a Language Token that is not being used (anymore), just add a comment in "english_us.ts" and it will be taken into account when merging the file with the API translations (see item #6 from above).
+
+### Known issues
+
+1. **numbro** npm package must be limited to version **2.1.1** in **package.json** file. It is a dependency of **handsontable** npm package which, by default, installs a newer version which triggers an error in production environment when using cells of type Number (e.g. age Years/Months):
+```
+Uncaught RangeError: toFixed() digits argument must be between 0 and 100
+``` 

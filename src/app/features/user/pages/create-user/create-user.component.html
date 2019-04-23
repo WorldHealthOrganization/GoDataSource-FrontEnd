@@ -14,7 +14,7 @@
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="firstName"
                                 [(ngModel)]="newUser.firstName"
@@ -54,7 +54,7 @@
                             </app-form-select>
                         </div>
 
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-select
                                 *ngIf="hasOutbreakReadAccess()"
                                 name="outbreakIds"
@@ -88,7 +88,7 @@
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 type="password"
                                 name="password"
@@ -116,7 +116,7 @@
                     </div>
                 </mat-card>
 
-                <div class="stepper-wrapper">
+                <div class="stepper-navigation-buttons">
                     <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
@@ -129,7 +129,7 @@
 
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
 
-            <div class="stepper-wrapper">
+            <div class="stepper-navigation-buttons">
                 <button mat-raised-button type="button" matStepperPrevious>
                     {{'LNG_STEPPER_BUTTON_BACK' | translate}}
                 </button>

@@ -10,14 +10,15 @@
 
         <!-- Relationships step -->
         <mat-step [stepControl]="relationshipsForm">
-            <form #relationshipsForm="ngForm">
+            <form #relationshipsForm="ngForm" fxLayout="column">
                 <ng-template matStepLabel>
                     {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_TAB_RELATIONSHIPS' | translate}}
                 </ng-template>
 
                 <div
                     *ngFor="let person of selectedEntities; let ind = index"
-                    fxFlex fxLayout="row" fxLayoutAlign="start center">
+                    fxLayout="row" fxLayoutAlign="start center"
+                >
                     <mat-card
                         fxFlex
                         class="page-section">
@@ -39,8 +40,14 @@
                             required="true"
                             [displayCopyField]="true"
                             [displayCopyFieldDescription]="'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_COPY_BUTTON_TITLE' | translate"
-                            (copyValue)="copyValueToEmptyFields($event, relationships[ind], relationshipsForm)">
-                        </app-form-relationship>
+                            (copyValue)="copyValueToEmptyFields($event, relationships[ind], relationshipsForm)"
+                            [certaintyLevelOptions$]="certaintyLevelOptions$"
+                            [exposureTypeOptions$]="exposureTypeOptions$"
+                            [exposureFrequencyOptions$]="exposureFrequencyOptions$"
+                            [exposureDurationOptions$]="exposureDurationOptions$"
+                            [socialRelationshipOptions$]="socialRelationshipOptions$"
+                            [clusterOptions$]="clusterOptions$"
+                        ></app-form-relationship>
                     </mat-card>
 
                     <div
@@ -55,7 +62,7 @@
                     </div>
                 </div>
 
-                <div class="stepper-wrapper">
+                <div class="stepper-navigation-buttons">
                     <button mat-raised-button color="accent" matStepperNext>
                         {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
                     </button>
@@ -67,7 +74,7 @@
         <mat-step>
             <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}</ng-template>
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
-            <div class="stepper-wrapper">
+            <div class="stepper-navigation-buttons">
                 <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                 <button type="button" mat-raised-button color="accent" (click)="createNewRelationship(relationshipsForm)">
                     {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON' | translate}}

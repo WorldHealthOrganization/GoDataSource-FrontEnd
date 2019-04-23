@@ -16,8 +16,7 @@
                 <!-- Personal Details section -->
                 <mat-card class="page-section">
                     <div fxLayout="column">
-
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="firstName"
                                 [(ngModel)]="contactData.firstName"
@@ -113,7 +112,6 @@
                             <div fxFlex><!-- placeholder --></div>
                             <div fxFlex><!-- placeholder --></div>
                         </div>
-
                     </div>
                 </mat-card>
 
@@ -127,7 +125,7 @@
                     [required]="true">
                 </app-form-document-list>
 
-                <div class="stepper-wrapper">
+                <div class="stepper-navigation-buttons">
                     <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
@@ -146,7 +144,7 @@
                     [required]="true">
                 </app-form-address-list>
 
-                <div class="stepper-wrapper">
+                <div class="stepper-navigation-buttons">
                     <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                     <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
@@ -169,7 +167,7 @@
                     </app-form-relationship>
                 </mat-card>
 
-                <div class="stepper-wrapper">
+                <div class="stepper-navigation-buttons">
                     <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                     <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
@@ -184,7 +182,7 @@
 
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
 
-            <div class="stepper-wrapper">
+            <div class="stepper-navigation-buttons">
                 <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                 <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent"
                         (click)="createNewContact([personalForm, addressForm, relationshipForm])">

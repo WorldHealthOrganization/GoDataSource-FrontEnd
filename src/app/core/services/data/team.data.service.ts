@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import 'rxjs/add/operator/mergeMap';
+
 import { TeamModel } from '../../models/team.model';
 
 @Injectable()
@@ -12,7 +12,8 @@ export class TeamDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {}
+    ) {
+    }
 
     /**
      * Retrieve the list of Teams
@@ -80,7 +81,7 @@ export class TeamDataService {
      * @param data
      * @returns {Observable<TeamModel>}
      */
-     modifyTeam(teamId: string, data: any): Observable<TeamModel> {
+    modifyTeam(teamId: string, data: any): Observable<TeamModel> {
         return this.modelHelper.mapObservableToModel(
             this.http.patch(`teams/${teamId}`, data),
             TeamModel
@@ -92,7 +93,7 @@ export class TeamDataService {
      * @param {string} teamId
      * @returns {Observable<any>}
      */
-     deleteTeam(teamId: string): Observable<any> {
+    deleteTeam(teamId: string): Observable<any> {
         return this.http.delete(`teams/${teamId}`);
     }
 

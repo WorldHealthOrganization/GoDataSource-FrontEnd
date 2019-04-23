@@ -12,12 +12,13 @@ import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SystemSyncDataService } from '../../../../core/services/data/system-sync.data.service';
 import { SystemSyncModel } from '../../../../core/models/system-sync.model';
 import { SystemSyncLogDataService } from '../../../../core/services/data/system-sync-log.data.service';
 import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.model';
 import { Constants } from '../../../../core/models/constants';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-upstream-servers-list',
@@ -158,10 +159,12 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.systemSettingsDataService
                         .getSystemSettings()
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showError(err.message);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe((settings: SystemSettingsModel) => {
                             // remove upstream server
                             const upIndex: number = _.findIndex(settings.upstreamServers, { url: upstreamServer.url });
@@ -174,10 +177,12 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
                                     .modifySystemSettings({
                                         upstreamServers: settings.upstreamServers
                                     })
-                                    .catch((err) => {
-                                        this.snackbarService.showApiError(err);
-                                        return ErrorObservable.create(err);
-                                    })
+                                    .pipe(
+                                        catchError((err) => {
+                                            this.snackbarService.showApiError(err);
+                                            return throwError(err);
+                                        })
+                                    )
                                     .subscribe(() => {
                                         // display success message
                                         this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SUCCESS_MESSAGE');
@@ -206,10 +211,12 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
         // save sync
         this.systemSettingsDataService
             .getSystemSettings()
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                return ErrorObservable.create(err);
-            })
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    return throwError(err);
+                })
+            )
             .subscribe((settings: SystemSettingsModel) => {
                 // upstream server
                 const upstreamItem: SystemUpstreamServerModel = _.find(settings.upstreamServers, { url: upstreamServer.url });
@@ -222,10 +229,12 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
                         .modifySystemSettings({
                             upstreamServers: settings.upstreamServers
                         })
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             // display success message
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_TOGGLE_SYNC_ENABLED_SUCCESS_MESSAGE');
@@ -250,11 +259,13 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
                     // check if backup is ready
                     this.systemSyncLogDataService
                         .getSyncLog(syncLogId)
-                        .catch((err) => {
-                            this.loading = false;
-                            this.snackbarService.showApiError(err);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.loading = false;
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe((systemSyncLogModel: SystemSyncLogModel) => {
                             switch (systemSyncLogModel.status) {
                                 // sync ready ?
@@ -291,11 +302,13 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
                     this.loading = true;
                     this.systemSyncDataService
                         .sync(upstreamServer.url)
-                        .catch((err) => {
-                            this.loading = false;
-                            this.snackbarService.showApiError(err);
-                            return ErrorObservable.create(err);
-                        })
+                        .pipe(
+                            catchError((err) => {
+                                this.loading = false;
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe((result: SystemSyncModel) => {
                             syncCheckIfDone(result.syncLogId);
                         });

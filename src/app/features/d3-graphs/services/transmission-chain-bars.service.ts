@@ -5,6 +5,8 @@ import * as _ from 'lodash';
 import { Constants } from '../../../core/models/constants';
 import { TransmissionChainBarsModel } from '../typings/transmission-chain-bars.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
+import { CaseBarModel } from '../typings/case-bar.model';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class TransmissionChainBarsService {
@@ -16,8 +18,8 @@ export class TransmissionChainBarsService {
     private marginBetween = 7;
     // date cell width (first column)
     private dateCellWidth = 120;
-    // case visual ID cell height (first row)
-    private visualIdCellHeight = 80;
+    // case details cell height (first row)
+    private caseDetailsCellHeight = 100;
 
     // keeping this config centralized in case we need to make the graph configurable by the user
     private graphConfig = {
@@ -26,7 +28,9 @@ export class TransmissionChainBarsService {
         labResultColor: 'darkred',
         labResultTextColor: 'white',
         dateOfOnsetColor: 'white',
-        dateOfOnsetTextColor: 'black'
+        dateOfOnsetTextColor: 'black',
+        // opacity for cells that are before date of onset
+        beforeDateOfOnsetOpacity: 0.35
     };
 
     // data used to draw the graph
@@ -52,7 +56,8 @@ export class TransmissionChainBarsService {
     private translationsMap = {};
 
     constructor(
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private router: Router
     ) {
     }
 
@@ -109,18 +114,18 @@ export class TransmissionChainBarsService {
             .attr('width', this.dateCellWidth)
             .attr('height', '100%');
 
-        // draw the first cell (placeholder for dates column and visual IDs row)
+        // draw the first cell (placeholder for visual IDs and full names rows)
         this.graphDatesContainer.append('rect')
             .attr('fill', 'transparent')
             .attr('width', this.dateCellWidth)
-            .attr('height', this.visualIdCellHeight);
+            .attr('height', this.caseDetailsCellHeight);
 
         // draw each date
         Object.keys(this.datesMap).forEach((dayDate, index) => {
             // set position (top-left corner)
             const dateContainer = this.graphDatesContainer.append('svg')
                 .attr('x', 0)
-                .attr('y', this.visualIdCellHeight + index * this.cellHeight);
+                .attr('y', this.caseDetailsCellHeight + index * this.cellHeight);
 
             const dateGroup = dateContainer.append('g');
             dateGroup.append('rect')
@@ -141,8 +146,8 @@ export class TransmissionChainBarsService {
      */
     private drawCases() {
         // determine graph width based on the number of cases
-        // cases-no * (margin-between-cases + case-cell-width)
-        const casesGraphWidth = this.graphData.casesOrder.length * (this.marginBetween + this.cellWidth);
+        // cases-no * (margin-between-cases + case-cell-width) + placeholder-for-overflowing-name-or-visual-id
+        const casesGraphWidth = this.graphData.casesOrder.length * (this.marginBetween + this.cellWidth) + 20;
 
         // create cases container
         this.graphCasesContainer = this.graphContainer.append('div')
@@ -166,7 +171,11 @@ export class TransmissionChainBarsService {
      * Draw a case block
      */
     private drawCase(caseId) {
-        const caseData = this.graphData.casesMap[caseId];
+        // keep case data for later use
+        const caseData = this.graphData.casesMap[caseId] as CaseBarModel;
+        // keep date of onset for later use
+        const dateOfOnsetMoment = moment(caseData.dateOfOnset);
+        const dateOfOnset = dateOfOnsetMoment.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
         if (!caseData) {
             return;
@@ -185,16 +194,33 @@ export class TransmissionChainBarsService {
             .attr('x', caseColumnIdx * (this.marginBetween + this.cellWidth))
             .attr('y', 0);
 
-        // draw the visual ID cell
-        const visualIdGroup = caseColumnContainer.append('g')
-            .attr('transform', 'rotate(-58, 25, 40)');
-        visualIdGroup.append('text')
-            .text(caseData.visualId)
+        // draw the case details cell
+        const caseDetailsGroup = caseColumnContainer.append('g')
+            .attr('transform', `translate(-6 0) rotate(-54, ${this.cellWidth / 2}, ${this.caseDetailsCellHeight / 2})`)
+            .attr('class', 'case-info-header');
+        // case full name
+        caseDetailsGroup.append('text')
+            .text(`${caseData.firstName} ${caseData.lastName}`)
             .attr('fill', 'black')
             .attr('font-size', '12px')
             .attr('alignment-baseline', 'central')
             // center the text vertically
-            .attr('y', this.visualIdCellHeight / 2);
+            .attr('y', this.caseDetailsCellHeight / 2);
+        // case visual ID
+        caseDetailsGroup.append('text')
+            .text(caseData.visualId)
+            // .attr('class', 'case-info-header')
+            .attr('fill', 'black')
+            .attr('font-size', '12px')
+            .attr('alignment-baseline', 'central')
+            // center the text vertically and add extra 15px to display it on the next row
+            .attr('y', this.caseDetailsCellHeight / 2 + 15);
+
+        // register onclick event to navigate to case page when user clicks on Visual ID or Full Name
+        const redirectToCasePage = (targetCaseId: string) => {
+            this.router.navigate(['cases', targetCaseId, 'view']);
+        };
+        caseDetailsGroup.on('click', () => { redirectToCasePage(caseData.id); });
 
         /**
          * draw the case isolation cells
@@ -204,19 +230,26 @@ export class TransmissionChainBarsService {
             let isolationLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_ISOLATED_CASE_LABEL');
             if (isolation.typeId === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_HOSPITALIZATION') {
                 isolationLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_CASE_LABEL');
+            } else if (isolation.typeId === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_HOSPITALIZATION_FOR_OTHER_MEDICAL_CONDITIONS') {
+                isolationLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_FOR_OTHER_CONDITIONS_CASE_LABEL');
             }
 
             // draw a cell for each isolation date
             isolationDates.forEach((isolationDate) => {
+                // check if date is before date of onset
+                const opacity = (moment(isolationDate).isBefore(dateOfOnsetMoment)) ? this.graphConfig.beforeDateOfOnsetOpacity : 1;
+
                 const isolationGroup = caseColumnContainer.append('g')
-                    .attr('transform', `translate(0, ${this.visualIdCellHeight + (this.datesMap[isolationDate] * this.cellHeight)})`);
+                    .attr('transform', `translate(0, ${this.caseDetailsCellHeight + (this.datesMap[isolationDate] * this.cellHeight)})`);
                 isolationGroup.append('rect')
                     .attr('width', this.cellWidth)
                     .attr('height', this.cellHeight)
-                    .attr('fill', this.graphConfig.isolationColor);
+                    .attr('fill', this.graphConfig.isolationColor)
+                    .attr('fill-opacity', opacity);
                 isolationGroup.append('text')
                     .text(isolationLabel)
                     .attr('fill', this.graphConfig.isolationTextColor)
+                    .attr('fill-opacity', opacity)
                     .attr('alignment-baseline', 'central')
                     .attr('text-anchor', 'middle')
                     // center the text
@@ -229,19 +262,25 @@ export class TransmissionChainBarsService {
          * draw the lab results cells
          */
         (caseData.labResults || []).forEach((labResult) => {
-            let result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_NEGATIVE_LABEL');
+            let result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_UNKNOWN_LABEL');
             if (labResult.result === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_POSITIVE') {
                 result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_POSITIVE_LABEL');
+            } else if (labResult.result === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_NEGATIVE') {
+                result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_NEGATIVE_LABEL');
             }
 
             const labResultDate = moment(labResult.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
+            // check if date is before date of onset
+            const opacity = (moment(labResultDate).isBefore(dateOfOnsetMoment)) ? this.graphConfig.beforeDateOfOnsetOpacity : 1;
+
             const labResultGroup = caseColumnContainer.append('g')
-                .attr('transform', `translate(0, ${this.visualIdCellHeight + (this.datesMap[labResultDate] * this.cellHeight)})`);
+                .attr('transform', `translate(0, ${this.caseDetailsCellHeight + (this.datesMap[labResultDate] * this.cellHeight)})`);
             labResultGroup.append('rect')
                 .attr('width', this.cellWidth)
                 .attr('height', this.cellHeight)
-                .attr('fill', this.graphConfig.labResultColor);
+                .attr('fill', this.graphConfig.labResultColor)
+                .attr('fill-opacity', opacity);
             labResultGroup.append('text')
                 .text(result)
                 .attr('fill', this.graphConfig.labResultTextColor)
@@ -256,9 +295,8 @@ export class TransmissionChainBarsService {
          * draw the date of onset cell
          */
         const dateOfOnsetLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_CASE_ONSET_LABEL');
-        const dateOfOnset = moment(caseData.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
         const dateOfOnsetGroup = caseColumnContainer.append('g')
-            .attr('transform', `translate(0, ${this.visualIdCellHeight + (this.datesMap[dateOfOnset] * this.cellHeight)})`);
+            .attr('transform', `translate(0, ${this.caseDetailsCellHeight + (this.datesMap[dateOfOnset] * this.cellHeight)})`);
         dateOfOnsetGroup.append('rect')
             .attr('width', this.cellWidth)
             .attr('height', this.cellHeight)
@@ -273,14 +311,13 @@ export class TransmissionChainBarsService {
             .attr('y', this.cellHeight / 2);
 
         // draw the case bar container (to show the border)
-        const caseDateOfOnset = moment(caseData.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
         const caseBar = caseColumnContainer.append('svg')
             .attr('class', 'case-bar')
             .attr('x', 0)
-            .attr('y', this.visualIdCellHeight + (this.datesMap[caseDateOfOnset] * this.cellHeight));
+            .attr('y', this.caseDetailsCellHeight + (this.datesMap[dateOfOnset] * this.cellHeight));
         caseBar.append('rect')
             .attr('width', this.cellWidth)
-            .attr('height', (moment(caseData.lastGraphDate).diff(moment(caseData.dateOfOnset), 'days') + 1) * this.cellHeight)
+            .attr('height', (moment(caseData.lastGraphDate).diff(dateOfOnsetMoment, 'days') + 1) * this.cellHeight)
             .attr('fill', 'transparent')
             .attr('stroke', 'black')
             .attr('stroke-width', '1')
@@ -372,13 +409,13 @@ export class TransmissionChainBarsService {
         // left or right?
         const leftOrRight = (sourceCaseColumnIdx < targetCaseColumnIdx) ? 1 : 0;
         const lineStartX = (sourceCaseColumnIdx * (this.marginBetween + this.cellWidth)) + (leftOrRight * this.cellWidth);
-        const lineStartY = this.visualIdCellHeight + (this.datesMap[sourceCaseFirstGraphDate] * this.cellHeight) + (this.cellHeight / 2);
+        const lineStartY = this.caseDetailsCellHeight + (this.datesMap[sourceCaseFirstGraphDate] * this.cellHeight) + (this.cellHeight / 2);
         // stop at the horizontal middle of the target case's bar
         const lineEndX = (targetCaseColumnIdx * (this.marginBetween + this.cellWidth)) + (this.cellWidth / 2);
         const lineEndY = lineStartY;
         // draw the arrow at the horizontal middle of the target case's bar, but touching the bar
         const arrowX = lineEndX;
-        const arrowY = this.visualIdCellHeight + (this.datesMap[targetCaseFirstGraphDate] * this.cellHeight);
+        const arrowY = this.caseDetailsCellHeight + (this.datesMap[targetCaseFirstGraphDate] * this.cellHeight);
 
         // draw the horizontal line from the source case to the target case
         this.graphCasesContainer.append('line')
@@ -414,7 +451,7 @@ export class TransmissionChainBarsService {
         const daysNo = Object.keys(this.datesMap).length;
 
         // visual-id-column-height + days-no * cell-height
-        return this.visualIdCellHeight + daysNo * this.cellHeight;
+        return this.caseDetailsCellHeight + daysNo * this.cellHeight;
     }
 
     /**

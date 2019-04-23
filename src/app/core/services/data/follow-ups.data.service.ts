@@ -1,18 +1,18 @@
 import * as _ from 'lodash';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { ContactFollowUpsModel } from '../../models/contact-follow-ups.model';
 import { FollowUpModel } from '../../models/follow-up.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { LocationDataService } from './location.data.service';
-import 'rxjs/add/operator/mergeMap';
 import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-contacts-lost-to-follow-up.model';
 import { MetricContactsModel } from '../../models/metrics/metric-contacts.model';
 import { MetricContactsWithSuccessfulFollowUp } from '../../models/metrics/metric.contacts-with-success-follow-up.model';
 import { TeamFollowupsPerDayModel } from '../../models/team-followups-per-day.model';
 import { RangeFollowUpsModel } from '../../models/range-follow-ups.model';
+import { map, mergeMap } from 'rxjs/operators';
 
 @Injectable()
 export class FollowUpsDataService {
@@ -21,7 +21,8 @@ export class FollowUpsDataService {
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private locationDataService: LocationDataService
-    ) {}
+    ) {
+    }
 
     /**
      * Generate followups for contacts
@@ -48,6 +49,8 @@ export class FollowUpsDataService {
     /**
      * Retrieve the list of FollowUps from an Outbreak
      * @param {string} outbreakId
+     * @param queryBuilder
+     * @param needsContactData
      * @returns {Observable<FollowUpModel[]>}
      */
     getFollowUpsList(
@@ -66,29 +69,34 @@ export class FollowUpsDataService {
         // retrieve locations
         return this.locationDataService
             .getLocationsList()
-            .mergeMap((locations) => {
-                // map names to id
-                const locationsMapped = _.groupBy(locations, 'id');
-                return this.modelHelper.mapObservableListToModel(
-                    this.http.get(`outbreaks/${outbreakId}/follow-ups?filter=${filter}`),
-                    FollowUpModel
-                ).map((followUps) => {
-                    return _.map(followUps, (followUp: FollowUpModel) => {
-                        // map location
-                        if (
-                            followUp.address &&
-                            followUp.address.locationId
-                        ) {
-                            followUp.address.location = locationsMapped[followUp.address.locationId] ?
-                                locationsMapped[followUp.address.locationId][0] :
-                                null;
-                        }
+            .pipe(
+                mergeMap((locations) => {
+                    // map names to id
+                    const locationsMapped = _.groupBy(locations, 'id');
+                    return this.modelHelper.mapObservableListToModel(
+                        this.http.get(`outbreaks/${outbreakId}/follow-ups?filter=${filter}`),
+                        FollowUpModel
+                    )
+                        .pipe(
+                            map((followUps) => {
+                                return _.map(followUps, (followUp: FollowUpModel) => {
+                                    // map location
+                                    if (
+                                        followUp.address &&
+                                        followUp.address.locationId
+                                    ) {
+                                        followUp.address.location = locationsMapped[followUp.address.locationId] ?
+                                            locationsMapped[followUp.address.locationId][0] :
+                                            null;
+                                    }
 
-                        // finished
-                        return followUp;
-                    });
-                });
-            });
+                                    // finished
+                                    return followUp;
+                                });
+                            })
+                        );
+                })
+            );
     }
 
     /**
@@ -109,12 +117,14 @@ export class FollowUpsDataService {
         // construct query
         const filter = qb.buildQuery();
 
-        // !!!IMPORTANT!!!
         // since include doesn't work in GET single follow-up item, we need to use get list or make two requests ( 1 for contact and 1 for follow-up which would be slower )
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups?filter=${filter}`),
             FollowUpModel
-        ).mergeMap(followUps => followUps);
+        )
+            .pipe(
+                map((followUps: FollowUpModel[]) => followUps.pop())
+            );
     }
 
     /**
@@ -182,7 +192,7 @@ export class FollowUpsDataService {
     /**
      * Get metrics for contacts on follow-up lists
      * @param {string} outbreakId
-     * @param {string} date
+     * @param queryBuilder
      * @returns {Observable<MetricContactsModel>}
      */
     getCountIdsOfContactsOnTheFollowUpList(
@@ -199,7 +209,7 @@ export class FollowUpsDataService {
     /**
      * Get metrics for contacts not seen
      * @param {string} outbreakId
-     * @param {number} daysNotSeen
+     * @param queryBuilder
      * @returns {Observable<MetricContactsModel>}
      */
     getCountIdsOfContactsNotSeen(
@@ -216,7 +226,7 @@ export class FollowUpsDataService {
     /**
      * Get the number of contacts who are lost to followup
      * @param outbreakId
-     * @param {string} date
+     * @param queryBuilder
      * @returns {Observable<Object>}
      */
     getNumberOfContactsWhoAreLostToFollowUp(
@@ -278,6 +288,7 @@ export class FollowUpsDataService {
     /**
      * Retrieve the list of FollowUps grouped by contacts from an Outbreak
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<FollowUpModel[]>}
      */
     getRangeFollowUpsList(
@@ -294,6 +305,7 @@ export class FollowUpsDataService {
     /**
      * Count groups => FollowUps grouped by contacts from an Outbreak
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<FollowUpModel[]>}
      */
     getRangeFollowUpsListCount(

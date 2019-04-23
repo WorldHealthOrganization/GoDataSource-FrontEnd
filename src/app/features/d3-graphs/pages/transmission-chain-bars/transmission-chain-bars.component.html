@@ -11,13 +11,33 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
-                    <ng-container>
-                        <button
-                            mat-menu-item
-                            (click)="exportChain()">
-                            {{'LNG_PAGE_TRANSMISSION_CHAIN_BARS_EXPORT_CHAIN' | translate}}
-                        </button>
-                    </ng-container>
+                    <button
+                        mat-menu-item
+                        [disabled]="x86Architecture"
+                        (click)="exportChain()">
+                        {{'LNG_PAGE_TRANSMISSION_CHAIN_BARS_EXPORT_CHAIN' | translate}}
+                    </button>
+
+                    <mat-divider></mat-divider>
+
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/transmission-chains']">
+                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL' | translate}}
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/transmission-chains', 'list']">
+                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LIST_LABEL' | translate}}
+                    </button>
+
+                    <button
+                        *ngIf="hasCaseReadAccess()"
+                        mat-menu-item
+                        [routerLink]="['/transmission-chains', 'case-count-map']">
+                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_COUNT_MAP_LABEL' | translate}}
+                    </button>
                 </mat-menu>
 
             </div>
@@ -46,11 +66,13 @@
                 <div fxFlex fxLayout="column" fxLayoutGap="10px">
                     <div>{{ 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate }}</div>
 
-                    <app-form-daterange
-                        name="dateOfOnset"
-                        [ngModel]="filters.dateOfOnset"
-                        (changed)="filters.dateOfOnset = $event"
-                    ></app-form-daterange>
+                    <div fxLayout="row">
+                        <app-form-daterange
+                            name="dateOfOnset"
+                            [ngModel]="filters.dateOfOnset"
+                            (changed)="filters.dateOfOnset = $event"
+                        ></app-form-daterange>
+                    </div>
                 </div>
 
                 <!-- Location -->
@@ -68,11 +90,13 @@
                 <div fxFlex fxLayout="column" fxLayoutGap="10px">
                     <div>{{ 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FILTERS_HOSPITALISATION_ISOLATION' | translate }}</div>
 
-                    <app-form-daterange
-                        name="isolationDate"
-                        [ngModel]="filters.isolationDate"
-                        (changed)="filters.isolationDate = $event"
-                    ></app-form-daterange>
+                    <div fxLayout="row">
+                        <app-form-daterange
+                            name="isolationDate"
+                            [ngModel]="filters.isolationDate"
+                            (changed)="filters.isolationDate = $event"
+                        ></app-form-daterange>
+                    </div>
                 </div>
 
                 <!-- Hospitalisation / Isolation center name -->

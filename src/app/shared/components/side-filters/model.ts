@@ -1,5 +1,5 @@
 // filter operations
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { Moment } from 'moment';

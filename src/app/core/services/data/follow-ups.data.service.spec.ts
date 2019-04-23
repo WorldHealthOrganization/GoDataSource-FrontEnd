@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import * as _ from 'lodash';
 import { FollowUpModel } from '../../models/follow-up.model';
 import { ContactDataServiceMock } from './contact.data.service.spec';
@@ -54,7 +54,7 @@ export const FollowUpsDataServiceMock: {
         outbreakId: string,
         contactId: string
     ): Observable<FollowUpModel[]> => {
-        return Observable.of(
+        return of(
             FollowUpsDataServiceMock.followUps[outbreakId] && FollowUpsDataServiceMock.followUps[outbreakId][contactId] ?
                 FollowUpsDataServiceMock.followUps[outbreakId][contactId] :
                 []
@@ -63,11 +63,10 @@ export const FollowUpsDataServiceMock: {
 
     getFollowUpsList: (
         outbreakId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
-        needsContactData: boolean = true
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<FollowUpModel[]> => {
         // retrieve all follow-ups from this outbreak
-        const items = FollowUpsDataServiceMock.followUps[outbreakId] ?
+        const items: FollowUpModel[] = FollowUpsDataServiceMock.followUps[outbreakId] ?
             _.transform(FollowUpsDataServiceMock.followUps[outbreakId], (accumulator, followUps) => {
                 _.each(followUps, (followUp) => {
                     accumulator.push(followUp);
@@ -86,7 +85,7 @@ export const FollowUpsDataServiceMock: {
         }
 
         // finished
-        return Observable.of(personId ? _.filter(items, { personId: personId }) : items);
+        return of(personId ? _.filter(items, { personId: personId }) : items);
     }
 };
 

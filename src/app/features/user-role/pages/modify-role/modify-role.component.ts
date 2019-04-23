@@ -1,13 +1,11 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
+import { Observable } from 'rxjs';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
@@ -15,6 +13,8 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-modify-role',
@@ -79,11 +79,13 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.userRoleDataService
                 .modifyRole(this.userRoleId, dirtyFields)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    loadingDialog.close();
-                    return ErrorObservable.create(err);
-                })
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        loadingDialog.close();
+                        return throwError(err);
+                    })
+                )
                 .subscribe((modifiedRole: UserRoleModel) => {
                     // update model
                     this.userRole = modifiedRole;

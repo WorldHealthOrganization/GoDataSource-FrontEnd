@@ -3,7 +3,7 @@ import { Constants } from '../../../../core/models/constants';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { MetricContactsWithSuccessfulFollowUp } from '../../../../core/models/metrics/metric.contacts-with-success-follow-up.model';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-contacts-with-successful-follow-ups-dashlet',

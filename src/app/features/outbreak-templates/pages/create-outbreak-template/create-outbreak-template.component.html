@@ -15,7 +15,7 @@
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="name"
                                 [(ngModel)]="newOutbreakTemplate.name"
@@ -40,7 +40,7 @@
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="periodOfFollowup"
                                 [(ngModel)]="newOutbreakTemplate.periodOfFollowup"
@@ -75,7 +75,7 @@
                             </app-form-input>
                         </div>
 
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="noDaysNotSeen"
                                 [(ngModel)]="newOutbreakTemplate.noDaysNotSeen"
@@ -111,7 +111,7 @@
                     </div>
                 </mat-card>
 
-                <div class="stepper-wrapper">
+                <div class="stepper-navigation-buttons">
                     <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
 
@@ -126,7 +126,7 @@
                 {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
             </div>
             <br><br><br>
-            <div class="stepper-wrapper">
+            <div class="stepper-navigation-buttons">
                 <button matStepperPrevious mat-raised-button type="button">{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                 <button type="button" mat-raised-button color="accent"
                         (click)="createOutbreakTemplate([detailsForm])">

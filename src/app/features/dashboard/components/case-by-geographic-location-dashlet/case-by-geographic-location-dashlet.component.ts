@@ -6,10 +6,9 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { MetricChartDataModel } from '../../../../core/models/metrics/metric-chart-data.model';
 import * as _ from 'lodash';
 import { MetricLocationCasesCountsModel } from '../../../../core/models/metrics/metric-location-cases-count.model';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription ,  Subscriber } from 'rxjs';
 import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Subscriber } from 'rxjs/Subscriber';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({

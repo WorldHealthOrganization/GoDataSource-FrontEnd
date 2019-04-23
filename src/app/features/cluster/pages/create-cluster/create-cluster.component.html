@@ -15,8 +15,7 @@
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
-
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="name"
                                 [ngModel]="clusterData.name"
@@ -31,17 +30,18 @@
                             <div fxFlex><!-- placeholder --></div>
                         </div>
 
-                        <app-form-textarea
-                            name="description"
-                            [ngModel]="clusterData.description"
-                            [placeholder]="'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION' | translate"
-                            tooltip="LNG_CLUSTER_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
-                        </app-form-textarea>
-
+                        <div fxLayout="column">
+                            <app-form-textarea
+                                name="description"
+                                [ngModel]="clusterData.description"
+                                [placeholder]="'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION' | translate"
+                                tooltip="LNG_CLUSTER_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
+                            </app-form-textarea>
+                        </div>
                     </div>
                 </mat-card>
 
-                <div class="stepper-wrapper">
+                <div class="stepper-navigation-buttons">
                     <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
@@ -51,7 +51,7 @@
         <mat-step>
             <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL'| translate}}</ng-template>
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
-            <div class="stepper-wrapper">
+            <div class="stepper-navigation-buttons">
                 <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                 <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent" (click)="createNewCluster([detailsForm])">
                     {{'LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_BUTTON' | translate}}

@@ -40,12 +40,14 @@
                             <button
                                 *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                                 mat-menu-item
+                                [disabled]="x86Architecture"
                                 (click)="generateEpiCurveReport()">
                                 {{'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL' | translate}}
                             </button>
 
                             <button
                                 mat-menu-item
+                                [disabled]="x86Architecture"
                                 (click)="generateKpisReport()">
                                 {{'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL' | translate}}
                             </button>
@@ -71,10 +73,12 @@
         </app-side-filters>
 
         <!-- Dashboard items -->
-        <div class="page-content">
+        <div
+            class="page-content"
+            fxLayout="column"
+        >
 
-            <div
-                fxFlex fxLayout="row" fxLayoutAlign="space-between">
+            <div fxLayout="row" fxLayoutAlign="space-between">
 
                 <div fxFlex="33">
                     <mat-card class="dashboard-gauge">
@@ -138,6 +142,7 @@
                 </app-histogram-transmission-chains-size-dashlet>
             </mat-card>
 
+            <!-- Epidemiological Curve -->
             <mat-card
                 *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                 class="page-section">
@@ -177,8 +182,8 @@
 
             <!-- Contact follow-up overview -->
             <mat-card class="page-section">
-                <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_TITLE' |
-                    translate}}
+                <div class="other-kpi-header">
+                    {{'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_TITLE' | translate}}
                 </div>
 
                 <!-- Contact follow-up overview c3 chart -->
@@ -191,8 +196,8 @@
 
             <!-- Cases based on contact status -->
             <mat-card class="page-section">
-                <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_TITLE' |
-                    translate}}
+                <div class="other-kpi-header">
+                    {{'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_TITLE' | translate}}
                 </div>
 
                 <!-- Cases based on contact status c3 chart -->

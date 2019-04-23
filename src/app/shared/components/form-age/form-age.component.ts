@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, Output, EventEmitter } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { GroupBase } from '../../xt-forms/core';
 import { AgeModel } from '../../../core/models/age.model';
@@ -102,6 +102,11 @@ export class FormAgeComponent extends GroupBase<AgeModel> {
         // initialize
         super.writeValue(value);
 
+        setTimeout(() => {
+            // parent handler
+            super.validateGroup();
+        });
+
         // set initial state
         if (
             value &&
@@ -116,6 +121,12 @@ export class FormAgeComponent extends GroupBase<AgeModel> {
      * Age Model
      */
     get age(): AgeModel {
+        if (this.value && this.value.months > 0) {
+            this._ageType = AgeType.MONTHS;
+        } else {
+            this._ageType = AgeType.YEARS;
+        }
+
         // finished
         return this.value ?
             this.value :
@@ -149,7 +160,19 @@ export class FormAgeComponent extends GroupBase<AgeModel> {
             parseFloat(value as string) :
             value;
 
-        // parent handler
-        super.onChange();
+        setTimeout(() => {
+            // parent handler
+            super.onChange();
+        });
+    }
+
+    /**
+     * Change type (Years / Months)
+     */
+    onChangeType() {
+        setTimeout(() => {
+            // parent handler
+            super.onChange();
+        });
     }
 }

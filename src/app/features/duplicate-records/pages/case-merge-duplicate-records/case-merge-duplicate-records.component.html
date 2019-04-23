@@ -24,7 +24,7 @@
                     <mat-card class="page-section">
                         <div fxLayout="column">
 
-                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <div fxLayout="row" fxLayoutGap="20px">
                                 <app-form-select
                                     name="firstName"
                                     [(ngModel)]="uniqueOptions?.firstName.value"
@@ -98,7 +98,7 @@
                     <mat-card class="page-section">
                         <div fxLayout="column">
 
-                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <div fxLayout="row" fxLayoutGap="20px">
                                 <app-form-select
                                     name="riskLevel"
                                     [(ngModel)]="uniqueOptions?.riskLevel.value"
@@ -133,13 +133,15 @@
                                 </app-form-select>
                             </div>
 
-                            <app-form-select
-                                name="riskReason"
-                                [(ngModel)]="uniqueOptions?.riskReason.value"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION"
-                                [options]="uniqueOptions?.riskReason.options">
-                            </app-form-select>
+                            <div fxLayout="row">
+                                <app-form-select
+                                    name="riskReason"
+                                    [(ngModel)]="uniqueOptions?.riskReason.value"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION"
+                                    [options]="uniqueOptions?.riskReason.options">
+                                </app-form-select>
+                            </div>
                         </div>
                     </mat-card>
 
@@ -151,7 +153,7 @@
                         [disabled]="true">
                     </app-form-document-list>
 
-                    <div class="stepper-wrapper">
+                    <div class="stepper-navigation-buttons">
                         <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                     </div>
                 </form>
@@ -190,7 +192,7 @@
                         [minItems]="0">
                     </app-form-address-list>
 
-                    <div class="stepper-wrapper">
+                    <div class="stepper-navigation-buttons">
                         <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                         <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                     </div>
@@ -206,7 +208,7 @@
                     <mat-card class="page-section">
                         <div fxLayout="column">
 
-                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <div fxLayout="row" fxLayoutGap="20px">
                                 <app-form-select
                                     name="classification"
                                     [(ngModel)]="uniqueOptions?.classification.value"
@@ -260,48 +262,40 @@
 
                     <!-- Outcome section -->
                     <mat-card class="page-section">
+                        <div fxLayout="column">
+                            <div fxLayout="row" fxLayoutGap="20px">
+                                <app-form-select
+                                    name="outcomeId"
+                                    [(ngModel)]="uniqueOptions?.outcomeId.value"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_OUTCOME' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION"
+                                    [options]="uniqueOptions?.outcomeId.options">
+                                </app-form-select>
 
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-select
-                                name="outcomeId"
-                                [(ngModel)]="uniqueOptions?.outcomeId.value"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_OUTCOME' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION"
-                                [options]="uniqueOptions?.outcomeId.options">
-                            </app-form-select>
+                                <app-form-select
+                                    name="dateOfOutcome"
+                                    [(ngModel)]="uniqueOptions?.dateOfOutcome.value"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION"
+                                    [options]="uniqueOptions?.dateOfOutcome.options">
+                                </app-form-select>
 
-                            <app-form-select
-                                name="dateOfOutcome"
-                                [(ngModel)]="uniqueOptions?.dateOfOutcome.value"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION"
-                                [options]="uniqueOptions?.dateOfOutcome.options">
-                            </app-form-select>
+                                <app-form-select
+                                    name="safeBurial"
+                                    [(ngModel)]="uniqueOptions?.safeBurial.value"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION"
+                                    [options]="uniqueOptions?.safeBurial.options">
+                                </app-form-select>
 
-                            <div fxFlex><!-- placeholder --></div>
-                            <div fxFlex><!-- placeholder --></div>
-                        </div>
-
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-
-                            <app-form-select
-                                name="safeBurial"
-                                [(ngModel)]="uniqueOptions?.safeBurial.value"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION"
-                                [options]="uniqueOptions?.safeBurial.options">
-                            </app-form-select>
-
-                            <app-form-select
-                                name="dateOfBurial"
-                                [(ngModel)]="uniqueOptions?.dateOfBurial.value"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION"
-                                [options]="uniqueOptions?.dateOfBurial.options">
-                            </app-form-select>
-
-                            <div fxFlex><!-- placeholder --></div>
-                            <div fxFlex><!-- placeholder --></div>
+                                <app-form-select
+                                    name="dateOfBurial"
+                                    [(ngModel)]="uniqueOptions?.dateOfBurial.value"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION"
+                                    [options]="uniqueOptions?.dateOfBurial.options">
+                                </app-form-select>
+                            </div>
                         </div>
                     </mat-card>
 
@@ -315,10 +309,11 @@
                         [componentTitle]="'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS' | translate"
                         centerNameLabel="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
                         centerNameTooltip="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME_DESCRIPTION"
-                        [minDate]="uniqueOptions?.dateOfOnset.value"
+                        [required]="true"
+                        [dateOfOnset]="caseData.dateOfOnset"
                     ></app-form-case-center-daterange-list>
 
-                    <div class="stepper-wrapper">
+                    <div class="stepper-navigation-buttons">
                         <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                         <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                     </div>
@@ -347,7 +342,7 @@
                         [disabled]="true">
                     </app-form-fill-questionnaire>
 
-                    <div class="stepper-wrapper">
+                    <div class="stepper-navigation-buttons">
                         <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
                     </div>
                 </form>
@@ -357,7 +352,7 @@
             <mat-step>
                 <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL'| translate}}</ng-template>
                 {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
-                <div class="stepper-wrapper">
+                <div class="stepper-navigation-buttons">
                     <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                     <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent" (click)="createNewCase([personalForm, addressForm, infectionForm, questionnaireForm])">
                         {{'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASE_BUTTON' | translate}}

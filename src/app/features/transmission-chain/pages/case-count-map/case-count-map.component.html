@@ -11,27 +11,31 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
-                    <ng-container>
+                    <button
+                        mat-menu-item
+                        (click)="exportCaseCountMap()">
+                        {{'LNG_PAGE_CASE_COUNT_EXPORT_MAP' | translate}}
+                    </button>
 
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/transmission-chains']">
-                            {{'LNG_PAGE_CASE_COUNT_MAP_ACTION_GRAPH_BUTTON' | translate}}
-                        </button>
+                    <mat-divider></mat-divider>
 
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/transmission-chains', 'list']">
-                            {{'LNG_PAGE_CASE_COUNT_MAP_ACTION_LIST_BUTTON' | translate}}
-                        </button>
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/transmission-chains']">
+                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL' | translate}}
+                    </button>
 
-                        <button
-                            mat-menu-item
-                            (click)="exportCaseCountMap()">
-                            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT' | translate}}
-                        </button>
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/graphs/transmission-chain-bars']">
+                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAIN_BARS_LABEL' | translate}}
+                    </button>
 
-                    </ng-container>
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/transmission-chains', 'list']">
+                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LIST_LABEL' | translate}}
+                    </button>
                 </mat-menu>
 
             </div>
@@ -40,13 +44,15 @@
 </app-topnav>
 
 <mat-card
-    class="page-section page-content">
-
+    class="page-section page-content"
+    fxLayout="column"
+>
     <div
-        class="app-case-count-map-filters">
+        class="app-case-count-map-filters"
+        fxLayout="column"
+    >
         <!-- panel toggle -->
-        <div
-            fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxLayout="row" fxLayoutAlign="space-between center">
             <!-- settings toggle -->
             <button
                 mat-raised-button
@@ -58,7 +64,8 @@
         <!-- settings panel -->
         <div
             *ngIf="showSettings"
-            fxFlex fxLayout="column">
+            fxLayout="column"
+        >
             <!-- Filters -->
             <app-transmission-chain-filters
                 title="LNG_PAGE_CASE_COUNT_MAP_FILTERS_TITLE"
@@ -66,8 +73,7 @@
             </app-transmission-chain-filters>
 
             <!-- Buttons -->
-            <div
-                fxFlex fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
+            <div fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
                 <!-- Reset filters -->
                 <button
                     fxFlex="150px"
@@ -88,8 +94,7 @@
         </div>
     </div>
 
-    <div
-        fxFlex fxLayout="row" fxLayoutGap="20px">
+    <div fxLayout="row" fxLayoutGap="20px">
         <div fxFlex="200px">
             {{ 'LNG_PAGE_CASE_COUNT_MAP_DISTANCE_LABEL' | translate }} ( {{ clusterDistance }} )
         </div>

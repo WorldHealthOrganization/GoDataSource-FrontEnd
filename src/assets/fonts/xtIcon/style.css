@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'xtIcon';
   src:
-    url('fonts/xtIcon.ttf?kfum0x') format('truetype'),
-    url('fonts/xtIcon.woff?kfum0x') format('woff'),
-    url('fonts/xtIcon.svg?kfum0x#xtIcon') format('svg');
+    url('fonts/xtIcon.ttf?73rrbf') format('truetype'),
+    url('fonts/xtIcon.woff?73rrbf') format('woff'),
+    url('fonts/xtIcon.svg?73rrbf#xtIcon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -33,6 +33,18 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.xtIconellipse:before {
+  content: "\e92f";
+}
+.xtIconpentagon:before {
+  content: "\e930";
+}
+.xtIconsquare:before {
+  content: "\e931";
+}
+.xtIconstar:before {
+  content: "\e932";
+}
 .xtIconbaseline-contacts-24px-1:before {
   content: "\e924";
 }
@@ -165,6 +177,9 @@
 }
 .xtIconinfo:before {
   content: "\e923";
+}
+.xtIconsync:before {
+  content: "\e92e";
 }
 .xtIconlab:before {
   content: "\e9aa";

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ReportDifferenceOnsetRelationshipModel, RelationshipModel } from '../../models/relationship.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
@@ -13,8 +13,13 @@ import { ReportCasesWithOnsetModel } from '../../models/report-cases-with-onset.
 import { LabelValuePair } from '../../models/label-value-pair';
 import { Constants } from '../../models/constants';
 import * as moment from 'moment';
+import * as _ from 'lodash';
 import { EntityModel } from '../../models/entity.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
+import { CaseModel } from '../../models/case.model';
+import { ContactModel } from '../../models/contact.model';
+import { EventModel } from '../../models/event.model';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class RelationshipDataService {
@@ -165,28 +170,6 @@ export class RelationshipDataService {
     }
 
     /**
-     * Retrieve the total number of Relationships of a Case / Contact / Event
-     * @param {string} outbreakId
-     * @param {EntityType} entityType
-     * @param {string} entityId
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
-     */
-    getEntityRelationshipsCount(
-        outbreakId: string,
-        entityType: EntityType,
-        entityId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
-
-        const filter = queryBuilder.buildQuery();
-
-        return this.http.get(
-            `outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/filtered-count?filter=${filter}`
-        );
-    }
-
-    /**
      * Retrieve a Relationship between 2 entities (Cases / Contacts / Events)
      * @param {string} outbreakId
      * @param {EntityType} entityType
@@ -266,6 +249,7 @@ export class RelationshipDataService {
     /**
      * Get metrics for contacts per case
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<MetricContactsPerCaseModel>}
      */
     getMetricsOfContactsPerCase(
@@ -291,6 +275,7 @@ export class RelationshipDataService {
     /**
      * Get count and ids of cases with less than x contacts
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<MetricCasesWithContactsModel>}
      */
     getCountIdsOfCasesLessThanXContacts(
@@ -307,7 +292,7 @@ export class RelationshipDataService {
     /**
      * Get count of cases outside the transmission chains
      * @param {string} outbreakId
-     * @param {number} noDaysInChains
+     * @param queryBuilder
      * @returns {Observable<MetricCasesTransmissionChainsModel>}
      */
     getCountOfCasesOutsideTheTransmissionChains(
@@ -324,6 +309,7 @@ export class RelationshipDataService {
     /**
      * Get count and ids of new cases among known contacts
      * @param {string} outbreakId
+     * @param queryBuilder
      * @returns {Observable<MetricNewCasesWithContactsModel>}
      */
     getCountIdsOfCasesAmongKnownContacts(
@@ -370,6 +356,20 @@ export class RelationshipDataService {
 
         const lightObject = [];
 
+        const sourcePerson = _.find(relationship.persons, person => person.source === true);
+        const sourcePeople = _.find(relationship.people, people => people.model.id === sourcePerson.id);
+        const destinationPeople = _.find(relationship.people, people => people.model.id !== sourcePerson.id);
+
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_SOURCE',
+            sourcePeople.model.name
+        ));
+
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_TARGET',
+            destinationPeople.model.name
+        ));
+
         // dialog fields
         lightObject.push(new LabelValuePair(
             'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
@@ -407,6 +407,50 @@ export class RelationshipDataService {
         ));
 
         return lightObject;
+    }
+
+    /**
+     * Retrieve available people of a Case / Contact / Event
+     * @param {string} outbreakId
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<(CaseModel | ContactModel | EventModel)[]>}
+     */
+    getEntityAvailablePeople(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<(CaseModel | ContactModel | EventModel)[]> {
+        const filter = queryBuilder.buildQuery();
+        return this.http
+            .get(`outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/available-people?filter=${filter}`)
+            .pipe(
+                map((peopleList) => {
+                    return _.map(peopleList, (entity) => {
+                        return new EntityModel(entity).model;
+                    });
+                })
+            );
+    }
+
+    /**
+     * Count available people of a Case / Contact / Event
+     * @param {string} outbreakId
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getEntityAvailablePeopleCount(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/available-people/count?where=${whereFilter}`);
     }
 }
 

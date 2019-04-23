@@ -140,6 +140,17 @@ export class Constants {
         }
     };
 
+    static ANSWERS_DISPLAY = {
+        VERTICAL: {
+            label: 'LNG_OUTBREAK_QUESTIONNAIRE_ANSWERS_DISPLAY_ORIENTATION_VERTICAL',
+            value: 'LNG_OUTBREAK_QUESTIONNAIRE_ANSWERS_DISPLAY_ORIENTATION_VERTICAL'
+        },
+        HORIZONTAL: {
+            label: 'LNG_OUTBREAK_QUESTIONNAIRE_ANSWERS_DISPLAY_ORIENTATION_HORIZONTAL',
+            value: 'LNG_OUTBREAK_QUESTIONNAIRE_ANSWERS_DISPLAY_ORIENTATION_HORIZONTAL'
+        }
+    };
+
     static APP_PAGE = {
         LAB_RESULTS: {
             label: 'LNG_APP_PAGE_LAB_RESULTS',
@@ -226,8 +237,8 @@ export class Constants {
             value: 'LNG_APP_PAGE_IMPORT_CASES'
         },
         CONTACT: {
-            label: 'LNG_APP_PAGE_IMPORT_CONTACT',
-            value: 'LNG_APP_PAGE_IMPORT_CONTACT'
+            label: 'LNG_APP_PAGE_IMPORT_CONTACTS',
+            value: 'LNG_APP_PAGE_IMPORT_CONTACTS'
         },
         CASE_LAB_DATA: {
             label: 'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA',
@@ -373,6 +384,14 @@ export class Constants {
      */
     static CHRONOLOGY_ITEM_TYPE = {
       FOLLOW_UP: 'LNG_FOLLOW_UP_ITEM',
+    };
+
+    /**
+     * Platform architecture
+     */
+    static PLATFORM_ARCH = {
+        X64: 'x64',
+        X86: 'x86'
     };
 
     /**

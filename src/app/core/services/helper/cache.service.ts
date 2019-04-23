@@ -7,7 +7,8 @@ export enum CacheKey {
     LANGUAGES = 'LANGUAGES',
     LOCATIONS = 'LOCATIONS',
     REFERENCE_DATA = 'REFERENCE_DATA',
-    HELP_ITEMS = 'HELP_ITEMS'
+    HELP_ITEMS = 'HELP_ITEMS',
+    API_VERSION = 'API_VERSION'
 }
 
 @Injectable()

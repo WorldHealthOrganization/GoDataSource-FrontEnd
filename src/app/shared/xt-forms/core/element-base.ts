@@ -1,12 +1,7 @@
 import { AfterViewInit, Input } from '@angular/core';
 import { AbstractControl, ControlContainer } from '@angular/forms';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/debounceTime';
-
 import * as _ from 'lodash';
-
 import { ValueAccessorBase } from './value-accessor-base';
-
 import {
     AsyncValidatorArray,
     ValidatorArray,
@@ -15,6 +10,7 @@ import {
 import { ErrorMessage } from './error-message';
 import { ElementBaseFailure } from './element-base-failure';
 import { MatTooltip } from '@angular/material';
+import { debounceTime } from 'rxjs/operators';
 
 /**
  * Base class to be extended by custom form controls
@@ -120,8 +116,10 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
 
             // run validations when form control value is changed
             this.control.valueChanges
-                // add debounce to run validations when user stops typing
-                .debounceTime(500)
+                .pipe(
+                    // add debounce to run validations when user stops typing
+                    debounceTime(500)
+                )
                 .subscribe(() => {
                     this.validate();
                 });
