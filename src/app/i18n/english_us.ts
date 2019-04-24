@@ -38,7 +38,12 @@ export const EnglishUsLang = {
          * uiChainsOfTransmissionBars
          */
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_UNKNOWN_LABEL': 'Lab?',
-        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_FOR_OTHER_CONDITIONS_CASE_LABEL': 'hsp'
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_FOR_OTHER_CONDITIONS_CASE_LABEL': 'hsp',
+
+        /**
+         * uiCasesListPage
+         */
+        'LNG_PAGE_LIST_CASES_NOT_A_CASE_INFO_LABEL': '* Note that: If you wish to filter to see discarded cases then you should add the \'Not a Case\' column from the menu of extra field on the left hand side and ensure that this is set to \'Yes\'. You can\'t simply filter on the Classification column for "Not a case (discarded)" since Not a Case is set, by default, to "No" to only show you active records.'
 
         /**
          * REMOVE the tokens from below

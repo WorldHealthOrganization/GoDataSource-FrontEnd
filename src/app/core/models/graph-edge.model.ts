@@ -25,28 +25,50 @@ export class GraphEdgeModel {
         this.fontFamily = 'Roboto, "Helvetica Neue", sans-serif';
     }
 
+    static getEdgeIconContextOfTransmission(context: string): string | undefined {
+        switch (context) {
+            case Constants.CONTEXT_OF_TRANSMISSION.CO_WORKERS:
+                return 'contacts';
+            case Constants.CONTEXT_OF_TRANSMISSION.FAMILY:
+                return 'people';
+            case Constants.CONTEXT_OF_TRANSMISSION.FRIENDS:
+                return 'person_add';
+            case Constants.CONTEXT_OF_TRANSMISSION.FUNERAL:
+                return 'turned_in';
+            case Constants.CONTEXT_OF_TRANSMISSION.NEIGHBOUR:
+                return 'nature_people';
+            case Constants.CONTEXT_OF_TRANSMISSION.NOSOCOMIAL:
+                return 'airline_seat_flat';
+            case Constants.CONTEXT_OF_TRANSMISSION.TRAVEL:
+                return 'commute';
+            case Constants.CONTEXT_OF_TRANSMISSION.UNKNOWN:
+                return 'help';
+            default:
+                return '';
+        }
+    }
+
+    static getEdgeIconExposureType(type: string): string | undefined {
+        switch (type) {
+            case Constants.EXPOSURE_TYPE.DIRECT_PHYSICAL_CONTACT:
+                return 'touch_app';
+            case Constants.EXPOSURE_TYPE.SLEPT_ATE_SPENT_TIME_TOGETHER:
+                return 'hotel';
+            case Constants.EXPOSURE_TYPE.TOUCHED_BODY_FLUIDS:
+                return 'pan_tool';
+            case Constants.EXPOSURE_TYPE.TOUCHED_LINENS_CLOTHES:
+                return 'free_breakfast';
+            default:
+                return '';
+        }
+    }
+
     /**
      * set the icon based on the context of transmission value
      * @param relationshipData
      */
     setEdgeIconContextOfTransmission(relationshipData) {
-        if (relationshipData.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.CO_WORKERS) {
-            this.label = 'contacts';
-        } else if (relationshipData.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.FAMILY) {
-            this.label = 'people';
-        } else if (relationshipData.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.FRIENDS) {
-            this.label = 'person_add';
-        } else if (relationshipData.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.FUNERAL) {
-            this.label = 'turned_in';
-        } else if (relationshipData.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.NEIGHBOUR) {
-            this.label = 'nature_people';
-        } else if (relationshipData.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.NOSOCOMIAL) {
-            this.label = 'airline_seat_flat';
-        } else if (relationshipData.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.TRAVEL) {
-            this.label = 'commute';
-        } else if (relationshipData.socialRelationshipTypeId === Constants.CONTEXT_OF_TRANSMISSION.UNKNOWN) {
-            this.label = 'help';
-        }
+        this.label = GraphEdgeModel.getEdgeIconContextOfTransmission(relationshipData.socialRelationshipTypeId);
     }
 
     /**
@@ -54,15 +76,7 @@ export class GraphEdgeModel {
      * @param relationshipData
      */
     setEdgeIconExposureType(relationshipData) {
-        if (relationshipData.exposureTypeId === Constants.EXPOSURE_TYPE.DIRECT_PHYSICAL_CONTACT) {
-            this.label = 'touch_app';
-        } else if (relationshipData.exposureTypeId === Constants.EXPOSURE_TYPE.SLEPT_ATE_SPENT_TIME_TOGETHER) {
-            this.label = 'hotel';
-        } else if (relationshipData.exposureTypeId === Constants.EXPOSURE_TYPE.TOUCHED_BODY_FLUIDS) {
-            this.label = 'pan_tool';
-        } else if (relationshipData.exposureTypeId === Constants.EXPOSURE_TYPE.TOUCHED_LINENS_CLOTHES) {
-            this.label = 'free_breakfast';
-        }
+        this.label = GraphEdgeModel.getEdgeIconExposureType(relationshipData.exposureTypeId);
     }
 
     /**

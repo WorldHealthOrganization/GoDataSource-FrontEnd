@@ -490,7 +490,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
      */
     generateVisualId() {
         if (!_.isEmpty(this.selectedOutbreak.caseIdMask)) {
-            this.caseData.visualId = this.selectedOutbreak.caseIdMask;
+            this.caseData.visualId = CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask);
             this.visualId.control.markAsDirty();
         }
     }

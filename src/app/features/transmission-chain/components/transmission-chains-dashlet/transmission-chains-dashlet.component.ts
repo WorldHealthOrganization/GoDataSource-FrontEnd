@@ -149,6 +149,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         nodeNameColorField: 'classification',
         edgeColorField: 'certaintyLevelId',
         nodeIconField: '',
+        edgeIconField: '',
         nodeColorLabel: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
         nodeNameColorLabel: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
         edgeColorLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
@@ -439,7 +440,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.legend.nodeColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].label;
         this.legend.nodeNameColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeNameColorCriteria].label;
         this.legend.edgeColorLabel = this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].label;
+        this.legend.edgeIconLabel = (this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria]) ? this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria].label : '';
         this.legend.nodeIconLabel = (this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria]) ? this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria].label : '';
+        this.legend.nodeShapeLabel = (this.referenceDataLabelMap[this.colorCriteria.nodeShapeCriteria]) ? this.referenceDataLabelMap[this.colorCriteria.nodeShapeCriteria].label : '';
         // re-initialize legend entries
         this.legend.nodeColor = {};
         this.legend.nodeColorKeys = [];
@@ -447,6 +450,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.legend.nodeNameColorKeys = [];
         this.legend.edgeColor = {};
         this.legend.edgeColorKeys = [];
+        this.legend.edgeIcon = {};
+        this.legend.edgeIconKeys = [];
         this.legend.nodeIcon = {};
         this.legend.nodeIconKeys = [];
         this.legend.nodeShape = {};
@@ -467,6 +472,20 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
         });
         this.legend.edgeColorKeys = Object.keys(this.legend.edgeColor);
+        if (this.colorCriteria.edgeIconCriteria !== Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value) {
+            const edgeIconReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria].refDataCateg], 'entries', []);
+            // get edge icons based on the selected criteria
+            let getEdgeIconFunc: (criteriaKey: any) => string;
+            if (this.colorCriteria.edgeIconCriteria === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
+                getEdgeIconFunc = GraphEdgeModel.getEdgeIconContextOfTransmission;
+            } else if (this.colorCriteria.edgeIconCriteria === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.EXPOSURE_TYPE.value) {
+                getEdgeIconFunc = GraphEdgeModel.getEdgeIconExposureType;
+            }
+            _.forEach(edgeIconReferenceDataEntries, (value) => {
+                this.legend.edgeIcon[value.value] = getEdgeIconFunc(value.value);
+            });
+            this.legend.edgeIconKeys = Object.keys(this.legend.edgeIcon);
+        }
         if (this.colorCriteria.nodeIconCriteria !== Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS.NONE.value) {
             const nodeIconReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria].refDataCateg], 'entries', []);
             _.forEach(nodeIconReferenceDataEntries, (value) => {
@@ -476,8 +495,15 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         }
         if (this.colorCriteria.nodeShapeCriteria !== Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.NONE.value) {
             const nodeShapeReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeShapeCriteria].refDataCateg], 'entries', []);
+            // get node shapes based on the selected criteria
+            let getNodeShapeFunc: (criteriaKey: any) => string;
+            if (this.colorCriteria.nodeShapeCriteria === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.TYPE.value) {
+                getNodeShapeFunc = GraphNodeModel.getNodeShapeType;
+            } else if (this.colorCriteria.nodeShapeCriteria === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.CLASSIFICATION.value) {
+                getNodeShapeFunc = GraphNodeModel.getNodeShapeClassification;
+            }
             _.forEach(nodeShapeReferenceDataEntries, (value) => {
-                this.legend.nodeShape[value.value] = value.iconUrl ? value.iconUrl : '';
+                this.legend.nodeShape[value.value] = `${getNodeShapeFunc(value.value)}_shape`;
             });
             this.legend.nodeShapeKeys = Object.keys(this.legend.nodeShape);
         }
