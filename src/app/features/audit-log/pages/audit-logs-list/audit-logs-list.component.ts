@@ -33,14 +33,6 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
     // list of existing audit logs
     auditLogsList$: Observable<AuditLogModel[]>;
     auditLogsListCount$: Observable<any>;
-    auditLogsTrim: {
-        [auditLogID: string]: {
-            changeDataAllString: string,
-            changeDataTrimString: string,
-            displayAll: boolean,
-            displayButtons: boolean
-        }
-    } = {};
 
     // options
     usersList$: Observable<any>;
@@ -164,26 +156,21 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
             this.queryBuilder.sort.by('createdAt', RequestSortDirection.DESC);
         }
 
+        // #TODO remove
+        this.queryBuilder.filter.where({
+            modelName: {
+                inq: ['case']
+            }
+        });
+        this.queryBuilder.filter.where({
+            action: 'LNG_AUDIT_LOG_ACTIONS_MODIFIED'
+        });
+
         // retrieve the list of Audit Logs
         this.auditLogsList$ = this.auditLogDataService
             .getAuditLogsList(this.queryBuilder)
             .pipe(
-                tap(this.checkEmptyList.bind(this)),
-                tap((items: AuditLogModel[]) => {
-                    this.auditLogsTrim = {};
-                    _.each(items, (item: AuditLogModel) => {
-                        const changedDataStringified: string = item.changedData ? JSON.stringify(item.changedData) : '';
-                        this.auditLogsTrim[item.id] = {
-                            changeDataAllString: changedDataStringified,
-                            changeDataTrimString: changedDataStringified.substr(
-                                0,
-                                Constants.DEFAULT_TABLE_COLUMN_TRIM_TEXT_LONGER_THAN_NO_CHARS
-                            ) + this.i18nService.instant('LNG_PAGE_LIST_AUDIT_LOGS_ELLIPSIS_LABEL'),
-                            displayAll: changedDataStringified.length <= Constants.DEFAULT_TABLE_COLUMN_TRIM_TEXT_LONGER_THAN_NO_CHARS,
-                            displayButtons: changedDataStringified.length > Constants.DEFAULT_TABLE_COLUMN_TRIM_TEXT_LONGER_THAN_NO_CHARS
-                        };
-                    });
-                })
+                tap(this.checkEmptyList.bind(this))
             );
     }
 
@@ -216,20 +203,6 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
      */
     resetFiltersAddDefault() {
         this.initializeHeaderFilters();
-    }
-
-    /**
-     * Display only some of the data
-     * @param item
-     */
-    trimChangeData(item: AuditLogModel): string {
-        // trim if necessary
-        const changedDataStringified: string = this.auditLogsTrim[item.id].displayAll ?
-            this.auditLogsTrim[item.id].changeDataAllString :
-            this.auditLogsTrim[item.id].changeDataTrimString;
-
-        // display data
-        return changedDataStringified;
     }
 }
 
