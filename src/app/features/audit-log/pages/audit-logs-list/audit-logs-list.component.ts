@@ -157,14 +157,14 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
         }
 
         // #TODO remove
-        this.queryBuilder.filter.where({
-            modelName: {
-                inq: ['case']
-            }
-        });
-        this.queryBuilder.filter.where({
-            action: 'LNG_AUDIT_LOG_ACTIONS_MODIFIED'
-        });
+        // this.queryBuilder.filter.where({
+        //     modelName: {
+        //         inq: ['case']
+        //     }
+        // });
+        // this.queryBuilder.filter.where({
+        //     action: 'LNG_AUDIT_LOG_ACTIONS_MODIFIED'
+        // });
 
         // retrieve the list of Audit Logs
         this.auditLogsList$ = this.auditLogDataService
