@@ -46,7 +46,6 @@ export class Constants {
     static DEFAULT_DEBOUNCE_TIME_MILLISECONDS = 500;
     static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
     static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
-    static DEFAULT_TABLE_COLUMN_TRIM_TEXT_LONGER_THAN_NO_CHARS = 150;
 
     // pagination defaults and configuration
     static PAGE_SIZE_OPTIONS = [10, 25, 50];

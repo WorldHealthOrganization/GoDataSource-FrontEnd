@@ -38,6 +38,6 @@ export const EnglishUsLang = {
         /**
          * REMOVE the tokens from below
          */
-        // ...
+        // LNG_PAGE_LIST_AUDIT_LOGS_ELLIPSIS_LABEL
     }
 };

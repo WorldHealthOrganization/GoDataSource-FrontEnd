@@ -13,7 +13,6 @@ import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/help
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { Constants } from '../../../../core/models/constants';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { share, tap } from 'rxjs/operators';
@@ -25,7 +24,6 @@ import { share, tap } from 'rxjs/operators';
     styleUrls: ['./audit-logs-list.component.less']
 })
 export class AuditLogsListComponent extends ListComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_AUDIT_LOGS_TITLE', '.', true)
     ];

@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges, SimpleChanges, ViewEncapsulation } from '@angular/core';
-import * as _ from 'lodash';
 import { AuditLogChangeDataModel, AuditLogModel } from '../../../../core/models/audit-log.model';
 import { AuditLogValue } from '../../types/field-value-type';
 import { AuditLogsService } from '../../services/audit-logs.service';
