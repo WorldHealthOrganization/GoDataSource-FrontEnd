@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { MatTreeModule } from '@angular/material';
 
 // modules
 import { routing } from './audit-log.module.routing';
@@ -15,8 +14,7 @@ import * as fromServices from './services';
 @NgModule({
     imports: [
         routing,
-        SharedModule,
-        MatTreeModule
+        SharedModule
     ],
     declarations: [
         ...fromPages.pageComponents,
