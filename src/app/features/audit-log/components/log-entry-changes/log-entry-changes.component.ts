@@ -23,13 +23,6 @@ export class LogEntryChangesComponent implements OnChanges {
     ngOnChanges(changes: SimpleChanges) {
         if (changes.value) {
             this.logValues = changes.value.currentValue.changedData
-                .filter((changedData: AuditLogChangeDataModel) => {
-                    // filter out empty values
-                    return (
-                        !_.isEmpty(changedData.oldValue) ||
-                        !_.isEmpty(changedData.newValue)
-                    );
-                })
                 .map((changedData: AuditLogChangeDataModel) => {
                     return this.auditLogsService.getFieldValue(changedData, changes.value.currentValue.modelName);
                 })
