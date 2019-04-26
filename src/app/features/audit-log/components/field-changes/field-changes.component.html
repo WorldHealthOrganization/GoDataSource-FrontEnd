@@ -1,0 +1,83 @@
+<!-- String or Number -->
+<div
+    *ngIf="value?.type === FieldValueType.STRING || value?.type === FieldValueType.NUMBER"
+    class="string-diff"
+    fxLayout="column" fxLayoutGap="2px"
+>
+    <span class="field-name">{{value.value.property}}</span>
+    <div class="field-changes" fxLayout="column">
+        <span class="old-value">{{value.value.oldValue}}</span>
+        <span class="new-value">{{value.value.newValue}}</span>
+    </div>
+</div>
+
+<!-- Language token -->
+<div
+    *ngIf="value?.type === FieldValueType.LNG_TOKEN"
+    class="string-diff"
+    fxLayout="column" fxLayoutGap="2px"
+>
+    <span class="field-name">{{value.value.property}}</span>
+    <div class="field-changes" fxLayout="column">
+        <span class="old-value">{{value.value.oldValue | translate}}</span>
+        <span class="new-value">{{value.value.newValue | translate}}</span>
+    </div>
+</div>
+
+<!-- Date -->
+<div
+    *ngIf="value?.type === FieldValueType.DATE"
+    class="string-diff"
+    fxLayout="column" fxLayoutGap="2px"
+>
+    <span class="field-name">{{value.value.property}}</span>
+    <div class="field-changes" fxLayout="column">
+        <span class="old-value">{{value.value.oldValue | dateTimeDefault}}</span>
+        <span class="new-value">{{value.value.newValue | dateTimeDefault}}</span>
+    </div>
+</div>
+
+<!-- Rich content -->
+<div
+    *ngIf="value?.type === FieldValueType.RICH_CONTENT"
+    class="string-diff"
+    fxLayout="column" fxLayoutGap="2px"
+>
+    <span class="field-name">{{value.property}}</span>
+    <div class="field-changes" fxLayout="column">
+        <div
+            fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="3px"
+            [matTooltip]="'LNG_PAGE_LIST_AUDIT_LOGS_RICH_TEXT_DESCRIPTION' | translate"
+        >
+            <span class="xt-icon">info</span>
+            <span class="rich-content">{{'LNG_PAGE_LIST_AUDIT_LOGS_RICH_TEXT_LABEL' | translate}}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Object or Array -->
+<div
+    *ngIf="value?.type === FieldValueType.OBJECT || value?.type === FieldValueType.ARRAY"
+    class="string-diff"
+    fxLayout="column" fxLayoutGap="2px"
+>
+    <div
+        class="object-value-property"
+        fxLayout="row" fxLayoutGap="3px"
+        (click)="collapsed = !collapsed"
+    >
+        <span class="field-name">{{value.rootProperty}}</span>
+        <span *ngIf="collapsed" class="xt-icon">thinArrowRight</span>
+        <span *ngIf="!collapsed" class="xt-icon">thinArrowDown</span>
+    </div>
+    <div
+        [fxShow]="!collapsed"
+        class="field-changes"
+        fxLayout="column" fxLayoutGap="2px"
+    >
+        <app-field-changes
+            *ngFor="let propValue of value.value"
+            [value]="propValue"
+        ></app-field-changes>
+    </div>
+</div>

@@ -13,7 +13,6 @@ import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/help
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { Constants } from '../../../../core/models/constants';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { share, tap } from 'rxjs/operators';
@@ -25,7 +24,6 @@ import { share, tap } from 'rxjs/operators';
     styleUrls: ['./audit-logs-list.component.less']
 })
 export class AuditLogsListComponent extends ListComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_AUDIT_LOGS_TITLE', '.', true)
     ];
@@ -33,14 +31,6 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
     // list of existing audit logs
     auditLogsList$: Observable<AuditLogModel[]>;
     auditLogsListCount$: Observable<any>;
-    auditLogsTrim: {
-        [auditLogID: string]: {
-            changeDataAllString: string,
-            changeDataTrimString: string,
-            displayAll: boolean,
-            displayButtons: boolean
-        }
-    } = {};
 
     // options
     usersList$: Observable<any>;
@@ -168,22 +158,7 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
         this.auditLogsList$ = this.auditLogDataService
             .getAuditLogsList(this.queryBuilder)
             .pipe(
-                tap(this.checkEmptyList.bind(this)),
-                tap((items: AuditLogModel[]) => {
-                    this.auditLogsTrim = {};
-                    _.each(items, (item: AuditLogModel) => {
-                        const changedDataStringified: string = item.changedData ? JSON.stringify(item.changedData) : '';
-                        this.auditLogsTrim[item.id] = {
-                            changeDataAllString: changedDataStringified,
-                            changeDataTrimString: changedDataStringified.substr(
-                                0,
-                                Constants.DEFAULT_TABLE_COLUMN_TRIM_TEXT_LONGER_THAN_NO_CHARS
-                            ) + this.i18nService.instant('LNG_PAGE_LIST_AUDIT_LOGS_ELLIPSIS_LABEL'),
-                            displayAll: changedDataStringified.length <= Constants.DEFAULT_TABLE_COLUMN_TRIM_TEXT_LONGER_THAN_NO_CHARS,
-                            displayButtons: changedDataStringified.length > Constants.DEFAULT_TABLE_COLUMN_TRIM_TEXT_LONGER_THAN_NO_CHARS
-                        };
-                    });
-                })
+                tap(this.checkEmptyList.bind(this))
             );
     }
 
@@ -216,20 +191,6 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
      */
     resetFiltersAddDefault() {
         this.initializeHeaderFilters();
-    }
-
-    /**
-     * Display only some of the data
-     * @param item
-     */
-    trimChangeData(item: AuditLogModel): string {
-        // trim if necessary
-        const changedDataStringified: string = this.auditLogsTrim[item.id].displayAll ?
-            this.auditLogsTrim[item.id].changeDataAllString :
-            this.auditLogsTrim[item.id].changeDataTrimString;
-
-        // display data
-        return changedDataStringified;
     }
 }
 

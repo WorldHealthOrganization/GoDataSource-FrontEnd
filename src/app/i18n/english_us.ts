@@ -13,6 +13,12 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiAuditLogsListPage
+         */
+        'LNG_PAGE_LIST_AUDIT_LOGS_RICH_TEXT_LABEL': 'Rich content',
+        'LNG_PAGE_LIST_AUDIT_LOGS_RICH_TEXT_DESCRIPTION': 'Can not display rich text on this page',
+
+        /**
          * uiChainsOfTransmissionBars
          * NEW GROUP
          */
@@ -32,6 +38,6 @@ export const EnglishUsLang = {
         /**
          * REMOVE the tokens from below
          */
-        // ...
+        // LNG_PAGE_LIST_AUDIT_LOGS_ELLIPSIS_LABEL
     }
 };
