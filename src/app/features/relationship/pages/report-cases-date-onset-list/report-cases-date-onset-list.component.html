@@ -18,6 +18,11 @@
         </button>
     </div>
 
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+    ></app-hover-row-actions>
+
     <mat-table #table [dataSource]="casesWithOnsetList$ | async">
 
         <!-- Primary Case => Case First Name -->
@@ -126,67 +131,14 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Inline Actions -->
-        <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-
-            <mat-cell *matCellDef="let item" fxFlex="70px">
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
-
-                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-                    <button
-                        mat-menu-item
-                        [routerLink]="['/cases', item.primaryCase?.id, 'view']"
-                        [queryParams]="{ onset: true }">
-                        {{ 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW' | translate:item.primaryCase }}
-                    </button>
-
-                    <button
-                        mat-menu-item
-                        [routerLink]="['/cases', item.secondaryCase?.id, 'view']"
-                        [queryParams]="{ onset: true }">
-                        {{ 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW' | translate:item.secondaryCase }}
-                    </button>
-
-                    <button
-                        mat-menu-item
-                        [routerLink]="['/relationships', EntityType.CASE, item.primaryCase?.id, item.relationship?.id, 'view']">
-                        {{ 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW_RELATIONSHIP' | translate }}
-                    </button>
-
-                    <mat-divider></mat-divider>
-
-                    <ng-container *app-selected-outbreak-is-active>
-                        <ng-container *ngIf="hasCaseWriteAccess()">
-                            <button
-                                mat-menu-item [routerLink]="['/cases', item.primaryCase?.id, 'modify']"
-                                [queryParams]="{ onset: true }">
-                                {{ 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY' | translate:item.primaryCase }}
-                            </button>
-
-                            <button
-                                mat-menu-item
-                                [routerLink]="['/cases', item.secondaryCase?.id, 'modify']"
-                                [queryParams]="{ onset: true }">
-                                {{ 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY' | translate:item.secondaryCase }}
-                            </button>
-
-                            <button
-                                mat-menu-item
-                                [routerLink]="['/relationships', EntityType.CASE, item.primaryCase?.id, item.relationship?.id, 'modify']">
-                                {{ 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY_RELATIONSHIP' | translate }}
-                            </button>
-                        </ng-container>
-                    </ng-container>
-
-                </mat-menu>
-            </mat-cell>
-        </ng-container>
-
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+        <mat-row
+            *matRowDef="let item; columns: getTableColumns()"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
     </mat-table>
 
     <div

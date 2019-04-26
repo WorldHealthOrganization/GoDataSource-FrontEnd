@@ -1,10 +1,11 @@
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import * as _ from 'lodash';
+import * as moment from 'moment';
 
 /**
  * Action Type
  */
-export enum HoverRowActionsType {
+export enum HoverRowActionType {
     BUTTON = 'button',
     MENU = 'menu',
     DIVIDER = 'divider'
@@ -13,15 +14,23 @@ export enum HoverRowActionsType {
 /**
  * Action
  */
-export class HoverRowActions {
+export class HoverRowAction {
     // fields
-    type: HoverRowActionsType = HoverRowActionsType.BUTTON;
+    type: HoverRowActionType = HoverRowActionType.BUTTON;
     icon: string;
-    click: (item: any) => void;
+    iconTooltip: string;
+    iconTooltipTranslateData: (item: any) => {
+        [key: string]: any
+    };
+    click: (item: any, handler: any) => void;
     class: string;
+    visible: (item: any) => boolean;
 
-    menuOptions: HoverRowActions[];
+    menuOptions: HoverRowAction[];
     menuOptionLabel: string;
+    menuOptionLabelTranslateData: (item: any) => {
+        [key: string]: any
+    };
 
     /**
      * Constructor
@@ -29,11 +38,19 @@ export class HoverRowActions {
     constructor(data: {
         // optional
         icon?: string,
-        click?: (item: any) => void,
-        type?: HoverRowActionsType,
-        menuOptions?: HoverRowActions[],
+        iconTooltip?: string,
+        iconTooltipTranslateData?: (item: any) => {
+            [key: string]: any
+        },
+        click?: (item: any, handler: any) => void,
+        type?: HoverRowActionType,
+        menuOptions?: HoverRowAction[],
         menuOptionLabel?: string,
-        class?: string
+        menuOptionLabelTranslateData?: (item: any) => {
+            [key: string]: any
+        },
+        class?: string,
+        visible?: (item: any) => boolean
     }) {
         Object.assign(this, data);
     }
@@ -69,10 +86,25 @@ export enum HoverRowActionsPosition {
 })
 export class HoverRowActionsComponent implements OnInit, OnDestroy {
     /**
+     * Minimum distance between current mouse cursor position and previous one to be taken in consideration ( to rerender data )
+     */
+    static readonly MIN_MOUSE_DISTANCE: number = 30;
+
+    /**
+     * During this time actions are inactive
+     */
+    static readonly ACTIONS_DEAD_TIME_SINCE_SHOWN_MS: number = 400;
+
+    /**
+     * Keep shown time
+     */
+    private shownTime: number = 0;
+
+    /**
      * Constants
      */
     HoverRowActionsPosition = HoverRowActionsPosition;
-    HoverRowActionsType = HoverRowActionsType;
+    HoverRowActionType = HoverRowActionType;
 
     /**
      * Keep last reference element
@@ -119,6 +151,11 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     } = {};
 
     /**
+     * Left side class
+     */
+    @Input() leftSideClass: string = '';
+
+    /**
      * Actions Position
      */
     private _position: HoverRowActionsPosition = HoverRowActionsPosition.CLOSEST;
@@ -136,41 +173,7 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     /**
      * Real position
      */
-    get realPosition(): HoverRowActionsPosition {
-        // determine real position
-        let position: HoverRowActionsPosition;
-        if (
-            this.position === HoverRowActionsPosition.CLOSEST &&
-            this.mouseEvent &&
-            this.elementRef
-        ) {
-            const scrolledX: number = this.determineParentScrollX();
-            const bounding: HoverRowActionsRect = this.elementRef.nativeElement.getBoundingClientRect();
-            const leftDistance = this.mouseEvent.clientX - (bounding.left + scrolledX);
-            const rightDistance = (bounding.left + scrolledX) + bounding.width - this.mouseEvent.clientX;
-            if (leftDistance < rightDistance) {
-                // left
-                position = HoverRowActionsPosition.LEFT;
-            } else {
-                // right
-                position = HoverRowActionsPosition.RIGHT;
-            }
-        } else if (this.position === HoverRowActionsPosition.LEFT) {
-            position = HoverRowActionsPosition.LEFT;
-        } else {
-            position = HoverRowActionsPosition.RIGHT;
-        }
-
-        // set rendered actions
-        if (position === HoverRowActionsPosition.RIGHT) {
-            this.realActions = this.actions;
-        } else {
-            this.realActions = this.actionsReversed;
-        }
-
-        // return real position
-        return position;
-    }
+    realPosition: HoverRowActionsPosition = HoverRowActionsPosition.LEFT;
 
     /**
      * Component active ?
@@ -195,6 +198,29 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Retrieve classes
+     */
+    get rowClasses(): {
+        [className: string]: boolean
+    } {
+        // default classes
+        const classes = {
+            'record-hover-actions': true
+        };
+
+        // add left side class
+        if (
+            !!this.leftSideClass &&
+            this.realPosition === HoverRowActionsPosition.LEFT
+        ) {
+            classes[this.leftSideClass] = true;
+        }
+
+        // finished
+        return classes;
+    }
+
+    /**
      * Actions row
      */
     @ViewChild('actionsRow') actionsRow: ElementRef;
@@ -212,22 +238,27 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     /**
      * Actions
      */
-    actions: HoverRowActions[] = [];
+    actions: HoverRowAction[] = [];
 
     /**
      * Actions reversed
      */
-    actionsReversed: HoverRowActions[] = [];
+    actionsReversed: HoverRowAction[] = [];
 
     /**
      * Actions rendered
      */
-    realActions: HoverRowActions[] = [];
+    realActions: HoverRowAction[] = [];
 
     /**
      * Action data
      */
     actionData: any;
+
+    /**
+     * Action handler
+     */
+    actionHandler: any;
 
     /**
      * Mouse event data
@@ -337,7 +368,22 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      * Update Mouse event
      */
     updateMouseEvent(mouseEvent: MouseEvent) {
+        // don't update that frequently...
+        if (
+            this.mouseEvent &&
+            mouseEvent &&
+            Math.abs(this.mouseEvent.clientX - mouseEvent.clientX) < HoverRowActionsComponent.MIN_MOUSE_DISTANCE
+        ) {
+            return;
+        }
+
+        // update mouse position
         this.mouseEvent = mouseEvent;
+
+        // determine real position
+        this.updateRealPosition();
+
+        // update bounding
         this.determineBounding();
     }
 
@@ -345,8 +391,9 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      * Show hover row
      */
     show(
+        handler: any,
         elementRef: ElementRef,
-        actions: HoverRowActions[],
+        actions: HoverRowAction[],
         actionData: any = null,
         mouseEvent: MouseEvent = null
     ) {
@@ -356,6 +403,9 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
             this.actionsReversed = actions ? _.cloneDeep(actions).reverse() : [];
         }
 
+        // set handler
+        this.actionHandler = handler;
+
         // set data
         this.actionData = actionData;
 
@@ -364,6 +414,11 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
 
         // determine row bounding
         this.elementRef = elementRef;
+
+        // determine real position
+        this.updateRealPosition();
+
+        // determine bounding
         this.determineBounding();
 
         // set caller visibility
@@ -371,6 +426,9 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
 
         // check if we need to display row
         this.determineVisibleValue();
+
+        // set shown time
+        this.shownTime = moment().valueOf();
     }
 
     /**
@@ -435,5 +493,61 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      */
     onWindowResize() {
         this.hideEverything();
+    }
+
+    /**
+     * Clicked Button or Menu option
+     * @param buttonData
+     */
+    clickedButton(buttonData: HoverRowAction) {
+        // actions disabled ?
+        if ((moment().valueOf() - this.shownTime) <= HoverRowActionsComponent.ACTIONS_DEAD_TIME_SINCE_SHOWN_MS) {
+            return;
+        }
+
+        // perform action
+        buttonData.click(
+            this.actionData,
+            this.actionHandler
+        );
+    }
+
+    /**
+     * Update Real position
+     */
+    private updateRealPosition() {
+        // determine real position
+        let position: HoverRowActionsPosition;
+        if (
+            this.position === HoverRowActionsPosition.CLOSEST &&
+            this.mouseEvent &&
+            this.elementRef
+        ) {
+            const scrolledX: number = this.determineParentScrollX();
+            const bounding: HoverRowActionsRect = this.elementRef.nativeElement.getBoundingClientRect();
+            const leftDistance = this.mouseEvent.clientX - (bounding.left + scrolledX);
+            const rightDistance = (bounding.left + scrolledX) + bounding.width - this.mouseEvent.clientX;
+            if (leftDistance < rightDistance) {
+                // left
+                position = HoverRowActionsPosition.LEFT;
+            } else {
+                // right
+                position = HoverRowActionsPosition.RIGHT;
+            }
+        } else if (this.position === HoverRowActionsPosition.LEFT) {
+            position = HoverRowActionsPosition.LEFT;
+        } else {
+            position = HoverRowActionsPosition.RIGHT;
+        }
+
+        // set rendered actions
+        if (position === HoverRowActionsPosition.RIGHT) {
+            this.realActions = this.actions;
+        } else {
+            this.realActions = this.actionsReversed;
+        }
+
+        // return real position
+        this.realPosition = position;
     }
 }

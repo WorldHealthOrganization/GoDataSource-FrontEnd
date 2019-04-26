@@ -13,6 +13,9 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { EntityType } from '../../../../core/models/entity-type';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-report-cases-date-onset-list',
@@ -40,7 +43,128 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
     ReferenceDataCategory = ReferenceDataCategory;
     EntityType = EntityType;
 
+    recordActions: HoverRowAction[] = [
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // View people 1
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW',
+                    menuOptionLabelTranslateData: (item: ReportCasesWithOnsetModel) => {
+                        return item.primaryCase;
+                    },
+                    click: (item: ReportCasesWithOnsetModel) => {
+                        this.router.navigate(['/cases', item.primaryCase.id, 'view'], {
+                            queryParams: {
+                                onset: true
+                            }
+                        });
+                    }
+                }),
+
+                // View people 2
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW',
+                    menuOptionLabelTranslateData: (item: ReportCasesWithOnsetModel) => {
+                        return item.secondaryCase;
+                    },
+                    click: (item: ReportCasesWithOnsetModel) => {
+                        this.router.navigate(['/cases', item.secondaryCase.id, 'view'], {
+                            queryParams: {
+                                onset: true
+                            }
+                        });
+                    }
+                }),
+
+                // View relationship
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW_RELATIONSHIP',
+                    click: (item: ReportCasesWithOnsetModel) => {
+                        // #TODO TBD - if this is correct !?
+                        // #TODO TBD - if this is correct !?
+                        // #TODO TBD - if this is correct !?
+                        // #TODO TBD - if this is correct !?
+                        // #TODO TBD - if this is correct !?
+                        const relationTypePath: string = _.find(item.relationship.persons, { id: item.primaryCase.id }).source ? 'contacts' : 'exposures';
+                        this.router.navigate(['/relationships', EntityType.CASE, item.primaryCase.id, relationTypePath, item.relationship.id, 'view']);
+                    }
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER
+                }),
+
+                // Modify people 1
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY',
+                    menuOptionLabelTranslateData: (item: ReportCasesWithOnsetModel) => {
+                        return item.primaryCase;
+                    },
+                    click: (item: ReportCasesWithOnsetModel) => {
+                        this.router.navigate(['/cases', item.primaryCase.id, 'modify'], {
+                            queryParams: {
+                                onset: true
+                            }
+                        });
+                    },
+                    visible: () => {
+                        return this.hasCaseWriteAccess() &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id;
+                    }
+                }),
+
+                // Modify people 2
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY',
+                    menuOptionLabelTranslateData: (item: ReportCasesWithOnsetModel) => {
+                        return item.secondaryCase;
+                    },
+                    click: (item: ReportCasesWithOnsetModel) => {
+                        this.router.navigate(['/cases', item.secondaryCase.id, 'modify'], {
+                            queryParams: {
+                                onset: true
+                            }
+                        });
+                    },
+                    visible: () => {
+                        return this.hasCaseWriteAccess() &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id;
+                    }
+                }),
+
+                // Modify relationship
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY_RELATIONSHIP',
+                    click: (item: ReportCasesWithOnsetModel) => {
+                        // #TODO TBD - if this is correct !?
+                        // #TODO TBD - if this is correct !?
+                        // #TODO TBD - if this is correct !?
+                        // #TODO TBD - if this is correct !?
+                        // #TODO TBD - if this is correct !?
+                        const relationTypePath: string = _.find(item.relationship.persons, { id: item.primaryCase.id }).source ? 'contacts' : 'exposures';
+                        this.router.navigate(['/relationships', EntityType.CASE, item.primaryCase.id, relationTypePath, item.relationship.id, 'modify']);
+                    },
+                    visible: () => {
+                        return this.hasCaseWriteAccess() &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id;
+                    }
+                })
+            ]
+        })
+    ];
+
     constructor(
+        private router: Router,
         protected snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -98,8 +222,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
             'secondaryCase.firstName',
             'secondaryCase.lastName',
             'secondaryCase.dateOfOnset',
-            'secondaryCase.classification',
-            'actions'
+            'secondaryCase.classification'
         ];
     }
 }

@@ -10,7 +10,7 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { DialogAnswerButton, DialogField, DialogFieldType } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
@@ -82,6 +82,102 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
 
     // subscribers
     outbreakSubscriber: Subscription;
+
+    recordActions: HoverRowAction[] = [
+        // View Follow-up
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_VIEW_FOLLOW_UP',
+            click: (item: FollowUpModel) => {
+                this.router.navigate(['/contacts', item.personId, 'follow-ups', item.id, 'view'], {
+                    queryParams: {
+                        rootPage: this.rootPage,
+                        rootCaseId: this.caseId
+                    }
+                });
+            },
+            visible: (item: FollowUpModel): boolean => {
+                return !item.deleted;
+            }
+        }),
+
+        // Modify Follow-up
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_FOLLOW_UP',
+            click: (item: FollowUpModel) => {
+                this.router.navigate(['/contacts', item.personId, 'follow-ups', item.id, 'modify'], {
+                    queryParams: {
+                        rootPage: this.rootPage,
+                        rootCaseId: this.caseId
+                    }
+                });
+            },
+            visible: (item: FollowUpModel): boolean => {
+                return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.hasFollowUpsWriteAccess() &&
+                    !Constants.isDateInTheFuture(item.date);
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Modify follow-up questionnaire
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_QUESTIONNAIRE',
+                    click: (item: FollowUpModel) => {
+                        this.modifyQuestionnaire(item);
+                    },
+                    visible: (item: FollowUpModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasFollowUpsWriteAccess() &&
+                            !Constants.isDateInTheFuture(item.date);
+                    }
+                }),
+
+                // Delete Follow-up
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_FOLLOW_UP',
+                    click: (item: FollowUpModel) => {
+                        this.deleteFollowUp(item);
+                    },
+                    visible: (item: FollowUpModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasFollowUpsWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+
+                // Restore a deleted follow-up
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_FOLLOW_UP',
+                    click: (item: FollowUpModel) => {
+                        this.restoreFollowUp(item);
+                    },
+                    visible: (item: FollowUpModel): boolean => {
+                        return item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasFollowUpsWriteAccess();
+                    },
+                    class: 'mat-menu-item-restore'
+                })
+            ]
+        })
+    ];
 
     constructor(
         protected snackbarService: SnackbarService,
@@ -252,6 +348,19 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID'
             }),
             new VisibleColumnModel({
+                field: 'team',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'statusId',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID'
+            }),
+            new VisibleColumnModel({
+                field: 'targeted',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED'
+            }),
+            new VisibleColumnModel({
                 field: 'contact.dateOfLastContact',
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
             }),
@@ -273,27 +382,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 visible: false
             }),
             new VisibleColumnModel({
-                field: 'team',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
-                visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'statusId',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID'
-            }),
-            new VisibleColumnModel({
-                field: 'targeted',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED'
-            }),
-            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
                 visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
             })
         ];
     }

@@ -24,7 +24,7 @@ import { DomService } from '../../../core/services/helper/dom.service';
 import { v4 as uuid } from 'uuid';
 import { FormInputComponent } from '../../xt-forms/components/form-input/form-input.component';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
-import { HoverRowActions, HoverRowActionsType } from '../hover-row-actions/hover-row-actions.component';
+import { HoverRowAction, HoverRowActionType } from '../hover-row-actions/hover-row-actions.component';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
 
@@ -182,12 +182,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     /**
      * Question Actions
      */
-    questionActions: HoverRowActions[] = [];
+    questionActions: HoverRowAction[] = [];
 
     /**
      * Question Answer Actions
      */
-    answerActions: HoverRowActions[] = [];
+    answerActions: HoverRowAction[] = [];
 
     /**
      * Allow question variable change
@@ -316,7 +316,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // add question actions that require write permissions
         if (this.hasWriteAccess()) {
             // question settings
-            this.questionActions.push(new HoverRowActions({
+            this.questionActions.push(new HoverRowAction({
                 icon: 'settings',
                 click: (questionIndex) => {
                     this.modifyQuestion(questionIndex);
@@ -324,7 +324,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             }));
 
             // move question above
-            this.questionActions.push(new HoverRowActions({
+            this.questionActions.push(new HoverRowAction({
                 icon: 'arrowAUp',
                 click: (questionIndex) => {
                     this.moveQuestionAbove(questionIndex);
@@ -332,7 +332,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             }));
 
             // move question bellow
-            this.questionActions.push(new HoverRowActions({
+            this.questionActions.push(new HoverRowAction({
                 icon: 'arrowADown',
                 click: (questionIndex) => {
                     this.moveQuestionBellow(questionIndex);
@@ -340,26 +340,26 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             }));
 
             // other options
-            this.questionActions.push(new HoverRowActions({
-                type: HoverRowActionsType.MENU,
+            this.questionActions.push(new HoverRowAction({
+                type: HoverRowActionType.MENU,
                 icon: 'moreVertical',
                 menuOptions: [
-                    new HoverRowActions({
+                    new HoverRowAction({
                         menuOptionLabel: 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_TO_POSITION_X',
                         click: (questionIndex) => {
                             this.addMoveQuestionPosition(questionIndex);
                         }
                     }),
-                    new HoverRowActions({
-                        type: HoverRowActionsType.DIVIDER
+                    new HoverRowAction({
+                        type: HoverRowActionType.DIVIDER
                     }),
-                    new HoverRowActions({
+                    new HoverRowAction({
                         menuOptionLabel: 'LNG_PAGE_ACTION_CLONE',
                         click: (questionIndex) => {
                             this.cloneQuestion(questionIndex);
                         }
                     }),
-                    new HoverRowActions({
+                    new HoverRowAction({
                         menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
                         click: (questionIndex) => {
                             this.deleteQuestion(questionIndex);
@@ -381,7 +381,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // add answer actions that require write permissions
         if (this.hasWriteAccess()) {
             // answer settings
-            this.answerActions.push(new HoverRowActions({
+            this.answerActions.push(new HoverRowAction({
                 icon: 'settings',
                 click: (answerIndex) => {
                     this.modifyAnswer(answerIndex);
@@ -389,7 +389,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             }));
 
             // move answer above
-            this.answerActions.push(new HoverRowActions({
+            this.answerActions.push(new HoverRowAction({
                 icon: 'arrowAUp',
                 click: (answerIndex) => {
                     this.moveAnswerAbove(answerIndex);
@@ -397,7 +397,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             }));
 
             // move answer bellow
-            this.answerActions.push(new HoverRowActions({
+            this.answerActions.push(new HoverRowAction({
                 icon: 'arrowADown',
                 click: (answerIndex) => {
                     this.moveAnswerBellow(answerIndex);
@@ -405,26 +405,26 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             }));
 
             // other options
-            this.answerActions.push(new HoverRowActions({
-                type: HoverRowActionsType.MENU,
+            this.answerActions.push(new HoverRowAction({
+                type: HoverRowActionType.MENU,
                 icon: 'moreVertical',
                 menuOptions: [
-                    new HoverRowActions({
+                    new HoverRowAction({
                         menuOptionLabel: 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_ANSWER_TO_POSITION_X',
                         click: (answerIndex) => {
                             this.addMoveQuestionAnswerPosition(answerIndex);
                         }
                     }),
-                    new HoverRowActions({
-                        type: HoverRowActionsType.DIVIDER
+                    new HoverRowAction({
+                        type: HoverRowActionType.DIVIDER
                     }),
-                    new HoverRowActions({
+                    new HoverRowAction({
                         menuOptionLabel: 'LNG_PAGE_ACTION_CLONE',
                         click: (answerIndex) => {
                             this.cloneAnswer(answerIndex);
                         }
                     }),
-                    new HoverRowActions({
+                    new HoverRowAction({
                         menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
                         click: (answerIndex) => {
                             this.deleteAnswer(answerIndex);

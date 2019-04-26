@@ -39,7 +39,7 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button
-            *ngIf="viewOnly && hasSysConfigWriteAccess()"
+            *ngIf="viewOnly && hasSysConfigWriteAccess() && languageData.id && !languageData.readOnly"
             mat-raised-button type="button"
             color="accent"
             [routerLink]="['/languages', languageId, 'modify']">

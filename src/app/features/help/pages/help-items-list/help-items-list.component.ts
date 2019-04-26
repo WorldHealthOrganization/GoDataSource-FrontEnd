@@ -6,11 +6,11 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
@@ -42,7 +42,63 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
     // provide constants to template
     Constants = Constants;
 
+    recordActions: HoverRowAction[] = [
+        // View Help Item
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_HELP_ITEMS_ACTION_VIEW_ITEM',
+            click: (item: HelpItemModel) => {
+                this.router.navigate(['/help', 'categories', item.categoryId, 'items', item.id, 'view']);
+            }
+        }),
+
+        // Modify Help Item
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_HELP_ITEMS_ACTION_MODIFY_ITEM',
+            click: (item: HelpItemModel) => {
+                this.router.navigate(['/help', 'categories', item.categoryId, 'items', item.id, 'modify']);
+            },
+            visible: (): boolean => {
+                return this.hasHelpWriteAccess();
+            }
+        }),
+
+        // Approve Help Item
+        new HoverRowAction({
+            icon: 'pan_tool',
+            iconTooltip: 'LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_ITEM',
+            click: (item: HelpItemModel) => {
+                this.approveHelpItem(item);
+            },
+            visible: (item: HelpItemModel): boolean => {
+                return this.hasHelpWriteAccess() &&
+                    !item.approved;
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Help Item
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_HELP_ITEMS_ACTION_DELETE_ITEM',
+                    click: (item: HelpItemModel) => {
+                        this.deleteHelpItem(item);
+                    },
+                    visible: (): boolean => {
+                        return this.hasHelpWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        })
+    ];
+
     constructor(
+        private router: Router,
         private helpDataService: HelpDataService,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
@@ -120,11 +176,6 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
             new VisibleColumnModel({
                 field: 'approvedDate',
                 label: 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE'
-            }),
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
             })
         ];
     }

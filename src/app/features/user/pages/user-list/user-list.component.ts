@@ -6,7 +6,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { UserRoleModel } from '../../../../core/models/user-role.model';
@@ -17,6 +17,7 @@ import * as _ from 'lodash';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-user-list',
@@ -41,7 +42,52 @@ export class UserListComponent extends ListComponent implements OnInit {
     outbreaksListMap: any = {};
     outbreaksList$: Observable<OutbreakModel[]>;
 
+    recordActions: HoverRowAction[] = [
+        // View User
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_USERS_ACTION_VIEW_USER',
+            click: (item: UserModel) => {
+                this.router.navigate(['/users', item.id, 'view']);
+            }
+        }),
+
+        // Modify User
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_USERS_ACTION_MODIFY_USER',
+            click: (item: UserModel) => {
+                this.router.navigate(['/users', item.id, 'modify']);
+            },
+            visible: (item: UserModel): boolean => {
+                return item.id !== this.authUser.id &&
+                    this.hasUserWriteAccess();
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete User
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_USERS_ACTION_DELETE_USER',
+                    click: (item: UserModel) => {
+                        this.deleteUser(item);
+                    },
+                    visible: (item: UserModel): boolean => {
+                        return item.id !== this.authUser.id &&
+                            this.hasUserWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        })
+    ];
+
     constructor(
+        private router: Router,
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
@@ -108,9 +154,13 @@ export class UserListComponent extends ListComponent implements OnInit {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = ['lastName', 'firstName', 'email', 'role', 'availableOutbreaks', 'actions'];
-
-        return columns;
+        return [
+            'lastName',
+            'firstName',
+            'email',
+            'role',
+            'availableOutbreaks'
+        ];
     }
 
     deleteUser(user: UserModel) {

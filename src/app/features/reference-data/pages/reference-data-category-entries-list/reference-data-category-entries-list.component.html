@@ -23,6 +23,11 @@
 
 <mat-card class="page-section page-content">
 
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+    ></app-hover-row-actions>
+
     <mat-table #table [dataSource]="categoryEntries$ | async">
 
         <!-- Label -->
@@ -144,43 +149,14 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Inline Actions -->
-        <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-            <mat-cell *matCellDef="let item" fxFlex="70px">
-
-                <button
-                    mat-icon-button
-                    [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
-
-                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-                    <button
-                        mat-menu-item
-                        [routerLink]="['.', item.id, 'view']">
-                        {{'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_VIEW_ENTRY' | translate}}
-                    </button>
-
-                    <button
-                        mat-menu-item
-                        [routerLink]="['.', item.id, 'modify']">
-                        {{'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_MODIFY_ENTRY' | translate}}
-                    </button>
-
-                    <button
-                        *ngIf="!item.readonly"
-                        mat-menu-item
-                        (click)="deleteEntry(item)">
-                        {{'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY' | translate}}
-                    </button>
-                </mat-menu>
-
-            </mat-cell>
-        </ng-container>
-
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+        <mat-row
+            *matRowDef="let item; columns: getTableColumns()"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
     </mat-table>
 
     <div

@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-
 import { Observable } from 'rxjs';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -11,7 +10,7 @@ import * as _ from 'lodash';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -20,6 +19,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-team-list',
@@ -45,7 +45,50 @@ export class TeamListComponent extends ListComponent implements OnInit {
     // selected outbreak - needed to check assignment at delete team
     selectedOutbreak: OutbreakModel;
 
+    recordActions: HoverRowAction[] = [
+        // View Team
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAM',
+            click: (item: TeamModel) => {
+                this.router.navigate(['/teams', item.id, 'view']);
+            }
+        }),
+
+        // Modify Team
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_TEAMS_ACTION_MODIFY_TEAM',
+            click: (item: TeamModel) => {
+                this.router.navigate(['/teams', item.id, 'modify']);
+            },
+            visible: (): boolean => {
+                return this.hasTeamWriteAccess();
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Team
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM',
+                    click: (item: TeamModel) => {
+                        this.deleteTeam(item);
+                    },
+                    visible: (): boolean => {
+                        return this.hasTeamWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        })
+    ];
+
     constructor(
+        private router: Router,
         private authDataService: AuthDataService,
         private teamDataService: TeamDataService,
         private dialogService: DialogService,
@@ -98,15 +141,11 @@ export class TeamListComponent extends ListComponent implements OnInit {
      */
     getTableColumns(): string[] {
         // default columns that we should display
-        const columns = [
+        return [
             'name',
             'users',
-            'locations',
-            'actions'
+            'locations'
         ];
-
-        // finished
-        return columns;
     }
 
     /**

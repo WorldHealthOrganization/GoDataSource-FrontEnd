@@ -16,10 +16,11 @@ import { InconsistencyModel } from '../../../../core/models/inconsistency.model'
 import * as _ from 'lodash';
 import { InconsistencyIssueEnum } from '../../../../core/enums/inconsistency-issue.enum';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { share, tap } from 'rxjs/operators';
+import { HoverRowAction } from '../../../../shared/components';
 
 @Component({
     selector: 'app-inconsistencies-list',
@@ -46,10 +47,38 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
 
+    recordActions: HoverRowAction[] = [
+        // View Item
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_ACTION_VIEW',
+            click: (item: CaseModel | ContactModel | EventModel) => {
+                this.router.navigateByUrl(this.getItemRouterLink(item, 'view'));
+            }
+        }),
+
+        // Modify Item
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
+            click: (item: CaseModel | ContactModel | EventModel) => {
+                this.router.navigateByUrl(this.getItemRouterLink(item, 'modify'));
+            },
+            visible: (item: CaseModel | ContactModel | EventModel): boolean => {
+                return !item.deleted &&
+                    this.authUser &&
+                    this.outbreak &&
+                    this.authUser.activeOutbreakId === this.outbreak.id &&
+                    this.getAccessPermissions(item);
+            }
+        })
+    ];
+
     /**
      * Constructor
      */
     constructor(
+        private router: Router,
         protected snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
@@ -166,8 +195,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
         return [
             'lastName',
             'firstName',
-            'inconsistencies',
-            'actions'
+            'inconsistencies'
         ];
     }
 

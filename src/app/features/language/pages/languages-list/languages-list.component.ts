@@ -9,11 +9,12 @@ import { DialogService, ExportDataExtension } from '../../../../core/services/he
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
 import { LanguageModel } from '../../../../core/models/language.model';
-import { DialogAnswer, DialogAnswerButton, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { TopnavComponent } from '../../../../shared/components/topnav/topnav.component';
 import { catchError, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-languages-list',
@@ -37,7 +38,82 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
 
     loadingDialog: LoadingDialogModel;
 
+    recordActions: HoverRowAction[] = [
+        // View Language
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_LANGUAGES_ACTION_VIEW_LANGUAGE',
+            click: (item: LanguageModel) => {
+                this.router.navigate(['/languages', item.id, 'view']);
+            }
+        }),
+
+        // Modify Language
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_LANGUAGES_ACTION_MODIFY_LANGUAGE',
+            click: (item: LanguageModel) => {
+                this.router.navigate(['/languages', item.id, 'modify']);
+            },
+            visible: (item: LanguageModel): boolean => {
+                return !item.readOnly &&
+                    this.hasSysConfigWriteAccess();
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Language
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_LANGUAGE',
+                    click: (item: LanguageModel) => {
+                        this.deleteLanguage(item);
+                    },
+                    visible: (item: LanguageModel): boolean => {
+                        return !item.readOnly &&
+                            this.hasSysConfigWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: LanguageModel): boolean => {
+                        // visible only if at least one of the previous...
+                        return !item.readOnly &&
+                            this.hasSysConfigWriteAccess();
+                    }
+                }),
+
+                // Export Language Tokens
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS',
+                    click: (item: LanguageModel) => {
+                        this.downloadLanguage(item);
+                    }
+                }),
+
+                // import Language Tokens
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_LANGUAGES_ACTION_IMPORT_TOKENS',
+                    click: (item: LanguageModel) => {
+                        this.router.navigate(['/import-export-data', 'language-data', item.id, 'import-tokens']);
+                    },
+                    visible: (): boolean => {
+                        return this.hasSysConfigWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        })
+    ];
+
     constructor(
+        private router: Router,
         private languageDataService: LanguageDataService,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
@@ -62,8 +138,7 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
      */
     tableHeaderColumns(): string[] {
         return [
-            'name',
-            'actions'
+            'name'
         ];
     }
 

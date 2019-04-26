@@ -39,6 +39,11 @@
         </button>
     </div>
 
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+    ></app-hover-row-actions>
+
     <mat-table #table [dataSource]="outbreaksList$ | async" matSort (matSortChange)="sortBy($event)">
         <!-- Name -->
         <ng-container matColumnDef="name">
@@ -245,85 +250,14 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Inline Actions -->
-        <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-            <mat-cell *matCellDef="let item" fxFlex="70px">
-
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
-
-                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-
-                    <ng-container
-                        *ngIf="item.id != authUser.activeOutbreakId && !item.deleted">
-                        <button
-                            mat-menu-item
-                            (click)="setActive(item)">
-                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE' | translate}}
-                        </button>
-
-                        <mat-divider></mat-divider>
-                    </ng-container>
-
-                    <ng-container
-                        *ngIf="!item.deleted">
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/outbreaks', item.id, 'inconsistencies']">
-                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_INCONSISTENCIES' | translate }}
-                        </button>
-
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/outbreaks', item.id, 'case-questionnaire']">
-                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE' | translate }}
-                        </button>
-
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/outbreaks', item.id, 'contact-follow-up-questionnaire']">
-                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE' | translate }}
-                        </button>
-
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/outbreaks', item.id, 'case-lab-results-questionnaire']">
-                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE' | translate }}
-                        </button>
-
-                        <mat-divider></mat-divider>
-                    </ng-container>
-
-                    <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'view']">
-                        {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_OUTBREAK' | translate}}
-                    </button>
-
-                    <ng-container *ngIf="hasOutbreakWriteAccess()">
-                        <button *ngIf="!item.deleted" mat-menu-item class="mat-menu-item" (click)="cloneOutbreak(item)">
-                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_OUTBREAK' | translate }}
-                        </button>
-
-                        <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_MODIFY_OUTBREAK' | translate}}
-                        </button>
-
-                        <button *ngIf="!item.deleted" mat-menu-item class="mat-menu-item-delete" (click)="delete(item)">
-                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_OUTBREAK' | translate}}
-                        </button>
-
-                        <button *ngIf="item.deleted && hasOutbreakWriteAccess()" mat-menu-item class="mat-menu-item-restore"
-                                (click)="restoreOutbreak(item)">
-                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_RESTORE_OUTBREAK' | translate}}
-                        </button>
-                    </ng-container>
-                </mat-menu>
-            </mat-cell>
-        </ng-container>
-
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
+        <mat-row
+            *matRowDef="let item; columns: visibleTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
     </mat-table>
 
     <div

@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
@@ -16,6 +16,7 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import * as _ from 'lodash';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-clusters-list',
@@ -37,7 +38,80 @@ export class ClustersListComponent extends ListComponent implements OnInit {
     clustersList$: Observable<ClusterModel[]>;
     clustersListCount$: Observable<any>;
 
+    recordActions: HoverRowAction[] = [
+        // View Cluster
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_CLUSTER',
+            click: (item: ClusterModel) => {
+                this.router.navigate(['/clusters', item.id, 'view']);
+            }
+        }),
+
+        // Modify Cluster
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_CLUSTERS_ACTION_MODIFY_CLUSTER',
+            click: (item: ClusterModel) => {
+                this.router.navigate(['/clusters', item.id, 'modify']);
+            },
+            visible: (): boolean => {
+                return this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.hasOutbreakWriteAccess();
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Cluster
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_CLUSTER',
+                    click: (item: ClusterModel) => {
+                        this.deleteCluster(item);
+                    },
+                    visible: (): boolean => {
+                        return this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasOutbreakWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (): boolean => {
+                        // visible only if at least one of the previous...
+                        return this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasOutbreakWriteAccess();
+                    }
+                }),
+
+                // View People
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_PEOPLE',
+                    click: (item: ClusterModel) => {
+                        this.router.navigate(['/clusters', item.id, 'people']);
+                    },
+                    visible: (): boolean => {
+                        return this.hasCaseReadAccess() ||
+                            this.hasContactReadAccess();
+                    }
+                })
+            ]
+        })
+    ];
+
     constructor(
+        private router: Router,
         private clusterDataService: ClusterDataService,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
@@ -117,13 +191,10 @@ export class ClustersListComponent extends ListComponent implements OnInit {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = [
+        return [
             'name',
-            'description',
-            'actions'
+            'description'
         ];
-
-        return columns;
     }
 
     /**

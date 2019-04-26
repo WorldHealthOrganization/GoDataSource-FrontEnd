@@ -86,6 +86,12 @@
         </button>
     </div>
 
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+        leftSideClass="hover-row-actions-mat-table-left"
+    ></app-hover-row-actions>
+
     <mat-table #table [dataSource]="followUpsList$ | async" matSort (matSortChange)="sortBy($event)">
         <!-- Checkbox -->
         <ng-container matColumnDef="checkbox">
@@ -376,70 +382,14 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Inline Actions -->
-        <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-            <mat-cell *matCellDef="let item" fxFlex="70px">
-                <div>
-                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                        <span class="xt-icon">moreVertical</span>
-                    </button>
-
-                    <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'view' ]"
-                            [queryParams]="{rootPage: rootPage}"
-                        >
-                            {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_VIEW_FOLLOW_UP' | translate }}
-                        </button>
-
-                        <ng-container *app-selected-outbreak-is-active>
-                            <ng-container
-                                *ngIf="hasFollowUpsWriteAccess()">
-                                <ng-container
-                                    *ngIf="!item.deleted">
-                                    <ng-container
-                                        *ngIf="item.personId && !Constants.isDateInTheFuture(item.date)">
-                                        <button
-                                            mat-menu-item
-                                            [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'modify']"
-                                            [queryParams]="{rootPage: rootPage}"
-                                        >
-                                            {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_FOLLOW_UP' | translate }}
-                                        </button>
-
-                                        <button
-                                            mat-menu-item
-                                            (click)="modifyQuestionnaire(item)">
-                                            {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_QUESTIONNAIRE' | translate }}
-                                        </button>
-                                    </ng-container>
-
-                                    <button
-                                        mat-menu-item
-                                        class="mat-menu-item-delete"
-                                        (click)="deleteFollowUp(item)">
-                                        {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_FOLLOW_UP' | translate }}
-                                    </button>
-                                </ng-container>
-
-                                <button
-                                    *ngIf="item.deleted"
-                                    mat-menu-item
-                                    class="mat-menu-item-restore"
-                                    (click)="restoreFollowUp(item)">
-                                    {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_FOLLOW_UP' | translate }}
-                                </button>
-                            </ng-container>
-                        </ng-container>
-                    </mat-menu>
-                </div>
-            </mat-cell>
-        </ng-container>
-
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
+        <mat-row
+            *matRowDef="let item; columns: visibleTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
     </mat-table>
 
     <div

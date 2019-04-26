@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
@@ -15,6 +15,7 @@ import { tap } from 'rxjs/operators';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { HoverRowAction } from '../../../../shared/components';
 
 @Component({
     selector: 'app-help-search',
@@ -39,7 +40,19 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
 
     searchedTerm: string = '';
 
+    recordActions: HoverRowAction[] = [
+        // View Help Item
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_GLOBAL_HELP_ACTION_VIEW_HELP_ITEM',
+            click: (item: HelpItemModel) => {
+                this.router.navigate(['/help', 'categories', item.categoryId, 'items', item.id, 'view-global']);
+            }
+        })
+    ];
+
     constructor(
+        private router: Router,
         private authDataService: AuthDataService,
         private helpDataService: HelpDataService,
         protected snackbarService: SnackbarService,
@@ -78,11 +91,6 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
             new VisibleColumnModel({
                 field: 'categoryId',
                 label: 'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY'
-            }),
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
             })
         ];
     }

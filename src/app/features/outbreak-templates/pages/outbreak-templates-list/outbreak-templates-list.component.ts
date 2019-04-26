@@ -15,6 +15,8 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 import { catchError, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-outbreak-templates-list',
@@ -38,7 +40,108 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
     UserSettings = UserSettings;
     ReferenceDataCategory = ReferenceDataCategory;
 
+    recordActions: HoverRowAction[] = [
+        // View Outbreak template
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_VIEW_OUTBREAK_TEMPLATE',
+            click: (item: OutbreakTemplateModel) => {
+                this.router.navigate(['/outbreak-templates', item.id, 'view']);
+            }
+        }),
+
+        // Modify Outbreak template
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_MODIFY_OUTBREAK_TEMPLATE',
+            click: (item: OutbreakTemplateModel) => {
+                this.router.navigate(['/outbreak-templates', item.id, 'modify']);
+            },
+            visible: (): boolean => {
+                return this.hasOutbreakTemplateWriteAccess();
+            }
+        }),
+
+        // Create outbreak from outbreak template
+        new HoverRowAction({
+            icon: 'add',
+            iconTooltip: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_GENERATE_OUTBREAK',
+            click: (item: OutbreakTemplateModel) => {
+                this.router.navigate(['/outbreaks', 'create'], {
+                    queryParams: {
+                        outbreakTemplateId: item.id
+                    }
+                });
+            },
+            visible: (): boolean => {
+                return this.hasOutbreakWriteAccess();
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Outbreak template
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_DELETE_OUTBREAK_TEMPLATE',
+                    click: (item: OutbreakTemplateModel) => {
+                        this.deleteOutbreakTemplate(item);
+                    },
+                    visible: (): boolean => {
+                        return this.hasOutbreakTemplateWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (): boolean => {
+                        // visible only if at least one of the previous...
+                        return this.hasOutbreakTemplateWriteAccess();
+                    }
+                }),
+
+                // View Outbreak template case form
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE',
+                    click: (item: OutbreakTemplateModel) => {
+                        this.router.navigate(['/outbreak-templates', item.id, 'case-questionnaire']);
+                    },
+                    visible: (): boolean => {
+                        return this.hasOutbreakTemplateWriteAccess();
+                    }
+                }),
+
+                // View Outbreak template contact follow-up form
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
+                    click: (item: OutbreakTemplateModel) => {
+                        this.router.navigate(['/outbreak-templates', item.id, 'contact-follow-up-questionnaire']);
+                    },
+                    visible: (): boolean => {
+                        return this.hasOutbreakTemplateWriteAccess();
+                    }
+                }),
+
+                // View Outbreak template case lab result form
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE',
+                    click: (item: OutbreakTemplateModel) => {
+                        this.router.navigate(['/outbreak-templates', item.id, 'case-lab-results-questionnaire']);
+                    },
+                    visible: (): boolean => {
+                        return this.hasOutbreakTemplateWriteAccess();
+                    }
+                })
+            ]
+        })
+    ];
+
     constructor(
+        private router: Router,
         protected snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private referenceDataDataService: ReferenceDataDataService,
@@ -77,11 +180,6 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
             new VisibleColumnModel({
                 field: 'disease',
                 label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE'
-            }),
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
             })
         ];
     }
