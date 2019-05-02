@@ -89,7 +89,12 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
     filtersVisible: boolean = false;
 
-    filters = {
+    filters: {
+        contactName: any,
+        visualId: any,
+        dateOfLastContact: any,
+        dateOfTheEndOfTheFollowUp: any
+    } = {
         contactName: null,
         visualId: null,
         dateOfLastContact: null,
