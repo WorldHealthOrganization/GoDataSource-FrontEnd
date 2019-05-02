@@ -267,11 +267,13 @@
                                     <!-- FollowUp alerted icon -->
                                     <img
                                         *ngIf="followUp.alerted"
+                                        fxFlex
                                         class="follow-up-range-date-column-data-bell"
                                         src="/assets/images/bell.png"/>
 
                                     <!-- FollowUp status -->
                                     <div
+                                        fxFlex
                                         [style.background-color]="dailyStatuses[followUp.statusId]?.colorCode">
                                         <!-- placeholder -->
                                     </div>
