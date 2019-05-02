@@ -21,6 +21,8 @@ import { catchError } from 'rxjs/operators';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { Constants } from '../../../../core/models/constants';
+import { EntityType } from '../../../../core/models/entity-type';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-transmission-chain-bars',
@@ -51,8 +53,13 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     // do architecture is x32?
     x86Architecture: boolean = false;
     // models for filters form elements
-    filters = {
-        dateOfOnset: null,
+    filters: {
+        date: any,
+        isolationDate: any,
+        isolationCenterName: any,
+        locationId: any
+    } = {
+        date: null,
         isolationDate: null,
         isolationCenterName: null,
         locationId: null
@@ -115,7 +122,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
             .subscribe((graphData) => {
                 this.loadingData = false;
 
-                if (graphData.casesOrder.length > 0) {
+                if (graphData.personsOrder.length > 0) {
                     this.noData = false;
                     this.transmissionChainBarsService.drawGraph(this.chartContainer.nativeElement, graphData);
                 } else {
@@ -191,7 +198,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     resetFilters() {
         // reset filters in UI
         this.filters = {
-            dateOfOnset: null,
+            date: null,
             locationId: null,
             isolationDate: null,
             isolationCenterName: null
@@ -214,17 +221,64 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         // clear query builder and apply each filter separately
         this.queryBuilder.clear();
 
-        if (this.filters.dateOfOnset !== null) {
+        // case dateonset / event date filter
+        if (
+            this.filters.date && (
+                this.filters.date.startDate ||
+                this.filters.date.endDate
+            )
+        ) {
+            // determine operator & value
+            const fromValue = this.filters.date.startDate ? moment(this.filters.date.startDate).toISOString() : null;
+            const toValue = this.filters.date.endDate ? moment(this.filters.date.endDate).toISOString() : null;
+            let operator: string;
+            let valueToCompare: any;
+            if (fromValue && toValue) {
+                operator = 'between';
+                valueToCompare = [fromValue, toValue];
+            } else if (fromValue) {
+                operator = 'gte';
+                valueToCompare = fromValue;
+            } else {
+                operator = 'lte';
+                valueToCompare = toValue;
+            }
+
+            // condition
             this.queryBuilder.filter
-                .byDateRange('dateOfOnset', this.filters.dateOfOnset);
+                .where({
+                    or: [
+                        {
+                            type: EntityType.CASE,
+                            dateOfOnset: {
+                                [operator]: valueToCompare
+                            }
+                        }, {
+                            type: EntityType.EVENT,
+                            date: {
+                                [operator]: valueToCompare
+                            }
+                        }
+                    ]
+                });
         }
 
         if (this.filters.locationId !== null) {
             this.queryBuilder.filter
                 .where({
-                    'addresses.parentLocationIdFilter': {
-                        inq: [this.filters.locationId]
-                    }
+                    or: [
+                        {
+                            type: EntityType.CASE,
+                            'addresses.parentLocationIdFilter': {
+                                inq: [this.filters.locationId]
+                            }
+                        }, {
+                            type: EntityType.EVENT,
+                            'address.parentLocationIdFilter': {
+                                inq: [this.filters.locationId]
+                            }
+                        }
+                    ]
                 });
         }
 

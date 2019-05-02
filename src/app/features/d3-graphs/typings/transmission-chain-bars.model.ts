@@ -1,10 +1,10 @@
-import { CaseBarModel } from './case-bar.model';
+import { EntityBarModel } from './entity-bar.model';
 
 export interface TransmissionChainBarsModel {
-    casesMap: {
-        [uid: string]: CaseBarModel
+    personsMap: {
+        [uid: string]: EntityBarModel
     };
-    casesOrder: string[];
+    personsOrder: string[];
     relationships: {
         [sourceUid: string]: string[]
     };

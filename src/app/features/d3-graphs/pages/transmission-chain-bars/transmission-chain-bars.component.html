@@ -64,13 +64,13 @@
             <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="20px">
                 <!-- Date of onset -->
                 <div fxFlex fxLayout="column" fxLayoutGap="10px">
-                    <div>{{ 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate }}</div>
+                    <div>{{ 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FIELD_LABEL_DATE' | translate }}</div>
 
                     <div fxLayout="row">
                         <app-form-daterange
-                            name="dateOfOnset"
-                            [ngModel]="filters.dateOfOnset"
-                            (changed)="filters.dateOfOnset = $event"
+                            name="date"
+                            [ngModel]="filters.date"
+                            (changed)="filters.date = $event"
                         ></app-form-daterange>
                     </div>
                 </div>
