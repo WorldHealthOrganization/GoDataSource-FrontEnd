@@ -20,9 +20,11 @@ export const EnglishUsLang = {
 
         /**
          * uiChainsOfTransmissionBars
-         * NEW GROUP
          */
         'LNG_HOSPITALISATION_ISOLATION_DATE_RANGE_WARNING_CASE_DATEOFONSET_AFTER_START_DATE': 'Warning: Date of onset is after start date',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_UNKNOWN_LABEL': 'Lab?',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_FOR_OTHER_CONDITIONS_CASE_LABEL': 'hsp',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FIELD_LABEL_DATE': 'Date',
 
         /**
          * uiTeamsListPage
@@ -39,12 +41,6 @@ export const EnglishUsLang = {
          * uiDialogs
          */
         'LNG_DIALOG_CONFIRM_WIPE_DEVICE': 'Are you sure you want to wipe this device?',
-
-        /**
-         * uiChainsOfTransmissionBars
-         */
-        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_UNKNOWN_LABEL': 'Lab?',
-        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_FOR_OTHER_CONDITIONS_CASE_LABEL': 'hsp',
 
         /**
          * uiCasesListPage
