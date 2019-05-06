@@ -250,6 +250,7 @@
                             [(ngModel)]="address.geoLocationAccurate"
                             [label]="'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES' | translate"
                             tooltip="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES_DESCRIPTION"
+                            [disabled]="disabled"
                             (input)="onChange()">
                         </app-form-slide-toggle>
                         <div
