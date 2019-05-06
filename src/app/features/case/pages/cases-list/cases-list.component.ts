@@ -409,6 +409,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         // #TODO should move this logic in list-component?
         this.resetFiltersAddDefault();
 
+        this.route.queryParams
+            .subscribe((queryParams: any) => {
+                console.log(queryParams);
+            });
         // add page title
         this.casesDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE') +
             ' - ' +

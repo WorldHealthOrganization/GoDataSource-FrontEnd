@@ -12,6 +12,7 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { Subscriber, Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Constants } from '../../../../core/models/constants';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-case-summary-dashlet',
@@ -67,7 +68,8 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private caseDataService: CaseDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private router: Router
     ) {
     }
 
@@ -125,10 +127,23 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
             if (classification !== Constants.CASE_CLASSIFICATION.NOT_A_CASE) {
                 result.push(new MetricChartDataModel({
                     name: this.i18nService.instant(classification),
-                    value: caseData.count
+                    value: caseData.count,
+                    classification: classification
                 }));
             }
         }, []);
+    }
+
+    onDoughnutPress(pressed) {
+        // this.router.navigate([`cases`],
+        //     {
+        //         queryParams: {
+        //             filterType: Constants.CASE_CLASSIFICATION.SUSPECT
+        //         }
+        //     });
+
+        console.log(pressed);
+        console.log(this.caseSummaryResults);
     }
 
     /**
@@ -187,6 +202,7 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
                 .getCasesGroupedByClassification(this.outbreakId, qb)
                 .subscribe((groupedCases) => {
                     this.caseSummaryResults = this.buildChartData(groupedCases.classification);
+                    console.log(this.caseSummaryResults);
                     this.displayLoading = false;
                 });
         }
