@@ -22,6 +22,8 @@ import { FilterModel, FilterType } from '../../../../shared/components/side-filt
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-lab-results',
@@ -62,7 +64,85 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
     UserSettings = UserSettings;
     ReferenceDataCategory = ReferenceDataCategory;
 
+    recordActions: HoverRowAction[] = [
+        // View Case Lab Results
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_VIEW_LAB_RESULT',
+            click: (item: LabResultModel) => {
+                this.router.navigate(['/cases', item.personId, 'lab-results', item.id, 'view'], {
+                    queryParams: {
+                        fromLabResultsList: true
+                    }
+                });
+            },
+            visible: (item: LabResultModel): boolean => {
+                return !item.deleted;
+            }
+        }),
+
+        // Modify Case Lab Results
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT',
+            click: (item: LabResultModel) => {
+                this.router.navigate(['/cases', item.personId, 'lab-results', item.id, 'modify'], {
+                    queryParams: {
+                        fromLabResultsList: true
+                    }
+                });
+            },
+            visible: (item: LabResultModel): boolean => {
+                return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.hasLabResultWriteAccess();
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Case Lab Results
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_LAB_RESULT',
+                    click: (item: LabResultModel) => {
+                        this.deleteLabResult(item);
+                    },
+                    visible: (item: LabResultModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasLabResultWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+
+                // Restore a deleted Case Lab Results
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT',
+                    click: (item: LabResultModel) => {
+                        this.restoreLabResult(item);
+                    },
+                    visible: (item: LabResultModel): boolean => {
+                        return item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasLabResultWriteAccess();
+                    },
+                    class: 'mat-menu-item-restore'
+                })
+            ]
+        })
+    ];
+
     constructor(
+        private router: Router,
         protected snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -157,11 +237,6 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
                 field: 'deleted',
                 label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DELETED',
                 visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
             })
         ];
     }

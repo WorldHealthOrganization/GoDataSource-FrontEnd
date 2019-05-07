@@ -1,9 +1,12 @@
-export interface CaseBarModel {
+import { EntityType } from '../../../core/models/entity-type';
+
+export interface EntityBarModel {
     id: string;
+    type: EntityType;
     firstName: string;
     lastName?: string;
     visualId?: string;
-    dateOfOnset: string;
+    date: string;
     addresses?: {
         // #TODO we may need location name
         locationId: string,

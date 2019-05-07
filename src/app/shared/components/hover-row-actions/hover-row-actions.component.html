@@ -8,10 +8,10 @@
 <!-- Hover actions -->
 <div
     #actionsRow
-    class="record-hover-actions"
     [class.partial-visible]="visible && !visibleActions"
     [class.full-visible]="visible && visibleActions"
     [class.right]="realPosition === HoverRowActionsPosition.RIGHT"
+    [ngClass]="rowClasses"
     [ngStyle]="hoverActionsStyle"
     (mouseenter)="actionsMouseEnter()"
     (mouseleave)="actionsMouseLeave()"
@@ -20,18 +20,19 @@
         *ngFor="let buttonData of realActions">
         <!-- Icon button -->
         <button
-            *ngIf="buttonData.type === HoverRowActionsType.BUTTON"
+            *ngIf="buttonData.type === HoverRowActionType.BUTTON"
             mat-icon-button
             color="accent"
             type="button"
             [ngClass]="buttonData.class"
-            (click)="buttonData.click(actionData)">
+            (click)="clickedButton(buttonData)"
+            [matTooltip]="buttonData.iconTooltip | translate:buttonData.iconTooltipTranslateData ? buttonData.iconTooltipTranslateData(actionData) : null">
             <span class="xt-icon">{{ buttonData.icon }}</span>
         </button>
 
         <!-- Menu -->
         <ng-container
-            *ngIf="buttonData.type === HoverRowActionsType.MENU">
+            *ngIf="buttonData.type === HoverRowActionType.MENU && buttonData.menuOptions">
             <button
                 mat-icon-button
                 color="accent"
@@ -48,20 +49,19 @@
                 <!-- Menu Options -->
                 <ng-container
                     *ngFor="let menuOptionData of buttonData.menuOptions">
-
                     <!-- Menu Button -->
                     <button
-                        *ngIf="menuOptionData.type === HoverRowActionsType.BUTTON"
+                        *ngIf="menuOptionData.type === HoverRowActionType.BUTTON"
                         mat-menu-item
                         type="button"
                         [ngClass]="menuOptionData.class"
-                        (click)="menuOptionData.click(actionData)">
-                        {{ menuOptionData.menuOptionLabel | translate }}
+                        (click)="clickedButton(menuOptionData)">
+                        {{ menuOptionData.menuOptionLabel | translate:menuOptionData.menuOptionLabelTranslateData ? menuOptionData.menuOptionLabelTranslateData(actionData) : null }}
                     </button>
 
                     <!-- Menu Divider -->
                     <mat-divider
-                        *ngIf="menuOptionData.type === HoverRowActionsType.DIVIDER"
+                        *ngIf="menuOptionData.type === HoverRowActionType.DIVIDER"
                         [ngClass]="menuOptionData.class">
                     </mat-divider>
                 </ng-container>

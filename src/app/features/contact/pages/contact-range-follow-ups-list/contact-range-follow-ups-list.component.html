@@ -70,21 +70,25 @@
                 <div fxFlex fxLayout="column" fxLayoutGap="10px">
                     <div>{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}</div>
 
-                    <app-form-daterange
-                        name="dateOfLastContact"
-                        [(ngModel)]="filters.dateOfLastContact"
-                        (changed)="filters.dateOfLastContact = $event"
-                    ></app-form-daterange>
+                    <div fxLayout="row">
+                        <app-form-daterange
+                            name="dateOfLastContact"
+                            [(ngModel)]="filters.dateOfLastContact"
+                            (changed)="filters.dateOfLastContact = $event"
+                        ></app-form-daterange>
+                    </div>
                 </div>
 
                 <div fxFlex fxLayout="column" fxLayoutGap="10px">
                     <div>{{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP' | translate }}</div>
 
-                    <app-form-daterange
-                        name="dateOfTheEndOfTheFollowUp"
-                        [(ngModel)]="filters.dateOfTheEndOfTheFollowUp"
-                        (changed)="filters.dateOfTheEndOfTheFollowUp = $event"
-                    ></app-form-daterange>
+                    <div fxLayout="row">
+                        <app-form-daterange
+                            name="dateOfTheEndOfTheFollowUp"
+                            [(ngModel)]="filters.dateOfTheEndOfTheFollowUp"
+                            (changed)="filters.dateOfTheEndOfTheFollowUp = $event"
+                        ></app-form-daterange>
+                    </div>
                 </div>
             </div>
 

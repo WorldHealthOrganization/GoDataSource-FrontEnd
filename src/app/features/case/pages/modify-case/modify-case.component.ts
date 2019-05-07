@@ -21,7 +21,6 @@ import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
-import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -491,7 +490,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
      */
     generateVisualId() {
         if (!_.isEmpty(this.selectedOutbreak.caseIdMask)) {
-            this.caseData.visualId = this.selectedOutbreak.caseIdMask;
+            this.caseData.visualId = CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask);
             this.visualId.control.markAsDirty();
         }
     }

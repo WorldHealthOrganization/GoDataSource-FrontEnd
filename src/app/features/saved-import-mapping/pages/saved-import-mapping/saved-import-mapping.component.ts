@@ -13,6 +13,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { Constants } from '../../../../core/models/constants';
 import { throwError } from 'rxjs';
+import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 
 @Component({
     selector: 'app-saved-import-mapping',
@@ -33,6 +34,27 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
 
     savedImportMappingsList$: Observable<SavedImportMappingModel[]>;
     savedImportMappingsListCount$: Observable<any>;
+
+    recordActions: HoverRowAction[] = [
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Import
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_DELETE_MAPPING',
+                    click: (item: SavedImportMappingModel) => {
+                        this.deleteImportMapping(item.id);
+                    },
+                    visible: (item: SavedImportMappingModel): boolean => {
+                        return !item.readOnly;
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        })
+    ];
 
     constructor(
         protected snackbarService: SnackbarService,
@@ -76,14 +98,11 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = [
+        return [
             'name',
             'isPublic',
-            'mappingKey',
-            'actions'
+            'mappingKey'
         ];
-
-        return columns;
     }
 
     /**

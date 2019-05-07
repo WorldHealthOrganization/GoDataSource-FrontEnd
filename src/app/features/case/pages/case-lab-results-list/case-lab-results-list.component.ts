@@ -5,7 +5,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { Observable } from 'rxjs';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
@@ -17,11 +17,14 @@ import { FilterModel, FilterType } from '../../../../shared/components/side-filt
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { UserSettings } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { catchError, share, tap } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
 import { throwError } from 'rxjs';
+import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { PERMISSION } from '../../../../core/models/permission.model';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -60,7 +63,89 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     // values for side filter
     savedFiltersType = Constants.APP_PAGE.CASE_LAB_RESULTS.value;
 
+    // authenticated user
+    authUser: UserModel;
+
+    recordActions: HoverRowAction[] = [
+        // View Case Lab Results
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_VIEW_LAB_RESULT',
+            click: (item: LabResultModel) => {
+                this.router.navigate(['/cases', item.personId, 'lab-results', item.id, 'view'], {
+                    queryParams: {
+                        fromLabResultsList: true
+                    }
+                });
+            },
+            visible: (item: LabResultModel): boolean => {
+                return !item.deleted;
+            }
+        }),
+
+        // Modify Case Lab Results
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT',
+            click: (item: LabResultModel) => {
+                this.router.navigate(['/cases', item.personId, 'lab-results', item.id, 'modify'], {
+                    queryParams: {
+                        fromLabResultsList: true
+                    }
+                });
+            },
+            visible: (item: LabResultModel): boolean => {
+                return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.hasLabResultWriteAccess();
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Case Lab Results
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_LAB_RESULT',
+                    click: (item: LabResultModel) => {
+                        this.deleteLabResult(item);
+                    },
+                    visible: (item: LabResultModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasLabResultWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+
+                // Restore a deleted Case Lab Results
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT',
+                    click: (item: LabResultModel) => {
+                        this.restoreLabResult(item);
+                    },
+                    visible: (item: LabResultModel): boolean => {
+                        return item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasLabResultWriteAccess();
+                    },
+                    class: 'mat-menu-item-restore'
+                })
+            ]
+        })
+    ];
+
     constructor(
+        private router: Router,
+        private authDataService: AuthDataService,
         private route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
         private caseDataService: CaseDataService,
@@ -76,6 +161,9 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     }
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // retrieve case information
         this.route.params.subscribe((params: { caseId }) => {
             // get selected outbreak
@@ -163,11 +251,6 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                 field: 'deleted',
                 label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DELETED',
                 visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
             })
         ];
     }
@@ -334,5 +417,13 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                         });
                 }
             });
+    }
+
+    /**
+     * Check if we have write access to lab results
+     * @returns {boolean}
+     */
+    hasLabResultWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
     }
 }

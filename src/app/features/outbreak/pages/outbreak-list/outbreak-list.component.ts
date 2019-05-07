@@ -9,7 +9,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import * as _ from 'lodash';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -61,6 +61,158 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     UserSettings = UserSettings;
 
     @ViewChild('topNav') topNav: TopnavComponent;
+
+    recordActions: HoverRowAction[] = [
+        // View Outbreak
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_OUTBREAK',
+            click: (item: OutbreakModel) => {
+                this.router.navigate(['/outbreaks', item.id, 'view']);
+            },
+            visible: (item: OutbreakModel): boolean => {
+                return !item.deleted;
+            }
+        }),
+
+        // Modify Outbreak
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_MODIFY_OUTBREAK',
+            click: (item: OutbreakModel) => {
+                this.router.navigate(['/outbreaks', item.id, 'modify']);
+            },
+            visible: (item: OutbreakModel): boolean => {
+                return !item.deleted &&
+                    this.hasOutbreakWriteAccess();
+            }
+        }),
+
+        // Make Outbreak active
+        new HoverRowAction({
+            icon: 'link',
+            iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE',
+            click: (item: OutbreakModel) => {
+                this.setActive(item);
+            },
+            visible: (item: OutbreakModel): boolean => {
+                return !item.deleted &&
+                    this.authUser &&
+                    item.id !== this.authUser.activeOutbreakId;
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Outbreak
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_OUTBREAK',
+                    click: (item: OutbreakModel) => {
+                        this.delete(item);
+                    },
+                    visible: (item: OutbreakModel): boolean => {
+                        return !item.deleted &&
+                            this.hasOutbreakWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: OutbreakModel): boolean => {
+                        // visible only if at least one of the previous...
+                        return !item.deleted &&
+                            this.hasOutbreakWriteAccess();
+                    }
+                }),
+
+                // View Outbreak inconsistencies
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_INCONSISTENCIES',
+                    click: (item: OutbreakModel) => {
+                        this.router.navigate(['/outbreaks', item.id, 'inconsistencies']);
+                    },
+                    visible: (item: OutbreakModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+
+                // View Outbreak case form
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE',
+                    click: (item: OutbreakModel) => {
+                        this.router.navigate(['/outbreaks', item.id, 'case-questionnaire']);
+                    },
+                    visible: (item: OutbreakModel): boolean => {
+                        return !item.deleted &&
+                            this.hasOutbreakWriteAccess();
+                    }
+                }),
+
+                // View Outbreak contact follow-up form
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
+                    click: (item: OutbreakModel) => {
+                        this.router.navigate(['/outbreaks', item.id, 'contact-follow-up-questionnaire']);
+                    },
+                    visible: (item: OutbreakModel): boolean => {
+                        return !item.deleted &&
+                            this.hasOutbreakWriteAccess();
+                    }
+                }),
+
+                // View Outbreak case lab result form
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE',
+                    click: (item: OutbreakModel) => {
+                        this.router.navigate(['/outbreaks', item.id, 'case-lab-results-questionnaire']);
+                    },
+                    visible: (item: OutbreakModel): boolean => {
+                        return !item.deleted &&
+                            this.hasOutbreakWriteAccess();
+                    }
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: OutbreakModel): boolean => {
+                        // visible only if at least one of the previous...
+                        return !item.deleted;
+                    }
+                }),
+
+                // Clone Outbreak
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_OUTBREAK',
+                    click: (item: OutbreakModel) => {
+                        this.cloneOutbreak(item);
+                    },
+                    visible: (item: OutbreakModel): boolean => {
+                        return !item.deleted &&
+                            this.hasOutbreakWriteAccess();
+                    }
+                }),
+
+                // Restore deleted Outbreak
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_RESTORE_OUTBREAK',
+                    click: (item: OutbreakModel) => {
+                        this.restoreOutbreak(item);
+                    },
+                    visible: (item: OutbreakModel): boolean => {
+                        return item.deleted &&
+                            this.hasOutbreakWriteAccess();
+                    },
+                    class: 'mat-menu-item-restore'
+                })
+            ]
+        })
+    ];
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -143,11 +295,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                 field: 'deleted',
                 label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
                 visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
             })
         ];
     }

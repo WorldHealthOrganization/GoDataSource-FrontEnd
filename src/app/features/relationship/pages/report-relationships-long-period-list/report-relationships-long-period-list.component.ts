@@ -12,6 +12,9 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { ReportDifferenceOnsetRelationshipModel } from '../../../../core/models/relationship.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { tap } from 'rxjs/operators';
+import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import { Router } from '@angular/router';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-report-relationships-long-period',
@@ -35,10 +38,128 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
     // list of long periods in the dates of onset between cases in the chain of transmission i.e. indicate where an intermediate contact may have been missed
     relationshipList$: Observable<ReportDifferenceOnsetRelationshipModel[]>;
 
-    // provide constants to template
-    EntityType = EntityType;
+    recordActions: HoverRowAction[] = [
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // View people 1
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_VIEW',
+                    menuOptionLabelTranslateData: (item: ReportDifferenceOnsetRelationshipModel) => {
+                        return item.people[0].model;
+                    },
+                    click: (item: ReportDifferenceOnsetRelationshipModel) => {
+                        this.router.navigate(['/cases', item.people[0].model.id, 'view'], {
+                            queryParams: {
+                                longPeriod: true
+                            }
+                        });
+                    }
+                }),
+
+                // View people 2
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_VIEW',
+                    menuOptionLabelTranslateData: (item: ReportDifferenceOnsetRelationshipModel) => {
+                        return item.people[1].model;
+                    },
+                    click: (item: ReportDifferenceOnsetRelationshipModel) => {
+                        this.router.navigate(['/cases', item.people[1].model.id, 'view'], {
+                            queryParams: {
+                                longPeriod: true
+                            }
+                        });
+                    }
+                }),
+
+                // View relationship
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_VIEW_RELATIONSHIP',
+                    click: (item: ReportDifferenceOnsetRelationshipModel) => {
+                        // #TODO TBD - if this is correct !?
+                        // #TODO TBD - if this is correct !?
+                        // #TODO TBD - if this is correct !?
+                        // #TODO TBD - if this is correct !?
+                        // #TODO TBD - if this is correct !?
+                        const relationTypePath: string = _.find(item.persons, { id: item.people[0].model.id }).source ? 'contacts' : 'exposures';
+                        this.router.navigate(['/relationships', EntityType.CASE, item.people[0].model.id, relationTypePath, item.id, 'view']);
+                    }
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER
+                }),
+
+                // Modify people 1
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_MODIFY',
+                    menuOptionLabelTranslateData: (item: ReportDifferenceOnsetRelationshipModel) => {
+                        return item.people[0].model;
+                    },
+                    click: (item: ReportDifferenceOnsetRelationshipModel) => {
+                        this.router.navigate(['/cases', item.people[0].model.id, 'modify'], {
+                            queryParams: {
+                                longPeriod: true
+                            }
+                        });
+                    },
+                    visible: () => {
+                        return this.hasCaseWriteAccess() &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id;
+                    }
+                }),
+
+                // Modify people 2
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_MODIFY',
+                    menuOptionLabelTranslateData: (item: ReportDifferenceOnsetRelationshipModel) => {
+                        return item.people[1].model;
+                    },
+                    click: (item: ReportDifferenceOnsetRelationshipModel) => {
+                        this.router.navigate(['/cases', item.people[1].model.id, 'modify'], {
+                            queryParams: {
+                                longPeriod: true
+                            }
+                        });
+                    },
+                    visible: () => {
+                        return this.hasCaseWriteAccess() &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id;
+                    }
+                }),
+
+                // Modify relationship
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_MODIFY_RELATIONSHIP',
+                    click: (item: ReportDifferenceOnsetRelationshipModel) => {
+                        // #TODO TBD - if this is correct !?
+                        // #TODO TBD - if this is correct !?
+                        // #TODO TBD - if this is correct !?
+                        // #TODO TBD - if this is correct !?
+                        // #TODO TBD - if this is correct !?
+                        const relationTypePath: string = _.find(item.persons, { id: item.people[0].model.id }).source ? 'contacts' : 'exposures';
+                        this.router.navigate(['/relationships', EntityType.CASE, item.people[0].model.id, relationTypePath, item.id, 'modify']);
+                    },
+                    visible: () => {
+                        return this.hasCaseWriteAccess() &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id;
+                    }
+                })
+            ]
+        })
+    ];
 
     constructor(
+        private router: Router,
         protected snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -95,8 +216,7 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
             'people[1].firstName',
             'people[1].lastName',
             'people[1].dateOfOnset',
-            'differenceBetweenDatesOfOnset',
-            'actions'
+            'differenceBetweenDatesOfOnset'
         ];
     }
 }

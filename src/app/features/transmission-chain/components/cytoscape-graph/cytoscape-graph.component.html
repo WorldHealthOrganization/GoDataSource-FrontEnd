@@ -64,7 +64,6 @@
             {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate}}
             <div class="legend-field-name">{{legend.edgeColorLabel | translate}}:</div>
         </div>
-
         <div
             *ngFor="let edgeColorItem of legend.edgeColorKeys" class="legend-item">
             <div
@@ -90,6 +89,34 @@
             </div>
             <div>
                 {{nodeIconItem | translate}}
+            </div>
+        </div>
+
+        <!-- node shape -->
+        <div *ngIf="legend.nodeShapeKeys && legend.nodeShapeKeys.length"
+             class="legend-name">
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE' | translate}}
+            <div class="legend-field-name">{{legend.nodeShapeLabel | translate}}:</div>
+        </div>
+        <div
+            *ngFor="let nodeShapeItem of legend.nodeShapeKeys" class="legend-item">
+            <span class="xt-icon">{{legend.nodeShape[nodeShapeItem]}}</span>
+            <div>
+                {{nodeShapeItem | translate}}
+            </div>
+        </div>
+
+        <!-- edge icon -->
+        <div *ngIf="legend.edgeIconKeys && legend.edgeIconKeys.length"
+             class="legend-name">
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE' | translate}}
+            <div class="legend-field-name">{{legend.edgeIconLabel | translate}}:</div>
+        </div>
+        <div
+            *ngFor="let edgeIconItem of legend.edgeIconKeys" class="legend-item">
+            <span class="xt-icon">{{legend.edgeIcon[edgeIconItem]}}</span>
+            <div>
+                {{edgeIconItem | translate}}
             </div>
         </div>
 

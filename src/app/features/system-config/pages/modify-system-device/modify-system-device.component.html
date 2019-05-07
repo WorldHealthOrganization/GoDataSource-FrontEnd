@@ -11,24 +11,26 @@
         <mat-card class="page-section">
             <div fxLayout="column">
 
-                <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                <div fxLayout="row" fxLayoutGap="20px">
                     <app-form-input
                         name="name"
                         [(ngModel)]="deviceData.name"
                         [placeholder]="'LNG_SYSTEM_DEVICE_FIELD_LABEL_NAME' | translate"
                         tooltip="LNG_SYSTEM_DEVICE_FIELD_LABEL_NAME_DESCRIPTION"
                         required="true"
-                        maxlength="200">
+                        maxlength="200"
+                        [disabled]="viewOnly">
                     </app-form-input>
                 </div>
-                <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                <div fxLayout="row" fxLayoutGap="20px">
                     <app-form-textarea
                         fxFlex
                         name="description"
                         [ngModel]="deviceData.description"
                         [placeholder]="'LNG_SYSTEM_DEVICE_FIELD_LABEL_DESCRIPTION' | translate"
                         tooltip="LNG_SYSTEM_DEVICE_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
-                        minRows="1">
+                        minRows="1"
+                        [disabled]="viewOnly">
                     </app-form-textarea>
 
                 </div>

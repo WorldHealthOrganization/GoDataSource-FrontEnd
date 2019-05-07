@@ -51,6 +51,11 @@
         </button>
     </div>
 
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+    ></app-hover-row-actions>
+
     <mat-table #table [dataSource]="syncLogsList$" matSort (matSortChange)="sortBy($event)">
         <!-- Sync Server URL -->
         <ng-container matColumnDef="syncServerUrl">
@@ -152,23 +157,25 @@
         <ng-container matColumnDef="outbreaks">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_OUTBREAKS' | translate}}</div>
-                </div>
-                <div class="column-filter">
-                    <app-form-select
-                        name="outbreaks"
-                        ngModel
-                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                        [options]="outbreaks"
-                        [multiple]="true"
-                        (optionChanged)="filterBySelectField('outbreakIDs', $event, 'id')"
-                        app-reset-input-on-side-filter
-                        [allowSelectionOfDisabledItems]="true"
-                        [displayInvisibleItems]="true"
-                        [displayFilterIcon]="true"
-                        optionLabelKey="name"
-                        optionValueKey="id">
-                    </app-form-select>
+                    <div class="column-header">
+                        {{'LNG_UPSTREAM_SERVER_FIELD_LABEL_OUTBREAKS' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="outbreaks"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="outbreaks"
+                            [multiple]="true"
+                            (optionChanged)="filterBySelectField('outbreakIDs', $event, 'id')"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true"
+                            optionLabelKey="name"
+                            optionValueKey="id">
+                        </app-form-select>
+                    </div>
                 </div>
             </mat-header-cell>
 
@@ -237,38 +244,14 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Inline Actions -->
-        <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-
-            <mat-cell *matCellDef="let item" fxFlex="70px">
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
-
-                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-                    <button
-                        *ngIf="item.error"
-                        mat-menu-item
-                        (click)="viewError(item)">
-                        {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_VIEW_ERROR' | translate }}
-                    </button>
-
-                    <ng-container
-                        *ngIf="hasSysConfigWriteAccess()">
-                        <button
-                            mat-menu-item
-                            class="mat-menu-item-delete"
-                            (click)="deleteSyncLog(item)">
-                            {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_LOG' | translate }}
-                        </button>
-                    </ng-container>
-                </mat-menu>
-            </mat-cell>
-        </ng-container>
-
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
+        <mat-row
+            *matRowDef="let item; columns: visibleTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
     </mat-table>
 
     <div

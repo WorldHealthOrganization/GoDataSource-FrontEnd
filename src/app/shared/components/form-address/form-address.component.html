@@ -250,6 +250,7 @@
                             [(ngModel)]="address.geoLocationAccurate"
                             [label]="'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES' | translate"
                             tooltip="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES_DESCRIPTION"
+                            [disabled]="disabled"
                             (input)="onChange()">
                         </app-form-slide-toggle>
                         <div
@@ -270,7 +271,7 @@
                 </div>
             </div>
 
-            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+            <div fxLayout="row" fxLayoutGap="20px">
                 <div fxFlex fxLayout="row" fxLayoutGap="5px">
                     <app-form-input
                         [name]="name + '[phoneNumber]'"

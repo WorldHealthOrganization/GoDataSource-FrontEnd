@@ -14,8 +14,7 @@
                 <!-- Details section -->
                 <mat-card class="page-section">
                     <div fxLayout="column">
-
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="name"
                                 [ngModel]="clusterData.name"
@@ -31,14 +30,15 @@
                             <div fxFlex><!-- placeholder --></div>
                         </div>
 
-                        <app-form-textarea
-                            name="description"
-                            [ngModel]="clusterData.description"
-                            [placeholder]="'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION' | translate"
-                            tooltip="LNG_CLUSTER_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
-                            [disabled]="viewOnly">
-                        </app-form-textarea>
-
+                        <div fxLayout="row">
+                            <app-form-textarea
+                                name="description"
+                                [ngModel]="clusterData.description"
+                                [placeholder]="'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION' | translate"
+                                tooltip="LNG_CLUSTER_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-textarea>
+                        </div>
                     </div>
                 </mat-card>
 

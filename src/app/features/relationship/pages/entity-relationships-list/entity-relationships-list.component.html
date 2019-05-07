@@ -55,6 +55,12 @@
         </div>
     </div>
 
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+        leftSideClass="hover-row-actions-mat-table-left"
+    ></app-hover-row-actions>
+
     <mat-table #table [dataSource]="relationshipsList$ | async" matSort (matSortChange)="sortBy($event)">
         <!-- Checkbox -->
         <ng-container matColumnDef="checkbox">
@@ -373,38 +379,14 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Inline Actions -->
-        <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-            <mat-cell *matCellDef="let item" fxFlex="70px">
-                <div>
-                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                        <span class="xt-icon">moreVertical</span>
-                    </button>
-
-                    <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-
-                        <button mat-menu-item [routerLink]="['.', item.relationship.id, 'view']">
-                            {{'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_VIEW_RELATIONSHIP' | translate}}
-                        </button>
-
-                        <ng-container *app-selected-outbreak-is-active>
-                            <button *ngIf="hasEntityWriteAccess()" mat-menu-item [routerLink]="['.', item.relationship.id, 'modify']">
-                                {{'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_MODIFY_RELATIONSHIP' | translate}}
-                            </button>
-
-                            <button *ngIf="hasEntityWriteAccess()" mat-menu-item class="mat-menu-item-delete" (click)="deleteRelationship(item)">
-                                {{'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP' | translate}}
-                            </button>
-                        </ng-container>
-
-                    </mat-menu>
-                </div>
-            </mat-cell>
-        </ng-container>
-
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
+        <mat-row
+            *matRowDef="let item; columns: visibleTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
     </mat-table>
 
     <div

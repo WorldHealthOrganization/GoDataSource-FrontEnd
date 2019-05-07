@@ -381,7 +381,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
      */
     generateVisualId() {
         if (!_.isEmpty(this.selectedOutbreak.contactIdMask)) {
-            this.contactData.visualId = this.selectedOutbreak.contactIdMask;
+            this.contactData.visualId = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);
             this.visualId.control.markAsDirty();
         }
     }

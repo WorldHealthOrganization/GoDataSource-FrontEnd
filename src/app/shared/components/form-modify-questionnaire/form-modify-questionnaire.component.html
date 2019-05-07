@@ -14,8 +14,9 @@
     <!-- Question list general actions -->
     <div
         *ngIf="hasWriteAccess()"
-        fxFlex fxLayout="row" fxLayoutAlign="end"
-        class="modify-questionnaire-table-question-actions-top">
+        fxLayout="row" fxLayoutAlign="end"
+        class="modify-questionnaire-table-question-actions-top"
+    >
         <button
             type="button"
             mat-flat-button color="accent"
@@ -60,9 +61,7 @@
     </div>
 
     <!-- Question list headers -->
-    <div
-        fxFlex fxLayout="row">
-
+    <div fxLayout="row">
         <!-- Question Order -->
         <div
             fxFlex="70px"
@@ -129,9 +128,7 @@
     </div>
 
     <!-- Question Data -->
-    <div
-        fxFlex fxLayout="column">
-
+    <div fxLayout="column">
         <!-- Hover question effects / actions -->
         <app-hover-row-actions
             #hoverRowQuestion
@@ -151,7 +148,7 @@
 
             <!-- Question Row Data -->
             <div
-                fxFlex fxLayout="row"
+                fxLayout="row"
                 [class.question-in-edit-row]="questionIndex === questionIndexInEditMode"
                 [class.question-is-inactive]="questionIndex === questionIndexInEditMode ? questionInEditModeClone.inactive : question.inactive">
                 <!-- Order -->
@@ -228,8 +225,9 @@
             >
                 <!-- Question Actions -->
                 <div
-                    fxFlex fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px"
-                    class="modify-questionnaire-edit-question-card-buttons">
+                    fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px"
+                    class="modify-questionnaire-edit-question-card-buttons"
+                >
                     <button
                         type="button"
                         mat-raised-button
@@ -257,7 +255,8 @@
                         [id]="uniqueIDQuestionForm"
                         class="modify-questionnaire-form"
                         fxFlex fxLayout="column"
-                        (submit)="saveModifyQuestion()">
+                        (submit)="saveModifyQuestion()"
+                    >
                         <!-- Dummy field used to make form dirty -->
                         <input
                             #inputQuestionForMakingFormDirty="ngModel"
@@ -400,11 +399,11 @@
                         <!-- question answers -->
                         <div
                             *ngIf="questionInEditModeClone.answerType === answerTypes.MULTIPLE_OPTIONS.value || questionInEditModeClone.answerType === answerTypes.SINGLE_SELECTION.value"
-                            fxFlex fxLayout="column">
+                            fxLayout="column">
                             <!-- Answers list general actions -->
                             <div
                                 *ngIf="hasWriteAccess()"
-                                fxFlex fxLayout="row" fxLayoutAlign="end"
+                                fxLayout="row" fxLayoutAlign="end"
                                 class="modify-questionnaire-table-answer-actions-top">
                                 <button
                                     type="button"
@@ -450,8 +449,7 @@
                             </div>
 
                             <!-- Answer Headers -->
-                            <div
-                                fxFlex fxLayout="row">
+                            <div fxLayout="row">
                                 <!-- Answer Order -->
                                 <div
                                     fxFlex="70px"
@@ -507,7 +505,7 @@
 
                                 <!-- Answer Row Data -->
                                 <div
-                                    fxFlex fxLayout="row"
+                                    fxLayout="row"
                                     [class.answer-in-edit-row]="answerIndex === questionAnswerIndexInEditMode">
                                     <!-- Order -->
                                     <div
@@ -554,7 +552,7 @@
                                 >
                                     <!-- Answer buttons -->
                                     <div
-                                        fxFlex fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px"
+                                        fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px"
                                         class="modify-questionnaire-edit-question-answer-card-buttons">
                                         <button
                                             type="button"
@@ -576,7 +574,9 @@
 
                                     <!-- Answer Data -->
                                     <mat-card
-                                        class="modify-questionnaire-edit-question-answer-card">
+                                        class="modify-questionnaire-edit-question-answer-card"
+                                        fxLayout="row"
+                                    >
                                         <!-- Answer Form -->
                                         <form
                                             #answerForm="ngForm"
@@ -684,7 +684,7 @@
                             <!-- Answers list general actions -->
                             <div
                                 *ngIf="hasWriteAccess()"
-                                fxFlex fxLayout="row" fxLayoutAlign="end"
+                                fxLayout="row" fxLayoutAlign="end"
                                 class="modify-questionnaire-table-answer-actions-bottom">
                                 <button
                                     type="button"
@@ -738,7 +738,7 @@
     <!-- Question list general actions -->
     <div
         *ngIf="hasWriteAccess()"
-        fxFlex fxLayout="row" fxLayoutAlign="end"
+        fxLayout="row" fxLayoutAlign="end"
         class="modify-questionnaire-table-question-actions-bottom">
         <button
             type="button"

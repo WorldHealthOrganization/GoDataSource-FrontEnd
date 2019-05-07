@@ -10,14 +10,14 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, DialogField, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import * as moment from 'moment';
@@ -122,7 +122,270 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
     loadingDialog: LoadingDialogModel;
 
+    recordActions: HoverRowAction[] = [
+        // View Case
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE',
+            click: (item: CaseModel) => {
+                this.router.navigate(['/cases', item.id, 'view']);
+            },
+            visible: (item: CaseModel): boolean => {
+                return !item.deleted;
+            }
+        }),
+
+        // Modify Case
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE',
+            click: (item: CaseModel) => {
+                this.router.navigate(['/cases', item.id, 'modify']);
+            },
+            visible: (item: CaseModel): boolean => {
+                return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.hasCaseWriteAccess();
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Convert Case To Contact
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT',
+                    click: (item: CaseModel) => {
+                        this.convertCaseToContact(item);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasCaseWriteAccess() &&
+                            this.hasContactWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+
+                // Delete Case
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE',
+                    click: (item: CaseModel) => {
+                        this.deleteCase(item);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasCaseWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: CaseModel): boolean => {
+                        // visible only if at least one of the first two items is visible
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasCaseWriteAccess();
+                    }
+                }),
+
+                // Add Contact to Case
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_ADD_CONTACT',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/contacts', 'create'], {
+                            queryParams: {
+                                entityType: EntityType.CASE,
+                                entityId: item.id
+                            }
+                        });
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasContactWriteAccess();
+                    }
+                }),
+
+                // Bulk add contacts to case
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_BULK_ADD_CONTACTS',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/contacts', 'create-bulk'], {
+                            queryParams: {
+                                entityType: EntityType.CASE,
+                                entityId: item.id
+                            }
+                        });
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasContactWriteAccess();
+                    }
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: CaseModel): boolean => {
+                        // visible only if at least one of the previous two items is visible
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasContactWriteAccess();
+                    }
+                }),
+
+                // See case contacts..
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/relationships', EntityType.CASE, item.id, 'contacts']);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+
+                // See case exposures
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/relationships', EntityType.CASE, item.id, 'exposures']);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: CaseModel): boolean => {
+                        // visible only if at least one of the previous two items is visible
+                        return !item.deleted;
+                    }
+                }),
+
+                // See case lab results
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/cases', item.id, 'lab-results']);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            this.hasCaseWriteAccess();
+                    }
+                }),
+
+                // See contacts follow-us belonging to this case
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/contacts', 'case-related-follow-ups', item.id]);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            this.hasContactFollowUpReadAccess();
+                    }
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: CaseModel): boolean => {
+                        // visible only if at least one of the previous two items is visible
+                        return !item.deleted && (
+                            this.hasCaseWriteAccess() ||
+                            this.hasContactFollowUpReadAccess()
+                        );
+                    }
+                }),
+
+                // View Case movement map
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/cases', item.id, 'movement']);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+
+                // View case chronology timeline
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/cases', item.id, 'chronology']);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+
+                // Download case investigation form
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASE_INVESTIGATION_FORM',
+                    click: (item: CaseModel) => {
+                        this.exportCaseInvestigationForm(item);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            this.hasReportAccess() &&
+                            this.hasContactReadAccess();
+                    }
+                }),
+
+                // Restore a deleted case
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_RESTORE_CASE',
+                    click: (item: CaseModel) => {
+                        this.restoreCase(item);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasCaseWriteAccess();
+                    },
+                    class: 'mat-menu-item-restore'
+                })
+            ]
+        })
+    ];
+
     constructor(
+        private router: Router,
         private caseDataService: CaseDataService,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
@@ -286,11 +549,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 field: 'deleted',
                 label: 'LNG_CASE_FIELD_LABEL_DELETED',
                 visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
             })
         ];
     }
@@ -535,6 +793,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      */
     hasContactReadAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
+    }
+
+    /**
+     * Check if we have access view a contact follow-up
+     * @returns {boolean}
+     */
+    hasContactFollowUpReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP);
     }
 
     /**

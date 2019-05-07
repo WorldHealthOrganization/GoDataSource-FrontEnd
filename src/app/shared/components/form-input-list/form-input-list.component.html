@@ -5,8 +5,10 @@
         #groupForm="ngForm"
         fxLayout="column"
     >
-        <div *ngFor="let inputValue of inputValues; let i = index; trackBy: trackByIndex" fxFlex fxLayout="row"
-             fxLayoutAlign="start center">
+        <div
+            *ngFor="let inputValue of inputValues; let i = index; trackBy: trackByIndex"
+            fxLayout="row" fxLayoutAlign="start center"
+        >
             <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
                 <app-form-input
                     *ngIf="!unique"

@@ -24,7 +24,7 @@
                     <mat-card class="page-section">
                         <div fxLayout="column">
 
-                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <div fxLayout="row" fxLayoutGap="20px">
                                 <app-form-select
                                     name="firstName"
                                     [(ngModel)]="uniqueOptions?.firstName.value"
@@ -98,7 +98,7 @@
                     <mat-card class="page-section">
                         <div fxLayout="column">
 
-                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <div fxLayout="row" fxLayoutGap="20px">
                                 <app-form-select
                                     name="riskLevel"
                                     [(ngModel)]="uniqueOptions?.riskLevel.value"
@@ -133,13 +133,15 @@
                                 </app-form-select>
                             </div>
 
-                            <app-form-select
-                                name="riskReason"
-                                [(ngModel)]="uniqueOptions?.riskReason.value"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION"
-                                [options]="uniqueOptions?.riskReason.options">
-                            </app-form-select>
+                            <div fxLayout="row">
+                                <app-form-select
+                                    name="riskReason"
+                                    [(ngModel)]="uniqueOptions?.riskReason.value"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION"
+                                    [options]="uniqueOptions?.riskReason.options">
+                                </app-form-select>
+                            </div>
                         </div>
                     </mat-card>
 
@@ -206,7 +208,7 @@
                     <mat-card class="page-section">
                         <div fxLayout="column">
 
-                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <div fxLayout="row" fxLayoutGap="20px">
                                 <app-form-select
                                     name="classification"
                                     [(ngModel)]="uniqueOptions?.classification.value"
@@ -261,7 +263,7 @@
                     <!-- Outcome section -->
                     <mat-card class="page-section">
                         <div fxLayout="column">
-                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <div fxLayout="row" fxLayoutGap="20px">
                                 <app-form-select
                                     name="outcomeId"
                                     [(ngModel)]="uniqueOptions?.outcomeId.value"
@@ -294,7 +296,6 @@
                                     [options]="uniqueOptions?.dateOfBurial.options">
                                 </app-form-select>
                             </div>
-
                         </div>
                     </mat-card>
 

@@ -27,7 +27,7 @@ export class GraphNodeModel {
     constructor(data = null) {
         this.id = _.get(data, 'id');
         this.name = _.get(data, 'name');
-        this.type = _.get(data, 'type', '');
+        this.type = _.get(data, 'type');
         this.dateTimeline = _.get(data, 'dateTimeline', '');
         this.displayTimeline = _.get(data, 'displayTimeline', 'element');
         this.nodeColor = _.get(data, 'nodeColor', Constants.DEFAULT_COLOR_CHAINS);
@@ -64,18 +64,38 @@ export class GraphNodeModel {
         }
     }
 
+    static getNodeShapeType(type: EntityType): string | undefined {
+        switch (type) {
+            case EntityType.CASE:
+                return 'ellipse';
+            case EntityType.CONTACT:
+                return 'pentagon';
+            case EntityType.EVENT:
+                return 'star';
+            default:
+                return 'ellipse';
+        }
+    }
+
+    static getNodeShapeClassification(classification: string): string | undefined {
+        switch (classification) {
+            case Constants.CASE_CLASSIFICATION.CONFIRMED:
+                return 'ellipse';
+            case Constants.CASE_CLASSIFICATION.PROBABLE:
+                return 'rectangle';
+            case Constants.CASE_CLASSIFICATION.SUSPECT:
+                return 'pentagon';
+            default:
+                return 'ellipse';
+        }
+    }
+
     /**
      * set the node shape based on the entity type
      * @param nodeData
      */
     setNodeShapeType(nodeData) {
-        if (nodeData.type === EntityType.CASE) {
-            this.shape = 'ellipse';
-        } else if (nodeData.type === EntityType.CONTACT) {
-            this.shape = 'pentagon';
-        } else if (nodeData.type === EntityType.EVENT) {
-            this.shape = 'star';
-        }
+        this.shape = GraphNodeModel.getNodeShapeType(nodeData.type);
     }
 
     /**
@@ -83,12 +103,6 @@ export class GraphNodeModel {
      * @param nodeData
      */
     setNodeShapeClassification(nodeData) {
-        if (nodeData.model.classification === Constants.CASE_CLASSIFICATION.CONFIRMED) {
-            this.shape = 'ellipse';
-        } else if (nodeData.model.classification === Constants.CASE_CLASSIFICATION.PROBABLE) {
-            this.shape = 'rectangle';
-        } else if (nodeData.model.classification === Constants.CASE_CLASSIFICATION.SUSPECT) {
-            this.shape = 'pentagon';
-        }
+        this.shape = GraphNodeModel.getNodeShapeClassification(nodeData.model.classification);
     }
 }

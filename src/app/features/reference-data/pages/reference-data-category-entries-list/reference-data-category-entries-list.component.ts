@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
@@ -34,7 +34,50 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
 
     authUser: UserModel;
 
+    recordActions: HoverRowAction[] = [
+        // View Item
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_VIEW_ENTRY',
+            click: (item: ReferenceDataEntryModel) => {
+                this.router.navigate(['/reference-data', item.categoryId, item.id, 'view']);
+            }
+        }),
+
+        // Modify Item
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_MODIFY_ENTRY',
+            click: (item: ReferenceDataEntryModel) => {
+                this.router.navigate(['/reference-data', item.categoryId, item.id, 'modify']);
+            },
+            visible: (): boolean => {
+                return this.hasReferenceDataWriteAccess();
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Item
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY',
+                    click: (item: ReferenceDataEntryModel) => {
+                        this.deleteEntry(item);
+                    },
+                    visible: (): boolean => {
+                        return this.hasReferenceDataWriteAccess();
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        })
+    ];
+
     constructor(
+        private router: Router,
         protected route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
         protected snackbarService: SnackbarService,
@@ -112,9 +155,15 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = ['label', 'description', 'icon', 'color', 'order', 'active', 'readonly', 'actions'];
-
-        return columns;
+        return [
+            'label',
+            'description',
+            'icon',
+            'color',
+            'order',
+            'active',
+            'readonly'
+        ];
     }
 
     /**

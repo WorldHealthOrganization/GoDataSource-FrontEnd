@@ -64,13 +64,15 @@
             <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="20px">
                 <!-- Date of onset -->
                 <div fxFlex fxLayout="column" fxLayoutGap="10px">
-                    <div>{{ 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate }}</div>
+                    <div>{{ 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FIELD_LABEL_DATE' | translate }}</div>
 
-                    <app-form-daterange
-                        name="dateOfOnset"
-                        [ngModel]="filters.dateOfOnset"
-                        (changed)="filters.dateOfOnset = $event"
-                    ></app-form-daterange>
+                    <div fxLayout="row">
+                        <app-form-daterange
+                            name="date"
+                            [ngModel]="filters.date"
+                            (changed)="filters.date = $event"
+                        ></app-form-daterange>
+                    </div>
                 </div>
 
                 <!-- Location -->
@@ -88,11 +90,13 @@
                 <div fxFlex fxLayout="column" fxLayoutGap="10px">
                     <div>{{ 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FILTERS_HOSPITALISATION_ISOLATION' | translate }}</div>
 
-                    <app-form-daterange
-                        name="isolationDate"
-                        [ngModel]="filters.isolationDate"
-                        (changed)="filters.isolationDate = $event"
-                    ></app-form-daterange>
+                    <div fxLayout="row">
+                        <app-form-daterange
+                            name="isolationDate"
+                            [ngModel]="filters.isolationDate"
+                            (changed)="filters.isolationDate = $event"
+                        ></app-form-daterange>
+                    </div>
                 </div>
 
                 <!-- Hospitalisation / Isolation center name -->

@@ -15,7 +15,7 @@
                 <!-- Details section -->
                 <mat-card class="page-section">
                     <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                                 <app-form-input
                                     name="name"
@@ -47,14 +47,16 @@
                             </app-form-input>
                         </div>
 
-                        <app-form-textarea
-                            name="description"
-                            [(ngModel)]="upstreamServerData.description"
-                            [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION' | translate"
-                            tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
-                        </app-form-textarea>
+                        <div fxLayout="row">
+                            <app-form-textarea
+                                name="description"
+                                [(ngModel)]="upstreamServerData.description"
+                                [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION' | translate"
+                                tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
+                            </app-form-textarea>
+                        </div>
 
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="syncInterval"
                                 [(ngModel)]="upstreamServerData.syncInterval"
@@ -81,7 +83,7 @@
                             <div fxFlex><!-- placeholder --></div>
                         </div>
 
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="credentials[clientId]"
                                 [(ngModel)]="upstreamServerData.credentials.clientId"

@@ -33,6 +33,11 @@
         </div>
     </div>
 
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+    ></app-hover-row-actions>
+
     <mat-table #table [dataSource]="entitiesList$ | async" matSort (matSortChange)="sortBy($event)">
         <!-- First Name -->
         <ng-container matColumnDef="firstName">
@@ -100,36 +105,14 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Inline Actions -->
-        <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-
-            <mat-cell *matCellDef="let item" fxFlex="70px">
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
-
-                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-                    <button
-                        [routerLink]="getItemRouterLink(item, 'view')"
-                        mat-menu-item>
-                        {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
-                    </button>
-
-                    <ng-container *app-selected-outbreak-is-active>
-                        <button
-                            *ngIf="getAccessPermissions(item)"
-                            [routerLink]="getItemRouterLink(item, 'modify')"
-                            mat-menu-item>
-                            {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
-                        </button>
-                    </ng-container>
-                </mat-menu>
-            </mat-cell>
-        </ng-container>
-
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+        <mat-row
+            *matRowDef="let item; columns: getTableColumns()"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
     </mat-table>
 
     <div

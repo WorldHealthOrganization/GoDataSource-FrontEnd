@@ -14,7 +14,7 @@
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="firstName"
                                 [(ngModel)]="user.firstName"
@@ -60,7 +60,7 @@
 
                         <div
                             *ngIf="hasOutbreakReadAccess()"
-                            fxLayout="row" fxLayoutGap="20px" fxFlex
+                            fxLayout="row" fxLayoutGap="20px"
                         >
                             <app-form-select
                                 name="outbreakIds"
@@ -95,7 +95,7 @@
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 type="password"
                                 name="password"
@@ -130,7 +130,7 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button *ngIf="viewOnly && hasUserWriteAccess()"
+        <button *ngIf="viewOnly && hasUserWriteAccess() && user.id && user.id !== authUser.id"
                 mat-raised-button type="button" color="accent"
                 [routerLink]="['/users', userId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}

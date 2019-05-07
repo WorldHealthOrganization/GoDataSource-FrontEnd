@@ -42,6 +42,11 @@
         </button>
     </div>
 
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+    ></app-hover-row-actions>
+
     <mat-table #table [dataSource]="outbreakTemplatesList$ | async" matSort (matSortChange)="sortBy($event)">
 
         <!-- Name -->
@@ -97,73 +102,14 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Inline Actions -->
-        <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-            <mat-cell *matCellDef="let item" fxFlex="70px">
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
-
-                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-                    <ng-container
-                        *ngIf="hasOutbreakWriteAccess()">
-                        <button
-                            mat-menu-item
-                            class="mat-menu-item"
-                            routerLink="/outbreaks/create"
-                            [queryParams]="{ outbreakTemplateId: item.id }">
-                            {{ 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_GENERATE_OUTBREAK' | translate}}
-                        </button>
-
-                        <mat-divider></mat-divider>
-                    </ng-container>
-
-                    <button
-                        mat-menu-item
-                        [routerLink]="['/outbreak-templates', item.id, 'case-questionnaire']">
-                        {{ 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE' | translate }}
-                    </button>
-
-                    <button
-                        mat-menu-item
-                        [routerLink]="['/outbreak-templates', item.id, 'contact-follow-up-questionnaire']">
-                        {{ 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE' | translate }}
-                    </button>
-
-                    <button
-                        mat-menu-item
-                        [routerLink]="['/outbreak-templates', item.id, 'case-lab-results-questionnaire']">
-                        {{ 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE' | translate }}
-                    </button>
-
-                    <mat-divider></mat-divider>
-
-                    <button mat-menu-item [routerLink]="['.', item.id, 'view']">
-                        {{ 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_VIEW_OUTBREAK_TEMPLATE' | translate }}
-                    </button>
-
-                    <ng-container
-                        *ngIf="hasOutbreakTemplateWriteAccess()">
-                        <button
-                            mat-menu-item
-                            [routerLink]="['.', item.id, 'modify']">
-                            {{'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_MODIFY_OUTBREAK_TEMPLATE'| translate}}
-                        </button>
-
-                        <button
-                            mat-menu-item
-                            class="mat-menu-item-delete"
-                            (click)="deleteOutbreakTemplate(item)">
-                            {{ 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_DELETE_OUTBREAK_TEMPLATE' | translate }}
-                        </button>
-                    </ng-container>
-                </mat-menu>
-            </mat-cell>
-        </ng-container>
-
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
+        <mat-row
+            *matRowDef="let item; columns: visibleTableColumns"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
     </mat-table>
 
     <div

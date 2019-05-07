@@ -36,6 +36,11 @@
         </button>
     </div>
 
+    <!-- Hover question effects / actions -->
+    <app-hover-row-actions
+        #hoverRow
+    ></app-hover-row-actions>
+
     <mat-table #table [dataSource]="usersList$ | async" matSort (matSortChange)="sortBy($event)">
 
         <!-- Last Name -->
@@ -217,38 +222,14 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Inline Actions -->
-        <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-            <mat-cell *matCellDef="let item" fxFlex="70px">
-
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
-
-                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-
-                    <button mat-menu-item [routerLink]="['.', item.id, 'view']">
-                        {{'LNG_PAGE_LIST_USERS_ACTION_VIEW_USER' | translate}}
-                    </button>
-
-                    <button *ngIf="hasUserWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                        {{'LNG_PAGE_LIST_USERS_ACTION_MODIFY_USER' | translate}}
-                    </button>
-
-                    <span [matTooltip]="(item.id === authUser.id ? 'You cannot delete your own account' : '')">
-                        <button *ngIf="hasUserWriteAccess()" mat-menu-item [disabled]="item.id === authUser.id" (click)="deleteUser(item)">
-                            {{'LNG_PAGE_LIST_USERS_ACTION_DELETE_USER' | translate}}
-                        </button>
-                    </span>
-
-                </mat-menu>
-
-            </mat-cell>
-        </ng-container>
-
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+        <mat-row
+            *matRowDef="let item; columns: getTableColumns()"
+            app-hover-row-actions
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="recordActions"
+            [hoverRowActionData]="item"
+        ></mat-row>
     </mat-table>
 
     <div

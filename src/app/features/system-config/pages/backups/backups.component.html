@@ -77,6 +77,11 @@
             </button>
         </div>
 
+        <!-- Hover question effects / actions -->
+        <app-hover-row-actions
+            #hoverRow
+        ></app-hover-row-actions>
+
         <mat-table #table [dataSource]="backupsList$ | async" matSort (matSortChange)="sortBy($event)">
             <!-- Location -->
             <ng-container matColumnDef="location">
@@ -233,44 +238,14 @@
                 </mat-cell>
             </ng-container>
 
-            <!-- Inline Actions -->
-            <ng-container matColumnDef="actions">
-                <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-
-                <mat-cell *matCellDef="let item" fxFlex="70px">
-                    <ng-container
-                        *ngIf="hasSysConfigWriteAccess() && item.status !== Constants.SYSTEM_BACKUP_STATUS.PENDING.value">
-
-                        <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                            <span class="xt-icon">moreVertical</span>
-                        </button>
-
-                        <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-                            <ng-container
-                                *ngIf="item.status === Constants.SYSTEM_BACKUP_STATUS.SUCCESS.value">
-                                <button
-                                    mat-menu-item
-                                    (click)="restoreBackup(item)">
-                                    {{ 'LNG_PAGE_SYSTEM_BACKUPS_ACTION_RESTORE_BACKUP' | translate }}
-                                </button>
-
-                                <mat-divider></mat-divider>
-                            </ng-container>
-
-                            <button
-                                mat-menu-item
-                                class="mat-menu-item-delete"
-                                (click)="deleteBackup(item)">
-                                {{ 'LNG_PAGE_SYSTEM_BACKUPS_ACTION_DELETE_BACKUP' | translate }}
-                            </button>
-                        </mat-menu>
-
-                    </ng-container>
-                </mat-cell>
-            </ng-container>
-
             <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-            <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+            <mat-row
+                *matRowDef="let item; columns: getTableColumns()"
+                app-hover-row-actions
+                [hoverRowActionsComponent]="hoverRow"
+                [hoverRowActions]="recordActions"
+                [hoverRowActionData]="item"
+            ></mat-row>
         </mat-table>
 
         <div

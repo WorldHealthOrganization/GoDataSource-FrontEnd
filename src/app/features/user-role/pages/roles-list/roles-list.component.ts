@@ -8,11 +8,12 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-roles-list',
@@ -33,7 +34,52 @@ export class RolesListComponent extends ListComponent implements OnInit {
     // list of permission
     availablePermissions$: Observable<any>;
 
+    recordActions: HoverRowAction[] = [
+        // View Role
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_USER_ROLES_ACTION_VIEW_ROLE',
+            click: (item: UserRoleModel) => {
+                this.router.navigate(['/user-roles', item.id, 'view']);
+            }
+        }),
+
+        // Modify Role
+        new HoverRowAction({
+            icon: 'settings',
+            iconTooltip: 'LNG_PAGE_LIST_USER_ROLES_ACTION_MODIFY_ROLE',
+            click: (item: UserRoleModel) => {
+                this.router.navigate(['/user-roles', item.id, 'modify']);
+            },
+            visible: (item: UserRoleModel): boolean => {
+                return this.hasUserRoletWriteAccess() &&
+                    !this.authUser.hasRole(item.id);
+            }
+        }),
+
+        // Other actions
+        new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                // Delete Role
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_USER_ROLES_ACTION_DELETE_ROLE',
+                    click: (item: UserRoleModel) => {
+                        this.deleteRole(item);
+                    },
+                    visible: (item: UserRoleModel): boolean => {
+                        return this.hasUserRoletWriteAccess() &&
+                            !this.authUser.hasRole(item.id);
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        })
+    ];
+
     constructor(
+        private router: Router,
         private userRoleDataService: UserRoleDataService,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
@@ -99,13 +145,10 @@ export class RolesListComponent extends ListComponent implements OnInit {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = ['name', 'description', 'permissions'];
-
-        // check if the authenticated user has WRITE access
-        if (this.hasUserRoletWriteAccess()) {
-            columns.push('actions');
-        }
-
-        return columns;
+        return [
+            'name',
+            'description',
+            'permissions'
+        ];
     }
 }
