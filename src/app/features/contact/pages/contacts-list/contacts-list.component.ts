@@ -579,6 +579,13 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
                     }),
                     new FilterModel({
+                        fieldName: 'index',
+                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
+                        type: FilterType.NUMBER,
+                        relationshipPath: ['followUps'],
+                        relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+                    }),
+                    new FilterModel({
                         fieldName: 'targeted',
                         fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
                         type: FilterType.SELECT,
