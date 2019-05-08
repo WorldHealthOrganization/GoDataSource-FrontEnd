@@ -45,7 +45,12 @@ export const EnglishUsLang = {
         /**
          * uiCasesListPage
          */
-        'LNG_PAGE_LIST_CASES_NOT_A_CASE_INFO_LABEL': '* Note that: If you wish to filter to see discarded cases then you should add the \'Not a Case\' column from the menu of extra field on the left hand side and ensure that this is set to \'Yes\'. You can\'t simply filter on the Classification column for "Not a case (discarded)" since Not a Case is set, by default, to "No" to only show you active records.'
+        'LNG_PAGE_LIST_CASES_NOT_A_CASE_INFO_LABEL': '* Note that: If you wish to filter to see discarded cases then you should add the \'Not a Case\' column from the menu of extra field on the left hand side and ensure that this is set to \'Yes\'. You can\'t simply filter on the Classification column for "Not a case (discarded)" since Not a Case is set, by default, to "No" to only show you active records.',
+
+        /**
+         * uiListFiltersPageTitles
+         */
+        'LNG_PAGE_DASHBOARD_CASE_SUMMARY': 'Case summary',
 
         /**
          * REMOVE the tokens from below
