@@ -202,7 +202,6 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
                 .getCasesGroupedByClassification(this.outbreakId, qb)
                 .subscribe((groupedCases) => {
                     this.caseSummaryResults = this.buildChartData(groupedCases.classification);
-                    console.log(this.caseSummaryResults);
                     this.displayLoading = false;
                 });
         }
