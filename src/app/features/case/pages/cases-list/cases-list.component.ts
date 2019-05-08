@@ -411,7 +411,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
         this.route.queryParams
             .subscribe((queryParams: any) => {
-                console.log(queryParams);
+                if (queryParams.dashboardClassificationFilter) {
+                    const classificationCondition = {classification: {eq: queryParams.dashboardClassificationFilter}};
+
+                    this.queryBuilder.filter.where(classificationCondition);
+                }
             });
         // add page title
         this.casesDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE') +

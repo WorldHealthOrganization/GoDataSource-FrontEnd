@@ -128,22 +128,22 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
                 result.push(new MetricChartDataModel({
                     name: this.i18nService.instant(classification),
                     value: caseData.count,
-                    classification: classification
+                    extra: classification
                 }));
             }
         }, []);
     }
 
+    /**
+     * Redirect to cases page when user click on a piece of pie chart to display the cases that represent the part of pie chart
+     */
     onDoughnutPress(pressed) {
-        // this.router.navigate([`cases`],
-        //     {
-        //         queryParams: {
-        //             filterType: Constants.CASE_CLASSIFICATION.SUSPECT
-        //         }
-        //     });
-
-        console.log(pressed);
-        console.log(this.caseSummaryResults);
+        this.router.navigate([`cases`],
+            {
+                queryParams: {
+                    dashboardClassificationFilter: pressed.extra
+                }
+            });
     }
 
     /**
