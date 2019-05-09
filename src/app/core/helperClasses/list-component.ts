@@ -821,6 +821,33 @@ export abstract class ListComponent {
                     });
                 break;
 
+            // filter cases by classification criteria
+            case Constants.APPLY_LIST_FILTER.CASE_SUMMARY:
+                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                    null,
+                    null,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId
+                );
+
+                const classificationCriteria = _.get(queryParams, 'x', null);
+                // merge query builder
+                this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+                this.appliedListFilterQueryBuilder.filter.where({
+                    classification: {
+                        'eq': classificationCriteria
+                    }
+                }, true);
+
+                if (!globalQb.isEmpty()) {
+                    this.appliedListFilterQueryBuilder.merge(globalQb);
+                }
+
+                this.mergeListFilterToMainFilter();
+                // refresh list
+                this.needsRefreshList(true);
+                break;
+
             // Filter contacts lost to follow-up
             case Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP:
                 // get the correct query builder and merge with the existing one

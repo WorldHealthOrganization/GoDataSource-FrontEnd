@@ -138,10 +138,27 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
      * Redirect to cases page when user click on a piece of pie chart to display the cases that represent the part of pie chart
      */
     onDoughnutPress(pressed) {
+        const global: {
+            date?: Moment,
+            locationId?: string
+        } = {};
+
+        // do we have a global date set ?
+        if (!_.isEmpty(this.globalFilterDate)) {
+            global.date = this.globalFilterDate;
+        }
+
+        // do we have a global location Id set ?
+        if (!_.isEmpty(this.globalFilterLocationId)) {
+            global.locationId = this.globalFilterLocationId;
+        }
+
         this.router.navigate([`cases`],
             {
                 queryParams: {
-                    dashboardClassificationFilter: pressed.extra
+                    global: JSON.stringify(global),
+                    applyListFilter: Constants.APPLY_LIST_FILTER.CASE_SUMMARY,
+                    x: pressed.extra,
                 }
             });
     }
