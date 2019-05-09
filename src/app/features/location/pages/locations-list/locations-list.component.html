@@ -132,9 +132,7 @@
                     </mat-header-cell>
 
                     <mat-cell *matCellDef="let item">
-                        <a [routerLink]="['/locations', item.id, 'children']">
-                            {{ item.name }}
-                        </a>
+                        {{ item.name }}
                     </mat-cell>
                 </ng-container>
 
