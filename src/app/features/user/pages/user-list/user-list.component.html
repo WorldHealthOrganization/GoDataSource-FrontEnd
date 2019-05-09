@@ -214,10 +214,16 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
                 <mat-chip-list>
-                    <mat-chip
+                    <ng-container
                         *ngFor="let outbreakId of item.outbreakIds"
-                        [matTooltip]="outbreaksListMap[outbreakId] ? outbreaksListMap[outbreakId].description : ''">
-                        {{ outbreaksListMap[outbreakId] ? outbreaksListMap[outbreakId].name : '' }}</mat-chip>
+                    >
+                        <mat-chip
+                            *ngIf="outbreaksListMap[outbreakId]"
+                            [matTooltip]="outbreaksListMap[outbreakId].description"
+                        >
+                            {{ outbreaksListMap[outbreakId].name }}
+                        </mat-chip>
+                    </ng-container>
                 </mat-chip-list>
             </mat-cell>
         </ng-container>

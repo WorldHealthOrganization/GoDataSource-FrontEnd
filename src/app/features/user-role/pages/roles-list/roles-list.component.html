@@ -149,10 +149,13 @@
                     </button>
                 </ng-container>
 
-                <ng-container *ngIf="isCellExpanded('permissions', item.id)">
-                    <mat-chip-list>
-                        <mat-chip *ngFor="let permission of item.permissions"
-                                  [matTooltip]="permission.description | translate">{{ permission.label | translate }}
+                <div
+                    *ngIf="isCellExpanded('permissions', item.id)"
+                    fxLayout="column" fxLayoutAlign="start start">
+                    <mat-chip-list fxLayout="row wrap">
+                        <mat-chip
+                            *ngFor="let permission of item.permissions"
+                            [matTooltip]="permission.description | translate">{{ permission.label | translate }}
                         </mat-chip>
                     </mat-chip-list>
 
@@ -164,7 +167,7 @@
                     >
                         {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate}}
                     </button>
-                </ng-container>
+                </div>
             </mat-cell>
         </ng-container>
 

@@ -96,25 +96,28 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" fxFlex>
-                <mat-chip-list>
-                    <ng-container *ngIf="!isCellExpanded('entries', item.id)">
-                        <app-number-of-items-label
-                            [value]="item.entries?.length"
-                        ></app-number-of-items-label>
+            <mat-cell *matCellDef="let item">
+                <ng-container *ngIf="!isCellExpanded('entries', item.id)">
+                    <app-number-of-items-label
+                        [value]="item.entries?.length"
+                    ></app-number-of-items-label>
 
-                        <button
-                            type="button"
-                            mat-button
-                            color="accent"
-                            (click)="toggleCell('entries', item.id, true)"
-                        >
-                            {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND' | translate}}
-                        </button>
-                    </ng-container>
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('entries', item.id, true)"
+                    >
+                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND' | translate}}
+                    </button>
+                </ng-container>
 
-                    <ng-container *ngIf="isCellExpanded('entries', item.id)">
-                        <ng-container *ngFor="let entry of item.entries">
+                <div
+                    *ngIf="isCellExpanded('entries', item.id)"
+                    fxLayout="column" fxLayoutAlign="start start">
+                    <mat-chip-list fxLayout="row wrap">
+                        <ng-container
+                            *ngFor="let entry of item.entries">
                             <mat-chip
                                 *ngIf="entry.active"
                                 [matTooltip]="entry.description | translate">
@@ -125,17 +128,17 @@
                                 {{ entry.value | translate }}
                             </mat-chip>
                         </ng-container>
+                    </mat-chip-list>
 
-                        <button
-                            type="button"
-                            mat-button
-                            color="accent"
-                            (click)="toggleCell('entries', item.id, false)"
-                        >
-                            {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate}}
-                        </button>
-                    </ng-container>
-                </mat-chip-list>
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('entries', item.id, false)"
+                    >
+                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate}}
+                    </button>
+                </div>
             </mat-cell>
         </ng-container>
 
