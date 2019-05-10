@@ -5,10 +5,10 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import {OutbreakModel} from '../../../../core/models/outbreak.model';
-import {OutbreakDataService} from '../../../../core/services/data/outbreak.data.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import * as _ from 'lodash';
-import {EntityType} from '../../../../core/models/entity-type';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-relationship-summary',
@@ -49,11 +49,8 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
             const relationship: SimpleChange = changes.relationship;
             this.updateRelationshipData(relationship.currentValue);
             // condition the reversing persons action if any of them is contact type
-            _.map(relationship.currentValue.persons, (person) => {
-                if (person.type === EntityType.CONTACT) {
-                    this.canReverseRelation = false;
-                }
-            });
+            this.canReverseRelation = !_.find(this.relationship.persons, { type : EntityType.CONTACT });
+
         }
 
     }
@@ -93,7 +90,8 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
             .reverseExistingRelationship(
                 this.selectedOutbreak.id,
                 this.relationship.id,
-                relationshipPersons
+                relationshipPersons.sourceId,
+                relationshipPersons.targetId
             )
             .subscribe(() => this.onReverseRelationshipPersons());
     }

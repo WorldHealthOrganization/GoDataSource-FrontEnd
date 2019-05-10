@@ -696,5 +696,6 @@ export class TransmissionChainsGraphComponent implements OnInit {
         this.resetNodes();
 
         // reset node action
-        this.currentNodeAction = null;    }
+        this.currentNodeAction = null;
+    }
 }

@@ -168,11 +168,8 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                 )
                 .subscribe((relationshipData) => {
                     this.relationship = relationshipData;
-                    _.map(this.relationship.persons, (person) => {
-                            if (person.type === EntityType.CONTACT) {
-                                this.canReverseRelation = false;
-                            }
-                    });
+
+                    this.canReverseRelation = !_.find(this.relationship.persons, { type : EntityType.CONTACT });
 
                     this.initializeBreadcrumbs();
                 });
@@ -269,7 +266,8 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             .reverseExistingRelationship(
                 this.selectedOutbreak.id,
                 this.relationshipId,
-                relationshipPersons
+                relationshipPersons.sourceId,
+                relationshipPersons.targetId
             )
             .subscribe((relationshipData: RelationshipModel) => {
                 const targetPerson = _.find(relationshipData.persons, {target: true});
