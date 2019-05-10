@@ -9,6 +9,8 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import * as _ from 'lodash';
 import { EntityType } from '../../../../core/models/entity-type';
+import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-relationship-summary',
@@ -37,7 +39,8 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
     constructor(
         private authDataService: AuthDataService,
         private relationshipDataService: RelationshipDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private dialogService: DialogService
     ) {
     }
 
@@ -81,19 +84,27 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
         return null;
     }
 
+    /**
+     * Reverse persons of an existing relationship
+     */
     reverseExistingRelationship() {
-        const relationshipPersons = {
-            sourceId: _.find(this.relationship.persons, {target: true}).id,
-            targetId: this.relationship.sourcePerson.id
-        };
-        this.relationshipDataService
-            .reverseExistingRelationship(
-                this.selectedOutbreak.id,
-                this.relationship.id,
-                relationshipPersons.sourceId,
-                relationshipPersons.targetId
-            )
-            .subscribe(() => this.onReverseRelationshipPersons());
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REVERSE_PERSONS')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    const relationshipPersons = {
+                        sourceId: _.find(this.relationship.persons, {target: true}).id,
+                        targetId: this.relationship.sourcePerson.id
+                    };
+                    this.relationshipDataService
+                        .reverseExistingRelationship(
+                            this.selectedOutbreak.id,
+                            this.relationship.id,
+                            relationshipPersons.sourceId,
+                            relationshipPersons.targetId
+                        )
+                        .subscribe(() => this.onReverseRelationshipPersons());
+                }
+            });
     }
 
     updateRelationshipData(relationship: RelationshipModel) {

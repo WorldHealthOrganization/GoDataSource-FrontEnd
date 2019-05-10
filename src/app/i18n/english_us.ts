@@ -41,6 +41,7 @@ export const EnglishUsLang = {
          * uiDialogs
          */
         'LNG_DIALOG_CONFIRM_WIPE_DEVICE': 'Are you sure you want to wipe this device?',
+        'LNG_DIALOG_CONFIRM_REVERSE_PERSONS': 'Are you sure you want to reverse persons?',
 
         /**
          * uiCasesListPage

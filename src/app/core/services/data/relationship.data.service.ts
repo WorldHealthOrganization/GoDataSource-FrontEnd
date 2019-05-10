@@ -54,20 +54,24 @@ export class RelationshipDataService {
      * Reverse source and target persons from existing relationship
      * @param {string} outbreakId
      * @param {string} relationshipId
-     * @param {{sourceId: string; targetId: string}} relationshipPersons
+     * @param {string} sourceId
+     * @param {string} targetId
      * @returns {Observable<Object>}
      */
     reverseExistingRelationship(
         outbreakId: string,
         relationshipId: string,
         sourceId: string,
-        targetId: string)
-    : Observable<any> {
-        return this.http.post(`outbreaks/${outbreakId}/relationships/${relationshipId}/replace-source-and-target`,
-            {
-                sourceId: sourceId,
-                targetId: targetId
-            }
+        targetId: string
+    )
+    : Observable<RelationshipModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.post(`outbreaks/${outbreakId}/relationships/${relationshipId}/replace-source-and-target`,
+                {
+                    sourceId: sourceId,
+                    targetId: targetId
+                }),
+            RelationshipModel
         );
     }
 
