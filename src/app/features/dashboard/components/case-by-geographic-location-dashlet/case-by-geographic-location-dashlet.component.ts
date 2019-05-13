@@ -111,6 +111,9 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
         return caseLocationSummaryResults;
     }
 
+    /**
+     * Redirect to cases page when user click on a piece of pie chart to display the cases that represent the part of pie chart
+     */
     onDoughnutPress(pressed) {
 
         const global: {
