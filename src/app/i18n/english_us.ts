@@ -58,8 +58,14 @@ export const EnglishUsLang = {
          * uiChainsOfTransmissionGraph
          */
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_REVERSE_RELATIONSHIP': 'Reverse persons',
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_REVERSE_RELATIONSHIP_TOOLTIP': 'You can reverse a relationship only if is not involving a contact'
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_REVERSE_RELATIONSHIP_TOOLTIP': 'You can reverse a relationship only if is not involving a contact',
 
+        /**
+         * uiListFiltersPageTitles
+         */
+        'LNG_PAGE_DASHBOARD_CASE_SUMMARY': 'Case summary',
+        'LNG_PAGE_LIST_FILTER_CASES_NOT_HOSPITALISED': 'Cases not hospitalized',
+        'LNG_PAGE_DASHBOARD_CASE_BY_LOCATION': 'Cases by geographic location'
         /**
          * REMOVE the tokens from below
          */

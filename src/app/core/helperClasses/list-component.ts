@@ -789,6 +789,27 @@ export abstract class ListComponent {
                 this.needsRefreshList(true);
                 break;
 
+            case Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED:
+                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                    null,
+                    null,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId
+                );
+
+                // get the correct query builder and merge with the existing one
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesNotHospitalized(globalFilters.date);
+                if (!globalQb.isEmpty()) {
+                    this.appliedListFilterQueryBuilder.merge(globalQb);
+                }
+
+                // merge query builder
+                this.mergeListFilterToMainFilter();
+
+                // refresh list
+                this.needsRefreshList(true);
+                break;
+
             // Filter contacts not seen
             case Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN:
                 // get the number of days if it was updated
@@ -819,6 +840,55 @@ export abstract class ListComponent {
                         // refresh list
                         this.needsRefreshList(true);
                     });
+                break;
+
+            // filter cases by classification criteria
+            case Constants.APPLY_LIST_FILTER.CASE_SUMMARY:
+                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                    null,
+                    null,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId
+                );
+
+                const classificationCriteria = _.get(queryParams, 'x', null);
+                // merge query builder
+                this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+                this.appliedListFilterQueryBuilder.filter.where({
+                    classification: {
+                        'eq': classificationCriteria
+                    }
+                }, true);
+
+                if (!globalQb.isEmpty()) {
+                    this.appliedListFilterQueryBuilder.merge(globalQb);
+                }
+
+                this.mergeListFilterToMainFilter();
+                // refresh list
+                this.needsRefreshList(true);
+                break;
+
+            case Constants.APPLY_LIST_FILTER.CASES_BY_LOCATION:
+                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                    null,
+                    null,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId
+                );
+                const locationId = _.get(queryParams, 'locationId', null);
+
+                // merge query builder
+                this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+                this.appliedListFilterQueryBuilder.filter.byEquality('addresses.parentLocationIdFilter', locationId);
+
+                if (!globalQb.isEmpty()) {
+                    this.appliedListFilterQueryBuilder.merge(globalQb);
+                }
+
+                this.mergeListFilterToMainFilter();
+                // refresh list
+                this.needsRefreshList(true);
                 break;
 
             // Filter contacts lost to follow-up

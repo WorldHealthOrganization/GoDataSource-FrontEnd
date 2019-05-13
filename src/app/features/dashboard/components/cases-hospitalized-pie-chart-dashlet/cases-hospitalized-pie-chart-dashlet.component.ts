@@ -10,7 +10,9 @@ import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError } from 'rxjs/operators';
-
+import { Constants } from '../../../../core/models/constants';
+import { Router } from '@angular/router';
+import * as _ from 'lodash';
 @Component({
     selector: 'app-cases-hospitalized-pie-chart-dashlet',
     encapsulation: ViewEncapsulation.None,
@@ -63,7 +65,8 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
         private outbreakDataService: OutbreakDataService,
         private caseDataService: CaseDataService,
         private i18nService: I18nService,
-        protected snackbarService: SnackbarService
+        protected snackbarService: SnackbarService,
+        private router: Router
     ) {
     }
 
@@ -94,6 +97,34 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
     }
 
     /**
+     * Redirect to cases page when user click on a piece of pie chart to display the cases that represent the part of pie chart
+     */
+    onDoughnutPress(pressed) {
+        const global: {
+            date?: Moment,
+            locationId?: string
+        } = {};
+
+        // do we have a global date set ?
+        if (!_.isEmpty(this.globalFilterDate)) {
+            global.date = this.globalFilterDate;
+        }
+
+        // do we have a global location Id set ?
+        if (!_.isEmpty(this.globalFilterLocationId)) {
+            global.locationId = this.globalFilterLocationId;
+        }
+
+        this.router.navigate([`cases`],
+            {
+                queryParams: {
+                    global: JSON.stringify(global),
+                    applyListFilter: pressed.extra
+                }
+            });
+    }
+
+    /**
      * Build chart data object
      * @returns {MetricChartDataModel[]}
      */
@@ -109,20 +140,22 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
             return caseHospitalizationSummaryResults;
         }
 
-        caseHospitalizationSummaryResults.push({
+        caseHospitalizationSummaryResults.push(new MetricChartDataModel({
             value: caseHospitalizationCount,
-            name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_HOSPITALIZED_LABEL')
-        });
-        caseHospitalizationSummaryResults.push({
+            name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_HOSPITALIZED_LABEL'),
+            extra: Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED
+        }));
+        caseHospitalizationSummaryResults.push(new MetricChartDataModel({
             value: caseIsolationCount,
-            name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_ISOLATED_LABEL')
-        });
+            name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_ISOLATED_LABEL'),
+        }));
 
         const caseNotHospitalized = caseListCount - caseHospitalizationCount - caseIsolationCount;
-        caseHospitalizationSummaryResults.push({
+        caseHospitalizationSummaryResults.push(new MetricChartDataModel({
             value: caseNotHospitalized,
-            name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_NOT_HOSPITALIZED_LABEL')
-        });
+            name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_NOT_HOSPITALIZED_LABEL'),
+            extra: Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED
+        }));
 
         return caseHospitalizationSummaryResults;
     }

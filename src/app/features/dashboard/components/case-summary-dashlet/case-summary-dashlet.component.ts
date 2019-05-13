@@ -12,6 +12,7 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { Subscriber, Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Constants } from '../../../../core/models/constants';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-case-summary-dashlet',
@@ -67,7 +68,8 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private caseDataService: CaseDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private router: Router
     ) {
     }
 
@@ -125,10 +127,40 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
             if (classification !== Constants.CASE_CLASSIFICATION.NOT_A_CASE) {
                 result.push(new MetricChartDataModel({
                     name: this.i18nService.instant(classification),
-                    value: caseData.count
+                    value: caseData.count,
+                    extra: classification
                 }));
             }
         }, []);
+    }
+
+    /**
+     * Redirect to cases page when user click on a piece of pie chart to display the cases that represent the part of pie chart
+     */
+    onDoughnutPress(pressed) {
+        const global: {
+            date?: Moment,
+            locationId?: string
+        } = {};
+
+        // do we have a global date set ?
+        if (!_.isEmpty(this.globalFilterDate)) {
+            global.date = this.globalFilterDate;
+        }
+
+        // do we have a global location Id set ?
+        if (!_.isEmpty(this.globalFilterLocationId)) {
+            global.locationId = this.globalFilterLocationId;
+        }
+
+        this.router.navigate([`cases`],
+            {
+                queryParams: {
+                    global: JSON.stringify(global),
+                    applyListFilter: Constants.APPLY_LIST_FILTER.CASE_SUMMARY,
+                    x: pressed.extra,
+                }
+            });
     }
 
     /**

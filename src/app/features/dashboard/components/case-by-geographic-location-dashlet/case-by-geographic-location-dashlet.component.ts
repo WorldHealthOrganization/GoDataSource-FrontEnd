@@ -1,7 +1,6 @@
 import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { MetricChartDataModel } from '../../../../core/models/metrics/metric-chart-data.model';
 import * as _ from 'lodash';
@@ -10,6 +9,8 @@ import { Subscription ,  Subscriber } from 'rxjs';
 import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { Router } from '@angular/router';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-case-by-geographic-location-dashlet',
@@ -59,8 +60,8 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
 
     constructor(
         private outbreakDataService: OutbreakDataService,
-        private referenceDataDataService: ReferenceDataDataService,
-        private caseDataService: CaseDataService
+        private caseDataService: CaseDataService,
+        private router: Router
     ) {}
 
     ngOnInit() {
@@ -101,12 +102,43 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
                 const caseLocationSummaryResult: MetricChartDataModel = new MetricChartDataModel();
                 caseLocationSummaryResult.name = locationMetric.location.name;
                 caseLocationSummaryResult.value = locationMetric.casesCount;
+                caseLocationSummaryResult.extra = locationMetric.location.id;
                 caseLocationSummaryResults.push(caseLocationSummaryResult);
             }
         });
 
         // finished
         return caseLocationSummaryResults;
+    }
+
+    /**
+     * Redirect to cases page when user click on a piece of pie chart to display the cases that represent the part of pie chart
+     */
+    onDoughnutPress(pressed) {
+
+        const global: {
+            date?: Moment,
+            locationId?: string
+        } = {};
+
+        // do we have a global date set ?
+        if (!_.isEmpty(this.globalFilterDate)) {
+            global.date = this.globalFilterDate;
+        }
+
+        // do we have a global location Id set ?
+        if (!_.isEmpty(this.globalFilterLocationId)) {
+            global.locationId = this.globalFilterLocationId;
+        }
+
+        this.router.navigate([`cases`],
+            {
+                queryParams: {
+                    global: JSON.stringify(global),
+                    applyListFilter: Constants.APPLY_LIST_FILTER.CASES_BY_LOCATION,
+                    locationId: pressed.extra,
+                }
+            });
     }
 
     /**

@@ -185,6 +185,36 @@ export class ListFilterDataService {
         return filterQueryBuilder;
     }
 
+    filterCasesNotHospitalized(date: string | Moment): RequestQueryBuilder {
+        // generate a query builder for hospitalized cases
+        const filterQueryBuilder = new RequestQueryBuilder();
+
+        // compare hospitalisation dates start and end with current date
+        filterQueryBuilder.filter.where({
+            dateRanges: {
+                not: {
+                    $elemMatch: {
+                        typeId: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_HOSPITALIZATION',
+                        $or: [
+                            {
+                                endDate: {
+                                    $eq: null
+                                }
+                            }, {
+                                endDate: {
+                                    $gt: moment(date).endOf('day').toISOString()
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }, true);
+
+        // finished
+        return filterQueryBuilder;
+    }
+
     /**
      * Create the query builder for filtering the list of cases
      * @returns {RequestQueryBuilder}
