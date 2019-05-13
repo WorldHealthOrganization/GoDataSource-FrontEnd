@@ -58,7 +58,7 @@ export const EnglishUsLang = {
          * uiChainsOfTransmissionGraph
          */
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_REVERSE_RELATIONSHIP': 'Reverse persons',
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_REVERSE_RELATIONSHIP_TOOLTIP': 'You can reverse a relationship only if is not involving a contact'
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_REVERSE_RELATIONSHIP_TOOLTIP': 'You can reverse a relationship only if is not involving a contact',
 
         /**
          * uiListFiltersPageTitles
