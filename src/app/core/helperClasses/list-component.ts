@@ -789,6 +789,27 @@ export abstract class ListComponent {
                 this.needsRefreshList(true);
                 break;
 
+            case Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED:
+                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                    null,
+                    null,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId
+                );
+
+                // get the correct query builder and merge with the existing one
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesNotHospitalized(globalFilters.date);
+                if (!globalQb.isEmpty()) {
+                    this.appliedListFilterQueryBuilder.merge(globalQb);
+                }
+
+                // merge query builder
+                this.mergeListFilterToMainFilter();
+
+                // refresh list
+                this.needsRefreshList(true);
+                break;
+
             // Filter contacts not seen
             case Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN:
                 // get the number of days if it was updated

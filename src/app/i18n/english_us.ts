@@ -51,6 +51,7 @@ export const EnglishUsLang = {
          * uiListFiltersPageTitles
          */
         'LNG_PAGE_DASHBOARD_CASE_SUMMARY': 'Case summary',
+        'LNG_PAGE_LIST_FILTER_CASES_NOT_HOSPITALISED': 'Cases not hospitalized'
 
         /**
          * REMOVE the tokens from below

@@ -119,8 +119,7 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
             {
                 queryParams: {
                     global: JSON.stringify(global),
-                    applyListFilter: Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED,
-                    x: pressed.extra,
+                    applyListFilter: pressed.extra
                 }
             });
     }
@@ -144,6 +143,7 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
         caseHospitalizationSummaryResults.push(new MetricChartDataModel({
             value: caseHospitalizationCount,
             name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_HOSPITALIZED_LABEL'),
+            extra: Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED
         }));
         caseHospitalizationSummaryResults.push(new MetricChartDataModel({
             value: caseIsolationCount,
@@ -154,6 +154,7 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
         caseHospitalizationSummaryResults.push(new MetricChartDataModel({
             value: caseNotHospitalized,
             name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_NOT_HOSPITALIZED_LABEL'),
+            extra: Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED
         }));
 
         return caseHospitalizationSummaryResults;
