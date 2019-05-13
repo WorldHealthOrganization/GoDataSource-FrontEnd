@@ -190,23 +190,26 @@ export class ListFilterDataService {
         const filterQueryBuilder = new RequestQueryBuilder();
 
         // compare hospitalisation dates start and end with current date
-        filterQueryBuilder.filter.where(
-            {
-                or: [{
-                    'dateRanges.typeId': {
-                        'neq': DateType.HOSPITALIZATION_DATE
-                    }
-                }, {
-                    dateRanges: {
-                        elemMatch: {
-                            typeId: DateType.HOSPITALIZATION_DATE,
-                            endDate: {
-                                lte: moment(date).startOf('day').toISOString()
+        filterQueryBuilder.filter.where({
+            dateRanges: {
+                not: {
+                    $elemMatch: {
+                        typeId: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_HOSPITALIZATION',
+                        $or: [
+                            {
+                                endDate: {
+                                    $eq: null
+                                }
+                            }, {
+                                endDate: {
+                                    $gt: moment(date).endOf('day').toISOString()
+                                }
                             }
-                        }
+                        ]
                     }
-                }]
-            }, true);
+                }
+            }
+        }, true);
 
         // finished
         return filterQueryBuilder;

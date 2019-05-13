@@ -869,6 +869,28 @@ export abstract class ListComponent {
                 this.needsRefreshList(true);
                 break;
 
+            case Constants.APPLY_LIST_FILTER.CASES_BY_LOCATION:
+                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                    null,
+                    null,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId
+                );
+                const locationId = _.get(queryParams, 'locationId', null);
+
+                // merge query builder
+                this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+                this.appliedListFilterQueryBuilder.filter.byEquality('addresses.parentLocationIdFilter', locationId);
+
+                if (!globalQb.isEmpty()) {
+                    this.appliedListFilterQueryBuilder.merge(globalQb);
+                }
+
+                this.mergeListFilterToMainFilter();
+                // refresh list
+                this.needsRefreshList(true);
+                break;
+
             // Filter contacts lost to follow-up
             case Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP:
                 // get the correct query builder and merge with the existing one

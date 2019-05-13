@@ -33,6 +33,7 @@ export enum ApplyListFilter {
     EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN = 'events_without_date_of_reporting_chain',
     CONTEXT_SENSITIVE_HELP_ITEMS = 'context_sensitive_help_items',
     CASE_SUMMARY = 'case-summary',
+    CASES_BY_LOCATION = 'cases-by-location',
 }
 
 export class Constants {
@@ -321,6 +322,7 @@ export class Constants {
         [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN]: 'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN',
         [Constants.APPLY_LIST_FILTER.CONTEXT_SENSITIVE_HELP_ITEMS]: 'LNG_PAGE_LIST_FILTER_HELP_CONTEXT_SENSITIVE',
         [Constants.APPLY_LIST_FILTER.CASE_SUMMARY]: 'LNG_PAGE_DASHBOARD_CASE_SUMMARY',
+        [Constants.APPLY_LIST_FILTER.CASES_BY_LOCATION]: 'LNG_PAGE_DASHBOARD_CASE_BY_LOCATION',
     };
 
     // Options for Yes/No dropdowns
