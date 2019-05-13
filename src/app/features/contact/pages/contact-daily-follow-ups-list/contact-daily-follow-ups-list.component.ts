@@ -419,6 +419,11 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 }
             }),
             new FilterModel({
+                fieldName: 'index',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
+                type: FilterType.NUMBER
+            }),
+            new FilterModel({
                 fieldName: 'teamId',
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
                 type: FilterType.MULTISELECT,

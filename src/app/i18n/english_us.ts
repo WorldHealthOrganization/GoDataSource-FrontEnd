@@ -41,11 +41,24 @@ export const EnglishUsLang = {
          * uiDialogs
          */
         'LNG_DIALOG_CONFIRM_WIPE_DEVICE': 'Are you sure you want to wipe this device?',
+        'LNG_DIALOG_CONFIRM_REVERSE_PERSONS': 'Are you sure you want to reverse persons?',
 
         /**
          * uiCasesListPage
          */
         'LNG_PAGE_LIST_CASES_NOT_A_CASE_INFO_LABEL': '* Note that: If you wish to filter to see discarded cases then you should add the \'Not a Case\' column from the menu of extra field on the left hand side and ensure that this is set to \'Yes\'. You can\'t simply filter on the Classification column for "Not a case (discarded)" since Not a Case is set, by default, to "No" to only show you active records.',
+
+        /**
+         * uiModifyEntityRelationshipPage
+         */
+        'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_REVERSE_RELATIONSHIP': 'Reverse persons',
+        'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_REVERSE_RELATIONSHIP_TOOLTIP': 'You can reverse a relationship only if is not involving a contact',
+
+        /**
+         * uiChainsOfTransmissionGraph
+         */
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_REVERSE_RELATIONSHIP': 'Reverse persons',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_REVERSE_RELATIONSHIP_TOOLTIP': 'You can reverse a relationship only if is not involving a contact'
 
         /**
          * uiListFiltersPageTitles

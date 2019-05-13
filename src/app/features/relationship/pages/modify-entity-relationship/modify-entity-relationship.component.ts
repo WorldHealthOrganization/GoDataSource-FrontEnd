@@ -24,6 +24,7 @@ import { RelationshipType } from '../../../../core/enums/relationship-type.enum'
 import { EntityModel } from '../../../../core/models/entity.model';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-modify-entity-relationship',
@@ -65,6 +66,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     relationship: RelationshipModel = new RelationshipModel();
     // route data
     relationshipType: RelationshipType;
+    canReverseRelation: boolean = true;
 
     // provide constants to template
     EntityModel = EntityModel;
@@ -168,6 +170,8 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                 .subscribe((relationshipData) => {
                     this.relationship = relationshipData;
 
+                    this.canReverseRelation = !_.find(this.relationship.persons, { type : EntityType.CONTACT });
+
                     this.initializeBreadcrumbs();
                 });
         }
@@ -248,6 +252,33 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
 
                 // hide dialog
                 loadingDialog.close();
+            });
+    }
+
+    /**
+     * Reverse relation persons(source person person became target person and vice-versa)
+     */
+    reverseExistingRelationship() {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REVERSE_PERSONS')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    const relationshipPersons = {
+                        sourceId: _.find(this.relationship.persons, {target: true}).id,
+                        targetId: this.relationship.sourcePerson.id
+                    };
+                    this.relationshipDataService
+                        .reverseExistingRelationship(
+                            this.selectedOutbreak.id,
+                            this.relationshipId,
+                            relationshipPersons.sourceId,
+                            relationshipPersons.targetId
+                        )
+                        .subscribe((relationshipData: RelationshipModel) => {
+                            const targetPerson = _.find(relationshipData.persons, {target: true});
+                            this.router.navigate([`/relationships/${targetPerson.type}/${targetPerson.id}/${this.relationshipTypeRoutePath}/${relationshipData.id}/modify`]);
+                        });
+                }
             });
     }
 

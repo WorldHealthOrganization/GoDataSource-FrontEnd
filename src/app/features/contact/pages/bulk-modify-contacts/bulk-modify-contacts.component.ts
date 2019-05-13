@@ -284,6 +284,10 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                                 addressModel = AddressModel.getCurrentAddress(contact.addresses);
                                 value = addressModel ? addressModel.city : null;
                                 break;
+                            case 'addresses.postalCode':
+                                addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                                value = addressModel ? addressModel.postalCode : null;
+                                break;
                             case 'addresses.locationId':
                                 addressModel = AddressModel.getCurrentAddress(contact.addresses);
                                 value = addressModel ? _.find(this.existingLocations, { value: addressModel.locationId }) : null;
@@ -360,6 +364,9 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
                 .setProperty('addresses.addressLine1'),
+            new TextSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE')
+                .setProperty('addresses.postalCode'),
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER')
                 .setProperty('addresses.phoneNumber'),
@@ -537,21 +544,36 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                                     // replace phone number
                                     if (contactData.addresses.phoneNumber !== undefined) {
                                         address.phoneNumber = contactData.addresses.phoneNumber;
+                                    } else {
+                                        address.phoneNumber = null;
                                     }
 
                                     // replace city
                                     if (contactData.addresses.city !== undefined) {
                                         address.city = contactData.addresses.city;
+                                    } else {
+                                        address.city = null;
+                                    }
+
+                                    // replace postal code
+                                    if (contactData.addresses.postalCode !== undefined) {
+                                        address.postalCode = contactData.addresses.postalCode;
+                                    } else {
+                                        address.postalCode = null;
                                     }
 
                                     // replace locationId
                                     if (contactData.addresses.locationId !== undefined) {
                                         address.locationId = contactData.addresses.locationId;
+                                    } else {
+                                        address.locationId = null;
                                     }
 
                                     // replace address1
                                     if (contactData.addresses.addressLine1 !== undefined) {
                                         address.addressLine1 = contactData.addresses.addressLine1;
+                                    } else {
+                                        address.addressLine1 = null;
                                     }
 
                                     // replace with correct data

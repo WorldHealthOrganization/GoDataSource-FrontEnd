@@ -87,7 +87,9 @@
                 [relationship]="selectedRelationship"
                 (remove)="removeRelationship()"
                 (modifyRelationship)="modifySelectedRelationship($event)"
-                (deleteRelationship)="deleteSelectedRelationship($event)">
+                (deleteRelationship)="deleteSelectedRelationship($event)"
+                (reverseRelationshipPersons)="refreshAfterReverseRelationshipPersons()"
+                >
             </app-relationship-summary>
         </mat-card>
     </div>
