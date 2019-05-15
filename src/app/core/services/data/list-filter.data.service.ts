@@ -151,6 +151,39 @@ export class ListFilterDataService {
     }
 
     /**
+     * Construct hospitalized condition
+     * @param negated
+     */
+    private getFilterHospitalizedCondition(date, negated: boolean = false) {
+        const elementCondition = {
+            [negated ? '$elemMatch' : 'elemMatch']: {
+                typeId: DateType.HOSPITALIZATION_DATE,
+                startDate: {
+                    $lte: moment(date).endOf('day').toISOString()
+                },
+                $or: [
+                    {
+                        endDate: {
+                            $eq: null
+                        }
+                    }, {
+                        endDate: {
+                            $gte: moment(date).endOf('day').toISOString()
+                        }
+                    }
+                ]
+            }
+        };
+
+        // finished
+        return {
+            dateRanges: negated ?
+                { not: elementCondition } :
+                elementCondition
+        };
+    }
+
+    /**
      * Create the query builder for filtering the list of cases
      * @returns {RequestQueryBuilder}
      */
@@ -159,57 +192,28 @@ export class ListFilterDataService {
         const filterQueryBuilder = new RequestQueryBuilder();
 
         // compare hospitalisation dates start and end with current date
-        filterQueryBuilder.filter.where({
-            [RequestFilterOperator.AND]: [
-                {
-                    'dateRanges.typeId': DateType.HOSPITALIZATION_DATE
-                }, {
-                    'dateRanges.startDate': {
-                        lte: moment(date).endOf('day').toISOString()
-                    }
-                }, {
-                    [RequestFilterOperator.OR]: [{
-                        'dateRanges.endDate': {
-                            eq: null
-                        }
-                    }, {
-                        'dateRanges.endDate': {
-                            gte: moment(date).startOf('day').toISOString()
-                        }
-                    }]
-                }
-            ]
-        }, true);
+        filterQueryBuilder.filter.where(
+            this.getFilterHospitalizedCondition(date, false),
+            true
+        );
 
         // finished
         return filterQueryBuilder;
     }
 
+    /**
+     * Retrieve cases that aren't hospitalized
+     * @param date
+     */
     filterCasesNotHospitalized(date: string | Moment): RequestQueryBuilder {
         // generate a query builder for hospitalized cases
         const filterQueryBuilder = new RequestQueryBuilder();
 
         // compare hospitalisation dates start and end with current date
-        filterQueryBuilder.filter.where({
-            dateRanges: {
-                not: {
-                    $elemMatch: {
-                        typeId: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_HOSPITALIZATION',
-                        $or: [
-                            {
-                                endDate: {
-                                    $eq: null
-                                }
-                            }, {
-                                endDate: {
-                                    $gt: moment(date).endOf('day').toISOString()
-                                }
-                            }
-                        ]
-                    }
-                }
-            }
-        }, true);
+        filterQueryBuilder.filter.where(
+            this.getFilterHospitalizedCondition(date, true),
+            true
+        );
 
         // finished
         return filterQueryBuilder;

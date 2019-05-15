@@ -13,6 +13,7 @@ import { catchError } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
+
 @Component({
     selector: 'app-cases-hospitalized-pie-chart-dashlet',
     encapsulation: ViewEncapsulation.None,
@@ -128,14 +129,14 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
      * Build chart data object
      * @returns {MetricChartDataModel[]}
      */
-    buildChartData(caseHospitalizationCount, caseIsolationCount, caseListCount) {
+    buildChartData(caseHospitalizationCount, caseIsolationCount, caseNotHospitalizationCount) {
         const caseHospitalizationSummaryResults: MetricChartDataModel[] = [];
 
         // check for no data
         if (
             caseHospitalizationCount === 0 &&
             caseIsolationCount === 0 &&
-            caseListCount === 0
+            caseNotHospitalizationCount === 0
         ) {
             return caseHospitalizationSummaryResults;
         }
@@ -149,10 +150,8 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
             value: caseIsolationCount,
             name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_ISOLATED_LABEL'),
         }));
-
-        const caseNotHospitalized = caseListCount - caseHospitalizationCount - caseIsolationCount;
         caseHospitalizationSummaryResults.push(new MetricChartDataModel({
-            value: caseNotHospitalized,
+            value: caseNotHospitalizationCount,
             name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_NOT_HOSPITALIZED_LABEL'),
             extra: Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED
         }));
@@ -191,6 +190,13 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
                 );
             }
 
+            // exclude discarded cases
+            qb.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
+
             // retrieve data
             this.displayLoading = true;
             this.previousSubscriber = forkJoin(
@@ -199,7 +205,7 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
                 this.caseDataService
                     .getIsolatedCasesCount(this.outbreakId, this.globalFilterDate, qb),
                 this.caseDataService
-                    .getCasesCount(this.outbreakId, qb)
+                    .getNotHospitalisedCasesCount(this.outbreakId, this.globalFilterDate, qb)
             )
                 .pipe(
                     catchError((err) => {
@@ -207,12 +213,12 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
                         return throwError(err);
                     })
                 )
-                .subscribe(([hospitalizedCountResults, isolatedCountResults, casesCountResults]) => {
+                .subscribe(([hospitalizedCountResults, isolatedCountResults, caseNotHospitalizationCount]) => {
                     // construct chart
                     this.caseHospitalizationSummaryResults = this.buildChartData(
                         hospitalizedCountResults.count,
                         isolatedCountResults.count,
-                        casesCountResults.count
+                        caseNotHospitalizationCount.count
                     );
 
                     // finished
