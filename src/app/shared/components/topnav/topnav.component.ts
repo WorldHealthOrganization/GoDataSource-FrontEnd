@@ -11,6 +11,7 @@ import { I18nService } from '../../../core/services/helper/i18n.service';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
 import { map } from 'rxjs/operators';
+import { DialogService } from '../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-topnav',
@@ -42,7 +43,8 @@ export class TopnavComponent implements OnInit, OnDestroy {
         private authDataService: AuthDataService,
         private languageDataService: LanguageDataService,
         private i18nService: I18nService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private dialogService: DialogService
     ) {
         // get the outbreaks list
         this.refreshOutbreaksList();
@@ -132,9 +134,16 @@ export class TopnavComponent implements OnInit, OnDestroy {
      * @param {LanguageModel} language
      */
     selectLanguage(language: LanguageModel) {
+        // display loading
+        const loadingDialog = this.dialogService.showLoadingDialog();
+
         this.i18nService
             .changeLanguage(language)
             .subscribe(() => {
+                // hide loading
+                loadingDialog.close();
+
+                // finished
                 this.snackbarService.showSuccess('LNG_LAYOUT_ACTION_CHANGE_LANGUAGE_SUCCESS_MESSAGE');
             });
     }

@@ -1,4 +1,6 @@
 import * as _ from 'lodash';
+import { Moment } from 'moment';
+import * as moment from 'moment';
 
 export class LanguageTokenModel {
     token: string;
@@ -7,6 +9,19 @@ export class LanguageTokenModel {
     constructor(data = null) {
         this.token = _.get(data, 'token');
         this.translation = _.get(data, 'translation');
+    }
+}
+
+export class LanguageTokenDetails {
+    tokens: LanguageTokenModel[];
+    lastUpdateDate: Moment;
+
+    constructor(data = null) {
+        this.tokens = _.get(data, 'tokens');
+        this.tokens = (this.tokens || []).map((token) => new LanguageTokenModel(token));
+
+        this.lastUpdateDate = _.get(data, 'lastUpdateDate');
+        this.lastUpdateDate = this.lastUpdateDate ? moment(this.lastUpdateDate) : null;
     }
 }
 
