@@ -408,7 +408,7 @@
         <ng-container matColumnDef="clusterId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">
+                    <div mat-sort-header class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' | translate}}
                     </div>
                     <div class="column-filter">
@@ -416,7 +416,7 @@
                             name="clusterIdFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="relationshipsList$ | async"
+                            [options]="clusterOptions$ | async"
                             (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('clusterId', $event)"
                             multiple="true"
                             app-reset-input-on-side-filter
@@ -429,10 +429,12 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
-                <app-reference-data-label
-                    [category]="ReferenceDataCategory.CONTEXT_OF_TRANSMISSION"
-                    [value]="item.relationship.clusterId">
-                </app-reference-data-label>
+                <app-list-item-label
+                    [options]="clusterOptions$ | async"
+                    optionLabelKey="label"
+                    optionValueKey="value"
+                    [value]="item.relationship.clusterId"
+                ></app-list-item-label>
             </mat-cell>
         </ng-container>
 
