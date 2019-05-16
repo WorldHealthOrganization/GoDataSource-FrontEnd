@@ -379,6 +379,63 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Relation details -->
+        <ng-container matColumnDef="socialRelationshipDetail">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="socialRelationshipDetailFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').byText('socialRelationshipDetail', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                {{item.relationship.socialRelationshipDetail}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Cluster -->
+        <ng-container matColumnDef="clusterId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="clusterIdFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="relationshipsList$ | async"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('clusterId', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.CONTEXT_OF_TRANSMISSION"
+                    [value]="item.relationship.clusterId">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
         <mat-row
             *matRowDef="let item; columns: visibleTableColumns"
