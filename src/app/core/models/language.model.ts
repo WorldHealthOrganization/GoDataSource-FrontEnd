@@ -1,4 +1,6 @@
 import * as _ from 'lodash';
+import { Moment } from 'moment';
+import * as moment from 'moment';
 
 export class LanguageTokenModel {
     token: string;
@@ -7,6 +9,22 @@ export class LanguageTokenModel {
     constructor(data = null) {
         this.token = _.get(data, 'token');
         this.translation = _.get(data, 'translation');
+    }
+}
+
+export class LanguageTokenDetails {
+    languageId: string;
+    lastUpdateDate: Moment;
+    tokens: LanguageTokenModel[];
+
+    constructor(data = null) {
+        this.languageId = _.get(data, 'languageId');
+
+        this.lastUpdateDate = _.get(data, 'lastUpdateDate');
+        this.lastUpdateDate = this.lastUpdateDate ? moment(this.lastUpdateDate) : null;
+
+        this.tokens = _.get(data, 'tokens');
+        this.tokens = (this.tokens || []).map((token) => new LanguageTokenModel(token));
     }
 }
 
@@ -21,15 +39,5 @@ export class LanguageModel {
         this.name = _.get(data, 'name');
         this.tokens = _.get(data, 'tokens', []);
         this.readOnly = _.get(data, 'readOnly', false);
-    }
-
-    getTokensObject() {
-        const tokensObj = {};
-
-        _.each(this.tokens, (token: LanguageTokenModel) => {
-            _.set(tokensObj, token.token, token.translation);
-        });
-
-        return tokensObj;
     }
 }

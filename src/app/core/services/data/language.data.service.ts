@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
-import { LanguageModel, LanguageTokenModel } from '../../models/language.model';
+import { LanguageModel, LanguageTokenDetails, LanguageTokenModel } from '../../models/language.model';
 import { CacheKey, CacheService } from '../helper/cache.service';
 import * as _ from 'lodash';
 import { localLanguages } from '../../../i18n';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { map, share, tap } from 'rxjs/operators';
+import { Moment } from 'moment';
+import * as moment from 'moment';
 
 @Injectable()
 export class LanguageDataService {
@@ -89,29 +91,39 @@ export class LanguageDataService {
     /**
      * Retrieve the list of tokens for a given language
      * @param {LanguageModel} lang
-     * @returns {Observable<LanguageTokenModel[]>}
+     * @param updatedSince
+     * @returns {Observable<LanguageTokenDetails>}
      */
-    getLanguageTokens(lang: LanguageModel): Observable<LanguageTokenModel[]> {
+    getLanguageTokens(
+        lang: LanguageModel,
+        updatedSince?: Moment
+    ): Observable<LanguageTokenDetails> {
         // retrieve only token and translation fields to reduce the payload
         const qb = new RequestQueryBuilder();
         qb.fields('token', 'translation');
+
+        // retrieve only tokens for updating list
+        if (updatedSince) {
+            qb.filter.flag('updatedSince', moment(updatedSince).toISOString());
+        }
+
         const filter = qb.buildQuery();
 
-        return this.modelHelper.mapObservableListToModel(
+        return this.modelHelper.mapObservableToModel(
             this.http.get(`languages/${lang.id}/language-tokens?filter=${filter}`),
-            LanguageTokenModel
+            LanguageTokenDetails
         )
-            .pipe(
-                map((tokens) => {
-                    // get the local language tokens
-                    const localLanguageTokens = _.get(this.getLocalLanguageTokens(), lang.id, []);
+        .pipe(
+            map((tokenData: LanguageTokenDetails) => {
+                // get the local language tokens
+                const localLanguageTokens = _.get(this.getLocalLanguageTokens(), lang.id, []);
 
-                    // merge local tokens with the tokens received from server
-                    tokens = [...tokens, ...localLanguageTokens as any[]];
+                // merge local tokens with the tokens received from server
+                tokenData.tokens = [...tokenData.tokens, ...localLanguageTokens as any[]];
 
-                    return tokens;
-                })
-            );
+                return tokenData;
+            })
+        );
     }
 
     /**

@@ -1,6 +1,6 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { LanguageModel, LanguageTokenModel } from '../../models/language.model';
+import { LanguageModel, LanguageTokenDetails } from '../../models/language.model';
 import { StorageKey, StorageService } from './storage.service';
 import { LanguageDataService } from '../data/language.data.service';
 import { Observable } from 'rxjs';
@@ -8,10 +8,12 @@ import { ModelHelperService } from './model-helper.service';
 import { UserDataService } from '../data/user.data.service';
 import { AuthDataService } from '../data/auth.data.service';
 import { map, mergeMap } from 'rxjs/operators';
+import * as moment from 'moment';
+import * as _ from 'lodash';
+import { AuthModel } from '../../models/auth.model';
 
 @Injectable()
 export class I18nService {
-
     private defaultLanguageId = 'english_us';
 
     private languageLoadedEvent = new EventEmitter<void>();
@@ -51,27 +53,88 @@ export class I18nService {
     }
 
     /**
+     * Set tokens
+     * @param languageId
+     */
+    private setTranslationTokens(
+        languageId: string,
+        tokens: {
+            [key: string]: string
+        },
+        lastUpdateDate: string
+    ) {
+        // determine if we need to retrieve old tokens or replace them with new ones
+        let oldDates = this.storageService.get(StorageKey.LANGUAGE_UPDATE_LAST);
+        oldDates = oldDates ? oldDates : {};
+
+        // update tokens
+        this.translateService.setTranslation(
+            languageId,
+            tokens,
+            !!oldDates[languageId]
+        );
+
+        // update date of last token retrieval for this language
+        this.storageService.set(
+            StorageKey.LANGUAGE_UPDATE_LAST, {
+                ...oldDates,
+                ...{
+                    [languageId]: lastUpdateDate
+                }
+            }
+        );
+    }
+
+    /**
+     * Determine when was last time we updated language tokens for current language
+     * @param language
+     */
+    private determineCurrentLanguageSinceDate(language: LanguageModel) {
+        // determine since when we need to update tokens
+        const loadedLanguages = this.translateService.getLangs() || [];
+        const oldDates = this.storageService.get(StorageKey.LANGUAGE_UPDATE_LAST);
+        return loadedLanguages.includes(language.id) && oldDates && oldDates[language.id] ? moment(oldDates[language.id]) : null;
+    }
+
+    /**
      * Change the UI language and keep it in local storage
      * @param {LanguageModel} language
-     * @returns {Observable<boolean>}
+     * @returns {Observable<void | AuthModel>}
      */
-    changeLanguage(language: LanguageModel): Observable<any> {
+    changeLanguage(language: LanguageModel): Observable<void | AuthModel> {
+        // save the selected language to local storage
+        this.storageService.set(StorageKey.SELECTED_LANGUAGE_ID, language.id);
+
         // get the tokens for the selected language
         return this.languageDataService
-            .getLanguageTokens(language)
+            .getLanguageTokens(language, this.determineCurrentLanguageSinceDate(language))
             .pipe(
-                mergeMap((tokens: LanguageTokenModel[]) => {
-                    // add the tokens to the Language object
-                    const selectedLanguage = new LanguageModel({...language, tokens});
+                mergeMap((tokenData: LanguageTokenDetails) => {
+                    // update translation tokens
+                    this.setTranslationTokens(
+                        tokenData.languageId,
+                        _.transform(
+                            tokenData.tokens,
+                            (a, v) => {
+                                a[v.token] = v.translation;
+                            },
+                            {}
+                        ),
+                        tokenData.lastUpdateDate ? tokenData.lastUpdateDate.toISOString() : null
+                    );
 
-                    // configure the TranslateService
-                    this.translateService.setTranslation(selectedLanguage.id, selectedLanguage.getTokensObject());
-                    this.translateService.use(selectedLanguage.id);
+                    // same as selected language ?
+                    if (this.storageService.get(StorageKey.SELECTED_LANGUAGE_ID) === tokenData.languageId) {
+                        // set system to use the new language
+                        this.translateService.use(tokenData.languageId);
 
-                    // trigger language change events
-                    this.languageChangedEvent.emit();
+                        // trigger language change events
+                        this.languageChangedEvent.emit();
+                        return this.persistUserLanguage(tokenData.languageId);
+                    }
 
-                    return this.persistUserLanguage(language.id);
+                    // NOTHING TO DO...finished with this map
+                    return;
                 })
             );
     }
@@ -100,9 +163,9 @@ export class I18nService {
     /**
      * Load authenticated user's language
      * Note: If user is NOT authenticated, or doesn't have a language selected, use the default language (english_us)
-     * @returns {Observable<any>}
+     * @returns {Observable<void>}
      */
-    loadUserLanguage(): Observable<LanguageModel> {
+    loadUserLanguage(): Observable<void> {
         // get the selected language ID
         const langId = this.getSelectedLanguageId();
 
@@ -116,21 +179,32 @@ export class I18nService {
                 mergeMap((language: LanguageModel) => {
                     // get the tokens for the selected language
                     return this.languageDataService
-                        .getLanguageTokens(language)
+                        .getLanguageTokens(language, this.determineCurrentLanguageSinceDate(language))
                         .pipe(
-                            map((tokens: LanguageTokenModel[]) => {
+                            map((tokenData: LanguageTokenDetails) => {
+                                // update translation tokens
+                                this.setTranslationTokens(
+                                    tokenData.languageId,
+                                    _.transform(
+                                        tokenData.tokens,
+                                        (a, v) => {
+                                            a[v.token] = v.translation;
+                                        },
+                                        {}
+                                    ),
+                                    tokenData.lastUpdateDate ? tokenData.lastUpdateDate.toISOString() : null
+                                );
 
-                                // add the tokens to the Language object
-                                language = this.modelHelperService.getModelInstance(LanguageModel, {...language, tokens});
+                                // same as selected language ?
+                                if (this.storageService.get(StorageKey.SELECTED_LANGUAGE_ID) === tokenData.languageId) {
+                                    // set system to use the new language
+                                    this.translateService.use(tokenData.languageId);
 
-                                // configure the TranslateService
-                                this.translateService.setTranslation(language.id, language.getTokensObject());
-                                this.translateService.use(language.id);
+                                    // translation initialized
+                                    this.languageLoadedEvent.emit();
+                                }
 
-                                // translation initialized
-                                this.languageLoadedEvent.emit();
-
-                                return language;
+                                // NOTHING TO DO...finished with this map
                             })
                         );
                 })
