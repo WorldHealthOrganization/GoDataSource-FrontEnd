@@ -241,7 +241,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             }),
             new VisibleColumnModel({
                 field: 'socialRelationshipDetail',
-                label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL',
                 visible: false
             }),
             new VisibleColumnModel({
