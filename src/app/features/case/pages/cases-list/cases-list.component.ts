@@ -480,6 +480,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         this.filterByNotACaseField(false);
     }
 
+    clearedQueryBuilder() {
+        // by default do not display cases classified as Not a Case
+        this.filterByNotACaseField(false);
+    }
+
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

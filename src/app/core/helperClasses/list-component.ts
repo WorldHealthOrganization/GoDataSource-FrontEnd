@@ -522,11 +522,21 @@ export abstract class ListComponent {
     }
 
     /**
+     * Called after query builder is cleared
+     */
+    clearedQueryBuilder() {
+        // NOTHING
+    }
+
+    /**
      * Clear query builder of conditions and sorting criterias
      */
     clearQueryBuilder() {
         // clear query filters
         this.queryBuilder.clear();
+
+        // cleared query builder
+        this.clearedQueryBuilder();
     }
 
     /**
@@ -878,7 +888,11 @@ export abstract class ListComponent {
                     addresses: {
                         elemMatch: {
                             typeId: AddressType.CURRENT_ADDRESS,
-                            parentLocationIdFilter: locationId
+                            parentLocationIdFilter: {
+                                // fix for not beeing consistent through the website, sometimes we use elemMatch other times $elemMatch which causes some issues on the api
+                                // if we want to fix this we need to change in many places, so this is an workaround
+                                $in: [locationId]
+                            }
                         }
                     }
                 });
