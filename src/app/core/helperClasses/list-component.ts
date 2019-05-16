@@ -21,6 +21,7 @@ import {
     MetricContactsWithSuccessfulFollowUp
 } from '../models/metrics/metric.contacts-with-success-follow-up.model';
 import { VisibleColumnModel } from '../../shared/components/side-columns/model';
+import { AddressType } from '../models/address.model';
 
 export abstract class ListComponent {
     /**
@@ -870,23 +871,21 @@ export abstract class ListComponent {
                 break;
 
             case Constants.APPLY_LIST_FILTER.CASES_BY_LOCATION:
-                globalQb = this.listFilterDataService.getGlobalFilterQB(
-                    null,
-                    null,
-                    'addresses.parentLocationIdFilter',
-                    globalFilters.locationId
-                );
+                // construct query builder to filter by location
                 const locationId = _.get(queryParams, 'locationId', null);
-
-                // merge query builder
                 this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-                this.appliedListFilterQueryBuilder.filter.byEquality('addresses.parentLocationIdFilter', locationId);
+                this.appliedListFilterQueryBuilder.filter.where({
+                    addresses: {
+                        elemMatch: {
+                            typeId: AddressType.CURRENT_ADDRESS,
+                            parentLocationIdFilter: locationId
+                        }
+                    }
+                });
 
-                if (!globalQb.isEmpty()) {
-                    this.appliedListFilterQueryBuilder.merge(globalQb);
-                }
-
+                // main filters
                 this.mergeListFilterToMainFilter();
+
                 // refresh list
                 this.needsRefreshList(true);
                 break;
