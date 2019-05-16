@@ -22,7 +22,6 @@ import { RelationshipType } from '../../../../core/enums/relationship-type.enum'
 import { EntityModel } from '../../../../core/models/entity.model';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { throwError } from 'rxjs';
-import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -110,7 +109,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
-        private clusterDataService: ClusterDataService
     ) {
         super(
             snackbarService, router, route,
@@ -128,7 +126,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         this.exposureDurationList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION);
         this.relationshipTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION);
         // get clusters list
-        this.clusterOptions$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id).pipe(share());
         const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
         personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
             this.personTypesListMap = _.transform(
