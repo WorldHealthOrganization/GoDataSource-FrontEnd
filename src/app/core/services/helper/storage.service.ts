@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 export enum StorageKey {
     SELECTED_LANGUAGE_ID = 'SELECTED_LANGUAGE_ID',
+    LANGUAGE_UPDATE_LAST = 'LANGUAGE_UPDATE_LAST',
     AUTH_DATA = 'AUTH_DATA',
     SELECTED_OUTBREAK_ID = 'SELECTED_OUTBREAK_ID'
 }
