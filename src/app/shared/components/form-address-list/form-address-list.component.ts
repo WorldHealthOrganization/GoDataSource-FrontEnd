@@ -21,6 +21,7 @@ import * as _ from 'lodash';
 export class FormAddressListComponent extends ListBase<AddressModel> implements OnInit, GroupFilteredValue<any[]> {
     @Input() required: boolean = false;
     @Input() disabled: boolean = false;
+    @Input() sourceAddress: AddressModel;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -48,6 +49,17 @@ export class FormAddressListComponent extends ListBase<AddressModel> implements 
                     }
                 });
         });
+
+        this.copyConfirm.subscribe((observer: Subscriber<void>) => {
+            this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_COPY_ADDRESS')
+                .subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        observer.next();
+                    }
+                });
+        });
+
+        console.log(this.sourceAddress);
     }
 
     /**
@@ -62,5 +74,9 @@ export class FormAddressListComponent extends ListBase<AddressModel> implements 
                 }
             ) :
             this.value;
+    }
+
+    copySourceAddress() {
+
     }
 }

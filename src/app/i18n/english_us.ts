@@ -42,6 +42,7 @@ export const EnglishUsLang = {
          */
         'LNG_DIALOG_CONFIRM_WIPE_DEVICE': 'Are you sure you want to wipe this device?',
         'LNG_DIALOG_CONFIRM_REVERSE_PERSONS': 'Are you sure you want to reverse persons?',
+        'LNG_DIALOG_CONFIRM_COPY_ADDRESS': 'Are you sure you want to copy parent entity address?',
 
         /**
          * uiCasesListPage
@@ -65,7 +66,18 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_DASHBOARD_CASE_SUMMARY': 'Case summary',
         'LNG_PAGE_LIST_FILTER_CASES_NOT_HOSPITALISED': 'Cases not hospitalized',
-        'LNG_PAGE_DASHBOARD_CASE_BY_LOCATION': 'Cases by geographic location'
+        'LNG_PAGE_DASHBOARD_CASE_BY_LOCATION': 'Cases by geographic location',
+
+        /**
+         * uiCreateContactPage
+         */
+        'LNG_PAGE_CREATE_CONTACT_ACTION_COPY_ENTITY_ADDRESS_BUTTON': 'Copy case address',
+
+        /**
+         *
+         */
+        'LNG_ADDRESS_TOOLTIP_COPY_ADDRESS': 'Copy main address from the parent entity'
+
         /**
          * REMOVE the tokens from below
          */

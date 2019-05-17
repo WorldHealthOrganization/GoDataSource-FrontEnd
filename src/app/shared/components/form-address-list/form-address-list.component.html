@@ -22,9 +22,18 @@
                 </app-form-address>
             </mat-card>
 
-            <button type="button" mat-icon-button (click)="delete(i)">
-                <span class="xt-icon">delete</span>
-            </button>
+            <div fxLayout="column" class="address-buttons-container">
+                <button type="button" mat-icon-button (click)="delete(i)">
+                    <span class="xt-icon">delete</span>
+                </button>
+                <button *ngIf="sourceAddress"
+                        type="button"
+                        mat-icon-button
+                        (click)="copy(i, sourceAddress)"
+                        [matTooltip]="'LNG_ADDRESS_TOOLTIP_COPY_ADDRESS' | translate">
+                    <span class="xt-icon">fileCopy</span>
+                </button>
+            </div>
         </div>
 
         <div fxLayout="row">
