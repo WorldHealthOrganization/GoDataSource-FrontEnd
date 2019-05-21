@@ -50,6 +50,7 @@ export class FormAddressListComponent extends ListBase<AddressModel> implements 
                 });
         });
 
+        // handle copy item confirmation
         this.copyConfirm.subscribe((observer: Subscriber<void>) => {
             this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_COPY_ADDRESS')
                 .subscribe((answer: DialogAnswer) => {
