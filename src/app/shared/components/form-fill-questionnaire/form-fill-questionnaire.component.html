@@ -81,7 +81,7 @@
                                             <!-- Date -->
                                             <div
                                                 *ngIf="question.multiAnswer"
-                                                fxFlex>
+                                                fxFlex fxLayout="row" fxLayoutGap="5px">
                                                 <app-form-datepicker
                                                     [name]="name + '[' + question.variable + ']' + '[' + (childValueIndex === undefined ? answerDataIndex : childValueIndex) + '][date]'"
                                                     [alternativeName]="alternativeName + '[' + questionIndex + ']'"
@@ -92,6 +92,19 @@
                                                     (optionChanged)="changedAnswerDate(answerData, $event)"
                                                     app-date-validator>
                                                 </app-form-datepicker>
+
+                                                <div
+                                                    fxFlex="40px">
+                                                    <button
+                                                        *ngIf="answerData.date"
+                                                        class="copy-field-button"
+                                                        type="button"
+                                                        mat-icon-button
+                                                        [title]="'LNG_QUESTIONNAIRE_LABEL_MULTI_ANSWER_COPY_DATE_DESCRIPTION' | translate"
+                                                        (click)="triggerCopyDate(answerData.date)">
+                                                        <span class="xt-icon">fileCopy</span>
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             <!-- Answer -->
