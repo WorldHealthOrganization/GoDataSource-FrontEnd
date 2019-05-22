@@ -74,8 +74,4 @@ export class FormAddressListComponent extends ListBase<AddressModel> implements 
             ) :
             this.value;
     }
-
-    copySourceAddress() {
-
-    }
 }
