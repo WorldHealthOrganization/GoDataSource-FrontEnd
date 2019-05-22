@@ -7,8 +7,9 @@
         #groupForm="ngForm"
         fxLayout="column"
     >
-        <div *ngFor="let address of values; let i = index; trackBy: trackByIndex"
-             fxLayout="row" fxLayoutAlign="start center"
+        <div
+            *ngFor="let address of values; let i = index; trackBy: trackByIndex"
+            fxLayout="row"
         >
             <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
                 <app-form-address
@@ -22,8 +23,10 @@
                 </app-form-address>
             </mat-card>
 
-            <div fxLayout="column" fxLayoutAlign="center center">
-                <div>
+            <div
+                fxLayout="column"
+                class="app-form-address-list-buttons">
+                <div fxFlex fxLayoutAlign="space-between center">
                     <button *ngIf="sourceAddress"
                             type="button"
                             mat-icon-button
@@ -32,7 +35,7 @@
                         <span class="xt-icon">fileCopy</span>
                     </button>
                 </div>
-                <div>
+                <div fxFlex fxLayoutAlign="space-between center">
                     <button type="button" mat-icon-button (click)="delete(i)">
                         <span class="xt-icon">delete</span>
                     </button>
