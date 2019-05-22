@@ -20,7 +20,12 @@ export const EnglishUsLang = {
         /**
          * uiDialogs
          */
-        'LNG_DIALOG_CONFIRM_COPY_QUESTIONNAIRE_DATE': 'Are you sure you want to copy this date to all empty date fields ?'
+        'LNG_DIALOG_CONFIRM_COPY_QUESTIONNAIRE_DATE': 'Are you sure you want to copy this date to all empty date fields ?',
+        'LNG_DIALOG_CONFIRM_COPY_PARENT_ENTITY_ADDRESS': 'Are you sure you want to copy address from the parent entity?',
+        /**
+         * uiCreateContactPage
+         */
+        'LNG_PAGE_CREATE_CONTACT_ACTION_COPY_ENTITY_ADDRESS_TOOLTIP': 'Copy main address from the parent entity'
 
 
         /**
