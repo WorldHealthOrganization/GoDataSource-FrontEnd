@@ -15,7 +15,6 @@ export const EnglishUsLang = {
         /**
          * uiCreateContactPage
          */
-        'LNG_PAGE_CREATE_CONTACT_ACTION_COPY_ENTITY_ADDRESS_BUTTON': 'Copy case address',
         'LNG_PAGE_CREATE_CONTACT_ACTION_COPY_ENTITY_ADDRESS_TOOLTIP': 'Copy main address from the parent entity'
 
         /**
