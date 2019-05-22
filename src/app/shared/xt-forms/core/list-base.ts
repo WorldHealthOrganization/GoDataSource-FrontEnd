@@ -25,9 +25,6 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
     // allow each component to decide if we need to display a confirmation dialog or just remove it
     @Output() deleteConfirm = new EventEmitter<any>();
 
-    // copy data confirmation
-    @Output() copyConfirm = new EventEmitter<any>();
-
     /**
      * Constructor
      */
@@ -67,18 +64,6 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
 
         // write value
         super.writeValue(valuesArray);
-    }
-
-    /**
-     * Copy a model
-     */
-    copy(index, valueToCopy: T) {
-        // show confirm dialog to confirm the action
-        new Observable((observer) => {
-            this.copyConfirm.emit(observer);
-        }).subscribe(() => {
-            this.values[index] = valueToCopy;
-        });
     }
 
     /**

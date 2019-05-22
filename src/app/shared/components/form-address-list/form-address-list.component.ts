@@ -49,16 +49,6 @@ export class FormAddressListComponent extends ListBase<AddressModel> implements 
                     }
                 });
         });
-
-        // handle copy item confirmation
-        this.copyConfirm.subscribe((observer: Subscriber<void>) => {
-            this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_COPY_ADDRESS')
-                .subscribe((answer: DialogAnswer) => {
-                    if (answer.button === DialogAnswerButton.Yes) {
-                        observer.next();
-                    }
-                });
-        });
     }
 
     /**
@@ -73,5 +63,18 @@ export class FormAddressListComponent extends ListBase<AddressModel> implements 
                 }
             ) :
             this.value;
+    }
+
+    /**
+     * Copy parent address
+     */
+    copyParentAddress(index, valueToCopy: AddressModel) {
+        // handle copy item confirmation
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_COPY_PARENT_ENTITY_ADDRESS')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.values[index] = valueToCopy;
+                }
+        });
     }
 }

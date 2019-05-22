@@ -26,11 +26,13 @@
             <div
                 fxLayout="column"
                 class="app-form-address-list-buttons">
-                <div fxFlex fxLayoutAlign="space-between center">
-                    <button *ngIf="sourceAddress"
+                <div
+                    *ngIf="sourceAddress"
+                    fxFlex fxLayoutAlign="space-between center">
+                    <button
                             type="button"
                             mat-icon-button
-                            (click)="copy(i, sourceAddress)"
+                            (click)="copyParentAddress(i, sourceAddress)"
                             [matTooltip]="'LNG_PAGE_CREATE_CONTACT_ACTION_COPY_ENTITY_ADDRESS_TOOLTIP' | translate">
                         <span class="xt-icon">fileCopy</span>
                     </button>
