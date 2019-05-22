@@ -12,6 +12,15 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
+        /**
+         * uiQuestionnaire
+         */
+        'LNG_QUESTIONNAIRE_LABEL_MULTI_ANSWER_COPY_DATE_DESCRIPTION': 'Copy this date to all empty date fields',
+
+        /**
+         * uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_COPY_QUESTIONNAIRE_DATE': 'Are you sure you want to copy this date to all empty date fields ?'
 
 
         /**
