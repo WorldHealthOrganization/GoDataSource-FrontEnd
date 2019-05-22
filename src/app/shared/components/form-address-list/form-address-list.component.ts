@@ -68,12 +68,12 @@ export class FormAddressListComponent extends ListBase<AddressModel> implements 
     /**
      * Copy parent address
      */
-    copyParentAddress(index, valueToCopy: AddressModel) {
+    copyParentAddress(index, addressToCopy: AddressModel) {
         // handle copy item confirmation
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_COPY_PARENT_ENTITY_ADDRESS')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
-                    this.values[index] = valueToCopy;
+                    this.values[index] = new AddressModel(addressToCopy);
                 }
         });
     }
