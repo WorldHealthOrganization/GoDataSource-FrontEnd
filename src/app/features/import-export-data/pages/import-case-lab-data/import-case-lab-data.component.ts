@@ -79,6 +79,6 @@ export class ImportCaseLabDataComponent implements OnInit {
     }
 
     finished() {
-        this.router.navigate(['/cases']);
+        this.router.navigate(['/cases', 'lab-results']);
     }
 }
