@@ -22,6 +22,8 @@ import { RelationshipType } from '../../../../core/enums/relationship-type.enum'
 import { EntityModel } from '../../../../core/models/entity.model';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { throwError } from 'rxjs';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -43,6 +45,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     exposureDurationList$: Observable<any>;
     relationshipTypeList$: Observable<any>;
     personTypesListMap: { [id: string]: ReferenceDataEntryModel };
+    clusterOptions$: Observable<any[]>;
 
     // provide constants to template
     Constants = Constants;
@@ -107,7 +110,8 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         protected entityDataService: EntityDataService,
         private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private clusterDataService: ClusterDataService
     ) {
         super(
             snackbarService, router, route,
@@ -118,12 +122,22 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     ngOnInit() {
         super.ngOnInit();
 
+        this.outbreakDataService
+            .getSelectedOutbreakSubject()
+            .subscribe((outbreak: OutbreakModel) => {
+                if (outbreak) {
+                    // update the selected outbreak
+                    this.clusterOptions$ = this.clusterDataService.getClusterListAsLabelValue(outbreak.id);
+                }
+            });
+
         // reference data
         this.certaintyLevelList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL);
         this.exposureTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE);
         this.exposuresFrequencyList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY);
         this.exposureDurationList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION);
         this.relationshipTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION);
+
         const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
         personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
             this.personTypesListMap = _.transform(
@@ -224,6 +238,16 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             new VisibleColumnModel({
                 field: 'socialRelationshipTypeId',
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION'
+            }),
+            new VisibleColumnModel({
+                field: 'socialRelationshipDetail',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'clusterId',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+                visible: false
             })
         ];
     }

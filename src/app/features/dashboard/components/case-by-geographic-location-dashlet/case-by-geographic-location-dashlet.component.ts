@@ -172,6 +172,13 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
                 );
             }
 
+            // exclude discarded cases
+            qb.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
+
             // retrieve data
             this.displayLoading = true;
             this.previousSubscriber = this.caseDataService
