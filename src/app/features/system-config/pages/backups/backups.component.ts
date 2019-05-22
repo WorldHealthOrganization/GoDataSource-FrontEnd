@@ -278,7 +278,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
                     .createBackup(answer.inputValue.value)
                     .pipe(
                         catchError((err) => {
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err);
                             return throwError(err);
                         })
                     )
