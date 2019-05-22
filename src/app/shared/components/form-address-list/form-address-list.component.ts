@@ -59,8 +59,6 @@ export class FormAddressListComponent extends ListBase<AddressModel> implements 
                     }
                 });
         });
-
-        console.log(this.sourceAddress);
     }
 
     /**

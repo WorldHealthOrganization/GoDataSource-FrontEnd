@@ -142,7 +142,7 @@
                     name="addresses"
                     [(ngModel)]="contactData.addresses"
                     [required]="true"
-                    [sourceAddress]="relatedEntityData.mainAddress">
+                    [sourceAddress]="relatedEntityData?.mainAddress">
                 </app-form-address-list>
 
                 <div class="stepper-navigation-buttons">
