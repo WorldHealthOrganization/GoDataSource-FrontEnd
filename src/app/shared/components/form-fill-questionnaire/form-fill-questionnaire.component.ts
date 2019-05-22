@@ -953,4 +953,50 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         // finished
         this.onChange();
     }
+
+    /**
+     * Copy date to all empty date fields
+     * @param date
+     */
+    triggerCopyDate(date: any) {
+        // validate input
+        if (!date) {
+            return;
+        }
+
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_COPY_QUESTIONNAIRE_DATE')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // determine top level questions
+                    const topLevelQuestionsGrouped: {
+                        [variable: string]: QuestionModel
+                    } = {};
+                    _.each(this.questionsGroupedByCategory, (data) => {
+                        if (_.isArray(data.questions)) {
+                            _.each(data.questions, (question: QuestionModel) => {
+                                topLevelQuestionsGrouped[question.variable] = question;
+                            });
+                        }
+                    });
+
+                    // go through all answer and copy value if answer value is empty
+                    _.each(this.value, (answersData: IAnswerData[], questionVariable: string) => {
+                        _.each(answersData, (answerData: IAnswerData) => {
+                            // no date, top level question & multi answer question since parent questions will send date further to children
+                            if (
+                                !answerData.date &&
+                                topLevelQuestionsGrouped[questionVariable] &&
+                                topLevelQuestionsGrouped[questionVariable].multiAnswer
+                            ) {
+                                answerData.date = moment(date).format();
+                            }
+                        });
+                    });
+
+                    // trigger parent on change
+                    this.onChange();
+                }
+            });
+    }
 }

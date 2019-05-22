@@ -1,9 +1,10 @@
 // tslint:disable:no-use-before-declare
 import * as _ from 'lodash';
 import { Constants } from './constants';
+import { Moment } from 'moment';
 
 export interface IAnswerData {
-    date?: string;
+    date?: string | Moment;
     value: any;
 }
 
