@@ -25,7 +25,8 @@ export const EnglishUsLang = {
         /**
          * uiCreateContactPage
          */
-        'LNG_PAGE_CREATE_CONTACT_ACTION_COPY_ENTITY_ADDRESS_TOOLTIP': 'Copy main address from the parent entity'
+        'LNG_PAGE_CREATE_CONTACT_ACTION_COPY_ENTITY_ADDRESS_TOOLTIP': 'Copy main address from the parent entity',
+        'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_ANOTHER_CONTACT_BUTTON': 'Create and add another'
 
 
         /**
