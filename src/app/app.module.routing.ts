@@ -1,13 +1,12 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import { AuthGuard } from './core/services/guards/auth-guard.service';
 import { PERMISSION } from './core/models/permission.model';
-
 import { AuthenticatedComponent } from './core/components/authenticated/authenticated.component';
 import { LanguageResolver } from './core/services/resolvers/language.resolver';
 import { ModulePath } from './core/enums/module-path.enum';
 import { PasswordChangeGuard } from './core/services/guards/password-change-guard.service';
+import { RedirectComponent } from './core/components/redirect/redirect.component';
 
 const routes: Routes = [
     // Authentication Module routes
@@ -345,6 +344,13 @@ const routes: Routes = [
                 canActivate: [
                     PasswordChangeGuard
                 ]
+            },
+
+            // Redirect Module routes
+            // hack for coming back to the same page since angular doesn't permit this and this creates a couple of issues
+            {
+                path: ModulePath.RedirectModule,
+                component: RedirectComponent
             }
         ]
     },

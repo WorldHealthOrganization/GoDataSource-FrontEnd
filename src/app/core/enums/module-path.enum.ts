@@ -26,5 +26,6 @@ export enum ModulePath {
     TermsOfUseModule = 'terms-of-use',
     VersionModule = 'version',
     LanguageModule = 'languages',
-    HelpModule = 'help'
+    HelpModule = 'help',
+    RedirectModule = 'redirect'
 }
