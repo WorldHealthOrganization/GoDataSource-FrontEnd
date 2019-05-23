@@ -77,6 +77,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     UserSettings = UserSettings;
     ReferenceDataCategory = ReferenceDataCategory;
 
+    notACaseFilter: boolean | string = false;
+
     exportCasesUrl: string;
     casesDataExportFileName: string = moment().format('YYYY-MM-DD');
     allowedExportTypes: ExportDataExtension[] = [
@@ -406,9 +408,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     }
 
     ngOnInit() {
-        // #TODO should move this logic in list-component?
-        this.resetFiltersAddDefault();
-
         // add page title
         this.casesDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE') +
             ' - ' +
@@ -473,16 +472,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
-    }
-
-    resetFiltersAddDefault() {
-        // by default do not display cases classified as Not a Case
-        this.filterByNotACaseField(false);
-    }
-
-    clearedQueryBuilder() {
-        // by default do not display cases classified as Not a Case
-        this.filterByNotACaseField(false);
     }
 
     ngOnDestroy() {
@@ -721,10 +710,35 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     }
 
     /**
+     * Classification conditions
+     */
+    private addClassificationConditions() {
+        // create classification condition
+        const trueCondition = {classification: {eq: Constants.CASE_CLASSIFICATION.NOT_A_CASE}};
+        const falseCondition = {classification: {neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE}};
+
+        // remove existing filter
+        this.queryBuilder.filter.removeExactCondition(trueCondition);
+        this.queryBuilder.filter.removeExactCondition(falseCondition);
+
+        // filter by classification
+        if (this.notACaseFilter === true) {
+            // show cases that are NOT classified as Not a Case
+            this.queryBuilder.filter.where(trueCondition);
+        } else if (this.notACaseFilter === false) {
+            // show cases classified as Not a Case
+            this.queryBuilder.filter.where(falseCondition);
+        }
+    }
+
+    /**
      * Re(load) the Cases list, based on the applied filter, sort criterias
      */
     refreshList() {
         if (this.selectedOutbreak) {
+            // classification conditions - not really necessary since refreshListCount is always called before this one
+            this.addClassificationConditions();
+
             // retrieve the list of Cases
             this.casesList$ = this.caseDataService
                 .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
@@ -748,6 +762,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      */
     refreshListCount() {
         if (this.selectedOutbreak) {
+            // classification conditions
+            this.addClassificationConditions();
+
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
@@ -943,21 +960,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * @param value
      */
     filterByNotACaseField(value: boolean | string) {
-        // create condition
-        const trueCondition = {classification: {eq: Constants.CASE_CLASSIFICATION.NOT_A_CASE}};
-        const falseCondition = {classification: {neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE}};
-
-        // remove existing filter
-        this.queryBuilder.filter.removeExactCondition(trueCondition);
-        this.queryBuilder.filter.removeExactCondition(falseCondition);
-
-        if (value === true) {
-            // show cases that are NOT classified as Not a Case
-            this.queryBuilder.filter.where(trueCondition);
-        } else if (value === false) {
-            // show cases classified as Not a Case
-            this.queryBuilder.filter.where(falseCondition);
-        }
+        // set filter value
+        this.notACaseFilter = value;
 
         // refresh list
         this.needsRefreshList();
