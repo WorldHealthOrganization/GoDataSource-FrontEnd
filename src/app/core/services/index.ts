@@ -47,6 +47,7 @@ import { GlobalEntitySearchDataService } from './data/global-entity-search.data.
 import { DeviceDataService } from './data/device.data.service';
 import { SavedFiltersService } from './data/saved-filters.data.service';
 import { SavedImportMappingService } from './data/saved-import-mapping.data.service';
+import { RedirectService } from './helper/redirect.service';
 
 // export the list of services
 export const services: any[] = [
@@ -105,5 +106,6 @@ export const services: any[] = [
     CacheService,
     DialogService,
     DomService,
-    BulkContactsService
+    BulkContactsService,
+    RedirectService
 ];
