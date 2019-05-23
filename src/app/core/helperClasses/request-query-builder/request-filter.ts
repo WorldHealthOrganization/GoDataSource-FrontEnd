@@ -473,11 +473,13 @@ export class RequestFilter {
             if (
                 prop.length > 0 &&
                 // remove only some conditions with a given operator?
-                operator !== null
+                operator !== null &&
+
+                // do we have data on this property ?
+                condition[property] !== undefined
             ) {
                 // get the operator
                 const op = Object.keys(condition[property])[0];
-
                 return prop !== property || op !== operator;
             } else {
                 // remove all conditions on property
