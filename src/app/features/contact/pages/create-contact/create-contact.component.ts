@@ -30,6 +30,7 @@ import { EntityModel } from '../../../../core/models/entity.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-create-contact',
@@ -74,7 +75,8 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
         private dialogService: DialogService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private redirectService: RedirectService
     ) {
         super();
     }
@@ -220,8 +222,9 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
     /**
      * Create Contact
      * @param {NgForm[]} stepForms
+     * @param {boolean} andAnotherOne
      */
-    createNewContact(stepForms: NgForm[]) {
+    createNewContact(stepForms: NgForm[], andAnotherOne: boolean = false) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
         const relationship = _.get(dirtyFields, 'relationship');
@@ -303,7 +306,17 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
 
                                         // navigate to listing page
                                         this.disableDirtyConfirm();
-                                        this.router.navigate([`/contacts/${contactData.id}/modify`]);
+                                        if (andAnotherOne) {
+                                            this.redirectService.to(
+                                                [`/contacts/create`],
+                                                {
+                                                    entityType: this.entityType,
+                                                    entityId: this.entityId
+                                                }
+                                            );
+                                        } else {
+                                            this.router.navigate([`/contacts/${contactData.id}/modify`]);
+                                        }
                                     });
                             });
                     };

@@ -189,6 +189,10 @@
                         (click)="createNewContact([personalForm, addressForm, relationshipForm])">
                     {{'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_BUTTON' | translate}}
                 </button>
+                <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent"
+                        (click)="createNewContact([personalForm, addressForm, relationshipForm], true)">
+                    {{'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_ANOTHER_CONTACT_BUTTON' | translate}}
+                </button>
             </div>
         </mat-step>
     </mat-horizontal-stepper>
