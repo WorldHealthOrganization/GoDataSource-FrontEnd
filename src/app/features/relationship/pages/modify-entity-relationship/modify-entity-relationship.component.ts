@@ -256,7 +256,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     }
 
     /**
-     * Reverse relation persons(source person person became target person and vice-versa)
+     * Reverse relation persons(source person became target person and vice-versa)
      */
     reverseExistingRelationship() {
         // show confirm dialog to confirm the action
@@ -275,8 +275,8 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                             relationshipPersons.targetId
                         )
                         .subscribe((relationshipData: RelationshipModel) => {
-                            const targetPerson = _.find(relationshipData.persons, {target: true});
-                            this.router.navigate([`/relationships/${targetPerson.type}/${targetPerson.id}/${this.relationshipTypeRoutePath}/${relationshipData.id}/modify`]);
+                            const sourcePerson = _.find(relationshipData.persons, {source: true});
+                            this.router.navigate([`/relationships/${sourcePerson.type}/${sourcePerson.id}/${this.relationshipTypeRoutePath}/${relationshipData.id}/modify`]);
                         });
                 }
             });
