@@ -28,6 +28,15 @@ export class OutbreakTemplateDataService {
     }
 
     /**
+     * Retrieve the number of Outbreak Templates
+     * @param {RequestQueryBuilder} queryBuilder
+     */
+    getOutbreakTemplatesCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`templates/count?where=${whereFilter}`);
+    }
+
+    /**
      * Delete an existing outbreak template
      * @param {string} outbreakTemplateId
      * @returns {Observable<any>}

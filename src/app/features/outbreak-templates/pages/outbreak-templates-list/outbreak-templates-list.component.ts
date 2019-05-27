@@ -13,10 +13,11 @@ import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-outbreak-templates-list',
@@ -31,6 +32,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
     ];
 
     outbreakTemplatesList$: Observable<any>;
+    outbreakTemplatesListCount$: Observable<any>;
 
     diseasesList$: Observable<any[]>;
 
@@ -163,6 +165,9 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
         // initialize Side Table Columns
         this.initializeSideTableColumns();
 
+        // initialize pagination
+        this.initPaginator();
+
         // ...and re-load the list when the Selected Outbreak is changed
         this.needsRefreshList(true);
     }
@@ -192,6 +197,16 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
         // retrieve the list of Events
         this.outbreakTemplatesList$ = this.outbreakTemplateDataService.getOutbreakTemplatesList(this.queryBuilder)
             .pipe(tap(this.checkEmptyList.bind(this)));
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        this.outbreakTemplatesListCount$ = this.outbreakTemplateDataService.getOutbreakTemplatesCount(countQueryBuilder).pipe(share());
     }
 
     /**
