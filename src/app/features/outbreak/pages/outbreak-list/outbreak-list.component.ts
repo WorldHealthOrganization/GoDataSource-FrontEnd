@@ -22,7 +22,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { Router } from '@angular/router';
 import { TopnavComponent } from '../../../../shared/components/topnav/topnav.component';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, share, switchMap, tap } from 'rxjs/operators';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import { throwError } from 'rxjs';
 
@@ -43,6 +43,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
 
     // list of existing outbreaks
     outbreaksList$: Observable<OutbreakModel[]>;
+    outbreaksListCount$: Observable<any>;
+
     // list of options from the Active dropdown
     activeOptionsList$: Observable<any[]>;
     // list of diseases
@@ -251,6 +253,9 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         // initialize Side Table Columns
         this.initializeSideTableColumns();
 
+        // initialize pagination
+        this.initPaginator();
+
         // refresh
         this.needsRefreshList(true);
     }
@@ -306,6 +311,16 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         // retrieve the list of Outbreaks
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksList(this.queryBuilder)
             .pipe(tap(this.checkEmptyList.bind(this)));
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        this.outbreaksListCount$ = this.outbreakDataService.getOutbreaksCount(countQueryBuilder).pipe(share());
     }
 
     /**
