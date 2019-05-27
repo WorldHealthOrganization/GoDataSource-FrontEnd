@@ -2,6 +2,8 @@ import * as Handsontable from 'handsontable';
 import { SheetCellValidationType } from './sheet-cell-validation-type';
 import * as _ from 'lodash';
 import { SheetCellType } from './sheet-cell-type';
+import * as moment from 'moment';
+import { Constants } from '../constants';
 
 export class SheetCellValidator {
     // cells being part of empty rows will get this value at validation time, so we know to skip validation for them (e.g. skip Required validation)
@@ -75,8 +77,17 @@ export class SheetCellValidator {
                 return (Handsontable as any).validators.DropdownValidator;
 
             case SheetCellValidationType.DATE:
-                // 'handsontable' built-in validator for Dates
-                return (Handsontable as any).validators.DateValidator;
+                // custom validator for dates
+                // we don't use "return (Handsontable as any).validators.DateValidator;" since we need min & max date validation which this validator version doesn't support
+                return (value, callback, sheetColumn) => {
+                    callback(
+                        _.isEmpty(value) || (
+                            moment(value, Constants.DEFAULT_DATE_DISPLAY_FORMAT).isValid() &&
+                            (sheetColumn.min ? sheetColumn.min.isSameOrBefore(moment(value, Constants.DEFAULT_DATE_DISPLAY_FORMAT)) : true) &&
+                            (sheetColumn.max ? sheetColumn.max.isSameOrAfter(moment(value, Constants.DEFAULT_DATE_DISPLAY_FORMAT)) : true)
+                        )
+                    );
+                };
 
             case SheetCellValidationType.REQUIRED:
                 // custom validator for Required cells

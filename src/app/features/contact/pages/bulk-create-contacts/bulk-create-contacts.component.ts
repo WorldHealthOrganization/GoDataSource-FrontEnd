@@ -29,6 +29,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { throwError } from 'rxjs';
 import { catchError, map, mergeMap, share } from 'rxjs/operators';
 import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -216,7 +217,9 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
                 .setProperty('contact.gender')
                 .setOptions(this.genderList$, this.i18nService),
-            new DateSheetColumn()
+            new DateSheetColumn(
+                null,
+                moment())
                 .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING')
                 .setProperty('contact.dateOfReporting')
                 .setRequired(),
@@ -277,7 +280,9 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 .setProperty('contact.addresses[0].phoneNumber'),
 
             // Relationship properties
-            new DateSheetColumn()
+            new DateSheetColumn(
+                null,
+                moment())
                 .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE')
                 .setProperty('relationship.contactDate')
                 .setRequired(),
