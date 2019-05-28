@@ -26,8 +26,13 @@ export const EnglishUsLang = {
          * uiCreateContactPage
          */
         'LNG_PAGE_CREATE_CONTACT_ACTION_COPY_ENTITY_ADDRESS_TOOLTIP': 'Copy main address from the parent entity',
-        'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_ANOTHER_CONTACT_BUTTON': 'Create and add another'
+        'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_ANOTHER_CONTACT_BUTTON': 'Create and add another',
 
+        /**
+         * uiModifyFollowUpListPage
+         */
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_FOLLOW_UPS_DATES': 'Follow-ups dates:',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_INFO_LABEL': '*The system will replace only data that is changed. If you don\'t enter any data, then the system won\'t update the data to any of the selected follow-ups'
 
         /**
          * REMOVE the tokens from below

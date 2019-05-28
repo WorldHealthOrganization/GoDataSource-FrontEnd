@@ -137,6 +137,18 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
             });
     }
 
+    /**
+     * Return follow up dates for selected follow-ups to be modified
+     */
+    get followUpDates(): string[] {
+        return this.selectedFollowUps
+            .map(followUp => followUp.date )
+            .filter((contact, index, self) => {
+                // keep only unique contacts
+                return self.indexOf(contact) === index;
+            });
+    }
+
     getFormDirtyFields(stepForms: NgForm[]): any {
         const dirtyFields: any = this.formHelper.mergeDirtyFields(stepForms);
 

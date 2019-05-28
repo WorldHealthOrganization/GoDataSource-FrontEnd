@@ -2,6 +2,12 @@
     fxFlex
     class="page-section"
 >
+    <div fxLayout="column" fxLayoutGap="5px" class="info-container">
+        <div>
+            {{ 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_INFO_LABEL' | translate }}
+        </div>
+    </div>
+
     <div>{{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_SELECTED_CONTACTS' | translate}}</div>
     <div fxLayout="row wrap" fxLayoutGap="20px">
         <a
@@ -9,6 +15,15 @@
             [routerLink]="['/contacts', contact.id, 'view']"
         >
             {{ contact.name }}
+        </a>
+    </div>
+
+    <div class="follow-up-dates">{{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_FOLLOW_UPS_DATES' | translate}}</div>
+    <div fxLayout="row wrap" fxLayoutGap="20px">
+        <a
+            *ngFor="let date of followUpDates"
+        >
+            {{ date | dateDefault}}
         </a>
     </div>
 </mat-card>
