@@ -51,7 +51,7 @@
         <ng-container *ngIf="!viewOnly">
 
             <button
-                [disabled]="!canReverseRelation"
+                *ngIf="!canReverseRelation"
                 (click)="reverseExistingRelationship()"
                 [matTooltip]="'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_REVERSE_RELATIONSHIP_TOOLTIP' | translate"
                 mat-raised-button

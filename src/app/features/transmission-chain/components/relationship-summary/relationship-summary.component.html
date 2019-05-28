@@ -24,7 +24,7 @@
             fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
 
             <button
-                [disabled]="!canReverseRelation"
+                *ngIf="!canReverseRelation"
                 (click)="reverseExistingRelationship()"
                 [matTooltip]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_REVERSE_RELATIONSHIP_TOOLTIP' | translate"
                 mat-raised-button type="button">
