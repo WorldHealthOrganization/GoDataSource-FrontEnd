@@ -13,7 +13,8 @@ import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { EntityType } from '../../../core/models/entity-type';
 import { Constants } from '../../../core/models/constants';
 import { share } from 'rxjs/operators';
-
+import * as moment from 'moment';
+import { Moment, months } from 'moment';
 @Component({
     selector: 'app-form-relationship',
     encapsulation: ViewEncapsulation.None,
@@ -120,6 +121,12 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
      */
     get relationship(): RelationshipModel {
         return this.value;
+    }
+
+    get minimumDate(): string | Moment {
+        console.log(this.selectedOutbreak.startDate);
+        console.log(moment(this.selectedOutbreak.startDate).subtract(2, 'months').format('YYY-MM-DD'));
+        return moment(this.selectedOutbreak.startDate).subtract(2, 'months').format('YYY-MM-DD');
     }
 
     /**
