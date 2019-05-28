@@ -24,7 +24,7 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
     chartData: any = [];
     chartDataCategories: any = [];
     chartDataColumns: any = [];
-    viewType = Constants.EPI_CURVE_VIEW_TYPE.MONTH.value;
+    viewType = Constants.EPI_CURVE_VIEW_TYPE.WEEK.value;
     mapCaseClassifications: any = {};
     colorPattern: string[] = [];
 

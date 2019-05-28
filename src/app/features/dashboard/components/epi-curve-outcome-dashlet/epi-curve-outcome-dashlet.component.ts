@@ -2,7 +2,6 @@ import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { MetricCasesCountStratified } from '../../../../core/models/metrics/metric-cases-count-stratified.model';
 import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -25,7 +24,7 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
     chartData: any = [];
     chartDataCategories: any = [];
     chartDataColumns: any = [];
-    viewType = Constants.EPI_CURVE_VIEW_TYPE.MONTH.value;
+    viewType = Constants.EPI_CURVE_VIEW_TYPE.WEEK.value;
     mapOutcomes: any = {};
     colorPattern: string[] = [];
 
