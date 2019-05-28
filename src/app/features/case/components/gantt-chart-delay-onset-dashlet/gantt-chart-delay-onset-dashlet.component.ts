@@ -5,7 +5,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { SVGGantt, CanvasGantt, StrGantt } from 'gantt';
+import { SVGGantt } from 'gantt';
 import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../../../core/models/metrics/metric-cases-delay-between-onset-lab-test.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import * as _ from 'lodash';
@@ -22,7 +22,6 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 })
 export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
     // constants
-    viewType = Constants.GANTT_CHART_VIEW_TYPE.WEEK.value;
     Constants = Constants;
 
     // gantt chart settings
@@ -30,7 +29,7 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
     ganttData: any = [];
     options = {
         // View mode: day/week/month
-        viewMode: Constants.GANTT_CHART_VIEW_TYPE.WEEK.value,
+        viewMode: Constants.GANTT_CHART_VIEW_TYPE.DAY.value,
         onClick: () => {},
         styleOptions: {
             baseBar: '#4DB0A0'
@@ -191,8 +190,7 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
      */
     changeView(viewType) {
         // configure new settings
-        this.viewType = viewType;
-        this.options.viewMode = this.viewType;
+        this.options.viewMode = viewType;
 
         // re-render chart
         this.displayChart();
