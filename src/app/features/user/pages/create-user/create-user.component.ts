@@ -17,6 +17,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-create-user',
@@ -46,7 +47,8 @@ export class CreateUserComponent extends ConfirmOnFormChanges implements OnInit 
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -68,17 +70,24 @@ export class CreateUserComponent extends ConfirmOnFormChanges implements OnInit 
         }
 
         if (form.valid && !_.isEmpty(dirtyFields)) {
+            // modify the user
+            const loadingDialog = this.dialogService.showLoadingDialog();
+
             // try to authenticate the user
             this.userDataService
                 .createUser(dirtyFields)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showError(err.message);
+                        loadingDialog.close();
                         return throwError(err);
                     })
                 )
                 .subscribe((newUser: UserModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_SUCCESS_MESSAGE');
+
+                    // hide dialog
+                    loadingDialog.close();
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
