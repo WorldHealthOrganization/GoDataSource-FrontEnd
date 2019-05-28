@@ -370,7 +370,9 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER')
                 .setProperty('addresses.phoneNumber'),
-            new DateSheetColumn()
+            new DateSheetColumn(
+                null,
+                moment())
                 .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING')
                 .setProperty('dateOfReporting')
                 .setRequired(),

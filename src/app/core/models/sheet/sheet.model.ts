@@ -3,6 +3,7 @@ import { SheetCellValidator } from './sheet-cell-validator';
 import { SheetCellType } from './sheet-cell-type';
 import { SheetCellValidationType } from './sheet-cell-validation-type';
 import { map } from 'rxjs/operators';
+import { Moment } from 'moment';
 
 export abstract class AbstractSheetColumn {
     // translation key for column name
@@ -76,7 +77,10 @@ export class TextSheetColumn extends AbstractSheetColumn {
  * Date picker cell
  */
 export class DateSheetColumn extends AbstractSheetColumn {
-    constructor() {
+    constructor(
+        public min?: Moment,
+        public max?: Moment
+    ) {
         super(SheetCellType.DATE);
     }
 }
