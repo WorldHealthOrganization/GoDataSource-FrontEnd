@@ -130,6 +130,9 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                             // hide dialog
                             loadingDialog.close();
                         });
+                } else {
+                    // hide dialog
+                    loadingDialog.close();
                 }
             });
     }
