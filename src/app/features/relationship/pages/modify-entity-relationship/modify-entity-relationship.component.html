@@ -50,17 +50,18 @@
 
         <ng-container *ngIf="!viewOnly">
 
-            <button
-                *ngIf="canReverseRelation"
-                (click)="reverseExistingRelationship()"
-                [matTooltip]="'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_REVERSE_RELATIONSHIP_TOOLTIP' | translate"
-                mat-raised-button
-                type="button"
+            <ng-container *ngIf="canReverseRelation" >
+                <button
+                    (click)="reverseExistingRelationship()"
+                    [matTooltip]="'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_REVERSE_RELATIONSHIP_TOOLTIP' | translate"
+                    mat-raised-button
+                    type="button"
                 >
-                {{ 'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_REVERSE_RELATIONSHIP' | translate }}
-            </button>
+                    {{ 'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_REVERSE_RELATIONSHIP' | translate }}
+                </button>
 
-            <div *ngIf="canReverseRelation" class="page-tabs-navbar-placeholder"></div>
+                <div class="page-tabs-navbar-placeholder"></div>
+            </ng-container>
 
             <button mat-raised-button color="accent">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
