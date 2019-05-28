@@ -123,10 +123,13 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
         return this.value;
     }
 
-    get minimumDate(): string | Moment {
-        console.log(this.selectedOutbreak.startDate);
-        console.log(moment(this.selectedOutbreak.startDate).subtract(2, 'months').format('YYY-MM-DD'));
-        return moment(this.selectedOutbreak.startDate).subtract(2, 'months').format('YYY-MM-DD');
+    /**
+     * Get minimum date for date of last contact
+     */
+    get minimumDate(): string {
+        if (this.selectedOutbreak.startDate) {
+            return moment(this.selectedOutbreak.startDate).subtract(6, 'months').format();
+        }
     }
 
     /**
