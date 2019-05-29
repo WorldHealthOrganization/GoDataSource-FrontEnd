@@ -21,7 +21,9 @@
                         (optionChanged)="onChange()"
                         [maxDate]="currentDate"
                         app-date-validator
-                        [dateSameOrBefore]="currentDate">
+                        [dateSameOrBefore]="currentDate"
+                        [dateSameOrAfter]="minimumDate"
+                        [minDate]="minimumDate">
                     </app-form-datepicker>
                     <div
                         *ngIf="displayCopyField"
