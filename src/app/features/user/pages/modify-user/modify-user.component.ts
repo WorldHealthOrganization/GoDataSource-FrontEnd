@@ -77,6 +77,11 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
     }
 
     modifyUser(form: NgForm) {
+        // validate form
+        if (!this.formHelper.validateForm(form)) {
+            return;
+        }
+
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
         // remove password confirm
