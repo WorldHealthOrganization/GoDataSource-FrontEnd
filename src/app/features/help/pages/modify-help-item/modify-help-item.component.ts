@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, Renderer2, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,7 +18,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { BUTTONS } from 'ngx-wig';
-import { ngxWigCustomLibraryButtonsFactory } from '../../definitions/ngx-wig-custom-library-buttons';
+import { ngxWigCustomLibraryButtonsFactory, ngxWigCustomLibraryButtonsRelease } from '../../definitions/ngx-wig-custom-library-buttons';
 
 @Component({
     selector: 'app-modify-help-item',
@@ -38,7 +38,7 @@ import { ngxWigCustomLibraryButtonsFactory } from '../../definitions/ngx-wig-cus
         }
     ]
 })
-export class ModifyHelpItemComponent extends ViewModifyComponent implements OnInit {
+export class ModifyHelpItemComponent extends ViewModifyComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     helpItemData: HelpItemModel = new HelpItemModel();
@@ -200,5 +200,12 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
      */
     hasHelpWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_HELP);
+    }
+
+    /**
+     * Release ngx-wig resources
+     */
+    ngOnDestroy(): void {
+        ngxWigCustomLibraryButtonsRelease();
     }
 }

@@ -9,6 +9,11 @@ import * as _ from 'lodash';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 
 /**
+ * List of active listeners
+ */
+let ngxWigCustomLibraryButtonsListeners: (() => void)[] = [];
+
+/**
  * Handles custom buttons for our wysiwyg
  * @param i18nService
  */
@@ -226,6 +231,9 @@ export const ngxWigCustomLibraryButtonsFactory = (
                         } else {
                             element.removeAttribute('alt');
                         }
+
+                        // content changed
+                        ctx.onContentChange(ctx.container.innerHTML);
                     }
                 }
             });
@@ -330,7 +338,7 @@ export const ngxWigCustomLibraryButtonsFactory = (
     };
 
     // remember caret position
-    renderer2.listen(
+    ngxWigCustomLibraryButtonsListeners.push(renderer2.listen(
         'document',
         'selectionchange',
         () => {
@@ -361,10 +369,10 @@ export const ngxWigCustomLibraryButtonsFactory = (
                 }
             }
         }
-    );
+    ));
 
     // handle custom double click events
-    renderer2.listen(
+    ngxWigCustomLibraryButtonsListeners.push(renderer2.listen(
         'body',
         'dblclick',
         (event) => {
@@ -377,7 +385,7 @@ export const ngxWigCustomLibraryButtonsFactory = (
                 displayImageDialog(ctxItem, event.target);
             }
         }
-    );
+    ));
 
     // buttons
     const finalButtons: { [idButton: string]: TButton } = _.transform(
@@ -411,4 +419,17 @@ export const ngxWigCustomLibraryButtonsFactory = (
 
     // finished
     return finalButtons;
+};
+
+/**
+ * Release listeners
+ */
+export const ngxWigCustomLibraryButtonsRelease = () => {
+    // release listeners
+    ngxWigCustomLibraryButtonsListeners.forEach((listener) => {
+        listener();
+    });
+
+    // clear list
+    ngxWigCustomLibraryButtonsListeners = [];
 };
