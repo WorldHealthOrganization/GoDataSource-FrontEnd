@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Renderer2, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,16 +14,29 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { Observable } from 'rxjs';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
-
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { BUTTONS } from 'ngx-wig';
+import { ngxWigCustomLibraryButtonsFactory } from '../../definitions/ngx-wig-custom-library-buttons';
 
 @Component({
     selector: 'app-modify-help-item',
     encapsulation: ViewEncapsulation.None,
     templateUrl: './modify-help-item.component.html',
-    styleUrls: ['./modify-help-item.component.less']
+    styleUrls: ['./modify-help-item.component.less'],
+    providers: [
+        {
+            provide: BUTTONS,
+            multi: true,
+            useFactory: ngxWigCustomLibraryButtonsFactory,
+            deps: [
+                I18nService,
+                DialogService,
+                Renderer2
+            ]
+        }
+    ]
 })
 export class ModifyHelpItemComponent extends ViewModifyComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [];
