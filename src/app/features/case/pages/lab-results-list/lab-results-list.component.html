@@ -74,6 +74,29 @@
 
     <mat-table #table [dataSource]="labResultsList$ | async" matSort (matSortChange)="sortBy($event)">
 
+        <!-- Case ID-->
+        <ng-container matColumnDef="caseVisualId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_CASE_LAB_RESULT_FIELD_LABEL_PERSON_ID' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="caseVisualIdFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByRelation('case').byText('visualId', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.case?.visualId}}
+            </mat-cell>
+        </ng-container>
+
         <!-- Case Last Name -->
         <ng-container matColumnDef="caseLastName">
             <mat-header-cell *matHeaderCellDef>
