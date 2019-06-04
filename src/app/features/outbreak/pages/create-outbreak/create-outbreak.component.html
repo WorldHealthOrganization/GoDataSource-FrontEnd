@@ -70,7 +70,7 @@
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_START_DATE_DESCRIPTION"
                                 required="true"
                                 app-date-validator
-                                [dateSameOrBefore]="'endDate'"
+                                [dateSameOrBefore]="['endDate', serverToday]"
                                 [maxDate]="serverToday">
                             </app-form-datepicker>
                             <app-form-datepicker
@@ -80,6 +80,7 @@
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_END_DATE_DESCRIPTION"
                                 app-date-validator
                                 [dateSameOrAfter]="'startDate'"
+                                [dateSameOrBefore]="serverToday"
                                 [maxDate]="serverToday">
                             </app-form-datepicker>
                             <app-form-input
