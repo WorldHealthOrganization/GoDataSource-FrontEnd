@@ -44,8 +44,12 @@ export class TButtonExtended implements TButton {
         );
 
         // translate
-        button.label = NgxWigCustomLibraryButtons.i18nService.instant(originalButton.label);
-        button.title = NgxWigCustomLibraryButtons.i18nService.instant(originalButton.title);
+        button.label = originalButton.label ?
+            NgxWigCustomLibraryButtons.i18nService.instant(originalButton.label) :
+            originalButton.label;
+        button.title = originalButton.title ?
+            NgxWigCustomLibraryButtons.i18nService.instant(originalButton.title) :
+            originalButton.title;
     }
 
     // extra params
@@ -107,6 +111,12 @@ export class NgxWigCustomLibraryButtons {
     static readonly defaultButtonsConf: {
         [idButton: string]: TButtonExtended
     } = {
+        _: new TButtonExtended({
+            id: '_',
+            label: ' ',
+            styleClass: '',
+            command: () => {}
+        }),
         list1: new TButtonExtended({
             id: 'list1',
             label: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_UNORDERED_LIST',
