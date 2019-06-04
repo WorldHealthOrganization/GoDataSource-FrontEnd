@@ -21,6 +21,15 @@ interface INgxWigImgData {
     imgAlt?: string;
 }
 
+/**
+ * Link data
+ */
+interface INgxWigLinkData {
+    linkUrl: string;
+    linkText: string;
+    linkTarget: string;
+}
+
 export class TButtonExtended implements TButton {
     // TButton properties
     label: string;
@@ -106,6 +115,28 @@ export class NgxWigCustomLibraryButtons {
     ];
 
     /**
+     * Link target types
+     */
+    static readonly targetTypes: LabelValuePair[] = [
+        new LabelValuePair(
+            'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK_DIALOG_TARGET_TYPE_BLANK',
+            '_blank'
+        ),
+        new LabelValuePair(
+            'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK_DIALOG_TARGET_TYPE_SELF',
+            '_self'
+        ),
+        new LabelValuePair(
+            'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK_DIALOG_TARGET_TYPE_PARENT',
+            '_parent'
+        ),
+        new LabelValuePair(
+            'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK_DIALOG_TARGET_TYPE_TOP',
+            '_top'
+        )
+    ];
+
+    /**
      * Default buttons setup
      */
     static readonly defaultButtonsConf: {
@@ -187,14 +218,14 @@ export class NgxWigCustomLibraryButtons {
             id: 'linkCustom',
             label: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK',
             title: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_TITLE_LINK',
-            command: (ctx: NgxWigComponent) => {
-                ctx.execCommand(
-                    'createlink', // CUSTOM
-                    ''
-                );
-            },
             styleClass: 'link',
-            icon: 'icon-link'
+            icon: 'icon-link',
+            command: (ctx: NgxWigComponent) => {
+                // display add image dialog
+                NgxWigCustomLibraryButtons.displayLinkDialog(
+                    ctx
+                );
+            }
         }),
         insertImageCustom: new TButtonExtended({
             id: 'insertImageCustom',
@@ -338,7 +369,7 @@ export class NgxWigCustomLibraryButtons {
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // date used to create / update image
-                    const data = {
+                    const data: INgxWigImgData = {
                         imgUrl: answer.inputValue.value.imgUrl,
                         imgWidth: answer.inputValue.value.imgWidth,
                         imgWidthType: answer.inputValue.value.imgWidthType,
@@ -367,12 +398,9 @@ export class NgxWigCustomLibraryButtons {
     }
 
     /**
-     * Insert new image
+     * Reset caret position
      */
-    static addNewImage(
-        ctx: NgxWigComponent,
-        data: INgxWigImgData
-    ) {
+    static resetCaretPosition(ctx: NgxWigComponent) {
         // determine caret position
         const selectionRange = _.get(
             ctx,
@@ -390,6 +418,17 @@ export class NgxWigCustomLibraryButtons {
                 selection.addRange(selectionRange);
             }
         }
+    }
+
+    /**
+     * Insert new image
+     */
+    static addNewImage(
+        ctx: NgxWigComponent,
+        data: INgxWigImgData
+    ) {
+        // reset caret position
+        NgxWigCustomLibraryButtons.resetCaretPosition(ctx);
 
         // construct image html
         let imgHtml = `<img class="ngx-wig-img" src="${data.imgUrl}"`;
@@ -503,6 +542,147 @@ export class NgxWigCustomLibraryButtons {
                 'alt'
             );
         }
+
+        // content changed - mark as dirty
+        ctx.onContentChange(ctx.container.innerHTML);
+    }
+
+    /**
+     * Display link create / update dialog
+     * @param ctx
+     * @param element
+     */
+    static displayLinkDialog(
+        ctx: NgxWigComponent,
+        element?: any
+    ) {
+        // display insert / modify image dialog
+        NgxWigCustomLibraryButtons.dialogService
+            .showInput(
+                new DialogConfiguration({
+                    message: element ? 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK_DIALOG_MODIFY' : 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK_DIALOG_ADD',
+                    yesLabel: element ? 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK_DIALOG_MODIFY_BUTTON' : 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK_DIALOG_ADD_BUTTON',
+                    fieldsListLayout: [
+                        100,
+                        75, 25
+                    ],
+                    fieldsList: [
+                        // link
+                        new DialogField({
+                            name: 'linkUrl',
+                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK_DIALOG_URL',
+                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK_DIALOG_URL_DESCRIPTION',
+                            required: true,
+                            value: element ? element.href : 'http://',
+                            fieldType: DialogFieldType.URL,
+                            urlAsyncValidator: (url: string): Observable<boolean> => {
+                                return of(url.indexOf('http://') === 0 || url.indexOf('https://') === 0);
+                            }
+                        }),
+
+                        // text
+                        new DialogField({
+                            name: 'linkText',
+                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK_DIALOG_TEXT',
+                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK_DIALOG_TEXT_DESCRIPTION',
+                            required: true,
+                            fieldType: DialogFieldType.TEXT,
+                            value: element ? element.innerText : undefined
+                        }),
+
+                        // target
+                        new DialogField({
+                            name: 'linkTarget',
+                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK_DIALOG_TARGET',
+                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK_DIALOG_TARGET_DESCRIPTION',
+                            inputOptions: NgxWigCustomLibraryButtons.targetTypes,
+                            inputOptionsClearable: false,
+                            value: element ? element.target : '_blank'
+                        })
+                    ]
+                })
+            )
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // date used to create / update link
+                    const data: INgxWigLinkData = {
+                        linkUrl: answer.inputValue.value.linkUrl,
+                        linkText: answer.inputValue.value.linkText,
+                        linkTarget: answer.inputValue.value.linkTarget
+                    };
+
+                    // insert or update link
+                    if (!element) {
+                        NgxWigCustomLibraryButtons.addNewLink(
+                            ctx,
+                            data
+                        );
+                    } else {
+                        // update link details
+                        NgxWigCustomLibraryButtons.updateLink(
+                            ctx,
+                            element,
+                            data
+                        );
+                    }
+                }
+            });
+    }
+
+    /**
+     * Insert new link
+     */
+    static addNewLink(
+        ctx: NgxWigComponent,
+        data: INgxWigLinkData
+    ) {
+        // reset caret position
+        NgxWigCustomLibraryButtons.resetCaretPosition(ctx);
+
+        // construct link html
+        let linkHtml = `<a class="ngx-wig-link" href="${data.linkUrl}"`;
+
+        // target
+        if (!_.isEmpty(data.linkTarget)) {
+            linkHtml += ` target="${data.linkTarget}"`;
+        }
+
+        // text - MUST BE LAST
+        if (!_.isEmpty(data.linkText)) {
+            linkHtml += '>' + data.linkText + '</a>';
+        }
+
+        // insert image
+        ctx.execCommand(
+            'insertHtml',
+            linkHtml
+        );
+    }
+
+    /**
+     * Update link details
+     */
+    static updateLink(
+        ctx: NgxWigComponent,
+        element,
+        data: INgxWigLinkData
+    ) {
+        // update URL
+        NgxWigCustomLibraryButtons.renderer2.setAttribute(
+            element,
+            'href',
+            data.linkUrl
+        );
+
+        // text
+        element.innerText = data.linkText;
+
+        // target
+        NgxWigCustomLibraryButtons.renderer2.setAttribute(
+            element,
+            'target',
+            data.linkTarget
+        );
 
         // content changed - mark as dirty
         ctx.onContentChange(ctx.container.innerHTML);

@@ -132,14 +132,20 @@ export class FormNgxWigComponent extends ElementBase<string> implements OnInit, 
                 if (
                     !this.disabled &&
                     event.target &&
-                    event.target.classList &&
-                    event.target.classList.contains('ngx-wig-img')
+                    event.target.classList
                 ) {
                     // update image
-                    NgxWigCustomLibraryButtons.displayImageDialog(
-                        this.ngxWig,
-                        event.target
-                    );
+                    if (event.target.classList.contains('ngx-wig-img')) {
+                        NgxWigCustomLibraryButtons.displayImageDialog(
+                            this.ngxWig,
+                            event.target
+                        );
+                    } else if (event.target.classList.contains('ngx-wig-link')) {
+                        NgxWigCustomLibraryButtons.displayLinkDialog(
+                            this.ngxWig,
+                            event.target
+                        );
+                    }
                 }
             }
         );
