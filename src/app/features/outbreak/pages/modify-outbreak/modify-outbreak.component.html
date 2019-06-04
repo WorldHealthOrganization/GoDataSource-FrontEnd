@@ -77,7 +77,8 @@
                                 required="true"
                                 app-date-validator
                                 [dateSameOrBefore]="'endDate'"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [maxDate]="serverToday">
                             </app-form-datepicker>
                             <app-form-datepicker
                                 name="endDate"
