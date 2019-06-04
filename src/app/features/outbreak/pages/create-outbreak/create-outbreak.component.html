@@ -79,7 +79,8 @@
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_END_DATE' | translate"
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_END_DATE_DESCRIPTION"
                                 app-date-validator
-                                [dateSameOrAfter]="'startDate'">
+                                [dateSameOrAfter]="'startDate'"
+                                [maxDate]="serverToday">
                             </app-form-datepicker>
                             <app-form-input
                                 name="caseIdMask"
