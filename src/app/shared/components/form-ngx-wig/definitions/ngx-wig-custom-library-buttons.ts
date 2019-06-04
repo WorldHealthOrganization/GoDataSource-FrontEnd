@@ -96,11 +96,11 @@ export class NgxWigCustomLibraryButtons {
      */
     static readonly unitTypes: LabelValuePair[] = [
         new LabelValuePair(
-            'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_WIDTH_TYPE_PX',
+            'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_WIDTH_TYPE_PX',
             'px'
         ),
         new LabelValuePair(
-            'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_WIDTH_TYPE_PERCENT',
+            'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_WIDTH_TYPE_PERCENT',
             '%'
         )
     ];
@@ -257,8 +257,8 @@ export class NgxWigCustomLibraryButtons {
         NgxWigCustomLibraryButtons.dialogService
             .showInput(
                 new DialogConfiguration({
-                    message: element ? 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_MODIFY' : 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_ADD',
-                    yesLabel: element ? 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_MODIFY_BUTTON' : 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_ADD_BUTTON',
+                    message: element ? 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_MODIFY' : 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_ADD',
+                    yesLabel: element ? 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_MODIFY_BUTTON' : 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_ADD_BUTTON',
                     fieldsListLayout: [
                         100,
                         30, 20, 30, 20,
@@ -269,8 +269,8 @@ export class NgxWigCustomLibraryButtons {
                         // url
                         new DialogField({
                             name: 'imgUrl',
-                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_URL',
-                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_URL_DESCRIPTION',
+                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_URL',
+                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_URL_DESCRIPTION',
                             required: true,
                             value: element ? element.src : 'http://',
                             fieldType: DialogFieldType.URL,
@@ -282,16 +282,16 @@ export class NgxWigCustomLibraryButtons {
                         // image width
                         new DialogField({
                             name: 'imgWidth',
-                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_WIDTH',
-                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_WIDTH_DESCRIPTION',
+                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_WIDTH',
+                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_WIDTH_DESCRIPTION',
                             type: 'number',
                             fieldType: DialogFieldType.TEXT,
                             value: widthValue
                         }),
                         new DialogField({
                             name: 'imgWidthType',
-                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_SIZE_TYPE',
-                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_SIZE_TYPE_DESCRIPTION',
+                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_SIZE_TYPE',
+                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_SIZE_TYPE_DESCRIPTION',
                             inputOptions: NgxWigCustomLibraryButtons.unitTypes,
                             inputOptionsClearable: false,
                             value: widthUnit
@@ -300,16 +300,16 @@ export class NgxWigCustomLibraryButtons {
                         // image height
                         new DialogField({
                             name: 'imgHeight',
-                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_HEIGHT',
-                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_HEIGHT_DESCRIPTION',
+                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_HEIGHT',
+                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_HEIGHT_DESCRIPTION',
                             type: 'number',
                             fieldType: DialogFieldType.TEXT,
                             value: heightValue
                         }),
                         new DialogField({
                             name: 'imgHeightType',
-                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_SIZE_TYPE',
-                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_SIZE_TYPE_DESCRIPTION',
+                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_SIZE_TYPE',
+                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_SIZE_TYPE_DESCRIPTION',
                             inputOptions: NgxWigCustomLibraryButtons.unitTypes,
                             inputOptionsClearable: false,
                             value: heightUnit
@@ -318,8 +318,8 @@ export class NgxWigCustomLibraryButtons {
                         // title
                         new DialogField({
                             name: 'imgTitle',
-                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_TITLE',
-                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_TITLE_DESCRIPTION',
+                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_TITLE',
+                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_TITLE_DESCRIPTION',
                             fieldType: DialogFieldType.TEXT,
                             value: element ? element.title : undefined
                         }),
@@ -327,8 +327,8 @@ export class NgxWigCustomLibraryButtons {
                         // Alt
                         new DialogField({
                             name: 'imgAlt',
-                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_ALT',
-                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_Alt_DESCRIPTION',
+                            placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_ALT',
+                            description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_IMAGE_DIALOG_Alt_DESCRIPTION',
                             fieldType: DialogFieldType.TEXT,
                             value: element ? element.alt : undefined
                         })
