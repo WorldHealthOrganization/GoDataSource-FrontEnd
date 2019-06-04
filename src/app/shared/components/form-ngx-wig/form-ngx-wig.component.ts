@@ -211,9 +211,10 @@ export class FormNgxWigComponent extends ElementBase<string> implements OnInit, 
         this.languageListener = this.i18nService.languageChangedEvent
             .subscribe(() => {
                 // update buttons translations
+                // hack to force library translation refresh
                 if (this.ngxWig) {
-                    _.each(this.ngxWig.toolbarButtons, (button: any) => {
-                        TButtonExtended.refreshTranslation(button);
+                    _.each((this.ngxWig as any)._ngWigToolbarService._buttonLibrary, (button: TButtonExtended) => {
+                        button.refreshTranslation();
                     });
 
                     // reset buttons list
