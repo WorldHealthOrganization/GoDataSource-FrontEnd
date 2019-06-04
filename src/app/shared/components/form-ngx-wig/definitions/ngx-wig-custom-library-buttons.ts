@@ -114,6 +114,7 @@ export class NgxWigCustomLibraryButtons {
         _: new TButtonExtended({
             id: '_',
             label: ' ',
+            title: '',
             styleClass: '',
             command: () => {}
         }),
