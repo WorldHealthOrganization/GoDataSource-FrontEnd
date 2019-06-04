@@ -206,8 +206,8 @@ export class FormNgxWigComponent extends ElementBase<string> implements OnInit, 
             .subscribe(() => {
                 // update buttons translations
                 if (this.ngxWig) {
-                    _.each(this.ngxWig.toolbarButtons, (button: TButtonExtended) => {
-                        button.refreshTranslation();
+                    _.each(this.ngxWig.toolbarButtons, (button: any) => {
+                        TButtonExtended.refreshTranslation(button);
                     });
 
                     // reset buttons list

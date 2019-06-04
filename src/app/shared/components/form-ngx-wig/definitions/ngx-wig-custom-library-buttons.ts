@@ -32,6 +32,22 @@ export class TButtonExtended implements TButton {
     // other properties
     id: string;
 
+    /**
+     * Refresh translation
+     */
+    static refreshTranslation(button: TButtonExtended) {
+        // determine parent button
+        const originalButton: TButtonExtended = _.find(
+            NgxWigCustomLibraryButtons.defaultButtonsConf, {
+                id: button.id
+            }
+        );
+
+        // translate
+        button.label = NgxWigCustomLibraryButtons.i18nService.instant(originalButton.label);
+        button.title = NgxWigCustomLibraryButtons.i18nService.instant(originalButton.title);
+    }
+
     // extra params
     constructor(data?: {
         id: string,
@@ -52,16 +68,7 @@ export class TButtonExtended implements TButton {
      * Refresh translation
      */
     public refreshTranslation() {
-        // determine parent button
-        const originalButton: TButtonExtended = _.find(
-            NgxWigCustomLibraryButtons.defaultButtonsConf, {
-                id: this.id
-            }
-        );
-
-        // translate
-        this.label = NgxWigCustomLibraryButtons.i18nService.instant(originalButton.label);
-        this.title = NgxWigCustomLibraryButtons.i18nService.instant(originalButton.title);
+        TButtonExtended.refreshTranslation(this);
     }
 }
 
