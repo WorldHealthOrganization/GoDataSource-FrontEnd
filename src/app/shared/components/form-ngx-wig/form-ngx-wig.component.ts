@@ -1,8 +1,11 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnDestroy, ViewChild } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnDestroy, ViewChild, OnInit, Renderer2 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { ElementBase } from '../../xt-forms/core';
 import { BUTTONS, NgxWigComponent } from 'ngx-wig';
-import { NgxWigCustomLibraryButtons } from './definitions/ngx-wig-custom-library-buttons';
+import { NgxWigCustomLibraryButtons, TButtonExtended } from './definitions/ngx-wig-custom-library-buttons';
+import * as _ from 'lodash';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-form-ngx-wig',
@@ -19,41 +22,31 @@ import { NgxWigCustomLibraryButtons } from './definitions/ngx-wig-custom-library
         useClass: NgxWigCustomLibraryButtons
     }]
 })
-export class FormNgxWigComponent extends ElementBase<string> implements  OnDestroy{
-    private _disabled: boolean = false;
-    @Input() set disabled(disabled: boolean) {
-        // set value
-        this._disabled = disabled;
+export class FormNgxWigComponent extends ElementBase<string> implements OnInit, OnDestroy {
+    // component id
+    static identifier: number = 0;
+    public readonly identifier = `form-ngx-wig-${FormNgxWigComponent.identifier++}`;
 
-        // register disabled component
-        this.registerDisabledComponent();
-    }
-    get disabled(): boolean {
-        return this._disabled;
-    }
+    // html listeners
+    private htmlListenerDblClickImg: () => void;
+    private htmlListenerSelectCaretPosition: () => void;
+    private languageListener: Subscription;
 
-    private _name: string;
-    @Input() set name(name: string) {
-        // set name
-        this._name = name;
+    // input
+    @Input() buttons: string;
+    @Input() name: string;
+    @Input() disabled: boolean;
 
-        // register component for easy find
-        this.registerComponent();
-
-        // register disabled component
-        this.registerDisabledComponent();
-    }
-    get name(): string {
-        return this._name;
-    }
-
+    /**
+     * WYSIWYG component
+     */
     private _ngxWig: NgxWigComponent;
     @ViewChild('ngxWig') set ngxWig(ngxWig: NgxWigComponent) {
         // keep reference
         this._ngxWig = ngxWig;
 
         // register component for easy find
-        this.registerComponent();
+        this.addHtmlListeners();
     }
     get ngxWig(): NgxWigComponent {
         return this._ngxWig;
@@ -62,61 +55,174 @@ export class FormNgxWigComponent extends ElementBase<string> implements  OnDestr
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+        private renderer2: Renderer2,
+        private i18nService: I18nService
     ) {
         super(controlContainer, validators, asyncValidators);
+    }
+
+    /**
+     * Init
+     */
+    ngOnInit(): void {
+        // language listener
+        this.addLanguageListener();
     }
 
     /**
      * Release data
      */
     ngOnDestroy(): void {
-        // release listeners
-        // #TODO - must be component limited, otherwise destroying one component listeners will destroy the other listeners as well which isn't okay
-        NgxWigCustomLibraryButtons.releaseHtmlListeners();
+        // release html listeners
+        this.releaseHtmlListeners();
 
-        // component behaviour
-        if (this.name) {
-            // release components
-            NgxWigCustomLibraryButtons.releaseComponentsMap(this.name);
-
-            // remove from disabled components
-            NgxWigCustomLibraryButtons.unregisterDisabledComponent(
-                this.name
-            );
-        }
+        // release language listener
+        this.releaseLanguageListener();
     }
 
     /**
-     * Register component for easy access
+     * Release html listener
      */
-    private registerComponent() {
-        if (this.name) {
-            // register component for easy find
-            NgxWigCustomLibraryButtons.registerComponent(
-                this.name,
-                this.ngxWig
-            );
+    private releaseHtmlListeners() {
+        // image double click listener
+        if (this.htmlListenerDblClickImg) {
+            this.htmlListenerDblClickImg();
+            this.htmlListenerDblClickImg = null;
         }
-    }
 
-    /**
-     * Register disabled component
-     */
-    private registerDisabledComponent() {
-        if (this.name) {
-            // add / remove from disabled components
-            if (this.disabled) {
-                // remove from disabled components
-                NgxWigCustomLibraryButtons.registerDisabledComponent(
-                    this.name
-                );
-            } else {
-                // remove from disabled components
-                NgxWigCustomLibraryButtons.unregisterDisabledComponent(
-                    this.name
+        // remember wysiwyg caret position
+        if (this.htmlListenerSelectCaretPosition) {
+            // listener
+            this.htmlListenerSelectCaretPosition();
+            this.htmlListenerSelectCaretPosition = null;
+
+            // remove old caret position
+            const selectionRange = _.get(
+                this.ngxWig,
+                NgxWigCustomLibraryButtons.SELECTION_RANGE_PATH
+            );
+            if (selectionRange) {
+                _.unset(
+                    this.ngxWig,
+                    NgxWigCustomLibraryButtons.SELECTION_RANGE_PATH
                 );
             }
+        }
+    }
+
+    /**
+     * Init html listeners
+     */
+    private addHtmlListeners() {
+        // release listeners
+        this.releaseHtmlListeners();
+
+        // there is no point in adding listeners if component is disabled
+        if (this.disabled) {
+            return;
+        }
+
+        // create image double click listener
+        this.htmlListenerDblClickImg = this.renderer2.listen(
+            this.ngxWig.ngxWigEditable.nativeElement,
+            'dblclick',
+            (event) => {
+                // images
+                if (
+                    !this.disabled &&
+                    event.target &&
+                    event.target.classList &&
+                    event.target.classList.contains('ngx-wig-img')
+                ) {
+                    // update image
+                    NgxWigCustomLibraryButtons.displayImageDialog(
+                        this.ngxWig,
+                        event.target
+                    );
+                }
+            }
+        );
+
+        // remember caret position
+        this.htmlListenerSelectCaretPosition = this.renderer2.listen(
+            document,
+            'selectionchange',
+            () => {
+                if (
+                    !this.disabled &&
+                    this.isComponentChild(document.activeElement)
+                ) {
+                    const selection = window.getSelection();
+                    if (
+                        selection.getRangeAt &&
+                        selection.rangeCount
+                    ) {
+                        _.set(
+                            this.ngxWig,
+                            NgxWigCustomLibraryButtons.SELECTION_RANGE_PATH,
+                            selection.getRangeAt(0)
+                        );
+                    }
+                }
+            }
+        );
+    }
+
+    /**
+     * Check if a child is in our component container
+     * @param child
+     * @returns boolean
+     */
+    private isComponentChild(child) {
+        // search for descendant parent
+        let node = child.parentNode;
+        while (node != null) {
+            // is this the parent node we're looking for ?
+            if (
+                node.tagName &&
+                node.tagName.toLowerCase() === 'app-form-ngx-wig' &&
+                node.childNodes.length > 0 &&
+                node.childNodes[0].getAttribute('id') === this.identifier
+            ) {
+                // seems to be out component child
+                return true;
+            }
+
+            // parent node
+            node = node.parentNode;
+        }
+
+        // not component child
+        return false;
+    }
+
+    /**
+     * Init language listener
+     */
+    private addLanguageListener() {
+        // update tokens on translate
+        this.languageListener = this.i18nService.languageChangedEvent
+            .subscribe(() => {
+                // update buttons translations
+                if (this.ngxWig) {
+                    _.each(this.ngxWig.toolbarButtons, (button: TButtonExtended) => {
+                        button.refreshTranslation();
+                    });
+
+                    // reset buttons list
+                    this.ngxWig.ngOnInit();
+                }
+            });
+    }
+
+    /**
+     * Release language listener
+     */
+    private releaseLanguageListener() {
+        if (this.languageListener) {
+            this.languageListener.unsubscribe();
+            this.languageListener = null;
         }
     }
 }

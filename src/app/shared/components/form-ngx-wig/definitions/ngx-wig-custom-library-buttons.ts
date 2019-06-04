@@ -1,4 +1,4 @@
-import { NgxWigComponent, TButton } from 'ngx-wig';
+import { commandFunction, NgxWigComponent, TButton } from 'ngx-wig';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../dialog/dialog.component.js';
@@ -21,135 +21,69 @@ interface INgxWigImgData {
     imgAlt?: string;
 }
 
+export class TButtonExtended implements TButton {
+    // TButton properties
+    label: string;
+    icon: string;
+    title: string;
+    command: string | commandFunction;
+    styleClass: string;
+
+    // other properties
+    id: string;
+
+    // extra params
+    constructor(data?: {
+        id: string,
+        label?: string,
+        icon?: string,
+        title?: string,
+        command?: string | commandFunction,
+        styleClass?: string
+    }) {
+        // assign properties
+        Object.assign(
+            this,
+            data
+        );
+    }
+
+    /**
+     * Refresh translation
+     */
+    public refreshTranslation() {
+        // determine parent button
+        const originalButton: TButtonExtended = _.find(
+            NgxWigCustomLibraryButtons.defaultButtonsConf, {
+                id: this.id
+            }
+        );
+
+        // translate
+        this.label = NgxWigCustomLibraryButtons.i18nService.instant(originalButton.label);
+        this.title = NgxWigCustomLibraryButtons.i18nService.instant(originalButton.title);
+    }
+}
+
 /**
  * Handles custom buttons for our wysiwyg
  * @param i18nService
  */
 export class NgxWigCustomLibraryButtons {
-    /**
-     * Html listeners
-     */
-    static htmlListenerDblClickImg: () => void;
-    static htmlListenerSelectCaretPosition: () => void;
+    // constants
+    static readonly SELECTION_RANGE_PATH = 'ngxWigEditable.nativeElement.selectionRange';
 
     /**
-     * Components
+     * Keep an instance of the services to access them from static methods
      */
-    static components: {
-        [name: string]: NgxWigComponent
-    } = {};
-
-    /**
-     * Disabled Components
-     */
-    static disabledComponents: {
-        [name: string]: true
-    } = {};
-
-    /**
-     * List of buttons
-     */
-    public list1: TButton;
-    public list2: TButton;
-    public bold: TButton;
-    public italic: TButton;
-    public underline: TButton;
-    public linkCustom: TButton;
-    public insertImageCustom: TButton;
-
-    /**
-     * Default buttons setup
-     */
-    private readonly defaultButtonsConf: {
-        [idButton: string]: TButton
-    } = {
-        list1: {
-            label: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_UNORDERED_LIST',
-            title: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_TITLE_UNORDERED_LIST',
-            command: (ctx: NgxWigComponent) => {
-                ctx.execCommand(
-                    'insertunorderedlist',
-                    ''
-                );
-            },
-            styleClass: 'list-ul',
-            icon: 'icon-list-ul'
-        },
-        list2: {
-            label: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_ORDERED_LIST',
-            title: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_TITLE_ORDERED_LIST',
-            command: (ctx: NgxWigComponent) => {
-                ctx.execCommand(
-                    'insertorderedlist',
-                    ''
-                );
-            },
-            styleClass: 'list-ol',
-            icon: 'icon-list-ol'
-        },
-        bold: {
-            label: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_BOLD',
-            title: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_TITLE_BOLD',
-            command: (ctx: NgxWigComponent) => {
-                ctx.execCommand(
-                    'bold',
-                    ''
-                );
-            },
-            styleClass: 'bold',
-            icon: 'icon-bold'
-        },
-        italic: {
-            label: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_ITALIC',
-            title: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_TITLE_ITALIC',
-            command: (ctx: NgxWigComponent) => {
-                ctx.execCommand(
-                    'italic',
-                    ''
-                );
-            },
-            styleClass: 'italic',
-            icon: 'icon-italic'
-        },
-        underline: {
-            label: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_UNDERLINE',
-            title: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_TITLE_UNDERLINE',
-            command: (ctx: NgxWigComponent) => {
-                ctx.execCommand(
-                    'underline',
-                    ''
-                );
-            },
-            styleClass: 'format-underlined',
-            icon: 'icon-underline'
-        },
-        linkCustom: {
-            label: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK',
-            title: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_TITLE_LINK',
-            command: (ctx: NgxWigComponent) => {
-                ctx.execCommand(
-                    'createlink', // CUSTOM
-                    ''
-                );
-            },
-            styleClass: 'link',
-            icon: 'icon-link'
-        },
-        insertImageCustom: {
-            label: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE',
-            title: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_TITLE_INSERT_IMAGE',
-            styleClass: 'file-image',
-            command: (ctx: NgxWigComponent) => {
-                // display add image dialog
-                this.displayImageDialog(ctx);
-            }
-        }
-    };
+    static i18nService: I18nService;
+    static dialogService: DialogService;
+    static renderer2: Renderer2;
 
     /**
      * Image width / height unit types
      */
-    private unitTypes: LabelValuePair[] = [
+    static readonly unitTypes: LabelValuePair[] = [
         new LabelValuePair(
             'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_WIDTH_TYPE_PX',
             'px'
@@ -161,233 +95,120 @@ export class NgxWigCustomLibraryButtons {
     ];
 
     /**
-     * Keep selection ranges values
+     * Default buttons setup
      */
-    private selectionRanges: {
-        [name: string]: any
-    } = {};
-
-    /**
-     * Check if our selection is a child of a ngx-wig
-     * @param parentTag
-     * @param child
-     * @returns boolean | ParentNode
-     */
-    static getDescendant(parentTag, child) {
-        // search for descendant parent
-        let node = child.parentNode;
-        while (node != null) {
-            // is this the parent node we're looking for ?
-            if (
-                node.tagName &&
-                node.tagName.toLowerCase() === parentTag
-            ) {
-                // return node descendant
-                return node;
+    static readonly defaultButtonsConf: {
+        [idButton: string]: TButtonExtended
+    } = {
+        list1: new TButtonExtended({
+            id: 'list1',
+            label: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_UNORDERED_LIST',
+            title: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_TITLE_UNORDERED_LIST',
+            command: (ctx: NgxWigComponent) => {
+                ctx.execCommand(
+                    'insertunorderedlist',
+                    ''
+                );
+            },
+            styleClass: 'list-ul',
+            icon: 'icon-list-ul'
+        }),
+        list2: new TButtonExtended({
+            id: 'list2',
+            label: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_ORDERED_LIST',
+            title: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_TITLE_ORDERED_LIST',
+            command: (ctx: NgxWigComponent) => {
+                ctx.execCommand(
+                    'insertorderedlist',
+                    ''
+                );
+            },
+            styleClass: 'list-ol',
+            icon: 'icon-list-ol'
+        }),
+        bold: new TButtonExtended({
+            id: 'bold',
+            label: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_BOLD',
+            title: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_TITLE_BOLD',
+            command: (ctx: NgxWigComponent) => {
+                ctx.execCommand(
+                    'bold',
+                    ''
+                );
+            },
+            styleClass: 'bold',
+            icon: 'icon-bold'
+        }),
+        italic: new TButtonExtended({
+            id: 'italic',
+            label: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_ITALIC',
+            title: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_TITLE_ITALIC',
+            command: (ctx: NgxWigComponent) => {
+                ctx.execCommand(
+                    'italic',
+                    ''
+                );
+            },
+            styleClass: 'italic',
+            icon: 'icon-italic'
+        }),
+        underline: new TButtonExtended({
+            id: 'underline',
+            label: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_UNDERLINE',
+            title: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_TITLE_UNDERLINE',
+            command: (ctx: NgxWigComponent) => {
+                ctx.execCommand(
+                    'underline',
+                    ''
+                );
+            },
+            styleClass: 'format-underlined',
+            icon: 'icon-underline'
+        }),
+        linkCustom: new TButtonExtended({
+            id: 'linkCustom',
+            label: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_LINK',
+            title: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_TITLE_LINK',
+            command: (ctx: NgxWigComponent) => {
+                ctx.execCommand(
+                    'createlink', // CUSTOM
+                    ''
+                );
+            },
+            styleClass: 'link',
+            icon: 'icon-link'
+        }),
+        insertImageCustom: new TButtonExtended({
+            id: 'insertImageCustom',
+            label: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE',
+            title: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_TITLE_INSERT_IMAGE',
+            styleClass: 'file-image',
+            command: (ctx: NgxWigComponent) => {
+                // display add image dialog
+                NgxWigCustomLibraryButtons.displayImageDialog(
+                    ctx
+                );
             }
-
-            // parent node
-            node = node.parentNode;
-        }
-
-        // no descendant
-        return false;
-    }
+        })
+    };
 
     /**
-     * Release Html listeners
+     * List of buttons
      */
-    static releaseHtmlListeners() {
-        // caret position
-        if (NgxWigCustomLibraryButtons.htmlListenerSelectCaretPosition) {
-            NgxWigCustomLibraryButtons.htmlListenerSelectCaretPosition();
-            NgxWigCustomLibraryButtons.htmlListenerSelectCaretPosition = null;
-        }
-
-        // img dbl click
-        if (NgxWigCustomLibraryButtons.htmlListenerDblClickImg) {
-            NgxWigCustomLibraryButtons.htmlListenerDblClickImg();
-            NgxWigCustomLibraryButtons.htmlListenerDblClickImg = null;
-        }
-    }
-
-    /**
-     * Release components
-     */
-    static releaseComponentsMap(
-        name?: string
-    ) {
-        if (name) {
-            delete NgxWigCustomLibraryButtons.components[name];
-        } else {
-            NgxWigCustomLibraryButtons.components = {};
-        }
-    }
-
-    /**
-     * Register component
-     * @param name
-     * @param ctx
-     */
-    static registerComponent(
-        name: string,
-        ctx: NgxWigComponent
-    ) {
-        NgxWigCustomLibraryButtons.components[name] = ctx;
-    }
-
-    /**
-     * Remove component from disabled components
-     */
-    static unregisterDisabledComponent(
-        name: string
-    ) {
-        delete NgxWigCustomLibraryButtons.disabledComponents[name];
-    }
-
-    /**
-     * Register disabled component
-     */
-    static registerDisabledComponent(
-        name: string
-    ) {
-        NgxWigCustomLibraryButtons.disabledComponents[name] = true;
-    }
-
-    /**
-     * Get component name
-     * @param element
-     */
-    static getName(element): string {
-        // find name component
-        const ctxNode = NgxWigCustomLibraryButtons.getDescendant('app-form-ngx-wig', element);
-        return ctxNode ? ctxNode.getAttribute('name') : null;
-    }
-
-    /**
-     * Construct buttons library
-     * @param i18nService
-     * @param dialogService
-     * @param renderer2
-     */
-    constructor(
-        @Inject(I18nService) private i18nService: I18nService,
-        @Inject(DialogService) private dialogService: DialogService,
-        @Inject(Renderer2) private renderer2: Renderer2
-    ) {
-        // add global listeners
-        this.addHtmlListeners();
-
-        // initialize buttons
-        this.initButtons();
-
-        // update tokens on translate
-        this.addLanguageListener();
-    }
-
-    /**
-     * Init buttons
-     */
-    private initButtons() {
-        // initialize buttons
-        _.each(
-            this.defaultButtonsConf,
-            (button: TButton, idButton: string) => {
-                // clone list of buttons so we don't alter anything
-                this[idButton] = _.cloneDeep(button);
-
-                // translate tokens & labels
-                this[idButton].label = this.i18nService.instant(button.label);
-                this[idButton].title = this.i18nService.instant(button.title);
-            }
-        );
-    }
-
-    /**
-     * Add html listeners
-     */
-    private addHtmlListeners() {
-        // release old listeners
-        NgxWigCustomLibraryButtons.releaseHtmlListeners();
-
-        // release ranges
-        this.selectionRanges = {};
-
-        // release components
-        NgxWigCustomLibraryButtons.releaseComponentsMap();
-
-        // remember caret position
-        NgxWigCustomLibraryButtons.htmlListenerSelectCaretPosition = this.renderer2.listen(
-            'document',
-            'selectionchange',
-            () => {
-                // if it is a child of ngx-wig, then we need to remember caret position
-                const name: string = NgxWigCustomLibraryButtons.getName(document.activeElement);
-                if (name) {
-                    const selection = window.getSelection();
-                    if (
-                        selection.getRangeAt &&
-                        selection.rangeCount
-                    ) {
-                        this.selectionRanges[name] = selection.getRangeAt(0);
-                    }
-                }
-            }
-        );
-
-        // handle custom double click events
-        NgxWigCustomLibraryButtons.htmlListenerDblClickImg = this.renderer2.listen(
-            'body',
-            'dblclick',
-            (event) => {
-                // images
-                if (
-                    event.target &&
-                    event.target.classList &&
-                    event.target.classList.contains('ngx-wig-img')
-                ) {
-                    // check if not disabled
-                    const name: string = NgxWigCustomLibraryButtons.getName(event.target);
-                    if (
-                        !name ||
-                        !NgxWigCustomLibraryButtons.disabledComponents[name]
-                    ) {
-                        // update image
-                        this.displayImageDialog(null, event.target);
-                    }
-                }
-            }
-        );
-    }
-
-    /**
-     * Add language listener
-     */
-    private addLanguageListener() {
-        // // update tokens on translate
-        // subscription = this.i18nService.languageChangedEvent
-        //     .subscribe(() => {
-        //         // update buttons translations
-        //         _.each(finalButtons, (button: TButton, idButton: string) => {
-        //             // translate tokens & labels
-        //             button.label = i18nService.instant(buttons[idButton].label);
-        //             button.title = i18nService.instant(buttons[idButton].title);
-        //         });
-        //
-        //         // reset buttons list
-        //         if (ctxItem) {
-        //             ctxItem.ngOnInit();
-        //         }
-        //     });
-        // subscription...release
-    }
+    public list1: TButtonExtended;
+    public list2: TButtonExtended;
+    public bold: TButtonExtended;
+    public italic: TButtonExtended;
+    public underline: TButtonExtended;
+    public linkCustom: TButtonExtended;
+    public insertImageCustom: TButtonExtended;
 
     /**
      * Display image create / update dialog
      * @param ctx
      * @param element
      */
-    private displayImageDialog(
+    static displayImageDialog(
         ctx: NgxWigComponent,
         element?: any
     ) {
@@ -415,7 +236,7 @@ export class NgxWigCustomLibraryButtons {
         }
 
         // display insert / modify image dialog
-        this.dialogService
+        NgxWigCustomLibraryButtons.dialogService
             .showInput(
                 new DialogConfiguration({
                     message: element ? 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_MODIFY' : 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_ADD',
@@ -453,7 +274,7 @@ export class NgxWigCustomLibraryButtons {
                             name: 'imgWidthType',
                             placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_SIZE_TYPE',
                             description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_SIZE_TYPE_DESCRIPTION',
-                            inputOptions: this.unitTypes,
+                            inputOptions: NgxWigCustomLibraryButtons.unitTypes,
                             inputOptionsClearable: false,
                             value: widthUnit
                         }),
@@ -471,7 +292,7 @@ export class NgxWigCustomLibraryButtons {
                             name: 'imgHeightType',
                             placeholder: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_SIZE_TYPE',
                             description: 'LNG_NGX_WIG_CUSTOM_LIBRARY_BUTTONS_LABEL_INSERT_IMAGE_DIALOG_SIZE_TYPE_DESCRIPTION',
-                            inputOptions: this.unitTypes,
+                            inputOptions: NgxWigCustomLibraryButtons.unitTypes,
                             inputOptionsClearable: false,
                             value: heightUnit
                         }),
@@ -511,10 +332,17 @@ export class NgxWigCustomLibraryButtons {
 
                     // insert or update image
                     if (!element) {
-                        this.addNewImage(ctx, data);
+                        NgxWigCustomLibraryButtons.addNewImage(
+                            ctx,
+                            data
+                        );
                     } else {
                         // update image details
-                        this.updateImage(element, data);
+                        NgxWigCustomLibraryButtons.updateImage(
+                            ctx,
+                            element,
+                            data
+                        );
                     }
                 }
             });
@@ -522,25 +350,26 @@ export class NgxWigCustomLibraryButtons {
 
     /**
      * Insert new image
-     * @param ctx
-     * @param data
      */
-    private addNewImage(
+    static addNewImage(
         ctx: NgxWigComponent,
         data: INgxWigImgData
     ) {
         // determine caret position
-        const name: string = NgxWigCustomLibraryButtons.getName(ctx.container);
-        if (
-            name &&
-            this.selectionRanges[name]
-        ) {
+        const selectionRange = _.get(
+            ctx,
+            NgxWigCustomLibraryButtons.SELECTION_RANGE_PATH
+        );
+        if (selectionRange) {
+            // clear all selections
             const selection = window.getSelection();
             if (selection.removeAllRanges) {
                 selection.removeAllRanges();
             }
+
+            // select old selection
             if (selection.addRange) {
-                selection.addRange(this.selectionRanges[name]);
+                selection.addRange(selectionRange);
             }
         }
 
@@ -582,14 +411,14 @@ export class NgxWigCustomLibraryButtons {
 
     /**
      * Update image details
-     * @param data
      */
-    private updateImage(
+    static updateImage(
+        ctx: NgxWigComponent,
         element,
         data: INgxWigImgData
     ) {
         // update URL
-        this.renderer2.setAttribute(
+        NgxWigCustomLibraryButtons.renderer2.setAttribute(
             element,
             'src',
             data.imgUrl
@@ -600,13 +429,13 @@ export class NgxWigCustomLibraryButtons {
             _.isNumber(data.imgWidth) ||
             !_.isEmpty(data.imgWidth)
         ) {
-            this.renderer2.setAttribute(
+            NgxWigCustomLibraryButtons.renderer2.setAttribute(
                 element,
                 'width',
                 `${data.imgWidth}${data.imgWidthType}`
             );
         } else {
-            this.renderer2.removeAttribute(
+            NgxWigCustomLibraryButtons.renderer2.removeAttribute(
                 element,
                 'width'
             );
@@ -617,13 +446,13 @@ export class NgxWigCustomLibraryButtons {
             _.isNumber(data.imgHeight) ||
             !_.isEmpty(data.imgHeight)
         ) {
-            this.renderer2.setAttribute(
+            NgxWigCustomLibraryButtons.renderer2.setAttribute(
                 element,
                 'height',
                 `${data.imgHeight}${data.imgHeightType}`
             );
         } else {
-            this.renderer2.removeAttribute(
+            NgxWigCustomLibraryButtons.renderer2.removeAttribute(
                 element,
                 'height'
             );
@@ -631,13 +460,13 @@ export class NgxWigCustomLibraryButtons {
 
         // title
         if (!_.isEmpty(data.imgTitle)) {
-            this.renderer2.setAttribute(
+            NgxWigCustomLibraryButtons.renderer2.setAttribute(
                 element,
                 'title',
                 data.imgTitle
             );
         } else {
-            this.renderer2.removeAttribute(
+            NgxWigCustomLibraryButtons.renderer2.removeAttribute(
                 element,
                 'title'
             );
@@ -645,26 +474,56 @@ export class NgxWigCustomLibraryButtons {
 
         // alt
         if (!_.isEmpty(data.imgAlt)) {
-            this.renderer2.setAttribute(
+            NgxWigCustomLibraryButtons.renderer2.setAttribute(
                 element,
                 'alt',
                 data.imgAlt
             );
         } else {
-            this.renderer2.removeAttribute(
+            NgxWigCustomLibraryButtons.renderer2.removeAttribute(
                 element,
                 'alt'
             );
         }
 
         // content changed - mark as dirty
-        // get name & determine if we have a context associated with it
-        const name: string = NgxWigCustomLibraryButtons.getName(element);
-        if (
-            name &&
-            NgxWigCustomLibraryButtons.components[name]
-        ) {
-            NgxWigCustomLibraryButtons.components[name].onContentChange(NgxWigCustomLibraryButtons.components[name].container.innerHTML);
-        }
+        ctx.onContentChange(ctx.container.innerHTML);
+    }
+
+    /**
+     * Construct buttons library
+     * @param i18nService
+     * @param dialogService
+     * @param renderer2
+     */
+    constructor(
+        @Inject(I18nService) i18nService: I18nService,
+        @Inject(DialogService) dialogService: DialogService,
+        @Inject(Renderer2) renderer2: Renderer2
+    ) {
+        // remember services
+        NgxWigCustomLibraryButtons.i18nService = i18nService;
+        NgxWigCustomLibraryButtons.dialogService = dialogService;
+        NgxWigCustomLibraryButtons.renderer2 = renderer2;
+
+        // initialize buttons
+        this.initButtons();
+    }
+
+    /**
+     * Init buttons
+     */
+    private initButtons() {
+        // initialize buttons
+        _.each(
+            NgxWigCustomLibraryButtons.defaultButtonsConf,
+            (button: TButtonExtended, idButton: string) => {
+                // clone list of buttons so we don't alter anything
+                // translate tokens & labels
+                const buttonClone: TButtonExtended = new TButtonExtended(_.cloneDeep(button));
+                buttonClone.refreshTranslation();
+                this[idButton] = buttonClone;
+            }
+        );
     }
 }
