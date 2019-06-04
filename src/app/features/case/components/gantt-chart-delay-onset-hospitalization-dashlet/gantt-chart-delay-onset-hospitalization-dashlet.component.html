@@ -9,27 +9,22 @@
         <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px">
             <button
                 mat-raised-button
-                *ngIf="viewType !== Constants.GANTT_CHART_VIEW_TYPE.MONTH.value"
+                *ngIf="options.viewMode !== Constants.GANTT_CHART_VIEW_TYPE.MONTH.value"
                 (click)="changeView(Constants.GANTT_CHART_VIEW_TYPE.MONTH.value)">
                 {{Constants.GANTT_CHART_VIEW_TYPE.MONTH.label | translate}}
             </button>
             <button
                 mat-raised-button
-                *ngIf="viewType !== Constants.GANTT_CHART_VIEW_TYPE.WEEK.value"
+                *ngIf="options.viewMode !== Constants.GANTT_CHART_VIEW_TYPE.WEEK.value"
                 (click)="changeView(Constants.GANTT_CHART_VIEW_TYPE.WEEK.value)">
                 {{Constants.GANTT_CHART_VIEW_TYPE.WEEK.label | translate}}
             </button>
             <button
                 mat-raised-button
-                *ngIf="viewType !== Constants.GANTT_CHART_VIEW_TYPE.DAY.value"
+                *ngIf="options.viewMode !== Constants.GANTT_CHART_VIEW_TYPE.DAY.value"
                 (click)="changeView(Constants.GANTT_CHART_VIEW_TYPE.DAY.value)">
                 {{Constants.GANTT_CHART_VIEW_TYPE.DAY.label | translate}}
             </button>
-        </div>
-
-        <div
-            *ngIf="!loading && !ganttData[0]?.children?.length">
-            {{ '' | translate }}
         </div>
     </div>
 </ng-container>

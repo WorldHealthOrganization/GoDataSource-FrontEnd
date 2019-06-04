@@ -14,7 +14,6 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { Observable } from 'rxjs';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
-
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';

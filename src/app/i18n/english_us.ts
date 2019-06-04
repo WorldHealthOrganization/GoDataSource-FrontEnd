@@ -13,22 +13,6 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
-         * uiQuestionnaire
-         */
-        'LNG_QUESTIONNAIRE_LABEL_MULTI_ANSWER_COPY_DATE_DESCRIPTION': 'Copy this date to all empty date fields',
-
-        /**
-         * uiDialogs
-         */
-        'LNG_DIALOG_CONFIRM_COPY_QUESTIONNAIRE_DATE': 'Are you sure you want to copy this date to all empty date fields ?',
-        'LNG_DIALOG_CONFIRM_COPY_PARENT_ENTITY_ADDRESS': 'Are you sure you want to copy address from the parent entity?',
-        /**
-         * uiCreateContactPage
-         */
-        'LNG_PAGE_CREATE_CONTACT_ACTION_COPY_ENTITY_ADDRESS_TOOLTIP': 'Copy main address from the parent entity',
-        'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_ANOTHER_CONTACT_BUTTON': 'Create and add another',
-
-        /**
          * uiModifyFollowUpListPage
          */
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_FOLLOW_UPS_DATES': 'Follow-ups dates:',

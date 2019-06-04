@@ -100,6 +100,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
                 .pipe(
                     map((outbreaksList) => {
                         return _.map(outbreaksList, (outbreak: OutbreakModel) => {
+                            // add outbreak details
+                            outbreak.details = outbreak.name + (_.isEmpty(outbreak.description) ? '' : `: ${outbreak.description}`);
+
                             // do we need to update name of the outbreak ?
                             if (outbreak.id === this.authUser.activeOutbreakId) {
                                 outbreak.name = this.i18nService.instant('LNG_LAYOUT_ACTIVE_OUTBREAK_LABEL', outbreak);

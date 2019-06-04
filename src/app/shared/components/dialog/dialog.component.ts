@@ -162,9 +162,30 @@ export class DialogConfiguration {
     public customInputOptions: LabelValuePair[];
     public customInputOptionsMultiple: boolean = false;
     public required: boolean = false;
-    public fieldsList: DialogField[];
     public buttons: DialogButton[];
     public addDefaultButtons: boolean = false;
+
+    // define fields
+    private _fieldsList: DialogField[];
+    public set fieldsList(fieldsList: DialogField[]) {
+        this._fieldsList = fieldsList;
+        this.updateFieldListLayoutCss();
+    }
+    public get fieldsList(): DialogField[] {
+        return this._fieldsList;
+    }
+
+    // define fields layout
+    // [25, 75, 100] => translates into two rows layout, first one has two columns ( one has 25% width, the other one has 75% width ), second one just one.
+    private _fieldsListLayout: number[];
+    public fieldsListLayoutCss: string[];
+    public set fieldsListLayout(fieldsListLayout: number[]) {
+        this._fieldsListLayout = fieldsListLayout;
+        this.updateFieldListLayoutCss();
+    }
+    public get fieldsListLayout(): number[] {
+        return this._fieldsListLayout;
+    }
 
     constructor(data: string | {
         message: string,
@@ -178,6 +199,7 @@ export class DialogConfiguration {
         customInputOptionsMultiple?: boolean,
         required?: boolean,
         fieldsList?: DialogField[],
+        fieldsListLayout?: number[],
         buttons?: DialogButton[],
         addDefaultButtons?: boolean,
         yesCssClass?: string,
@@ -193,6 +215,21 @@ export class DialogConfiguration {
                 data
             );
         }
+    }
+
+    /**
+     * Update field list css
+     */
+    private updateFieldListLayoutCss() {
+        this.fieldsListLayoutCss = [];
+        _.each(this.fieldsList, (field: DialogField, index: number) => {
+            this.fieldsListLayoutCss.push(
+                this.fieldsListLayout &&
+                this.fieldsListLayout[index] ?
+                    `calc(${this.fieldsListLayout[index]}% - 20px)` :
+                    'calc(100% - 20px)'
+            );
+        });
     }
 }
 

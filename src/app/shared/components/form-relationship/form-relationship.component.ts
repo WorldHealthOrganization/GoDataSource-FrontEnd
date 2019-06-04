@@ -13,6 +13,7 @@ import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { EntityType } from '../../../core/models/entity-type';
 import { Constants } from '../../../core/models/constants';
 import { share } from 'rxjs/operators';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-form-relationship',
@@ -46,6 +47,7 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
 
     currentDate = Constants.getCurrentDate();
 
+    minimumDate: string;
     // provide constants to template
     EntityType = EntityType;
 
@@ -90,11 +92,13 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
-                if (
-                    this.selectedOutbreak &&
-                    !this.clusterOptions$
-                ) {
-                    this.clusterOptions$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id);
+                if (this.selectedOutbreak) {
+                    // get the minimum date of last contact
+                    this.getMinimumDate();
+                    // get clusters
+                    if (!this.clusterOptions$) {
+                        this.clusterOptions$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id);
+                    }
                 }
             });
     }
@@ -120,6 +124,15 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
      */
     get relationship(): RelationshipModel {
         return this.value;
+    }
+
+    /**
+     * Get minimum date for date of last contact
+     */
+    getMinimumDate() {
+        if (this.selectedOutbreak.startDate) {
+            this.minimumDate = moment(this.selectedOutbreak.startDate).subtract(6, 'months').format();
+        }
     }
 
     /**
