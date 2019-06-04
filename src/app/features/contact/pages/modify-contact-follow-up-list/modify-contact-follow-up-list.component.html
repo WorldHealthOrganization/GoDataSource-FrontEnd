@@ -20,8 +20,11 @@
 
                 <app-selected-contacts-list
                     [contacts]="selectedContacts"
-                    [followUpDates]="followUpDates"
                 ></app-selected-contacts-list>
+
+                <app-selected-follow-up-dates
+                    [followUpDates]="followUpDates">
+                </app-selected-follow-up-dates>
 
                 <mat-card class="page-section">
                     <div fxLayout="column">

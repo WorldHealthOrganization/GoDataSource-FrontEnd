@@ -9,5 +9,4 @@ import { ContactModel } from '../../../../core/models/contact.model';
 })
 export class SelectedContactsListComponent {
     @Input() contacts: ContactModel[] = [];
-    @Input() followUpDates: string[] = [];
 }

@@ -143,9 +143,9 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     get followUpDates(): string[] {
         return this.selectedFollowUps
             .map(followUp => followUp.date )
-            .filter((contact, index, self) => {
+            .filter((date, index, self) => {
                 // keep only unique contacts
-                return self.indexOf(contact) === index;
+                return self.indexOf(date) === index;
             });
     }
 
