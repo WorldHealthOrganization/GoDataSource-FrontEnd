@@ -10,6 +10,7 @@ import { AngularMaterialModule } from './angular-material/angular-material.modul
 import { NgSelectModule } from '@ng-select/ng-select';
 import { MglTimelineModule } from 'angular-mgl-timeline';
 import { FileUploadModule } from 'ng2-file-upload';
+import { NgxWigModule } from 'ngx-wig';
 
 // components
 import * as fromSharedComponents from './components';
@@ -27,7 +28,8 @@ import * as fromSharedPipes from './pipes';
         AngularMaterialModule,
         TranslateModule,
         MglTimelineModule,
-        FileUploadModule
+        FileUploadModule,
+        NgxWigModule
     ],
     declarations: [
         ...fromSharedComponents.components,
