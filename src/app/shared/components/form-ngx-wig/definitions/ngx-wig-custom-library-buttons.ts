@@ -41,29 +41,6 @@ export class TButtonExtended implements TButton {
     // other properties
     id: string;
 
-    /**
-     * Refresh translation
-     */
-    static refreshTranslation(button: TButtonExtended) {
-        // determine parent button
-        const originalButton: TButtonExtended = _.find(
-            // tslint:disable-next-line:no-use-before-declare
-            NgxWigCustomLibraryButtons.defaultButtonsConf, {
-                id: button.id
-            }
-        );
-
-        // translate
-        button.label = originalButton.label ?
-            // tslint:disable-next-line:no-use-before-declare
-            NgxWigCustomLibraryButtons.i18nService.instant(originalButton.label) :
-            originalButton.label;
-        button.title = originalButton.title ?
-            // tslint:disable-next-line:no-use-before-declare
-            NgxWigCustomLibraryButtons.i18nService.instant(originalButton.title) :
-            originalButton.title;
-    }
-
     // extra params
     constructor(data?: {
         id: string,
@@ -84,7 +61,23 @@ export class TButtonExtended implements TButton {
      * Refresh translation
      */
     public refreshTranslation() {
-        TButtonExtended.refreshTranslation(this);
+        // determine parent button
+        const originalButton: TButtonExtended = _.find(
+            // tslint:disable-next-line:no-use-before-declare
+            NgxWigCustomLibraryButtons.defaultButtonsConf, {
+                id: this.id
+            }
+        );
+
+        // translate
+        this.label = originalButton.label ?
+            // tslint:disable-next-line:no-use-before-declare
+            NgxWigCustomLibraryButtons.i18nService.instant(originalButton.label) :
+            originalButton.label;
+        this.title = originalButton.title ?
+            // tslint:disable-next-line:no-use-before-declare
+            NgxWigCustomLibraryButtons.i18nService.instant(originalButton.title) :
+            originalButton.title;
     }
 }
 
