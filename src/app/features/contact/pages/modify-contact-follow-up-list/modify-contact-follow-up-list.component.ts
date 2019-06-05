@@ -141,10 +141,10 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
      * Return follow up dates for selected follow-ups to be modified
      */
     get followUpDates(): string[] {
-        return this.selectedFollowUps
-            .map(followUp => followUp.date )
+        return _.sortBy(this.selectedFollowUps, 'date')
+            .map((followUp) => followUp.date )
             .filter((date, index, self) => {
-                // keep only unique contacts
+                // keep only unique dates
                 return self.indexOf(date) === index;
             });
     }
