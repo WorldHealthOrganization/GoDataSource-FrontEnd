@@ -345,7 +345,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                         .deleteRelationship(this.selectedOutbreak.id, this.entityType, this.entityId, relatedEntity.relationship.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showApiError(err);
+                                this.snackbarService.showError(err.message);
                                 return throwError(err);
                             })
                         )
