@@ -76,15 +76,9 @@ export class LabResultDataService {
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<any> {
 
-        const qb = new RequestQueryBuilder();
-        // include case data
-        qb.include('case', true);
+        const filter = queryBuilder.buildQuery();
 
-        qb.merge(queryBuilder);
-
-        const filter = qb.buildQuery();
-
-        return this.http.get(`outbreaks/${outbreakId}/lab-results?filter=${filter}`);
+        return this.http.get(`outbreaks/${outbreakId}/lab-results/aggregate?filter=${filter}`);
     }
 
     /**
@@ -98,7 +92,7 @@ export class LabResultDataService {
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<any> {
         const filter = queryBuilder.buildQuery();
-        return this.http.get(`/outbreaks/${outbreakId}/lab-results/filtered-count?filter=${filter}`);
+        return this.http.get(`/outbreaks/${outbreakId}/lab-results/aggregate-filtered-count?filter=${filter}`);
     }
 
     /**
