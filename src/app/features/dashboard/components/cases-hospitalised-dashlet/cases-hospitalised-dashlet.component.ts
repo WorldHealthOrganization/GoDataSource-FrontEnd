@@ -63,6 +63,9 @@ export class CasesHospitalisedDashletComponent extends DashletComponent implemen
             this.previousSubscriber.unsubscribe();
             this.previousSubscriber = null;
         }
+
+        // parent subscribers
+        this.releaseSubscribers();
     }
 
     /**

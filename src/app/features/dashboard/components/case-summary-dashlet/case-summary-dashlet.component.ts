@@ -111,6 +111,12 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
             this.previousSubscriber.unsubscribe();
             this.previousSubscriber = null;
         }
+
+        // debounce caller
+        if (this.refreshDataCaller) {
+            this.refreshDataCaller.unsubscribe();
+            this.refreshDataCaller = null;
+        }
     }
 
     /**

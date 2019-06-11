@@ -59,6 +59,9 @@ export class ContactsPerCaseMedianDashletComponent extends DashletComponent impl
             this.previousSubscriber.unsubscribe();
             this.previousSubscriber = null;
         }
+
+        // parent subscribers
+        this.releaseSubscribers();
     }
 
     /**

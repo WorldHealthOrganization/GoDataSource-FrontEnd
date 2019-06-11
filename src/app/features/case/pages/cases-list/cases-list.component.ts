@@ -480,6 +480,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
+
+        // release resources
+        super.ngOnDestroy();
     }
 
     /**

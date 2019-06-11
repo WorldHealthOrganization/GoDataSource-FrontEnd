@@ -26,6 +26,11 @@ export class DebounceTimeCaller {
      * @param instant True if you don't want to wait for debounce time
      */
     call(instant: boolean = false) {
+        // no subscriber ?
+        if (!this.subscriber) {
+            return;
+        }
+
         // do we want to execute call instantly ?
         if (instant) {
             // stop the previous one
@@ -46,6 +51,16 @@ export class DebounceTimeCaller {
                 // timeout executed - clear
                 this.refreshTimeoutID = null;
             }, this.time);
+        }
+    }
+
+    /**
+     * Release resources
+     */
+    unsubscribe() {
+        if (this.subscriber) {
+            this.subscriber.unsubscribe();
+            this.subscriber = null;
         }
     }
 }

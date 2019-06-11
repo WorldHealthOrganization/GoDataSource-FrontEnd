@@ -67,6 +67,9 @@ export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent exten
             this.previousSubscriber.unsubscribe();
             this.previousSubscriber = null;
         }
+
+        // parent subscribers
+        this.releaseSubscribers();
     }
 
     /**

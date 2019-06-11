@@ -60,6 +60,9 @@ export class IndependentTransmissionChainsDashletComponent extends DashletCompon
             this.previousSubscriber.unsubscribe();
             this.previousSubscriber = null;
         }
+
+        // parent subscribers
+        this.releaseSubscribers();
     }
 
     /**

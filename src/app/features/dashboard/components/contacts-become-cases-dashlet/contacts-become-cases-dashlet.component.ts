@@ -68,6 +68,9 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
             this.previousSubscriber.unsubscribe();
             this.previousSubscriber = null;
         }
+
+        // parent subscribers
+        this.releaseSubscribers();
     }
 
     /**

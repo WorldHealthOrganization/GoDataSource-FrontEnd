@@ -76,6 +76,15 @@ export class ContactsNotSeenDashletComponent extends DashletComponent implements
             this.previousSubscriber.unsubscribe();
             this.previousSubscriber = null;
         }
+
+        // debounce caller
+        if (this.triggerUpdateValues) {
+            this.triggerUpdateValues.unsubscribe();
+            this.triggerUpdateValues = null;
+        }
+
+        // parent subscribers
+        this.releaseSubscribers();
     }
 
     /**

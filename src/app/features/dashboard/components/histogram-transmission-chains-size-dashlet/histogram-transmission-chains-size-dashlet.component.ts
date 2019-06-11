@@ -111,6 +111,12 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
             this.refdataSubscriber.unsubscribe();
             this.refdataSubscriber = null;
         }
+
+        // debounce caller
+        if (this.refreshDataCaller) {
+            this.refreshDataCaller.unsubscribe();
+            this.refreshDataCaller = null;
+        }
     }
 
     /**

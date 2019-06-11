@@ -75,6 +75,15 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
             this.previousSubscriber.unsubscribe();
             this.previousSubscriber = null;
         }
+
+        // parent subscribers
+        this.releaseSubscribers();
+
+        // debounce caller
+        if (this.triggerUpdateValues) {
+            this.triggerUpdateValues.unsubscribe();
+            this.triggerUpdateValues = null;
+        }
     }
 
     /**
