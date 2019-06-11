@@ -154,9 +154,13 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     // refresh only after we finish changing data
+    public refreshingList: boolean = false;
     private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
         // refresh list
-        this.refreshList();
+        this.refreshingList = true;
+        this.refreshList(() => {
+            this.refreshingList = false;
+        });
     }));
 
     // refresh only after we finish changing data
@@ -186,7 +190,7 @@ export abstract class ListComponent implements OnDestroy {
     /**
      * Refresh list
      */
-    public abstract refreshList();
+    public abstract refreshList(finishCallback: () => void);
 
     /**
      * Refresh items count

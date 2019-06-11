@@ -101,7 +101,7 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
                     );
 
                     // get usage list
-                    this.refreshList();
+                    this.needsRefreshList(true);
                 });
         });
     }
@@ -109,7 +109,7 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
     /**
      * Re(load) the list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (this.locationId) {
             // retrieve outbreaks
             this.outbreakDataService
@@ -163,8 +163,13 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
 
                             // flag if list is empty
                             this.checkEmptyList(this.usageDetailsList);
+
+                            // finished
+                            finishCallback();
                         });
                 });
+        } else {
+            finishCallback();
         }
     }
 

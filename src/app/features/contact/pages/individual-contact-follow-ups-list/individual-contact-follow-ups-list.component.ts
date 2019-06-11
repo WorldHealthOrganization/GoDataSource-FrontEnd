@@ -433,7 +433,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
     /**
      * Refresh list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (
             this.selectedOutbreak &&
             this.contactId
@@ -454,8 +454,13 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                             followUps
                         );
                     }),
-                    tap(this.checkEmptyList.bind(this))
+                    tap(this.checkEmptyList.bind(this)),
+                    tap(() => {
+                        finishCallback();
+                    })
                 );
+        } else {
+            finishCallback();
         }
     }
 

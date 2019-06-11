@@ -198,18 +198,26 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
     /**
      * Re(load) the available Entities list, based on the applied filter, sort criterias
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (
             this.entityType &&
             this.entityId &&
             this.selectedOutbreak
         ) {
             // retrieve the list of Relationships
-            this.entitiesList$ = this.entityDataService.getEntitiesList(
-                this.selectedOutbreak.id,
-                this.queryBuilder
-            )
-                .pipe(tap(this.checkEmptyList.bind(this)));
+            this.entitiesList$ = this.entityDataService
+                .getEntitiesList(
+                    this.selectedOutbreak.id,
+                    this.queryBuilder
+                )
+                .pipe(
+                    tap(this.checkEmptyList.bind(this)),
+                    tap(() => {
+                        finishCallback();
+                    })
+                );
+        } else {
+            finishCallback();
         }
     }
 

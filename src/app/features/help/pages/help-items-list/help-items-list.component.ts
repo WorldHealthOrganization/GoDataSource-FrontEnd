@@ -183,10 +183,15 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the items list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         // retrieve the list of items
         this.helpItemsList$ = this.helpDataService.getHelpItemsCategoryList(this.categoryId, this.queryBuilder)
-            .pipe(tap(this.checkEmptyList.bind(this)));
+            .pipe(
+                tap(this.checkEmptyList.bind(this)),
+                tap(() => {
+                    finishCallback();
+                })
+            );
     }
 
     /**

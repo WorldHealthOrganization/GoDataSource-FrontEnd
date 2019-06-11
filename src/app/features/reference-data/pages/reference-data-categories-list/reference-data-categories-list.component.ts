@@ -13,6 +13,7 @@ import { HoverRowAction, LoadingDialogModel } from '../../../../shared/component
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-reference-data-categories-list',
@@ -57,7 +58,7 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
     ) {
         super(snackbarService);
 
-        this.refreshList();
+        this.needsRefreshList(true);
 
         // add page title
         this.referenceDataExporFileName = this.i18nService.instant('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE') +
@@ -76,9 +77,15 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
     /**
      * Re(load) the Reference Data Categories list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         // load reference data
-        this.referenceData$ = this.referenceDataDataService.getReferenceData();
+        this.referenceData$ = this.referenceDataDataService
+            .getReferenceData()
+            .pipe(
+                tap(() => {
+                    finishCallback();
+                })
+            );
     }
 
     /**

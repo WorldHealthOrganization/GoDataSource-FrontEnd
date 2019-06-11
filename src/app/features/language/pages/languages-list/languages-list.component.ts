@@ -145,10 +145,15 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the Languages list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         // retrieve the list of Languages
         this.languagesList$ = this.languageDataService.getLanguagesList(this.queryBuilder)
-            .pipe(tap(this.checkEmptyList.bind(this)));
+            .pipe(
+                tap(this.checkEmptyList.bind(this)),
+                tap(() => {
+                    finishCallback();
+                })
+            );
     }
 
     /**
