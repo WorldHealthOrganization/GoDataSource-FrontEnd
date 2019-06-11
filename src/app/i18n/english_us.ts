@@ -13,21 +13,9 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
-         * uiQuestionnaire
+         * uiAPIErrors
          */
-        'LNG_QUESTIONNAIRE_LABEL_MULTI_ANSWER_COPY_DATE_DESCRIPTION': 'Copy this date to all empty date fields',
-
-        /**
-         * uiDialogs
-         */
-        'LNG_DIALOG_CONFIRM_COPY_QUESTIONNAIRE_DATE': 'Are you sure you want to copy this date to all empty date fields ?',
-        'LNG_DIALOG_CONFIRM_COPY_PARENT_ENTITY_ADDRESS': 'Are you sure you want to copy address from the parent entity?',
-        /**
-         * uiCreateContactPage
-         */
-        'LNG_PAGE_CREATE_CONTACT_ACTION_COPY_ENTITY_ADDRESS_TOOLTIP': 'Copy main address from the parent entity',
-        'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_ANOTHER_CONTACT_BUTTON': 'Create and add another'
-
+        'LNG_API_ERROR_CODE_DELETE_CONTACT_LAST_RELATIONSHIP': 'Cannot delete a contact\'s last relationship with a case or event. The contact doesn\'t have an additional relationship with a case or event.',
 
         /**
          * REMOVE the tokens from below

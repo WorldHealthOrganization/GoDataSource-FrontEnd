@@ -11,7 +11,9 @@
                 (optionChanged)="onChange()"
                 [maxDate]="currentDate"
                 app-date-validator
-                [dateSameOrBefore]="currentDate">
+                [dateSameOrBefore]="currentDate"
+                [dateSameOrAfter]="minimumDate"
+                [minDate]="minimumDate">
             </app-form-datepicker>
 
             <app-form-slide-toggle

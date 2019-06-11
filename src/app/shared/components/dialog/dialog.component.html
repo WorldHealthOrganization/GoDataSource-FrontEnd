@@ -48,17 +48,18 @@
             </ng-container>
 
             <!-- Multiple inputs -->
-            <ng-container *ngIf="confirmData?.fieldsList?.length > 0">
-                <ng-container
-                    *ngFor="let field of confirmData.fieldsList">
+            <div
+                *ngIf="confirmData?.fieldsList?.length > 0"
+                fxLayout="row wrap" fxLayoutGap="20px">
+                <div
+                    *ngFor="let field of confirmData.fieldsList; let fieldIndex = index"
+                    [fxFlex]="confirmData.fieldsListLayoutCss[fieldIndex]"
+                    class="field-list-item">
                     <div
-                        *ngIf="field.isVisible(dialogAnswerInputValue.value)"
-                        fxLayout="column" fxLayoutGap="20px">
+                        *ngIf="field.isVisible(dialogAnswerInputValue.value)">
 
                         <div
-                            *ngIf="field.fieldType === DialogFieldType.SELECT"
-                            fxLayout="row"
-                        >
+                            *ngIf="field.fieldType === DialogFieldType.SELECT">
                             <!-- Select -->
                             <app-form-select
                                 [name]="field.name"
@@ -76,9 +77,7 @@
                         </div>
 
                         <div
-                            *ngIf="field.fieldType === DialogFieldType.TEXT && field.type !== 'number'"
-                            fxLayout="row"
-                        >
+                            *ngIf="field.fieldType === DialogFieldType.TEXT && field.type !== 'number'">
                             <!-- Text -->
                             <app-form-input
                                 [name]="field.name"
@@ -92,9 +91,7 @@
                         </div>
 
                         <div
-                            *ngIf="field.fieldType === DialogFieldType.TEXT && field.type === 'number'"
-                            fxLayout="row"
-                        >
+                            *ngIf="field.fieldType === DialogFieldType.TEXT && field.type === 'number'">
                             <!-- Number -->
                             <app-form-input
                                 [name]="field.name"
@@ -113,9 +110,7 @@
                         </div>
 
                         <div
-                            *ngIf="field.fieldType === DialogFieldType.BOOLEAN"
-                            fxLayout="row"
-                        >
+                            *ngIf="field.fieldType === DialogFieldType.BOOLEAN">
                             <!-- Boolean -->
                             <app-form-slide-toggle
                                 [name]="field.name"
@@ -127,9 +122,7 @@
                         </div>
 
                         <div
-                            *ngIf="field.fieldType === DialogFieldType.DATE"
-                            fxLayout="row"
-                        >
+                            *ngIf="field.fieldType === DialogFieldType.DATE">
                             <!-- Date -->
                             <app-form-datepicker
                                 [name]="field.name"
@@ -144,9 +137,7 @@
                         </div>
 
                         <div
-                            *ngIf="field.fieldType === DialogFieldType.DATE_RANGE"
-                            fxLayout="row"
-                        >
+                            *ngIf="field.fieldType === DialogFieldType.DATE_RANGE">
                             <!-- Date range -->
                             <app-form-daterange
                                 [name]="field.name"
@@ -166,9 +157,7 @@
                         </a>
 
                         <div
-                            *ngIf="field.fieldType === DialogFieldType.URL"
-                            fxLayout="row"
-                        >
+                            *ngIf="field.fieldType === DialogFieldType.URL">
                             <!-- Url -->
                             <app-form-input
                                 [name]="field.name"
@@ -184,8 +173,8 @@
                             </app-form-input>
                         </div>
                     </div>
-                </ng-container>
-            </ng-container>
+                </div>
+            </div>
         </div>
 
         <div fxLayout="row" fxLayoutAlign="end">

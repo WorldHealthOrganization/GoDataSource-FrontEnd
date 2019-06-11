@@ -1,0 +1,12 @@
+<div
+    [id]="identifier"
+    class="form-element"
+    [ngClass]="{invalid: invalid}">
+    <ngx-wig
+        #ngxWig
+        [name]="name"
+        [(ngModel)]="value"
+        [buttons]="buttons"
+        [disabled]="disabled">
+    </ngx-wig>
+</div>
