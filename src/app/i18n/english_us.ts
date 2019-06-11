@@ -15,7 +15,7 @@ export const EnglishUsLang = {
         /**
          * uiAPIErrors
          */
-        'LNG_API_ERROR_CODE_DELETE_CONTACT_LAST_RELATIONSHIP': 'Cannot delete a contact\'s last relationship with a case or event. The contact with ID {{ contactId }} doesn\'t have an additional relationship with a case or event.',
+        'LNG_API_ERROR_CODE_DELETE_CONTACT_LAST_RELATIONSHIP': 'Cannot delete a contact\'s last relationship with a case or event. The contact doesn\'t have an additional relationship with a case or event.',
 
         /**
          * REMOVE the tokens from below
