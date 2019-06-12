@@ -255,7 +255,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     /**
      * Re(load) the Relationships list, based on the applied filter, sort criterias
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (
             this.relationshipType &&
             this.entityType &&
@@ -270,7 +270,12 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                     this.entityId,
                     this.queryBuilder
                 )
-                    .pipe(tap(this.checkEmptyList.bind(this)));
+                    .pipe(
+                        tap(this.checkEmptyList.bind(this)),
+                        tap(() => {
+                            finishCallback();
+                        })
+                    );
             } else {
                 // retrieve the list of contacts
                 this.relationshipsList$ = this.relationshipDataService.getEntityContacts(
@@ -279,8 +284,15 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                     this.entityId,
                     this.queryBuilder
                 )
-                    .pipe(tap(this.checkEmptyList.bind(this)));
+                    .pipe(
+                        tap(this.checkEmptyList.bind(this)),
+                        tap(() => {
+                            finishCallback();
+                        })
+                    );
             }
+        } else {
+            finishCallback();
         }
     }
 

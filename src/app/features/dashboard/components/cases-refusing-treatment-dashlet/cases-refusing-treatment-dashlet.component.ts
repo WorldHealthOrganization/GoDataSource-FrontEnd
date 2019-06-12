@@ -63,6 +63,9 @@ export class CasesRefusingTreatmentDashletComponent extends DashletComponent imp
             this.previousSubscriber.unsubscribe();
             this.previousSubscriber = null;
         }
+
+        // parent subscribers
+        this.releaseSubscribers();
     }
 
     /**

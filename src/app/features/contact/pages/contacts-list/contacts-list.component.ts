@@ -651,13 +651,20 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the Contacts list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
             // refresh list of contacts grouped by risk level
             this.getContactsGroupedByRiskLevel();
             // retrieve the list of Contacts
             this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder)
-                .pipe(tap(this.checkEmptyList.bind(this)));
+                .pipe(
+                    tap(this.checkEmptyList.bind(this)),
+                    tap(() => {
+                        finishCallback();
+                    })
+                );
+        } else {
+            finishCallback();
         }
     }
 

@@ -137,12 +137,15 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
             this.getSelectedOutbreakSubject.unsubscribe();
             this.getSelectedOutbreakSubject = null;
         }
+
+        // release resources
+        super.ngOnDestroy();
     }
 
     /**
      * Refresh list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (
             this.selectedOutbreak &&
             !_.isEmpty(this.teamsData)
@@ -178,11 +181,19 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
 
                         // format data
                         this.formatData(metricTeamsFollowups);
+
+                        // finished
+                        finishCallback();
                     });
             } else {
                 // hide loading
                 this.displayLoading = false;
+
+                // finished
+                finishCallback();
             }
+        } else {
+            finishCallback();
         }
     }
 

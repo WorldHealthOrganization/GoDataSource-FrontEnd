@@ -98,7 +98,7 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the items list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         this.queryBuilder.filter.where({approved: true}, true);
         // retrieve the list of items
         if (_.isEmpty(this.searchedTerm)) {
@@ -109,7 +109,12 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
         }
 
         this.helpItemsList$ = this.helpItemsList$
-            .pipe(tap(this.checkEmptyList.bind(this)));
+            .pipe(
+                tap(this.checkEmptyList.bind(this)),
+                tap(() => {
+                    finishCallback();
+                })
+            );
     }
 
 

@@ -307,10 +307,16 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the Outbreaks list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         // retrieve the list of Outbreaks
-        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList(this.queryBuilder)
-            .pipe(tap(this.checkEmptyList.bind(this)));
+        this.outbreaksList$ = this.outbreakDataService
+            .getOutbreaksList(this.queryBuilder)
+            .pipe(
+                tap(this.checkEmptyList.bind(this)),
+                tap(() => {
+                    finishCallback();
+                })
+            );
     }
 
     /**

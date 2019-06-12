@@ -101,6 +101,11 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
             this.previousSubscriber = null;
         }
 
+        // debounce caller
+        if (this.refreshDataCaller) {
+            this.refreshDataCaller.unsubscribe();
+            this.refreshDataCaller = null;
+        }
     }
 
     /**

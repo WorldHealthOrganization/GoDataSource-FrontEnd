@@ -193,10 +193,16 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
     /**
      * Re(load) the Outbreak Templates list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         // retrieve the list of Events
-        this.outbreakTemplatesList$ = this.outbreakTemplateDataService.getOutbreakTemplatesList(this.queryBuilder)
-            .pipe(tap(this.checkEmptyList.bind(this)));
+        this.outbreakTemplatesList$ = this.outbreakTemplateDataService
+            .getOutbreakTemplatesList(this.queryBuilder)
+            .pipe(
+                tap(this.checkEmptyList.bind(this)),
+                tap(() => {
+                    finishCallback();
+                })
+            );
     }
 
     /**

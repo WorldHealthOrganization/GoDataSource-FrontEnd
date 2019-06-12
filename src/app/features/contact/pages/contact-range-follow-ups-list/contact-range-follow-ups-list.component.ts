@@ -215,7 +215,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     /**
      * Refresh list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
             // retrieve the list of Follow Ups
             this.displayLoading = true;
@@ -279,9 +279,14 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                         }
                     }
 
+                    // finished
+                    finishCallback();
+
                     // display data
                     this.displayLoading = false;
                 });
+        } else {
+            finishCallback();
         }
     }
 
