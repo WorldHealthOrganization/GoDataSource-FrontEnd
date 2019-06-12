@@ -873,7 +873,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                     new DialogField({
                         name: 'date',
                         required: true,
-                        value: value ? moment(value).toISOString() : value,
+                        value: value ? moment(value).format('YYYY-MM-DD') : value,
                         fieldType: DialogFieldType.DATE,
                         disabled: true
                     }),
