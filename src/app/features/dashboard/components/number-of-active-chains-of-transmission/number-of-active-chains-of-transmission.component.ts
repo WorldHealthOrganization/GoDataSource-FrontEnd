@@ -64,6 +64,9 @@ export class NumberOfActiveChainsOfTransmissionComponent extends DashletComponen
             this.previousSubscriber.unsubscribe();
             this.previousSubscriber = null;
         }
+
+        // parent subscribers
+        this.releaseSubscribers();
     }
 
     /**

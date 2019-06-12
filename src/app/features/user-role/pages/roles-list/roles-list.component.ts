@@ -102,10 +102,15 @@ export class RolesListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the User Roles list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         // get the list of existing roles
         this.rolesList$ = this.userRoleDataService.getRolesList(this.queryBuilder)
-            .pipe(tap(this.checkEmptyList.bind(this)));
+            .pipe(
+                tap(this.checkEmptyList.bind(this)),
+                tap(() => {
+                    finishCallback();
+                })
+            );
     }
 
     deleteRole(userRole: UserRoleModel) {

@@ -63,6 +63,9 @@ export class CasesDeceasedDashletComponent extends DashletComponent implements O
             this.previousSubscriber.unsubscribe();
             this.previousSubscriber = null;
         }
+
+        // parent subscribers
+        this.releaseSubscribers();
     }
 
     /**

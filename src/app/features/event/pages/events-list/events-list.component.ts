@@ -317,11 +317,18 @@ export class EventsListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the Events list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
             // retrieve the list of Events
             this.eventsList$ = this.eventDataService.getEventsList(this.selectedOutbreak.id, this.queryBuilder)
-                .pipe(tap(this.checkEmptyList.bind(this)));
+                .pipe(
+                    tap(this.checkEmptyList.bind(this)),
+                    tap(() => {
+                        finishCallback();
+                    })
+                );
+        } else {
+            finishCallback();
         }
     }
 

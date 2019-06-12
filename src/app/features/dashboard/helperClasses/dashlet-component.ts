@@ -114,4 +114,15 @@ export abstract class DashletComponent {
      * Refreshes dashlet data
      */
     abstract refreshData();
+
+    /**
+     * Release subscribers
+     */
+    protected releaseSubscribers() {
+        // debounce caller
+        if (this.refreshDataCaller) {
+            this.refreshDataCaller.unsubscribe();
+            this.refreshDataCaller = null;
+        }
+    }
 }

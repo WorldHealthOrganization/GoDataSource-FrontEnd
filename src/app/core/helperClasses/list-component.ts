@@ -6,7 +6,7 @@ import { Observable, Subscriber } from 'rxjs';
 import { ApplyListFilter, Constants } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ResetInputOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
 import { MatPaginator, MatSort, MatSortable, PageEvent } from '@angular/material';
 import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
@@ -23,7 +23,7 @@ import {
 import { VisibleColumnModel } from '../../shared/components/side-columns/model';
 import { AddressType } from '../models/address.model';
 
-export abstract class ListComponent {
+export abstract class ListComponent implements OnDestroy {
     /**
      * Breadcrumbs
      */
@@ -154,9 +154,13 @@ export abstract class ListComponent {
     }
 
     // refresh only after we finish changing data
+    public refreshingList: boolean = false;
     private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
         // refresh list
-        this.refreshList();
+        this.refreshingList = true;
+        this.refreshList(() => {
+            this.refreshingList = false;
+        });
     }));
 
     // refresh only after we finish changing data
@@ -177,9 +181,16 @@ export abstract class ListComponent {
     }
 
     /**
+     * Release resources
+     */
+    ngOnDestroy(): void {
+        this.releaseSubscribers();
+    }
+
+    /**
      * Refresh list
      */
-    public abstract refreshList();
+    public abstract refreshList(finishCallback: () => void);
 
     /**
      * Refresh items count
@@ -187,6 +198,20 @@ export abstract class ListComponent {
      */
     public refreshListCount() {
         console.error('Component must implement \'refreshListCount\' method');
+    }
+
+    /**
+     * Release subscribers
+     */
+    private releaseSubscribers() {
+        if (this.triggerListRefresh) {
+            this.triggerListRefresh.unsubscribe();
+            this.triggerListRefresh = null;
+        }
+        if (this.triggerListCountRefresh) {
+            this.triggerListCountRefresh.unsubscribe();
+            this.triggerListCountRefresh = null;
+        }
     }
 
     /**

@@ -218,9 +218,14 @@ export class LocationsListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the list of Locations
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         this.locationsList$ = this.locationDataService.getLocationsListByParent(this.parentId, this.queryBuilder)
-            .pipe(tap(this.checkEmptyList.bind(this)));
+            .pipe(
+                tap(this.checkEmptyList.bind(this)),
+                tap(() => {
+                    finishCallback();
+                })
+            );
     }
 
     /**

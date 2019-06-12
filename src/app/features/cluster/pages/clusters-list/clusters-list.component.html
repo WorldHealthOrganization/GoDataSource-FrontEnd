@@ -42,6 +42,7 @@
     <!-- Hover question effects / actions -->
     <app-hover-row-actions
         #hoverRow
+        [active]="!refreshingList"
     ></app-hover-row-actions>
 
     <mat-table #table [dataSource]="clustersList$ | async" matSort (matSortChange)="sortBy($event)">

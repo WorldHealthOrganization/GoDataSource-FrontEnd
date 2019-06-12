@@ -143,10 +143,17 @@ export class ClustersListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the Clusters list, based on the applied filter, sort criterias
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
             this.clustersList$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id, this.queryBuilder)
-                .pipe(tap(this.checkEmptyList.bind(this)));
+                .pipe(
+                    tap(this.checkEmptyList.bind(this)),
+                    tap(() => {
+                        finishCallback();
+                    })
+                );
+        } else {
+            finishCallback();
         }
     }
 

@@ -174,7 +174,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
     /**
      * Refresh list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         this.clientApplicationsServerList = [];
 
         const outbreaksList$: Observable<OutbreakModel[]> = this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK) ?
@@ -218,6 +218,9 @@ export class ClientApplicationsListComponent extends ListComponent implements On
 
                 // flag if list is empty
                 this.checkEmptyList(this.clientApplicationsServerList);
+
+                // finished
+                finishCallback();
             });
     }
 
