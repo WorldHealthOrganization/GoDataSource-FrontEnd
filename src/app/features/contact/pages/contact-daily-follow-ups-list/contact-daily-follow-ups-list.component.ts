@@ -869,14 +869,13 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         this.genericDataService
             .getRangeFollowUpGroupByOptions(true)
             .subscribe((options) => {
+                this.printFollowUpsDialogExtraAPIData = {
+                    date: {
+                        startDate: moment(value).startOf('day'),
+                        endDate: moment(value).endOf('day')
+                    }
+                };
                 this.printFollowUpsDialogFields = [
-                    new DialogField({
-                        name: 'date',
-                        required: true,
-                        value: value ? moment(value).format('YYYY-MM-DD') : value,
-                        fieldType: DialogFieldType.DATE,
-                        disabled: true
-                    }),
                     new DialogField({
                         name: 'groupBy',
                         placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',

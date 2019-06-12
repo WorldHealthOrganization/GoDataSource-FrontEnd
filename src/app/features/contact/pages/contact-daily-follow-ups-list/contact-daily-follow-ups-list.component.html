@@ -27,6 +27,7 @@
                         [fileName]="printFollowUpsFileName"
                         [fileType]="ExportDataExtension.PDF"
                         [extraDialogFields]="printFollowUpsDialogFields"
+                        [extraAPIData]="printFollowUpsDialogExtraAPIData"
                         [queryBuilder]="queryBuilder"
                         (exportStart)="showLoadingDialog()"
                         (exportFinished)="closeLoadingDialog()">
