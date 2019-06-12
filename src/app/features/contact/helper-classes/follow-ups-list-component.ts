@@ -63,6 +63,9 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
     printFollowUpsUrl: string;
     printFollowUpsFileName: string;
     printFollowUpsDialogFields: DialogField[] = [];
+    printFollowUpsDialogExtraAPIData: {
+        [key: string]: any
+    } = {};
 
     loadingDialog: LoadingDialogModel;
 
