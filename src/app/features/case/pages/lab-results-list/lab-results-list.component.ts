@@ -190,6 +190,10 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
         // default table columns
         this.tableColumns = [
             new VisibleColumnModel({
+                field: 'case.visualId',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_PERSON_ID'
+            }),
+            new VisibleColumnModel({
                 field: 'case.lastName',
                 label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_LAST_NAME'
             }),
