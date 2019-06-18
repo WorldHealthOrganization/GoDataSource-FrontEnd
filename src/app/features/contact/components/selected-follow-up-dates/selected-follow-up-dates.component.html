@@ -1,0 +1,10 @@
+<div class="follow-up-dates-container">
+    <div>{{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_FOLLOW_UPS_DATES' | translate}}</div>
+    <div fxLayout="row wrap" fxLayoutGap="20px">
+        <a
+            *ngFor="let date of followUpDates"
+        >
+            {{ date | dateDefault}}
+        </a>
+    </div>
+</div>
