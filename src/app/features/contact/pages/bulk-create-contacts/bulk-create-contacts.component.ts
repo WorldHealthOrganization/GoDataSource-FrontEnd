@@ -80,6 +80,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         }
     }[] = [];
 
+    contactVisualIdModel: string;
+
     afterChangeCallback: (
         sheetCore: Handsontable,
         changes: any[],
@@ -152,6 +154,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             )
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+                // setting the contact visual id model
+                this.contactVisualIdModel = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);
 
                 this.retrieveRelatedPerson();
             });
