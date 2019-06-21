@@ -24,6 +24,11 @@ export const EnglishUsLang = {
         'LNG_API_ERROR_CODE_DELETE_CONTACT_LAST_RELATIONSHIP': 'Cannot delete a contact\'s last relationship with a case or event. The contact doesn\'t have an additional relationship with a case or event.',
 
         /**
+         * uiBulkAddContactsPage
+         */
+        'LNG_PAGE_BULK_ADD_CONTACTS_VISUAL_ID_INFO_LABEL': '* "Contact ID" cell must follow this pattern: {{mask}}'
+
+        /**
          * REMOVE the tokens from below
          */
         // ...

@@ -30,6 +30,7 @@ import { throwError } from 'rxjs';
 import { catchError, map, mergeMap, share } from 'rxjs/operators';
 import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import * as moment from 'moment';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -61,6 +62,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
     relatedEntityData: CaseModel | EventModel;
 
+    ContactModel = ContactModel;
+
     // sheet widget configuration
     sheetWidth = 500;
     sheetContextMenu = {};
@@ -78,6 +81,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             columns: string
         }
     }[] = [];
+
+    contactVisualIdModel: {mask: string};
 
     afterChangeCallback: (
         sheetCore: Handsontable,
@@ -151,6 +156,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             )
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+                // setting the contact visual id model
+                this.contactVisualIdModel = {mask : ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)};
 
                 this.retrieveRelatedPerson();
             });
@@ -213,6 +220,30 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             new TextSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_LAST_NAME')
                 .setProperty('contact.lastName'),
+            new TextSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_VISUAL_ID')
+                .setProperty('contact.visualId')
+                .setAsyncValidator((value: string, callback: (result: boolean) => void): void => {
+                    if (_.isEmpty(value)) {
+                        callback(true);
+                    } else {
+                        const visualIDTranslateData = {
+                            mask: ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
+                        };
+                        // set visual ID validator
+                        this.contactDataService.checkContactVisualIDValidity(
+                            this.selectedOutbreak.id,
+                            visualIDTranslateData.mask,
+                            value
+                        ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                            if (isValid === true) {
+                                callback(true);
+                            } else {
+                                callback(false);
+                            }
+                        });
+                    }
+                }),
             new DropdownSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
                 .setProperty('contact.gender')
