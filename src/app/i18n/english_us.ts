@@ -20,7 +20,7 @@ export const EnglishUsLang = {
         /**
          * uiBulkAddContactsPage
          */
-        'LNG_PAGE_BULK_ADD_CONTACTS_CONTACT_VISUAL_ID_INFO_LABEL': '* "Contact ID" cell must follow this pattern: '
+        'LNG_PAGE_BULK_ADD_CONTACTS_VISUAL_ID_INFO_LABEL': '* "Contact ID" cell must follow this pattern: '
 
         /**
          * REMOVE the tokens from below
