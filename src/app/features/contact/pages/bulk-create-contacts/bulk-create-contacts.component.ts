@@ -62,6 +62,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
     relatedEntityData: CaseModel | EventModel;
 
+    ContactModel = ContactModel;
+
     // sheet widget configuration
     sheetWidth = 500;
     sheetContextMenu = {};
@@ -80,7 +82,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         }
     }[] = [];
 
-    contactVisualIdModel: string;
+    contactVisualIdModel: {mask: string};
 
     afterChangeCallback: (
         sheetCore: Handsontable,
@@ -155,7 +157,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
                 // setting the contact visual id model
-                this.contactVisualIdModel = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);
+                this.contactVisualIdModel = {mask : ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)};
 
                 this.retrieveRelatedPerson();
             });
