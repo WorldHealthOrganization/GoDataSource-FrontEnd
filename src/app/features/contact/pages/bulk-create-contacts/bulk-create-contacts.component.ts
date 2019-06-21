@@ -222,21 +222,25 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_CONTACT_FIELD_LABEL_VISUAL_ID')
                 .setProperty('contact.visualId')
                 .setAsyncValidator((value: string, callback: (result: boolean) => void): void => {
-                    const visualIDTranslateData = {
-                        mask: ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
-                    };
-                    // set visual ID validator
-                    this.contactDataService.checkContactVisualIDValidity(
-                        this.selectedOutbreak.id,
-                        visualIDTranslateData.mask,
-                        value
-                    ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                        if (isValid === true) {
-                            callback(true);
-                        } else {
-                            callback(false);
-                        }
-                    });
+                    if (_.isEmpty(value)) {
+                        callback(true);
+                    } else {
+                        const visualIDTranslateData = {
+                            mask: ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
+                        };
+                        // set visual ID validator
+                        this.contactDataService.checkContactVisualIDValidity(
+                            this.selectedOutbreak.id,
+                            visualIDTranslateData.mask,
+                            value
+                        ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                            if (isValid === true) {
+                                callback(true);
+                            } else {
+                                callback(false);
+                            }
+                        });
+                    }
                 }),
             new DropdownSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
