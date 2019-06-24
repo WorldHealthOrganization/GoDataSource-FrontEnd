@@ -371,6 +371,33 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             });
     }
 
+    deleteSelectedRelationships() {
+        // get list of selected relationships
+        const selectedRelationships: boolean | string[] = this.validateCheckedRecords();
+        if (!selectedRelationships) {
+            return;
+        }
+
+        this.dialogService.showConfirm(`TOKEN`)
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.relationshipDataService
+                        .deleteBulkRelationships(this.selectedOutbreak.id, selectedRelationships)
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('SUCCESS TOKEN');
+
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+
     /**
      * Share selected relationships with other people
      */

@@ -24,6 +24,11 @@ export const EnglishUsLang = {
         'LNG_API_ERROR_CODE_DELETE_CONTACT_LAST_RELATIONSHIP': 'Cannot delete a contact\'s last relationship with a case or event. The contact doesn\'t have an additional relationship with a case or event.',
 
         /**
+         * uiBulkActionsOnListPages
+         */
+        'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_DELETE_SELECTED_RELATIONSHIPS': 'Deleted selected relationships'
+
+        /**
          * REMOVE the tokens from below
          */
         // ...

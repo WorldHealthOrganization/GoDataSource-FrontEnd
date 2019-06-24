@@ -247,6 +247,30 @@ export class RelationshipDataService {
     }
 
     /**
+     * Delete multiple relationships at once
+     * @param {string} outbreakId
+     * @param {string[]} selectedRelationshipsIds
+     * @returns {Observable<any>}
+     */
+    deleteBulkRelationships(
+        outbreakId: string,
+        selectedRelationshipsIds: boolean | string[]
+    ): Observable<any> {
+        const qb = new RequestQueryBuilder();
+        qb.filter.where({
+            'id': {
+                'inq': selectedRelationshipsIds
+            }
+        });
+
+        const selectedRelationships = qb.filter.generateCondition(true);
+
+        return this.http.delete(
+            `outbreaks/${outbreakId}/relationships/bulk?where=${selectedRelationships}`
+        );
+    }
+
+    /**
      * Modify a Relationship between 2 entities (Cases / Contacts / Events)
      * @param {string} outbreakId
      * @param {EntityType} entityType
