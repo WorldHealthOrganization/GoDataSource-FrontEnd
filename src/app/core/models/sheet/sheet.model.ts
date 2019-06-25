@@ -5,6 +5,8 @@ import { SheetCellValidationType } from './sheet-cell-validation-type';
 import { map } from 'rxjs/operators';
 import { Moment } from 'moment';
 
+export type SheetColumnAsyncValidator = (value: string, callback: (result: boolean) => void) => void;
+
 export abstract class AbstractSheetColumn {
     // translation key for column name
     title: string;
@@ -16,6 +18,8 @@ export abstract class AbstractSheetColumn {
     validationFunc: (value: string, callback: (result: boolean) => any) => any;
     // list of all individual validations to be applied on cells
     private validations: SheetCellValidationType[] = [];
+    // async validators
+    asyncValidators: SheetColumnAsyncValidator[] = [];
 
     constructor(
         // column type (check Handsontable documentation)
@@ -49,6 +53,14 @@ export abstract class AbstractSheetColumn {
         return this;
     }
 
+    public setAsyncValidator(callback: SheetColumnAsyncValidator) {
+        if (callback) {
+            this.addAsyncValidator(callback);
+        }
+
+        return this;
+    }
+
     /**
      * Add an individual validation for cells under this column
      * @param validationType
@@ -61,6 +73,20 @@ export abstract class AbstractSheetColumn {
             this.validations,
             this
         );
+    }
+
+    /**
+     * Add async validator
+     * @param {SheetColumnAsyncValidator} callback
+     */
+    public addAsyncValidator(callback: SheetColumnAsyncValidator) {
+        // add async validator if needed
+        if (this.validations.indexOf(SheetCellValidationType.ASYNC_VALIDATION) === -1) {
+            this.addValidation(SheetCellValidationType.ASYNC_VALIDATION);
+        }
+
+        // add async method
+        this.asyncValidators.push(callback);
     }
 }
 
