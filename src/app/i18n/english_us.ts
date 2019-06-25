@@ -31,12 +31,12 @@ export const EnglishUsLang = {
         /**
          * uiDialogs
          */
-        'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP': 'Are you sure you want to delete selected relationships?',
+        'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIPS': 'Are you sure you want to delete selected relationships?',
 
         /**
          * uiEntityRelationshipsListPage
          */
-        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_BULK_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationships deleted',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_BULK_ACTION_DELETE_RELATIONSHIPS_SUCCESS_MESSAGE': 'Relationships deleted',
 
 
         /**

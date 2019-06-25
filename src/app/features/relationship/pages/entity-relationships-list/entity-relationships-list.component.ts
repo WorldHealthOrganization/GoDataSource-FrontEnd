@@ -405,7 +405,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             return;
         }
 
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP')
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIPS')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.relationshipDataService
@@ -417,7 +417,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                             })
                         )
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_BULK_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_BULK_ACTION_DELETE_RELATIONSHIPS_SUCCESS_MESSAGE');
 
                             this.needsRefreshList(true);
                         });
