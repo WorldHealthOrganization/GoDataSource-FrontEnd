@@ -58,13 +58,8 @@ export class FollowUpsDataService {
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
         needsContactData: boolean = true
     ): Observable<FollowUpModel[]> {
-        // include contact in response
-        const qb = new RequestQueryBuilder();
-        qb.include('contact', needsContactData);
-        qb.merge(queryBuilder);
-
         // construct query
-        const filter = qb.buildQuery();
+        const filter = queryBuilder.buildQuery();
 
         // retrieve locations
         return this.locationDataService
