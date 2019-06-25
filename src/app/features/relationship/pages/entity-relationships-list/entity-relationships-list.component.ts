@@ -24,6 +24,7 @@ import { RelationshipsListComponent } from '../../helper-classes/relationships-l
 import { throwError } from 'rxjs';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { PERMISSION } from '../../../../core/models/permission.model';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -176,6 +177,22 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     onPersonLoaded() {
         // (re)initialize breadcrumbs
         this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Check if the user has write access to contacts
+     * @returns {boolean}
+     */
+    hasContactWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
+    }
+
+    /**
+     * Check if the user has write access to cases
+     * @returns {boolean}
+     */
+    hasCaseWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
     }
 
     private initializeBreadcrumbs() {

@@ -107,6 +107,7 @@
                             <mat-divider></mat-divider>
 
                             <button
+                                [disabled]="hasCaseWriteAccess() || hasContactWriteAccess()"
                                 mat-menu-item
                                 [disabled]="checkedRecords.length === 0"
                                 (click)="deleteSelectedRelationships()">
