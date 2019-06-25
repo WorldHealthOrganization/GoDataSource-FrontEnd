@@ -53,6 +53,10 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     EntityType = EntityType;
     UserSettings = UserSettings;
 
+    checkedEntityModels: {
+        [idRelationship: string]: EntityModel
+    } = {};
+
     recordActions: HoverRowAction[] = [
         // View Relationship
         new HoverRowAction({
@@ -127,7 +131,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             .subscribe((outbreak: OutbreakModel) => {
                 if (outbreak) {
                     // update the selected outbreak
-                    this.clusterOptions$ = this.clusterDataService.getClusterListAsLabelValue(outbreak.id);
+                    this.clusterOptions$ = this.clusterDataService.getClusterListAsLabelValue(outbreak.id).pipe(share());
                 }
             });
 
@@ -262,6 +266,9 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             this.entityId &&
             this.selectedOutbreak
         ) {
+            // reset checked items
+            this.checkedEntityModels = {};
+
             if (this.relationshipType === RelationshipType.EXPOSURE) {
                 // retrieve the list of exposures
                 this.relationshipsList$ = this.relationshipDataService.getEntityExposures(
@@ -371,6 +378,9 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             });
     }
 
+    /**
+     * Bulk delete selected relationships
+     */
     deleteSelectedRelationships() {
         // get list of selected relationships
         const selectedRelationships: boolean | string[] = this.validateCheckedRecords();
@@ -378,7 +388,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             return;
         }
 
-        this.dialogService.showConfirm(`TOKEN`)
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.relationshipDataService
@@ -390,7 +400,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                             })
                         )
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('SUCCESS TOKEN');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_BULK_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
 
                             this.needsRefreshList(true);
                         });
@@ -399,14 +409,41 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     }
 
     /**
+     * Send further selected relationships
+     * @param {EntityModel} model
+     * @param {boolean} checked
+     */
+    checkedRecordRelationship(
+        model: EntityModel,
+        checked: boolean
+    ) {
+        // keep model for further use
+        if (checked) {
+            this.checkedEntityModels[model.relationship.id] = model;
+        } else {
+            delete this.checkedEntityModels[model.relationship.id];
+        }
+
+        // send data further
+        this.checkedRecord(model.relationship.id, checked);
+    }
+
+    /**
      * Share selected relationships with other people
      */
     shareSelectedRelationships() {
-        // get list of selected ids
-        const selectedRecords: false | string[] = this.validateCheckedRecords();
-        if (!selectedRecords) {
+        // get list of selected relationship ids
+        const selectedRelationshipRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRelationshipRecords) {
             return;
         }
+
+        // determine list of model ids
+        const selectedRecords: string[] = _.map(selectedRelationshipRecords, (idRelationship: string) => this.checkedEntityModels[idRelationship].model.id)
+            .filter((record, index, self) => {
+                // keep only unique dates
+                return self.indexOf(record) === index;
+            });
 
         // redirect to next step
         this.router.navigate(

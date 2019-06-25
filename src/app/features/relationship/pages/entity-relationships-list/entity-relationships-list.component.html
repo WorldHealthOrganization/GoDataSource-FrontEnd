@@ -104,6 +104,8 @@
                                 {{ shareSelectedRelationshipsButtonLabel | translate }}
                             </button>
 
+                            <mat-divider></mat-divider>
+
                             <button
                                 mat-menu-item
                                 [disabled]="checkedRecords.length === 0"
@@ -120,11 +122,11 @@
             <mat-cell *matCellDef="let item;" fxFlex="60px">
                 <app-form-checkbox
                     #listCheckedIndividual
-                    [name]="'listCheckedIndividual[' + item.model.id + ']'"
+                    [name]="'listCheckedIndividual[' + item.relationship.id + ']'"
                     class="table-checkbox"
                     ngModel
-                    (optionChanged)="checkedRecord(item.model.id, $event)"
-                    (afterInitialize)="checkedRecord(item.model.id, false)">
+                    (optionChanged)="checkedRecordRelationship(item, $event)"
+                    (afterInitialize)="checkedRecordRelationship(item, false)">
                 </app-form-checkbox>
             </mat-cell>
         </ng-container>

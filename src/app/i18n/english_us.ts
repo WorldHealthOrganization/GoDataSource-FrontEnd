@@ -26,7 +26,18 @@ export const EnglishUsLang = {
         /**
          * uiBulkActionsOnListPages
          */
-        'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_DELETE_SELECTED_RELATIONSHIPS': 'Deleted selected relationships'
+        'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_DELETE_SELECTED_RELATIONSHIPS': 'Deleted selected relationships',
+
+        /**
+         * uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP': 'Are you sure you want to delete selected relationships?',
+
+        /**
+         * uiEntityRelationshipsListPage
+         */
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_BULK_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationships deleted',
+
 
         /**
          * REMOVE the tokens from below
