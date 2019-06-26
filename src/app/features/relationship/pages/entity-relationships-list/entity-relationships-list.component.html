@@ -95,16 +95,16 @@
                                 {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
                             </button>
 
-                            <mat-divider></mat-divider>
-
-                            <button
-                                mat-menu-item
-                                [disabled]="checkedRecords.length === 0"
-                                (click)="shareSelectedRelationships()">
-                                {{ shareSelectedRelationshipsButtonLabel | translate }}
-                            </button>
-
                             <ng-container *ngIf="hasCaseWriteAccess() || hasContactWriteAccess()">
+                                <mat-divider></mat-divider>
+
+                                <button
+                                    mat-menu-item
+                                    [disabled]="checkedRecords.length === 0"
+                                    (click)="shareSelectedRelationships()">
+                                    {{ shareSelectedRelationshipsButtonLabel | translate }}
+                                </button>
+
                                 <mat-divider></mat-divider>
 
                                 <button
