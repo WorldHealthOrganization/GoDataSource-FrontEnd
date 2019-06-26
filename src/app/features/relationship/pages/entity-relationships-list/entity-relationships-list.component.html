@@ -104,15 +104,16 @@
                                 {{ shareSelectedRelationshipsButtonLabel | translate }}
                             </button>
 
-                            <mat-divider></mat-divider>
+                            <ng-container *ngIf="hasCaseWriteAccess() || hasContactWriteAccess()">
+                                <mat-divider></mat-divider>
 
-                            <button
-                                [disabled]="hasCaseWriteAccess() || hasContactWriteAccess()"
-                                mat-menu-item
-                                [disabled]="checkedRecords.length === 0"
-                                (click)="deleteSelectedRelationships()">
-                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_DELETE_SELECTED_RELATIONSHIPS' | translate }}
-                            </button>
+                                <button
+                                    mat-menu-item
+                                    [disabled]="checkedRecords.length === 0"
+                                    (click)="deleteSelectedRelationships()">
+                                    {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS' | translate }}
+                                </button>
+                            </ng-container>
                         </mat-menu>
                     </div>
                     <div class="column-filter">

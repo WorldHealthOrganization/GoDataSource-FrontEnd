@@ -25,6 +25,7 @@ import { throwError } from 'rxjs';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -404,12 +405,19 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         if (!selectedRelationships) {
             return;
         }
+        const qb = new RequestQueryBuilder();
+
+        qb.filter.where({
+            'id': {
+                'inq': selectedRelationships
+            }
+        });
 
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIPS')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.relationshipDataService
-                        .deleteBulkRelationships(this.selectedOutbreak.id, selectedRelationships)
+                        .deleteBulkRelationships(this.selectedOutbreak.id, qb)
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
@@ -417,7 +425,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                             })
                         )
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_BULK_ACTION_DELETE_RELATIONSHIPS_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS_SUCCESS_MESSAGE');
 
                             this.needsRefreshList(true);
                         });

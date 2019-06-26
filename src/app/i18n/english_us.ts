@@ -28,12 +28,6 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_BULK_ADD_CONTACTS_VISUAL_ID_INFO_LABEL': '* "Contact ID" cell must follow this pattern: {{mask}}',
 
-
-        /**
-         * uiBulkActionsOnListPages
-         */
-        'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_DELETE_SELECTED_RELATIONSHIPS': 'Deleted selected relationships',
-
         /**
          * uiDialogs
          */
@@ -42,8 +36,8 @@ export const EnglishUsLang = {
         /**
          * uiEntityRelationshipsListPage
          */
-        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_BULK_ACTION_DELETE_RELATIONSHIPS_SUCCESS_MESSAGE': 'Relationships deleted',
-
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS': 'Delete selected relationships',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS_SUCCESS_MESSAGE': 'Relationships deleted',
 
         /**
          * REMOVE the tokens from below
