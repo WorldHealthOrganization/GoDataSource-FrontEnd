@@ -254,8 +254,7 @@ export class RelationshipDataService {
      */
     deleteBulkRelationships(
         outbreakId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any>
-    {
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
         const selectedRelationships = queryBuilder.filter.generateCondition(true);
 
         return this.http.delete(
