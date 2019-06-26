@@ -365,11 +365,11 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
             }),
             new VisibleColumnModel({
-                field: 'dateOfFollowUpEnd',
+                field: 'contact.followUp.endDate',
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP'
             }),
             new VisibleColumnModel({
-                field: 'dayOfFollowUp',
+                field: 'index',
                 label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP'
             }),
             new VisibleColumnModel({

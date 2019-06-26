@@ -17,6 +17,8 @@ export enum UserSettings {
     OUTBREAK_FIELDS = 'outbreakFields',
     OUTBREAK_TEMPLATE_FIELDS = 'outbreakTemplateFields',
     CONTACT_DAILY_FOLLOW_UP_FIELDS = 'contactDailyFollowUpFields',
+    CASE_RELATED_DAILY_FOLLOW_UP_FIELDS = 'caseRelatedFollowUpFields',
+    CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS = 'contactRelatedFollowUpFields',
     SYNC_UPSTREAM_SERVERS_FIELDS = 'syncUpstreamServersFields',
     SYNC_CLIENT_APPLICATIONS_FIELDS = 'syncClientApplicationsFields',
     SYNC_LOGS_FIELDS = 'syncLogsFields'
@@ -38,6 +40,8 @@ abstract class UserSettingsHandlers {
     static OUTBREAK_FIELDS = [];
     static OUTBREAK_TEMPLATE_FIELDS = [];
     static CONTACT_DAILY_FOLLOW_UP_FIELDS = [];
+    static CASE_RELATED_DAILY_FOLLOW_UP_FIELDS = [];
+    static CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS = [];
     static SYNC_UPSTREAM_SERVERS_FIELDS = [];
     static SYNC_CLIENT_APPLICATIONS_FIELDS = [];
     static SYNC_LOGS_FIELDS = [];
