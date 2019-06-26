@@ -95,7 +95,7 @@
                                 {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
                             </button>
 
-                            <ng-container *ngIf="(hasCaseWriteAccess() || hasContactWriteAccess()) && checkedRecords.length === 0">
+                            <ng-container *ngIf="(hasCaseWriteAccess() || hasContactWriteAccess()) && checkedRecords.length > 0">
                                 <mat-divider></mat-divider>
 
                                 <button
