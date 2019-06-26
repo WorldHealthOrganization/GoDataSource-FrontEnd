@@ -344,10 +344,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_CONTACTS';
     }
 
-    get changeSourceForSelectedRelationshipsLabel(): string {
-        return `a`;
-    }
-
     /**
      * Delete a relationship for current Entity
      * @param {EntityModel} relatedEntity
@@ -402,6 +398,13 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             return;
         }
 
-
+        this.router.navigate(
+            [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/switch`],
+            {
+                queryParams: {
+                    selectedTargetIds: JSON.stringify(selectedRecords)
+                }
+            }
+        );
     }
 }
