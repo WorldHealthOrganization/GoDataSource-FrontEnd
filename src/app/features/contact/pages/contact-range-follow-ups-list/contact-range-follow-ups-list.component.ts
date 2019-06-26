@@ -141,9 +141,6 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // initialize query builder
-        this.initializeQueryBuilder();
-
         // add page title
         this.exportRangeFollowUpsFileName = this.i18nService.instant('LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE') +
             ' - ' +
@@ -217,6 +214,22 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
      */
     refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
+            // order by name
+            this.queryBuilder.sort.clear();
+            this.queryBuilder.sort
+                .by(
+                    'contact.firstName',
+                    RequestSortDirection.ASC
+                )
+                .by(
+                    'contact.lastName',
+                    RequestSortDirection.ASC
+                )
+                .by(
+                    'contact.visualId',
+                    RequestSortDirection.ASC
+                );
+
             // retrieve the list of Follow Ups
             this.displayLoading = true;
             this.followUpsGroupedByContact = [];
@@ -298,6 +311,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
             this.followUpsGroupedByContactCount$ = this.followUpsDataService.getRangeFollowUpsListCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }
@@ -344,26 +358,6 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
         // refresh list
         this.needsRefreshList(instant);
-    }
-
-    /**
-     * Initialize query builder
-     */
-    initializeQueryBuilder() {
-        // order by name
-        this.queryBuilder.sort
-            .by(
-                'contact.firstName',
-                RequestSortDirection.ASC
-            )
-            .by(
-                'contact.lastName',
-                RequestSortDirection.ASC
-            )
-            .by(
-                'contact.visualId',
-                RequestSortDirection.ASC
-            );
     }
 
     resetFilters() {

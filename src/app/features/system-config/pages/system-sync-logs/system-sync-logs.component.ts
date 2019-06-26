@@ -239,6 +239,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
         // remove paginator from query builder
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
         this.syncLogsListCount$ = this.systemSyncLogDataService.getSyncLogsCount(countQueryBuilder);
     }
 

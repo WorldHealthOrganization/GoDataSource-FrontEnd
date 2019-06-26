@@ -676,6 +676,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
             this.contactsListCount$ = this.contactDataService.getContactsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }

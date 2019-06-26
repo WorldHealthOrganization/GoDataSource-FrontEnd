@@ -309,6 +309,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
 
             if (this.relationshipType === RelationshipType.EXPOSURE) {
                 // count the exposures

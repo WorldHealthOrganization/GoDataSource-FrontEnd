@@ -326,6 +326,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         // remove paginator from query builder
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
         this.outbreaksListCount$ = this.outbreakDataService.getOutbreaksCount(countQueryBuilder).pipe(share());
     }
 

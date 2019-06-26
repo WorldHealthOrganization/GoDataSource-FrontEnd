@@ -201,6 +201,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
             this.entitiesListCount$ = this.relationshipDataService
                 .getEntityAvailablePeopleCount(
                     this.selectedOutbreak.id,

@@ -776,6 +776,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
             this.casesListCount$ = this.caseDataService.getCasesCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }

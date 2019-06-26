@@ -233,6 +233,7 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
             this.entitiesListCount$ = this.entityDataService.getEntitiesCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }
