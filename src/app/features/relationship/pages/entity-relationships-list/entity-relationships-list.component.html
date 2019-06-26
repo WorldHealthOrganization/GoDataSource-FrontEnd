@@ -95,12 +95,11 @@
                                 {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
                             </button>
 
-                            <ng-container *ngIf="hasCaseWriteAccess() || hasContactWriteAccess()">
+                            <ng-container *ngIf="hasCaseWriteAccess() || hasContactWriteAccess() || checkedRecords.length === 0">
                                 <mat-divider></mat-divider>
 
                                 <button
                                     mat-menu-item
-                                    [disabled]="checkedRecords.length === 0"
                                     (click)="shareSelectedRelationships()">
                                     {{ shareSelectedRelationshipsButtonLabel | translate }}
                                 </button>
@@ -109,7 +108,6 @@
 
                                 <button
                                     mat-menu-item
-                                    [disabled]="checkedRecords.length === 0"
                                     (click)="deleteSelectedRelationships()">
                                     {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS' | translate }}
                                 </button>
