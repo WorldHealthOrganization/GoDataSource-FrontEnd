@@ -103,6 +103,13 @@
                                 (click)="shareSelectedRelationships()">
                                 {{ shareSelectedRelationshipsButtonLabel | translate }}
                             </button>
+
+                            <button
+                                mat-menu-item
+                                [disabled]="checkedRecords.length === 0"
+                                (click)="changeSourceForSelectedRelationships()">
+                                {{ changeSourceForSelectedRelationshipsLabel() | translate }}
+                            </button>
                         </mat-menu>
                     </div>
                     <div class="column-filter">
