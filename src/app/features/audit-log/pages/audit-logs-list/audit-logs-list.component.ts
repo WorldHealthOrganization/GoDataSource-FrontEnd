@@ -172,6 +172,7 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
         // remove paginator from query builder
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
         this.auditLogsListCount$ = this.auditLogDataService.getAuditLogsCount(countQueryBuilder).pipe(share());
     }
 

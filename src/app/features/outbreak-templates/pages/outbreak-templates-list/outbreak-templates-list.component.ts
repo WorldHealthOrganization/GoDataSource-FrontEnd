@@ -212,6 +212,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
         // remove paginator from query builder
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
         this.outbreakTemplatesListCount$ = this.outbreakTemplateDataService.getOutbreakTemplatesCount(countQueryBuilder).pipe(share());
     }
 

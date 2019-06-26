@@ -485,6 +485,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(qb);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
             this.followUpsListCount$ = this.followUpsDataService
                 .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
                 .pipe(
