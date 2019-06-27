@@ -200,13 +200,6 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     private generateSideFilters() {
         this.availableSideFilters = [
             new FilterModel({
-                fieldName: 'type',
-                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_TYPE',
-                type: FilterType.MULTISELECT,
-                options$: this.personTypesList$,
-                sortable: true
-            }),
-            new FilterModel({
                 fieldName: 'firstName',
                 fieldLabel: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
                 type: FilterType.TEXT,
@@ -231,31 +224,35 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                 sortable: true
             }),
             new FilterModel({
-                fieldName: 'age',
-                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_AGE',
-                type: FilterType.RANGE_AGE,
-                sortable: true
-            }),
-            new FilterModel({
                 fieldName: 'addresses',
                 fieldLabel: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
                 type: FilterType.ADDRESS
-            }),
-            new FilterModel({
-                fieldName: 'dob',
-                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_DOB',
-                type: FilterType.RANGE_DATE,
-                sortable: true
-            }),
-            new FilterModel({
-                fieldName: 'riskLevel',
-                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_RISK',
-                type: FilterType.MULTISELECT,
-                options$: this.riskLevelsList$,
-                sortable: true
-            }),
-
+            })
         ];
+    }
+
+    /**
+     * Retrieve Person Type color
+     */
+    getPersonTypeColor(personType: string) {
+        const personTypeData = _.get(this.personTypesListMap, personType);
+        return _.get(personTypeData, 'colorCode', '');
+    }
+
+    /**
+     * Get the list of table columns to be displayed
+     * @returns {string[]}
+     */
+    getTableColumns(): string[] {
+        const columns = [
+            'lastName',
+            'firstName',
+            'visualId',
+            'gender',
+            'place',
+        ];
+
+        return columns;
     }
 
 }

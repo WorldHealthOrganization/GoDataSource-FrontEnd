@@ -47,6 +47,137 @@
                 </div>
             </div>
 
+            <mat-table #table [dataSource]="entitiesList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
+
+                <!-- Last Name -->
+                <ng-container matColumnDef="lastName">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">
+                                {{'LNG_ENTITY_FIELD_LABEL_LAST_NAME' | translate}}
+                            </div>
+                            <div class="column-filter">
+                                <app-form-input
+                                    name="lastNameFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    (optionChanged)="filterByTextField('lastName', $event)"
+                                    [displayFilterIcon]="true">
+                                </app-form-input>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                        {{item.lastName}}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- First Name -->
+                <ng-container matColumnDef="firstName">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">
+                                {{'LNG_ENTITY_FIELD_LABEL_FIRST_NAME' | translate}}
+                            </div>
+                            <div class="column-filter">
+                                <app-form-input
+                                    name="firstNameFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    (optionChanged)="filterByTextField(['firstName', 'name'], $event)"
+                                    [displayFilterIcon]="true">
+                                </app-form-input>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                        {{item.type === EntityType.EVENT ? item.name : item.firstName}}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Case / Contact Visual ID -->
+                <ng-container matColumnDef="visualId">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">
+                                {{'LNG_ENTITY_FIELD_LABEL_VISUAL_ID' | translate}}
+                            </div>
+                            <div class="column-filter">
+                                <app-form-input
+                                    name="visualIdFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    (optionChanged)="filterByTextField('visualId', $event)"
+                                    [displayFilterIcon]="true">
+                                </app-form-input>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                        {{ item.visualId }}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Gender -->
+                <ng-container matColumnDef="gender">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">
+                                {{'LNG_ENTITY_FIELD_LABEL_GENDER' | translate}}
+                            </div>
+                            <div class="column-filter">
+                                <app-form-select
+                                    name="genderFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    [options]="genderList$ | async"
+                                    (optionChanged)="filterBySelectField('gender', $event)"
+                                    multiple="true"
+                                    [allowSelectionOfDisabledItems]="true"
+                                    [displayInvisibleItems]="true"
+                                    [displayFilterIcon]="true">
+                                </app-form-select>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                        {{ item.gender | translate }}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Place -->
+                <ng-container matColumnDef="place">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div class="column-header">
+                                {{'LNG_ENTITY_FIELD_LABEL_PLACE' | translate}}
+                            </div>
+                            <div class="column-filter">
+                                <!--<app-form-location-dropdown-->
+                                <!--name="locationFilter"-->
+                                <!--ngModel-->
+                                <!--[placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+                                <!--(changed)="filterBySelectField('address.locationId', $event)"-->
+                                <!--multiple="true"-->
+                                <!--app-reset-input-on-side-filter>-->
+                                <!--</app-form-location-dropdown>-->
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                        {{item.mainAddress.location?.name}}
+                    </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+                <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+            </mat-table>
+
             <div
                 *ngIf="isEmptyList"
                 class="mat-table"
