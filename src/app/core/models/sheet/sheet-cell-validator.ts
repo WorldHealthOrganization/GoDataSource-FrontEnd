@@ -70,7 +70,9 @@ export class SheetCellValidator {
      * Note: Each function must respect the format expected by 'handsontable'
      * @param validationType
      */
-    static getValidation(validationType: SheetCellValidationType) {
+    static getValidation(
+        validationType: SheetCellValidationType
+    ): (value: any, callback: (boolean) => void, sheetColumn: any) => void {
         switch (validationType) {
             case SheetCellValidationType.DROPDOWN:
                 // 'handsontable' built-in validator for Dropdowns
@@ -101,6 +103,30 @@ export class SheetCellValidator {
                     }
 
                     callback(false);
+                };
+
+            case SheetCellValidationType.ASYNC_VALIDATION:
+                // custom validator for contact visual id
+                return (value, callback, sheetColumn) => {
+                    // execute async validators in series
+                    let index: number = 0;
+                    const next = (isValid: boolean) => {
+                        if (
+                            !isValid ||
+                            index >= sheetColumn.asyncValidators.length
+                        ) {
+                            return callback(isValid);
+                        }
+
+                        // call next validator
+                        sheetColumn.asyncValidators[index++](
+                            value,
+                            next
+                        );
+                    };
+
+                    // call next validator
+                    next(true);
                 };
 
             case SheetCellValidationType.NUMERIC:

@@ -103,6 +103,11 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
             this.previousSubscriber = null;
         }
 
+        // debounce caller
+        if (this.refreshDataCaller) {
+            this.refreshDataCaller.unsubscribe();
+            this.refreshDataCaller = null;
+        }
     }
 
     /**

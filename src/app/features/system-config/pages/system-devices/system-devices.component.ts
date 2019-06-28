@@ -13,7 +13,7 @@ import { DeviceDataService } from '../../../../core/services/data/device.data.se
 import { DeviceModel } from '../../../../core/models/device.model';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 @Component({
@@ -186,8 +186,14 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
     /**
      * Refresh list
      */
-    refreshList() {
-        this.devicesList$ = this.deviceDataService.getDevices();
+    refreshList(finishCallback: () => void) {
+        this.devicesList$ = this.deviceDataService
+            .getDevices()
+            .pipe(
+                tap(() => {
+                    finishCallback();
+                })
+            );
     }
 
     /**

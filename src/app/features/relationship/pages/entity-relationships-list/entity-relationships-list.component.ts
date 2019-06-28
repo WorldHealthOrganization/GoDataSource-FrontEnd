@@ -24,6 +24,8 @@ import { RelationshipsListComponent } from '../../helper-classes/relationships-l
 import { throwError } from 'rxjs';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -52,6 +54,10 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     ReferenceDataCategory = ReferenceDataCategory;
     EntityType = EntityType;
     UserSettings = UserSettings;
+
+    checkedEntityModels: {
+        [idRelationship: string]: EntityModel
+    } = {};
 
     recordActions: HoverRowAction[] = [
         // View Relationship
@@ -127,7 +133,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             .subscribe((outbreak: OutbreakModel) => {
                 if (outbreak) {
                     // update the selected outbreak
-                    this.clusterOptions$ = this.clusterDataService.getClusterListAsLabelValue(outbreak.id);
+                    this.clusterOptions$ = this.clusterDataService.getClusterListAsLabelValue(outbreak.id).pipe(share());
                 }
             });
 
@@ -172,6 +178,22 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     onPersonLoaded() {
         // (re)initialize breadcrumbs
         this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Check if the user has write access to contacts
+     * @returns {boolean}
+     */
+    hasContactWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
+    }
+
+    /**
+     * Check if the user has write access to cases
+     * @returns {boolean}
+     */
+    hasCaseWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
     }
 
     private initializeBreadcrumbs() {
@@ -255,13 +277,16 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     /**
      * Re(load) the Relationships list, based on the applied filter, sort criterias
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (
             this.relationshipType &&
             this.entityType &&
             this.entityId &&
             this.selectedOutbreak
         ) {
+            // reset checked items
+            this.checkedEntityModels = {};
+
             if (this.relationshipType === RelationshipType.EXPOSURE) {
                 // retrieve the list of exposures
                 this.relationshipsList$ = this.relationshipDataService.getEntityExposures(
@@ -270,7 +295,12 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                     this.entityId,
                     this.queryBuilder
                 )
-                    .pipe(tap(this.checkEmptyList.bind(this)));
+                    .pipe(
+                        tap(this.checkEmptyList.bind(this)),
+                        tap(() => {
+                            finishCallback();
+                        })
+                    );
             } else {
                 // retrieve the list of contacts
                 this.relationshipsList$ = this.relationshipDataService.getEntityContacts(
@@ -279,8 +309,15 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                     this.entityId,
                     this.queryBuilder
                 )
-                    .pipe(tap(this.checkEmptyList.bind(this)));
+                    .pipe(
+                        tap(this.checkEmptyList.bind(this)),
+                        tap(() => {
+                            finishCallback();
+                        })
+                    );
             }
+        } else {
+            finishCallback();
         }
     }
 
@@ -297,6 +334,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
 
             if (this.relationshipType === RelationshipType.EXPOSURE) {
                 // count the exposures
@@ -360,14 +398,78 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     }
 
     /**
+     * Bulk delete selected relationships
+     */
+    deleteSelectedRelationships() {
+        // get list of selected relationships
+        const selectedRelationships: boolean | string[] = this.validateCheckedRecords();
+        if (!selectedRelationships) {
+            return;
+        }
+        const qb = new RequestQueryBuilder();
+
+        qb.filter.where({
+            'id': {
+                'inq': selectedRelationships
+            }
+        });
+
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIPS')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.relationshipDataService
+                        .deleteBulkRelationships(this.selectedOutbreak.id, qb)
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS_SUCCESS_MESSAGE');
+
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+
+    /**
+     * Send further selected relationships
+     * @param {EntityModel} model
+     * @param {boolean} checked
+     */
+    checkedRecordRelationship(
+        model: EntityModel,
+        checked: boolean
+    ) {
+        // keep model for further use
+        if (checked) {
+            this.checkedEntityModels[model.relationship.id] = model;
+        } else {
+            delete this.checkedEntityModels[model.relationship.id];
+        }
+
+        // send data further
+        this.checkedRecord(model.relationship.id, checked);
+    }
+
+    /**
      * Share selected relationships with other people
      */
     shareSelectedRelationships() {
-        // get list of selected ids
-        const selectedRecords: false | string[] = this.validateCheckedRecords();
-        if (!selectedRecords) {
+        // get list of selected relationship ids
+        const selectedRelationshipRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRelationshipRecords) {
             return;
         }
+
+        // determine list of model ids
+        const selectedRecords: string[] = _.map(selectedRelationshipRecords, (idRelationship: string) => this.checkedEntityModels[idRelationship].model.id)
+            .filter((record, index, self) => {
+                // keep only unique dates
+                return self.indexOf(record) === index;
+            });
 
         // redirect to next step
         this.router.navigate(

@@ -199,6 +199,10 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
         // default table columns
         this.tableColumns = [
             new VisibleColumnModel({
+                field: 'case.visualId',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_PERSON_ID'
+            }),
+            new VisibleColumnModel({
                 field: 'case.lastName',
                 label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_LAST_NAME'
             }),
@@ -317,11 +321,18 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the Lab Results list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
             // retrieve the list of lab results
             this.labResultsList$ = this.labResultDataService.getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder)
-                .pipe(tap(this.checkEmptyList.bind(this)));
+                .pipe(
+                    tap(this.checkEmptyList.bind(this)),
+                    tap(() => {
+                        finishCallback();
+                    })
+                );
+        } else {
+            finishCallback();
         }
     }
 
@@ -333,6 +344,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
             this.labResultsListCount$ = this.labResultDataService.getOutbreakLabResultsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }

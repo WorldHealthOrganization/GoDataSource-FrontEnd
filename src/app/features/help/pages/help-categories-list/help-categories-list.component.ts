@@ -147,10 +147,15 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
     /**
      * Re(load) the categories list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         // retrieve the list of Categories
         this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList(this.queryBuilder)
-            .pipe(tap(this.checkEmptyList.bind(this)));
+            .pipe(
+                tap(this.checkEmptyList.bind(this)),
+                tap(() => {
+                    finishCallback();
+                })
+            );
     }
 
     /**

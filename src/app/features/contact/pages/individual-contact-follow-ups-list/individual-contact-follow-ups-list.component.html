@@ -46,18 +46,16 @@
 
 <!-- Side columns -->
 <app-side-columns
-    [tableColumnsUserSettingsKey]="UserSettings.CONTACT_DAILY_FOLLOW_UP_FIELDS"
+    [tableColumnsUserSettingsKey]="UserSettings.CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS"
     [tableColumns]="tableColumns"
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
 
 <div fxLayout fxLayoutAlign="space-between end">
-
     <!--Total number of records from the list-->
     <app-total-number-of-records
         [value]="(followUpsListCount$ | async)?.count">
     </app-total-number-of-records>
-
 </div>
 
 <!-- Side filters -->
@@ -68,27 +66,56 @@
 </app-side-filters>
 
 <mat-card class="page-section page-content">
-    <!-- Reset Filters -->
-    <div class="reset-filters">
-        <button
-            type="button"
-            mat-raised-button
-            color="accent"
-            (click)="resetFiltersToSideFilters()">
-            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
-        </button>
-        <button
-            type="button"
-            mat-raised-button
-            color="accent"
-            (click)="needsRefreshList(true)">
-            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
-        </button>
+    <div
+        fxLayout="row" fxLayoutAlign="start center">
+        <!-- Contact information -->
+        <div
+            fxFlex fxLayout="column">
+            <div
+                fxFlex fxLayout="row" fxLayoutGap="20px">
+                <div
+                    class="contact-details">
+                    {{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}
+                </div>
+                <div>
+                    {{ contactData?.dateOfLastContact | dateDefault}}
+                </div>
+            </div>
+            <div
+                fxFlex fxLayoutAlign="row" fxLayoutGap="20px">
+                <div
+                    class="contact-details">
+                    {{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP' | translate }}
+                </div>
+                <div>
+                    {{ contactData?.followUp?.endDate | dateDefault }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Reset Filters -->
+        <div class="reset-filters">
+            <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="resetFiltersToSideFilters()">
+                {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+            </button>
+            <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="needsRefreshList(true)">
+                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+            </button>
+        </div>
     </div>
 
     <!-- Hover question effects / actions -->
     <app-hover-row-actions
         #hoverRow
+        [active]="!refreshingList"
         leftSideClass="hover-row-actions-mat-table-left"
     ></app-hover-row-actions>
 
@@ -159,31 +186,11 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Date of Last Contact -->
-        <ng-container matColumnDef="contact.dateOfLastContact">
-            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}</div>
-                    <div class="column-filter">
-                        <app-form-daterange
-                            name="dateOfLastContactFilter"
-                            ngModel
-                            (changed)="filterByRelation('contact').byDateRange('dateOfLastContact', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-daterange>
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell class="has-date-range-filter" *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.contact?.dateOfLastContact | dateDefault }}
-            </mat-cell>
-        </ng-container>
-
         <!-- Follow-up date -->
         <ng-container matColumnDef="date">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate }}</div>
                     <div class="column-filter">
                         <app-form-daterange
                             name="dateFilter"
@@ -199,28 +206,11 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Date of the End of Follow-up -->
-        <ng-container matColumnDef="dateOfFollowUpEnd">
+        <!-- Day of Follow-up -->
+        <ng-container matColumnDef="index">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP' | translate }}</div>
-                    <div class="column-filter">
-                        <div class="column-filter">
-                            <!-- placeholder -->
-                        </div>
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.contact?.followUp.endDate | dateDefault }}
-            </mat-cell>
-        </ng-container>
-
-        <!--Day of Follow-up -->
-        <ng-container matColumnDef="dayOfFollowUp">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP' | translate }}</div>
                     <div class="column-filter">
                         <div class="column-filter">
                             <!-- placeholder -->

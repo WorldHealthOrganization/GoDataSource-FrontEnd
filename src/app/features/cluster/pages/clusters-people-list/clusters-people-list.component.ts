@@ -151,10 +151,17 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     /**
      * Re(load) the Cluster people list, based on the applied filter, sort criterias
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
             this.clusterPeopleList$ = this.clusterDataService.getClusterPeople(this.selectedOutbreak.id, this.cluster.id, this.queryBuilder)
-                .pipe(tap(this.checkEmptyList.bind(this)));
+                .pipe(
+                    tap(this.checkEmptyList.bind(this)),
+                    tap(() => {
+                        finishCallback();
+                    })
+                );
+        } else {
+            finishCallback();
         }
     }
 
@@ -165,6 +172,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         // remove paginator from query builder
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
         this.clusterPeopleListCount$ = this.clusterDataService.getClusterPeopleCount(this.selectedOutbreak.id, this.cluster.id, countQueryBuilder).pipe(share());
     }
 

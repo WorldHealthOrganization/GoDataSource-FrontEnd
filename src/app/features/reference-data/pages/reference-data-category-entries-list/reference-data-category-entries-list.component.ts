@@ -96,7 +96,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
             .subscribe((params: { categoryId }) => {
                 this.categoryId = params.categoryId;
 
-                this.refreshList();
+                this.needsRefreshList(true);
 
                 // retrieve Reference Data Category info
                 this.referenceDataDataService
@@ -110,7 +110,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
             });
     }
 
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (this.categoryId) {
             this.categoryEntries$ = this.referenceDataDataService
                 .getReferenceDataByCategory(this.categoryId)
@@ -118,8 +118,13 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                     map((category: ReferenceDataCategoryModel) => {
                         return category.entries;
                     }),
-                    tap(this.checkEmptyList.bind(this))
+                    tap(this.checkEmptyList.bind(this)),
+                    tap(() => {
+                        finishCallback();
+                    })
                 );
+        } else {
+            finishCallback();
         }
     }
 
@@ -144,7 +149,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                             this.snackbarService.showSuccess('LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

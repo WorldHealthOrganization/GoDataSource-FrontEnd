@@ -197,9 +197,14 @@ export class BackupsComponent extends ListComponent implements OnInit {
     /**
      * Refresh list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         this.backupsList$ = this.systemBackupDataService.getBackupList(this.queryBuilder)
-            .pipe(tap(this.checkEmptyList.bind(this)));
+            .pipe(
+                tap(this.checkEmptyList.bind(this)),
+                tap(() => {
+                    finishCallback();
+                })
+            );
     }
 
     /**
@@ -208,6 +213,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
     refreshListCount() {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
         this.backupsListCount$ = this.systemBackupDataService.getBackupListCount(countQueryBuilder).pipe(share());
     }
 

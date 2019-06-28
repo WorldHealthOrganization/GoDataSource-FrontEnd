@@ -63,6 +63,9 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
             this.previousSubscriber.unsubscribe();
             this.previousSubscriber = null;
         }
+
+        // parent subscribers
+        this.releaseSubscribers();
     }
 
     /**

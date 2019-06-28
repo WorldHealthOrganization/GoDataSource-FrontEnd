@@ -341,14 +341,21 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     /**
      * Re(load) the Case lab results list, based on the applied filter, sort criterias
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (
             this.selectedOutbreak &&
             this.caseId
         ) {
             // retrieve the list of lab results
             this.labResultsList$ = this.labResultDataService.getCaseLabResults(this.selectedOutbreak.id, this.caseId, this.queryBuilder)
-                .pipe(tap(this.checkEmptyList.bind(this)));
+                .pipe(
+                    tap(this.checkEmptyList.bind(this)),
+                    tap(() => {
+                        finishCallback();
+                    })
+                );
+        } else {
+            finishCallback();
         }
     }
 
@@ -363,6 +370,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
             this.labResultsListCount$ = this.labResultDataService.getCaseLabResultsCount(this.selectedOutbreak.id, this.caseId, countQueryBuilder).pipe(share());
         }
     }

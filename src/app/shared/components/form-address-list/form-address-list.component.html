@@ -27,7 +27,7 @@
                 fxLayout="column"
                 class="app-form-address-list-buttons">
                 <div
-                    *ngIf="sourceAddress"
+                    *ngIf="sourceAddress && !!sourceAddress.typeId"
                     fxFlex fxLayoutAlign="space-between center">
                     <button
                             type="button"

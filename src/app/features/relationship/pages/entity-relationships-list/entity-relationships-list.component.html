@@ -58,6 +58,7 @@
     <!-- Hover question effects / actions -->
     <app-hover-row-actions
         #hoverRow
+        [active]="!refreshingList"
         leftSideClass="hover-row-actions-mat-table-left"
     ></app-hover-row-actions>
 
@@ -94,14 +95,23 @@
                                 {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
                             </button>
 
-                            <mat-divider></mat-divider>
+                            <ng-container *ngIf="(hasCaseWriteAccess() || hasContactWriteAccess()) && checkedRecords.length > 0">
+                                <mat-divider></mat-divider>
 
-                            <button
-                                mat-menu-item
-                                [disabled]="checkedRecords.length === 0"
-                                (click)="shareSelectedRelationships()">
-                                {{ shareSelectedRelationshipsButtonLabel | translate }}
-                            </button>
+                                <button
+                                    mat-menu-item
+                                    (click)="shareSelectedRelationships()">
+                                    {{ shareSelectedRelationshipsButtonLabel | translate }}
+                                </button>
+
+                                <mat-divider></mat-divider>
+
+                                <button
+                                    mat-menu-item
+                                    (click)="deleteSelectedRelationships()">
+                                    {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS' | translate }}
+                                </button>
+                            </ng-container>
                         </mat-menu>
                     </div>
                     <div class="column-filter">
@@ -112,11 +122,11 @@
             <mat-cell *matCellDef="let item;" fxFlex="60px">
                 <app-form-checkbox
                     #listCheckedIndividual
-                    [name]="'listCheckedIndividual[' + item.model.id + ']'"
+                    [name]="'listCheckedIndividual[' + item.relationship.id + ']'"
                     class="table-checkbox"
                     ngModel
-                    (optionChanged)="checkedRecord(item.model.id, $event)"
-                    (afterInitialize)="checkedRecord(item.model.id, false)">
+                    (optionChanged)="checkedRecordRelationship(item, $event)"
+                    (afterInitialize)="checkedRecordRelationship(item, false)">
                 </app-form-checkbox>
             </mat-cell>
         </ng-container>

@@ -42,6 +42,13 @@
                 <form class="form-section" (submit)="addContacts(sheetTable)">
                     <div class="form-content">
                         <mat-card class="page-section" fxLayout="column">
+
+                            <div fxLayout="column" fxLayoutGap="5px" class="info-container">
+                                <div>
+                                    {{ 'LNG_PAGE_BULK_ADD_CONTACTS_VISUAL_ID_INFO_LABEL' | translate: contactVisualIdModel }}
+                                </div>
+                            </div>
+
                             <ng-container
                                 *ngIf="errorMessages && errorMessages.length > 0">
                                 <div

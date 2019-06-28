@@ -85,7 +85,7 @@ export class ManageIconsListComponent extends ListComponent implements OnInit {
             });
 
         // retrieve icons
-        this.refreshList();
+        this.needsRefreshList(true);
     }
 
     /**
@@ -140,10 +140,15 @@ export class ManageIconsListComponent extends ListComponent implements OnInit {
     /**
      * Retrieve Icons
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         this.iconsList$ = this.iconDataService
             .getIconsList(this.queryBuilder)
-            .pipe(tap(this.checkEmptyList.bind(this)));
+            .pipe(
+                tap(this.checkEmptyList.bind(this)),
+                tap(() => {
+                    finishCallback();
+                })
+            );
     }
 
     /**

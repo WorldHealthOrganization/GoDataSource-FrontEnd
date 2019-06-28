@@ -87,7 +87,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
     /**
      * Re(load) the list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
             // retrieve the list
             this.duplicatesList = null;
@@ -98,7 +98,12 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
                 }))
                 .subscribe((duplicatesList) => {
                     this.duplicatesList = duplicatesList;
+
+                    // finished
+                    finishCallback();
                 });
+        } else {
+            finishCallback();
         }
     }
 
@@ -110,6 +115,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
             this.duplicatesListCount$ = this.outbreakDataService.getPeoplePossibleDuplicatesCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }

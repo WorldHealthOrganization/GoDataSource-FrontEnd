@@ -79,9 +79,15 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
     /**
      * Re(load) the Clusters list, based on the applied filter, sort criterias
      */
-    refreshList() {
-        this.savedImportMappingsList$ = this.savedImportMappingService.getImportMappingsList(this.queryBuilder)
-            .pipe(tap(this.checkEmptyList.bind(this)));
+    refreshList(finishCallback: () => void) {
+        this.savedImportMappingsList$ = this.savedImportMappingService
+            .getImportMappingsList(this.queryBuilder)
+            .pipe(
+                tap(this.checkEmptyList.bind(this)),
+                tap(() => {
+                    finishCallback();
+                })
+            );
     }
 
     /**
@@ -90,6 +96,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
     refreshListCount() {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
         this.savedImportMappingsListCount$ = this.savedImportMappingService.getImportMappingsListCount(countQueryBuilder).pipe(share());
     }
 

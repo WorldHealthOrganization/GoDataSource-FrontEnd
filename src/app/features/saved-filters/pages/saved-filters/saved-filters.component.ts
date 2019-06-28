@@ -81,9 +81,14 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the Saved filters list, based on the applied filter, sort criterias
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         this.savedFiltersList$ = this.savedFiltersService.getSavedFiltersList(this.queryBuilder)
-            .pipe(tap(this.checkEmptyList.bind(this)));
+            .pipe(
+                tap(this.checkEmptyList.bind(this)),
+                tap(() => {
+                    finishCallback();
+                })
+            );
     }
 
     /**
@@ -92,6 +97,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
     refreshListCount() {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
         this.savedFiltersListCount$ = this.savedFiltersService.getSavedFiltersListCount(countQueryBuilder).pipe(share());
     }
 

@@ -307,10 +307,16 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the Outbreaks list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         // retrieve the list of Outbreaks
-        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList(this.queryBuilder)
-            .pipe(tap(this.checkEmptyList.bind(this)));
+        this.outbreaksList$ = this.outbreakDataService
+            .getOutbreaksList(this.queryBuilder)
+            .pipe(
+                tap(this.checkEmptyList.bind(this)),
+                tap(() => {
+                    finishCallback();
+                })
+            );
     }
 
     /**
@@ -320,6 +326,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         // remove paginator from query builder
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
         this.outbreaksListCount$ = this.outbreakDataService.getOutbreaksCount(countQueryBuilder).pipe(share());
     }
 

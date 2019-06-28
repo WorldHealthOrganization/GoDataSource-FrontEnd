@@ -18,9 +18,21 @@
                     {{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TAB_DETAILS_TITLE'| translate}}
                 </ng-template>
 
-                <app-selected-contacts-list
-                    [contacts]="selectedContacts"
-                ></app-selected-contacts-list>
+                <mat-card class="page-section">
+                    <div fxLayout="column" fxLayoutGap="5px" class="info-container">
+                        <div>
+                            {{ 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_INFO_LABEL' | translate }}
+                        </div>
+                    </div>
+
+                    <app-selected-contacts-list
+                        [contacts]="selectedContacts"
+                    ></app-selected-contacts-list>
+
+                    <app-selected-follow-up-dates
+                        [followUpDates]="followUpDates">
+                    </app-selected-follow-up-dates>
+                </mat-card>
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
@@ -78,9 +90,21 @@
                     {{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TAB_QUESTIONNAIRE_TITLE'| translate}}
                 </ng-template>
 
-                <app-selected-contacts-list
-                    [contacts]="selectedContacts"
-                ></app-selected-contacts-list>
+                <mat-card class="page-section">
+                    <div fxLayout="column" fxLayoutGap="5px" class="info-container">
+                        <div>
+                            {{ 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_INFO_LABEL' | translate }}
+                        </div>
+                    </div>
+
+                    <app-selected-contacts-list
+                        [contacts]="selectedContacts"
+                    ></app-selected-contacts-list>
+
+                    <app-selected-follow-up-dates
+                        [followUpDates]="followUpDates">
+                    </app-selected-follow-up-dates>
+                </mat-card>
 
                 <!-- Questionnaire section -->
                 <app-form-fill-questionnaire
@@ -107,9 +131,21 @@
                 {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
             </ng-template>
 
-            <app-selected-contacts-list
-                [contacts]="selectedContacts"
-            ></app-selected-contacts-list>
+            <mat-card class="page-section">
+                <div fxLayout="column" fxLayoutGap="5px" class="info-container">
+                    <div>
+                        {{ 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_INFO_LABEL' | translate }}
+                    </div>
+                </div>
+
+                <app-selected-contacts-list
+                    [contacts]="selectedContacts"
+                ></app-selected-contacts-list>
+
+                <app-selected-follow-up-dates
+                    [followUpDates]="followUpDates">
+                </app-selected-follow-up-dates>
+            </mat-card>
 
             <mat-card
                 class="page-section"

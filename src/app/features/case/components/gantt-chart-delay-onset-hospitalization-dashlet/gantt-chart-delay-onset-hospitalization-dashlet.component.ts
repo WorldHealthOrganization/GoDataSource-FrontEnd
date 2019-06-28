@@ -128,6 +128,12 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
             this.refdataSubscriber.unsubscribe();
             this.refdataSubscriber = null;
         }
+
+        // debounce caller
+        if (this.refreshDataCaller) {
+            this.refreshDataCaller.unsubscribe();
+            this.refreshDataCaller = null;
+        }
     }
 
     /**

@@ -88,6 +88,12 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
             this.previousSubscriber.unsubscribe();
             this.previousSubscriber = null;
         }
+
+        // debounce caller
+        if (this.refreshDataCaller) {
+            this.refreshDataCaller.unsubscribe();
+            this.refreshDataCaller = null;
+        }
     }
 
     /**

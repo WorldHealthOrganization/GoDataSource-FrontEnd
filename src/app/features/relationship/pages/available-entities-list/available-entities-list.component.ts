@@ -164,7 +164,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     /**
      * Re(load) the available Entities list, based on the applied filter, sort criterias
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (
             this.entityType &&
             this.entityId &&
@@ -178,7 +178,14 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
                     this.entityId,
                     this.queryBuilder
                 )
-                .pipe(tap(this.checkEmptyList.bind(this)));
+                .pipe(
+                    tap(this.checkEmptyList.bind(this)),
+                    tap(() => {
+                        finishCallback();
+                    })
+                );
+        } else {
+            finishCallback();
         }
     }
 
@@ -194,6 +201,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
             this.entitiesListCount$ = this.relationshipDataService
                 .getEntityAvailablePeopleCount(
                     this.selectedOutbreak.id,

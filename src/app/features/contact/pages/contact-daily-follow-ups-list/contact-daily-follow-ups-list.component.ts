@@ -365,11 +365,11 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
             }),
             new VisibleColumnModel({
-                field: 'dateOfFollowUpEnd',
+                field: 'contact.followUp.endDate',
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP'
             }),
             new VisibleColumnModel({
-                field: 'dayOfFollowUp',
+                field: 'index',
                 label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP'
             }),
             new VisibleColumnModel({
@@ -743,7 +743,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     /**
      * Refresh list
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
             // refresh badges
             this.getFollowUpsGroupedByTeams();
@@ -763,8 +763,13 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                             followUps
                         );
                     }),
-                    tap(this.checkEmptyList.bind(this))
+                    tap(this.checkEmptyList.bind(this)),
+                    tap(() => {
+                        finishCallback();
+                    })
                 );
+        } else {
+            finishCallback();
         }
     }
 
@@ -785,6 +790,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(qb);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
             this.followUpsListCount$ = this.followUpsDataService
                 .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
                 .pipe(
@@ -864,14 +870,13 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         this.genericDataService
             .getRangeFollowUpGroupByOptions(true)
             .subscribe((options) => {
+                this.printFollowUpsDialogExtraAPIData = {
+                    date: {
+                        startDate: moment(value).startOf('day'),
+                        endDate: moment(value).endOf('day')
+                    }
+                };
                 this.printFollowUpsDialogFields = [
-                    new DialogField({
-                        name: 'date',
-                        required: true,
-                        value: value ? moment(value).toISOString() : value,
-                        fieldType: DialogFieldType.DATE,
-                        disabled: true
-                    }),
                     new DialogField({
                         name: 'groupBy',
                         placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',

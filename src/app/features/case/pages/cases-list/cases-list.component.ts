@@ -480,6 +480,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
+
+        // release resources
+        super.ngOnDestroy();
     }
 
     /**
@@ -734,7 +737,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     /**
      * Re(load) the Cases list, based on the applied filter, sort criterias
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
             // classification conditions - not really necessary since refreshListCount is always called before this one
             this.addClassificationConditions();
@@ -752,8 +755,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             cases
                         );
                     }),
-                    tap(this.checkEmptyList.bind(this))
+                    tap(this.checkEmptyList.bind(this)),
+                    tap(() => {
+                        finishCallback();
+                    })
                 );
+        } else {
+            finishCallback();
         }
     }
 
@@ -768,6 +776,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
             this.casesListCount$ = this.caseDataService.getCasesCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }

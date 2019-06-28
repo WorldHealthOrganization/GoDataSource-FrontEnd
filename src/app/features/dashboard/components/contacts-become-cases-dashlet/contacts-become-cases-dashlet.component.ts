@@ -68,6 +68,9 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
             this.previousSubscriber.unsubscribe();
             this.previousSubscriber = null;
         }
+
+        // parent subscribers
+        this.releaseSubscribers();
     }
 
     /**
@@ -84,6 +87,10 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
 
             // date
             if (this.globalFilterDate) {
+                qb.filter.byBoolean(
+                    'wasContact',
+                    true
+                );
                 qb.filter.byDateRange(
                     'dateBecomeCase', {
                         endDate: this.globalFilterDate.endOf('day').format()
@@ -95,7 +102,8 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
             if (!qb.filter.has('dateBecomeCase')) {
                 // any date
                 qb.filter.where({
-                    'dateBecomeCase': {
+                    wasContact: true,
+                    dateBecomeCase: {
                         neq: null
                     }
                 });

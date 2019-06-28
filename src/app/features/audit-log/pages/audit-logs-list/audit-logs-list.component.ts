@@ -145,7 +145,7 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the list, based on the applied filter, sort criterias
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         // include user details
         this.queryBuilder.include('user', true);
 
@@ -158,7 +158,10 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
         this.auditLogsList$ = this.auditLogDataService
             .getAuditLogsList(this.queryBuilder)
             .pipe(
-                tap(this.checkEmptyList.bind(this))
+                tap(this.checkEmptyList.bind(this)),
+                tap(() => {
+                    finishCallback();
+                })
             );
     }
 
@@ -169,6 +172,7 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
         // remove paginator from query builder
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
         this.auditLogsListCount$ = this.auditLogDataService.getAuditLogsCount(countQueryBuilder).pipe(share());
     }
 

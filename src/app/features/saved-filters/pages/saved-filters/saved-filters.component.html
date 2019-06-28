@@ -31,6 +31,7 @@
     <!-- Hover question effects / actions -->
     <app-hover-row-actions
         #hoverRow
+        [active]="!refreshingList"
     ></app-hover-row-actions>
 
     <mat-table #table [dataSource]="savedFiltersList$ | async" matSort (matSortChange)="sortBy($event)">

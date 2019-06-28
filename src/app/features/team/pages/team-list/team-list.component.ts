@@ -118,10 +118,15 @@ export class TeamListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the list of Teams
      */
-    refreshList() {
+    refreshList(finishCallback: () => void) {
         // retrieve the list of Teams
         this.teamsList$ = this.teamDataService.getTeamsList(this.queryBuilder)
-            .pipe(tap(this.checkEmptyList.bind(this)));
+            .pipe(
+                tap(this.checkEmptyList.bind(this)),
+                tap(() => {
+                    finishCallback();
+                })
+            );
     }
 
     /**
@@ -131,7 +136,7 @@ export class TeamListComponent extends ListComponent implements OnInit {
         // remove paginator from query builder
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
-
+        countQueryBuilder.sort.clear();
         this.teamsListCount$ = this.teamDataService.getTeamsCount(countQueryBuilder).pipe(share());
     }
 
