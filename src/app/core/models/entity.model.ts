@@ -8,7 +8,6 @@ import { AddressModel } from './address.model';
 import { IAnswerData, QuestionModel } from './question.model';
 import { Constants } from './constants';
 import * as moment from 'moment';
-import { RelationshipModel } from './relationship.model';
 
 /**
  * Model representing a Case, a Contact or an Event
@@ -16,15 +15,11 @@ import { RelationshipModel } from './relationship.model';
 export class EntityModel {
     type: EntityType;
     model: CaseModel | ContactModel | EventModel;
-    relationship: RelationshipModel;
+    relationship: any;
 
     constructor(data) {
         this.type = _.get(data, 'type');
-
         this.relationship = _.get(data, 'relationship');
-        this.relationship = this.relationship && !(this.relationship instanceof RelationshipModel) ?
-            new RelationshipModel(this.relationship) :
-            this.relationship;
 
         switch (this.type) {
             case EntityType.CASE:

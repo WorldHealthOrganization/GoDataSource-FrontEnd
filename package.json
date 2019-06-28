@@ -32,7 +32,7 @@
         "@swimlane/ngx-charts": "10.1.0",
         "angular-mgl-timeline": "0.3.2",
         "buffer": "5.2.1",
-        "c3": "0.7.1",
+        "c3": "0.6.8",
         "core-js": "2.6.5",
         "cytoscape": "3.2.18",
         "cytoscape-cola": "2.2.4",
