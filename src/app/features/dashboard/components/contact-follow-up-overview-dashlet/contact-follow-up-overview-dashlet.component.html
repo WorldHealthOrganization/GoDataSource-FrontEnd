@@ -1,7 +1,6 @@
 <!-- Chart -->
 <div
-    [fxShow]="!displayLoading && chartData?.length > 0"
-    fxLayout="column" fxFlex fxLayoutAlign="center">
+    [fxShow]="!displayLoading && chartData?.length > 0">
     <app-c3-combination-stacked-bar-chart
         chartId="c3FollowedUpReport"
         [chartData]="chartData"
