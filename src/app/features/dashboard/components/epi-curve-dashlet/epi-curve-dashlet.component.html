@@ -1,39 +1,37 @@
 <!-- Chart -->
-<ng-container
-    *ngIf="!displayLoading && chartData?.length > 0">
-    <div fxLayout="column" fxFlex fxLayoutAlign="center">
-        <app-c3-stacked-bar-chart
-            [chartData]="chartData"
-            [chartDataColumns]="chartDataColumns"
-            [chartDataCategories]="chartDataCategories"
-            [showLabels]="false"
-            [xLabel]="'LNG_PAGE_DASHBOARD_EPI_CURVE_DATE_OF_ONSET_LABEL' | translate"
-            [yLabel]="'LNG_PAGE_DASHBOARD_EPI_CURVE_NO_CASES_LABEL' | translate"
-            [colorPattern]="colorPattern">
-        </app-c3-stacked-bar-chart>
+<div
+    [fxShow]="!displayLoading && chartData?.length > 0">
+    <app-c3-stacked-bar-chart
+        [chartData]="chartData"
+        [chartDataColumns]="chartDataColumns"
+        [chartDataCategories]="chartDataCategories"
+        [showLabels]="false"
+        [xLabel]="'LNG_PAGE_DASHBOARD_EPI_CURVE_DATE_OF_ONSET_LABEL' | translate"
+        [yLabel]="'LNG_PAGE_DASHBOARD_EPI_CURVE_NO_CASES_LABEL' | translate"
+        [colorPattern]="colorPattern">
+    </app-c3-stacked-bar-chart>
 
-        <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px">
-            <button
-                mat-raised-button
-                *ngIf="viewType !== Constants.EPI_CURVE_VIEW_TYPE.MONTH.value"
-                (click)="changeView(Constants.EPI_CURVE_VIEW_TYPE.MONTH.value)">
-                {{Constants.EPI_CURVE_VIEW_TYPE.MONTH.label | translate}}
-            </button>
-            <button
-                mat-raised-button
-                *ngIf="viewType !== Constants.EPI_CURVE_VIEW_TYPE.WEEK.value"
-                (click)="changeView(Constants.EPI_CURVE_VIEW_TYPE.WEEK.value)">
-                {{Constants.EPI_CURVE_VIEW_TYPE.WEEK.label | translate}}
-            </button>
-            <button
-                mat-raised-button
-                *ngIf="viewType !== Constants.EPI_CURVE_VIEW_TYPE.DAY.value"
-                (click)="changeView(Constants.EPI_CURVE_VIEW_TYPE.DAY.value)">
-                {{Constants.EPI_CURVE_VIEW_TYPE.DAY.label | translate}}
-            </button>
-        </div>
+    <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px">
+        <button
+            mat-raised-button
+            *ngIf="viewType !== Constants.EPI_CURVE_VIEW_TYPE.MONTH.value"
+            (click)="changeView(Constants.EPI_CURVE_VIEW_TYPE.MONTH.value)">
+            {{Constants.EPI_CURVE_VIEW_TYPE.MONTH.label | translate}}
+        </button>
+        <button
+            mat-raised-button
+            *ngIf="viewType !== Constants.EPI_CURVE_VIEW_TYPE.WEEK.value"
+            (click)="changeView(Constants.EPI_CURVE_VIEW_TYPE.WEEK.value)">
+            {{Constants.EPI_CURVE_VIEW_TYPE.WEEK.label | translate}}
+        </button>
+        <button
+            mat-raised-button
+            *ngIf="viewType !== Constants.EPI_CURVE_VIEW_TYPE.DAY.value"
+            (click)="changeView(Constants.EPI_CURVE_VIEW_TYPE.DAY.value)">
+            {{Constants.EPI_CURVE_VIEW_TYPE.DAY.label | translate}}
+        </button>
     </div>
-</ng-container>
+</div>
 
 <!-- No data -->
 <ng-container
