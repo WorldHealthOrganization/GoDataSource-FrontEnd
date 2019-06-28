@@ -70,6 +70,15 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_VIEW_LAB_RESULT',
             click: (item: LabResultModel) => {
+                if (item.case.type === EntityType.CONTACT) {
+                    this.router.navigate(['/cases', item.personId, 'lab-results', item.id, 'view'], {
+                        queryParams: {
+                            fromLabResultsList: true,
+                            entityIsContact: true
+                        }
+                    });
+                    return;
+                }
                 this.router.navigate(['/cases', item.personId, 'lab-results', item.id, 'view'], {
                     queryParams: {
                         fromLabResultsList: true

@@ -24,6 +24,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import * as moment from 'moment';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 
 @Component({
     selector: 'app-modify-case-relationship',
@@ -49,6 +50,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
 
     // variable for breadcrumbs manipulation if we're coming from lab result list
     fromLabResultsList: boolean = false;
+    entityIsContact: boolean = false;
 
     sampleTypesList$: Observable<any[]>;
     testTypesList$: Observable<any[]>;
@@ -101,9 +103,10 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
             });
 
         this.route.queryParams.
-            subscribe((queryParams: {fromLabResultsList}) => {
+            subscribe((queryParams: {fromLabResultsList, entityIsContact}) => {
             if (!_.isEmpty(queryParams)) {
                 this.fromLabResultsList = JSON.parse(queryParams.fromLabResultsList);
+                this.entityIsContact = JSON.parse(queryParams.entityIsContact);
             }
         });
 
@@ -115,6 +118,40 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                     .getSelectedOutbreak()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.selectedOutbreak = selectedOutbreak;
+
+                        if (this.selectedOutbreak && this.entityIsContact) {
+                            // create the query builder
+                            const qb: RequestQueryBuilder = new RequestQueryBuilder();
+                            qb.filter
+                                .where({
+                                    id: {
+                                        'eq': this.labResultId
+                                    }
+                                }, true);
+                            // get lab results
+                            this.labResultDataService
+                                .getOutbreakLabResults(this.selectedOutbreak.id, qb)
+                                .pipe(
+                                    catchError((err) => {
+                                        this.snackbarService.showApiError(err);
+
+                                        this.disableDirtyConfirm();
+
+                                        this.router.navigate([`/cases/${params.caseId}/lab-results`]);
+
+                                        return throwError(err);
+                                    })
+                                )
+                                .subscribe((labResultData: LabResultModel) => {
+                                    // creating labResult and caseData with the first item from response because api
+                                    // is returning an array of objects. In this case there can't be more than one item in the response
+                                    this.caseData = new CaseModel(labResultData[0].case);
+                                    this.labResultData = new LabResultModel(labResultData[0]);
+                                    // update breadcrumbs
+                                    this.createBreadcrumbs();
+                                });
+                            return;
+                        }
 
                         // get case data
                         this.caseDataService
