@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import * as c3 from 'c3';
 
 @Component({
@@ -7,7 +7,7 @@ import * as c3 from 'c3';
     templateUrl: './c3-stacked-bar-chart.component.html',
     styleUrls: ['./c3-stacked-bar-chart.component.less']
 })
-export class C3StackedBarChartComponent implements OnInit, OnChanges {
+export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy {
 
     @Input() chartData;
     @Input() chartDataColumns;
@@ -25,15 +25,30 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges {
         this.render();
     }
 
+    ngOnDestroy(): void {
+        this.destroyChart();
+    }
+
     ngOnChanges(): any {
         // render c3 object
         this.render();
+    }
+
+    private destroyChart() {
+        if (this.chart) {
+            this.chart.destroy();
+            this.chart = null;
+        }
     }
 
     /**
      * generate the chart
      */
     render() {
+        // destroy before re-init
+        this.destroyChart();
+
+        // create chart
         this.chart = c3.generate({
             bindto: '#chart',
             onrendered: () => {
