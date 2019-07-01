@@ -634,6 +634,9 @@ export class ListFilterDataService {
         qb.filter.where({
             wasContact: {
                 neq: true
+            },
+            classification: {
+                neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
             }
         });
         return qb;

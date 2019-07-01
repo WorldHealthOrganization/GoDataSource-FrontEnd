@@ -109,6 +109,13 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
                 });
             }
 
+            // exclude discarded cases
+            qb.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
+
             // release previous subscriber
             if (this.previousSubscriber) {
                 this.previousSubscriber.unsubscribe();

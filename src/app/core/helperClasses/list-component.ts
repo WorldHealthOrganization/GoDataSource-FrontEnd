@@ -1097,6 +1097,13 @@ export abstract class ListComponent implements OnDestroy {
                     });
                 }
 
+                // exclude discarded cases
+                this.appliedListFilterQueryBuilder.filter.where({
+                    classification: {
+                        neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                    }
+                });
+
                 // merge query builder
                 this.mergeListFilterToMainFilter();
 
