@@ -6,7 +6,7 @@ import { ContactModel } from './contact.model';
 import { EntityType } from './entity-type';
 
 export class LabResultModel {
-    case: CaseModel | ContactModel;
+    entity: CaseModel | ContactModel;
     id: string;
     sampleIdentifier: string;
     dateSampleTaken: string;
@@ -28,10 +28,10 @@ export class LabResultModel {
     deleted: boolean;
 
     constructor(data = null) {
-        this.case = _.get(data, 'case');
-        this.case = this.case && this.case.type === EntityType.CONTACT ?
-            new ContactModel(this.case) :
-            new CaseModel(this.case);
+        this.entity = _.get(data, 'case');
+        this.entity = this.entity && this.entity.type === EntityType.CONTACT ?
+            new ContactModel(this.entity) :
+            new CaseModel(this.entity);
 
         this.id = _.get(data, 'id');
         this.sampleIdentifier = _.get(data, 'sampleIdentifier', '');

@@ -62,10 +62,10 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
      */
     get displayOnsetDateWarningMessage(): boolean {
         return this.labResultData &&
-            this.labResultData.case &&
-            (this.labResultData.case as CaseModel).dateOfOnset &&
+            this.labResultData.entity &&
+            (this.labResultData.entity as CaseModel).dateOfOnset &&
             this.labResultData.dateSampleTaken &&
-            moment((this.labResultData.case as CaseModel).dateOfOnset).startOf('day').isAfter(moment(this.labResultData.dateSampleTaken).startOf('day'));
+            moment((this.labResultData.entity as CaseModel).dateOfOnset).startOf('day').isAfter(moment(this.labResultData.dateSampleTaken).startOf('day'));
     }
 
     constructor(
@@ -176,9 +176,9 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
             )
             .subscribe((modifiedLabResult: LabResultModel) => {
                 // update model
-                const parentData = this.labResultData.case;
+                const parentData = this.labResultData.entity;
                 this.labResultData = modifiedLabResult;
-                this.labResultData.case = parentData;
+                this.labResultData.entity = parentData;
 
                 // mark form as pristine
                 form.form.markAsPristine();
@@ -217,13 +217,13 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
         // add case model only if necessary
         if (
             !this.fromLabResultsList &&
-            this.labResultData.case &&
-            this.labResultData.case.id
+            this.labResultData.entity &&
+            this.labResultData.entity.id
         ) {
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
-                    this.labResultData.case.name,
-                    `/cases/${this.labResultData.case.id}/view`
+                    this.labResultData.entity.name,
+                    `/cases/${this.labResultData.entity.id}/view`
                 )
             );
         }
@@ -232,9 +232,9 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
         this.breadcrumbs.push(
             new BreadcrumbItemModel(
                 'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE',
-                this.fromLabResultsList || !this.labResultData.case || this.labResultData.case.id ?
+                this.fromLabResultsList || !this.labResultData.entity || this.labResultData.entity.id ?
                 '/cases/lab-results' :
-                `/cases/${this.labResultData.case.id}/lab-results`
+                `/cases/${this.labResultData.entity.id}/lab-results`
             ),
             new BreadcrumbItemModel(
                 this.viewOnly ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE',

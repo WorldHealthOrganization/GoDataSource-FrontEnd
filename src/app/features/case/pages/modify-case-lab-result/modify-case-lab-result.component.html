@@ -17,17 +17,17 @@
                             class="lab-result-case-title"
                             fxLayout="row" fxLayoutGap="20px">
                             <ng-container
-                                *ngIf="labResultData?.case?.id">
-                                <div>{{ (labResultData.case.type === EntityType.CASE ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE' : 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT') | translate }}</div>
+                                *ngIf="labResultData?.entity?.id">
+                                <div>{{ (labResultData.entity.type === EntityType.CASE ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE' : 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT') | translate }}</div>
 
                                 <a
-                                    [routerLink]="[labResultData.case.type === EntityType.CASE ? '/cases' : '/contacts', labResultData.personId, 'view']">
-                                    {{ labResultData.case.name}}
+                                    [routerLink]="[labResultData.entity.type === EntityType.CASE ? '/cases' : '/contacts', labResultData.personId, 'view']">
+                                    {{ labResultData.entity.name}}
                                 </a>
 
                                 <div
-                                    *ngIf="labResultData.case.type === EntityType.CONTACT">
-                                    {{ 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT_WITH_INFO' | translate: {caseName: labResultData.case.name} }}
+                                    *ngIf="labResultData.entity.type === EntityType.CONTACT">
+                                    {{ 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT_WITH_INFO' | translate: {caseName: labResultData.entity.name} }}
                                 </div>
                             </ng-container>
                         </div>
