@@ -351,7 +351,7 @@
             *ngIf="viewOnly && hasCaseWriteAccess()"
             type="button"
             mat-raised-button color="accent"
-            [routerLink]="['/cases', caseData.id, 'modify']">
+            [routerLink]="['/cases', caseId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
 
@@ -372,32 +372,32 @@
                 type="button"
                 mat-raised-button color="accent"
                 routerLink="/contacts/create"
-                [queryParams]="{ entityType: EntityType.CASE, entityId: caseData.id }">
+                [queryParams]="{ entityType: EntityType.CASE, entityId: caseId }">
                 {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
             </button>
 
             <div class="page-tabs-navbar-placeholder"></div>
         </ng-container>
 
-        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CASE, caseData.id, 'contacts']">
+        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CASE, caseId, 'contacts']">
             {{ 'LNG_COMMON_BUTTON_EXPOSURES_FROM' | translate }}
         </button>
-        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CASE, caseData.id, 'exposures']">
+        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CASE, caseId, 'exposures']">
             {{ 'LNG_COMMON_BUTTON_EXPOSURES_TO' | translate }}
         </button>
 
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button *ngIf="hasCaseWriteAccess()" mat-raised-button type="button" [routerLink]="['/cases', caseData.id, 'lab-results']">
+        <button *ngIf="hasCaseWriteAccess()" mat-raised-button type="button" [routerLink]="['/cases', caseId, 'lab-results']">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS' | translate }}
         </button>
-        <button mat-raised-button type="button" [routerLink]="['/cases', caseData.id, 'movement']">
+        <button mat-raised-button type="button" [routerLink]="['/cases', caseId, 'movement']">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT' | translate }}
         </button>
-        <button mat-raised-button type="button" [routerLink]="['/cases', caseData.id, 'chronology']">
+        <button mat-raised-button type="button" [routerLink]="['/cases', caseId, 'chronology']">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY' | translate }}
         </button>
-        <button mat-raised-button type="button" [routerLink]="['/contacts/case-related-follow-ups', caseData.id]">
+        <button mat-raised-button type="button" [routerLink]="['/contacts/case-related-follow-ups', caseId]">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS' | translate }}
         </button>
     </div>

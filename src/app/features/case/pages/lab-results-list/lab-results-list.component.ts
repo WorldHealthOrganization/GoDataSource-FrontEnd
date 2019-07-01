@@ -70,15 +70,6 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_VIEW_LAB_RESULT',
             click: (item: LabResultModel) => {
-                if (item.case.type === EntityType.CONTACT) {
-                    this.router.navigate(['/cases', item.personId, 'lab-results', item.id, 'view'], {
-                        queryParams: {
-                            fromLabResultsList: true,
-                            entityIsContact: true
-                        }
-                    });
-                    return;
-                }
                 this.router.navigate(['/cases', item.personId, 'lab-results', item.id, 'view'], {
                     queryParams: {
                         fromLabResultsList: true
@@ -367,7 +358,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete lab result
-                    this.labResultDataService.deleteLabResult(this.selectedOutbreak.id, labResult.case.id, labResult.id)
+                    this.labResultDataService.deleteLabResult(this.selectedOutbreak.id, labResult.id)
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
