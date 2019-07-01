@@ -1,14 +1,12 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
@@ -18,12 +16,14 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import * as moment from 'moment';
 import { Moment } from 'moment';
 import * as _ from 'lodash';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
-import * as moment from 'moment';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { EntityType } from 'app/core/models/entity-type';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
     selector: 'app-modify-case-relationship',
@@ -40,12 +40,8 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
     // selected outbreak
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
-    // case data
-    caseData: CaseModel = new CaseModel();
-
     // lab results
     labResultData: LabResultModel = new LabResultModel();
-    labResultId: string;
 
     // variable for breadcrumbs manipulation if we're coming from lab result list
     fromLabResultsList: boolean = false;
@@ -58,21 +54,23 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
 
     serverToday: Moment = null;
 
+    // constants
+    EntityType = EntityType;
+
     /**
      * Check if we need to display warning message that case date of onset is after sample taken date
      */
     get displayOnsetDateWarningMessage(): boolean {
-        return this.caseData &&
-            this.labResultData &&
-            this.caseData.dateOfOnset &&
+        return this.labResultData &&
+            this.labResultData.entity &&
+            (this.labResultData.entity as CaseModel).dateOfOnset &&
             this.labResultData.dateSampleTaken &&
-            moment(this.caseData.dateOfOnset).startOf('day').isAfter(moment(this.labResultData.dateSampleTaken).startOf('day'));
+            moment((this.labResultData.entity as CaseModel).dateOfOnset).startOf('day').isAfter(moment(this.labResultData.dateSampleTaken).startOf('day'));
     }
 
     constructor(
         protected route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
-        private caseDataService: CaseDataService,
         private snackbarService: SnackbarService,
         private router: Router,
         private formHelper: FormHelperService,
@@ -109,51 +107,47 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
 
         this.route.params
             .subscribe((params: {caseId, labResultId}) => {
-                this.labResultId = params.labResultId;
                 // get selected outbreak
                 this.outbreakDataService
                     .getSelectedOutbreak()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.selectedOutbreak = selectedOutbreak;
+                        if (this.selectedOutbreak) {
+                            // params.caseId can actually be either a case or a contact lately
+                            // construct query builder
+                            const qb: RequestQueryBuilder = new RequestQueryBuilder();
+                            qb.filter
+                                .where({
+                                    id: params.labResultId
+                                });
 
-                        // get case data
-                        this.caseDataService
-                            .getCase(this.selectedOutbreak.id, params.caseId)
-                            .pipe(
-                                catchError((err) => {
-                                    this.snackbarService.showError(err.message);
+                            // get lab results
+                            this.labResultDataService
+                                .getOutbreakLabResults(this.selectedOutbreak.id, qb)
+                                .pipe(
+                                    catchError((err) => {
+                                        this.snackbarService.showApiError(err);
+                                        this.disableDirtyConfirm();
+                                        this.router.navigate(['/cases/lab-results']);
+                                        return throwError(err);
+                                    })
+                                )
+                                .subscribe((labResults: LabResultModel[]) => {
+                                    // not found ?
+                                    if (_.isEmpty(labResults)) {
+                                        this.disableDirtyConfirm();
+                                        this.router.navigate(['/cases/lab-results']);
+                                        return;
+                                    }
 
-                                    // Case not found; navigate back to Cases list
-                                    this.disableDirtyConfirm();
-                                    this.router.navigate(['/cases']);
+                                    // creating labResult and caseData with the first item from response because api
+                                    // is returning an array of objects. In this case there can't be more than one item in the response
+                                    this.labResultData = new LabResultModel(labResults[0]);
 
-                                    return throwError(err);
-                                })
-                            )
-                            .subscribe((caseData: CaseModel) => {
-                                this.caseData = caseData;
-
-                                // get relationship data
-                                this.labResultDataService
-                                    .getLabResult(this.selectedOutbreak.id, params.caseId, params.labResultId)
-                                    .pipe(
-                                        catchError((err) => {
-                                            this.snackbarService.showError(err.message);
-
-                                            this.disableDirtyConfirm();
-                                            this.router.navigate([`/cases/${params.caseId}/lab-results`]);
-
-                                            return throwError(err);
-                                        })
-                                    )
-                                    .subscribe((labResultData) => {
-                                        this.labResultData = new LabResultModel(labResultData);
-
-                                        // update breadcrumb
-                                        this.createBreadcrumbs();
-                                    });
-
-                            });
+                                    // update breadcrumbs
+                                    this.createBreadcrumbs();
+                                });
+                        }
                     });
             });
     }
@@ -170,7 +164,6 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
         this.labResultDataService
             .modifyLabResult(
                 this.selectedOutbreak.id,
-                this.caseData.id,
                 this.labResultData.id,
                 dirtyFields
             )
@@ -183,7 +176,9 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
             )
             .subscribe((modifiedLabResult: LabResultModel) => {
                 // update model
+                const parentData = this.labResultData.entity;
                 this.labResultData = modifiedLabResult;
+                this.labResultData.entity = parentData;
 
                 // mark form as pristine
                 form.form.markAsPristine();
@@ -211,6 +206,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
      * Create breadcrumbs
      */
     createBreadcrumbs() {
+        // construct breadcrumbs
         this.breadcrumbs = [
             new BreadcrumbItemModel(
                 'LNG_PAGE_LIST_CASES_TITLE',
@@ -219,11 +215,15 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
         ];
 
         // add case model only if necessary
-        if (!this.fromLabResultsList) {
+        if (
+            !this.fromLabResultsList &&
+            this.labResultData.entity &&
+            this.labResultData.entity.id
+        ) {
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
-                    this.caseData.name,
-                    `/cases/${this.caseData.id}/view`
+                    this.labResultData.entity.name,
+                    `/cases/${this.labResultData.entity.id}/view`
                 )
             );
         }
@@ -232,11 +232,10 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
         this.breadcrumbs.push(
             new BreadcrumbItemModel(
                 'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE',
-                this.fromLabResultsList ?
-                    '/cases/lab-results' :
-                    `/cases/${this.caseData.id}/lab-results`
+                this.fromLabResultsList || !this.labResultData.entity || this.labResultData.entity.id ?
+                '/cases/lab-results' :
+                `/cases/${this.labResultData.entity.id}/lab-results`
             ),
-
             new BreadcrumbItemModel(
                 this.viewOnly ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE',
                 null,

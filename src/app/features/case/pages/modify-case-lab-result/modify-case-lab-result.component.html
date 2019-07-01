@@ -16,11 +16,20 @@
                         <div
                             class="lab-result-case-title"
                             fxLayout="row" fxLayoutGap="20px">
-                            <div>{{ 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE' | translate }}</div>
-                            <a
-                                [routerLink]="['/cases', caseData.id, 'view']">
-                                {{ caseData.name}}
-                            </a>
+                            <ng-container
+                                *ngIf="labResultData?.entity?.id">
+                                <div>{{ (labResultData.entity.type === EntityType.CASE ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE' : 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT') | translate }}</div>
+
+                                <a
+                                    [routerLink]="[labResultData.entity.type === EntityType.CASE ? '/cases' : '/contacts', labResultData.personId, 'view']">
+                                    {{ labResultData.entity.name}}
+                                </a>
+
+                                <div
+                                    *ngIf="labResultData.entity.type === EntityType.CONTACT">
+                                    {{ 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT_WITH_INFO' | translate: {caseName: labResultData.entity.name} }}
+                                </div>
+                            </ng-container>
                         </div>
 
                         <div
@@ -218,7 +227,7 @@
 
         <button *ngIf="viewOnly && hasCaseWriteAccess()"
                 mat-raised-button type="button" color="accent"
-                [routerLink]=" ['/cases', caseData.id, 'lab-results', labResultId, 'modify' ]"
+                [routerLink]=" ['/cases', labResultData.personId, 'lab-results', labResultData.id, 'modify' ]"
                 [queryParams]="{fromLabResultsList: fromLabResultsList}">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
@@ -229,7 +238,7 @@
             <button type="button"
                     mat-raised-button
                     [routerLink]="!fromLabResultsList ?
-                        ['/cases', caseData.id, 'lab-results'] :
+                        ['/cases', labResultData.personId, 'lab-results'] :
                         ['/cases/lab-results']">
                 {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
             </button>

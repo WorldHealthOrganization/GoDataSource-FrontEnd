@@ -358,7 +358,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete lab result
-                    this.labResultDataService.deleteLabResult(this.selectedOutbreak.id, labResult.case.id, labResult.id)
+                    this.labResultDataService.deleteLabResult(this.selectedOutbreak.id, labResult.id)
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);

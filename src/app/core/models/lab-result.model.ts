@@ -2,9 +2,11 @@ import * as _ from 'lodash';
 import { Constants } from './constants';
 import { CaseModel } from './case.model';
 import { IAnswerData } from './question.model';
+import { ContactModel } from './contact.model';
+import { EntityType } from './entity-type';
 
 export class LabResultModel {
-    case: CaseModel;
+    entity: CaseModel | ContactModel;
     id: string;
     sampleIdentifier: string;
     dateSampleTaken: string;
@@ -26,7 +28,11 @@ export class LabResultModel {
     deleted: boolean;
 
     constructor(data = null) {
-        this.case = new CaseModel(_.get(data, 'case'));
+        this.entity = _.get(data, 'case');
+        this.entity = this.entity && this.entity.type === EntityType.CONTACT ?
+            new ContactModel(this.entity) :
+            new CaseModel(this.entity);
+
         this.id = _.get(data, 'id');
         this.sampleIdentifier = _.get(data, 'sampleIdentifier', '');
         this.dateSampleTaken = _.get(data, 'dateSampleTaken');

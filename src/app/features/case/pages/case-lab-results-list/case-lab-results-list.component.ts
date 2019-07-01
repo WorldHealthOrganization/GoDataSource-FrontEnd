@@ -72,11 +72,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_VIEW_LAB_RESULT',
             click: (item: LabResultModel) => {
-                this.router.navigate(['/cases', item.personId, 'lab-results', item.id, 'view'], {
-                    queryParams: {
-                        fromLabResultsList: true
-                    }
-                });
+                this.router.navigate(['/cases', item.personId, 'lab-results', item.id, 'view']);
             },
             visible: (item: LabResultModel): boolean => {
                 return !item.deleted;
@@ -88,11 +84,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT',
             click: (item: LabResultModel) => {
-                this.router.navigate(['/cases', item.personId, 'lab-results', item.id, 'modify'], {
-                    queryParams: {
-                        fromLabResultsList: true
-                    }
-                });
+                this.router.navigate(['/cases', item.personId, 'lab-results', item.id, 'modify']);
             },
             visible: (item: LabResultModel): boolean => {
                 return !item.deleted &&
@@ -382,7 +374,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete lab result
                     this.labResultDataService
-                        .deleteLabResult(this.selectedOutbreak.id, this.caseId, labResult.id)
+                        .deleteLabResult(this.selectedOutbreak.id, labResult.id)
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showError(err.message);

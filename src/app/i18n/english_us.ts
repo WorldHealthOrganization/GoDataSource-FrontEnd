@@ -40,6 +40,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS_SUCCESS_MESSAGE': 'Relationships deleted',
 
         /**
+         * uiModifyCaseLabResultPage
+         */
+        'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT': 'Contact',
+        'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT_WITH_INFO': '* This person is now a contact and lab tests were performed at the time when "{{ caseName }}" was registered as a case'
+
+        /**
          * REMOVE the tokens from below
          */
         // ...
