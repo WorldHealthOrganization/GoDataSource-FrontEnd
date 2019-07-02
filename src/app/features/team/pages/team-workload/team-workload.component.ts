@@ -97,7 +97,11 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
             .getTeamsList()
             .subscribe((teams) => {
                 // map teams
-                this.teamsData = [];
+                this.teamsData = [{
+                    id: null,
+                    name: this.i18nService.instant('LNG_PAGE_TEAMS_WORKLOAD_NO_TEAM_LABEL'),
+                    dates: {}
+                }];
                 _.forEach(teams, (team: TeamModel) => {
                     this.teamsData.push({
                         id: team.id,
@@ -209,16 +213,11 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
             // map teams for team search
             const teamsMap = {};
             this.teamsData.forEach((teamData) => {
-                teamsMap[teamData.id] = teamData;
+                teamsMap[teamData.id ? teamData.id : 'N'] = teamData;
             });
 
-            // keep only teams with id
-            const teams = _.filter(metricTeamsFollowups.teams, (teamMetricData) => {
-                return teamMetricData.id && teamsMap[teamMetricData.id];
-            }) as any[];
-
             // go through teams and create list of date information
-            _.forEach(teams, (team) => {
+            _.forEach(metricTeamsFollowups.teams, (team) => {
                 // construct list of dates
                 const dates = {};
                 if (team.dates) {
@@ -231,7 +230,14 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                 }
 
                 // assign dates
-                teamsMap[team.id].dates = dates;
+                if (
+                    team.id &&
+                    teamsMap[team.id]
+                ) {
+                    teamsMap[team.id].dates = dates;
+                } else {
+                    teamsMap['N'].dates = dates;
+                }
             });
         }
 
