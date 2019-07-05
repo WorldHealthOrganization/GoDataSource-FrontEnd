@@ -183,7 +183,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
                     // set filter slider info
                     this.slideFilterData.minDate = moment(this.selectedOutbreak.startDate).startOf('day');
-                    this.slideFilterData.maxDate = moment().add(this.selectedOutbreak.periodOfFollowup, 'days').endOf('day');
+                    this.slideFilterData.maxDate = moment().add(1, 'days').endOf('day');
                     this.slideFilterData.maxRange = this.selectedOutbreak.periodOfFollowup;
 
                     // initialize pagination
@@ -191,8 +191,8 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
                     // filter
                     this.filterByDateRange(new FormDateRangeSliderData({
-                        low: moment(),
-                        high: moment().add(this.selectedOutbreak.periodOfFollowup, 'days')
+                        low: moment().add(-this.selectedOutbreak.periodOfFollowup + 1, 'days').startOf('day'),
+                        high: moment().add(1, 'days').endOf('day')
                     }), true);
                 }
 
