@@ -122,11 +122,11 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                         ) {
                             // set min & max dates
                             this.slideFilterData.minDate = moment(this.selectedOutbreak.startDate).startOf('day');
-                            this.slideFilterData.maxDate = moment().add(this.selectedOutbreak.periodOfFollowup, 'days').endOf('day');
+                            this.slideFilterData.maxDate = moment().add(1, 'days').endOf('day');
                             this.slideFilterData.maxRange = this.selectedOutbreak.periodOfFollowup;
                             this.sliderDateFilterValue = new FormDateRangeSliderData({
-                                low: moment(),
-                                high: moment().add(this.selectedOutbreak.periodOfFollowup, 'days')
+                                low: moment().add(-this.selectedOutbreak.periodOfFollowup + 1, 'days').startOf('day'),
+                                high: moment().add(1, 'days').endOf('day')
                             });
                         }
                     });
