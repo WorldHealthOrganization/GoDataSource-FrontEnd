@@ -389,7 +389,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     /**
      * Get person link
      */
-    private getPersonLink(contactExposure) {
+    getPersonLink(contactExposure) {
         return contactExposure ?
             EntityModel.getPersonLink(contactExposure) :
             null;
