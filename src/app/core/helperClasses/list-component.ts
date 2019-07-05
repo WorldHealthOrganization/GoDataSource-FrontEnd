@@ -159,7 +159,9 @@ export abstract class ListComponent implements OnDestroy {
         // refresh list
         this.refreshingList = true;
         this.refreshList(() => {
-            this.refreshingList = false;
+            setTimeout(() => {
+                this.refreshingList = false;
+            });
         });
     }));
 

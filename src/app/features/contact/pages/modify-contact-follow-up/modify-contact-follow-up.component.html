@@ -103,7 +103,7 @@
         <button
             *ngIf="viewOnly && hasFollowUpsWriteAccess() && !Constants.isDateInTheFuture(followUpData.date)"
             mat-raised-button type="button" color="accent"
-            [routerLink]="['/contacts', contactId,'follow-ups', followUpId, 'modify']"
+            [routerLink]="['/contacts', contactId, 'follow-ups', followUpId, 'modify']"
             [queryParams]="{rootPage: rootPage, rootCaseId: rootCaseId}"
         >
             {{'LNG_COMMON_BUTTON_EDIT'| translate}}
