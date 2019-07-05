@@ -63,14 +63,14 @@
 
         <button *ngIf="viewOnly && hasOutbreakWriteAccess()"
                 mat-raised-button type="button" color="accent"
-                [routerLink]="['/clusters', clusterData.id, 'modify']">
+                [routerLink]="['/clusters', clusterId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
 
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button *ngIf="hasCaseReadAccess() || hasContactReadAccess()"
-            mat-raised-button type="button" [routerLink]="['/clusters', clusterData.id, 'people']">
+            mat-raised-button type="button" [routerLink]="['/clusters', clusterId, 'people']">
             {{ 'LNG_PAGE_MODIFY_CLUSTER_ACTION_VIEW_PEOPLE' | translate }}
         </button>
 

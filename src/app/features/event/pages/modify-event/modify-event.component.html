@@ -121,10 +121,10 @@
             <div class="page-tabs-navbar-placeholder"></div>
         </ng-container>
 
-        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.EVENT, eventData.id, 'contacts']">
+        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.EVENT, eventId, 'contacts']">
             {{ 'LNG_COMMON_BUTTON_EXPOSURES_FROM' | translate }}
         </button>
-        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.EVENT, eventData.id, 'exposures']">
+        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.EVENT, eventId, 'exposures']">
             {{ 'LNG_COMMON_BUTTON_EXPOSURES_TO' | translate }}
         </button>
     </div>

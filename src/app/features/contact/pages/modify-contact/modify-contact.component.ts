@@ -385,4 +385,13 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
             this.visualId.control.markAsDirty();
         }
     }
+
+    /**
+     * Get person link
+     */
+    getPersonLink(contactExposure) {
+        return contactExposure ?
+            EntityModel.getPersonLink(contactExposure) :
+            null;
+    }
 }
