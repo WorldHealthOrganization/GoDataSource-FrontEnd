@@ -103,7 +103,9 @@
                     </div>
                 </mat-header-cell>
 
-                <mat-cell *matCellDef="let item">
+                <mat-cell
+                    *matCellDef="let item"
+                    class="cell-break-all">
                     {{ item.location }}
                 </mat-cell>
             </ng-container>
