@@ -28,6 +28,11 @@ export class HoverRowActionsDirective {
     private _previousEvent: MouseEvent;
 
     /**
+     * Disable action show..to be able to select text
+     */
+    private disableShow: boolean = false;
+
+    /**
      * Constructor
      */
     constructor(
@@ -79,12 +84,25 @@ export class HoverRowActionsDirective {
     }
 
     /**
+     * Hide component
+     */
+    private hide() {
+        // hide actions
+        if (this.hoverRowActionsComponent) {
+            this.hoverRowActionsComponent.hide();
+        }
+    }
+
+    /**
      * Display actions
      * @param event
      */
     private show(event) {
         // trigger show
-        if (this.hoverRowActionsComponent) {
+        if (
+            !this.disableShow &&
+            this.hoverRowActionsComponent
+        ) {
             // keep an instance of the event
             this._previousEvent = event;
 
@@ -104,6 +122,23 @@ export class HoverRowActionsDirective {
      */
     public redraw() {
         this.show(this._previousEvent);
+    }
+
+    /**
+     * Mouse down - start selecting text ?
+     */
+    @HostListener('mousedown', ['$event'])
+    mouseDown() {
+        this.disableShow = true;
+        this.hide();
+    }
+
+    /**
+     * Mouse up - stop selecting text ?
+     */
+    @HostListener('mouseup', ['$event'])
+    mouseUp() {
+        this.disableShow = false;
     }
 
     /**
@@ -144,9 +179,6 @@ export class HoverRowActionsDirective {
      */
     @HostListener('mouseleave', ['$event'])
     mouseLeave() {
-        // hide actions
-        if (this.hoverRowActionsComponent) {
-            this.hoverRowActionsComponent.hide();
-        }
+        this.hide();
     }
 }
