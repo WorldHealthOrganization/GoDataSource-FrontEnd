@@ -27,6 +27,7 @@ export const EnglishUsLang = {
          * uiAPIErrors
          */
         'LNG_API_ERROR_CODE_DELETE_CONTACT_LAST_RELATIONSHIP': 'Cannot delete a contact\'s last relationship with a case or event. The contact doesn\'t have an additional relationship with a case or event.',
+        'LNG_API_ERROR_CODE_INVALID_CASE_RELATIONSHIP': 'Case needs to be related to another case in order to be able to convert it to a contact',
 
         /**
          * uiBulkAddContactsPage
@@ -49,6 +50,8 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT': 'Contact',
         'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT_WITH_INFO': '* This person is now a contact and lab tests were performed at the time when "{{ caseName }}" was registered as a case'
+
+
 
         /**
          * REMOVE the tokens from below
