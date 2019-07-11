@@ -7,7 +7,7 @@ import { LabelValuePair } from './label-value-pair';
 import { AddressModel } from './address.model';
 import { IAnswerData, QuestionModel } from './question.model';
 import { Constants } from './constants';
-import * as moment from 'moment';
+import { moment } from '../helperClasses/x-moment';
 
 /**
  * Model representing a Case, a Contact or an Event

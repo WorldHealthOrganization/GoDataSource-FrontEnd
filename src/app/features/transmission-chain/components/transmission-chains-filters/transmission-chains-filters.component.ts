@@ -1,5 +1,4 @@
 import { Component, HostBinding, Input, OnInit, ViewEncapsulation } from '@angular/core';
-import { Moment } from 'moment';
 import { AgeModel } from '../../../../core/models/age.model';
 import { Observable } from 'rxjs';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -7,6 +6,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import * as _ from 'lodash';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { Moment } from '../../../../core/helperClasses/x-moment';
 
 export class TransmissionChainFilters {
     classification: string;

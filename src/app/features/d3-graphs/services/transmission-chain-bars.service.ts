@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import * as d3 from 'd3';
-import * as moment from 'moment';
 import * as _ from 'lodash';
 import { Constants } from '../../../core/models/constants';
 import { TransmissionChainBarsModel } from '../typings/transmission-chain-bars.model';
@@ -8,6 +7,7 @@ import { I18nService } from '../../../core/services/helper/i18n.service';
 import { EntityBarModel } from '../typings/entity-bar.model';
 import { Router } from '@angular/router';
 import { EntityType } from '../../../core/models/entity-type';
+import { moment } from '../../../core/helperClasses/x-moment';
 
 @Injectable()
 export class TransmissionChainBarsService {

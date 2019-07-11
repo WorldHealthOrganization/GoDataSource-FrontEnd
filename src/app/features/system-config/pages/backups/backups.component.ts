@@ -22,9 +22,9 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { catchError, map, share, tap } from 'rxjs/operators';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import * as moment from 'moment';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-backups',

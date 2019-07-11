@@ -1,10 +1,10 @@
 import { EventEmitter, Input, Output } from '@angular/core';
-import { Moment } from 'moment';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import { DebounceTimeCaller } from '../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs';
 import { ListFilterDataService } from '../../../core/services/data/list-filter.data.service';
 import * as _ from 'lodash';
+import { Moment } from '../../../core/helperClasses/x-moment';
 
 export abstract class DashletComponent {
     // Global filters => Date

@@ -20,7 +20,6 @@ import { EventModel } from '../../../../core/models/event.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { Moment } from 'moment';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -30,7 +29,7 @@ import { RelationshipPersonModel } from '../../../../core/models/relationship-pe
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
-import * as moment from 'moment';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-create-contact',

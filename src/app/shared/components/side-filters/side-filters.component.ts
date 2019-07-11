@@ -8,7 +8,6 @@ import * as _ from 'lodash';
 import { AddressModel } from '../../../core/models/address.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Constants } from '../../../core/models/constants';
-import * as moment from 'moment';
 import { SavedFiltersService } from '../../../core/services/data/saved-filters.data.service';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../dialog/dialog.component';
@@ -21,6 +20,7 @@ import { Observable } from 'rxjs';
 import { RequestFilter } from '../../../core/helperClasses/request-query-builder/request-filter';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { moment } from '../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-side-filters',

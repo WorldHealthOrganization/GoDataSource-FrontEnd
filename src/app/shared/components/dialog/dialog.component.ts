@@ -4,9 +4,8 @@ import * as _ from 'lodash';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { NgForm } from '@angular/forms';
 import { Constants } from '../../../core/models/constants';
-import * as moment from 'moment';
-import { Moment } from 'moment';
 import { Observable } from 'rxjs';
+import { moment, Moment } from '../../../core/helperClasses/x-moment';
 
 export enum DialogAnswerButton {
     Yes = 'Yes',

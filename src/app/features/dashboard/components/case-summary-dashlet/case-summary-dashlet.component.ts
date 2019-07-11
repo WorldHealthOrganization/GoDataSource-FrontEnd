@@ -7,12 +7,12 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { MetricChartDataModel } from '../../../../core/models/metrics/metric-chart-data.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
-import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber, Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Constants } from '../../../../core/models/constants';
 import { Router } from '@angular/router';
+import { Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-case-summary-dashlet',

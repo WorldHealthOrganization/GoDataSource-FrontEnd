@@ -1,12 +1,12 @@
 import { Component, Input, ViewChild, ViewEncapsulation } from '@angular/core';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import * as _ from 'lodash';
-import * as moment from 'moment';
 import { WorldMapComponent, WorldMapMarker, WorldMapPath, WorldMapPathType, WorldMapPoint } from '../../../world-map/components/world-map/world-map.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as FileSaver from 'file-saver';
 import { EntityType } from '../../../../core/models/entity-type';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-world-map-movement',

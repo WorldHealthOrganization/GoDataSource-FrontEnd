@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import { moment } from '../x-moment';
 
 export enum RequestFilterOperator {
     AND = 'and',

@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import { moment } from '../../../core/helperClasses/x-moment';
 
 /**
  * Action Type

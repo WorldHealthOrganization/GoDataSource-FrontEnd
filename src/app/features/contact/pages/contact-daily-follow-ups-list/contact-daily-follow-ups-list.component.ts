@@ -14,8 +14,6 @@ import { DialogAnswerButton, DialogField, DialogFieldType, HoverRowAction, Hover
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import * as moment from 'moment';
-import { Moment } from 'moment';
 import { AppliedFilterModel, FilterComparator, FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -34,6 +32,7 @@ import { CountedItemsListItem } from '../../../../shared/components/counted-item
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { FollowUpPage } from '../../typings/follow-up-page';
 import { throwError } from 'rxjs';
+import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-daily-follow-ups-list',

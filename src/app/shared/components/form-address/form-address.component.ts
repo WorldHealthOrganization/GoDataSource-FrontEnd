@@ -4,13 +4,12 @@ import { GroupBase, GroupFilteredValue } from '../../xt-forms/core';
 import { AddressModel } from '../../../core/models/address.model';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
-import { Moment } from 'moment';
 import { LocationAutoItem } from '../form-location-dropdown/form-location-dropdown.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
-import * as moment from 'moment';
+import { moment, Moment } from '../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-form-address',

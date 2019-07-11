@@ -16,11 +16,10 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import * as _ from 'lodash';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-import { Moment } from 'moment';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import * as moment from 'moment';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-create-case-relationship',

@@ -1,11 +1,11 @@
 import { Directive, forwardRef, Input } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS, ControlContainer, NgForm, NgModel } from '@angular/forms';
 import * as _ from 'lodash';
-import * as moment from 'moment';
-import { Moment, MomentBuiltinFormat } from 'moment';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { ElementBase } from '../core';
 import { Constants } from '../../../core/models/constants';
+import { moment, Moment, MomentBuiltinFormat } from '../../../core/helperClasses/x-moment';
+import * as momentOriginal from 'moment';
 
 /**
  * Handle Date compare input
@@ -103,7 +103,7 @@ export class DateValidatorDirective implements Validator {
                     );
                 } else if (
                     compare instanceof ElementBase ||
-                    compare instanceof moment ||
+                    compare instanceof momentOriginal ||
                     _.isString(compare)
                 ) {
                     compareItem = new DateValidatorFieldComparator(
@@ -122,7 +122,7 @@ export class DateValidatorDirective implements Validator {
                 // & label if necessary
                 let compareWithDate: Moment;
                 let fieldLabel = compareItem.fieldLabel;
-                if (compareItem.compareItemValue instanceof moment) {
+                if (compareItem.compareItemValue instanceof momentOriginal) {
                     compareWithDate = compareItem.compareItemValue as Moment;
                 }
 
@@ -222,7 +222,7 @@ export class DateValidatorDirective implements Validator {
 
         // validate date
         let value: any = control.value;
-        if (control.value instanceof moment) {
+        if (control.value instanceof momentOriginal) {
             value = _.isObject(value._i) ? value : value._i;
         }
 

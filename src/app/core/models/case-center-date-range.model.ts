@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
-import { Moment } from 'moment';
 import { LocationModel } from './location.model';
+import { Moment } from '../helperClasses/x-moment';
 
 export class CaseCenterDateRangeModel {
     typeId: string;

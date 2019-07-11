@@ -7,8 +7,8 @@ import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Subscription } from 'rxjs';
-import * as moment from 'moment';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-contacts-lost-to-follow-up-dashlet',

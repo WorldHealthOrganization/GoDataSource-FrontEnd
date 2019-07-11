@@ -1,5 +1,4 @@
-import { Moment } from 'moment';
-import * as moment from 'moment';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 export class ChronologyItem {
     public label: string;

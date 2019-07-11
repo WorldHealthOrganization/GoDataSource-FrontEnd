@@ -16,8 +16,6 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
-import * as moment from 'moment';
-import { Moment } from 'moment';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -31,6 +29,7 @@ import { MatDialogRef } from '@angular/material';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-modify-case',

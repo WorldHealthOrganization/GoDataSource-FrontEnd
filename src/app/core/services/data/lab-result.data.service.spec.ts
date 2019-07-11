@@ -1,7 +1,7 @@
 import { Observable, of } from 'rxjs';
 import { LabResultModel } from '../../models/lab-result.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import * as moment from 'moment';
+import { moment } from '../../helperClasses/x-moment';
 
 export const LabResultDataServiceMock: {
     selectedLabResultId: string,

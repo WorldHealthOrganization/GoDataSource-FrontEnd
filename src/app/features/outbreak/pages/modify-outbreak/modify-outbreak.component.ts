@@ -19,8 +19,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { catchError, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { Moment } from 'moment';
-import * as moment from 'moment';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-modify-outbreak',

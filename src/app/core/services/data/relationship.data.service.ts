@@ -12,7 +12,6 @@ import { MetricNewCasesWithContactsModel } from '../../models/metric-new-cases-c
 import { ReportCasesWithOnsetModel } from '../../models/report-cases-with-onset.model';
 import { LabelValuePair } from '../../models/label-value-pair';
 import { Constants } from '../../models/constants';
-import * as moment from 'moment';
 import * as _ from 'lodash';
 import { EntityModel } from '../../models/entity.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
@@ -20,6 +19,7 @@ import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
 import { map } from 'rxjs/operators';
+import { moment } from '../../helperClasses/x-moment';
 
 @Injectable()
 export class RelationshipDataService {

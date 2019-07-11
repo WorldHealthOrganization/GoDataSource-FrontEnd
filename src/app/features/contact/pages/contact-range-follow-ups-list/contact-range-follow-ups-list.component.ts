@@ -9,10 +9,8 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
-import * as moment from 'moment';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { Constants } from '../../../../core/models/constants';
-import { Moment } from 'moment';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -25,6 +23,7 @@ import { RangeFollowUpsModel } from '../../../../core/models/range-follow-ups.mo
 import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',

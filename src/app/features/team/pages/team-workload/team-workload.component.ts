@@ -9,12 +9,11 @@ import { TeamFollowupsPerDayModel } from '../../../../core/models/team-followups
 import { Constants } from '../../../../core/models/constants';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
-import * as moment from 'moment';
 import * as _ from 'lodash';
-import { Moment } from 'moment';
 import { FormDateRangeSliderData } from '../../../../shared/xt-forms/components/form-date-range-slider/form-date-range-slider.component';
 import { Subscription } from 'rxjs';
 import { TeamModel } from '../../../../core/models/team.model';
+import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-team-workload',

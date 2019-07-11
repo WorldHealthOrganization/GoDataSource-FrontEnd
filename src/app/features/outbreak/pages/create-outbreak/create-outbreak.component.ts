@@ -20,8 +20,7 @@ import { catchError, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { Moment } from 'moment';
-import * as moment from 'moment';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-create-outbreak',

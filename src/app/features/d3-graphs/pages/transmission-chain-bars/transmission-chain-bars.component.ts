@@ -22,7 +22,7 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
-import * as moment from 'moment';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-transmission-chain-bars',

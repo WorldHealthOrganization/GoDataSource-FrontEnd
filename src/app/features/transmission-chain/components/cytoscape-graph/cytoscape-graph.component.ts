@@ -9,7 +9,6 @@ import { Observable, Subscription } from 'rxjs';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Constants } from '../../../../core/models/constants';
 import * as _ from 'lodash';
-import * as moment from 'moment';
 import { WorldMapComponent, WorldMapMarker, WorldMapMarkerType, WorldMapPath, WorldMapPathType, WorldMapPoint } from '../../../../common-modules/world-map/components/world-map/world-map.component';
 import { IConvertChainToGraphElements } from '../../../../core/services/data/transmission-chain.data.service';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
@@ -38,6 +37,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { catchError } from 'rxjs/operators';
 import { throwError, forkJoin } from 'rxjs';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-cytoscape-graph',

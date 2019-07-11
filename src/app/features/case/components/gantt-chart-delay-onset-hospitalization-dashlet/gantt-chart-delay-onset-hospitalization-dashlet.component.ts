@@ -9,10 +9,10 @@ import { SVGGantt } from 'gantt';
 import { EntityType } from '../../../../core/models/entity-type';
 import * as _ from 'lodash';
 import { Subscription ,  Subscriber } from 'rxjs';
-import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/index';
 import { MetricCasesDelayBetweenOnsetHospitalizationModel } from '../../../../core/models/metrics/metric-cases-delay-between-onset-hospitalization.model';
+import { Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-gantt-chart-delay-onset-hospitalization-dashlet',

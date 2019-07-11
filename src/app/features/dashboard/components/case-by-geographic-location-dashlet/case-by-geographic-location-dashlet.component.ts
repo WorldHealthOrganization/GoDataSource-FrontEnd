@@ -6,11 +6,11 @@ import { MetricChartDataModel } from '../../../../core/models/metrics/metric-cha
 import * as _ from 'lodash';
 import { MetricLocationCasesCountsModel } from '../../../../core/models/metrics/metric-location-cases-count.model';
 import { Subscription ,  Subscriber } from 'rxjs';
-import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Router } from '@angular/router';
 import { Constants } from '../../../../core/models/constants';
+import { Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-case-by-geographic-location-dashlet',

@@ -16,14 +16,13 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import * as moment from 'moment';
-import { Moment } from 'moment';
 import * as _ from 'lodash';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { EntityType } from 'app/core/models/entity-type';
 import { CaseModel } from '../../../../core/models/case.model';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-modify-case-relationship',

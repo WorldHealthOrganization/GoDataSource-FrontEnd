@@ -10,11 +10,11 @@ import { GraphEdgeModel } from '../../models/graph-edge.model';
 import { EntityType } from '../../models/entity-type';
 import { Constants } from '../../models/constants';
 import { I18nService } from '../helper/i18n.service';
-import * as moment from 'moment';
 import * as _ from 'lodash';
 import { LocationModel } from '../../models/location.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
 import { map } from 'rxjs/operators';
+import { moment } from '../../helperClasses/x-moment';
 
 export interface IConvertChainToGraphElements {
     nodes: {

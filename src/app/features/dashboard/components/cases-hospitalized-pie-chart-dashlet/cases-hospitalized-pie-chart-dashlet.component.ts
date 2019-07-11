@@ -6,13 +6,13 @@ import { MetricChartDataModel } from '../../../../core/models/metrics/metric-cha
 import { Subscription, Subscriber, throwError, forkJoin } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
+import { Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-cases-hospitalized-pie-chart-dashlet',

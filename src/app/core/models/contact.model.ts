@@ -4,8 +4,8 @@ import { DocumentModel } from './document.model';
 import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
-import * as moment from 'moment';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
+import { moment } from '../helperClasses/x-moment';
 
 export class ContactModel {
     id: string;
