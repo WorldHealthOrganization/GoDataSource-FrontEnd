@@ -52,7 +52,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
     labNameOptionsList$: Observable<any[]>;
     progressOptionsList$: Observable<any[]>;
 
-    serverToday: Moment = null;
+    serverToday: Moment = moment();
 
     // constants
     EntityType = EntityType;
@@ -90,13 +90,6 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
         this.resultTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT);
         this.labNameOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME);
         this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
-
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
-            });
 
         this.route.queryParams.
             subscribe((queryParams: {fromLabResultsList}) => {

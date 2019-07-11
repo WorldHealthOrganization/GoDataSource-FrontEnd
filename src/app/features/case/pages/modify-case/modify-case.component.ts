@@ -18,7 +18,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import * as moment from 'moment';
 import { Moment } from 'moment';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -60,7 +59,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     EntityType = EntityType;
     Constants = Constants;
 
-    serverToday: Moment = null;
+    serverToday: Moment = moment();
 
     parentOnsetDates: (string | Moment)[][] = [];
 
@@ -87,7 +86,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private genericDataService: GenericDataService,
         private i18nService: I18nService,
         private dialogService: DialogService
     ) {
@@ -115,13 +113,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             .subscribe((params: { caseId }) => {
                 this.caseId = params.caseId;
                 this.retrieveCaseData();
-            });
-
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
             });
 
         this.outbreakDataService

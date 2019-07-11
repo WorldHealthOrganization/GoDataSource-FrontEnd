@@ -21,7 +21,7 @@ import { throwError } from 'rxjs';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Moment } from 'moment';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-create-outbreak',
@@ -47,7 +47,7 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
 
     outbreakNameValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
-    serverToday: Moment = null;
+    serverToday: Moment = moment();
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -58,8 +58,7 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
         private route: ActivatedRoute,
         private outbreakTemplateDataService: OutbreakTemplateDataService,
         private dialogService: DialogService,
-        private i18nService: I18nService,
-        private genericDataService: GenericDataService
+        private i18nService: I18nService
     ) {
         super();
     }
@@ -78,12 +77,6 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                     })
                 )
             );
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
-            });
 
         // get the outbreak template
         this.route.queryParams

@@ -11,11 +11,11 @@ import { EventDataService } from '../../../../core/services/data/event.data.serv
 import * as _ from 'lodash';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { Moment } from 'moment';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { AddressType } from '../../../../core/models/address.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-create-event',
@@ -35,7 +35,7 @@ export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit
 
     eventData: EventModel = new EventModel();
 
-    serverToday: Moment = null;
+    serverToday: Moment = moment();
 
     constructor(
         private router: Router,
@@ -43,26 +43,19 @@ export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private genericDataService: GenericDataService,
         private dialogService: DialogService
     ) {
         super();
     }
 
     ngOnInit() {
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
-            });
-
         // get selected outbreak
         this.outbreakDataService
             .getSelectedOutbreak()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.outbreakId = selectedOutbreak.id;
             });
+
         // pre-set the initial address as "current address"
         this.eventData.address.typeId = AddressType.CURRENT_ADDRESS;
     }

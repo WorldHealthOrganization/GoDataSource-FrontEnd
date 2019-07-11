@@ -47,7 +47,7 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
     // case data
     caseData: CaseModel = new CaseModel();
 
-    serverToday: Moment = null;
+    serverToday: Moment = moment();
 
     /**
      * Check if we need to display warning message that case date of onset is after sample taken date
@@ -81,13 +81,6 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
         this.resultTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT);
         this.labNameOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME);
         this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
-
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
-            });
 
         this.route.params
             .subscribe((params: {caseId}) => {
