@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { I18nService } from './core/services/helper/i18n.service';
+import * as momentTimezone from 'moment-timezone';
 
 @Component({
     selector: 'app-root',
@@ -16,6 +17,9 @@ export class AppComponent implements OnInit {
     ngOnInit() {
         // load the default language
         this.i18nService.loadUserLanguage().subscribe();
+
+        // set default timezone to utc
+        momentTimezone.tz.setDefault('utc');
 
         // used by OpenLayers
         // The script below is only needed for old environments like Internet Explorer and Android 4.x

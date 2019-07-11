@@ -5,12 +5,12 @@ import { AddressModel } from '../../../core/models/address.model';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { Moment } from 'moment';
-import { GenericDataService } from '../../../core/services/data/generic.data.service';
 import { LocationAutoItem } from '../form-location-dropdown/form-location-dropdown.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-form-address',
@@ -35,14 +35,13 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
     @Input() displayCopyFieldDescription: string;
     @Output() copyValue = new EventEmitter<string>();
 
-    serverToday: Moment = null;
+    serverToday: Moment = moment();
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
         private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService,
         private dialogService: DialogService
     ) {
         super(controlContainer, validators, asyncValidators);
@@ -54,13 +53,6 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
     ngOnInit() {
         // init value
         this.value = new AddressModel(this.value);
-
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
-            });
 
         this.addressTypes$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.ADDRESS_TYPE);
     }
