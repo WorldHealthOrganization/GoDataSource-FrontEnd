@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
-import { Moment } from 'moment';
-import * as moment from 'moment';
+import { moment, Moment } from '../helperClasses/x-moment';
 
 export class LanguageTokenModel {
     token: string;

@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { FollowUpModel } from '../../models/follow-up.model';
 import { ContactDataServiceMock } from './contact.data.service.spec';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import * as moment from 'moment';
+import { moment } from '../../helperClasses/x-moment';
 
 export const FollowUpsDataServiceMock: {
     selectedFollowUpId: string,

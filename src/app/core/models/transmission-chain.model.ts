@@ -3,9 +3,9 @@ import { EntityModel } from './entity.model';
 import { CaseModel } from './case.model';
 import { RelationshipModel } from './relationship.model';
 import { EntityType } from './entity-type';
-import * as moment from 'moment';
 import { Constants } from './constants';
 import { EventModel } from './event.model';
+import { moment } from '../helperClasses/x-moment';
 
 export class TransmissionChainRelation {
 

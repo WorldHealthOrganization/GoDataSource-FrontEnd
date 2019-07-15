@@ -2,8 +2,8 @@ import * as Handsontable from 'handsontable';
 import { SheetCellValidationType } from './sheet-cell-validation-type';
 import * as _ from 'lodash';
 import { SheetCellType } from './sheet-cell-type';
-import * as moment from 'moment';
 import { Constants } from '../constants';
+import { moment } from '../../helperClasses/x-moment';
 
 export class SheetCellValidator {
     // cells being part of empty rows will get this value at validation time, so we know to skip validation for them (e.g. skip Required validation)

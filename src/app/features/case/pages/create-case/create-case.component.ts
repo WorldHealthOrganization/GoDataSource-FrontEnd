@@ -13,7 +13,6 @@ import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-import { Moment } from 'moment';
 import * as _ from 'lodash';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -24,7 +23,7 @@ import { Constants } from '../../../../core/models/constants';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import * as moment from 'moment';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-create-case',

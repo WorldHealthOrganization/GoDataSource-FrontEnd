@@ -7,9 +7,9 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { Subscriber, Subscription } from 'rxjs';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import * as moment from 'moment';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-new-cases-previous-days-transmission-chains-dashlet',

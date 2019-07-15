@@ -8,13 +8,12 @@ import { GenericDataService } from './generic.data.service';
 import { RelationshipDataService } from './relationship.data.service';
 import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-contacts-lost-to-follow-up.model';
 import { Constants } from '../../models/constants';
-import * as moment from 'moment';
 import * as _ from 'lodash';
 import { RequestFilterOperator } from '../../helperClasses/request-query-builder/request-filter';
-import { Moment } from 'moment';
 import { ContactDataService } from './contact.data.service';
 import { DateType } from '../../enums/date-types.enum';
 import { map, mergeMap } from 'rxjs/operators';
+import { Moment, moment } from '../../helperClasses/x-moment';
 
 @Injectable()
 export class ListFilterDataService {

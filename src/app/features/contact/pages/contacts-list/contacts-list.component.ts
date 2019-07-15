@@ -24,7 +24,6 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { RequestQueryBuilder, RequestRelationBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
-import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
@@ -33,6 +32,7 @@ import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.mo
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { throwError } from 'rxjs';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-contacts-list',

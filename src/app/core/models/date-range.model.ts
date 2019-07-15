@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Moment } from 'moment';
+import { Moment } from '../helperClasses/x-moment';
 
 export class DateRangeModel {
     startDate: string | Moment;

@@ -15,13 +15,13 @@ import * as _ from 'lodash';
 import { Router } from '@angular/router';
 import { TeamModel } from '../../../core/models/team.model';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
-import * as moment from 'moment';
 import { OnInit } from '@angular/core';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Observable } from 'rxjs';
 import { TeamDataService } from '../../../core/services/data/team.data.service';
 import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
+import { moment } from '../../../core/helperClasses/x-moment';
 
 export abstract class FollowUpsListComponent extends ListComponent implements OnInit {
     // authenticated user

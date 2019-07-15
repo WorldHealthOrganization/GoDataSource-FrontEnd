@@ -16,7 +16,6 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { Moment } from 'moment';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField } from '../../../../shared/components';
@@ -30,7 +29,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import * as moment from 'moment';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-modify-contact',

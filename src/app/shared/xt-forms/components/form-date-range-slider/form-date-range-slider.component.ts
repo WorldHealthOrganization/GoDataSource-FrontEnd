@@ -10,11 +10,11 @@ import {
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { ElementBase } from '../../core/index';
-import { Moment } from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import * as moment from 'moment';
 import { ChangeContext, Options } from 'ng5-slider';
 import { Constants } from '../../../../core/models/constants';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import * as momentOriginal from 'moment';
 
 /**
  * Handles filter range data
@@ -116,7 +116,7 @@ export class FormDateRangeSliderComponent extends ElementBase<FormDateRangeSlide
     @Input() set minDate(minDate: Moment) {
         // set min date
         this._minDate = !minDate ? null : (
-            minDate instanceof moment ? minDate : moment(minDate)
+            minDate instanceof momentOriginal ? minDate : moment(minDate)
         ) as Moment;
 
         // set max date if smaller
@@ -146,7 +146,7 @@ export class FormDateRangeSliderComponent extends ElementBase<FormDateRangeSlide
     @Input() set maxDate(maxDate: Moment) {
         // set max date
         this._maxDate = !maxDate ? null : (
-            maxDate instanceof moment ? maxDate : moment(maxDate)
+            maxDate instanceof momentOriginal ? maxDate : moment(maxDate)
         ) as Moment;
 
         // set min date if smaller

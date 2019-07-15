@@ -5,7 +5,7 @@ import { ListBase } from '../../core';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { Subscriber } from 'rxjs';
 import { DialogAnswer, DialogAnswerButton } from '../../../components/dialog/dialog.component';
-import { Moment } from 'moment';
+import { Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-form-daterange-list',

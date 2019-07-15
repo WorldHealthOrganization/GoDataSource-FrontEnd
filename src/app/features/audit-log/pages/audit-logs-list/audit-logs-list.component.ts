@@ -13,9 +13,8 @@ import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/help
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import * as moment from 'moment';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { share, tap } from 'rxjs/operators';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-audit-logs-list',
@@ -54,8 +53,7 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
         private auditLogDataService: AuditLogDataService,
         protected snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
-        private userDataService: UserDataService,
-        private i18nService: I18nService
+        private userDataService: UserDataService
     ) {
         super(
             snackbarService

@@ -12,7 +12,7 @@ import { ReferenceDataDataService } from '../../../core/services/data/reference-
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { Constants } from '../../../core/models/constants';
 import { share } from 'rxjs/operators';
-import * as moment from 'moment';
+import { moment } from '../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-form-relationship-quick',

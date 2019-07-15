@@ -22,7 +22,6 @@ import { NgModel } from '@angular/forms';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { BulkContactsService } from '../../../../core/services/helper/bulk-contacts.service';
 import { ContactModel } from '../../../../core/models/contact.model';
-import * as moment from 'moment';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
@@ -30,6 +29,7 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { map, switchMap } from 'rxjs/internal/operators';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-bulk-modify-contacts',

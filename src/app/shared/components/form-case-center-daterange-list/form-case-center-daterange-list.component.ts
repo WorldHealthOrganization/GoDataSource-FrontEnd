@@ -4,11 +4,9 @@ import { GroupFilteredValue, ListBase } from '../../xt-forms/core';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { Subscriber } from 'rxjs';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
-import { Moment } from 'moment';
 import { CaseCenterDateRangeModel } from '../../../core/models/case-center-date-range.model';
 import * as _ from 'lodash';
-import * as moment from 'moment';
-import { Constants } from '../../../core/models/constants';
+import { moment, Moment } from '../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-form-case-center-daterange-list',

@@ -1,8 +1,8 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import * as _ from 'lodash';
 import { ChronologyItem } from './typings/chronology-item';
-import * as moment from 'moment';
 import { Constants } from '../../../core/models/constants';
+import { moment } from '../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-chronology',

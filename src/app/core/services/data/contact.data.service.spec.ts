@@ -1,7 +1,7 @@
 import { Observable, of } from 'rxjs';
 import { ContactModel } from '../../models/contact.model';
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import { moment } from '../../helperClasses/x-moment';
 
 export const ContactDataServiceMock: {
     selectedContactId: string,

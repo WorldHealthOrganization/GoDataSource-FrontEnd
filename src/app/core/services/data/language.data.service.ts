@@ -8,8 +8,7 @@ import * as _ from 'lodash';
 import { localLanguages } from '../../../i18n';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { map, share, tap } from 'rxjs/operators';
-import { Moment } from 'moment';
-import * as moment from 'moment';
+import { moment, Moment } from '../../helperClasses/x-moment';
 
 @Injectable()
 export class LanguageDataService {

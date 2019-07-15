@@ -5,9 +5,9 @@ import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { CaseCenterDateRangeModel } from './case-center-date-range.model';
-import * as moment from 'moment';
 import { IAnswerData } from './question.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
+import { moment } from '../helperClasses/x-moment';
 
 export class CaseModel {
     id: string;

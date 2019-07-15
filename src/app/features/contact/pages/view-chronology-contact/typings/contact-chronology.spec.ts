@@ -1,5 +1,4 @@
 import { ContactModel } from '../../../../../core/models/contact.model';
-import * as moment from 'moment';
 import { ContactChronology } from './contact-chronology';
 import * as _ from 'lodash';
 import { FollowUpModel } from '../../../../../core/models/follow-up.model';
@@ -19,7 +18,7 @@ import { FollowUpsDataServiceMock } from '../../../../../core/services/data/foll
 import { ChronologyItem } from '../../../../../shared/components/chronology/typings/chronology-item';
 import { ChronologyComponent } from '../../../../../shared/components/chronology/chronology.component';
 import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import { moment } from '../../../../../core/helperClasses/x-moment';
 
 describe('ContactChronology', () => {
     const date = moment();

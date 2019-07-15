@@ -1,5 +1,4 @@
-import * as moment from 'moment';
-import { Moment } from 'moment';
+import { moment, Moment } from '../helperClasses/x-moment';
 
 /**
  * Apply List Filter
