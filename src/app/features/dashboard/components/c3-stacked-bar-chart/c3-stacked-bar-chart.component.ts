@@ -141,7 +141,19 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
      */
     configureNumberOfTicks(elementsDisplayedNo: number) {
         const elements: any = document.getElementsByClassName('c3-axis-x');
+        if (
+            !elements ||
+            elements.length < 1
+        ) {
+            return;
+        }
         const element: any = elements[0];
+        if (
+            !element ||
+            !element.classList
+        ) {
+            return;
+        }
 
         if (elementsDisplayedNo < 70) {
             element.classList.add('c3-axis-x-n');
