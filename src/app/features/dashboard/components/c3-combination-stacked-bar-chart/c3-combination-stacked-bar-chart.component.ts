@@ -167,7 +167,20 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
         }
 
         const elements: any = chartElement.querySelectorAll('.c3-axis-x');
+        if (
+            !elements ||
+            elements.length < 1
+        ) {
+            return;
+        }
+
         const element: any = elements[0];
+        if (
+            !element ||
+            !element.classList
+        ) {
+            return;
+        }
 
         if (elementsDisplayedNo < 70) {
             element.classList.add('c3-axis-x-n');
