@@ -19,7 +19,7 @@ export function moment(inp?: momentOriginal.MomentInput, format?: momentOriginal
     } else if (!(inp instanceof momentOriginal)) {
         date = momentOriginal(inp, format, strict);
     } else {
-        date = inp as MomentOriginal;
+        date = (inp as MomentOriginal).clone();
     }
 
     // do we have a valid date ?
