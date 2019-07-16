@@ -28,6 +28,7 @@ export const EnglishUsLang = {
          */
         'LNG_API_ERROR_CODE_DELETE_CONTACT_LAST_RELATIONSHIP': 'Cannot delete a contact\'s last relationship with a case or event. The contact doesn\'t have an additional relationship with a case or event.',
         'LNG_API_ERROR_CODE_INVALID_CASE_RELATIONSHIP': 'Case needs to be related to another case in order to be able to convert it to a contact',
+        'LNG_API_ERROR_CODE_INVALID_PASSWORD': 'Invalid current password',
 
         /**
          * uiBulkAddContactsPage
