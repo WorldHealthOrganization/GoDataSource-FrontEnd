@@ -6,11 +6,11 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { Observable } from 'rxjs/index';
+import { Observable, throwError } from 'rxjs/index';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
-import { map, share, tap } from 'rxjs/internal/operators';
+import { catchError, map, share, tap } from 'rxjs/internal/operators';
 import * as _ from 'lodash';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
@@ -23,6 +23,10 @@ import {
 } from '../../../../core/models/reference-data.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityType } from '../../../../core/models/entity-type';
+import { FormControl, NgForm } from '@angular/forms';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-available-entities-for-switch-list',
@@ -38,6 +42,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
 
     // available side filters
     availableSideFilters: FilterModel[];
+    selectedRecordsIds: string[];
 
     // saved filters type
     savedFiltersType = Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_RELATIONSHIPS.value;
@@ -64,6 +69,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
         private relationshipDataService: RelationshipDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
+        private dialogService: DialogService
     ) {
         super(
             snackbarService, router, route,
@@ -97,6 +103,18 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                 {}
             );
         });
+
+        // read route query params
+        this.route.queryParams
+            .subscribe((queryParams: { selectedTargetIds }) => {
+                if (_.isEmpty(queryParams.selectedTargetIds)) {
+                    this.snackbarService.showError('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_NO_FOLLOW_UPS_SELECTED');
+
+                    this.router.navigate(['/contacts/follow-ups']);
+                } else {
+                    this.selectedRecordsIds = JSON.parse(queryParams.selectedTargetIds);
+                }
+            });
 
         // side filters
         this.generateSideFilters();
@@ -245,14 +263,57 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
      */
     getTableColumns(): string[] {
         const columns = [
+            'radio',
             'lastName',
             'firstName',
             'visualId',
             'gender',
-            'place',
+            'place'
         ];
 
         return columns;
     }
 
+    get changeRelationshipText() {
+        return 'asdasd';
+    }
+
+    switchWithSelectedRecord() {
+        // get the selected record
+        const selectedRecord = this.checkedRecords[0];
+        if (!selectedRecord) {
+            return;
+        }
+
+        const qb = new RequestQueryBuilder();
+        qb.merge(this.queryBuilder);
+
+        qb.filter.where({
+            id: {
+                inq: this.selectedRecordsIds
+            }
+        });
+
+        console.log(this.selectedRecordsIds);
+
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CHANGE_SOURCE')
+            .subscribe((answer: DialogAnswer) => {
+                  if (answer.button === DialogAnswerButton.Yes) {
+                      this.relationshipDataService
+                          .bulkChangeSource(
+                              this.selectedOutbreak.id,
+                              selectedRecord,
+                              qb)
+                          .pipe(
+                              catchError((err) => {
+                                  this.snackbarService.showApiError(err);
+                                  return throwError(err);
+                              })
+                          )
+                          .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_BULK_CHANGE_SOURCE_SUCCESS_MESSAGE');
+                          });
+                  }
+            });
+    }
 }

@@ -477,5 +477,22 @@ export class RelationshipDataService {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/available-people/count?where=${whereFilter}`);
     }
+
+    /**
+     * Change source for multiple entities
+     * @param {string} outbreakId
+     * @param {string} sourceId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    bulkChangeSource(
+        outbreakId: string,
+        sourceId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder
+    ): Observable<any> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        console.log(whereFilter);
+        return this.http.post(`/outbreaks/${outbreakId}/relationships/bulk-change-source?where=${whereFilter}`, {sourceId: sourceId, where: JSON.parse(whereFilter)});
+    }
 }
 

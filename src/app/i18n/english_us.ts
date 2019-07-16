@@ -26,7 +26,12 @@ export const EnglishUsLang = {
         /**
          * uiBulkAddContactsPage
          */
-        'LNG_PAGE_BULK_ADD_CONTACTS_VISUAL_ID_INFO_LABEL': '* "Contact ID" cell must follow this pattern: {{mask}}'
+        'LNG_PAGE_BULK_ADD_CONTACTS_VISUAL_ID_INFO_LABEL': '* "Contact ID" cell must follow this pattern: {{mask}}',
+
+        /**
+         * uiEntityRelationshipsListPage
+         */
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE': 'Change source'
 
         /**
          * REMOVE the tokens from below
