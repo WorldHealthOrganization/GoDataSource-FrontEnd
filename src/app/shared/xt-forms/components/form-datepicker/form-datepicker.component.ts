@@ -13,11 +13,11 @@ import {
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { Constants } from '../../../../core/models/constants';
 import { ElementBase } from '../../core/index';
-import { MomentDateAdapter } from '@angular/material-moment-adapter';
-import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
-import { Moment } from 'moment';
+import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { MatDatepicker } from '@angular/material';
+import { Moment } from '../../../../core/helperClasses/x-moment';
 
 // Define format to be used into datepicker
 export const DEFAULT_FORMAT = {
@@ -37,15 +37,36 @@ export const DEFAULT_FORMAT = {
     encapsulation: ViewEncapsulation.None,
     templateUrl: './form-datepicker.component.html',
     styleUrls: ['./form-datepicker.component.less'],
-    providers: [{
-        provide: NG_VALUE_ACCESSOR,
-        useExisting: FormDatepickerComponent,
-        multi: true
-    },
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: FormDatepickerComponent,
+            multi: true
+        },
+
+        // always UTC
+        {
+            provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS,
+            useValue: {
+                useUtc: true
+            }
+        },
+
+        {
+            provide: MAT_DATE_FORMATS,
+            useValue: DEFAULT_FORMAT
+        },
+
         // tried adding a custom adapter for validations, but the system wasn't picking up the issue and there was no way to set a validation error message
         // this is way we implemented a custom validator directive
-       { provide: DateAdapter, useClass: MomentDateAdapter },
-       { provide: MAT_DATE_FORMATS, useValue: DEFAULT_FORMAT }
+        {
+            provide: DateAdapter,
+            useClass: MomentDateAdapter,
+            deps: [
+                MAT_DATE_LOCALE,
+                MAT_MOMENT_DATE_ADAPTER_OPTIONS
+            ]
+        }
     ]
 })
 export class FormDatepickerComponent extends ElementBase<string> {

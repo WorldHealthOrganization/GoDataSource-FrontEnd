@@ -3,45 +3,10 @@ import { Observable, of } from 'rxjs';
 import { Constants } from '../../models/constants';
 import { EntityType } from '../../models/entity-type';
 import * as _ from 'lodash';
-import { HttpClient } from '@angular/common/http';
-import * as moment from 'moment';
-import { Moment } from 'moment';
-import { LabelValuePair } from '../../models/label-value-pair';
 import { RelationshipType } from '../../enums/relationship-type.enum';
-import { map } from 'rxjs/operators';
 
 @Injectable()
 export class GenericDataService {
-    constructor(
-        private http: HttpClient
-    ) {}
-
-    /**
-     * Retrieve server date & time
-     * @returns {Observable<string>}
-     */
-    getServerUTCCurrentDateTime(): Observable<string> {
-        return this.http.get('system-settings/utc-date')
-            .pipe(
-                map((dateObject: { date }) => {
-                    return _.get(dateObject, 'date');
-                })
-            );
-    }
-
-    /**
-     * Retrieve server current date
-     * @returns {Observable<Moment>}
-     */
-    getServerUTCToday(): Observable<Moment> {
-        return this.getServerUTCCurrentDateTime()
-            .pipe(
-                map((serverDateTime: string) => {
-                    return moment(serverDateTime).startOf('day');
-                })
-            );
-    }
-
     /**
      * Retrieve the list of Filter Yes / No options
      * @returns {Observable<any[]>}
@@ -104,26 +69,6 @@ export class GenericDataService {
         }
 
         return availableTypes;
-    }
-
-    /**
-     * Get entity type options
-     */
-    getEntityTypeOptions(): Observable<any[]> {
-        return of([
-            new LabelValuePair(
-                EntityType.CASE,
-                EntityType.CASE
-            ),
-            new LabelValuePair(
-                EntityType.CONTACT,
-                EntityType.CONTACT
-            ),
-            new LabelValuePair(
-                EntityType.EVENT,
-                EntityType.EVENT
-            )
-        ]);
     }
 
     /**

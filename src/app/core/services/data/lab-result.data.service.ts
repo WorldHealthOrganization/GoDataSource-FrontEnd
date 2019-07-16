@@ -52,20 +52,6 @@ export class LabResultDataService {
     }
 
     /**
-     * Retrieve Lab Result
-     * @param {string} outbreakId
-     * @param {string} caseId
-     * @param {string} labResultId
-     * @returns {Observable<LabResultModel>}
-     */
-    getLabResult(outbreakId: string, caseId: string, labResultId: string): Observable<LabResultModel> {
-        return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/cases/${caseId}/lab-results/${labResultId}`),
-            LabResultModel
-        );
-    }
-
-    /**
      * Get the list of all lab results
      * @param {string} outbreakId
      * @param queryBuilder
@@ -109,14 +95,13 @@ export class LabResultDataService {
     /**
      * Modify Lab Result
      * @param {string} outbreakId
-     * @param {string} caseId
      * @param {string} labResultId
      * @param labResultData
      * @returns {Observable<LabResultModel>}
      */
-    modifyLabResult(outbreakId: string, caseId: string, labResultId: string, labResultData): Observable<LabResultModel> {
+    modifyLabResult(outbreakId: string, labResultId: string, labResultData): Observable<LabResultModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.put(`outbreaks/${outbreakId}/cases/${caseId}/lab-results/${labResultId}`, labResultData),
+            this.http.put(`outbreaks/${outbreakId}/lab-results/${labResultId}`, labResultData),
             LabResultModel
         );
     }
@@ -124,12 +109,11 @@ export class LabResultDataService {
     /**
      * Delete Lab Result
      * @param {string} outbreakId
-     * @param {string} caseId
      * @param {string} labResultId
      * @returns {Observable<any>}
      */
-    deleteLabResult(outbreakId: string, caseId: string, labResultId: string): Observable<any> {
-        return this.http.delete(`outbreaks/${outbreakId}/cases/${caseId}/lab-results/${labResultId}`);
+    deleteLabResult(outbreakId: string, labResultId: string): Observable<any> {
+        return this.http.delete(`outbreaks/${outbreakId}/lab-results/${labResultId}`);
     }
 
     /**

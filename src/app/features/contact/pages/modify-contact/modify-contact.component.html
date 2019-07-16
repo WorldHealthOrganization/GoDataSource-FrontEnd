@@ -212,7 +212,7 @@
         <ng-container *ngIf="viewOnly && hasContactWriteAccess()">
             <button
                 mat-raised-button type="button" color="accent"
-                [routerLink]="['/contacts', contactData.id, 'modify']"
+                [routerLink]="['/contacts', contactId, 'modify']"
             >
                 {{'LNG_COMMON_BUTTON_EDIT' | translate}}
             </button>
@@ -221,30 +221,30 @@
         </ng-container>
 
         <button
-            *ngIf="contactExposure"
+            [disabled]="!contactExposure"
             type="button"
             mat-raised-button
             color="primary"
-            [routerLink]="[EntityModel.getPersonLink(contactExposure)]"
+            [routerLink]="[getPersonLink(contactExposure)]"
         >
             {{ 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_EXPOSURE' | translate }}
         </button>
 
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CONTACT, contactData.id, 'exposures']">
+        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CONTACT, contactId, 'exposures']">
             {{ 'LNG_COMMON_BUTTON_EXPOSURES_TO' | translate }}
         </button>
 
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button mat-raised-button type="button" [routerLink]="['/contacts/contact-related-follow-ups', contactData.id]">
+        <button mat-raised-button type="button" [routerLink]="['/contacts/contact-related-follow-ups', contactId]">
             {{ 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_FOLLOW_UPS' | translate }}
         </button>
-        <button mat-raised-button type="button" [routerLink]="['/contacts', contactData.id, 'movement']">
+        <button mat-raised-button type="button" [routerLink]="['/contacts', contactId, 'movement']">
             {{ 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_MOVEMENT' | translate }}
         </button>
-        <button mat-raised-button type="button" [routerLink]="['/contacts', contactData.id, 'chronology']">
+        <button mat-raised-button type="button" [routerLink]="['/contacts', contactId, 'chronology']">
             {{ 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_CHRONOLOGY' | translate }}
         </button>
     </div>

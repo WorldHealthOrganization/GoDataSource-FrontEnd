@@ -14,13 +14,13 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { EntityModel } from '../../../../core/models/entity.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DocumentModel } from '../../../../core/models/document.model';
-import * as moment from 'moment';
 import { Constants } from '../../../../core/models/constants';
 import { NgForm } from '@angular/forms';
 import { EntityType } from '../../../../core/models/entity-type';
 import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-case-merge-duplicate-records',

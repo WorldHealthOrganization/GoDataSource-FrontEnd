@@ -1,6 +1,6 @@
-import * as moment from 'moment';
 import { GenericDataService } from './generic.data.service';
 import { Observable, of } from 'rxjs';
+import { moment } from '../../helperClasses/x-moment';
 
 const CURRENT_DATE = moment.utc().format();
 

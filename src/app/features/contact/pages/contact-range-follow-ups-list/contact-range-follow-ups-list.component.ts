@@ -9,10 +9,8 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
-import * as moment from 'moment';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { Constants } from '../../../../core/models/constants';
-import { Moment } from 'moment';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -25,6 +23,7 @@ import { RangeFollowUpsModel } from '../../../../core/models/range-follow-ups.mo
 import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -141,9 +140,6 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // initialize query builder
-        this.initializeQueryBuilder();
-
         // add page title
         this.exportRangeFollowUpsFileName = this.i18nService.instant('LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE') +
             ' - ' +
@@ -186,7 +182,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
                     // set filter slider info
                     this.slideFilterData.minDate = moment(this.selectedOutbreak.startDate).startOf('day');
-                    this.slideFilterData.maxDate = moment().add(this.selectedOutbreak.periodOfFollowup, 'days').endOf('day');
+                    this.slideFilterData.maxDate = moment().add(1, 'days').endOf('day');
                     this.slideFilterData.maxRange = this.selectedOutbreak.periodOfFollowup;
 
                     // initialize pagination
@@ -194,8 +190,8 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
                     // filter
                     this.filterByDateRange(new FormDateRangeSliderData({
-                        low: moment(),
-                        high: moment().add(this.selectedOutbreak.periodOfFollowup, 'days')
+                        low: moment().add(-this.selectedOutbreak.periodOfFollowup + 1, 'days').startOf('day'),
+                        high: moment().add(1, 'days').endOf('day')
                     }), true);
                 }
 
@@ -217,6 +213,22 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
      */
     refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
+            // order by name
+            this.queryBuilder.sort.clear();
+            this.queryBuilder.sort
+                .by(
+                    'contact.firstName',
+                    RequestSortDirection.ASC
+                )
+                .by(
+                    'contact.lastName',
+                    RequestSortDirection.ASC
+                )
+                .by(
+                    'contact.visualId',
+                    RequestSortDirection.ASC
+                );
+
             // retrieve the list of Follow Ups
             this.displayLoading = true;
             this.followUpsGroupedByContact = [];
@@ -298,6 +310,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
             this.followUpsGroupedByContactCount$ = this.followUpsDataService.getRangeFollowUpsListCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }
@@ -344,26 +357,6 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
         // refresh list
         this.needsRefreshList(instant);
-    }
-
-    /**
-     * Initialize query builder
-     */
-    initializeQueryBuilder() {
-        // order by name
-        this.queryBuilder.sort
-            .by(
-                'contact.firstName',
-                RequestSortDirection.ASC
-            )
-            .by(
-                'contact.lastName',
-                RequestSortDirection.ASC
-            )
-            .by(
-                'contact.visualId',
-                RequestSortDirection.ASC
-            );
     }
 
     resetFilters() {

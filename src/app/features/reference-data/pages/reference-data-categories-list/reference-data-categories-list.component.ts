@@ -7,13 +7,13 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
-import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { HoverRowAction, LoadingDialogModel } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { tap } from 'rxjs/operators';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-reference-data-categories-list',

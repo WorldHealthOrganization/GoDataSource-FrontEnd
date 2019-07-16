@@ -4,10 +4,9 @@ import { GroupBase } from '../../xt-forms/core';
 import { CaseModel } from '../../../core/models/case.model';
 import { ContactModel } from '../../../core/models/contact.model';
 import { FormDatepickerComponent } from '../../xt-forms/components/form-datepicker/form-datepicker.component';
-import { Moment } from 'moment';
 import { AgeModel } from '../../../core/models/age.model';
 import { Constants } from '../../../core/models/constants';
-import * as moment from 'moment';
+import { moment, Moment } from '../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-form-age-dob',

@@ -56,7 +56,9 @@
 
 <!-- Side columns -->
 <app-side-columns
-    [tableColumnsUserSettingsKey]="UserSettings.CONTACT_DAILY_FOLLOW_UP_FIELDS"
+    [tableColumnsUserSettingsKey]="caseId ?
+        UserSettings.CASE_RELATED_DAILY_FOLLOW_UP_FIELDS :
+        UserSettings.CONTACT_DAILY_FOLLOW_UP_FIELDS"
     [tableColumns]="tableColumns"
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
@@ -85,36 +87,48 @@
 </app-side-filters>
 
 <mat-card class="page-section page-content">
-    <!-- Reset Filters -->
-    <div class="reset-filters">
-        <button
-            type="button"
-            mat-raised-button
-            color="accent"
-            (click)="resetFiltersToSideFilters()">
-            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
-        </button>
-        <button
-            type="button"
-            mat-raised-button
-            color="accent"
-            (click)="needsRefreshList(true)">
-            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
-        </button>
-    </div>
+    <div
+        fxLayout="row" fxLayoutAlign="start center">
+        <!-- Contact information -->
+        <div
+            fxFlex fxLayout="column">
+            <div
+                fxFlex fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="start center">
+                <div
+                    class="search-filter-details">
+                    {{ 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_FOLLOW_UPS_FOR_DATE' | translate }}
+                </div>
+                <div>
+                    <app-form-datepicker
+                        #followUpDate
+                        name="dateFilter"
+                        [ngModel]="dateFilterDefaultValue"
+                        [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
+                        (optionChanged)="filterByFollowUpDate($event)"
+                        app-reset-input-on-side-filter
+                        [resetToPristineValue]="false">
+                    </app-form-datepicker>
+                </div>
+            </div>
+        </div>
 
-    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="15px">
-        <span>{{'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_FOLLOW_UPS_FOR_DATE' | translate}}</span>
-        <div fxLayout="column">
-            <app-form-datepicker
-                #followUpDate
-                name="dateFilter"
-                [ngModel]="dateFilterDefaultValue"
-                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
-                (optionChanged)="filterByFollowUpDate($event)"
-                app-reset-input-on-side-filter
-                [resetToPristineValue]="false">
-            </app-form-datepicker>
+        <!-- Reset Filters -->
+        <div
+            class="reset-filters">
+            <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="resetFiltersToSideFilters()">
+                {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+            </button>
+            <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="needsRefreshList(true)">
+                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+            </button>
         </div>
     </div>
 
@@ -264,7 +278,7 @@
         <ng-container matColumnDef="contact.dateOfLastContact">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}</div>
                     <div class="column-filter">
                         <app-form-daterange
                             name="dateFilter"
@@ -281,10 +295,10 @@
         </ng-container>
 
         <!-- Date of the End of Follow-up -->
-        <ng-container matColumnDef="dateOfFollowUpEnd">
+        <ng-container matColumnDef="contact.followUp.endDate">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP' | translate }}</div>
                     <div class="column-filter">
                         <app-form-daterange
                             name="dateFilter"
@@ -301,13 +315,13 @@
         </ng-container>
 
         <!-- Day of Follow-up -->
-        <ng-container matColumnDef="dayOfFollowUp">
+        <ng-container matColumnDef="index">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP' | translate }}</div>
                     <div class="column-filter">
                         <app-form-input
-                            name="dayOfFollowUpFilter"
+                            name="indexFilter"
                             ngModel
                             type="number"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"

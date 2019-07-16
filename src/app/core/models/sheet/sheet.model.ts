@@ -3,7 +3,7 @@ import { SheetCellValidator } from './sheet-cell-validator';
 import { SheetCellType } from './sheet-cell-type';
 import { SheetCellValidationType } from './sheet-cell-validation-type';
 import { map } from 'rxjs/operators';
-import { Moment } from 'moment';
+import { Moment } from '../../helperClasses/x-moment';
 
 export type SheetColumnAsyncValidator = (value: string, callback: (result: boolean) => void) => void;
 

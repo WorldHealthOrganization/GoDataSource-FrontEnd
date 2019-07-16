@@ -14,8 +14,6 @@ import { DialogAnswerButton, DialogField, DialogFieldType, HoverRowAction, Hover
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import * as moment from 'moment';
-import { Moment } from 'moment';
 import { AppliedFilterModel, FilterComparator, FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -34,6 +32,7 @@ import { CountedItemsListItem } from '../../../../shared/components/counted-item
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { FollowUpPage } from '../../typings/follow-up-page';
 import { throwError } from 'rxjs';
+import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -365,11 +364,11 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
             }),
             new VisibleColumnModel({
-                field: 'dateOfFollowUpEnd',
+                field: 'contact.followUp.endDate',
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP'
             }),
             new VisibleColumnModel({
-                field: 'dayOfFollowUp',
+                field: 'index',
                 label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP'
             }),
             new VisibleColumnModel({
@@ -790,6 +789,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(qb);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
             this.followUpsListCount$ = this.followUpsDataService
                 .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
                 .pipe(

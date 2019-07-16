@@ -18,7 +18,7 @@ import { I18nService } from '../../../../../core/services/helper/i18n.service';
 import { I18nServiceMock } from '../../../../../core/services/helper/i18n.service.spec';
 import { ChronologyItem } from '../../../../../shared/components/chronology/typings/chronology-item';
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import { moment } from '../../../../../core/helperClasses/x-moment';
 
 describe('CaseChronology', () => {
     // Component tests

@@ -12,10 +12,10 @@ import { HttpClient } from '@angular/common/http';
 import * as _ from 'lodash';
 import { EntityModel } from '../../models/entity.model';
 import { LabelValuePair } from '../../models/label-value-pair';
-import * as moment from 'moment';
 import { Constants } from '../../models/constants';
 import { I18nService } from '../helper/i18n.service';
 import { map } from 'rxjs/operators';
+import { moment } from '../../helperClasses/x-moment';
 
 @Injectable()
 export class EntityDataService {

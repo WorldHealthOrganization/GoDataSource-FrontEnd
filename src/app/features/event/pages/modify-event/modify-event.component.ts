@@ -13,11 +13,10 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { UserModel } from '../../../../core/models/user.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { Moment } from 'moment';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-modify-event',
@@ -39,7 +38,7 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
     // provide constants to template
     EntityType = EntityType;
 
-    serverToday: Moment = null;
+    serverToday: Moment = moment();
 
     constructor(
         protected route: ActivatedRoute,
@@ -49,7 +48,6 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
         private snackbarService: SnackbarService,
         private router: Router,
         private authDataService: AuthDataService,
-        private genericDataService: GenericDataService,
         private dialogService: DialogService
     ) {
         super(route);
@@ -58,13 +56,6 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
-
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
-            });
 
         this.route.params
             .subscribe((params: {eventId}) => {

@@ -16,8 +16,6 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { Moment } from 'moment';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField } from '../../../../shared/components';
@@ -31,6 +29,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-modify-contact',
@@ -59,7 +58,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     EntityType = EntityType;
     EntityModel = EntityModel;
 
-    serverToday: Moment = null;
+    serverToday: Moment = moment();
 
     visualIDTranslateData: {
         mask: string
@@ -79,7 +78,6 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
         private router: Router,
-        private genericDataService: GenericDataService,
         private dialogService: DialogService,
         private i18nService: I18nService,
         private relationshipDataService: RelationshipDataService
@@ -96,13 +94,6 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
-
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
-            });
 
         this.route.params
             .subscribe((params: {contactId}) => {
@@ -384,5 +375,14 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
             this.contactData.visualId = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);
             this.visualId.control.markAsDirty();
         }
+    }
+
+    /**
+     * Get person link
+     */
+    getPersonLink(contactExposure) {
+        return contactExposure ?
+            EntityModel.getPersonLink(contactExposure) :
+            null;
     }
 }

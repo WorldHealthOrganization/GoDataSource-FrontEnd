@@ -29,8 +29,8 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { throwError } from 'rxjs';
 import { catchError, map, mergeMap, share } from 'rxjs/operators';
 import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
-import * as moment from 'moment';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-bulk-create-contacts',

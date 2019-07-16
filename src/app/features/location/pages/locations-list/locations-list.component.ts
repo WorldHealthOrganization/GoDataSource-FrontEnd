@@ -15,7 +15,6 @@ import { DialogService, ExportDataExtension } from '../../../../core/services/he
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
 import { ErrorCodes } from '../../../../core/enums/error-codes.enum';
-import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { FormLocationDropdownComponent, LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import { catchError, share, tap } from 'rxjs/operators';
@@ -24,6 +23,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder';
 import { throwError } from 'rxjs';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-locations-list',
@@ -235,6 +235,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         // remove paginator from query builder
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
         this.locationsListCount$ = this.locationDataService.getLocationsCountByParent(this.parentId, countQueryBuilder).pipe(share());
     }
 

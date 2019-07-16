@@ -16,11 +16,10 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import * as _ from 'lodash';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-import { Moment } from 'moment';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import * as moment from 'moment';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-create-case-relationship',
@@ -47,7 +46,7 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
     // case data
     caseData: CaseModel = new CaseModel();
 
-    serverToday: Moment = null;
+    serverToday: Moment = moment();
 
     /**
      * Check if we need to display warning message that case date of onset is after sample taken date
@@ -81,13 +80,6 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
         this.resultTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT);
         this.labNameOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME);
         this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
-
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
-            });
 
         this.route.params
             .subscribe((params: {caseId}) => {

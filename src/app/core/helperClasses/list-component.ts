@@ -11,9 +11,7 @@ import { ResetInputOnSideFilterDirective } from '../../shared/directives/reset-i
 import { MatPaginator, MatSort, MatSortable, PageEvent } from '@angular/material';
 import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
 import { DebounceTimeCaller } from './debounce-time-caller';
-import { Moment } from 'moment';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
-import * as moment from 'moment';
 import { FormCheckboxComponent } from '../../shared/xt-forms/components/form-checkbox/form-checkbox.component';
 import { SnackbarService } from '../services/helper/snackbar.service';
 import {
@@ -22,6 +20,7 @@ import {
 } from '../models/metrics/metric.contacts-with-success-follow-up.model';
 import { VisibleColumnModel } from '../../shared/components/side-columns/model';
 import { AddressType } from '../models/address.model';
+import { moment, Moment } from './x-moment';
 
 export abstract class ListComponent implements OnDestroy {
     /**
@@ -159,7 +158,9 @@ export abstract class ListComponent implements OnDestroy {
         // refresh list
         this.refreshingList = true;
         this.refreshList(() => {
-            this.refreshingList = false;
+            setTimeout(() => {
+                this.refreshingList = false;
+            });
         });
     }));
 
@@ -1096,6 +1097,13 @@ export abstract class ListComponent implements OnDestroy {
                         }
                     });
                 }
+
+                // exclude discarded cases
+                this.appliedListFilterQueryBuilder.filter.where({
+                    classification: {
+                        neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                    }
+                });
 
                 // merge query builder
                 this.mergeListFilterToMainFilter();

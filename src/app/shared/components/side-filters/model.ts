@@ -2,7 +2,7 @@
 import { Observable } from 'rxjs';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
-import { Moment } from 'moment';
+import { Moment } from '../../../core/helperClasses/x-moment';
 
 // value types
 enum ValueType {

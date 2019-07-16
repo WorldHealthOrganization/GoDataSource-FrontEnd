@@ -19,8 +19,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { catchError, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { Moment } from 'moment';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -44,7 +43,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     // list of geographical levels
     geographicalLevelsList$: Observable<any[]>;
 
-    serverToday: Moment = null;
+    serverToday: Moment = moment();
 
     outbreakNameValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
@@ -55,8 +54,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private authDataService: AuthDataService,
-        private dialogService: DialogService,
-        private genericDataService: GenericDataService
+        private dialogService: DialogService
     ) {
         super(route);
 
@@ -78,13 +76,6 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
                     })
                 )
             );
-
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
-            });
 
         // get outbreak
         this.outbreak = this.route.snapshot.data.outbreak;

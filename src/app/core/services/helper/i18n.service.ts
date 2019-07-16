@@ -8,9 +8,9 @@ import { ModelHelperService } from './model-helper.service';
 import { UserDataService } from '../data/user.data.service';
 import { AuthDataService } from '../data/auth.data.service';
 import { map, mergeMap } from 'rxjs/operators';
-import * as moment from 'moment';
 import * as _ from 'lodash';
 import { AuthModel } from '../../models/auth.model';
+import { moment } from '../../helperClasses/x-moment';
 
 @Injectable()
 export class I18nService {

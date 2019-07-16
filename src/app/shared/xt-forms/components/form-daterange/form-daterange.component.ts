@@ -2,8 +2,8 @@ import { Component, Host, HostBinding, Inject, Input, Optional, SkipSelf, ViewEn
 import { GroupBase } from '../../core';
 import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { DateRangeModel } from '../../../../core/models/date-range.model';
-import * as moment from 'moment';
-import { Moment } from 'moment';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import * as momentOriginal from 'moment';
 
 @Component({
     selector: 'app-form-daterange',
@@ -93,7 +93,7 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
             // do we need to replace start date time with start of the day?
             if (
                 this.dateRange.startDate && (
-                    !(this.dateRange.startDate instanceof moment) ||
+                    !(this.dateRange.startDate instanceof momentOriginal) ||
                     !(this.dateRange.startDate as Moment).isSame((this.dateRange.startDate as Moment).startOf('day'))
                 )
             ) {
@@ -103,7 +103,7 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
             // do we need to replace end date time with end of the day?
             if (
                 this.dateRange.endDate && (
-                    !(this.dateRange.endDate instanceof moment) ||
+                    !(this.dateRange.endDate instanceof momentOriginal) ||
                     !(this.dateRange.endDate as Moment).isSame((this.dateRange.endDate as Moment).endOf('day'))
                 )
             ) {

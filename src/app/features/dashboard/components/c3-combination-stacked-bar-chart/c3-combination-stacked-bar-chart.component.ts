@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import * as c3 from 'c3';
 
 @Component({
@@ -7,7 +7,7 @@ import * as c3 from 'c3';
     templateUrl: './c3-combination-stacked-bar-chart.component.html',
     styleUrls: ['./c3-combination-stacked-bar-chart.component.less']
 })
-export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges {
+export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges, OnDestroy {
 
     @Input() chartData;
     @Input() chartDataColumns;
@@ -29,15 +29,29 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges 
         this.render();
     }
 
+    ngOnDestroy(): void {
+        this.destroyChart();
+    }
+
     ngOnChanges(): any {
         // render c3 object
         this.render();
+    }
+
+    private destroyChart() {
+        if (this.chart) {
+            this.chart.destroy();
+            this.chart = null;
+        }
     }
 
     /**
      * generate the chart
      */
     render() {
+        // destroy before re-init
+        this.destroyChart();
+
         const chartIdBind = '#' + this.chartId;
         this.chart = c3.generate({
             bindto: chartIdBind,
@@ -147,8 +161,26 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges 
      * @param {number} elementsDisplayedNo
      */
     configureNumberOfTicks(elementsDisplayedNo: number) {
-        const elements: any = document.getElementById(this.chartId).querySelectorAll('.c3-axis-x');
+        const chartElement = document.getElementById(this.chartId);
+        if (!chartElement) {
+            return;
+        }
+
+        const elements: any = chartElement.querySelectorAll('.c3-axis-x');
+        if (
+            !elements ||
+            elements.length < 1
+        ) {
+            return;
+        }
+
         const element: any = elements[0];
+        if (
+            !element ||
+            !element.classList
+        ) {
+            return;
+        }
 
         if (elementsDisplayedNo < 70) {
             element.classList.add('c3-axis-x-n');

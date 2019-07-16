@@ -13,8 +13,6 @@ import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-import { Moment } from 'moment';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as _ from 'lodash';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -25,6 +23,7 @@ import { Constants } from '../../../../core/models/constants';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-create-case',
@@ -53,7 +52,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
-    serverToday: Moment = null;
+    serverToday: Moment = moment();
     Constants = Constants;
 
     visualIDTranslateData: {
@@ -70,7 +69,6 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private genericDataService: GenericDataService,
         private dialogService: DialogService,
         private i18nService: I18nService
     ) {
@@ -91,13 +89,6 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
 
                     this.initializeBreadcrumbs();
                 }
-            });
-
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
             });
 
         // by default, enforce Case having an address

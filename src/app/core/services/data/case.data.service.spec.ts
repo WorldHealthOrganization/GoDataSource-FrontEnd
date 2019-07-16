@@ -1,8 +1,8 @@
 import { Observable, of } from 'rxjs';
 import * as _ from 'lodash';
 import { CaseModel } from '../../models/case.model';
-import * as moment from 'moment';
 import { CaseCenterDateRangeModel } from '../../models/case-center-date-range.model';
+import { moment } from '../../helperClasses/x-moment';
 
 export const CaseDataServiceMock: {
     selectedCaseId: string,

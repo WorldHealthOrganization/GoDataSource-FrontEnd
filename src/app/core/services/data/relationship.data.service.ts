@@ -12,7 +12,6 @@ import { MetricNewCasesWithContactsModel } from '../../models/metric-new-cases-c
 import { ReportCasesWithOnsetModel } from '../../models/report-cases-with-onset.model';
 import { LabelValuePair } from '../../models/label-value-pair';
 import { Constants } from '../../models/constants';
-import * as moment from 'moment';
 import * as _ from 'lodash';
 import { EntityModel } from '../../models/entity.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
@@ -20,6 +19,7 @@ import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
 import { map } from 'rxjs/operators';
+import { moment } from '../../helperClasses/x-moment';
 
 @Injectable()
 export class RelationshipDataService {
@@ -243,6 +243,22 @@ export class RelationshipDataService {
     ): Observable<any> {
         return this.http.delete(
             `outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/${relationshipId}`
+        );
+    }
+
+    /**
+     * Delete multiple relationships at once
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    deleteBulkRelationships(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+        const selectedRelationships = queryBuilder.filter.generateCondition(true);
+
+        return this.http.delete(
+            `outbreaks/${outbreakId}/relationships/bulk?where=${selectedRelationships}`
         );
     }
 

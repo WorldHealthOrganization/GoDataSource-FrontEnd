@@ -9,7 +9,6 @@ import { MetricCasesCountStratified } from '../../models/metrics/metric-cases-co
 import { MetricCasesPerLocationCountsModel } from '../../models/metrics/metric-cases-per-location-counts.model';
 import { AddressModel } from '../../models/address.model';
 import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../models/metrics/metric-cases-delay-between-onset-lab-test.model';
-import * as moment from 'moment';
 import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import * as _ from 'lodash';
@@ -20,6 +19,7 @@ import { MetricCasesCountStratifiedOutcome } from '../../models/metrics/metric-c
 import { MetricCasesBasedOnContactStatusModel } from '../../models/metrics/metric-cases-based-on-contact-status.model';
 import { catchError, map } from 'rxjs/operators';
 import { throwError, of } from 'rxjs';
+import { moment } from '../../helperClasses/x-moment';
 
 @Injectable()
 export class CaseDataService {

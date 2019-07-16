@@ -15,8 +15,8 @@ import { AttachmentModel } from '../../../core/models/attachment.model';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import * as FileSaver from 'file-saver';
-import { Moment } from 'moment';
-import * as moment from 'moment';
+import * as momentOriginal from 'moment';
+import { moment, Moment } from '../../../core/helperClasses/x-moment';
 
 interface UploaderData {
     uploader: FileUploader;
@@ -299,7 +299,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         }
 
         // set date
-        const childDate: string = this.parentDate instanceof moment ?
+        const childDate: string = this.parentDate instanceof momentOriginal ?
             (this.parentDate as Moment).format() :
             (this.parentDate as string);
         const setDates = (question: QuestionModel, childIndex: number) => {
@@ -620,7 +620,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         value: string | Moment
     ) {
         // set date
-        answerData.date = value instanceof moment ?
+        answerData.date = value instanceof momentOriginal ?
             (value as Moment).format() :
             (value as string);
 
@@ -633,7 +633,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
      */
     private generateNewAnswer(parentDate: Moment | string): IAnswerData {
         // determine if we have parent date
-        const childDate: string = parentDate instanceof moment ?
+        const childDate: string = parentDate instanceof momentOriginal ?
             (parentDate as Moment).format() :
             (parentDate as string);
 

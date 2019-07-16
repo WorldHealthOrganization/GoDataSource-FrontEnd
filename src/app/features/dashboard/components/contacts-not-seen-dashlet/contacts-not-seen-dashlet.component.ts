@@ -8,8 +8,8 @@ import { Subscriber, Subscription } from 'rxjs';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import * as moment from 'moment';
 import * as _ from 'lodash';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-contacts-not-seen-dashlet',

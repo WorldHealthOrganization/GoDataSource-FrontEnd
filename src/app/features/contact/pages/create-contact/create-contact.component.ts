@@ -20,8 +20,6 @@ import { EventModel } from '../../../../core/models/event.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { Moment } from 'moment';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -31,6 +29,7 @@ import { RelationshipPersonModel } from '../../../../core/models/relationship-pe
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-create-contact',
@@ -55,7 +54,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
     relatedEntityData: CaseModel | EventModel;
     relationship: RelationshipModel = new RelationshipModel();
 
-    serverToday: Moment = null;
+    serverToday: Moment = moment();
 
     visualIDTranslateData: {
         mask: string
@@ -73,7 +72,6 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService,
         private dialogService: DialogService,
         private i18nService: I18nService,
         private redirectService: RedirectService
@@ -90,13 +88,6 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
         this.contactData.addresses.push(new AddressModel());
         // pre-set the initial address as "current address"
         this.contactData.addresses[0].typeId = AddressType.CURRENT_ADDRESS;
-
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
-            });
 
         // retrieve query params
         this.route.queryParams

@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { LocationModel } from './location.model';
 import { RequestFilter, RequestQueryBuilder } from '../helperClasses/request-query-builder';
-import * as moment from 'moment';
+import { moment } from '../helperClasses/x-moment';
 
 // addresses types
 export enum AddressType {

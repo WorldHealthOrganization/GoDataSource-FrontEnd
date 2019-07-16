@@ -16,7 +16,7 @@ import { AppliedFilterModel, FilterComparator, FilterModel, FilterType } from '.
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
@@ -324,10 +324,6 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 excludeFromSave: true
             }),
             new VisibleColumnModel({
-                field: 'contact.dateOfLastContact',
-                label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
-            }),
-            new VisibleColumnModel({
                 field: 'date',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE'
             }),
@@ -345,11 +341,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED'
             }),
             new VisibleColumnModel({
-                field: 'dateOfFollowUpEnd',
-                label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP'
-            }),
-            new VisibleColumnModel({
-                field: 'dayOfFollowUp',
+                field: 'index',
                 label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP'
             }),
             new VisibleColumnModel({
@@ -444,6 +436,15 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 this.contactId
             );
 
+            // make sure we always sort by something
+            // default by date asc
+            if (this.queryBuilder.sort.isEmpty()) {
+                this.queryBuilder.sort.by(
+                    'date',
+                    RequestSortDirection.ASC
+                );
+            }
+
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService
                 .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
@@ -485,6 +486,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(qb);
             countQueryBuilder.paginator.clear();
+            countQueryBuilder.sort.clear();
             this.followUpsListCount$ = this.followUpsDataService
                 .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
                 .pipe(

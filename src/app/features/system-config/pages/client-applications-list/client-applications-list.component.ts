@@ -15,13 +15,13 @@ import { SystemClientApplicationModel } from '../../../../core/models/system-cli
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Observable, Subscriber } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { environment } from '../../../../../environments/environment';
 import { catchError } from 'rxjs/operators';
 import { throwError, of, forkJoin } from 'rxjs';
 import { Router } from '@angular/router';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-client-applications-list',

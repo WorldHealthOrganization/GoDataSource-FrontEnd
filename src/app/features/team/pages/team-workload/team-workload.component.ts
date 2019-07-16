@@ -9,12 +9,11 @@ import { TeamFollowupsPerDayModel } from '../../../../core/models/team-followups
 import { Constants } from '../../../../core/models/constants';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
-import * as moment from 'moment';
 import * as _ from 'lodash';
-import { Moment } from 'moment';
 import { FormDateRangeSliderData } from '../../../../shared/xt-forms/components/form-date-range-slider/form-date-range-slider.component';
 import { Subscription } from 'rxjs';
 import { TeamModel } from '../../../../core/models/team.model';
+import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-team-workload',
@@ -97,7 +96,11 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
             .getTeamsList()
             .subscribe((teams) => {
                 // map teams
-                this.teamsData = [];
+                this.teamsData = [{
+                    id: null,
+                    name: this.i18nService.instant('LNG_PAGE_TEAMS_WORKLOAD_NO_TEAM_LABEL'),
+                    dates: {}
+                }];
                 _.forEach(teams, (team: TeamModel) => {
                     this.teamsData.push({
                         id: team.id,
@@ -118,11 +121,11 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                         ) {
                             // set min & max dates
                             this.slideFilterData.minDate = moment(this.selectedOutbreak.startDate).startOf('day');
-                            this.slideFilterData.maxDate = moment().add(this.selectedOutbreak.periodOfFollowup, 'days').endOf('day');
+                            this.slideFilterData.maxDate = moment().add(1, 'days').endOf('day');
                             this.slideFilterData.maxRange = this.selectedOutbreak.periodOfFollowup;
                             this.sliderDateFilterValue = new FormDateRangeSliderData({
-                                low: moment(),
-                                high: moment().add(this.selectedOutbreak.periodOfFollowup, 'days')
+                                low: moment().add(-this.selectedOutbreak.periodOfFollowup + 1, 'days').startOf('day'),
+                                high: moment().add(1, 'days').endOf('day')
                             });
                         }
                     });
@@ -209,16 +212,11 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
             // map teams for team search
             const teamsMap = {};
             this.teamsData.forEach((teamData) => {
-                teamsMap[teamData.id] = teamData;
+                teamsMap[teamData.id ? teamData.id : 'N'] = teamData;
             });
 
-            // keep only teams with id
-            const teams = _.filter(metricTeamsFollowups.teams, (teamMetricData) => {
-                return teamMetricData.id && teamsMap[teamMetricData.id];
-            }) as any[];
-
             // go through teams and create list of date information
-            _.forEach(teams, (team) => {
+            _.forEach(metricTeamsFollowups.teams, (team) => {
                 // construct list of dates
                 const dates = {};
                 if (team.dates) {
@@ -231,7 +229,14 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                 }
 
                 // assign dates
-                teamsMap[team.id].dates = dates;
+                if (
+                    team.id &&
+                    teamsMap[team.id]
+                ) {
+                    teamsMap[team.id].dates = dates;
+                } else {
+                    teamsMap['N'].dates = dates;
+                }
             });
         }
 

@@ -15,11 +15,11 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import * as moment from 'moment';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-contact-merge-duplicate-records',

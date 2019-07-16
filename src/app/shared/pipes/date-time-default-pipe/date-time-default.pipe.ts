@@ -6,9 +6,7 @@ import * as moment from 'moment';
     name: 'dateTimeDefault'
 })
 export class DateTimeDefaultPipe implements PipeTransform {
-
     transform(value: any): any {
-        return value ? moment(value).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : '';
+        return value ? moment.utc(value).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : '';
     }
-
 }

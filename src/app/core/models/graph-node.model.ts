@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { EntityType } from './entity-type';
 import { Constants } from './constants';
-import * as moment from 'moment';
+import { moment } from '../helperClasses/x-moment';
 
 export class GraphNodeModel {
     id: string;
