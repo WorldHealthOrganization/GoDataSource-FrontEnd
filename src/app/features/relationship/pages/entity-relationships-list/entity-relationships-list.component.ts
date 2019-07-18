@@ -26,6 +26,7 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
+import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -48,6 +49,8 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     relationshipTypeList$: Observable<any>;
     personTypesListMap: { [id: string]: ReferenceDataEntryModel };
     clusterOptions$: Observable<any[]>;
+
+    relationshipTypeContact: boolean = false;
 
     // provide constants to template
     Constants = Constants;
@@ -155,6 +158,10 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                 {}
             );
         });
+
+        if (this.relationshipType === RelationshipType.CONTACT) {
+            this.relationshipTypeContact = true;
+        }
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
@@ -484,15 +491,26 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
 
     changeSourceForSelectedRelationships() {
         const selectedRecords: false | string [] = this.validateCheckedRecords();
+        const selectedTargetPersons: string[] = [];
+        // pass the selected target persons for not including them in available peoples
+        _.forEach(this.checkedEntityModels, (model) => {
+            const targetPerson: RelationshipPersonModel = _.find(model.relationship.persons, 'target');
+            selectedTargetPersons.push(targetPerson.id);
+        });
         if (!selectedRecords) {
             return;
         }
+        // keep only unique values
+        const filteredIds = selectedTargetPersons.filter((personId, index, self) => {
+            return self.indexOf(personId) === index;
+        });
 
         this.router.navigate(
             [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/switch`],
             {
                 queryParams: {
-                    selectedTargetIds: JSON.stringify(selectedRecords)
+                    selectedTargetIds: JSON.stringify(selectedRecords),
+                    selectedPersonsIds: JSON.stringify(filteredIds)
                 }
             }
         );

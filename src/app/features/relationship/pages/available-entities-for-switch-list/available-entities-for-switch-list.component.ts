@@ -23,7 +23,6 @@ import {
 } from '../../../../core/models/reference-data.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityType } from '../../../../core/models/entity-type';
-import { FormControl, NgForm } from '@angular/forms';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
@@ -43,6 +42,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     // available side filters
     availableSideFilters: FilterModel[];
     selectedRecordsIds: string[];
+    selectedPeopleIds: string[];
 
     // saved filters type
     savedFiltersType = Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_RELATIONSHIPS.value;
@@ -104,18 +104,6 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
             );
         });
 
-        // read route query params
-        this.route.queryParams
-            .subscribe((queryParams: { selectedTargetIds }) => {
-                if (_.isEmpty(queryParams.selectedTargetIds)) {
-                    this.snackbarService.showError('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_NO_FOLLOW_UPS_SELECTED');
-
-                    this.router.navigate(['/contacts/follow-ups']);
-                } else {
-                    this.selectedRecordsIds = JSON.parse(queryParams.selectedTargetIds);
-                }
-            });
-
         // side filters
         this.generateSideFilters();
     }
@@ -134,6 +122,24 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
         this.initPaginator();
         // ...and (re)load the list
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Get queryParams for further use
+     */
+    getQueryParams() {
+        // read route query params
+        this.route.queryParams
+            .subscribe((queryParams: { selectedTargetIds, selectedPersonsIds }) => {
+                if (_.isEmpty(queryParams.selectedTargetIds)) {
+                    this.snackbarService.showError('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_NO_FOLLOW_UPS_SELECTED');
+
+                    this.router.navigate(['/contacts/follow-ups']);
+                } else {
+                    this.selectedRecordsIds = JSON.parse(queryParams.selectedTargetIds);
+                    this.selectedPeopleIds = JSON.parse(queryParams.selectedPersonsIds);
+                }
+            });
     }
 
     /**
@@ -173,13 +179,24 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
             this.entityId &&
             this.selectedOutbreak
         ) {
+            this.getQueryParams();
+            // create queryBuilder
+            const qb = new RequestQueryBuilder();
+            qb.merge(this.queryBuilder);
+
+            qb.filter.where({
+                id: {
+                    nin: this.selectedPeopleIds
+                }
+            });
+
             // retrieve the list of Relationships
             this.entitiesList$ = this.relationshipDataService
                 .getEntityAvailablePeople(
                     this.selectedOutbreak.id,
                     this.entityType,
                     this.entityId,
-                    this.queryBuilder
+                    qb
                 )
                 .pipe(
                     tap(this.checkEmptyList.bind(this)),
@@ -201,6 +218,17 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
             this.entityId &&
             this.selectedOutbreak
         ) {
+            this.getQueryParams();
+            // create queryBuilder
+            const qb = new RequestQueryBuilder();
+            qb.merge(this.queryBuilder);
+
+            qb.filter.where({
+                id: {
+                    nin: this.selectedPeopleIds
+                }
+            });
+
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
@@ -209,7 +237,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                     this.selectedOutbreak.id,
                     this.entityType,
                     this.entityId,
-                    this.queryBuilder
+                    qb
                 )
                 .pipe(share());
         }
@@ -293,8 +321,6 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                 inq: this.selectedRecordsIds
             }
         });
-
-        console.log(this.selectedRecordsIds);
 
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CHANGE_SOURCE')
             .subscribe((answer: DialogAnswer) => {
