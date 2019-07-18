@@ -39,6 +39,7 @@ export const EnglishUsLang = {
          * uiDialogs
          */
         'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIPS': 'Are you sure you want to delete selected relationships?',
+        'LNG_DIALOG_CONFIRM_CHANGE_SOURCE': 'Are you sure you want to set this entity as source for selected contacts?',
 
         /**
          * uiEntityRelationshipsListPage
@@ -55,8 +56,14 @@ export const EnglishUsLang = {
         /**
          * uiEntityRelationshipsListPage
          */
-        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE': 'Change source'
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE': 'Change source',
 
+        /**
+         * uiAvailableEntitiesForSwitchRelationshipPage
+         */
+        'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_TITLE': 'Available people for switch',
+        'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_SET_SOURCE_BUTTON': 'Set as source',
+        'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE': 'Source set successful'
 
         /**
          * REMOVE the tokens from below

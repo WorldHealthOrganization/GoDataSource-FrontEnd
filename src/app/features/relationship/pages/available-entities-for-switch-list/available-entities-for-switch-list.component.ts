@@ -165,7 +165,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                     this.relationshipsListPageTitle,
                     `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
                 ),
-                new BreadcrumbItemModel('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE', null, true)
+                new BreadcrumbItemModel('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_TITLE', null, true)
             ];
         }
     }
@@ -302,10 +302,9 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
         return columns;
     }
 
-    get changeRelationshipText() {
-        return 'asdasd';
-    }
-
+    /**
+     * Switch cases with selected entity
+     */
     switchWithSelectedRecord() {
         // get the selected record
         const selectedRecord = this.checkedRecords[0];
@@ -337,7 +336,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                               })
                           )
                           .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_BULK_CHANGE_SOURCE_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
                           });
                   }
             });

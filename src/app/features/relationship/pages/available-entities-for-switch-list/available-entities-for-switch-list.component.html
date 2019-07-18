@@ -60,8 +60,6 @@
                             <app-form-slide-toggle
                                 #listCheckedIndividual
                                 [name]="'recordCheck[' + item + ']'"
-                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
-                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
                                 (optionChanged)="checkedRecord(item.id, $event)">
                             </app-form-slide-toggle>
                         </mat-cell>
@@ -223,7 +221,7 @@
             mat-raised-button
             color="accent"
             (click)="switchWithSelectedRecord()">
-            {{ changeRelationshipText | translate}}
+            {{ 'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_SET_SOURCE_BUTTON' | translate}}
         </button>
     </div>
 </div>
