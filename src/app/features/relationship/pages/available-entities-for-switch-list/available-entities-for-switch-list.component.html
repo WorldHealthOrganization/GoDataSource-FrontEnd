@@ -57,6 +57,15 @@
                             </div>
                         </mat-header-cell>
                         <mat-cell *matCellDef="let item;" fxFlex="60px">
+
+                            <!--<app-form-checkbox-->
+                                <!--#listCheckedIndividual-->
+                                <!--[name]="'recordCheck[' + item + ']'"-->
+                                <!--class="table-checkbox"-->
+                                <!--ngModel-->
+                                <!--(optionChanged)="checkedRecord(item.id, $event, true)">-->
+                            <!--</app-form-checkbox>-->
+
                             <app-form-slide-toggle
                                 #listCheckedIndividual
                                 [name]="'recordCheck[' + item + ']'"

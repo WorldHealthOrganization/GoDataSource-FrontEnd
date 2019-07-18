@@ -148,6 +148,7 @@ export abstract class ListComponent implements OnDestroy {
             });
         }
     }
+
     get checkedAllRecords(): boolean {
         return this.checkboxModels.checkAll;
     }

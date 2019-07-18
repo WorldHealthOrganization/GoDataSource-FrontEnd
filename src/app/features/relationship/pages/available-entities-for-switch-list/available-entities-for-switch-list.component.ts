@@ -132,7 +132,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
         this.route.queryParams
             .subscribe((queryParams: { selectedTargetIds, selectedPersonsIds }) => {
                 if (_.isEmpty(queryParams.selectedTargetIds)) {
-                    this.snackbarService.showError('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_NO_FOLLOW_UPS_SELECTED');
+                    this.snackbarService.showError('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_NO_CONTACTS_SELECTED');
 
                     this.router.navigate(['/contacts/follow-ups']);
                 } else {
