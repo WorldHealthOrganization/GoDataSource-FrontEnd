@@ -337,6 +337,8 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                           )
                           .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
+
+                            this.router.navigate(['/cases']);
                           });
                   }
             });
