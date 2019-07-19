@@ -15,7 +15,6 @@ import * as _ from 'lodash';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { Constants } from '../../../../core/models/constants';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import {
     ReferenceDataCategory, ReferenceDataCategoryModel,
@@ -38,6 +37,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
 
     entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
     entitiesListCount$: Observable<any>;
+    entityType: EntityType;
 
     // available side filters
     availableSideFilters: FilterModel[];
@@ -51,8 +51,6 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     genderList$: Observable<any[]>;
     personTypesList$: Observable<any[]>;
     personTypesListMap: { [id: string]: ReferenceDataEntryModel };
-    riskLevelsList$: Observable<any[]>;
-    caseClassificationsList$: Observable<any[]>;
 
     // provide constants to template
     Constants = Constants;
@@ -67,7 +65,6 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
         protected outbreakDataService: OutbreakDataService,
         protected entityDataService: EntityDataService,
         private relationshipDataService: RelationshipDataService,
-        private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService
     ) {
@@ -82,8 +79,6 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
 
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
-        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).pipe(share());
-        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION).pipe(share());
         const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
         this.personTypesList$ = personTypes$
             .pipe(
@@ -130,7 +125,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     getQueryParams() {
         // read route query params
         this.route.queryParams
-            .subscribe((queryParams: { selectedTargetIds, selectedPersonsIds }) => {
+            .subscribe((queryParams: { selectedTargetIds, selectedPersonsIds, entityType }) => {
                 if (_.isEmpty(queryParams.selectedTargetIds)) {
                     this.snackbarService.showError('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_NO_CONTACTS_SELECTED');
 
@@ -138,6 +133,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                 } else {
                     this.selectedRecordsIds = JSON.parse(queryParams.selectedTargetIds);
                     this.selectedPeopleIds = JSON.parse(queryParams.selectedPersonsIds);
+                    this.entityType = JSON.parse(queryParams.entityType);
                 }
             });
     }
@@ -307,8 +303,8 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
      */
     switchWithSelectedRecord() {
         // get the selected record
-        const selectedRecord = this.checkedRecords[0];
-        if (!selectedRecord) {
+        const selectedRecordId = this.checkedRecords[0];
+        if (!selectedRecordId) {
             return;
         }
 
@@ -327,7 +323,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                       this.relationshipDataService
                           .bulkChangeSource(
                               this.selectedOutbreak.id,
-                              selectedRecord,
+                              selectedRecordId,
                               qb)
                           .pipe(
                               catchError((err) => {
@@ -338,7 +334,8 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                           .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
 
-                            this.router.navigate(['/cases']);
+                            this.router.navigate(['/relationships', this.entityType, selectedRecordId, 'contacts']);
+
                           });
                   }
             });

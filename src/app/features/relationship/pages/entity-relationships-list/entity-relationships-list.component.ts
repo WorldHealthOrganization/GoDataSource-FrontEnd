@@ -510,7 +510,8 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             {
                 queryParams: {
                     selectedTargetIds: JSON.stringify(selectedRecords),
-                    selectedPersonsIds: JSON.stringify(filteredIds)
+                    selectedPersonsIds: JSON.stringify(filteredIds),
+                    entityType: JSON.stringify(this.entityType)
                 }
             }
         );
