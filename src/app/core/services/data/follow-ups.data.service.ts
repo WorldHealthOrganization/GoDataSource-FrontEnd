@@ -99,15 +99,27 @@ export class FollowUpsDataService {
      * @param {string} outbreakId
      * @param {string} contactId
      * @param {string} followUpId
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<FollowUpModel>}
      */
-    getFollowUp(outbreakId: string, contactId: string, followUpId: string): Observable<FollowUpModel> {
+    getFollowUp(
+        outbreakId: string,
+        contactId: string,
+        followUpId: string,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<FollowUpModel> {
         // include contact in response
         const qb = new RequestQueryBuilder();
         qb.include('contact', true);
         qb.filter.where({
             id: followUpId
         });
+
+        // retrieve created user & modified user information
+        if (retrieveCreatedUpdatedBy) {
+            qb.include('createdByUser', true);
+            qb.include('updatedByUser', true);
+        }
 
         // construct query
         const filter = qb.buildQuery();

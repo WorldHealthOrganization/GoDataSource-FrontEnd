@@ -33,6 +33,7 @@ import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-com
 import { FollowUpPage } from '../../typings/follow-up-page';
 import { throwError } from 'rxjs';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -47,6 +48,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     authUser: UserModel;
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
+
+    // user list
+    userList$: Observable<UserModel[]>;
 
     // follow ups list
     followUpsList$: Observable<FollowUpModel[]>;
@@ -190,7 +194,8 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
-        private caseDataService: CaseDataService
+        private caseDataService: CaseDataService,
+        private userDataService: UserDataService
     ) {
         super(
             snackbarService, dialogService, followUpsDataService,
@@ -207,6 +212,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         // dropdowns options
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
+
+        // retrieve users
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
         // set default filter rules
         this.initializeHeaderFilters();
@@ -384,6 +392,22 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 field: 'deleted',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
                 visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'createdBy',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'createdAt',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedBy',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedAt',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT'
             })
         ];
     }
@@ -751,6 +775,10 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             if (this.caseId) {
                 this.queryBuilder.addChildQueryBuilder('case').filter.byEquality('id', this.caseId);
             }
+
+            // retrieve created user & modified user information
+            this.queryBuilder.include('createdByUser', true);
+            this.queryBuilder.include('updatedByUser', true);
 
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService

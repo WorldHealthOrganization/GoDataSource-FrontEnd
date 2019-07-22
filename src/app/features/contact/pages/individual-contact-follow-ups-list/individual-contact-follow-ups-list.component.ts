@@ -26,6 +26,7 @@ import { map, share, tap } from 'rxjs/operators';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { DialogField, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { FollowUpPage } from '../../typings/follow-up-page';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-individual-contact-follow-ups-list',
@@ -40,6 +41,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
     authUser: UserModel;
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
+
+    // user list
+    userList$: Observable<UserModel[]>;
 
     // follow ups list
     followUpsList$: Observable<FollowUpModel[]>;
@@ -175,7 +179,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
-        private contactDataService: ContactDataService
+        private contactDataService: ContactDataService,
+        private userDataService: UserDataService
     ) {
         super(
             snackbarService, dialogService, followUpsDataService,
@@ -188,6 +193,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // retrieve users
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
         // dropdowns options
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
@@ -357,6 +365,22 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 field: 'deleted',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
                 visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'createdBy',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'createdAt',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedBy',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedAt',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT'
             })
         ];
     }
@@ -444,6 +468,10 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                     RequestSortDirection.ASC
                 );
             }
+
+            // retrieve created user & modified user information
+            this.queryBuilder.include('createdByUser', true);
+            this.queryBuilder.include('updatedByUser', true);
 
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService

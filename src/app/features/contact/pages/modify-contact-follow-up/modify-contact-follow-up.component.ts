@@ -145,7 +145,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         ) {
             // retrieve follow-up information
             this.followUpsDataService
-                .getFollowUp(this.selectedOutbreak.id, this.contactId, this.followUpId)
+                .getFollowUp(this.selectedOutbreak.id, this.contactId, this.followUpId, true)
                 .pipe(
                     catchError((err) => {
                         // show error message

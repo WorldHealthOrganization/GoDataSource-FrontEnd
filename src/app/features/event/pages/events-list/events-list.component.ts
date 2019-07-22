@@ -321,19 +321,19 @@ export class EventsListComponent extends ListComponent implements OnInit {
             }),
             new VisibleColumnModel({
                 field: 'createdBy',
-                label: 'LNG_CONTACT_FIELD_LABEL_CREATED_BY'
+                label: 'LNG_EVENT_FIELD_LABEL_CREATED_BY'
             }),
             new VisibleColumnModel({
                 field: 'createdAt',
-                label: 'LNG_CONTACT_FIELD_LABEL_CREATED_AT'
+                label: 'LNG_EVENT_FIELD_LABEL_CREATED_AT'
             }),
             new VisibleColumnModel({
                 field: 'updatedBy',
-                label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_BY'
+                label: 'LNG_EVENT_FIELD_LABEL_UPDATED_BY'
             }),
             new VisibleColumnModel({
                 field: 'updatedAt',
-                label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_AT'
+                label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT'
             })
         ];
     }
