@@ -68,9 +68,12 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
 
                 // retrieve Reference Data Entry info
                 this.referenceDataDataService
-                    .getEntry(params.entryId)
+                    .getEntry(params.entryId, true)
                     .subscribe((entry: ReferenceDataEntryModel) => {
+                        const category = this.entry.category;
                         this.entry = entry;
+                        this.entry.category = category;
+
                         this.categoryName = _.get(this.entry, 'category.name');
                         this.createBreadcrumbs();
                     });

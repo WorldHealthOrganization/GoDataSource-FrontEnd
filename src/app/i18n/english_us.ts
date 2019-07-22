@@ -115,6 +115,23 @@ export const EnglishUsLang = {
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
 
         /**
+         * uiModifyReferenceDataEntryPage
+         */
+        'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
+
+        /**
+         * uiReferenceDataEntryFields
+         */
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_BY': 'Created By',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_BY_DESCRIPTION': '',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_AT': 'Created At ( utc )',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_AT_DESCRIPTION': '',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_BY': 'Updated By',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_BY_DESCRIPTION': '',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_AT': 'Updated At ( utc )',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
+
+        /**
          * uiModifyFollowUpListPage
          */
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_FOLLOW_UPS_DATES': 'Follow-ups dates:',

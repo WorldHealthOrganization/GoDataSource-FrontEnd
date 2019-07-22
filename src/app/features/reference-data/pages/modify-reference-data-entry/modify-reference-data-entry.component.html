@@ -5,144 +5,188 @@
 </app-topnav>
 
 <form class="page-content form-section" #form="ngForm" (submit)="modifyEntry(form)">
+    <div class="form-content">
+        <mat-card class="page-section fit-color-picker">
 
-    <mat-card class="form-content page-section fit-color-picker">
+            <div fxLayout="column">
 
-        <div fxLayout="column">
-
-            <div fxLayout="row" fxLayoutGap="20px">
-                <app-form-input
-                    name="value"
-                    [ngModel]="entry.value | translate"
-                    [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE' | translate"
-                    tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE_DESCRIPTION"
-                    required="true"
-                    [disabled]="viewOnly || entry.readonly">
-                </app-form-input>
-
-                <div
-                    fxFlex fxLayout="row" fxLayoutGap="20px">
-                    <app-form-slide-toggle
-                        name="active"
-                        [label]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE' | translate"
-                        tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE_DESCRIPTION"
-                        [ngModel]="entry.active"
+                <div fxLayout="row" fxLayoutGap="20px">
+                    <app-form-input
+                        name="value"
+                        [ngModel]="entry.value | translate"
+                        [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE' | translate"
+                        tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE_DESCRIPTION"
+                        required="true"
                         [disabled]="viewOnly || entry.readonly">
-                    </app-form-slide-toggle>
+                    </app-form-input>
+
+                    <div
+                        fxFlex fxLayout="row" fxLayoutGap="20px">
+                        <app-form-slide-toggle
+                            name="active"
+                            [label]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE' | translate"
+                            tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE_DESCRIPTION"
+                            [ngModel]="entry.active"
+                            [disabled]="viewOnly || entry.readonly">
+                        </app-form-slide-toggle>
+
+                        <app-form-input
+                            name="order"
+                            [ngModel]="entry.order"
+                            [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER' | translate"
+                            tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER_DESCRIPTION"
+                            type="number"
+                            [disabled]="viewOnly">
+                        </app-form-input>
+                    </div>
+                </div>
+
+                <div fxLayout="row" fxLayoutGap="20px">
+                    <app-form-textarea
+                        name="description"
+                        [ngModel]="entry.description | translate"
+                        [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION' | translate"
+                        tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
+                        minRows="1"
+                        [disabled]="viewOnly || entry.readonly">
+                    </app-form-textarea>
+
+                    <div
+                        fxFlex fxLayout="row" fxLayoutGap="20px">
+                        <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+                            <div>
+                                {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR' | translate }}
+                                <span
+                                    *ngIf="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
+                                    [matTooltip]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
+                                    class="xt-icon form-icon">help</span>
+                            </div>
+
+                            <!-- Read only -->
+                            <input
+                                *ngIf="viewOnly"
+                                fxFlex="132px"
+                                class="ref-data-color-picker"
+                                [style.background]="entry.colorCode"
+                                name="colorCode"
+                                [ngModel]="entry.colorCode"
+                                [readonly]="true"
+                                [required]="false"/>
+
+                            <!-- Read & Write -->
+                            <input
+                                *ngIf="!viewOnly"
+                                #colorPickerInput="ngModel"
+                                fxFlex="132px"
+                                class="ref-data-color-picker"
+                                [style.background]="entry.colorCode"
+                                name="colorCode"
+                                [ngModel]="entry.colorCode"
+                                type="text"
+                                [readonly]="true"
+                                [required]="false"
+                                [colorPicker]="entry.colorCode"
+                                cpOutputFormat="hex"
+                                (colorPickerChange)="entry.colorCode = $event; colorPickerInput.control.markAsDirty();"
+                                (click)="$event.target.select()"/>
+                        </div>
+
+                        <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+                            <!-- View Icon  -->
+                            <div
+                                *ngIf="!changeIcon"
+                                fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+
+                                <!-- Label -->
+                                <div>
+                                    {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON' | translate }}
+                                </div>
+
+                                <!-- Image -->
+                                <img
+                                    *ngIf="entry.iconId"
+                                    [src]="entry.iconUrl" />
+                                <div
+                                    *ngIf="!entry.iconId">
+                                    {{ 'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_LABEL_NO_COLOR' | translate }}
+                                </div>
+
+                                <!-- Change -->
+                                <div>
+                                    <button
+                                        *ngIf="!viewOnly"
+                                        type="button"
+                                        mat-raised-button
+                                        (click)="changeIcon = true;">
+                                        {{'LNG_COMMON_BUTTON_CHANGE' | translate}}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Change Icon -->
+                            <app-form-select
+                                *ngIf="changeIcon"
+                                name="iconId"
+                                [ngModel]="entry.iconId"
+                                [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON' | translate"
+                                tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON_DESCRIPTION"
+                                [options]="iconsList$ | async"
+                                optionLabelKey="name"
+                                optionValueKey="id"
+                                optionLabelImgKey="url"
+                                [disabled]="viewOnly">
+                            </app-form-select>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </mat-card>
+
+        <!-- Create / update by user information section -->
+        <div class="section-title">
+            {{ 'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE' | translate }}
+        </div>
+        <mat-card class="page-section">
+            <div fxLayout="column">
+
+                <div fxLayout="row" fxLayoutGap="20px">
+                    <app-form-input
+                        name="createdByUser"
+                        [ngModel]="entry.createdByUser?.name"
+                        [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_BY'| translate"
+                        tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_BY_DESCRIPTION"
+                        [disabled]="true">
+                    </app-form-input>
 
                     <app-form-input
-                        name="order"
-                        [ngModel]="entry.order"
-                        [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER' | translate"
-                        tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER_DESCRIPTION"
-                        type="number"
-                        [disabled]="viewOnly">
+                        name="createdAt"
+                        [ngModel]="entry.createdAt | dateTimeDefault"
+                        [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_AT'| translate"
+                        tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_AT_DESCRIPTION"
+                        [disabled]="true">
+                    </app-form-input>
+
+                    <app-form-input
+                        name="updatedByUser"
+                        [ngModel]="entry.updatedByUser?.name"
+                        [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_BY'| translate"
+                        tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_BY_DESCRIPTION"
+                        [disabled]="true">
+                    </app-form-input>
+
+                    <app-form-input
+                        name="updatedAt"
+                        [ngModel]="entry.updatedAt | dateTimeDefault"
+                        [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_AT'| translate"
+                        tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_AT_DESCRIPTION"
+                        [disabled]="true">
                     </app-form-input>
                 </div>
             </div>
-
-            <div fxLayout="row" fxLayoutGap="20px">
-                <app-form-textarea
-                    name="description"
-                    [ngModel]="entry.description | translate"
-                    [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION' | translate"
-                    tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
-                    minRows="1"
-                    [disabled]="viewOnly || entry.readonly">
-                </app-form-textarea>
-
-                <div
-                    fxFlex fxLayout="row" fxLayoutGap="20px">
-                    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
-                        <div>
-                            {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR' | translate }}
-                            <span
-                                *ngIf="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
-                                [matTooltip]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
-                                class="xt-icon form-icon">help</span>
-                        </div>
-
-                        <!-- Read only -->
-                        <input
-                            *ngIf="viewOnly"
-                            fxFlex="132px"
-                            class="ref-data-color-picker"
-                            [style.background]="entry.colorCode"
-                            name="colorCode"
-                            [ngModel]="entry.colorCode"
-                            [readonly]="true"
-                            [required]="false"/>
-
-                        <!-- Read & Write -->
-                        <input
-                            *ngIf="!viewOnly"
-                            #colorPickerInput="ngModel"
-                            fxFlex="132px"
-                            class="ref-data-color-picker"
-                            [style.background]="entry.colorCode"
-                            name="colorCode"
-                            [ngModel]="entry.colorCode"
-                            type="text"
-                            [readonly]="true"
-                            [required]="false"
-                            [colorPicker]="entry.colorCode"
-                            cpOutputFormat="hex"
-                            (colorPickerChange)="entry.colorCode = $event; colorPickerInput.control.markAsDirty();"
-                            (click)="$event.target.select()"/>
-                    </div>
-
-                    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
-                        <!-- View Icon  -->
-                        <div
-                            *ngIf="!changeIcon"
-                            fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
-
-                            <!-- Label -->
-                            <div>
-                                {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON' | translate }}
-                            </div>
-
-                            <!-- Image -->
-                            <img
-                                *ngIf="entry.iconId"
-                                [src]="entry.iconUrl" />
-                            <div
-                                *ngIf="!entry.iconId">
-                                {{ 'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_LABEL_NO_COLOR' | translate }}
-                            </div>
-
-                            <!-- Change -->
-                            <div>
-                                <button
-                                    *ngIf="!viewOnly"
-                                    type="button"
-                                    mat-raised-button
-                                    (click)="changeIcon = true;">
-                                    {{'LNG_COMMON_BUTTON_CHANGE' | translate}}
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Change Icon -->
-                        <app-form-select
-                            *ngIf="changeIcon"
-                            name="iconId"
-                            [ngModel]="entry.iconId"
-                            [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON' | translate"
-                            tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON_DESCRIPTION"
-                            [options]="iconsList$ | async"
-                            optionLabelKey="name"
-                            optionValueKey="id"
-                            optionLabelImgKey="url"
-                            [disabled]="viewOnly">
-                        </app-form-select>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-    </mat-card>
+        </mat-card>
+    </div>
 
     <div class="form-actions">
         <button
