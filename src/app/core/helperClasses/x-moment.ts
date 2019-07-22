@@ -13,7 +13,7 @@ export function moment(inp?: momentOriginal.MomentInput, format?: momentOriginal
     // make sure we have a date
     let date: MomentOriginal;
     if (_.isString(inp)) {
-        date = inp.endsWith('Z') ?
+        date = inp.endsWith('Z') || inp.includes('GMT') ?
             momentOriginal.utc(inp, format, strict) :
             momentOriginal(inp, format, strict);
     } else if (!(inp instanceof momentOriginal)) {
