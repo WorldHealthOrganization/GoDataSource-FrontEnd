@@ -112,11 +112,15 @@ export class OutbreakDataService {
     /**
      * Retrieve an Outbreak
      * @param {string} outbreakId
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<OutbreakModel>}
      */
-    getOutbreak(outbreakId: string): Observable<OutbreakModel> {
+    getOutbreak(
+        outbreakId: string,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<OutbreakModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}`),
+            this.http.get(`outbreaks/${outbreakId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`),
             OutbreakModel
         );
     }

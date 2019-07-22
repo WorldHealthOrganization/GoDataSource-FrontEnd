@@ -2,13 +2,13 @@ import * as _ from 'lodash';
 import { QuestionModel } from './question.model';
 import { LocationModel } from './location.model';
 import { MapServerModel } from './map-server.model';
+import { BaseModel } from './base.model';
 
-export class OutbreakModel {
+export class OutbreakModel extends BaseModel {
     id: string;
     name: string;
     description: string;
     disease: string;
-    deleted: boolean;
     startDate: string;
     endDate: string | null;
     periodOfFollowup: number;
@@ -40,11 +40,12 @@ export class OutbreakModel {
     details: string;
 
     constructor(data = null) {
+        super(data);
+
         this.id = _.get(data, 'id');
         this.name = _.get(data, 'name');
         this.description = _.get(data, 'description');
         this.disease = _.get(data, 'disease');
-        this.deleted = _.get(data, 'deleted');
         this.startDate = _.get(data, 'startDate');
         this.endDate = _.get(data, 'endDate');
         this.countries = _.get(data, 'countries', []);
