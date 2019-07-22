@@ -61,10 +61,11 @@ export class LabResultDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<any> {
-
         const filter = queryBuilder.buildQuery();
-
-        return this.http.get(`outbreaks/${outbreakId}/lab-results/aggregate?filter=${filter}`);
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/lab-results/aggregate?filter=${filter}`),
+            LabResultModel
+        );
     }
 
     /**

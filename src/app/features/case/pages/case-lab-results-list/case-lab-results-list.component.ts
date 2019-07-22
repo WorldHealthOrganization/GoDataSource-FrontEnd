@@ -25,6 +25,7 @@ import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -40,6 +41,9 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
 
     // case
     caseId: string;
+
+    // user list
+    userList$: Observable<UserModel[]>;
 
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
@@ -145,7 +149,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private userDataService: UserDataService
     ) {
         super(
             snackbarService
@@ -155,6 +160,9 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // retrieve users
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
         // retrieve case information
         this.route.params.subscribe((params: { caseId }) => {
@@ -243,6 +251,22 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                 field: 'deleted',
                 label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DELETED',
                 visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'createdBy',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'createdAt',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_AT'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedBy',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedAt',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_AT'
             })
         ];
     }
@@ -338,6 +362,10 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
             this.selectedOutbreak &&
             this.caseId
         ) {
+            // retrieve created user & modified user information
+            this.queryBuilder.include('createdByUser', true);
+            this.queryBuilder.include('updatedByUser', true);
+
             // retrieve the list of lab results
             this.labResultsList$ = this.labResultDataService.getCaseLabResults(this.selectedOutbreak.id, this.caseId, this.queryBuilder)
                 .pipe(

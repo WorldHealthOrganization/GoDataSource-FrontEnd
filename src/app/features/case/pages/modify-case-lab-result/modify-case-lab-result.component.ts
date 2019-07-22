@@ -113,6 +113,10 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                                     id: params.labResultId
                                 });
 
+                            // retrieve created user & modified user information
+                            qb.include('createdByUser', true);
+                            qb.include('updatedByUser', true);
+
                             // get lab results
                             this.labResultDataService
                                 .getOutbreakLabResults(this.selectedOutbreak.id, qb)

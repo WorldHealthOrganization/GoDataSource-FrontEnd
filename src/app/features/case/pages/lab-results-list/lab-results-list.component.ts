@@ -24,6 +24,7 @@ import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-lab-results',
@@ -46,6 +47,9 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
     testTypesList$: Observable<any[]>;
     labTestResultsList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any>;
+
+    // user list
+    userList$: Observable<UserModel[]>;
 
     // authenticated user
     authUser: UserModel;
@@ -149,7 +153,8 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
         private labResultDataService: LabResultDataService,
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private userDataService: UserDataService
     ) {
         super(snackbarService);
     }
@@ -163,6 +168,9 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
         this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST).pipe(share());
         this.labTestResultsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT).pipe(share());
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions().pipe(share());
+
+        // retrieve users
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService
@@ -241,6 +249,22 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
                 field: 'deleted',
                 label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DELETED',
                 visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'createdBy',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'createdAt',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_AT'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedBy',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedAt',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_AT'
             })
         ];
     }
@@ -314,6 +338,10 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
      */
     refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
+            // retrieve created user & modified user information
+            this.queryBuilder.include('createdByUser', true);
+            this.queryBuilder.include('updatedByUser', true);
+
             // retrieve the list of lab results
             this.labResultsList$ = this.labResultDataService.getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(

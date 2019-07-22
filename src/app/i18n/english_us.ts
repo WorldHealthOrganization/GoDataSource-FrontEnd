@@ -98,6 +98,23 @@ export const EnglishUsLang = {
         'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
 
         /**
+         * uiModifyCaseLabResultPage
+         */
+        'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
+
+        /**
+         * uiCaseLabResultsFields
+         */
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_BY': 'Created By',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_BY_DESCRIPTION': '',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_AT': 'Created At ( utc )',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_AT_DESCRIPTION': '',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_BY': 'Updated By',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_BY_DESCRIPTION': '',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_AT': 'Updated At ( utc )',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
+
+        /**
          * uiModifyFollowUpListPage
          */
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_FOLLOW_UPS_DATES': 'Follow-ups dates:',
