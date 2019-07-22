@@ -361,12 +361,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             ' - ' +
             moment().format('YYYY-MM-DD');
 
-        // retrieve user
-        const sortUserQb = new RequestQueryBuilder();
-        sortUserQb.sort
-            .by('firstName', RequestSortDirection.ASC)
-            .by('lastName', RequestSortDirection.ASC);
-        this.userList$ = this.userDataService.getUsersList(sortUserQb).pipe(share());
+        // retrieve users
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
         // dialog fields for daily follow-ups print
         this.genericDataService

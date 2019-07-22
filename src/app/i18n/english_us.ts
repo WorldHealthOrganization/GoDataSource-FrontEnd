@@ -13,6 +13,11 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiModifyContactPage
+         */
+        'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
+
+        /**
          * uiContactFields
          */
         'LNG_CONTACT_FIELD_LABEL_CREATED_BY': 'Created By',
@@ -25,15 +30,27 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
 
         /**
+         * uiModifyCasePage
+         */
+        'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
+
+        /**
+         * uiCaseFields
+         */
+        'LNG_CASE_FIELD_LABEL_CREATED_BY': 'Created By',
+        'LNG_CASE_FIELD_LABEL_CREATED_BY_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_CREATED_AT': 'Created At ( utc )',
+        'LNG_CASE_FIELD_LABEL_CREATED_AT_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_UPDATED_BY': 'Updated By',
+        'LNG_CASE_FIELD_LABEL_UPDATED_BY_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_UPDATED_AT': 'Updated At ( utc )',
+        'LNG_CASE_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
+
+        /**
          * uiModifyFollowUpListPage
          */
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_FOLLOW_UPS_DATES': 'Follow-ups dates:',
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_INFO_LABEL': '*The system will replace only data that is changed. If you don\'t enter any data, then the system won\'t update the data to any of the selected follow-ups',
-
-        /**
-         * uiModifyContactPage
-         */
-        'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
 
         /**
          * uiTeamsWorkload

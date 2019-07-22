@@ -8,8 +8,9 @@ import { CaseCenterDateRangeModel } from './case-center-date-range.model';
 import { IAnswerData } from './question.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
 import { moment } from '../helperClasses/x-moment';
+import { BaseModel } from './base.model';
 
-export class CaseModel {
+export class CaseModel extends BaseModel {
     id: string;
     firstName: string;
     middleName: string;
@@ -39,7 +40,6 @@ export class CaseModel {
     transferRefused: boolean;
     outbreakId: string;
     outcomeId: string;
-    deleted: boolean;
     dateBecomeContact: string;
     wasContact: boolean;
 
@@ -66,6 +66,8 @@ export class CaseModel {
     matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
 
     constructor(data = null) {
+        super(data);
+
         this.id = _.get(data, 'id');
         this.firstName = _.get(data, 'firstName');
         this.middleName = _.get(data, 'middleName');
@@ -114,7 +116,6 @@ export class CaseModel {
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
 
         this.relationships = _.get(data, 'relationships', []);
-        this.deleted = _.get(data, 'deleted');
         this.dateBecomeContact = _.get(data, 'dateBecomeContact');
         this.wasContact = _.get(data, 'wasContact');
 

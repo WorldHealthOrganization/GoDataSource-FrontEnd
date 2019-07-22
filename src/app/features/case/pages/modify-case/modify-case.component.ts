@@ -210,6 +210,10 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             const people = relations.queryBuilder.include('people', true);
             people.filterParent = false;
 
+            // retrieve created user & modified user information
+            qb.include('createdByUser', true);
+            qb.include('updatedByUser', true);
+
             // ID
             qb.filter.byEquality(
                 'id',
