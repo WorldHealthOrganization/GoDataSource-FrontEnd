@@ -69,7 +69,7 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
 
                         // get contact
                         this.eventDataService
-                            .getEvent(selectedOutbreak.id, this.eventId)
+                            .getEvent(selectedOutbreak.id, this.eventId, true)
                             .subscribe(eventDataReturned => {
                                 this.eventData = new EventModel(eventDataReturned);
                                 this.createBreadcrumbs();

@@ -82,6 +82,7 @@ export class ContactDataService {
      * Retrieve a Contact of an Outbreak
      * @param {string} outbreakId
      * @param {string} contactId
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<ContactModel>}
      */
     getContact(

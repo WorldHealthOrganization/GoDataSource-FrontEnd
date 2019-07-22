@@ -485,12 +485,12 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS'
             }),
             new VisibleColumnModel({
-                field: 'deleted',
-                label: 'LNG_CONTACT_FIELD_LABEL_DELETED'
-            }),
-            new VisibleColumnModel({
                 field: 'wasCase',
                 label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE'
+            }),
+            new VisibleColumnModel({
+                field: 'deleted',
+                label: 'LNG_CONTACT_FIELD_LABEL_DELETED'
             }),
             new VisibleColumnModel({
                 field: 'createdBy',

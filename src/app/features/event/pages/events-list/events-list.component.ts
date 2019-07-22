@@ -27,6 +27,7 @@ import { LoadingDialogModel } from '../../../../shared/components/loading-dialog
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { throwError } from 'rxjs';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-events-list',
@@ -42,6 +43,9 @@ export class EventsListComponent extends ListComponent implements OnInit {
 
     // authenticated user
     authUser: UserModel;
+
+    // user list
+    userList$: Observable<UserModel[]>;
 
     // list of existing events
     eventsList$: Observable<EventModel[]>;
@@ -244,7 +248,8 @@ export class EventsListComponent extends ListComponent implements OnInit {
         protected listFilterDataService: ListFilterDataService,
         private route: ActivatedRoute,
         private genericDataService: GenericDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private userDataService: UserDataService
     ) {
         super(
             snackbarService,
@@ -257,6 +262,9 @@ export class EventsListComponent extends ListComponent implements OnInit {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+
+        // retrieve users
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService
@@ -310,6 +318,22 @@ export class EventsListComponent extends ListComponent implements OnInit {
             new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_EVENT_FIELD_LABEL_DELETED'
+            }),
+            new VisibleColumnModel({
+                field: 'createdBy',
+                label: 'LNG_CONTACT_FIELD_LABEL_CREATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'createdAt',
+                label: 'LNG_CONTACT_FIELD_LABEL_CREATED_AT'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedBy',
+                label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedAt',
+                label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_AT'
             })
         ];
     }
@@ -319,6 +343,10 @@ export class EventsListComponent extends ListComponent implements OnInit {
      */
     refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
+            // retrieve created user & modified user information
+            this.queryBuilder.include('createdByUser', true);
+            this.queryBuilder.include('updatedByUser', true);
+
             // retrieve the list of Events
             this.eventsList$ = this.eventDataService.getEventsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
