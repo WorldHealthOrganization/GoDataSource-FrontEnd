@@ -13,7 +13,7 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
-         * uiContactsListPage
+         * uiContactFields
          */
         'LNG_CONTACT_FIELD_LABEL_CREATED_BY': 'Created By',
         'LNG_CONTACT_FIELD_LABEL_CREATED_BY_DESCRIPTION': '',

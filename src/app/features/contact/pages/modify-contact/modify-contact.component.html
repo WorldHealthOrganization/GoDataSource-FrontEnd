@@ -187,14 +187,13 @@
                                 [disabled]="true">
                             </app-form-input>
 
-                            <app-form-datepicker
-                                fxFlex
+                            <app-form-input
                                 name="createdAt"
-                                [(ngModel)]="contactData.createdAt"
+                                [ngModel]="contactData.createdAt | dateTimeDefault"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_CREATED_AT'| translate"
                                 tooltip="LNG_CONTACT_FIELD_LABEL_CREATED_AT_DESCRIPTION"
                                 [disabled]="true">
-                            </app-form-datepicker>
+                            </app-form-input>
 
                             <app-form-input
                                 name="updatedByUser"
@@ -204,14 +203,13 @@
                                 [disabled]="true">
                             </app-form-input>
 
-                            <app-form-datepicker
-                                fxFlex
+                            <app-form-input
                                 name="updatedAt"
-                                [(ngModel)]="contactData.updatedAt"
+                                [ngModel]="contactData.updatedAt | dateTimeDefault"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_UPDATED_AT'| translate"
                                 tooltip="LNG_CONTACT_FIELD_LABEL_UPDATED_AT_DESCRIPTION"
                                 [disabled]="true">
-                            </app-form-datepicker>
+                            </app-form-input>
                         </div>
                     </div>
                 </mat-card>
