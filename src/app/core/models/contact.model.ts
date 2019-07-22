@@ -6,8 +6,9 @@ import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
 import { moment } from '../helperClasses/x-moment';
+import { BaseModel } from './base.model';
 
-export class ContactModel {
+export class ContactModel extends BaseModel {
     id: string;
     firstName: string;
     middleName: string;
@@ -23,7 +24,6 @@ export class ContactModel {
     dateOfLastContact: string;
     isDateOfReportingApproximate: boolean;
     outbreakId: string;
-    deleted: boolean;
     dateBecomeContact: string;
     dateBecomeCase: string;
     wasCase: boolean;
@@ -45,6 +45,8 @@ export class ContactModel {
     matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
 
     constructor(data = null) {
+        super(data);
+
         this.id = _.get(data, 'id');
         this.firstName = _.get(data, 'firstName');
         this.middleName = _.get(data, 'middleName');
@@ -72,7 +74,6 @@ export class ContactModel {
         this.dateOfReporting = _.get(data, 'dateOfReporting');
         this.dateOfLastContact = _.get(data, 'dateOfLastContact');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
-        this.deleted = _.get(data, 'deleted');
         this.dateBecomeContact = _.get(data, 'dateBecomeContact');
         this.visualId = _.get(data, 'visualId', '');
 

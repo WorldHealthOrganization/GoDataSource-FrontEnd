@@ -655,6 +655,11 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         if (this.selectedOutbreak) {
             // refresh list of contacts grouped by risk level
             this.getContactsGroupedByRiskLevel();
+
+            // retrieve created user & modified user information
+            this.queryBuilder.include('createdByUser', true);
+            this.queryBuilder.include('updatedByUser', true);
+
             // retrieve the list of Contacts
             this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(

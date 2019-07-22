@@ -126,7 +126,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
             this.contactId
         ) {
             this.contactDataService
-                .getContact(this.selectedOutbreak.id, this.contactId)
+                .getContact(this.selectedOutbreak.id, this.contactId, true)
                 .subscribe(contactDataReturned => {
                     this.contactData = new ContactModel(contactDataReturned);
 

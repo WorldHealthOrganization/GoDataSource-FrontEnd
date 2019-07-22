@@ -84,9 +84,13 @@ export class ContactDataService {
      * @param {string} contactId
      * @returns {Observable<ContactModel>}
      */
-    getContact(outbreakId: string, contactId: string): Observable<ContactModel> {
+    getContact(
+        outbreakId: string,
+        contactId: string,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<ContactModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/contacts/${contactId}`),
+            this.http.get(`outbreaks/${outbreakId}/contacts/${contactId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`),
             ContactModel
         );
     }
