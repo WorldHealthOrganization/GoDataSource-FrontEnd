@@ -13,6 +13,14 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiContactsListPage
+         */
+        'LNG_CONTACT_FIELD_LABEL_CREATED_BY': 'Created By',
+        'LNG_CONTACT_FIELD_LABEL_CREATED_AT': 'Created At ( utc )',
+        'LNG_CONTACT_FIELD_LABEL_UPDATED_BY': 'Updated By',
+        'LNG_CONTACT_FIELD_LABEL_UPDATED_AT': 'Updated At ( utc )',
+
+        /**
          * uiModifyFollowUpListPage
          */
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_FOLLOW_UPS_DATES': 'Follow-ups dates:',

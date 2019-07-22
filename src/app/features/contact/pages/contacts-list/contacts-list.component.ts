@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -22,7 +22,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
-import { RequestQueryBuilder, RequestRelationBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestRelationBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
@@ -31,8 +31,8 @@ import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
-import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-contacts-list',
@@ -55,6 +55,9 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // list of existing contacts
     contactsList$: Observable<ContactModel[]>;
     contactsListCount$: Observable<any>;
+
+    // user list
+    userList$: Observable<UserModel[]>;
 
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
@@ -334,7 +337,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         private route: ActivatedRoute,
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private userDataService: UserDataService
     ) {
         super(
             snackbarService,
@@ -356,6 +360,13 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         this.exportContactsDailyFollowUpsFormFileName = this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE') +
             ' - ' +
             moment().format('YYYY-MM-DD');
+
+        // retrieve user
+        const sortUserQb = new RequestQueryBuilder();
+        sortUserQb.sort
+            .by('firstName', RequestSortDirection.ASC)
+            .by('lastName', RequestSortDirection.ASC);
+        this.userList$ = this.userDataService.getUsersList(sortUserQb).pipe(share());
 
         // dialog fields for daily follow-ups print
         this.genericDataService
@@ -484,6 +495,22 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             new VisibleColumnModel({
                 field: 'wasCase',
                 label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE'
+            }),
+            new VisibleColumnModel({
+                field: 'createdBy',
+                label: 'LNG_CONTACT_FIELD_LABEL_CREATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'createdAt',
+                label: 'LNG_CONTACT_FIELD_LABEL_CREATED_AT'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedBy',
+                label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedAt',
+                label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_AT'
             })
         ];
     }
