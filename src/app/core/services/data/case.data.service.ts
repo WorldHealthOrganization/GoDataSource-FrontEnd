@@ -344,14 +344,17 @@ export class CaseDataService {
         return obs
             .pipe(
                 map(
-                    (listResult) => {
-                        const results = [];
-                        Object.keys(listResult).forEach((key) => {
-                            // const metricResult = new MetricCasesCountStratified(listResult[key]);
-                            const metricResult = listResult[key];
-                            results.push(metricResult);
-                        });
-                        return results;
+                    (listResult: any) => {
+                        return _.sortBy(
+                            _.transform(
+                                listResult,
+                                (acc, value) => {
+                                    acc.push(new MetricCasesCountStratified(value));
+                                },
+                                []
+                            ),
+                            'start'
+                        );
                     }
                 )
             );
@@ -372,13 +375,17 @@ export class CaseDataService {
         return obs
             .pipe(
                 map(
-                    (listResult) => {
-                        const results = [];
-                        Object.keys(listResult).forEach((key) => {
-                            const metricResult = listResult[key];
-                            results.push(metricResult);
-                        });
-                        return results;
+                    (listResult: any) => {
+                        return _.sortBy(
+                            _.transform(
+                                listResult,
+                                (acc, value) => {
+                                    acc.push(new MetricCasesCountStratified(value));
+                                },
+                                []
+                            ),
+                            'start'
+                        );
                     }
                 )
             );
@@ -399,13 +406,17 @@ export class CaseDataService {
         return obs
             .pipe(
                 map(
-                    (listResult) => {
-                        const results = [];
-                        Object.keys(listResult).forEach((key) => {
-                            const metricResult = listResult[key];
-                            results.push(metricResult);
-                        });
-                        return results;
+                    (listResult: any) => {
+                        return _.sortBy(
+                            _.transform(
+                                listResult,
+                                (acc, value) => {
+                                    acc.push(new MetricCasesCountStratifiedOutcome(value));
+                                },
+                                []
+                            ),
+                            'start'
+                        );
                     }
                 )
             );

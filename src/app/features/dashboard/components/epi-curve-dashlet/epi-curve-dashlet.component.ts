@@ -144,9 +144,9 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
         const chartData = {};
 
         // build chart data
-        _.forEach(metricData, (metric) => {
+        _.forEach(metricData, (metric: MetricCasesCountStratified) => {
             // create the array with categories ( dates displayed on x axis )
-            this.chartDataCategories.push(moment(metric.start).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+            this.chartDataCategories.push(metric.start.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
 
             // create an array with data for each classification
             _.each(metric.classification, (data, key) => {
