@@ -1,8 +1,9 @@
 import * as _ from 'lodash';
 import { EntityModel } from './entity.model';
 import { RelationshipPersonModel } from './relationship-person.model';
+import { BaseModel } from './base.model';
 
-export class RelationshipModel {
+export class RelationshipModel extends BaseModel {
     id: string;
     persons: RelationshipPersonModel[];
     contactDate: string;
@@ -18,6 +19,8 @@ export class RelationshipModel {
     people: EntityModel[];
 
     constructor(data = null) {
+        super(data);
+
         this.id = _.get(data, 'id');
         this.persons = _.get(data, 'persons', []);
         this.contactDate = _.get(data, 'contactDate');

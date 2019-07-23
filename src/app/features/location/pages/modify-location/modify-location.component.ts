@@ -71,7 +71,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                 this.locationId = params.locationId;
 
                 this.locationDataService
-                    .getLocation(this.locationId)
+                    .getLocation(this.locationId, true)
                     .pipe(
                         catchError((err) => {
                             this.snackbarService.showApiError(err);

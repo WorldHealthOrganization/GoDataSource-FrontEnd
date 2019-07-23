@@ -1,7 +1,8 @@
 import * as _ from 'lodash';
 import { LocationIdentifierModel } from './location-identifier.model';
+import { BaseModel } from './base.model';
 
-export class LocationModel {
+export class LocationModel extends BaseModel {
     id: string;
     name: string;
     synonyms: string[];
@@ -14,6 +15,8 @@ export class LocationModel {
     identifiers: LocationIdentifierModel[];
 
     constructor(data = null) {
+        super(data);
+
         this.id = _.get(data, 'id');
         this.name = _.get(data, 'name');
         this.synonyms = _.get(data, 'synonyms', []);

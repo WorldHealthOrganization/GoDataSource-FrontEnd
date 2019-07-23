@@ -132,6 +132,40 @@ export const EnglishUsLang = {
         'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
 
         /**
+         * uiModifyLocationPage
+         */
+        'LNG_PAGE_MODIFY_LOCATION_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
+
+        /**
+         * uiLocationFields
+         */
+        'LNG_LOCATION_FIELD_LABEL_CREATED_BY': 'Created By',
+        'LNG_LOCATION_FIELD_LABEL_CREATED_BY_DESCRIPTION': '',
+        'LNG_LOCATION_FIELD_LABEL_CREATED_AT': 'Created At ( utc )',
+        'LNG_LOCATION_FIELD_LABEL_CREATED_AT_DESCRIPTION': '',
+        'LNG_LOCATION_FIELD_LABEL_UPDATED_BY': 'Updated By',
+        'LNG_LOCATION_FIELD_LABEL_UPDATED_BY_DESCRIPTION': '',
+        'LNG_LOCATION_FIELD_LABEL_UPDATED_AT': 'Updated At ( utc )',
+        'LNG_LOCATION_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
+
+        /**
+         * uiModifyEntityRelationshipPage
+         */
+        'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
+
+        /**
+         * uiRelationshipFields
+         */
+        'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY': 'Created By',
+        'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY_DESCRIPTION': '',
+        'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT': 'Created At ( utc )',
+        'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT_DESCRIPTION': '',
+        'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY': 'Updated By',
+        'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY_DESCRIPTION': '',
+        'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT': 'Updated At ( utc )',
+        'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
+
+        /**
          * uiModifyFollowUpListPage
          */
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_FOLLOW_UPS_DATES': 'Follow-ups dates:',

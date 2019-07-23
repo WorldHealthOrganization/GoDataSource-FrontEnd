@@ -8,7 +8,7 @@ import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { UserSettings } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -26,6 +26,7 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -39,6 +40,9 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     // list of relationships
     relationshipsList$: Observable<EntityModel[]>;
     relationshipsListCount$: Observable<any>;
+
+    // user list
+    userList$: Observable<UserModel[]>;
 
     // reference data
     certaintyLevelList$: Observable<any>;
@@ -117,7 +121,8 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
-        private clusterDataService: ClusterDataService
+        private clusterDataService: ClusterDataService,
+        private userDataService: UserDataService
     ) {
         super(
             snackbarService, router, route,
@@ -127,6 +132,9 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
 
     ngOnInit() {
         super.ngOnInit();
+
+        // retrieve users
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
         this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -270,6 +278,22 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                 field: 'clusterId',
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
                 visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'createdBy',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'createdAt',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedBy',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedAt',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT'
             })
         ];
     }
@@ -286,6 +310,10 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         ) {
             // reset checked items
             this.checkedEntityModels = {};
+
+            // retrieve created user & modified user information
+            this.queryBuilder.include('createdByUser', true);
+            this.queryBuilder.include('updatedByUser', true);
 
             if (this.relationshipType === RelationshipType.EXPOSURE) {
                 // retrieve the list of exposures

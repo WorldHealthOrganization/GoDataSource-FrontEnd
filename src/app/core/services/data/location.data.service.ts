@@ -186,11 +186,15 @@ export class LocationDataService {
     /**
      * Retrieve Location
      * @param {string} locationId
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<LocationModel>}
      */
-    getLocation(locationId: string): Observable<LocationModel> {
+    getLocation(
+        locationId: string,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<LocationModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`locations/${locationId}`),
+            this.http.get(`locations/${locationId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`),
             LocationModel
         );
     }
