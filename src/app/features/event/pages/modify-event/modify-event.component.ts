@@ -88,7 +88,12 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
         // modify the event
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.eventDataService
-            .modifyEvent(this.outbreakId, this.eventId, dirtyFields)
+            .modifyEvent(
+                this.outbreakId,
+                this.eventId,
+                dirtyFields,
+                true
+            )
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);

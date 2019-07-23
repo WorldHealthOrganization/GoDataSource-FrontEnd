@@ -82,11 +82,17 @@ export class EventDataService {
      * @param {string} outbreakId
      * @param {string} eventId
      * @param eventData
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<EventModel>}
      */
-    modifyEvent(outbreakId: string, eventId: string, eventData): Observable<EventModel> {
+    modifyEvent(
+        outbreakId: string,
+        eventId: string,
+        eventData,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<EventModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.put(`outbreaks/${outbreakId}/events/${eventId}`, eventData),
+            this.http.put(`outbreaks/${outbreakId}/events/${eventId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, eventData),
             EventModel
         );
     }

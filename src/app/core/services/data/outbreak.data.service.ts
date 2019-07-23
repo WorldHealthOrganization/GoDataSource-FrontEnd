@@ -129,11 +129,16 @@ export class OutbreakDataService {
      * Modify an existing Outbreak
      * @param {string} outbreakId
      * @param data
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<OutbreakModel>}
      */
-    modifyOutbreak(outbreakId: string, data: any): Observable<OutbreakModel> {
+    modifyOutbreak(
+        outbreakId: string,
+        data: any,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<OutbreakModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.patch(`outbreaks/${outbreakId}`, data)
+            this.http.patch(`outbreaks/${outbreakId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, data)
                 .pipe(
                     mergeMap((res) => {
                         // re-determine the selected Outbreak

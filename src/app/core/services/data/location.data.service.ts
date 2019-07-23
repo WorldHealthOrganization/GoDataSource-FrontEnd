@@ -203,12 +203,17 @@ export class LocationDataService {
      * Modify Location
      * @param {string} locationId
      * @param locationData
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<LocationModel>}
      */
-    modifyLocation(locationId: string, locationData): Observable<LocationModel> {
+    modifyLocation(
+        locationId: string,
+        locationData,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<LocationModel> {
         return this.modelHelper.mapObservableToModel(
             this.http
-                .put(`locations/${locationId}`, locationData)
+                .put(`locations/${locationId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, locationData)
                 .pipe(
                     tap(() => {
                         // refresh location cache

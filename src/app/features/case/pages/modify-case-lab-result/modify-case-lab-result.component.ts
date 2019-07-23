@@ -161,7 +161,8 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
             .modifyLabResult(
                 this.selectedOutbreak.id,
                 this.labResultData.id,
-                dirtyFields
+                dirtyFields,
+                true
             )
             .pipe(
                 catchError((err) => {

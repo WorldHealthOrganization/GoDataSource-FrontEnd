@@ -228,7 +228,12 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                 const runModifyContact = (finishCallBack?: () => void) => {
                     // modify the contact
                     this.contactDataService
-                        .modifyContact(this.selectedOutbreak.id, this.contactId, dirtyFields)
+                        .modifyContact(
+                            this.selectedOutbreak.id,
+                            this.contactId,
+                            dirtyFields,
+                            true
+                        )
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);

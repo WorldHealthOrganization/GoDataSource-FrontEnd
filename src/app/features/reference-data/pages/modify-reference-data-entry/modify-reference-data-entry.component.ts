@@ -91,7 +91,11 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
         // get selected outbreak
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.referenceDataDataService
-            .modifyEntry(this.entryId, dirtyFields)
+            .modifyEntry(
+                this.entryId,
+                dirtyFields,
+                true
+            )
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showError(err.message);

@@ -127,7 +127,11 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
 
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.locationDataService
-            .modifyLocation(this.locationId, dirtyFields)
+            .modifyLocation(
+                this.locationId,
+                dirtyFields,
+                true
+            )
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showError(err.message);

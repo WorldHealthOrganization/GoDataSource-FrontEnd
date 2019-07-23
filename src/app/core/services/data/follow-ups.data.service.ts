@@ -165,11 +165,18 @@ export class FollowUpsDataService {
      * @param {string} contactId
      * @param {string} followUpId
      * @param followUpData
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<FollowUpModel>}
      */
-    modifyFollowUp(outbreakId: string, contactId: string, followUpId: string, followUpData): Observable<FollowUpModel> {
+    modifyFollowUp(
+        outbreakId: string,
+        contactId: string,
+        followUpId: string,
+        followUpData,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<FollowUpModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups/${followUpId}`, followUpData),
+            this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups/${followUpId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, followUpData),
             FollowUpModel
         );
     }

@@ -194,11 +194,16 @@ export class ReferenceDataDataService {
      * Modify an existing Reference Data entry
      * @param {string} entryId
      * @param entryData
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<ReferenceDataEntryModel>}
      */
-    modifyEntry(entryId: string, entryData): Observable<ReferenceDataEntryModel> {
+    modifyEntry(
+        entryId: string,
+        entryData,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<ReferenceDataEntryModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.put(`reference-data/${entryId}`, entryData)
+            this.http.put(`reference-data/${entryId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, entryData)
                 .pipe(
                     tap(() => {
                         // invalidate list cache
