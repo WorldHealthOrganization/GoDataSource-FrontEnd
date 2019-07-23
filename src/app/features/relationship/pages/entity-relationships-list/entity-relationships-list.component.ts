@@ -311,10 +311,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             // reset checked items
             this.checkedEntityModels = {};
 
-            // retrieve created user & modified user information
-            this.queryBuilder.include('createdByUser', true);
-            this.queryBuilder.include('updatedByUser', true);
-
             if (this.relationshipType === RelationshipType.EXPOSURE) {
                 // retrieve the list of exposures
                 this.relationshipsList$ = this.relationshipDataService.getEntityExposures(
