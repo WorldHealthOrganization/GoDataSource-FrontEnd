@@ -463,7 +463,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="userList$ | async"
-                            (optionChanged)="filterBySelectField('createdBy', $event, 'id')"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('createdBy', $event, true, 'id')"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
                             [displayFilterIcon]="true"
@@ -483,14 +483,14 @@
         <ng-container matColumnDef="createdAt">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">
+                    <div class="column-header">
                         {{ 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT' | translate }}
                     </div>
                     <div class="column-filter">
                         <app-form-daterange
                             name="createdAtFilter"
                             ngModel
-                            (changed)="filterByDateRangeField('createdAt', $event)"
+                            (changed)="filterByChildQueryBuilder('relationship').byDateRange('createdAt', $event)"
                             app-reset-input-on-side-filter>
                         </app-form-daterange>
                     </div>
@@ -514,7 +514,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="userList$ | async"
-                            (optionChanged)="filterBySelectField('updatedBy', $event, 'id')"
+                            (optionChanged)="filterByChildQueryBuilder('relationship').bySelect('updatedBy', $event, true, 'id')"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
                             [displayFilterIcon]="true"
@@ -534,14 +534,14 @@
         <ng-container matColumnDef="updatedAt">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">
+                    <div class="column-header">
                         {{ 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT' | translate }}
                     </div>
                     <div class="column-filter">
                         <app-form-daterange
                             name="updatedAtFilter"
                             ngModel
-                            (changed)="filterByDateRangeField('updatedAt', $event)"
+                            (changed)="filterByChildQueryBuilder('relationship').byDateRange('updatedAt', $event)"
                             app-reset-input-on-side-filter>
                         </app-form-daterange>
                     </div>
