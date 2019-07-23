@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Observable } from 'rxjs';
@@ -25,6 +25,7 @@ import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-lab-results',
@@ -32,7 +33,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
     encapsulation: ViewEncapsulation.None,
     styleUrls: ['./lab-results-list.component.less']
 })
-export class LabResultsListComponent extends ListComponent implements OnInit {
+export class LabResultsListComponent extends ListComponent implements OnInit, OnDestroy {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_LAB_RESULTS_TITLE', '.', true),
@@ -55,6 +56,8 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
     authUser: UserModel;
     // selected outbreak
     selectedOutbreak: OutbreakModel;
+
+    outbreakSubscriber: Subscription;
 
     // available side filters
     availableSideFilters: FilterModel[];
@@ -173,7 +176,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
         this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
         // subscribe to the Selected Outbreak
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -189,6 +192,14 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
 
         // initialize side filters
         this.initializeSideFilters();
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**

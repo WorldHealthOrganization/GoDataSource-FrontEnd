@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -24,6 +24,7 @@ import { RequestSortDirection } from '../../../../core/helperClasses/request-que
 import { Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -31,7 +32,7 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
     templateUrl: './contact-range-follow-ups-list.component.html',
     styleUrls: ['./contact-range-follow-ups-list.component.less']
 })
-export class ContactRangeFollowUpsListComponent extends ListComponent implements OnInit {
+export class ContactRangeFollowUpsListComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
             'LNG_PAGE_LIST_CONTACTS_TITLE',
@@ -46,6 +47,8 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
     // authenticated user
     authUser: UserModel;
+
+    outbreakSubscriber: Subscription;
 
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
@@ -161,7 +164,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             });
 
         // subscribe to the Selected Outbreak
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 // selected outbreak
@@ -205,7 +208,14 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                         });
                     });
             });
+    }
 
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**

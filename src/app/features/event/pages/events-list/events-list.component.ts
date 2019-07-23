@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -28,6 +28,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { throwError } from 'rxjs';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-events-list',
@@ -35,7 +36,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
     templateUrl: './events-list.component.html',
     styleUrls: ['./events-list.component.less']
 })
-export class EventsListComponent extends ListComponent implements OnInit {
+export class EventsListComponent extends ListComponent implements OnInit, OnDestroy {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '.', true)
@@ -62,6 +63,7 @@ export class EventsListComponent extends ListComponent implements OnInit {
 
     loadingDialog: LoadingDialogModel;
 
+    outbreakSubscriber: Subscription;
 
     allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
@@ -267,7 +269,7 @@ export class EventsListComponent extends ListComponent implements OnInit {
         this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
         // subscribe to the Selected Outbreak
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -280,6 +282,14 @@ export class EventsListComponent extends ListComponent implements OnInit {
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**

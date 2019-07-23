@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -27,6 +27,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -34,12 +35,14 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
     templateUrl: './entity-relationships-list.component.html',
     styleUrls: ['./entity-relationships-list.component.less']
 })
-export class EntityRelationshipsListComponent extends RelationshipsListComponent implements OnInit {
+export class EntityRelationshipsListComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // list of relationships
     relationshipsList$: Observable<EntityModel[]>;
     relationshipsListCount$: Observable<any>;
+
+    outbreakSubscriber: Subscription;
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -136,7 +139,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         // retrieve users
         this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((outbreak: OutbreakModel) => {
                 if (outbreak) {
@@ -166,6 +169,14 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**

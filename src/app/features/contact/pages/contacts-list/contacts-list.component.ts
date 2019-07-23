@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable, throwError } from 'rxjs';
 import { PERMISSION } from '../../../../core/models/permission.model';
@@ -33,6 +33,7 @@ import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-contacts-list',
@@ -40,7 +41,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
     templateUrl: './contacts-list.component.html',
     styleUrls: ['./contacts-list.component.less']
 })
-export class ContactsListComponent extends ListComponent implements OnInit {
+export class ContactsListComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '.', true)
     ];
@@ -55,6 +56,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // list of existing contacts
     contactsList$: Observable<ContactModel[]>;
     contactsListCount$: Observable<any>;
+
+    outbreakSubscriber: Subscription;
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -408,7 +411,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         // subscribe to the Selected Outbreak
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -439,6 +442,14 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
         // initialize side filters
         this.initializeSideFilters();
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**

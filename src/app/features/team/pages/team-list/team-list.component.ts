@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Observable } from 'rxjs';
@@ -20,6 +20,7 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-team-list',
@@ -27,7 +28,7 @@ import { Router } from '@angular/router';
     templateUrl: './team-list.component.html',
     styleUrls: ['./team-list.component.less']
 })
-export class TeamListComponent extends ListComponent implements OnInit {
+export class TeamListComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumb header
     public breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
@@ -35,6 +36,8 @@ export class TeamListComponent extends ListComponent implements OnInit {
             '/teams'
         )
     ];
+
+    outbreakSubscriber: Subscription;
 
     // list of teams
     teamsList$: Observable<TeamModel[]>;
@@ -105,7 +108,7 @@ export class TeamListComponent extends ListComponent implements OnInit {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
         // subscribe to the Selected Outbreak Subject stream
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -113,6 +116,14 @@ export class TeamListComponent extends ListComponent implements OnInit {
                 this.initPaginator();
                 this.needsRefreshList(true);
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**

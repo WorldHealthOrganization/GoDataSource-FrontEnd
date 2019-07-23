@@ -1,10 +1,11 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ImportDataExtension, ImportServerModelNames } from '../../components/import-data/import-data.component';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Constants } from '../../../../core/models/constants';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-import-contact-data',
@@ -12,7 +13,7 @@ import { Constants } from '../../../../core/models/constants';
     templateUrl: './import-contact-data.component.html',
     styleUrls: ['./import-contact-data.component.less']
 })
-export class ImportContactDataComponent implements OnInit {
+export class ImportContactDataComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
             'LNG_PAGE_LIST_CONTACTS_TITLE',
@@ -24,6 +25,8 @@ export class ImportContactDataComponent implements OnInit {
             true
         )
     ];
+
+    outbreakSubscriber: Subscription;
 
     Constants = Constants;
 
@@ -71,7 +74,7 @@ export class ImportContactDataComponent implements OnInit {
 
     ngOnInit() {
         // get number of deceased cases
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
@@ -83,6 +86,14 @@ export class ImportContactDataComponent implements OnInit {
                     this.displayLoading = false;
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     finished() {

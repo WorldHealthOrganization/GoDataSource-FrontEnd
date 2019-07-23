@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Constants } from '../../../../core/models/constants';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -34,6 +34,7 @@ import { throwError } from 'rxjs';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 enum NodeAction {
     MODIFY_PERSON = 'modify-person',
@@ -47,13 +48,15 @@ enum NodeAction {
     templateUrl: './transmission-chains-graph.component.html',
     styleUrls: ['./transmission-chains-graph.component.less']
 })
-export class TransmissionChainsGraphComponent implements OnInit {
+export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', null, true)
     ];
 
     @ViewChild(TransmissionChainsDashletComponent) cotDashletChild;
+
+    outbreakSubscriber: Subscription;
 
     // authenticated user
     authUser: UserModel;
@@ -121,7 +124,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
             });
 
         // subscribe to the Selected Outbreak Subject stream
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -135,6 +138,14 @@ export class TransmissionChainsGraphComponent implements OnInit {
                     this.x86Architecture = true;
                  }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     hasCaseReadAccess(): boolean {
