@@ -17,7 +17,7 @@ import * as _ from 'lodash';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
-import { EntityModel } from '../../../../core/models/entity.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';

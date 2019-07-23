@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
-import { EntityModel } from './entity.model';
+import { EntityModel, RelationshipModel } from './entity-and-relationship.model';
 import { CaseModel } from './case.model';
-import { RelationshipModel } from './relationship.model';
 import { EntityType } from './entity-type';
 import { Constants } from './constants';
 import { EventModel } from './event.model';

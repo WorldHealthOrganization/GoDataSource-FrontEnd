@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { EntityModel } from './entity.model';
+import { EntityModel } from './entity-and-relationship.model';
 
 export class EntityDuplicatesModel {
     duplicates: EntityModel[];

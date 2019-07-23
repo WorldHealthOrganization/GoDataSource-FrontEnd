@@ -11,7 +11,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { Observable } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -24,7 +23,7 @@ import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
-import { EntityModel } from '../../../../core/models/entity.model';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';

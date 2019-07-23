@@ -19,7 +19,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { catchError, share, tap } from 'rxjs/operators';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
-import { EntityModel } from '../../../../core/models/entity.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { throwError } from 'rxjs';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';

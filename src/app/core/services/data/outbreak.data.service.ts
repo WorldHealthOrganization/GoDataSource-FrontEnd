@@ -8,7 +8,7 @@ import { StorageKey, StorageService } from '../helper/storage.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { AuthDataService } from './auth.data.service';
 import { SnackbarService } from '../helper/snackbar.service';
-import { EntityModel } from '../../models/entity.model';
+import { EntityModel } from '../../models/entity-and-relationship.model';
 import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';

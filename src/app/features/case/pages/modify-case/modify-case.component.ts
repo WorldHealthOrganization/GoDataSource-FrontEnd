@@ -24,7 +24,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField } from '../../../../shared/components';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { EntityModel } from '../../../../core/models/entity.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { MatDialogRef } from '@angular/material';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { throwError } from 'rxjs';

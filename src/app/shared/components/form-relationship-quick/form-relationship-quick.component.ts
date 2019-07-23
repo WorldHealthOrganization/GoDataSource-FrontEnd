@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, AfterViewInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, FormControl } from '@angular/forms';
 import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
-import { RelationshipModel } from '../../../core/models/relationship.model';
 import { Observable } from 'rxjs';
 import { ClusterDataService } from '../../../core/services/data/cluster.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
@@ -13,6 +12,7 @@ import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { Constants } from '../../../core/models/constants';
 import { share } from 'rxjs/operators';
 import { moment } from '../../../core/helperClasses/x-moment';
+import { RelationshipModel } from '../../../core/models/entity-and-relationship.model';
 
 @Component({
     selector: 'app-form-relationship-quick',

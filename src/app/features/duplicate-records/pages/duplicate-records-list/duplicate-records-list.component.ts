@@ -14,7 +14,7 @@ import { AddressModel } from '../../../../core/models/address.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { FormControl, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { EntityModel } from '../../../../core/models/entity.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { share, tap } from 'rxjs/operators';
 
 @Component({

@@ -21,7 +21,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { SelectedNodes } from '../../classes/selected-nodes';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
@@ -34,6 +33,7 @@ import { catchError, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
+import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 
 enum NodeAction {
     MODIFY_PERSON = 'modify-person',

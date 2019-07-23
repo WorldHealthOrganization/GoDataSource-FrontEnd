@@ -9,12 +9,12 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
-import { ReportDifferenceOnsetRelationshipModel } from '../../../../core/models/relationship.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { tap } from 'rxjs/operators';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
+import { ReportDifferenceOnsetRelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 
 @Component({
     selector: 'app-report-relationships-long-period',

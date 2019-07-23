@@ -9,7 +9,7 @@ import { GlobalEntitySearchDataService } from '../../../core/services/data/globa
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { Subscription } from 'rxjs';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
-import { EntityModel } from '../../../core/models/entity.model';
+import { EntityModel } from '../../../core/models/entity-and-relationship.model';
 import { Router } from '@angular/router';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { LoadingDialogModel } from '../loading-dialog/loading-dialog.component';

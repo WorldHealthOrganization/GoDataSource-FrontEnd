@@ -6,7 +6,7 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { MetricContactsSeenEachDays } from '../../models/metrics/metric-contacts-seen-each-days.model';
 import { AddressModel } from '../../models/address.model';
 import { RiskLevelGroupModel } from '../../models/risk-level-group.model';
-import { EntityModel } from '../../models/entity.model';
+import { EntityModel } from '../../models/entity-and-relationship.model';
 import { EntityType } from '../../models/entity-type';
 import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';

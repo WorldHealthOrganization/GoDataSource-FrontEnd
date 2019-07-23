@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { CaseModel } from './case.model';
-import { RelationshipModel } from './relationship.model';
+import { RelationshipModel } from './entity-and-relationship.model';
 
 export class ReportCasesWithOnsetModel {
     primaryCase: CaseModel;

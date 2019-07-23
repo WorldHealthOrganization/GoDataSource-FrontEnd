@@ -2,8 +2,8 @@ import { Component, Inject, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
-import { RelationshipModel } from '../../../core/models/relationship.model';
 import { RelationshipDataService } from '../../../core/services/data/relationship.data.service';
+import { RelationshipModel } from '../../../core/models/entity-and-relationship.model';
 
 export class ViewCOTEdgeData {
     constructor(
