@@ -6,7 +6,7 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { MetricContactsSeenEachDays } from '../../models/metrics/metric-contacts-seen-each-days.model';
 import { AddressModel } from '../../models/address.model';
 import { RiskLevelGroupModel } from '../../models/risk-level-group.model';
-import { EntityModel } from '../../models/entity.model';
+import { EntityModel } from '../../models/entity-and-relationship.model';
 import { EntityType } from '../../models/entity-type';
 import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
@@ -82,11 +82,16 @@ export class ContactDataService {
      * Retrieve a Contact of an Outbreak
      * @param {string} outbreakId
      * @param {string} contactId
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<ContactModel>}
      */
-    getContact(outbreakId: string, contactId: string): Observable<ContactModel> {
+    getContact(
+        outbreakId: string,
+        contactId: string,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<ContactModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/contacts/${contactId}`),
+            this.http.get(`outbreaks/${outbreakId}/contacts/${contactId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`),
             ContactModel
         );
     }
@@ -129,11 +134,17 @@ export class ContactDataService {
      * @param {string} outbreakId
      * @param {string} contactId
      * @param contactData
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<ContactModel>}
      */
-    modifyContact(outbreakId: string, contactId: string, contactData): Observable<ContactModel> {
+    modifyContact(
+        outbreakId: string,
+        contactId: string,
+        contactData,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<ContactModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}`, contactData),
+            this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, contactData),
             ContactModel
         );
     }

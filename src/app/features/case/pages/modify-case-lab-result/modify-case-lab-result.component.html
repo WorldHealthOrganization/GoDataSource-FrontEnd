@@ -207,6 +207,49 @@
                     </div>
                 </mat-card>
 
+                <!-- Create / update by user information section -->
+                <div class="section-title">
+                    {{ 'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE' | translate }}
+                </div>
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="createdByUser"
+                                [ngModel]="labResultData.createdByUser?.name"
+                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_BY'| translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_BY_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="createdAt"
+                                [ngModel]="labResultData.createdAt | dateTimeDefault"
+                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_AT'| translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_AT_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="updatedByUser"
+                                [ngModel]="labResultData.updatedByUser?.name"
+                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_BY'| translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_BY_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="updatedAt"
+                                [ngModel]="labResultData.updatedAt | dateTimeDefault"
+                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_AT'| translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_AT_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+                        </div>
+                    </div>
+                </mat-card>
+
             </mat-tab>
 
             <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate">

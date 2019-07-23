@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -8,7 +8,7 @@ import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { UserSettings } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -19,13 +19,15 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { catchError, share, tap } from 'rxjs/operators';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
-import { EntityModel } from '../../../../core/models/entity.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { throwError } from 'rxjs';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -33,12 +35,17 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
     templateUrl: './entity-relationships-list.component.html',
     styleUrls: ['./entity-relationships-list.component.less']
 })
-export class EntityRelationshipsListComponent extends RelationshipsListComponent implements OnInit {
+export class EntityRelationshipsListComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // list of relationships
     relationshipsList$: Observable<EntityModel[]>;
     relationshipsListCount$: Observable<any>;
+
+    outbreakSubscriber: Subscription;
+
+    // user list
+    userList$: Observable<UserModel[]>;
 
     // reference data
     certaintyLevelList$: Observable<any>;
@@ -117,7 +124,8 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
-        private clusterDataService: ClusterDataService
+        private clusterDataService: ClusterDataService,
+        private userDataService: UserDataService
     ) {
         super(
             snackbarService, router, route,
@@ -128,7 +136,10 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     ngOnInit() {
         super.ngOnInit();
 
-        this.outbreakDataService
+        // retrieve users
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
+
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((outbreak: OutbreakModel) => {
                 if (outbreak) {
@@ -158,6 +169,14 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
@@ -270,6 +289,22 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                 field: 'clusterId',
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
                 visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'createdBy',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'createdAt',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedBy',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedAt',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT'
             })
         ];
     }

@@ -4,8 +4,9 @@ import { CaseModel } from './case.model';
 import { IAnswerData } from './question.model';
 import { ContactModel } from './contact.model';
 import { EntityType } from './entity-type';
+import { BaseModel } from './base.model';
 
-export class LabResultModel {
+export class LabResultModel extends BaseModel {
     entity: CaseModel | ContactModel;
     id: string;
     sampleIdentifier: string;
@@ -25,9 +26,10 @@ export class LabResultModel {
     };
     personId: string;
     testedFor: string;
-    deleted: boolean;
 
     constructor(data = null) {
+        super(data);
+
         this.entity = _.get(data, 'case');
         this.entity = this.entity && this.entity.type === EntityType.CONTACT ?
             new ContactModel(this.entity) :
@@ -48,7 +50,6 @@ export class LabResultModel {
         this.quantitativeResult = _.get(data, 'quantitativeResult');
         this.personId = _.get(data, 'personId');
         this.testedFor = _.get(data, 'testedFor');
-        this.deleted = _.get(data, 'deleted');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
     }

@@ -31,7 +31,49 @@
                         required="true"
                         [disabled]="viewOnly">
                     </app-form-relationship>
+                </mat-card>
 
+                <!-- Create / update by user information section -->
+                <div class="section-title">
+                    {{ 'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE' | translate }}
+                </div>
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="createdByUser"
+                                [ngModel]="relationship.createdByUser?.name"
+                                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY'| translate"
+                                tooltip="LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="createdAt"
+                                [ngModel]="relationship.createdAt | dateTimeDefault"
+                                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT'| translate"
+                                tooltip="LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="updatedByUser"
+                                [ngModel]="relationship.updatedByUser?.name"
+                                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY'| translate"
+                                tooltip="LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="updatedAt"
+                                [ngModel]="relationship.updatedAt | dateTimeDefault"
+                                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT'| translate"
+                                tooltip="LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+                        </div>
+                    </div>
                 </mat-card>
 
             </mat-tab>

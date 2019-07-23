@@ -14,11 +14,11 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
-import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 
 @Component({
     selector: 'app-create-entity-relationship-bulk',

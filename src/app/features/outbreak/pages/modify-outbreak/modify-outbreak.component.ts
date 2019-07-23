@@ -118,7 +118,11 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         // modify the outbreak
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.outbreakDataService
-            .modifyOutbreak(this.outbreakId, dirtyFields)
+            .modifyOutbreak(
+                this.outbreakId,
+                dirtyFields,
+                true
+            )
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);

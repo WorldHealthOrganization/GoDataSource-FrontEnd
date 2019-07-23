@@ -13,6 +13,159 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiModifyContactPage
+         */
+        'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
+
+        /**
+         * uiContactFields
+         */
+        'LNG_CONTACT_FIELD_LABEL_CREATED_BY': 'Created By',
+        'LNG_CONTACT_FIELD_LABEL_CREATED_BY_DESCRIPTION': '',
+        'LNG_CONTACT_FIELD_LABEL_CREATED_AT': 'Created At ( utc )',
+        'LNG_CONTACT_FIELD_LABEL_CREATED_AT_DESCRIPTION': '',
+        'LNG_CONTACT_FIELD_LABEL_UPDATED_BY': 'Updated By',
+        'LNG_CONTACT_FIELD_LABEL_UPDATED_BY_DESCRIPTION': '',
+        'LNG_CONTACT_FIELD_LABEL_UPDATED_AT': 'Updated At ( utc )',
+        'LNG_CONTACT_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
+
+        /**
+         * uiModifyCasePage
+         */
+        'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
+
+        /**
+         * uiCaseFields
+         */
+        'LNG_CASE_FIELD_LABEL_CREATED_BY': 'Created By',
+        'LNG_CASE_FIELD_LABEL_CREATED_BY_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_CREATED_AT': 'Created At ( utc )',
+        'LNG_CASE_FIELD_LABEL_CREATED_AT_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_UPDATED_BY': 'Updated By',
+        'LNG_CASE_FIELD_LABEL_UPDATED_BY_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_UPDATED_AT': 'Updated At ( utc )',
+        'LNG_CASE_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
+
+        /**
+         * uiModifyEventPage
+         */
+        'LNG_PAGE_MODIFY_EVENT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
+
+        /**
+         * uiEventFields
+         */
+        'LNG_EVENT_FIELD_LABEL_CREATED_BY': 'Created By',
+        'LNG_EVENT_FIELD_LABEL_CREATED_BY_DESCRIPTION': '',
+        'LNG_EVENT_FIELD_LABEL_CREATED_AT': 'Created At ( utc )',
+        'LNG_EVENT_FIELD_LABEL_CREATED_AT_DESCRIPTION': '',
+        'LNG_EVENT_FIELD_LABEL_UPDATED_BY': 'Updated By',
+        'LNG_EVENT_FIELD_LABEL_UPDATED_BY_DESCRIPTION': '',
+        'LNG_EVENT_FIELD_LABEL_UPDATED_AT': 'Updated At ( utc )',
+        'LNG_EVENT_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
+
+        /**
+         * uiModifyOutbreakPage
+         */
+        'LNG_PAGE_MODIFY_OUTBREAK_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
+
+        /**
+         * uiOutbreakFields
+         */
+        'LNG_OUTBREAK_FIELD_LABEL_CREATED_BY': 'Created By',
+        'LNG_OUTBREAK_FIELD_LABEL_CREATED_BY_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_CREATED_AT': 'Created At ( utc )',
+        'LNG_OUTBREAK_FIELD_LABEL_CREATED_AT_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_UPDATED_BY': 'Updated By',
+        'LNG_OUTBREAK_FIELD_LABEL_UPDATED_BY_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_UPDATED_AT': 'Updated At ( utc )',
+        'LNG_OUTBREAK_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
+
+        /**
+         * uiModifyFollowUpPage
+         */
+        'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
+
+        /**
+         * uiFollowUpFields
+         */
+        'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY': 'Created By',
+        'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY_DESCRIPTION': '',
+        'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT': 'Created At ( utc )',
+        'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT_DESCRIPTION': '',
+        'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY': 'Updated By',
+        'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY_DESCRIPTION': '',
+        'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT': 'Updated At ( utc )',
+        'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
+
+        /**
+         * uiModifyCaseLabResultPage
+         */
+        'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
+
+        /**
+         * uiCaseLabResultsFields
+         */
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_BY': 'Created By',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_BY_DESCRIPTION': '',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_AT': 'Created At ( utc )',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_AT_DESCRIPTION': '',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_BY': 'Updated By',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_BY_DESCRIPTION': '',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_AT': 'Updated At ( utc )',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
+
+        /**
+         * uiModifyReferenceDataEntryPage
+         */
+        'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
+
+        /**
+         * uiReferenceDataEntryFields
+         */
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_BY': 'Created By',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_BY_DESCRIPTION': '',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_AT': 'Created At ( utc )',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_AT_DESCRIPTION': '',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_BY': 'Updated By',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_BY_DESCRIPTION': '',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_AT': 'Updated At ( utc )',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
+
+        /**
+         * uiModifyLocationPage
+         */
+        'LNG_PAGE_MODIFY_LOCATION_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
+
+        /**
+         * uiLocationFields
+         */
+        'LNG_LOCATION_FIELD_LABEL_CREATED_BY': 'Created By',
+        'LNG_LOCATION_FIELD_LABEL_CREATED_BY_DESCRIPTION': '',
+        'LNG_LOCATION_FIELD_LABEL_CREATED_AT': 'Created At ( utc )',
+        'LNG_LOCATION_FIELD_LABEL_CREATED_AT_DESCRIPTION': '',
+        'LNG_LOCATION_FIELD_LABEL_UPDATED_BY': 'Updated By',
+        'LNG_LOCATION_FIELD_LABEL_UPDATED_BY_DESCRIPTION': '',
+        'LNG_LOCATION_FIELD_LABEL_UPDATED_AT': 'Updated At ( utc )',
+        'LNG_LOCATION_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
+
+        /**
+         * uiModifyEntityRelationshipPage
+         */
+        'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details',
+
+        /**
+         * uiRelationshipFields
+         */
+        'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY': 'Created By',
+        'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY_DESCRIPTION': '',
+        'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT': 'Created At ( utc )',
+        'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT_DESCRIPTION': '',
+        'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY': 'Updated By',
+        'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY_DESCRIPTION': '',
+        'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT': 'Updated At ( utc )',
+        'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT_DESCRIPTION': '',
+
+        /**
          * uiModifyFollowUpListPage
          */
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_FOLLOW_UPS_DATES': 'Follow-ups dates:',

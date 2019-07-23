@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { PERMISSION } from '../../../../core/models/permission.model';
@@ -16,6 +16,7 @@ import { tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import * as _ from 'lodash';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-report-cases-date-onset-list',
@@ -23,7 +24,7 @@ import * as _ from 'lodash';
     templateUrl: './report-cases-date-onset-list.component.html',
     styleUrls: ['./report-cases-date-onset-list.component.less']
 })
-export class ReportCasesDateOnsetListComponent extends ListComponent implements OnInit {
+export class ReportCasesDateOnsetListComponent extends ListComponent implements OnInit, OnDestroy {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
@@ -32,6 +33,8 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
 
     // authenticated user
     authUser: UserModel;
+
+    outbreakSubscriber: Subscription;
 
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
@@ -180,7 +183,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // subscribe to the Selected Outbreak Subject stream
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -188,6 +191,14 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
                 // refresh
                 this.needsRefreshList(true);
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**

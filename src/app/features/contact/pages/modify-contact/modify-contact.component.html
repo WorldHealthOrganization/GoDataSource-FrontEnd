@@ -171,6 +171,49 @@
                     </div>
                 </mat-card>
 
+                <!-- Create / update by user information section -->
+                <div class="section-title">
+                    {{ 'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE' | translate }}
+                </div>
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="createdByUser"
+                                [ngModel]="contactData.createdByUser?.name"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_CREATED_BY'| translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_CREATED_BY_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="createdAt"
+                                [ngModel]="contactData.createdAt | dateTimeDefault"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_CREATED_AT'| translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_CREATED_AT_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="updatedByUser"
+                                [ngModel]="contactData.updatedByUser?.name"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_UPDATED_BY'| translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_UPDATED_BY_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="updatedAt"
+                                [ngModel]="contactData.updatedAt | dateTimeDefault"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_UPDATED_AT'| translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_UPDATED_AT_DESCRIPTION"
+                                [disabled]="true">
+                            </app-form-input>
+                        </div>
+                    </div>
+                </mat-card>
+
                 <!-- Documents section -->
                 <div class="section-title">{{'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_DOCUMENTS_TITLE'| translate}}</div>
                 <app-form-document-list

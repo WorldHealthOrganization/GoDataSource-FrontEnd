@@ -119,6 +119,12 @@ export class ReferenceDataDataService {
         // sort entries
         const qb = new RequestQueryBuilder();
         qb.sort.by('order', RequestSortDirection.ASC);
+
+        // retrieve created user & modified user information
+        qb.include('createdByUser', true);
+        qb.include('updatedByUser', true);
+
+        // build filter
         const filter = qb.buildQuery();
 
         // map to model
@@ -156,17 +162,15 @@ export class ReferenceDataDataService {
     /**
      * Retrieve a Reference Data entry
      * @param {string} entryId
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<ReferenceDataEntryModel>}
      */
-    getEntry(entryId: string): Observable<ReferenceDataEntryModel> {
-        const qb = new RequestQueryBuilder();
-        // include roles and permissions in response
-        qb.include('category', true);
-
-        const filter = qb.buildQuery();
-
+    getEntry(
+        entryId: string,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<ReferenceDataEntryModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`reference-data/${entryId}?filter=${filter}`),
+            this.http.get(`reference-data/${entryId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`),
             ReferenceDataEntryModel
         );
     }
@@ -190,11 +194,16 @@ export class ReferenceDataDataService {
      * Modify an existing Reference Data entry
      * @param {string} entryId
      * @param entryData
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<ReferenceDataEntryModel>}
      */
-    modifyEntry(entryId: string, entryData): Observable<ReferenceDataEntryModel> {
+    modifyEntry(
+        entryId: string,
+        entryData,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<ReferenceDataEntryModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.put(`reference-data/${entryId}`, entryData)
+            this.http.put(`reference-data/${entryId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, entryData)
                 .pipe(
                     tap(() => {
                         // invalidate list cache

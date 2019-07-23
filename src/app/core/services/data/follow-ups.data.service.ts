@@ -99,15 +99,27 @@ export class FollowUpsDataService {
      * @param {string} outbreakId
      * @param {string} contactId
      * @param {string} followUpId
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<FollowUpModel>}
      */
-    getFollowUp(outbreakId: string, contactId: string, followUpId: string): Observable<FollowUpModel> {
+    getFollowUp(
+        outbreakId: string,
+        contactId: string,
+        followUpId: string,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<FollowUpModel> {
         // include contact in response
         const qb = new RequestQueryBuilder();
         qb.include('contact', true);
         qb.filter.where({
             id: followUpId
         });
+
+        // retrieve created user & modified user information
+        if (retrieveCreatedUpdatedBy) {
+            qb.include('createdByUser', true);
+            qb.include('updatedByUser', true);
+        }
 
         // construct query
         const filter = qb.buildQuery();
@@ -153,11 +165,18 @@ export class FollowUpsDataService {
      * @param {string} contactId
      * @param {string} followUpId
      * @param followUpData
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<FollowUpModel>}
      */
-    modifyFollowUp(outbreakId: string, contactId: string, followUpId: string, followUpData): Observable<FollowUpModel> {
+    modifyFollowUp(
+        outbreakId: string,
+        contactId: string,
+        followUpId: string,
+        followUpData,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<FollowUpModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups/${followUpId}`, followUpData),
+            this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups/${followUpId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, followUpData),
             FollowUpModel
         );
     }

@@ -1,8 +1,7 @@
 import * as _ from 'lodash';
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, AfterViewInit, Output, EventEmitter } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, AfterViewInit, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, FormControl } from '@angular/forms';
 import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
-import { RelationshipModel } from '../../../core/models/relationship.model';
 import { Observable } from 'rxjs';
 import { ClusterDataService } from '../../../core/services/data/cluster.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
@@ -14,6 +13,8 @@ import { EntityType } from '../../../core/models/entity-type';
 import { Constants } from '../../../core/models/constants';
 import { share } from 'rxjs/operators';
 import { moment } from '../../../core/helperClasses/x-moment';
+import { RelationshipModel } from '../../../core/models/entity-and-relationship.model';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-form-relationship',
@@ -26,7 +27,7 @@ import { moment } from '../../../core/helperClasses/x-moment';
         multi: true
     }]
 })
-export class FormRelationshipComponent extends GroupBase<RelationshipModel> implements OnInit, AfterViewInit, GroupDirtyFields {
+export class FormRelationshipComponent extends GroupBase<RelationshipModel> implements OnInit, AfterViewInit, GroupDirtyFields, OnDestroy {
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
     @Input() relatedObject: any;
@@ -44,6 +45,8 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
 
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
+
+    outbreakSubscriber: Subscription;
 
     currentDate = Constants.getCurrentDate();
 
@@ -88,7 +91,7 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
         }
 
         // subscribe to the Selected Outbreak
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -101,6 +104,14 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
                     }
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     ngAfterViewInit() {

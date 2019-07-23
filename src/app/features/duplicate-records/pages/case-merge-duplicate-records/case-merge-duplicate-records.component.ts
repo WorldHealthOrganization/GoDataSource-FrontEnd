@@ -11,7 +11,7 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { EntityModel } from '../../../../core/models/entity.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { Constants } from '../../../../core/models/constants';

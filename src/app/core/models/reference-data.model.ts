@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { environment } from '../../../environments/environment';
 import { Constants } from './constants';
+import { BaseModel } from './base.model';
 
 export class ReferenceDataCategoryModel {
     id: string;
@@ -16,7 +17,7 @@ export class ReferenceDataCategoryModel {
     }
 }
 
-export class ReferenceDataEntryModel {
+export class ReferenceDataEntryModel extends BaseModel {
     id: string;
     categoryId: string;
     value: string;
@@ -40,6 +41,8 @@ export class ReferenceDataEntryModel {
     }
 
     constructor(data = null) {
+        super(data);
+
         this.id = _.get(data, 'id');
         this.categoryId = _.get(data, 'categoryId');
         this.value = _.get(data, 'value');

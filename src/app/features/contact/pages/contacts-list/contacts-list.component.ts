@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -22,7 +22,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
-import { RequestQueryBuilder, RequestRelationBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestRelationBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
@@ -31,8 +31,9 @@ import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
-import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-contacts-list',
@@ -40,7 +41,7 @@ import { moment } from '../../../../core/helperClasses/x-moment';
     templateUrl: './contacts-list.component.html',
     styleUrls: ['./contacts-list.component.less']
 })
-export class ContactsListComponent extends ListComponent implements OnInit {
+export class ContactsListComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '.', true)
     ];
@@ -55,6 +56,11 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // list of existing contacts
     contactsList$: Observable<ContactModel[]>;
     contactsListCount$: Observable<any>;
+
+    outbreakSubscriber: Subscription;
+
+    // user list
+    userList$: Observable<UserModel[]>;
 
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
@@ -334,7 +340,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         private route: ActivatedRoute,
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private userDataService: UserDataService
     ) {
         super(
             snackbarService,
@@ -356,6 +363,9 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         this.exportContactsDailyFollowUpsFormFileName = this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE') +
             ' - ' +
             moment().format('YYYY-MM-DD');
+
+        // retrieve users
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
         // dialog fields for daily follow-ups print
         this.genericDataService
@@ -401,7 +411,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         // subscribe to the Selected Outbreak
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -432,6 +442,14 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
         // initialize side filters
         this.initializeSideFilters();
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
@@ -478,12 +496,28 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS'
             }),
             new VisibleColumnModel({
+                field: 'wasCase',
+                label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE'
+            }),
+            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_CONTACT_FIELD_LABEL_DELETED'
             }),
             new VisibleColumnModel({
-                field: 'wasCase',
-                label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE'
+                field: 'createdBy',
+                label: 'LNG_CONTACT_FIELD_LABEL_CREATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'createdAt',
+                label: 'LNG_CONTACT_FIELD_LABEL_CREATED_AT'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedBy',
+                label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedAt',
+                label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_AT'
             })
         ];
     }
@@ -655,6 +689,11 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         if (this.selectedOutbreak) {
             // refresh list of contacts grouped by risk level
             this.getContactsGroupedByRiskLevel();
+
+            // retrieve created user & modified user information
+            this.queryBuilder.include('createdByUser', true);
+            this.queryBuilder.include('updatedByUser', true);
+
             // retrieve the list of Contacts
             this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(

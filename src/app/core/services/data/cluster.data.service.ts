@@ -7,7 +7,7 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { CaseModel } from '../../models/case.model';
 import { EventModel } from '../../models/event.model';
 import { ContactModel } from '../../models/contact.model';
-import { EntityModel } from '../../models/entity.model';
+import { EntityModel } from '../../models/entity-and-relationship.model';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../models/label-value-pair';
 import { map } from 'rxjs/operators';

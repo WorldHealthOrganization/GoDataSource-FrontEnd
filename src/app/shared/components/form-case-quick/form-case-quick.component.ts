@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
+import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, OnDestroy } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, FormControl } from '@angular/forms';
 import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
 import { Observable } from 'rxjs';
@@ -9,6 +9,7 @@ import { ReferenceDataCategory } from '../../../core/models/reference-data.model
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { Constants } from '../../../core/models/constants';
 import { CaseModel } from '../../../core/models/case.model';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-form-case-quick',
@@ -21,7 +22,7 @@ import { CaseModel } from '../../../core/models/case.model';
         multi: true
     }]
 })
-export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnInit, GroupDirtyFields {
+export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnInit, GroupDirtyFields, OnDestroy {
     genderList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
@@ -29,6 +30,8 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
     outcomeList$: Observable<any[]>;
 
     currentDate = Constants.getCurrentDate();
+
+    outbreakSubscriber: Subscription;
 
     // selected outbreak
     selectedOutbreak: OutbreakModel;
@@ -63,7 +66,7 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
         this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
 
         // subscribe to the Selected Outbreak
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -78,6 +81,14 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
                 };
 
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**

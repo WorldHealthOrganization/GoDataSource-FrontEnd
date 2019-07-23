@@ -1,13 +1,16 @@
-import { Directive, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Directive, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Directive({
     selector: '[app-selected-outbreak-is-active]'
 })
-export class SelectedOutbreakIsActiveDirective implements OnInit {
+export class SelectedOutbreakIsActiveDirective implements OnInit, OnDestroy {
     private _selectedOutbreak: OutbreakModel;
+
+    outbreakSubscriber: Subscription;
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -21,13 +24,21 @@ export class SelectedOutbreakIsActiveDirective implements OnInit {
         this.hideShow();
 
         // check if selected outbreak is the active one
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 // oub5reak changed, we need to check elements again
                 this._selectedOutbreak = selectedOutbreak;
                 this.hideShow();
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**

@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
+import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, OnDestroy } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, FormControl } from '@angular/forms';
 import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
 import { Observable } from 'rxjs';
@@ -9,6 +9,7 @@ import { ReferenceDataCategory } from '../../../core/models/reference-data.model
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { Constants } from '../../../core/models/constants';
 import { ContactModel } from '../../../core/models/contact.model';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-form-contact-quick',
@@ -21,7 +22,7 @@ import { ContactModel } from '../../../core/models/contact.model';
         multi: true
     }]
 })
-export class FormContactQuickComponent extends GroupBase<ContactModel> implements OnInit, GroupDirtyFields {
+export class FormContactQuickComponent extends GroupBase<ContactModel> implements OnInit, GroupDirtyFields, OnDestroy {
     genderList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
@@ -32,6 +33,8 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
     // selected outbreak
     selectedOutbreak: OutbreakModel;
     displayRefresh: boolean = false;
+
+    outbreakSubscriber: Subscription;
 
     visualIDTranslateData: {
         mask: string
@@ -61,7 +64,7 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
         this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
 
         // subscribe to the Selected Outbreak
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -75,6 +78,14 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
                     mask: ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
                 };
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
