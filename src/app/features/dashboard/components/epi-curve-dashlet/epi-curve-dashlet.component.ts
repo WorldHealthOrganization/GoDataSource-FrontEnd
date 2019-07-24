@@ -211,7 +211,12 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
             if (this.globalFilterDate) {
                 qb.filter.byEquality(
                     'endDate',
-                    this.globalFilterDate.format('YYYY-MM-DD')
+                    this.globalFilterDate.clone().endOf('day').toISOString()
+                );
+            } else {
+                qb.filter.byEquality(
+                    'endDate',
+                    moment().endOf('day').toISOString()
                 );
             }
 
