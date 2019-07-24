@@ -320,15 +320,13 @@
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP' | translate }}</div>
                     <div class="column-filter">
-                        <app-form-input
+                        <app-form-range
                             name="indexFilter"
                             ngModel
-                            type="number"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByEquality('index', toNumber($event))"
+                            (changed)="filterByRangeField('index', $event)"
                             app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+                            [min]="0">
+                        </app-form-range>
                     </div>
                 </div>
             </mat-header-cell>

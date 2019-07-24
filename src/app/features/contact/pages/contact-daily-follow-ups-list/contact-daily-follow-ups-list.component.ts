@@ -444,7 +444,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             new FilterModel({
                 fieldName: 'index',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
-                type: FilterType.NUMBER
+                type: FilterType.RANGE_NUMBER
             }),
             new FilterModel({
                 fieldName: 'teamId',
