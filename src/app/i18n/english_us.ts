@@ -12,10 +12,6 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
-        /**
-         * uiDashboardPage
-         */
-        'LNG_PAGE_DASHBOARD_KPI_CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP': 'Contacts with successful follow-up ( {{date}} )'
 
 
         /**
