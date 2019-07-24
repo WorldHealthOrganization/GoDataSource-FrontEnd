@@ -212,9 +212,13 @@
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP' | translate }}</div>
                     <div class="column-filter">
-                        <div class="column-filter">
-                            <!-- placeholder -->
-                        </div>
+                        <app-form-range
+                            name="indexFilter"
+                            ngModel
+                            (changed)="filterByRangeField('index', $event)"
+                            app-reset-input-on-side-filter
+                            [min]="0">
+                        </app-form-range>
                     </div>
                 </div>
             </mat-header-cell>
