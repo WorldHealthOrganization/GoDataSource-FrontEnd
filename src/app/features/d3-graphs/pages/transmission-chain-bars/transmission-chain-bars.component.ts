@@ -43,7 +43,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     // query builder for fetching data
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
     // show loading while fetching data and building the graph
-    loadingData: boolean = false;
+    loadingData: boolean = true;
     // do we have data to draw the graph?
     noData: boolean = false;
     // loading indicator

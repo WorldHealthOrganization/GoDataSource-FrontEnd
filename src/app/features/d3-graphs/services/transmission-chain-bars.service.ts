@@ -12,7 +12,7 @@ import { moment } from '../../../core/helperClasses/x-moment';
 @Injectable()
 export class TransmissionChainBarsService {
     // regular cell width
-    private cellWidth = 50;
+    private cellWidth = 64;
     // regular cell height
     private cellHeight = 25;
     // space between cases / events
@@ -272,6 +272,7 @@ export class TransmissionChainBarsService {
          * draw the lab results cells
          */
         (entityData.labResults || []).forEach((labResult) => {
+            // determine result caption
             let result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_UNKNOWN_LABEL');
             if (labResult.result === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_POSITIVE') {
                 result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_POSITIVE_LABEL');
@@ -279,13 +280,34 @@ export class TransmissionChainBarsService {
                 result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_NEGATIVE_LABEL');
             }
 
-            const labResultDate = moment(labResult.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+            // use date of result if we have one, or fallback to dateSampleTaken
+            let labResultDate: string;
+            let labPending: boolean = false;
+            if (labResult.dateOfResult) {
+                labResultDate = moment(labResult.dateOfResult).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+            } else {
+                labResultDate = moment(labResult.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                labPending = true;
+            }
+
+            // pending lab results message
+            if (labPending) {
+                result = this.translate(
+                    'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_PENDING_LABEL', {
+                        result: result
+                    }
+                );
+            }
 
             // check if date is before date of onset
-            const opacity = (moment(labResultDate).isBefore(dateMoment)) ? this.graphConfig.beforeDateOfOnsetOpacity : 1;
+            const opacity = moment(labResultDate).isBefore(dateMoment) ?
+                this.graphConfig.beforeDateOfOnsetOpacity :
+                1;
 
-            const labResultGroup = entityColumnContainer.append('g')
-                .attr('transform', `translate(0, ${this.entityDetailsCellHeight + (this.datesMap[labResultDate] * this.cellHeight)})`);
+            const labResultGroup = entityColumnContainer.append('g').attr(
+                'transform',
+                `translate(0, ${this.entityDetailsCellHeight + (this.datesMap[labResultDate] * this.cellHeight)})`
+            );
             labResultGroup.append('rect')
                 .attr('width', this.cellWidth)
                 .attr('height', this.cellHeight)
@@ -491,7 +513,19 @@ export class TransmissionChainBarsService {
     /**
      * Translate token and cache it
      */
-    private translate(token: string): string {
+    private translate(
+        token: string,
+        data?: any
+    ): string {
+        // if we have data, then we can't truly cache it
+        if (data) {
+            return this.i18nService.instant(
+                token,
+                data
+            );
+        }
+
+        // cache
         if (!this.translationsMap[token]) {
             this.translationsMap[token] = this.i18nService.instant(token);
         }
