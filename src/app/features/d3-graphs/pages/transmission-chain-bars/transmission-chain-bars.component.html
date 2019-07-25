@@ -128,7 +128,20 @@
         </div>
     </div>
 
-    <div [fxShow]="!loadingData && !noData" #chart id="chart"></div>
+    <div
+        [fxShow]="!loadingData && !noData">
+        <!-- Chart details -->
+        <div
+            [innerHTML]="'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LEGEND_DETAILS' | translate"
+            class="transmission-chain-bars-legend">
+        </div>
+
+        <!-- Chart -->
+        <div
+            #chart
+            id="chart"
+        ></div>
+    </div>
 
     <div *ngIf="!loadingData && noData">
         {{'LNG_PAGE_TRANSMISSION_CHAIN_BARS_NO_DATA' | translate}}

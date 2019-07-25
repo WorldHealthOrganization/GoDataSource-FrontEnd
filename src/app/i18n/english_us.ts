@@ -12,6 +12,12 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
+        /**
+         * uiChainsOfTransmissionBars
+         */
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_PENDING_LABEL': '{{result}} (p)',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LEGEND_DETAILS': 'Lab result details: ? unknown result / - negative result / + positive result / (p) waiting for result',
+
 
 
         /**
