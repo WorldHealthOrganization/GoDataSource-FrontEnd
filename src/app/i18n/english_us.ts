@@ -16,9 +16,13 @@ export const EnglishUsLang = {
          * uiChainsOfTransmissionBars
          */
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_PENDING_LABEL': '{{result}} (p)',
-        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LEGEND_DETAILS': 'Lab result details: ? unknown result / - negative result / + positive result / (p) waiting for result',
-
-
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LEGEND_DETAILS': 'Case details: h - Hospitalized / i - Isolated  <br/>Lab result details: L? - unknown result / L- - negative result / L+ - positive result / (p) - waiting for result',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_ISOLATED_CASE_LABEL': 'i',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_CASE_LABEL': 'h',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_POSITIVE_LABEL': 'L+',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_NEGATIVE_LABEL': 'L-',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_UNKNOWN_LABEL': 'L?',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_FOR_OTHER_CONDITIONS_CASE_LABEL': 'h'
 
         /**
          * REMOVE the tokens from below
