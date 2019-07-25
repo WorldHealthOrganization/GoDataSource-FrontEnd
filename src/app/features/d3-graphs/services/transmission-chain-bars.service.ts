@@ -9,6 +9,35 @@ import { Router } from '@angular/router';
 import { EntityType } from '../../../core/models/entity-type';
 import { moment } from '../../../core/helperClasses/x-moment';
 
+// define cell types that we need to draw
+enum drawCellType {
+    CASE_ISO_HSP,
+    LAB_RESULT,
+    DATE_OF_ONSET
+}
+
+// define cells that we need to draw
+class DrawCell {
+    // props
+    type: drawCellType;
+    date: string;
+    label: string;
+    opacity: number;
+
+    // constructor
+    constructor(data: {
+        // required
+        type: drawCellType,
+        date: string,
+        label: string
+
+        // optional
+        // #TODO
+    }) {
+        Object.assign(this, data);
+    }
+}
+
 @Injectable()
 export class TransmissionChainBarsService {
     // regular cell width
@@ -18,9 +47,11 @@ export class TransmissionChainBarsService {
     // space between cases / events
     private marginBetween = 7;
     // date cell width (first column)
-    private dateCellWidth = 120;
+    private dateCellWidth = 100;
     // case / event details cell height (first row)
     private entityDetailsCellHeight = 100;
+    // relationship X margin - position of relationship vertical lines on X position related to cell middle
+    private relationshipXMargin = -this.cellWidth / 2 + 10;
 
     // keeping this config centralized in case / event we need to make the graph configurable by the user
     private graphConfig = {
@@ -178,10 +209,6 @@ export class TransmissionChainBarsService {
             return;
         }
 
-        // keep case date of onset / event date for later use
-        const dateMoment = moment(entityData.date);
-        const date = dateMoment.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-
         // the column where we draw the case / event
         const entityColumnIdx = this.currentColumnIdx;
 
@@ -232,8 +259,27 @@ export class TransmissionChainBarsService {
         };
         entityDetailsGroup.on('click', () => { redirectToEntityPage(entityData.id, entityData.type); });
 
+
+
+        // keep case date of onset / event date for later use
+        const dateMoment = moment(entityData.date).startOf('day');
+        const date = dateMoment.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+
+        // determine all cell that we need to draw
+        const cells: DrawCell[] = [];
+
         /**
-         * draw the case isolation cells
+         * date of onset to cells that we need to draw
+         */
+        const dateOfOnsetLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_CASE_ONSET_LABEL');
+        cells.push(new DrawCell({
+            type: drawCellType.DATE_OF_ONSET,
+            date: moment(date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+            label: dateOfOnsetLabel
+        }));
+
+        /**
+         * determine case isolation cells that we should draw
          */
         (entityData.dateRanges || []).forEach((isolation) => {
             const isolationDates = this.getDaysBetween(isolation.startDate, isolation.endDate);
@@ -246,30 +292,16 @@ export class TransmissionChainBarsService {
 
             // draw a cell for each isolation date
             isolationDates.forEach((isolationDate) => {
-                // check if date is before date of onset
-                const opacity = (moment(isolationDate).isBefore(dateMoment)) ? this.graphConfig.beforeDateOfOnsetOpacity : 1;
-
-                const isolationGroup = entityColumnContainer.append('g')
-                    .attr('transform', `translate(0, ${this.entityDetailsCellHeight + (this.datesMap[isolationDate] * this.cellHeight)})`);
-                isolationGroup.append('rect')
-                    .attr('width', this.cellWidth)
-                    .attr('height', this.cellHeight)
-                    .attr('fill', this.graphConfig.isolationColor)
-                    .attr('fill-opacity', opacity);
-                isolationGroup.append('text')
-                    .text(isolationLabel)
-                    .attr('fill', this.graphConfig.isolationTextColor)
-                    .attr('fill-opacity', opacity)
-                    .attr('alignment-baseline', 'central')
-                    .attr('text-anchor', 'middle')
-                    // center the text
-                    .attr('x', this.cellWidth / 2)
-                    .attr('y', this.cellHeight / 2);
+                cells.push(new DrawCell({
+                    type: drawCellType.CASE_ISO_HSP,
+                    date: moment(isolationDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+                    label: isolationLabel
+                }));
             });
         });
 
         /**
-         * draw the lab results cells
+         * determine lab result cells that we should draw
          */
         (entityData.labResults || []).forEach((labResult) => {
             // determine result caption
@@ -299,48 +331,99 @@ export class TransmissionChainBarsService {
                 );
             }
 
-            // check if date is before date of onset
-            const opacity = moment(labResultDate).isBefore(dateMoment) ?
-                this.graphConfig.beforeDateOfOnsetOpacity :
-                1;
-
-            const labResultGroup = entityColumnContainer.append('g').attr(
-                'transform',
-                `translate(0, ${this.entityDetailsCellHeight + (this.datesMap[labResultDate] * this.cellHeight)})`
-            );
-            labResultGroup.append('rect')
-                .attr('width', this.cellWidth)
-                .attr('height', this.cellHeight)
-                .attr('fill', this.graphConfig.labResultColor)
-                .attr('fill-opacity', opacity);
-            labResultGroup.append('text')
-                .text(result)
-                .attr('fill', this.graphConfig.labResultTextColor)
-                .attr('alignment-baseline', 'central')
-                .attr('text-anchor', 'middle')
-                // center the text
-                .attr('x', this.cellWidth / 2)
-                .attr('y', this.cellHeight / 2);
+            // draw a cell for lab result
+            cells.push(new DrawCell({
+                type: drawCellType.LAB_RESULT,
+                date: labResultDate,
+                label: result
+            }));
         });
 
-        /**
-         * draw the date of onset cell
-         */
-        const dateOfOnsetLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_CASE_ONSET_LABEL');
-        const dateOfOnsetGroup = entityColumnContainer.append('g')
-            .attr('transform', `translate(0, ${this.entityDetailsCellHeight + (this.datesMap[date] * this.cellHeight)})`);
-        dateOfOnsetGroup.append('rect')
-            .attr('width', this.cellWidth)
-            .attr('height', this.cellHeight)
-            .attr('fill', this.graphConfig.dateColor);
-        dateOfOnsetGroup.append('text')
-            .text(dateOfOnsetLabel)
-            .attr('fill', this.graphConfig.dateTextColor)
-            .attr('alignment-baseline', 'central')
-            .attr('text-anchor', 'middle')
-            // center the text
-            .attr('x', this.cellWidth / 2)
-            .attr('y', this.cellHeight / 2);
+        // group cells that we need to draw by date
+        const groupedCells: {
+            [date: string]: DrawCell[]
+        } = _.groupBy(
+            cells,
+            'date'
+        );
+
+        // draw cells
+        _.each(
+            groupedCells,
+            (drawCells: DrawCell[]) => {
+                // determine cell width
+                const width: number = this.cellWidth / drawCells.length;
+
+                // draw each cell
+                _.each(
+                    drawCells,
+                    (drawCell: DrawCell, cellIndex: number) => {
+                        // determine type specific properties
+                        let rectFillColor;
+                        let rectTextColor;
+                        switch (drawCell.type) {
+                            case drawCellType.CASE_ISO_HSP:
+                                rectTextColor = this.graphConfig.isolationTextColor;
+                                rectFillColor = this.graphConfig.isolationColor;
+                                break;
+                            case drawCellType.LAB_RESULT:
+                                rectTextColor = this.graphConfig.labResultTextColor;
+                                rectFillColor = this.graphConfig.labResultColor;
+                                break;
+                            case drawCellType.DATE_OF_ONSET:
+                                rectTextColor = this.graphConfig.dateTextColor;
+                                rectFillColor = this.graphConfig.dateColor;
+                                break;
+                        }
+
+                        // position cell
+                        const group = entityColumnContainer.append('g')
+                            .attr(
+                                'transform',
+                                `translate(${width * cellIndex}, ${this.entityDetailsCellHeight + (this.datesMap[drawCell.date] * this.cellHeight)})`
+                            );
+
+                        // check if date is before date of onset
+                        const opacity = moment(drawCell.date).isBefore(dateMoment) ?
+                            this.graphConfig.beforeDateOfOnsetOpacity :
+                            1;
+
+                        // draw cell rectangle
+                        const rect = group.append('rect')
+                            .attr('width', (cellIndex + 1) < drawCells.length ? Math.ceil(width) : width)
+                            .attr('height', this.cellHeight)
+                            .attr('fill', rectFillColor);
+                        rect.on('mousemove', () => {
+                            console.log('sss');
+                        });
+
+
+                        // fill opacity
+                        if (drawCell.type !== drawCellType.DATE_OF_ONSET) {
+                            rect.attr('fill-opacity', opacity);
+                        }
+
+                        // draw cell text
+                        const text = group.append('text')
+                            .text(drawCell.label)
+                            .attr('fill', rectTextColor);
+
+                        // fill opacity
+                        if (drawCell.type !== drawCellType.DATE_OF_ONSET) {
+                            text.attr('fill-opacity', opacity);
+                        }
+
+                        // continue with text data;
+                        text
+                            .attr('alignment-baseline', 'central')
+                            .attr('text-anchor', 'middle')
+                            // center the text
+                            .attr('x', width / 2)
+                            .attr('y', this.cellHeight / 2);
+                    }
+                );
+            }
+        );
 
         // draw the case / event bar container (to show the border)
         const entityBar = entityColumnContainer.append('svg')
@@ -349,7 +432,7 @@ export class TransmissionChainBarsService {
             .attr('y', this.entityDetailsCellHeight + (this.datesMap[date] * this.cellHeight));
         entityBar.append('rect')
             .attr('width', this.cellWidth)
-            .attr('height', (moment(entityData.lastGraphDate).diff(dateMoment, 'days') + 1) * this.cellHeight)
+            .attr('height', (moment(entityData.lastGraphDate).startOf('day').diff(dateMoment, 'days') + 1) * this.cellHeight)
             .attr('fill', 'transparent')
             .attr('stroke', 'black')
             .attr('stroke-width', '1')
@@ -446,7 +529,7 @@ export class TransmissionChainBarsService {
         const lineStartX = (sourceEntityColumnIdx * (this.marginBetween + this.cellWidth)) + (leftOrRight * this.cellWidth);
         const lineStartY = this.entityDetailsCellHeight + (this.datesMap[sourceEntityFirstGraphDate] * this.cellHeight) + (this.cellHeight / 2);
         // stop at the horizontal middle of the target case's / event's bar
-        const lineEndX = (targetEntityColumnIdx * (this.marginBetween + this.cellWidth)) + (this.cellWidth / 2);
+        const lineEndX = (targetEntityColumnIdx * (this.marginBetween + this.cellWidth)) + (this.cellWidth / 2 + this.relationshipXMargin);
         const lineEndY = lineStartY;
         // draw the arrow at the horizontal middle of the target case's / event's bar, but touching the bar
         const arrowX = lineEndX;
@@ -494,8 +577,8 @@ export class TransmissionChainBarsService {
      */
     private getDaysBetween(startDate: string, endDate: string): string[] {
         // start from the start date and increment it
-        const dateMoment = moment(startDate);
-        const endDateMoment = moment(endDate);
+        const dateMoment = moment(startDate).startOf('day');
+        const endDateMoment = moment(endDate).startOf('day');
 
         const days = [];
         while (!dateMoment.isAfter(endDateMoment)) {
