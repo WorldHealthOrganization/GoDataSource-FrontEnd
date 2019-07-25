@@ -393,10 +393,6 @@ export class TransmissionChainBarsService {
                             .attr('width', (cellIndex + 1) < drawCells.length ? Math.ceil(width) : width)
                             .attr('height', this.cellHeight)
                             .attr('fill', rectFillColor);
-                        rect.on('mousemove', () => {
-                            console.log('sss');
-                        });
-
 
                         // fill opacity
                         if (drawCell.type !== drawCellType.DATE_OF_ONSET) {
