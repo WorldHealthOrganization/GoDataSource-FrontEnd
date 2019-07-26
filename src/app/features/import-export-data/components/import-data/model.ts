@@ -179,6 +179,11 @@ export class ImportableFileModel {
 
         this.distinctFileColumnValuesKeyValue = {};
         _.each(this.distinctFileColumnValues, (values: string[], property: string) => {
+            // sanitize property
+            property = property.replace(/\[\d+]$/g, '');
+            property = property.replace(/\[\d+\]/g, '[]');
+
+            // set distinct values
             this.distinctFileColumnValuesKeyValue[property] = _.map(
                 values,
                 (value: string) => {
@@ -210,7 +215,12 @@ export class ImportableMapField {
     public sourceFieldWithoutIndexes = null;
     set sourceField(value: string) {
         this._sourceField = value;
-        this.sourceFieldWithoutIndexes = this.sourceField ? this.sourceField.replace(/\[\d+\]/g, '[]') : null;
+
+        // strip [] from teh end since we shouldn't have this case
+        this.sourceFieldWithoutIndexes = this.sourceField ? this.sourceField.replace(/\[\d+]$/g, '') : null;
+        // replace array items with general ...
+        this.sourceFieldWithoutIndexes = this.sourceFieldWithoutIndexes ? this.sourceFieldWithoutIndexes.replace(/\[\d+\]/g, '[]') : this.sourceFieldWithoutIndexes;
+
         this.isSourceArray = this.sourceField ? this.sourceField.indexOf('[]') > -1 : false;
         this.checkNumberOfMaxLevels();
     }
