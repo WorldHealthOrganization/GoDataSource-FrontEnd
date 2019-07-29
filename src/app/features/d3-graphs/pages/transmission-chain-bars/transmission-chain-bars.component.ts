@@ -65,6 +65,9 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         locationId: null
     };
 
+    graphData: any;
+    cellWidth: number = 64;
+
     @ViewChild('chart') chartContainer: ElementRef;
 
     constructor(
@@ -124,11 +127,40 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
 
                 if (graphData.personsOrder.length > 0) {
                     this.noData = false;
-                    this.transmissionChainBarsService.drawGraph(this.chartContainer.nativeElement, graphData);
+
+                    this.graphData = graphData;
+                    this.redrawGraph();
                 } else {
                     this.noData = true;
                 }
             });
+    }
+
+    /**
+     * Redraw graph
+     */
+    redrawGraph() {
+        // there is no point in drawing graph if we have no data
+        if (this.graphData === undefined) {
+            return;
+        }
+
+        // draw graph
+        this.transmissionChainBarsService.drawGraph(
+            this.chartContainer.nativeElement,
+            this.graphData, {
+                cellWidth: this.cellWidth
+            }
+        );
+    }
+
+    /**
+     * Changed cell width
+     * @param cellWidth
+     */
+    cellWidthChanged(cellWidth: number) {
+        this.cellWidth = cellWidth;
+        this.redrawGraph();
     }
 
     /**

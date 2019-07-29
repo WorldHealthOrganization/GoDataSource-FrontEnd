@@ -7,6 +7,10 @@ export interface EntityBarModel {
     lastName?: string;
     visualId?: string;
     date: string;
+    outcomeId: string;
+    dateOfOutcome: string;
+    safeBurial: boolean;
+    dateOfBurial: string;
     addresses?: {
         // #TODO we may need location name
         locationId: string,
@@ -18,6 +22,7 @@ export interface EntityBarModel {
         endDate: string;
         // #TODO we may need location name
         locationId: string;
+        centerName: string;
     }[];
     labResults?: {
         dateOfResult: string;

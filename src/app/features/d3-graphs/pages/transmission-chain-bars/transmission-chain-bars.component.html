@@ -136,6 +136,21 @@
             class="transmission-chain-bars-legend">
         </div>
 
+        <!-- Chart cell width -->
+        <div
+            class="transmission-chain-bars-cell-width">
+            <div>
+                {{ 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_CELL_WIDTH_LABEL' | translate }}
+            </div>
+            <mat-slider
+                [min]="64"
+                [max]="150"
+                [ngModel]="cellWidth"
+                [tickInterval]="10"
+                (valueChange)="cellWidthChanged($event)">
+            </mat-slider>
+        </div>
+
         <!-- Chart -->
         <div
             #chart

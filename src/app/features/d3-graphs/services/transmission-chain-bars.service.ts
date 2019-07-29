@@ -41,7 +41,8 @@ class DrawCell {
 @Injectable()
 export class TransmissionChainBarsService {
     // regular cell width
-    private cellWidth = 64;
+    private readonly cellWidthDefault = 64;
+    private cellWidth = this.cellWidthDefault;
     // regular cell height
     private cellHeight = 25;
     // space between cases / events
@@ -50,8 +51,14 @@ export class TransmissionChainBarsService {
     private dateCellWidth = 100;
     // case / event details cell height (first row)
     private entityDetailsCellHeight = 100;
-    // relationship X margin - position of relationship vertical lines on X position related to cell middle
-    private relationshipXMargin = -this.cellWidth / 2 + 10;
+    // relationship X margin - position of relationship vertical lines on X position related to cell left position
+    private relationshipXMargin = 5;
+    // cell left padding
+    private cellXPadding = this.relationshipXMargin * 2;
+    // extra graph height
+    // - 30 for scrollbar (keep extra 30px for horizontal scrollbar)
+    // - this.cellHeight to draw relationships under
+    private graphExtraHeight = 30 + this.cellHeight;
 
     // keeping this config centralized in case / event we need to make the graph configurable by the user
     private graphConfig = {
@@ -90,10 +97,25 @@ export class TransmissionChainBarsService {
     constructor(
         private i18nService: I18nService,
         private router: Router
-    ) {
-    }
+    ) {}
 
-    drawGraph(containerNative: any, data: any) {
+    /**
+     * Draw graph
+     * @param containerNative
+     * @param data
+     * @param options
+     */
+    drawGraph(
+        containerNative: any,
+        data: any,
+        options?: {
+            cellWidth?: number
+        }
+    ) {
+        // change cell width ?
+        const cellWidth = _.get(options, 'cellWidth');
+        this.cellWidth = cellWidth ? cellWidth : this.cellWidthDefault;
+
         // clear current graph before redrawing
         d3.select(containerNative).selectAll('*').remove();
 
@@ -109,8 +131,8 @@ export class TransmissionChainBarsService {
         // collect the dates to be displayed on the graph (Oy axis)
         this.collectDates();
 
-        // set graph container height (keep extra 30px for horizontal scrollbar)
-        const graphHeight = this.determineGraphHeight() + 30;
+        // set graph container height
+        const graphHeight = this.determineGraphHeight() + this.graphExtraHeight;
         containerNative.style.height = `${graphHeight}px`;
 
         // create graph d3 container
@@ -225,7 +247,7 @@ export class TransmissionChainBarsService {
 
         // draw the case / event details cell
         const entityDetailsGroup = entityColumnContainer.append('g')
-            .attr('transform', `translate(-6 0) rotate(-54, ${this.cellWidth / 2}, ${this.entityDetailsCellHeight / 2})`)
+            .attr('transform', `translate(${this.cellWidth / 2 - 32} 10) rotate(-54, 32, ${this.entityDetailsCellHeight / 2})`)
             .attr('class', 'entity-info-header');
 
         // case full name / / event name
@@ -347,12 +369,18 @@ export class TransmissionChainBarsService {
             'date'
         );
 
+        // determine the cell content full  width
+        const fullCellContentWidth: number = this.cellWidth - this.cellXPadding;
+
         // draw cells
         _.each(
             groupedCells,
             (drawCells: DrawCell[]) => {
                 // determine cell width
-                const width: number = this.cellWidth / drawCells.length;
+                const width: number = fullCellContentWidth / drawCells.length;
+
+                // determine if we need to clip text
+                const clipText: boolean = drawCells.length > 1;
 
                 // draw each cell
                 _.each(
@@ -377,10 +405,12 @@ export class TransmissionChainBarsService {
                         }
 
                         // position cell
+                        const x: number = (cellIndex < 1 ? 0 : this.cellXPadding) + (width * cellIndex);
+                        const y: number = this.entityDetailsCellHeight + (this.datesMap[drawCell.date] * this.cellHeight);
                         const group = entityColumnContainer.append('g')
                             .attr(
                                 'transform',
-                                `translate(${width * cellIndex}, ${this.entityDetailsCellHeight + (this.datesMap[drawCell.date] * this.cellHeight)})`
+                                `translate(${x}, ${y})`
                             );
 
                         // check if date is before date of onset
@@ -389,8 +419,10 @@ export class TransmissionChainBarsService {
                             1;
 
                         // draw cell rectangle
+                        let rectWidth: number = (cellIndex + 1) < drawCells.length ? Math.ceil(width) : width;
+                        rectWidth = cellIndex < 1 ? rectWidth + this.cellXPadding : rectWidth;
                         const rect = group.append('rect')
-                            .attr('width', (cellIndex + 1) < drawCells.length ? Math.ceil(width) : width)
+                            .attr('width', rectWidth)
                             .attr('height', this.cellHeight)
                             .attr('fill', rectFillColor);
 
@@ -399,10 +431,26 @@ export class TransmissionChainBarsService {
                             rect.attr('fill-opacity', opacity);
                         }
 
+                        // add clip path to clip text ( hide overflow text )
+                        if (clipText) {
+                            group.append('clipPath')
+                                .attr('id', 'clipPathId')
+                                .append('rect')
+                                .attr('width', rectWidth)
+                                .attr('height', this.cellHeight);
+                        }
+
                         // draw cell text
                         const text = group.append('text')
-                            .text(drawCell.label)
-                            .attr('fill', rectTextColor);
+                            .text(drawCell.label);
+
+                        // clip text ?
+                        if (clipText) {
+                            text.attr('clip-path', 'url(#clipPathId)');
+                        }
+
+                        // set text color
+                        text.attr('fill', rectTextColor);
 
                         // fill opacity
                         if (drawCell.type !== drawCellType.DATE_OF_ONSET) {
@@ -410,11 +458,13 @@ export class TransmissionChainBarsService {
                         }
 
                         // continue with text data;
+                        let textX: number = width / 2;
+                        textX = cellIndex < 1 ? textX + this.cellXPadding : textX;
                         text
                             .attr('alignment-baseline', 'central')
                             .attr('text-anchor', 'middle')
                             // center the text
-                            .attr('x', width / 2)
+                            .attr('x', textX)
                             .attr('y', this.cellHeight / 2);
                     }
                 );
@@ -524,8 +574,8 @@ export class TransmissionChainBarsService {
         const leftOrRight = (sourceEntityColumnIdx < targetEntityColumnIdx) ? 1 : 0;
         const lineStartX = (sourceEntityColumnIdx * (this.marginBetween + this.cellWidth)) + (leftOrRight * this.cellWidth);
         const lineStartY = this.entityDetailsCellHeight + (this.datesMap[sourceEntityFirstGraphDate] * this.cellHeight) + (this.cellHeight / 2);
-        // stop at the horizontal middle of the target case's / event's bar
-        const lineEndX = (targetEntityColumnIdx * (this.marginBetween + this.cellWidth)) + (this.cellWidth / 2 + this.relationshipXMargin);
+        // stop at the horizontal of the target case's / event's bar
+        const lineEndX = (targetEntityColumnIdx * (this.marginBetween + this.cellWidth)) + this.relationshipXMargin;
         const lineEndY = lineStartY;
         // draw the arrow at the horizontal middle of the target case's / event's bar, but touching the bar
         const arrowX = lineEndX;
@@ -535,7 +585,7 @@ export class TransmissionChainBarsService {
         this.graphEntityContainer.append('line')
             .attr('class', `relationship source-entity-${sourceEntityId}`)
             .attr('stroke', 'black')
-            .attr('stroke-width', '1px')
+            .attr('stroke-width', '2px')
             .attr('x1', lineStartX)
             .attr('y1', lineStartY)
             .attr('x2', lineEndX)
@@ -545,7 +595,7 @@ export class TransmissionChainBarsService {
         this.graphEntityContainer.append('line')
             .attr('class', `relationship source-entity-${sourceEntityId}`)
             .attr('stroke', 'black')
-            .attr('stroke-width', '1px')
+            .attr('stroke-width', '2px')
             .attr('x1', lineEndX)
             .attr('y1', lineEndY)
             .attr('x2', arrowX)
