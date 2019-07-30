@@ -7,7 +7,7 @@ import { I18nService } from '../../../core/services/helper/i18n.service';
 import { EntityBarModel } from '../typings/entity-bar.model';
 import { Router } from '@angular/router';
 import { EntityType } from '../../../core/models/entity-type';
-import { moment } from '../../../core/helperClasses/x-moment';
+import { Moment, moment } from '../../../core/helperClasses/x-moment';
 import { v4 as uuid } from 'uuid';
 
 // define cell types that we need to draw
@@ -471,8 +471,49 @@ export class TransmissionChainBarsService {
                 // show div
                 this.graphHoverDiv.style.display = 'inline-block';
 
+                // text displayed on hover
+                let text: string = `${date}: ${personName}`;
+
+                // determine entity id
+                let entityId: string;
+                _.each(
+                    this.entityColumnMap,
+                    (index: number, id: string) => {
+                        if (index === nameIndex) {
+                            // found id
+                            entityId = id;
+
+                            // stop each
+                            return false;
+                        }
+                    }
+                );
+
+                // determine if we need to display center name as well
+                if (entityId) {
+                    const entityData: EntityBarModel = this.graphData.personsMap[entityId];
+                    const dateMoment: Moment = moment(date);
+                    if (entityData) {
+                        // check date ranges
+                        if (entityData.dateRanges) {
+                            entityData.dateRanges.forEach((dateRange) => {
+                                const centerName: string = dateRange.centerName ? dateRange.centerName.trim() : null;
+                                if (
+                                    centerName &&
+                                    dateRange.startDate &&
+                                    moment(dateRange.startDate).isSameOrBefore(dateMoment) && (
+                                        !dateRange.endDate ||
+                                        moment(dateRange.endDate).isSameOrAfter(dateMoment)
+                                    )
+                                ) {
+                                    text += `<br />${this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_CENTER_NAME_LABEL', { name: centerName })}`;
+                                }
+                            });
+                        }
+                    }
+                }
+
                 // determine if we need to change position and text
-                const text: string = `${date}: ${personName}`;
                 if (this.graphHoverDiv.innerHTML === text) {
                     return;
                 }

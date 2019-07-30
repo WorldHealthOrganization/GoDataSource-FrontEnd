@@ -15,6 +15,7 @@ export const EnglishUsLang = {
         /**
          * uiChainsOfTransmissionBars
          */
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_CENTER_NAME_LABEL': 'Center name: {{name}}',
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_CELL_WIDTH_LABEL': 'Cell width',
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_PENDING_LABEL': '{{result}} (p)',
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LEGEND_DETAILS': 'Case details: h - Hospitalized / i - Isolated  <br/>Lab result details: L? - unknown result / L- - negative result / L+ - positive result / (p) - waiting for result',
