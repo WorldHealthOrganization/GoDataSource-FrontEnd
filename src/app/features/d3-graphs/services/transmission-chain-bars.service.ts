@@ -38,6 +38,14 @@ class DrawCell {
     }
 }
 
+// used to draw lines
+interface Line {
+    x1: number;
+    x2: number;
+    y1: number;
+    y2: number;
+}
+
 @Injectable()
 export class TransmissionChainBarsService {
     // regular cell width
@@ -57,8 +65,16 @@ export class TransmissionChainBarsService {
     private cellXPadding = this.relationshipXMargin * 2;
     // extra graph height
     // - 30 for scrollbar (keep extra 30px for horizontal scrollbar)
-    // - this.cellHeight to draw relationships under
-    private graphExtraHeight = 30 + this.cellHeight;
+    private graphExtraHeight = 30;
+    // keep occupied space so we determine intersection
+    private relationshipOccupiedSpaces: {
+        [y: number]: Line[]
+    } = {};
+    private relationshipOccupiedSpacesMaxY: number = 0;
+    // relationship line width
+    private relationshipStrokeWidth: number = 1;
+    // relationship line width
+    private relationshipSpaceBetweenStrokes: number = 3;
 
     // keeping this config centralized in case / event we need to make the graph configurable by the user
     private graphConfig = {
@@ -131,10 +147,6 @@ export class TransmissionChainBarsService {
         // collect the dates to be displayed on the graph (Oy axis)
         this.collectDates();
 
-        // set graph container height
-        const graphHeight = this.determineGraphHeight() + this.graphExtraHeight;
-        containerNative.style.height = `${graphHeight}px`;
-
         // create graph d3 container
         this.graphContainer = d3.select(containerNative);
 
@@ -143,6 +155,10 @@ export class TransmissionChainBarsService {
 
         // draw the cases / events
         this.drawEntities();
+
+        // set graph container height
+        const graphHeight = this.determineGraphHeight();
+        containerNative.style.height = `${graphHeight}px`;
     }
 
     /**
@@ -203,14 +219,17 @@ export class TransmissionChainBarsService {
         // entities-no * (margin-between-entities + entity-cell-width) + placeholder-for-overflowing-name-or-visual-id
         const entitiesGraphWidth = this.graphData.personsOrder.length * (this.marginBetween + this.cellWidth) + 20;
 
+        // reset occupied spaces
+        this.relationshipOccupiedSpaces = {};
+        this.relationshipOccupiedSpacesMaxY = 0;
+
         // create entities container
         this.graphEntityContainer = this.graphContainer.append('div')
             .classed('entities-container', true);
 
         // create SVG container
         this.graphEntityContainer = this.graphEntityContainer.append('svg')
-            .attr('width', entitiesGraphWidth)
-            .attr('height', this.determineGraphHeight());
+            .attr('width', entitiesGraphWidth);
 
         // draw each case / event column
         this.graphData.personsOrder.forEach((entityId) => {
@@ -219,6 +238,10 @@ export class TransmissionChainBarsService {
                 this.drawEntity(entityId);
             }
         });
+
+        // set graph height
+        this.graphEntityContainer
+            .attr('height', this.determineGraphHeight());
     }
 
     /**
@@ -569,33 +592,81 @@ export class TransmissionChainBarsService {
         // mark the relation as being drawn, to avoid duplicates
         _.set(this.drawnRelations, `[${sourceEntityId}][${targetEntityId}]`, true);
 
-        // start from the vertical middle of the top cell from source case's / event's bar
-        // left or right?
+        // determine line coordinates
         const leftOrRight = (sourceEntityColumnIdx < targetEntityColumnIdx) ? 1 : 0;
         const lineStartX = (sourceEntityColumnIdx * (this.marginBetween + this.cellWidth)) + (leftOrRight * this.cellWidth);
-        const lineStartY = this.entityDetailsCellHeight + (this.datesMap[sourceEntityFirstGraphDate] * this.cellHeight) + (this.cellHeight / 2);
+        const lineInitialStartY = this.entityDetailsCellHeight + (this.datesMap[sourceEntityFirstGraphDate] * this.cellHeight) + Math.round(this.cellHeight / 2);
+        let lineStartY = lineInitialStartY;
         // stop at the horizontal of the target case's / event's bar
         const lineEndX = (targetEntityColumnIdx * (this.marginBetween + this.cellWidth)) + this.relationshipXMargin;
-        const lineEndY = lineStartY;
+        let lineEndY = lineStartY;
         // draw the arrow at the horizontal middle of the target case's / event's bar, but touching the bar
         const arrowX = lineEndX;
         const arrowY = this.entityDetailsCellHeight + (this.datesMap[targetEntityFirstGraphDate] * this.cellHeight);
+
+        // determine if line intersects another relationship line
+        const x1: number = lineStartX <= lineEndX ? lineStartX : lineEndX;
+        const x2: number = lineStartX <= lineEndX ? lineEndX : lineStartX;
+        while (
+            this.relationshipOccupiedSpaces[lineStartY] !== undefined &&
+            _.find(
+                this.relationshipOccupiedSpaces[lineStartY],
+                (line: Line) => {
+                    return (x1 >= line.x1 && x1 <= line.x2) ||
+                        (x2 >= line.x1 && x2 <= line.x2) ||
+                        (line.x1 >= x1 && line.x1 <= x2) ||
+                        (line.x2 >= x1 && line.x2 <= x2);
+                }
+            )
+        ) {
+            // try next one
+            lineStartY += this.relationshipStrokeWidth + this.relationshipSpaceBetweenStrokes;
+            lineEndY = lineStartY;
+        }
 
         // draw the horizontal line from the source case / event to the target case / event
         this.graphEntityContainer.append('line')
             .attr('class', `relationship source-entity-${sourceEntityId}`)
             .attr('stroke', 'black')
-            .attr('stroke-width', '2px')
+            .attr('stroke-width', `${this.relationshipStrokeWidth}px`)
             .attr('x1', lineStartX)
             .attr('y1', lineStartY)
             .attr('x2', lineEndX)
             .attr('y2', lineEndY);
 
+        // add line to list of intersections
+        if (!this.relationshipOccupiedSpaces[lineStartY]) {
+            this.relationshipOccupiedSpaces[lineStartY] = [];
+        }
+        this.relationshipOccupiedSpaces[lineStartY].push({
+            x1: x1,
+            x2: x2,
+            y1: lineStartY,
+            y2: lineEndY
+        });
+
+        // ste max relationship line y
+        this.relationshipOccupiedSpacesMaxY = lineStartY < this.relationshipOccupiedSpacesMaxY ?
+            this.relationshipOccupiedSpacesMaxY :
+            lineStartY;
+
+        // draw connection lines ?
+        if (lineEndY > lineInitialStartY) {
+            this.graphEntityContainer.append('line')
+                .attr('class', `relationship source-entity-${sourceEntityId}`)
+                .attr('stroke', 'black')
+                .attr('stroke-width', `${this.relationshipStrokeWidth}px`)
+                .attr('x1', lineStartX)
+                .attr('y1', lineInitialStartY)
+                .attr('x2', lineStartX)
+                .attr('y2', lineEndY);
+        }
+
         // draw the vertical line (arrow's base)
         this.graphEntityContainer.append('line')
             .attr('class', `relationship source-entity-${sourceEntityId}`)
             .attr('stroke', 'black')
-            .attr('stroke-width', '2px')
+            .attr('stroke-width', `${this.relationshipStrokeWidth}px`)
             .attr('x1', lineEndX)
             .attr('y1', lineEndY)
             .attr('x2', arrowX)
@@ -612,10 +683,15 @@ export class TransmissionChainBarsService {
      * Determine graph height based on the data
      */
     private determineGraphHeight(): number {
+        // determine number of dates displayed
         const daysNo = Object.keys(this.datesMap).length;
 
+        // determine container height accordingly to max number of cells
+        const datesHeight: number = this.entityDetailsCellHeight + daysNo * this.cellHeight;
+
         // visual-id-column-height + days-no * cell-height
-        return this.entityDetailsCellHeight + daysNo * this.cellHeight;
+        return Math.max(datesHeight, this.relationshipOccupiedSpacesMaxY)
+            + this.graphExtraHeight;
     }
 
     /**
