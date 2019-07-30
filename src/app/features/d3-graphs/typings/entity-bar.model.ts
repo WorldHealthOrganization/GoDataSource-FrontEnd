@@ -24,6 +24,7 @@ export interface EntityBarModel {
         locationId: string;
         centerName: string;
     }[];
+    centerNames: string[];
     labResults?: {
         dateOfResult: string;
         dateSampleTaken: string;

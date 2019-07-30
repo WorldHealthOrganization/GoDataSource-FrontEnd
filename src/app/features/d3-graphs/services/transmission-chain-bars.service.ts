@@ -8,6 +8,7 @@ import { EntityBarModel } from '../typings/entity-bar.model';
 import { Router } from '@angular/router';
 import { EntityType } from '../../../core/models/entity-type';
 import { moment } from '../../../core/helperClasses/x-moment';
+import { v4 as uuid } from 'uuid';
 
 // define cell types that we need to draw
 enum drawCellType {
@@ -44,6 +45,21 @@ interface Line {
     x2: number;
     y1: number;
     y2: number;
+}
+
+// used to render center names
+interface GroupCell {
+    nameCompare: string;
+    name: string;
+    entityStartIndex: number;
+    cells: number;
+    bgColor: string;
+    rect?: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    };
 }
 
 @Injectable()
@@ -119,6 +135,28 @@ export class TransmissionChainBarsService {
     // window scroll listener
     private onWindowScrollArrow: any;
 
+    // center name group line height
+    private entityDetailsTextLineCellHeight: number = 24;
+    private entityDetailsTextLineSpaceBetween: number = 5;
+    private entityDetailsTextLinesHeight: number;
+    private entityDetailsTextLinesColorMargin: number = 4;
+    private entityDetailsTextLinesColorWidth: number = 10;
+    // grouped center names
+    private centerNameCells: GroupCell[] = [];
+    // center name colors
+    private centerNameColors: string[] = [
+        '#cc00ff',
+        '#00cc00',
+        '#669999',
+        '#ff6600',
+        '#ccff99',
+        '#333300',
+        '#663300'
+    ];
+
+    /**
+     * Constructor
+     */
     constructor(
         private i18nService: I18nService,
         private router: Router
@@ -163,6 +201,9 @@ export class TransmissionChainBarsService {
         // create graph d3 container
         this.graphContainer = d3.select(containerNative);
 
+        // Determine center name groups
+        this.determineCenterNameGroups();
+
         // create hover div
         this.drawHoverDiv();
 
@@ -175,6 +216,81 @@ export class TransmissionChainBarsService {
         // set graph container height
         const graphHeight = this.determineGraphHeight();
         containerNative.style.height = `${graphHeight}px`;
+    }
+
+    /**
+     * Determine center name groups
+     */
+    private determineCenterNameGroups() {
+        // determine center name groups cells
+        const centerNameMapLastCells: {
+            [nameCompare: string]: GroupCell
+        } = {};
+        this.centerNameCells = [];
+        let colorIndex: number = 0;
+        this.graphData.personsOrder.forEach((entityId, entityIndex: number) => {
+            const entityData: EntityBarModel = this.graphData.personsMap[entityId];
+            entityData.centerNames.forEach((centerName: string) => {
+                // init data for this center name
+                const centerNameLowerCase = centerName.toLowerCase();
+
+                // check if we need to create a new cell or we can use the previous one
+                if (
+                    centerNameMapLastCells[centerNameLowerCase] &&
+                    centerNameMapLastCells[centerNameLowerCase].entityStartIndex + centerNameMapLastCells[centerNameLowerCase].cells >= entityIndex
+                ) {
+                    // extend the existing one
+                    centerNameMapLastCells[centerNameLowerCase].cells++;
+                } else {
+                    // create a new one
+                    const newCenterNameCell: GroupCell = {
+                        nameCompare: centerNameLowerCase,
+                        name: centerName,
+                        entityStartIndex: entityIndex,
+                        cells: 1,
+                        bgColor: this.centerNameColors[colorIndex % this.centerNameColors.length]
+                    };
+
+                    // next color
+                    colorIndex++;
+
+                    // map cell so we can use it later
+                    centerNameMapLastCells[newCenterNameCell.nameCompare] = newCenterNameCell;
+
+                    // add the new cell to the list of drawable cells
+                    this.centerNameCells.push(newCenterNameCell);
+                }
+            });
+        });
+
+        // determine max number of lines used to render center names
+        let centerNameMaxLines: number = 0;
+        _.each(this.centerNameCells, (group1: GroupCell) => {
+            // determine max for this item
+            let max: number = 1;
+            _.each(this.centerNameCells, (group2: GroupCell) => {
+                // no need to compare the same objects
+                if (group1 === group2) {
+                    return;
+                }
+
+                // compare
+                if (
+                    group2.entityStartIndex >= group1.entityStartIndex &&
+                    group2.entityStartIndex < group1.entityStartIndex + group1.cells
+                ) {
+                    max++;
+                }
+            });
+
+            // determine mex
+            centerNameMaxLines = centerNameMaxLines < max ?
+                max :
+                centerNameMaxLines;
+        });
+
+        // add center name lines
+        this.entityDetailsTextLinesHeight = centerNameMaxLines * (this.entityDetailsTextLineCellHeight + this.entityDetailsTextLineSpaceBetween);
     }
 
     /**
@@ -255,14 +371,14 @@ export class TransmissionChainBarsService {
         this.graphDatesContainer.append('rect')
             .attr('fill', 'transparent')
             .attr('width', this.dateCellWidth)
-            .attr('height', this.entityDetailsCellHeight);
+            .attr('height', this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight);
 
         // draw each date
         Object.keys(this.datesMap).forEach((dayDate, index) => {
             // set position (top-left corner)
             const dateContainer = this.graphDatesContainer.append('svg')
                 .attr('x', 0)
-                .attr('y', this.entityDetailsCellHeight + index * this.cellHeight);
+                .attr('y', this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight + index * this.cellHeight);
 
             const dateGroup = dateContainer.append('g');
             dateGroup.append('rect')
@@ -301,17 +417,17 @@ export class TransmissionChainBarsService {
                 this.hideHoverDiv();
 
                 // is there a point in checking position ?
-                if (evt.layerY <= this.entityDetailsCellHeight) {
+                if (evt.layerY <= this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight) {
                     return;
                 }
 
                 // determine date
                 const date: string = moment(this.graphData.minGraphDate)
-                    .add(Math.floor((evt.layerY - this.entityDetailsCellHeight) / this.cellHeight), 'days')
+                    .add(Math.floor((evt.layerY - (this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight)) / this.cellHeight), 'days')
                     .format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
                 // if date not mapped, then there is no point in displaying it
-                if (!this.datesMap[date]) {
+                if (this.datesMap[date] === undefined) {
                     return;
                 }
 
@@ -387,6 +503,9 @@ export class TransmissionChainBarsService {
             }
         });
 
+        // draw center names
+        this.drawGraphCenterNames();
+
         // set graph height
         this.graphEntityContainer
             .attr('height', this.determineGraphHeight());
@@ -395,7 +514,7 @@ export class TransmissionChainBarsService {
     /**
      * Draw a case / event block
      */
-    private drawEntity(entityId) {
+    private drawEntity(entityId: string) {
         // keep case / event data for later use
         const entityData = this.graphData.personsMap[entityId] as EntityBarModel;
         if (!entityData) {
@@ -587,7 +706,7 @@ export class TransmissionChainBarsService {
 
                         // position cell
                         const x: number = (cellIndex < 1 ? 0 : this.cellXPadding) + (width * cellIndex);
-                        const y: number = this.entityDetailsCellHeight + (this.datesMap[drawCell.date] * this.cellHeight);
+                        const y: number = this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight + (this.datesMap[drawCell.date] * this.cellHeight);
                         const group = entityColumnContainer.append('g')
                             .attr(
                                 'transform',
@@ -656,7 +775,7 @@ export class TransmissionChainBarsService {
         const entityBar = entityColumnContainer.append('svg')
             .attr('class', 'entity-bar')
             .attr('x', 0)
-            .attr('y', this.entityDetailsCellHeight + (this.datesMap[date] * this.cellHeight));
+            .attr('y', this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight + (this.datesMap[date] * this.cellHeight));
         entityBar.append('rect')
             .attr('width', this.cellWidth)
             .attr('height', (moment(entityData.lastGraphDate).startOf('day').diff(dateMoment, 'days') + 1) * this.cellHeight)
@@ -754,14 +873,14 @@ export class TransmissionChainBarsService {
         const leftOrRight = (sourceEntityColumnIdx < targetEntityColumnIdx) ? 1 : 0;
         let lineStartX = (sourceEntityColumnIdx * (this.marginBetween + this.cellWidth)) + (leftOrRight * this.cellWidth);
         const halfCellHeight = Math.round(this.cellHeight / 2);
-        const lineInitialStartY = this.entityDetailsCellHeight + (this.datesMap[sourceEntityFirstGraphDate] * this.cellHeight) + halfCellHeight;
+        const lineInitialStartY = this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight + (this.datesMap[sourceEntityFirstGraphDate] * this.cellHeight) + halfCellHeight;
         let lineStartY = lineInitialStartY;
         // stop at the horizontal of the target case's / event's bar
         const lineEndX = (targetEntityColumnIdx * (this.marginBetween + this.cellWidth)) + this.relationshipXMargin;
         let lineEndY = lineStartY;
         // draw the arrow at the horizontal middle of the target case's / event's bar, but touching the bar
         const arrowX = lineEndX;
-        const arrowY = this.entityDetailsCellHeight + (this.datesMap[targetEntityFirstGraphDate] * this.cellHeight);
+        const arrowY = this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight + (this.datesMap[targetEntityFirstGraphDate] * this.cellHeight);
 
         // determine if line intersects another relationship line
         const x1: number = lineStartX <= lineEndX ? lineStartX : lineEndX;
@@ -847,6 +966,97 @@ export class TransmissionChainBarsService {
     }
 
     /**
+     * Draw graph center cenlls
+     */
+    private drawGraphCenterNames() {
+        // position svg
+        const groupContainer = this.graphEntityContainer.append('svg')
+            .attr('x', 0)
+            .attr('y', this.entityDetailsCellHeight);
+
+        // draw cells
+        (this.centerNameCells || []).forEach((cell: GroupCell, cellIndex: number) => {
+            // determine bounds
+            const x: number = cell.entityStartIndex * (this.marginBetween + this.cellWidth);
+            const width: number = cell.cells * (this.marginBetween + this.cellWidth) - this.marginBetween;
+            const height: number = this.entityDetailsTextLineCellHeight;
+
+            // determine best position for this group
+            let y: number = 0;
+            let index = 0;
+            while (index < cellIndex) {
+                // stop found intersection, need other line
+                const previousCell: GroupCell = this.centerNameCells[index];
+                if (
+                    y === previousCell.rect.y &&
+                    x >= previousCell.rect.x && x <= previousCell.rect.x + previousCell.rect.width
+                ) {
+                    // start from the beginning
+                    index = 0;
+
+                    // next line
+                    y += this.entityDetailsTextLineCellHeight + this.entityDetailsTextLineSpaceBetween;
+
+                    // again
+                    continue;
+                }
+
+                // next item - no intersection until now
+                index++;
+            }
+
+            // map group zone
+            cell.rect = {
+                x: x,
+                y: y,
+                width: width,
+                height: height
+            };
+
+            // group handler
+            const group = groupContainer.append('svg')
+                .attr('x', x)
+                .attr('y', y);
+
+            // draw cell rectangle
+            group.append('rect')
+                .attr('width', width)
+                .attr('height', height)
+                .attr('fill', 'transparent')
+                .attr('stroke', 'black')
+                .attr('stroke-width', '1')
+                .attr('shape-rendering', 'optimizeQuality');
+
+            // draw color rectangle
+            group.append('rect')
+                .attr('x', this.entityDetailsTextLinesColorMargin)
+                .attr('y', this.entityDetailsTextLinesColorMargin)
+                .attr('width', this.entityDetailsTextLinesColorWidth)
+                .attr('height', height - this.entityDetailsTextLinesColorMargin * 2)
+                .attr('fill', cell.bgColor);
+
+            // clip path for text
+            const pathId: string = `clipPath${uuid()}`;
+            const textX: number = this.entityDetailsTextLinesColorMargin * 2 + this.entityDetailsTextLinesColorWidth;
+            group.append('clipPath')
+                .attr('id', pathId)
+                .append('rect')
+                .attr('x', textX)
+                .attr('width', width - (textX + this.entityDetailsTextLinesColorMargin))
+                .attr('height', height);
+
+            // draw cell text
+            const text = group.append('text')
+                .text(cell.name)
+                .attr('clip-path', `url(#${pathId})`)
+                .attr('fill', 'black')
+                .attr('alignment-baseline', 'central')
+                .attr('x', textX)
+                .attr('y', height / 2);
+        });
+    }
+
+    /**
      * Determine graph height based on the data
      */
     private determineGraphHeight(): number {
@@ -854,7 +1064,7 @@ export class TransmissionChainBarsService {
         const daysNo = Object.keys(this.datesMap).length;
 
         // determine container height accordingly to max number of cells
-        const datesHeight: number = this.entityDetailsCellHeight + daysNo * this.cellHeight;
+        const datesHeight: number = this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight + daysNo * this.cellHeight;
 
         // visual-id-column-height + days-no * cell-height
         return Math.max(datesHeight, this.relationshipOccupiedSpacesMaxY)
