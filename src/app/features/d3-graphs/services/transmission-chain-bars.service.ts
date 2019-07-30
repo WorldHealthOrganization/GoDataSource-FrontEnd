@@ -24,16 +24,17 @@ class DrawCell {
     date: string;
     label: string;
     opacity: number;
+    centerName: string;
 
     // constructor
     constructor(data: {
         // required
         type: drawCellType,
         date: string,
-        label: string
+        label: string,
 
         // optional
-        // #TODO
+        centerName?: string
     }) {
         Object.assign(this, data);
     }
@@ -141,8 +142,15 @@ export class TransmissionChainBarsService {
     private entityDetailsTextLinesHeight: number;
     private entityDetailsTextLinesColorMargin: number = 4;
     private entityDetailsTextLinesColorWidth: number = 10;
+    private centerNameCellHeight: number = 5;
     // grouped center names
     private centerNameCells: GroupCell[] = [];
+    // mapped entity center name cells
+    private entityToCenterNameCell: {
+        [entityId: string]: {
+            [centerName: string]: GroupCell
+        }
+    } = {};
     // center name colors
     private centerNameColors: string[] = [
         '#cc00ff',
@@ -153,6 +161,12 @@ export class TransmissionChainBarsService {
         '#333300',
         '#663300'
     ];
+
+    // relations that we couldn't draw along with parent..so we need to draw them later
+    // because target entity is missing
+    private remainingRelationsToDraw: {
+        [targetId: string]: string[]
+    } = {};
 
     /**
      * Constructor
@@ -211,6 +225,7 @@ export class TransmissionChainBarsService {
         this.drawDates();
 
         // draw the cases / events
+        this.remainingRelationsToDraw = {};
         this.drawEntities();
 
         // set graph container height
@@ -228,6 +243,7 @@ export class TransmissionChainBarsService {
         } = {};
         this.centerNameCells = [];
         let colorIndex: number = 0;
+        this.entityToCenterNameCell = {};
         this.graphData.personsOrder.forEach((entityId, entityIndex: number) => {
             const entityData: EntityBarModel = this.graphData.personsMap[entityId];
             entityData.centerNames.forEach((centerName: string) => {
@@ -241,6 +257,12 @@ export class TransmissionChainBarsService {
                 ) {
                     // extend the existing one
                     centerNameMapLastCells[centerNameLowerCase].cells++;
+
+                    // map entity to cell
+                    if (!this.entityToCenterNameCell[entityId]) {
+                        this.entityToCenterNameCell[entityId] = {};
+                    }
+                    this.entityToCenterNameCell[entityId][centerNameLowerCase] = centerNameMapLastCells[centerNameLowerCase];
                 } else {
                     // create a new one
                     const newCenterNameCell: GroupCell = {
@@ -256,6 +278,12 @@ export class TransmissionChainBarsService {
 
                     // map cell so we can use it later
                     centerNameMapLastCells[newCenterNameCell.nameCompare] = newCenterNameCell;
+
+                    // map entity to cell
+                    if (!this.entityToCenterNameCell[entityId]) {
+                        this.entityToCenterNameCell[entityId] = {};
+                    }
+                    this.entityToCenterNameCell[entityId][newCenterNameCell.nameCompare] = newCenterNameCell;
 
                     // add the new cell to the list of drawable cells
                     this.centerNameCells.push(newCenterNameCell);
@@ -617,7 +645,8 @@ export class TransmissionChainBarsService {
                 cells.push(new DrawCell({
                     type: drawCellType.CASE_ISO_HSP,
                     date: moment(isolationDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
-                    label: isolationLabel
+                    label: isolationLabel,
+                    centerName: isolation.centerName
                 }));
             });
         });
@@ -766,6 +795,20 @@ export class TransmissionChainBarsService {
                             // center the text
                             .attr('x', textX)
                             .attr('y', this.cellHeight / 2);
+
+                        // render center name color
+                        const centerNameLowerCase: string = drawCell.centerName ? drawCell.centerName.trim().toLowerCase() : null;
+                        if (
+                            centerNameLowerCase &&
+                            this.entityToCenterNameCell[entityId][centerNameLowerCase]
+                        ) {
+                            // render rect
+                            group.append('rect')
+                                .attr('width', rectWidth)
+                                .attr('height', this.centerNameCellHeight)
+                                .attr('fill', this.entityToCenterNameCell[entityId][centerNameLowerCase].bgColor)
+                                .attr('fill-opacity', opacity);
+                        }
                     }
                 );
             }
@@ -828,15 +871,33 @@ export class TransmissionChainBarsService {
             this.graphData.relationships[entityData.id].forEach((targetEntityId) => {
                 // need to draw the target case / event?
                 if (this.entityColumnMap[targetEntityId] === undefined) {
-                    this.drawEntity(targetEntityId);
+                    // add relation to be drawn later...
+                    if (!this.remainingRelationsToDraw[targetEntityId]) {
+                        this.remainingRelationsToDraw[targetEntityId] = [];
+                    }
+                    this.remainingRelationsToDraw[targetEntityId].push(entityData.id);
+                } else {
+                    // need to draw the relationship?
+                    if (
+                        !this.drawnRelations[entityData.id] ||
+                        !this.drawnRelations[entityData.id][targetEntityId]
+                    ) {
+                        this.drawRelationship(entityData.id, targetEntityId);
+                    }
                 }
+            });
+        }
 
+        // draw remaining relations
+        const targetId: string = entityData.id;
+        if (this.remainingRelationsToDraw[targetId]) {
+            this.remainingRelationsToDraw[targetId].forEach((sourceId: string) => {
                 // need to draw the relationship?
                 if (
-                    !this.drawnRelations[entityData.id] ||
-                    !this.drawnRelations[entityData.id][targetEntityId]
+                    !this.drawnRelations[sourceId] ||
+                    !this.drawnRelations[sourceId][targetId]
                 ) {
-                    this.drawRelationship(entityData.id, targetEntityId);
+                    this.drawRelationship(sourceId, targetId);
                 }
             });
         }
@@ -1046,7 +1107,7 @@ export class TransmissionChainBarsService {
                 .attr('height', height);
 
             // draw cell text
-            const text = group.append('text')
+            group.append('text')
                 .text(cell.name)
                 .attr('clip-path', `url(#${pathId})`)
                 .attr('fill', 'black')
