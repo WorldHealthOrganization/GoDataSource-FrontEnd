@@ -594,8 +594,9 @@ export class TransmissionChainBarsService {
 
         // determine line coordinates
         const leftOrRight = (sourceEntityColumnIdx < targetEntityColumnIdx) ? 1 : 0;
-        const lineStartX = (sourceEntityColumnIdx * (this.marginBetween + this.cellWidth)) + (leftOrRight * this.cellWidth);
-        const lineInitialStartY = this.entityDetailsCellHeight + (this.datesMap[sourceEntityFirstGraphDate] * this.cellHeight) + Math.round(this.cellHeight / 2);
+        let lineStartX = (sourceEntityColumnIdx * (this.marginBetween + this.cellWidth)) + (leftOrRight * this.cellWidth);
+        const halfCellHeight = Math.round(this.cellHeight / 2);
+        const lineInitialStartY = this.entityDetailsCellHeight + (this.datesMap[sourceEntityFirstGraphDate] * this.cellHeight) + halfCellHeight;
         let lineStartY = lineInitialStartY;
         // stop at the horizontal of the target case's / event's bar
         const lineEndX = (targetEntityColumnIdx * (this.marginBetween + this.cellWidth)) + this.relationshipXMargin;
@@ -624,6 +625,26 @@ export class TransmissionChainBarsService {
             lineEndY = lineStartY;
         }
 
+        // draw connection lines ?
+        if (lineStartY > lineInitialStartY) {
+            // draw line a bit more on the right if needed
+            let y: number = lineInitialStartY;
+            if (lineStartY > lineInitialStartY + halfCellHeight) {
+                lineStartX += this.relationshipXMargin;
+                y = lineInitialStartY + halfCellHeight;
+            }
+
+            // draw connection line
+            this.graphEntityContainer.append('line')
+                .attr('class', `relationship source-entity-${sourceEntityId}`)
+                .attr('stroke', 'black')
+                .attr('stroke-width', `${this.relationshipStrokeWidth}px`)
+                .attr('x1', lineStartX)
+                .attr('y1', y)
+                .attr('x2', lineStartX)
+                .attr('y2', lineEndY);
+        }
+
         // draw the horizontal line from the source case / event to the target case / event
         this.graphEntityContainer.append('line')
             .attr('class', `relationship source-entity-${sourceEntityId}`)
@@ -649,18 +670,6 @@ export class TransmissionChainBarsService {
         this.relationshipOccupiedSpacesMaxY = lineStartY < this.relationshipOccupiedSpacesMaxY ?
             this.relationshipOccupiedSpacesMaxY :
             lineStartY;
-
-        // draw connection lines ?
-        if (lineEndY > lineInitialStartY) {
-            this.graphEntityContainer.append('line')
-                .attr('class', `relationship source-entity-${sourceEntityId}`)
-                .attr('stroke', 'black')
-                .attr('stroke-width', `${this.relationshipStrokeWidth}px`)
-                .attr('x1', lineStartX)
-                .attr('y1', lineInitialStartY)
-                .attr('x2', lineStartX)
-                .attr('y2', lineEndY);
-        }
 
         // draw the vertical line (arrow's base)
         this.graphEntityContainer.append('line')
