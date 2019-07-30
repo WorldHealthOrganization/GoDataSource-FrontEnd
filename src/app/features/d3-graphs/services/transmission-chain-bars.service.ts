@@ -96,6 +96,11 @@ export class TransmissionChainBarsService {
     private graphDatesContainer: any;
     // child container for the cases / events
     private graphEntityContainer: any;
+    private graphEntityContainerDiv: any;
+    // keep hover div to display information
+    private graphHoverDiv: any;
+    // native container
+    private containerNative: any;
 
     // dates map to know the row # of each day date
     private datesMap = {};
@@ -106,9 +111,13 @@ export class TransmissionChainBarsService {
     // keep the relations that were already drawn, to avoid duplicates
     //      this.drawnRelations[sourceEntityId][targetEntityId] = true
     private drawnRelations = {};
+    private namesMap: string[] = [];
 
     // cache some translations
     private translationsMap = {};
+
+    // window scroll listener
+    private onWindowScrollArrow: any;
 
     constructor(
         private i18nService: I18nService,
@@ -128,6 +137,9 @@ export class TransmissionChainBarsService {
             cellWidth?: number
         }
     ) {
+        // keep container native
+        this.containerNative = containerNative;
+
         // change cell width ?
         const cellWidth = _.get(options, 'cellWidth');
         this.cellWidth = cellWidth ? cellWidth : this.cellWidthDefault;
@@ -140,6 +152,7 @@ export class TransmissionChainBarsService {
         this.entityColumnMap = {};
         this.currentColumnIdx = 0;
         this.drawnRelations = {};
+        this.namesMap = [];
 
         // cache graph data
         this.graphData = data;
@@ -150,6 +163,9 @@ export class TransmissionChainBarsService {
         // create graph d3 container
         this.graphContainer = d3.select(containerNative);
 
+        // create hover div
+        this.drawHoverDiv();
+
         // draw the dates column
         this.drawDates();
 
@@ -159,6 +175,57 @@ export class TransmissionChainBarsService {
         // set graph container height
         const graphHeight = this.determineGraphHeight();
         containerNative.style.height = `${graphHeight}px`;
+    }
+
+    /**
+     * Remove hover div
+     */
+    private removeHoverDiv() {
+        // remove previous
+        this.graphHoverDiv = document.querySelector('div.chart-floating-message');
+        if (this.graphHoverDiv) {
+            this.graphHoverDiv.remove();
+        }
+    }
+
+    /**
+     * Cleanup for Window scroll
+     */
+    private removeWindowScrollListener() {
+        if (this.onWindowScrollArrow) {
+            window.removeEventListener('scroll', this.onWindowScrollArrow, true);
+            this.onWindowScrollArrow = null;
+        }
+    }
+
+    /**
+     * Hover div used to display info
+     */
+    private drawHoverDiv() {
+        // remove previous
+        this.removeHoverDiv();
+
+        // remove previous window scroll
+        this.removeWindowScrollListener();
+
+        // listen for window scroll
+        this.onWindowScrollArrow = () => {
+            this.hideHoverDiv();
+        };
+        window.addEventListener('scroll', this.onWindowScrollArrow, true);
+
+        // create hover div
+        this.graphHoverDiv = document.createElement('DIV');
+        this.graphHoverDiv.className = 'chart-floating-message';
+        this.containerNative.parentElement.appendChild(this.graphHoverDiv);
+
+        // setup hover div
+        this.graphHoverDiv = document.querySelector('div.chart-floating-message');
+        this.graphHoverDiv.style.position = 'absolute';
+        this.graphHoverDiv.style['z-index'] = 100000;
+        this.graphHoverDiv.style['background-color'] = '#f0f0f5';
+        this.graphHoverDiv.style.padding = '2px';
+        this.graphHoverDiv.style.border = '1px solid #707075';
     }
 
     /**
@@ -212,6 +279,82 @@ export class TransmissionChainBarsService {
     }
 
     /**
+     * Mouse move - hover div
+     */
+    private initSvgMouseMove() {
+        const svg: any = document.querySelector('svg.graph-entities-container-svg');
+        svg.addEventListener(
+            'mouseleave',
+            () => {
+                this.hideHoverDiv();
+            }
+        );
+        svg.addEventListener(
+            'mousemove',
+            (evt) => {
+                // retrieve hover div
+                if (!this.graphHoverDiv) {
+                    return;
+                }
+
+                // hide div if we don't have anything to display
+                this.hideHoverDiv();
+
+                // is there a point in checking position ?
+                if (evt.layerY <= this.entityDetailsCellHeight) {
+                    return;
+                }
+
+                // determine date
+                const date: string = moment(this.graphData.minGraphDate)
+                    .add(Math.floor((evt.layerY - this.entityDetailsCellHeight) / this.cellHeight), 'days')
+                    .format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+
+                // if date not mapped, then there is no point in displaying it
+                if (!this.datesMap[date]) {
+                    return;
+                }
+
+                // determine person name
+                const nameIndex = Math.floor((evt.layerX + this.graphEntityContainerDiv.scrollLeft) / (this.marginBetween + this.cellWidth));
+                if (!this.namesMap[nameIndex]) {
+                    return;
+                }
+
+                // get person name
+                const personName: string = this.namesMap[nameIndex];
+
+                // show div
+                this.graphHoverDiv.style.display = 'inline-block';
+
+                // determine if we need to change position and text
+                const text: string = `${date}: ${personName}`;
+                if (this.graphHoverDiv.innerHTML === text) {
+                    return;
+                }
+
+                // determine parents position
+                let parent = this.graphHoverDiv.parentElement;
+                let totalOffsetTop: number = 0;
+                let totalOffsetLeft: number = 0;
+                let scrollOffsetY: number = 0;
+                while (parent) {
+                    totalOffsetTop += parent.offsetTop;
+                    totalOffsetLeft += parent.offsetLeft;
+                    scrollOffsetY += parent.scrollTop;
+                    parent = parent.parentElement;
+                }
+
+                // set floating div position
+                this.graphHoverDiv.innerHTML = text;
+                this.graphHoverDiv.style.left = `${evt.screenX - totalOffsetLeft}px`;
+                this.graphHoverDiv.style.top = `${evt.screenY - totalOffsetTop + scrollOffsetY}px`;
+            },
+            false
+        );
+    }
+
+    /**
      * Draw the cases & events (one column for each case / event)
      */
     private drawEntities() {
@@ -226,10 +369,15 @@ export class TransmissionChainBarsService {
         // create entities container
         this.graphEntityContainer = this.graphContainer.append('div')
             .classed('entities-container', true);
+        this.graphEntityContainerDiv = document.querySelector('div.entities-container');
 
         // create SVG container
         this.graphEntityContainer = this.graphEntityContainer.append('svg')
+            .classed('graph-entities-container-svg', true)
             .attr('width', entitiesGraphWidth);
+
+        // listen for hover mouse to show data & person
+        this.initSvgMouseMove();
 
         // draw each case / event column
         this.graphData.personsOrder.forEach((entityId) => {
@@ -285,14 +433,24 @@ export class TransmissionChainBarsService {
             .attr('y', this.entityDetailsCellHeight / 2);
 
         // case visual ID
-        entityDetailsGroup.append('text')
-            .text(entityData.visualId)
-            // .attr('class', 'entity-info-header')
-            .attr('fill', 'black')
-            .attr('font-size', '12px')
-            .attr('alignment-baseline', 'central')
-            // center the text vertically and add extra 15px to display it on the next row
-            .attr('y', this.entityDetailsCellHeight / 2 + 15);
+        const visualId: string = entityData.visualId ? entityData.visualId.trim() : null;
+        if (visualId) {
+            entityDetailsGroup.append('text')
+                .text(entityData.visualId)
+                // .attr('class', 'entity-info-header')
+                .attr('fill', 'black')
+                .attr('font-size', '12px')
+                .attr('alignment-baseline', 'central')
+                // center the text vertically and add extra 15px to display it on the next row
+                .attr('y', this.entityDetailsCellHeight / 2 + 15);
+        }
+
+        // add entity to list of mapped persons
+        this.namesMap.push(
+            visualId ?
+                `${name} (${visualId})` :
+                name
+        );
 
         // register onclick event to navigate to case page when user clicks on Visual ID or Full Name
         const redirectToEntityPage = (targetEntityId: string, entityType: EntityType) => {
@@ -745,5 +903,29 @@ export class TransmissionChainBarsService {
         }
 
         return this.translationsMap[token];
+    }
+
+    /**
+     * Clear
+     */
+    public destroy() {
+        // remove window listener
+        this.removeWindowScrollListener();
+
+        // remove hover div
+        this.removeHoverDiv();
+    }
+
+    /**
+     * Hide hover div
+     */
+    private hideHoverDiv() {
+        // retrieve hover div
+        if (!this.graphHoverDiv) {
+            return;
+        }
+
+        // hide div if we don't have anything to display
+        this.graphHoverDiv.style.display = 'none';
     }
 }
