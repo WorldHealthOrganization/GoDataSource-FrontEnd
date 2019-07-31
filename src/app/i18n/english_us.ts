@@ -35,6 +35,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FILTERS_CASE_OUTCOME': 'Case outcome',
 
         /**
+         * uiTeamsWorkload
+         */
+        'LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL': 'of'
+
+        /**
          * REMOVE the tokens from below
          */
         // ...

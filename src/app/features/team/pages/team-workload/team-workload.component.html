@@ -44,13 +44,33 @@
                 </tr>
                 <tr *ngFor="let teamData of teamsData">
                     <td *ngFor="let date of dates; let first = first">
-                        {{ first ?
-                            teamData.name : (
-                                teamData.dates[date] ?
-                                    ('LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL' | translate:{done: teamData.dates[date].successfulFollowupsCount, total: teamData.dates[date].totalFollowupsCount}) :
-                                    ('LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL' | translate:{done: 0, total: 0})
-                            )
-                        }}
+                        <ng-container
+                            *ngIf="first">
+                            {{ teamData.name }}
+                        </ng-container>
+                        <div
+                            *ngIf="!first">
+                            <a
+                                class="team-workload-link"
+                                routerLink="/contacts/follow-ups" [queryParams]="{
+                                    fromWorkload: true,
+                                    date: date,
+                                    team: teamData.id,
+                                    status: ['LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_OK', 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_NOT_OK']
+                                }">
+                                {{ teamData.dates[date] ? teamData.dates[date].successfulFollowupsCount : 0 }}
+                            </a>
+                            {{ 'LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL' | translate }}
+                            <a
+                                class="team-workload-link"
+                                routerLink="/contacts/follow-ups" [queryParams]="{
+                                    fromWorkload: true,
+                                    date: date,
+                                    team: teamData.id
+                                }">
+                                {{ teamData.dates[date] ? teamData.dates[date].totalFollowupsCount : 0 }}
+                            </a>
+                        </div>
                     </td>
                 </tr>
             </table>

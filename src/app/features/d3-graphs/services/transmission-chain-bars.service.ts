@@ -537,6 +537,15 @@ export class TransmissionChainBarsService {
                     parent = parent.parentElement;
                 }
 
+                // add filters height if necessary
+                const filtersDiv: any = document.querySelector('div.filters');
+                if (
+                    filtersDiv &&
+                    filtersDiv.offsetHeight
+                ) {
+                    scrollOffsetY += filtersDiv.offsetHeight - 30;
+                }
+
                 // set floating div position
                 this.graphHoverDiv.innerHTML = text;
                 this.graphHoverDiv.style.left = `${evt.screenX - totalOffsetLeft}px`;
@@ -545,7 +554,7 @@ export class TransmissionChainBarsService {
                 // check if outside the screen
                 const boundingRect = this.graphHoverDiv.getBoundingClientRect();
                 if (boundingRect.top + boundingRect.height > window.innerHeight) {
-                    this.graphHoverDiv.style.top = `${scrollOffsetY + window.innerHeight - (boundingRect.height + totalOffsetTop)}px`;
+                    this.graphHoverDiv.style.top = `${scrollOffsetY + window.innerHeight - 20 - (boundingRect.height + totalOffsetTop)}px`;
                 }
             },
             false
