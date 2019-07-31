@@ -14,7 +14,9 @@ import { v4 as uuid } from 'uuid';
 enum drawCellType {
     CASE_ISO_HSP,
     LAB_RESULT,
-    DATE_OF_ONSET
+    DATE_OF_ONSET,
+    DATE_OF_OUTCOME,
+    DATE_OF_BURIAL
 }
 
 // define cells that we need to draw
@@ -66,7 +68,7 @@ interface GroupCell {
 @Injectable()
 export class TransmissionChainBarsService {
     // regular cell width
-    private readonly cellWidthDefault = 64;
+    private readonly cellWidthDefault = 91;
     private cellWidth = this.cellWidthDefault;
     // regular cell height
     private cellHeight = 25;
@@ -94,13 +96,17 @@ export class TransmissionChainBarsService {
     private relationshipSpaceBetweenStrokes: number = 3;
 
     // keeping this config centralized in case / event we need to make the graph configurable by the user
-    private graphConfig = {
+    public graphConfig = {
         isolationColor: 'steelblue',
         isolationTextColor: 'black',
         labResultColor: 'darkred',
         labResultTextColor: 'white',
-        dateColor: 'white',
-        dateTextColor: 'black',
+        dateOnsetColor: 'white',
+        dateOnsetTextColor: 'black',
+        dateOutcomeColor: '#003d4d',
+        dateOutcomeTextColor: 'white',
+        dateOutcomeBurialColor: '#990000',
+        dateOutcomeBurialTextColor: 'black',
         // opacity for cells that are before date of onset
         beforeDateOfOnsetOpacity: 0.35
     };
@@ -184,7 +190,7 @@ export class TransmissionChainBarsService {
      */
     drawGraph(
         containerNative: any,
-        data: any,
+        data: TransmissionChainBarsModel,
         options?: {
             cellWidth?: number
         }
@@ -534,6 +540,12 @@ export class TransmissionChainBarsService {
                 this.graphHoverDiv.innerHTML = text;
                 this.graphHoverDiv.style.left = `${evt.screenX - totalOffsetLeft}px`;
                 this.graphHoverDiv.style.top = `${evt.screenY - totalOffsetTop + scrollOffsetY}px`;
+
+                // check if outside the screen
+                const boundingRect = this.graphHoverDiv.getBoundingClientRect();
+                if (boundingRect.top + boundingRect.height > window.innerHeight) {
+                    this.graphHoverDiv.style.top = `${scrollOffsetY + window.innerHeight - (boundingRect.height + totalOffsetTop)}px`;
+                }
             },
             false
         );
@@ -659,9 +671,7 @@ export class TransmissionChainBarsService {
         // determine all cell that we need to draw
         const cells: DrawCell[] = [];
 
-        /**
-         * date of onset to cells that we need to draw
-         */
+        // date of onset to cells that we need to draw
         const dateOfOnsetLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_CASE_ONSET_LABEL');
         cells.push(new DrawCell({
             type: drawCellType.DATE_OF_ONSET,
@@ -669,9 +679,49 @@ export class TransmissionChainBarsService {
             label: dateOfOnsetLabel
         }));
 
-        /**
-         * determine case isolation cells that we should draw
-         */
+        // date of outcome
+        if (
+            entityData.dateOfOutcome &&
+            entityData.outcomeId
+        ) {
+            // determine cell label
+            let dateOfOutcomeLabel: string = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_OUTCOME_OTHER_LABEL');
+            switch (entityData.outcomeId) {
+                case 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME_ALIVE':
+                    dateOfOutcomeLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_OUTCOME_ALIVE_LABEL');
+                    break;
+                case 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME_DECEASED':
+                    // label
+                    dateOfOutcomeLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_OUTCOME_DECEASED_LABEL');
+
+                    // add date of burial if we have one
+                    if (entityData.dateOfBurial) {
+                        // add cell
+                        cells.push(new DrawCell({
+                            type: drawCellType.DATE_OF_BURIAL,
+                            date: moment(entityData.dateOfBurial).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+                            label: entityData.safeBurial ?
+                                this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_OUTCOME_BURIAL_DATE_SAFE_LABEL') :
+                                this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_OUTCOME_BURIAL_DATE_NOT_SAFE_LABEL')
+                        }));
+                    }
+
+                    // finished
+                    break;
+                case 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME_RECOVERED':
+                    dateOfOutcomeLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_OUTCOME_RECOVERED_LABEL');
+                    break;
+            }
+
+            // add cell
+            cells.push(new DrawCell({
+                type: drawCellType.DATE_OF_OUTCOME,
+                date: moment(entityData.dateOfOutcome).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+                label: dateOfOutcomeLabel
+            }));
+        }
+
+        // determine case isolation cells that we should draw
         (entityData.dateRanges || []).forEach((isolation) => {
             const isolationDates = this.getDaysBetween(isolation.startDate, isolation.endDate);
             let isolationLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_ISOLATED_CASE_LABEL');
@@ -692,9 +742,7 @@ export class TransmissionChainBarsService {
             });
         });
 
-        /**
-         * determine lab result cells that we should draw
-         */
+        // determine lab result cells that we should draw
         (entityData.labResults || []).forEach((labResult) => {
             // determine result caption
             let result = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_UNKNOWN_LABEL');
@@ -769,8 +817,16 @@ export class TransmissionChainBarsService {
                                 rectFillColor = this.graphConfig.labResultColor;
                                 break;
                             case drawCellType.DATE_OF_ONSET:
-                                rectTextColor = this.graphConfig.dateTextColor;
-                                rectFillColor = this.graphConfig.dateColor;
+                                rectTextColor = this.graphConfig.dateOnsetTextColor;
+                                rectFillColor = this.graphConfig.dateOnsetColor;
+                                break;
+                            case drawCellType.DATE_OF_OUTCOME:
+                                rectTextColor = this.graphConfig.dateOutcomeTextColor;
+                                rectFillColor = this.graphConfig.dateOutcomeColor;
+                                break;
+                            case drawCellType.DATE_OF_BURIAL:
+                                rectTextColor = this.graphConfig.dateOutcomeBurialTextColor;
+                                rectFillColor = this.graphConfig.dateOutcomeBurialColor;
                                 break;
                         }
 
@@ -802,9 +858,10 @@ export class TransmissionChainBarsService {
                         }
 
                         // add clip path to clip text ( hide overflow text )
+                        const pathId: string = `clipPath${uuid()}`;
                         if (clipText) {
                             group.append('clipPath')
-                                .attr('id', 'clipPathId')
+                                .attr('id', pathId)
                                 .append('rect')
                                 .attr('width', rectWidth)
                                 .attr('height', this.cellHeight);
@@ -816,7 +873,7 @@ export class TransmissionChainBarsService {
 
                         // clip text ?
                         if (clipText) {
-                            text.attr('clip-path', 'url(#clipPathId)');
+                            text.attr('clip-path', `url(#${pathId})`);
                         }
 
                         // set text color

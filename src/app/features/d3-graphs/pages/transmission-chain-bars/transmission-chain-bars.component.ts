@@ -23,6 +23,10 @@ import { SystemSettingsVersionModel } from '../../../../core/models/system-setti
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { Observable } from 'rxjs/internal/Observable';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-transmission-chain-bars',
@@ -57,16 +61,26 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         date: any,
         isolationDate: any,
         isolationCenterName: any,
-        locationId: any
+        locationId: any,
+        caseClassification: any,
+        caseOutcome: any
     } = {
         date: null,
         isolationDate: null,
         isolationCenterName: null,
-        locationId: null
+        locationId: null,
+        caseClassification: null,
+        caseOutcome: null
     };
 
+    // define legend colors
+    legendColors: any;
+
     graphData: any;
-    cellWidth: number = 64;
+    cellWidth: number = 91;
+
+    caseClassificationsList$: Observable<LabelValuePair[]>;
+    caseOutcomeList$: Observable<LabelValuePair[]>;
 
     @ViewChild('chart') chartContainer: ElementRef;
 
@@ -79,14 +93,27 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService,
         protected snackbarService: SnackbarService,
-        private systemSettingsDataService: SystemSettingsDataService
-    ) {
-    }
+        private systemSettingsDataService: SystemSettingsDataService,
+        private referenceDataDataService: ReferenceDataDataService
+    ) {}
 
     ngOnInit() {
+        // init color rectangles
+        this.legendColors = {
+            rectCD: `<div class="legend-rect" style="background-color: ${this.transmissionChainBarsService.graphConfig.isolationColor};"></div>`,
+            rectLAB: `<div class="legend-rect" style="background-color: ${this.transmissionChainBarsService.graphConfig.labResultColor};"></div>`,
+            rectOUT: `<div class="legend-rect" style="background-color: ${this.transmissionChainBarsService.graphConfig.dateOutcomeColor};"></div>`,
+            rectB: `<div class="legend-rect" style="background-color: ${this.transmissionChainBarsService.graphConfig.dateOutcomeBurialColor};"></div>`
+        };
+
         // authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        // reference data
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        this.caseOutcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+
+        // outbreak
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
@@ -94,6 +121,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
 
                 this.loadGraph();
             });
+
         // check if platform architecture is x32
         this.systemSettingsDataService
             .getAPIVersion()
@@ -237,7 +265,9 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
             date: null,
             locationId: null,
             isolationDate: null,
-            isolationCenterName: null
+            isolationCenterName: null,
+            caseClassification: null,
+            caseOutcome: null
         };
 
         // reset query builder
@@ -393,6 +423,26 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         if (this.filters.isolationCenterName !== null) {
             this.queryBuilder.filter
                 .byText('dateRanges.centerName', this.filters.isolationCenterName);
+        }
+
+        // case classification
+        if (this.filters.caseClassification !== null) {
+            this.queryBuilder.filter.bySelect(
+                'classification',
+                this.filters.caseClassification,
+                true,
+                null
+            );
+        }
+
+        // case outcome
+        if (this.filters.caseOutcome !== null) {
+            this.queryBuilder.filter.bySelect(
+                'outcomeId',
+                this.filters.caseOutcome,
+                true,
+                null
+            );
         }
 
         // hide filters
