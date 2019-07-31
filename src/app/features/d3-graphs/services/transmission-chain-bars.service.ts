@@ -146,6 +146,7 @@ export class TransmissionChainBarsService {
     private entityDetailsTextLineCellHeight: number = 24;
     private entityDetailsTextLineSpaceBetween: number = 5;
     private entityDetailsTextLinesHeight: number;
+    private entityDetailsTextLinesHeightMarginBottom: number = 10;
     private entityDetailsTextLinesColorMargin: number = 4;
     private entityDetailsTextLinesColorWidth: number = 10;
     private centerNameCellHeight: number = 5;
@@ -324,7 +325,7 @@ export class TransmissionChainBarsService {
         });
 
         // add center name lines
-        this.entityDetailsTextLinesHeight = centerNameMaxLines * (this.entityDetailsTextLineCellHeight + this.entityDetailsTextLineSpaceBetween);
+        this.entityDetailsTextLinesHeight = centerNameMaxLines * (this.entityDetailsTextLineCellHeight + this.entityDetailsTextLineSpaceBetween) + this.entityDetailsTextLinesHeightMarginBottom;
     }
 
     /**
