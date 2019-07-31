@@ -373,7 +373,7 @@
                     <div class="column-filter">
                         <app-form-select
                             name="teamIdFilter"
-                            [ngModel]="teamIdFilterValue"
+                            [ngModel]="selectedTeamIdFilterValue"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="teamsListLoadedForHeaderSearch"
                             (optionChanged)="filterByTeam($event)"
@@ -413,7 +413,7 @@
                     <div class="column-filter">
                         <app-form-select
                             name="statusIdFilter"
-                            ngModel
+                            [ngModel]="selectedStatusFilterValue"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="dailyStatusTypeOptions$ | async"
                             (optionChanged)="filterBySelectField('statusId', $event)"
