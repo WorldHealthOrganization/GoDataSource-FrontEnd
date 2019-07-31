@@ -58,7 +58,7 @@
         </div>
 
         <div
-            *ngIf="filtersVisible"
+            [fxShow]="filtersVisible"
             fxLayout="column" fxLayoutGap="20px"
         >
             <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="20px">
@@ -108,6 +108,44 @@
                 ></app-form-input>
             </div>
 
+            <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="20px">
+                <!-- Case classification -->
+                <div fxFlex fxLayout="column" fxLayoutGap="10px">
+                    <div>
+                        {{ 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FILTERS_CASE_CLASSIFICATION' | translate }}
+                    </div>
+
+                    <div fxLayout="row">
+                        <app-form-select
+                            name="caseClassification"
+                            [placeholder]="'LNG_CASE_FIELD_LABEL_CLASSIFICATION' | translate"
+                            [options]="caseClassificationsList$ | async"
+                            [(ngModel)]="filters.caseClassification"
+                            [allowSelectionOfDisabledItems]="true"
+                            [multiple]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+
+                <!-- Case outcome -->
+                <div fxFlex fxLayout="column" fxLayoutGap="10px">
+                    <div>
+                        {{ 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FILTERS_CASE_OUTCOME' | translate }}
+                    </div>
+
+                    <div fxLayout="row">
+                        <app-form-select
+                            name="caseClassification"
+                            [placeholder]="'LNG_CASE_FIELD_LABEL_OUTCOME' | translate"
+                            [options]="caseOutcomeList$ | async"
+                            [(ngModel)]="filters.caseOutcome"
+                            [allowSelectionOfDisabledItems]="true"
+                            [multiple]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </div>
+
             <!-- Action buttons -->
             <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px">
                 <button
@@ -132,8 +170,23 @@
         [fxShow]="!loadingData && !noData">
         <!-- Chart details -->
         <div
-            [innerHTML]="'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LEGEND_DETAILS' | translate"
+            [innerHTML]="('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LEGEND_DETAILS' | translate:legendColors) | safeHtml"
             class="transmission-chain-bars-legend">
+        </div>
+
+        <!-- Chart cell width -->
+        <div
+            class="transmission-chain-bars-cell-width">
+            <div>
+                {{ 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_CELL_WIDTH_LABEL' | translate }}
+            </div>
+            <mat-slider
+                [min]="91"
+                [max]="150"
+                [ngModel]="cellWidth"
+                [tickInterval]="10"
+                (valueChange)="cellWidthChanged($event)">
+            </mat-slider>
         </div>
 
         <!-- Chart -->

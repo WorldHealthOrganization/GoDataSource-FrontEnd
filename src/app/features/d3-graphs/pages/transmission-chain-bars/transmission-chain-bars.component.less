@@ -9,6 +9,25 @@ app-transmission-chain-bars {
         margin-bottom: 20px;
     }
 
+    .legend-rect {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+    }
+
+    .transmission-chain-bars-cell-width {
+        position: absolute;
+        width: 100px;
+        margin-top: 50px;
+
+        mat-slider {
+            width: 100%;
+            min-width: 0;
+            height: auto;
+            position: static;
+        }
+    }
+
     #chart {
         display: flex;
         width: 100%;
@@ -19,6 +38,7 @@ app-transmission-chain-bars {
         .entities-container {
             flex: 1 1;
             overflow-x: scroll;
+            overflow-y: hidden;
 
             .relationship {
                 &.accent {

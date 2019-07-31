@@ -15,14 +15,24 @@ export const EnglishUsLang = {
         /**
          * uiChainsOfTransmissionBars
          */
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_CENTER_NAME_LABEL': 'Center name: {{name}}',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_CELL_WIDTH_LABEL': 'Cell width',
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_PENDING_LABEL': '{{result}} (p)',
-        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LEGEND_DETAILS': 'Case details: h - Hospitalized / i - Isolated  <br/>Lab result details: L? - unknown result / L- - negative result / L+ - positive result / (p) - waiting for result',
-        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_ISOLATED_CASE_LABEL': 'i',
-        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_CASE_LABEL': 'h',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LEGEND_DETAILS': '{{rectCD}} Case details: hs - Hospitalized / is - Isolated  <br/>{{rectLAB}} Lab result details: L? - unknown result / L- - negative result / L+ - positive result / (p) - waiting for result<br />{{rectOUT}} Outcome: oa - Alive / od - Deceased / or - Recovered<br />{{rectB}} Burial: bn - Buried no safe / bs - Buried safe',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_ISOLATED_CASE_LABEL': 'is',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_CASE_LABEL': 'hs',
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_POSITIVE_LABEL': 'L+',
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_NEGATIVE_LABEL': 'L-',
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_LAB_RESULT_UNKNOWN_LABEL': 'L?',
-        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_FOR_OTHER_CONDITIONS_CASE_LABEL': 'h'
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_HOSPITALISED_FOR_OTHER_CONDITIONS_CASE_LABEL': 'hs',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_OUTCOME_OTHER_LABEL': 'o?',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_OUTCOME_ALIVE_LABEL': 'oa',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_OUTCOME_DECEASED_LABEL': 'od',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_OUTCOME_RECOVERED_LABEL': 'or',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_OUTCOME_BURIAL_DATE_NOT_SAFE_LABEL': 'bn',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_OUTCOME_BURIAL_DATE_SAFE_LABEL': 'bs',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FILTERS_CASE_CLASSIFICATION': 'Case classification',
+        'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FILTERS_CASE_OUTCOME': 'Case outcome',
 
         /**
          * REMOVE the tokens from below
