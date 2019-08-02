@@ -116,6 +116,13 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
                 );
             }
 
+            // exclude discarded cases
+            qb.include('people').queryBuilder.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
+
             // location
             if (this.globalFilterLocationId) {
                 qb.include('people').queryBuilder.filter

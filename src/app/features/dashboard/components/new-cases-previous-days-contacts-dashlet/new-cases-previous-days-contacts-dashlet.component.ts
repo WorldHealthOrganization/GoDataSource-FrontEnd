@@ -103,8 +103,16 @@ export class NewCasesPreviousDaysContactsDashletComponent extends DashletCompone
             // add global filters
             const qb = this.getGlobalFilterQB(
                 null,
-                'addresses.parentLocationIdFilter'
+                'addresses.parentLocationIdFilter',
+                true
             );
+
+            // exclude discarded cases
+            qb.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
 
             // change the way we build query
             qb.filter.firstLevelConditions();

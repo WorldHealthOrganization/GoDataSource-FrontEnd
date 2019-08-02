@@ -438,18 +438,32 @@ export class ListFilterDataService {
      * Create the query builder for filtering the list of cases
      * @param date
      * @param location
+     * @param classificationId
      * @param {number} noDaysAmongContacts
      * @returns {Observable<RequestQueryBuilder>}
      */
-    filterCasesAmongKnownContacts(date, location, noDaysAmongContacts): Observable<RequestQueryBuilder> {
+    filterCasesAmongKnownContacts(
+        date,
+        location,
+        classificationId,
+        noDaysAmongContacts
+    ): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // add global filters
             const qb = this.getGlobalFilterQB(
                 null,
                 null,
                 'addresses.parentLocationIdFilter',
-                location
+                location,
+                classificationId
             );
+
+            // exclude discarded cases
+            qb.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
 
             // change the way we build query
             qb.filter.firstLevelConditions();

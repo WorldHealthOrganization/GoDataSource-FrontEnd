@@ -1098,7 +1098,12 @@ export abstract class ListComponent implements OnDestroy {
                 // get the number of days  if it was updated
                 const noDaysAmongContacts = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterCasesAmongKnownContacts(globalFilters.date, globalFilters.locationId, noDaysAmongContacts)
+                this.listFilterDataService.filterCasesAmongKnownContacts(
+                    globalFilters.date,
+                    globalFilters.locationId,
+                    globalFilters.classificationId,
+                    noDaysAmongContacts
+                )
                     .subscribe((qbFilterCasesAmongKnownContacts) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterCasesAmongKnownContacts;
