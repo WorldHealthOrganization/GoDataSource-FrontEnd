@@ -41,6 +41,16 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
         return this._globalFilterLocationId;
     }
 
+    // Global Filters => Case Classification
+    private _globalFilterClassificationId: string[];
+    @Input() set globalFilterClassificationId(globalFilterClassificationId: string[]) {
+        this._globalFilterClassificationId = globalFilterClassificationId;
+        this.refreshDataCaller.call();
+    }
+    get globalFilterClassificationId(): string[] {
+        return this._globalFilterClassificationId;
+    }
+
     // outbreak
     outbreakId: string;
 
@@ -121,10 +131,10 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
      * Redirect to cases page when user click on a piece of pie chart to display the cases that represent the part of pie chart
      */
     onDoughnutPress(pressed) {
-
         const global: {
             date?: Moment,
-            locationId?: string
+            locationId?: string,
+            classificationId?: string[]
         } = {};
 
         // do we have a global date set ?
@@ -135,6 +145,11 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
         // do we have a global location Id set ?
         if (!_.isEmpty(this.globalFilterLocationId)) {
             global.locationId = this.globalFilterLocationId;
+        }
+
+        // do we have a global classification Ids set ?
+        if (!_.isEmpty(this.globalFilterClassificationId)) {
+            global.classificationId = this.globalFilterClassificationId;
         }
 
         this.router.navigate([`cases`],
@@ -184,6 +199,16 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
                     neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
                 }
             });
+
+            // classification
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
+                qb.filter.bySelect(
+                    'classification',
+                    this.globalFilterClassificationId,
+                    false,
+                    null
+                );
+            }
 
             // retrieve data
             this.displayLoading = true;

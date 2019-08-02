@@ -8,6 +8,7 @@ export enum ApplyListFilter {
     CASES_DECEASED = 'cases_deceased',
     CASES_HOSPITALISED = 'cases_hospitalised',
     CASES_NOT_HOSPITALISED = 'cases_not_hospitalised',
+    CASES_ISOLATED = 'cases_isolated',
     CONTACTS_LOST_TO_FOLLOW_UP = 'contacts_lost_to_follow_up',
     CONTACTS_NOT_SEEN = 'contacts_not_seen',
     CONTACTS_SEEN = 'contacts_seen',

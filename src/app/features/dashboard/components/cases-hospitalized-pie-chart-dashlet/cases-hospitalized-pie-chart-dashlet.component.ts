@@ -29,7 +29,6 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
         this._globalFilterDate = globalFilterDate;
         this.refreshDataCaller.call();
     }
-
     get globalFilterDate(): Moment {
         return this._globalFilterDate;
     }
@@ -40,9 +39,18 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
         this._globalFilterLocationId = globalFilterLocationId;
         this.refreshDataCaller.call();
     }
-
     get globalFilterLocationId(): string {
         return this._globalFilterLocationId;
+    }
+
+    // Global Filters => Case Classification
+    private _globalFilterClassificationId: string[];
+    @Input() set globalFilterClassificationId(globalFilterClassificationId: string[]) {
+        this._globalFilterClassificationId = globalFilterClassificationId;
+        this.refreshDataCaller.call();
+    }
+    get globalFilterClassificationId(): string[] {
+        return this._globalFilterClassificationId;
     }
 
     // outbreak
@@ -109,7 +117,8 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
     onDoughnutPress(pressed) {
         const global: {
             date?: Moment,
-            locationId?: string
+            locationId?: string,
+            classificationId?: string[]
         } = {};
 
         // do we have a global date set ?
@@ -120,6 +129,11 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
         // do we have a global location Id set ?
         if (!_.isEmpty(this.globalFilterLocationId)) {
             global.locationId = this.globalFilterLocationId;
+        }
+
+        // do we have a global classification Ids set ?
+        if (!_.isEmpty(this.globalFilterClassificationId)) {
+            global.classificationId = this.globalFilterClassificationId;
         }
 
         this.router.navigate([`cases`],
@@ -155,6 +169,7 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
         caseHospitalizationSummaryResults.push(new MetricChartDataModel({
             value: caseIsolationCount,
             name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_ISOLATED_LABEL'),
+            extra: Constants.APPLY_LIST_FILTER.CASES_ISOLATED
         }));
         caseHospitalizationSummaryResults.push(new MetricChartDataModel({
             value: caseNotHospitalizationCount,
@@ -202,6 +217,16 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
                     neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
                 }
             });
+
+            // classification
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
+                qb.filter.bySelect(
+                    'classification',
+                    this.globalFilterClassificationId,
+                    false,
+                    null
+                );
+            }
 
             // retrieve data
             this.displayLoading = true;

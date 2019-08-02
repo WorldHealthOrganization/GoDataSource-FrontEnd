@@ -21,11 +21,14 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { Constants } from '../../../../core/models/constants';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { catchError } from 'rxjs/operators';
+import { catchError, map, share } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-dashboard',
@@ -105,8 +108,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // available side filters
     availableSideFilters: FilterModel[] = [];
 
-    globalFilterDate: Moment;
+    globalFilterDate: Moment = moment();
     globalFilterLocationId: string;
+    globalFilterClassificationId: string[] = [];
 
     @ViewChild('kpiSection') private kpiSection: ElementRef;
 
@@ -119,6 +123,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     epiCurveViewTypes$: Observable<any[]>;
 
+    caseClassificationsList$: Observable<LabelValuePair[]>;
+
     constructor(
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -128,11 +134,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
         private genericDataService: GenericDataService,
         private dialogService: DialogService,
         protected snackbarService: SnackbarService,
-        private systemSettingsDataService: SystemSettingsDataService
+        private systemSettingsDataService: SystemSettingsDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {}
 
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        this.caseClassificationsList$ = this.referenceDataDataService
+            .getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION)
+            .pipe(
+                map((records: LabelValuePair[]) => {
+                    return _.filter(
+                        records,
+                        (record: LabelValuePair) => {
+                            return record.value !== Constants.CASE_CLASSIFICATION.NOT_A_CASE;
+                        }
+                    );
+                }),
+                share()
+            );
 
         this.initializeDashlets();
 
@@ -187,14 +208,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
                 type: FilterType.LOCATION,
                 required: true,
-                multipleOptions: false
+                multipleOptions: false,
+                value: this.globalFilterLocationId
             }),
             new FilterModel({
                 fieldName: 'date',
                 fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
                 type: FilterType.DATE,
                 required: true,
-                maxDate: moment()
+                maxDate: moment(),
+                value: this.globalFilterDate
+            }),
+            new FilterModel({
+                fieldName: 'classificationId',
+                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_CLASSIFICATION',
+                type: FilterType.MULTISELECT,
+                required: true,
+                options$: this.caseClassificationsList$,
+                value: this.globalFilterClassificationId
             })
         ];
     }
@@ -394,10 +425,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // retrieve location filter
         const dateFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'date' } });
         const locationFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'locationId' } });
+        const classificationFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'classificationId' } });
 
         // set filters
         this.globalFilterDate = _.isEmpty(dateFilter.value) ? undefined : moment(dateFilter.value);
         this.globalFilterLocationId = _.isEmpty(locationFilter.value) ? undefined : locationFilter.value;
+        this.globalFilterClassificationId = _.isEmpty(classificationFilter.value) ? undefined : classificationFilter.value;
     }
 
     /**

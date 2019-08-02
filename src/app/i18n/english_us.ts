@@ -37,7 +37,12 @@ export const EnglishUsLang = {
         /**
          * uiTeamsWorkload
          */
-        'LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL': 'of'
+        'LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL': 'of',
+
+        /**
+         * uiGlobalFilterFields
+         */
+        'LNG_GLOBAL_FILTERS_FIELD_LABEL_CLASSIFICATION': 'Classification'
 
         /**
          * REMOVE the tokens from below

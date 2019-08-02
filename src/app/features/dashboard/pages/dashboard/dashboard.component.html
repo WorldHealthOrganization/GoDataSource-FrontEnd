@@ -77,9 +77,7 @@
             class="page-content"
             fxLayout="column"
         >
-
             <div fxLayout="row" fxLayoutAlign="space-between">
-
                 <div fxFlex="33">
                     <mat-card class="dashboard-gauge">
                         <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE' | translate}}</div>
@@ -88,7 +86,8 @@
                             <app-case-summary-dashlet
                                 *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-case-summary-dashlet>
                         </div>
                     </mat-card>
@@ -104,7 +103,8 @@
                             <app-case-by-geographic-location-dashlet
                                 *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-case-by-geographic-location-dashlet>
                         </div>
                     </mat-card>
@@ -119,14 +119,13 @@
                             <app-cases-hospitalized-pie-chart-dashlet
                                 *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-cases-hospitalized-pie-chart-dashlet>
                         </div>
                     </mat-card>
                 </div>
-
             </div>
-            <!--</mat-card>-->
 
             <!-- Histogram - chains of transmission -->
             <mat-card class="page-section">
@@ -138,7 +137,8 @@
                 <app-histogram-transmission-chains-size-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                     [globalFilterDate]="globalFilterDate"
-                    [globalFilterLocationId]="globalFilterLocationId">
+                    [globalFilterLocationId]="globalFilterLocationId"
+                    [globalFilterClassificationId]="globalFilterClassificationId">
                 </app-histogram-transmission-chains-size-dashlet>
             </mat-card>
 
