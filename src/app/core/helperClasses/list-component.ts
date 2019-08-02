@@ -954,7 +954,12 @@ export abstract class ListComponent implements OnDestroy {
                 // get the number of contacts if it was updated
                 const noLessContacts = _.get(queryParams, 'x', null);
                   // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterCasesLessThanContacts(globalFilters.date, globalFilters.locationId, noLessContacts)
+                this.listFilterDataService.filterCasesLessThanContacts(
+                    globalFilters.date,
+                    globalFilters.locationId,
+                    globalFilters.classificationId,
+                    noLessContacts
+                )
                     .subscribe((qbFilterCasesLessThanContacts) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterCasesLessThanContacts;

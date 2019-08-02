@@ -122,6 +122,18 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
                     .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
             }
 
+            // classification
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
+                qb.include('people').queryBuilder.filter
+                    .where({
+                        and: [{
+                            classification: {
+                                inq: this.globalFilterClassificationId
+                            }
+                        }]
+                    });
+            }
+
             // convert noLessContacts to number as the API expects
             const noLessContacts: number = _.isNumber(this.xLessContacts) || _.isEmpty(this.xLessContacts) ? this.xLessContacts  : _.parseInt(this.xLessContacts);
             if (_.isNumber(noLessContacts)) {

@@ -252,7 +252,7 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
             }
 
             // classification
-            if (this.globalFilterClassificationId) {
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
                 personQuery.filter.bySelect(
                     'classification',
                     this.globalFilterClassificationId,

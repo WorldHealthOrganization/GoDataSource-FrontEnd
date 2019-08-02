@@ -258,10 +258,16 @@ export class ListFilterDataService {
      * Create the query builder for filtering the list of cases
      * @param date
      * @param location
+     * @param classificationId
      * @param {number} noLessContacts
      * @returns {Observable<RequestQueryBuilder>}
      */
-    filterCasesLessThanContacts(date, location, noLessContacts): Observable<RequestQueryBuilder> {
+    filterCasesLessThanContacts(
+        date,
+        location,
+        classificationId,
+        noLessContacts
+    ): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // add global filters
             const qb = new RequestQueryBuilder();
@@ -282,6 +288,18 @@ export class ListFilterDataService {
             if (location) {
                 qb.include('people').queryBuilder.filter
                     .byEquality('addresses.parentLocationIdFilter', location);
+            }
+
+            // classification
+            if (!_.isEmpty(classificationId)) {
+                qb.include('people').queryBuilder.filter
+                    .where({
+                        and: [{
+                            classification: {
+                                inq: classificationId
+                            }
+                        }]
+                    });
             }
 
             // convert noLessContacts to number as the API expects
