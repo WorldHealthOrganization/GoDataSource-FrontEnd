@@ -164,21 +164,24 @@
                 <app-epi-curve-dashlet
                     *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.CLASSIFICATION.value"
                     [globalFilterDate]="globalFilterDate"
-                    [globalFilterLocationId]="globalFilterLocationId">
+                    [globalFilterLocationId]="globalFilterLocationId"
+                    [globalFilterClassificationId]="globalFilterClassificationId">
                 </app-epi-curve-dashlet>
 
                 <!-- epi curve outcome -->
                 <app-epi-curve-outcome-dashlet
                     *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.OUTCOME.value"
                     [globalFilterDate]="globalFilterDate"
-                    [globalFilterLocationId]="globalFilterLocationId">
+                    [globalFilterLocationId]="globalFilterLocationId"
+                    [globalFilterClassificationId]="globalFilterClassificationId">
                 </app-epi-curve-outcome-dashlet>
 
                 <!-- epi curve reporting -->
                 <app-epi-curve-reporting-dashlet
                     *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.REPORTING.value"
                     [globalFilterDate]="globalFilterDate"
-                    [globalFilterLocationId]="globalFilterLocationId">
+                    [globalFilterLocationId]="globalFilterLocationId"
+                    [globalFilterClassificationId]="globalFilterClassificationId">
                 </app-epi-curve-reporting-dashlet>
             </mat-card>
 
