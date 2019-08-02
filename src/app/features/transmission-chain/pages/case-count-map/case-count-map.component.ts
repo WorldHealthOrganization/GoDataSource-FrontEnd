@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { CanvasGantt, StrGantt, SVGGantt } from 'gantt';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -14,6 +13,7 @@ import { TransmissionChainFilters } from '../../components/transmission-chains-f
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as FileSaver from 'file-saver';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-case-count-map',
@@ -126,6 +126,13 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
                             $exists: true
                         }
                     }
+                }
+            });
+
+            // exclude discarded cases
+            qb.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
                 }
             });
 

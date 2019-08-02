@@ -779,8 +779,17 @@ export abstract class ListComponent implements OnDestroy {
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
-                    globalFilters.locationId
+                    globalFilters.locationId,
+                    globalFilters.classificationId
                 );
+
+                // condition already include by default on cases list page
+                // qb.filter.bySelect(
+                //     'classification',
+                //     this.globalFilterClassificationId,
+                //     false,
+                //     null
+                // );
 
                 // date
                 if (globalFilters.date) {
@@ -803,6 +812,47 @@ export abstract class ListComponent implements OnDestroy {
                 this.needsRefreshList(true);
                 break;
 
+            // filter cases isolated
+            case Constants.APPLY_LIST_FILTER.CASES_ISOLATED:
+                // add condition for deceased cases
+                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                    null,
+                    null,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId,
+                    globalFilters.classificationId
+                );
+
+                // date
+                if (globalFilters.date) {
+                    globalQb.filter.byDateRange(
+                        'dateOfOnset', {
+                            endDate: globalFilters.date.endOf('day').format()
+                        }
+                    );
+                }
+
+                // condition already include by default on cases list page
+                // qb.filter.bySelect(
+                //     'classification',
+                //     this.globalFilterClassificationId,
+                //     false,
+                //     null
+                // );
+
+                // get the correct query builder and merge with the existing one
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesIsolated(globalFilters.date);
+                if (!globalQb.isEmpty()) {
+                    this.appliedListFilterQueryBuilder.merge(globalQb);
+                }
+
+                // merge query builder
+                this.mergeListFilterToMainFilter();
+
+                // refresh list
+                this.needsRefreshList(true);
+                break;
+
             // filter cases hospitalised
             case Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED:
                 // add condition for deceased cases
@@ -810,8 +860,26 @@ export abstract class ListComponent implements OnDestroy {
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
-                    globalFilters.locationId
+                    globalFilters.locationId,
+                    globalFilters.classificationId
                 );
+
+                // date
+                if (globalFilters.date) {
+                    globalQb.filter.byDateRange(
+                        'dateOfOnset', {
+                            endDate: globalFilters.date.endOf('day').format()
+                        }
+                    );
+                }
+
+                // condition already include by default on cases list page
+                // qb.filter.bySelect(
+                //     'classification',
+                //     this.globalFilterClassificationId,
+                //     false,
+                //     null
+                // );
 
                 // get the correct query builder and merge with the existing one
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesHospitalized(globalFilters.date);
@@ -831,8 +899,26 @@ export abstract class ListComponent implements OnDestroy {
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
-                    globalFilters.locationId
+                    globalFilters.locationId,
+                    globalFilters.classificationId
                 );
+
+                // date
+                if (globalFilters.date) {
+                    globalQb.filter.byDateRange(
+                        'dateOfOnset', {
+                            endDate: globalFilters.date.endOf('day').format()
+                        }
+                    );
+                }
+
+                // condition already include by default on cases list page
+                // qb.filter.bySelect(
+                //     'classification',
+                //     this.globalFilterClassificationId,
+                //     false,
+                //     null
+                // );
 
                 // get the correct query builder and merge with the existing one
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesNotHospitalized(globalFilters.date);
@@ -868,7 +954,12 @@ export abstract class ListComponent implements OnDestroy {
                 // get the number of contacts if it was updated
                 const noLessContacts = _.get(queryParams, 'x', null);
                   // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterCasesLessThanContacts(globalFilters.date, globalFilters.locationId, noLessContacts)
+                this.listFilterDataService.filterCasesLessThanContacts(
+                    globalFilters.date,
+                    globalFilters.locationId,
+                    globalFilters.classificationId,
+                    noLessContacts
+                )
                     .subscribe((qbFilterCasesLessThanContacts) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterCasesLessThanContacts;
@@ -888,13 +979,25 @@ export abstract class ListComponent implements OnDestroy {
                     globalFilters.locationId
                 );
 
+                // date
+                if (globalFilters.date) {
+                    globalQb.filter.byDateRange(
+                        'dateOfOnset', {
+                            endDate: globalFilters.date.endOf('day').format()
+                        }
+                    );
+                }
+
                 const classificationCriteria = _.get(queryParams, 'x', null);
                 // merge query builder
                 this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
                 this.appliedListFilterQueryBuilder.filter.where({
-                    classification: {
-                        'eq': classificationCriteria
-                    }
+                    // add and condition because otherwise classification filter if overwritten by the default one
+                    and: [{
+                        classification: {
+                            'eq': classificationCriteria
+                        }
+                    }]
                 }, true);
 
                 if (!globalQb.isEmpty()) {
@@ -907,9 +1010,11 @@ export abstract class ListComponent implements OnDestroy {
                 break;
 
             case Constants.APPLY_LIST_FILTER.CASES_BY_LOCATION:
+                // add condition for deceased cases
+                this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+
                 // construct query builder to filter by location
                 const locationId = _.get(queryParams, 'locationId', null);
-                this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
                 this.appliedListFilterQueryBuilder.filter.where({
                     addresses: {
                         elemMatch: {
@@ -922,6 +1027,34 @@ export abstract class ListComponent implements OnDestroy {
                         }
                     }
                 });
+
+                // date
+                if (globalFilters.date) {
+                    this.appliedListFilterQueryBuilder.filter.byDateRange(
+                        'dateOfOnset', {
+                            endDate: globalFilters.date.endOf('day').format()
+                        }
+                    );
+                }
+
+                // condition already include by default on cases list page
+                // qb.filter.bySelect(
+                //     'classification',
+                //     this.globalFilterClassificationId,
+                //     false,
+                //     null
+                // );
+
+                // classification
+                if (!_.isEmpty(globalFilters.classificationId)) {
+                    this.appliedListFilterQueryBuilder.filter.where({
+                        and: [{
+                            classification: {
+                                inq: globalFilters.classificationId
+                            }
+                        }]
+                    });
+                }
 
                 // main filters
                 this.mergeListFilterToMainFilter();
@@ -965,7 +1098,12 @@ export abstract class ListComponent implements OnDestroy {
                 // get the number of days  if it was updated
                 const noDaysAmongContacts = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterCasesAmongKnownContacts(globalFilters.date, globalFilters.locationId, noDaysAmongContacts)
+                this.listFilterDataService.filterCasesAmongKnownContacts(
+                    globalFilters.date,
+                    globalFilters.locationId,
+                    globalFilters.classificationId,
+                    noDaysAmongContacts
+                )
                     .subscribe((qbFilterCasesAmongKnownContacts) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterCasesAmongKnownContacts;
@@ -1015,8 +1153,17 @@ export abstract class ListComponent implements OnDestroy {
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
-                    globalFilters.locationId
+                    globalFilters.locationId,
+                    globalFilters.classificationId
                 );
+
+                // condition already include by default on cases list page
+                // globalQb.filter.bySelect(
+                //     'classification',
+                //     this.globalFilterClassificationId,
+                //     false,
+                //     null
+                // );
 
                 // date
                 if (globalFilters.date) {
@@ -1359,16 +1506,19 @@ export abstract class ListComponent implements OnDestroy {
     getGlobalFilterValues(queryParams: {
         global?: string | {
             date?: Moment,
-            locationId?: string
+            locationId?: string,
+            classificationId?: string[]
         }
     }): {
         date?: Moment,
-        locationId?: string
+        locationId?: string,
+        classificationId?: string[]
     } {
         // do we need to decode global filters ?
         const global: {
             date?: Moment,
-            locationId?: string
+            locationId?: string,
+            classificationId?: string[]
         } = !queryParams.global ?
             {} : (
                 _.isString(queryParams.global) ?

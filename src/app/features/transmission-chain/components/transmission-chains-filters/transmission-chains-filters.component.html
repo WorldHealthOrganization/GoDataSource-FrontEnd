@@ -7,9 +7,10 @@
         <!-- case classification -->
         <app-form-select
             name="classification"
-            [(ngModel)]="filters.classification"
+            [(ngModel)]="filters.classificationId"
             [placeholder]="'LNG_CASE_FIELD_LABEL_CLASSIFICATION' | translate"
-            [options]="caseClassificationsList$ | async">
+            [options]="caseClassificationsList$ | async"
+            multiple="true">
         </app-form-select>
 
         <!-- occupation -->
@@ -17,7 +18,8 @@
             name="occupation"
             [(ngModel)]="filters.occupation"
             [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
-            [options]="occupationsList$ | async">
+            [options]="occupationsList$ | async"
+            multiple="true">
         </app-form-select>
 
         <!-- outcome -->
@@ -25,7 +27,8 @@
             name="outcomeId"
             [(ngModel)]="filters.outcomeId"
             [placeholder]="'LNG_CASE_FIELD_LABEL_OUTCOME' | translate"
-            [options]="outcomeList$ | async">
+            [options]="outcomeList$ | async"
+            multiple="true">
         </app-form-select>
     </div>
 

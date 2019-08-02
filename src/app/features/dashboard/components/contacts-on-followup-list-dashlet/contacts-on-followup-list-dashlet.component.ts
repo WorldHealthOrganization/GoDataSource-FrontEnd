@@ -75,7 +75,8 @@ export class ContactsOnFollowupListDashletComponent extends DashletComponent imp
             // add global filters
             const qb = this.getGlobalFilterQB(
                 null,
-                'address.parentLocationIdFilter'
+                'address.parentLocationIdFilter',
+                true
             );
 
             // date

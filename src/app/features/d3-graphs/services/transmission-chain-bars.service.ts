@@ -175,6 +175,14 @@ export class TransmissionChainBarsService {
         [targetId: string]: string[]
     } = {};
 
+    // keep last occupying group lines elements to easily determine position on which we should draw...
+    private centerOccupiedLines: {
+        [y: number]: {
+            x1: number,
+            x2: number
+        }
+    } = {};
+
     /**
      * Constructor
      */
@@ -233,6 +241,7 @@ export class TransmissionChainBarsService {
 
         // draw the cases / events
         this.remainingRelationsToDraw = {};
+        this.centerOccupiedLines = {};
         this.drawEntities();
 
         // set graph container height
@@ -1144,7 +1153,7 @@ export class TransmissionChainBarsService {
             .attr('y', this.entityDetailsCellHeight);
 
         // draw cells
-        (this.centerNameCells || []).forEach((cell: GroupCell, cellIndex: number) => {
+        (this.centerNameCells || []).forEach((cell: GroupCell) => {
             // determine bounds
             const x: number = cell.entityStartIndex * (this.marginBetween + this.cellWidth);
             const width: number = cell.cells * (this.marginBetween + this.cellWidth) - this.marginBetween;
@@ -1152,26 +1161,12 @@ export class TransmissionChainBarsService {
 
             // determine best position for this group
             let y: number = 0;
-            let index = 0;
-            while (index < cellIndex) {
-                // stop found intersection, need other line
-                const previousCell: GroupCell = this.centerNameCells[index];
-                if (
-                    y === previousCell.rect.y &&
-                    x >= previousCell.rect.x && x <= previousCell.rect.x + previousCell.rect.width
-                ) {
-                    // start from the beginning
-                    index = 0;
-
-                    // next line
-                    y += this.entityDetailsTextLineCellHeight + this.entityDetailsTextLineSpaceBetween;
-
-                    // again
-                    continue;
-                }
-
-                // next item - no intersection until now
-                index++;
+            while (
+                this.centerOccupiedLines[y] &&
+                x >= this.centerOccupiedLines[y].x1 && x <= this.centerOccupiedLines[y].x2
+            ) {
+                // next line
+                y += this.entityDetailsTextLineCellHeight + this.entityDetailsTextLineSpaceBetween;
             }
 
             // map group zone
@@ -1180,6 +1175,12 @@ export class TransmissionChainBarsService {
                 y: y,
                 width: width,
                 height: height
+            };
+
+            // occupy line
+            this.centerOccupiedLines[y] = {
+                x1: x,
+                x2: x + width
             };
 
             // group handler

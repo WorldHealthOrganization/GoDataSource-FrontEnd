@@ -50,6 +50,16 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
         return this._globalFilterLocationId;
     }
 
+    // Global Filters => Case Classification
+    private _globalFilterClassificationId: string[];
+    @Input() set globalFilterClassificationId(globalFilterClassificationId: string[]) {
+        this._globalFilterClassificationId = globalFilterClassificationId;
+        this.refreshDataCaller.call();
+    }
+    get globalFilterClassificationId(): string[] {
+        return this._globalFilterClassificationId;
+    }
+
     // outbreak
     outbreakId: string;
 
@@ -233,6 +243,23 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
                 'periodType',
                 this.viewType
             );
+
+            // exclude discarded cases
+            qb.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
+
+            // classification
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
+                qb.filter.bySelect(
+                    'classification',
+                    this.globalFilterClassificationId,
+                    false,
+                    null
+                );
+            }
 
             // get data
             this.displayLoading = true;

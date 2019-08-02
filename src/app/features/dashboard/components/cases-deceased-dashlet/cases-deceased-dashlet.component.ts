@@ -77,8 +77,16 @@ export class CasesDeceasedDashletComponent extends DashletComponent implements O
             // add global filters
             const qb = this.getGlobalFilterQB(
                 null,
-                'addresses.parentLocationIdFilter'
+                'addresses.parentLocationIdFilter',
+                true
             );
+
+            // exclude discarded cases
+            qb.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
 
             // date
             if (this.globalFilterDate) {

@@ -33,7 +33,6 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
         this._globalFilterDate = globalFilterDate;
         this.refreshDataCaller.call();
     }
-
     get globalFilterDate(): Moment {
         return this._globalFilterDate;
     }
@@ -44,9 +43,18 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
         this._globalFilterLocationId = globalFilterLocationId;
         this.refreshDataCaller.call();
     }
-
     get globalFilterLocationId(): string {
         return this._globalFilterLocationId;
+    }
+
+    // Global Filters => Case Classification
+    private _globalFilterClassificationId: string[];
+    @Input() set globalFilterClassificationId(globalFilterClassificationId: string[]) {
+        this._globalFilterClassificationId = globalFilterClassificationId;
+        this.refreshDataCaller.call();
+    }
+    get globalFilterClassificationId(): string[] {
+        return this._globalFilterClassificationId;
     }
 
     // outbreak
@@ -197,11 +205,9 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
             qb.filter.firstLevelConditions();
 
             // date
+            let endDate: string = moment().endOf('day').toISOString();
             if (this.globalFilterDate) {
-                qb.filter.byEquality(
-                    'end',
-                    this.globalFilterDate.format('YYYY-MM-DD')
-                );
+                endDate = this.globalFilterDate.clone().endOf('day').toISOString();
             }
 
             // location
@@ -219,12 +225,28 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
             );
 
             // set period interval to start of outbreak until current date
-            const startDate = this.outbreak.startDate;
-            const endDate = moment().format('YYYY-MM-DD');
-
+            const startDate = moment(this.outbreak.startDate).startOf('day');
             qb.filter.where({
                 periodInterval: [startDate, endDate]
             });
+
+            // exclude discarded cases
+            qb.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
+
+            // classification
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
+                qb.filter.where({
+                    and: [{
+                        classification: {
+                            inq: this.globalFilterClassificationId
+                        }
+                    }]
+                });
+            }
 
             // get data - start Date will be set to start of outbreak
             this.displayLoading = true;
@@ -237,7 +259,8 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
                     _.each(chartDataObject, (data) => {
                         this.chartData.push(data);
                     });
-                   // finished
+
+                    // finished
                     this.displayLoading = false;
                 });
         }

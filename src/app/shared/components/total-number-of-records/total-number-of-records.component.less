@@ -8,6 +8,19 @@ app-total-number-of-records {
         font-size: medium;
         font-family: @font-roboto;
         color: @color-dark-2nd;
+
+        @mat-spinner-width: 12px;
+        @mat-spinner-height: 12px;
+        mat-spinner {
+            display: inline-block;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
     }
 
     @media @mobile-devices {
