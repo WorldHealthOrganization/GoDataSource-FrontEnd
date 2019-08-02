@@ -13,6 +13,7 @@ import { HelpCategoryModel } from '../../../core/models/help-category.model';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { ViewHelpDetailsData, ViewHelpDetailsDialogComponent } from '../view-help-details-dialog/view-help-details-dialog.component';
+import { HoverRowAction } from '../hover-row-actions/hover-row-actions.component';
 
 export class ViewHelpData {
     helpItemsIds: string[];
@@ -53,6 +54,17 @@ export class ViewHelpDialogComponent extends ListComponent {
     helpItemsList$: Observable<HelpItemModel[]>;
     helpCategoriesList$: Observable<HelpCategoryModel[]>;
 
+    recordActions: HoverRowAction[] = [
+        // View Case
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_ACTION_VIEW',
+            click: (item: HelpItemModel) => {
+                this.viewHelpItemDetails(item);
+            }
+        })
+    ];
+
     /**
      * Constructor
      */
@@ -84,8 +96,7 @@ export class ViewHelpDialogComponent extends ListComponent {
     getTableColumns(): string[] {
         return [
             'title',
-            'categoryId',
-            'view'
+            'categoryId'
         ];
     }
 
