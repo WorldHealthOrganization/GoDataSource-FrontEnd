@@ -75,14 +75,17 @@ export abstract class DashletComponent {
      */
     getGlobalFilterQB(
         dateFieldPath: string | null,
-        locationFieldPath: string | null
+        locationFieldPath: string | null,
+        classification: boolean
     ): RequestQueryBuilder {
         return this.listFilterDataService.getGlobalFilterQB(
             dateFieldPath,
             this.globalFilterDate,
             locationFieldPath,
             this.globalFilterLocationId,
-            this.globalFilterClassificationId
+            classification ?
+                this.globalFilterClassificationId :
+                null
         );
     }
 

@@ -779,8 +779,17 @@ export abstract class ListComponent implements OnDestroy {
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
-                    globalFilters.locationId
+                    globalFilters.locationId,
+                    globalFilters.classificationId
                 );
+
+                // condition already include by default on cases list page
+                // qb.filter.bySelect(
+                //     'classification',
+                //     this.globalFilterClassificationId,
+                //     false,
+                //     null
+                // );
 
                 // date
                 if (globalFilters.date) {
