@@ -193,6 +193,23 @@ html, body, ul, li, div, span {
         }
     }
 
+    .mat-table-loading-data {
+        text-align: center;
+
+        @mat-spinner-width: 24px;
+        @mat-spinner-height: 24px;
+        mat-spinner {
+            display: inline-block;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+    }
+
     app-form-slide-toggle {
         display: inline-block;
     }

@@ -563,7 +563,13 @@
     </mat-table>
 
     <div
-        *ngIf="isEmptyList"
+        *ngIf="refreshingList"
+        class="mat-table-loading-data">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div
+        *ngIf="!refreshingList && isEmptyList"
         class="mat-table"
     >
         <div class="mat-row">
