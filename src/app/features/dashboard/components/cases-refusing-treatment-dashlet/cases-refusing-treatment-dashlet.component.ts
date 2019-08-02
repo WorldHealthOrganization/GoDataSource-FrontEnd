@@ -81,6 +81,13 @@ export class CasesRefusingTreatmentDashletComponent extends DashletComponent imp
                 true
             );
 
+            // exclude discarded cases
+            qb.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
+
             // date
             if (this.globalFilterDate) {
                 qb.filter.byDateRange(
