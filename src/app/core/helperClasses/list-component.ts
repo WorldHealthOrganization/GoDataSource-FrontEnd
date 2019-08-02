@@ -810,7 +810,8 @@ export abstract class ListComponent implements OnDestroy {
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
-                    globalFilters.locationId
+                    globalFilters.locationId,
+                    globalFilters.classificationId
                 );
 
                 // date
@@ -829,17 +830,6 @@ export abstract class ListComponent implements OnDestroy {
                 //     false,
                 //     null
                 // );
-
-                // classification
-                if (!_.isEmpty(globalFilters.classificationId)) {
-                    globalQb.filter.where({
-                        and: [{
-                            classification: {
-                                inq: globalFilters.classificationId
-                            }
-                        }]
-                    });
-                }
 
                 // get the correct query builder and merge with the existing one
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesIsolated(globalFilters.date);
@@ -861,7 +851,8 @@ export abstract class ListComponent implements OnDestroy {
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
-                    globalFilters.locationId
+                    globalFilters.locationId,
+                    globalFilters.classificationId
                 );
 
                 // date
@@ -880,17 +871,6 @@ export abstract class ListComponent implements OnDestroy {
                 //     false,
                 //     null
                 // );
-
-                // classification
-                if (!_.isEmpty(globalFilters.classificationId)) {
-                    globalQb.filter.where({
-                        and: [{
-                            classification: {
-                                inq: globalFilters.classificationId
-                            }
-                        }]
-                    });
-                }
 
                 // get the correct query builder and merge with the existing one
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesHospitalized(globalFilters.date);
@@ -910,7 +890,8 @@ export abstract class ListComponent implements OnDestroy {
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
-                    globalFilters.locationId
+                    globalFilters.locationId,
+                    globalFilters.classificationId
                 );
 
                 // date
@@ -929,17 +910,6 @@ export abstract class ListComponent implements OnDestroy {
                 //     false,
                 //     null
                 // );
-
-                // classification
-                if (!_.isEmpty(globalFilters.classificationId)) {
-                    globalQb.filter.where({
-                        and: [{
-                            classification: {
-                                inq: globalFilters.classificationId
-                            }
-                        }]
-                    });
-                }
 
                 // get the correct query builder and merge with the existing one
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesNotHospitalized(globalFilters.date);

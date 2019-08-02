@@ -647,12 +647,14 @@ export class ListFilterDataService {
      * @param dateFieldValue
      * @param locationFieldPath
      * @param locationFieldValue
+     * @param classificationFieldValue
      */
     getGlobalFilterQB(
         dateFieldPath: string,
         dateFieldValue: Moment,
         locationFieldPath: string,
-        locationFieldValue: string
+        locationFieldValue: string,
+        classificationFieldValue?: string[]
     ): RequestQueryBuilder {
         // construct query builder
         const qb = new RequestQueryBuilder();
@@ -679,6 +681,17 @@ export class ListFilterDataService {
                 locationFieldPath,
                 locationFieldValue
             );
+        }
+
+        // classification
+        if (!_.isEmpty(classificationFieldValue)) {
+            qb.filter.where({
+                and: [{
+                    classification: {
+                        inq: classificationFieldValue
+                    }
+                }]
+            });
         }
 
         // finished
