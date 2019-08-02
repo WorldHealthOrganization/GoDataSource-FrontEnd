@@ -209,7 +209,8 @@
                 <app-cases-based-on-contact-status-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                     [globalFilterDate]="globalFilterDate"
-                    [globalFilterLocationId]="globalFilterLocationId">
+                    [globalFilterLocationId]="globalFilterLocationId"
+                    [globalFilterClassificationId]="globalFilterClassificationId">
                 </app-cases-based-on-contact-status-dashlet>
             </mat-card>
 
