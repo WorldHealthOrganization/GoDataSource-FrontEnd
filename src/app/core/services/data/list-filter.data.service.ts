@@ -376,10 +376,16 @@ export class ListFilterDataService {
      * Create the query builder for filtering the list of cases
      * @param date
      * @param location
+     * @param classificationId
      * @param {number} noDaysInChains
      * @returns {Observable<RequestQueryBuilder>}
      */
-    filterCasesInKnownChains(date, location, noDaysInChains): Observable<RequestQueryBuilder> {
+    filterCasesInKnownChains(
+        date,
+        location,
+        classificationId,
+        noDaysInChains
+    ): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // add global filters
             const qb = new RequestQueryBuilder();
@@ -411,10 +417,29 @@ export class ListFilterDataService {
                 });
             }
 
+            // exclude discarded cases
+            qb.include('people').queryBuilder.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
+
             // location
             if (location) {
                 qb.include('people').queryBuilder.filter
                     .byEquality('addresses.parentLocationIdFilter', location);
+            }
+
+            // classification
+            if (!_.isEmpty(classificationId)) {
+                qb.include('people').queryBuilder.filter
+                    .where({
+                        and: [{
+                            classification: {
+                                inq: classificationId
+                            }
+                        }]
+                    });
             }
 
             return this.relationshipDataService
