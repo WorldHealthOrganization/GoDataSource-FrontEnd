@@ -63,11 +63,16 @@ export class EventDataService {
      * Retrieve an Event of an Outbreak
      * @param {string} outbreakId
      * @param {string} eventId
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<EventModel>}
      */
-    getEvent(outbreakId: string, eventId: string): Observable<EventModel> {
+    getEvent(
+        outbreakId: string,
+        eventId: string,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<EventModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/events/${eventId}`),
+            this.http.get(`outbreaks/${outbreakId}/events/${eventId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`),
             EventModel
         );
     }
@@ -77,11 +82,17 @@ export class EventDataService {
      * @param {string} outbreakId
      * @param {string} eventId
      * @param eventData
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<EventModel>}
      */
-    modifyEvent(outbreakId: string, eventId: string, eventData): Observable<EventModel> {
+    modifyEvent(
+        outbreakId: string,
+        eventId: string,
+        eventData,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<EventModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.put(`outbreaks/${outbreakId}/events/${eventId}`, eventData),
+            this.http.put(`outbreaks/${outbreakId}/events/${eventId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, eventData),
             EventModel
         );
     }

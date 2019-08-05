@@ -24,6 +24,7 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder';
 import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-locations-list',
@@ -42,6 +43,9 @@ export class LocationsListComponent extends ListComponent implements OnInit {
 
     // constants
     ExportDataExtension = ExportDataExtension;
+
+    // user list
+    userList$: Observable<UserModel[]>;
 
     // parent location ID
     parentId: string;
@@ -142,7 +146,8 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         protected snackbarService: SnackbarService,
         private router: Router,
         private i18nService: I18nService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private userDataService: UserDataService
     ) {
         super(
             snackbarService
@@ -155,6 +160,9 @@ export class LocationsListComponent extends ListComponent implements OnInit {
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // retrieve users
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
         // lists
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
@@ -211,6 +219,22 @@ export class LocationsListComponent extends ListComponent implements OnInit {
             new VisibleColumnModel({
                 field: 'geographicalLevelId',
                 label: 'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL'
+            }),
+            new VisibleColumnModel({
+                field: 'createdBy',
+                label: 'LNG_LOCATION_FIELD_LABEL_CREATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'createdAt',
+                label: 'LNG_LOCATION_FIELD_LABEL_CREATED_AT'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedBy',
+                label: 'LNG_LOCATION_FIELD_LABEL_UPDATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedAt',
+                label: 'LNG_LOCATION_FIELD_LABEL_UPDATED_AT'
             })
         ];
     }
@@ -219,6 +243,11 @@ export class LocationsListComponent extends ListComponent implements OnInit {
      * Re(load) the list of Locations
      */
     refreshList(finishCallback: () => void) {
+        // retrieve created user & modified user information
+        this.queryBuilder.include('createdByUser', true);
+        this.queryBuilder.include('updatedByUser', true);
+
+        // refresh
         this.locationsList$ = this.locationDataService.getLocationsListByParent(this.parentId, this.queryBuilder)
             .pipe(
                 tap(this.checkEmptyList.bind(this)),

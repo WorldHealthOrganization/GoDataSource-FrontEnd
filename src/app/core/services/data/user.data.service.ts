@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { UserModel, UserSettings } from '../../models/user.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { PasswordChangeModel } from '../../models/password-change.model';
-import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/request-query-builder';
 import { SecurityQuestionModel } from '../../models/securityQuestion.model';
 import * as _ from 'lodash';
 import { mergeMap } from 'rxjs/operators';
@@ -36,6 +36,19 @@ export class UserDataService {
             this.http.get(`users?filter=${filter}`),
             UserModel
         );
+    }
+
+    /**
+     * Retrieve the list of Users sorted by firstName Asc, lastName Asc
+     * @returns {Observable<UserModel[]>}
+     */
+    getUsersListSorted(): Observable<UserModel[]> {
+        // retrieve user
+        const sortUserQb = new RequestQueryBuilder();
+        sortUserQb.sort
+            .by('firstName', RequestSortDirection.ASC)
+            .by('lastName', RequestSortDirection.ASC);
+        return this.getUsersList(sortUserQb);
     }
 
     /**

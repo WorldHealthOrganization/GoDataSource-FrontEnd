@@ -145,7 +145,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         ) {
             // retrieve follow-up information
             this.followUpsDataService
-                .getFollowUp(this.selectedOutbreak.id, this.contactId, this.followUpId)
+                .getFollowUp(this.selectedOutbreak.id, this.contactId, this.followUpId, true)
                 .pipe(
                     catchError((err) => {
                         // show error message
@@ -254,7 +254,13 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         // modify follow-up
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.followUpsDataService
-            .modifyFollowUp(this.selectedOutbreak.id, this.followUpData.personId, this.followUpData.id, dirtyFields)
+            .modifyFollowUp(
+                this.selectedOutbreak.id,
+                this.followUpData.personId,
+                this.followUpData.id,
+                dirtyFields,
+                true
+            )
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showError(err.message);

@@ -1,7 +1,7 @@
 import { CaseModel } from './case.model';
 import { ContactModel } from './contact.model';
 import { EventModel } from './event.model';
-import { EntityModel } from './entity.model';
+import { EntityModel } from './entity-and-relationship.model';
 import { EntityType } from './entity-type';
 import { RelationshipPersonModel } from './relationship-person.model';
 

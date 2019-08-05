@@ -8,7 +8,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { EntityModel } from '../../../../core/models/entity.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { AddressModel } from '../../../../core/models/address.model';
 import * as _ from 'lodash';

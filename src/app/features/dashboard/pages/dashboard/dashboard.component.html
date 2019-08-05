@@ -77,9 +77,7 @@
             class="page-content"
             fxLayout="column"
         >
-
             <div fxLayout="row" fxLayoutAlign="space-between">
-
                 <div fxFlex="33">
                     <mat-card class="dashboard-gauge">
                         <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE' | translate}}</div>
@@ -88,7 +86,8 @@
                             <app-case-summary-dashlet
                                 *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-case-summary-dashlet>
                         </div>
                     </mat-card>
@@ -104,7 +103,8 @@
                             <app-case-by-geographic-location-dashlet
                                 *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-case-by-geographic-location-dashlet>
                         </div>
                     </mat-card>
@@ -119,14 +119,13 @@
                             <app-cases-hospitalized-pie-chart-dashlet
                                 *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-cases-hospitalized-pie-chart-dashlet>
                         </div>
                     </mat-card>
                 </div>
-
             </div>
-            <!--</mat-card>-->
 
             <!-- Histogram - chains of transmission -->
             <mat-card class="page-section">
@@ -138,7 +137,8 @@
                 <app-histogram-transmission-chains-size-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                     [globalFilterDate]="globalFilterDate"
-                    [globalFilterLocationId]="globalFilterLocationId">
+                    [globalFilterLocationId]="globalFilterLocationId"
+                    [globalFilterClassificationId]="globalFilterClassificationId">
                 </app-histogram-transmission-chains-size-dashlet>
             </mat-card>
 
@@ -164,21 +164,24 @@
                 <app-epi-curve-dashlet
                     *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.CLASSIFICATION.value"
                     [globalFilterDate]="globalFilterDate"
-                    [globalFilterLocationId]="globalFilterLocationId">
+                    [globalFilterLocationId]="globalFilterLocationId"
+                    [globalFilterClassificationId]="globalFilterClassificationId">
                 </app-epi-curve-dashlet>
 
                 <!-- epi curve outcome -->
                 <app-epi-curve-outcome-dashlet
                     *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.OUTCOME.value"
                     [globalFilterDate]="globalFilterDate"
-                    [globalFilterLocationId]="globalFilterLocationId">
+                    [globalFilterLocationId]="globalFilterLocationId"
+                    [globalFilterClassificationId]="globalFilterClassificationId">
                 </app-epi-curve-outcome-dashlet>
 
                 <!-- epi curve reporting -->
                 <app-epi-curve-reporting-dashlet
                     *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.REPORTING.value"
                     [globalFilterDate]="globalFilterDate"
-                    [globalFilterLocationId]="globalFilterLocationId">
+                    [globalFilterLocationId]="globalFilterLocationId"
+                    [globalFilterClassificationId]="globalFilterClassificationId">
                 </app-epi-curve-reporting-dashlet>
             </mat-card>
 
@@ -206,7 +209,8 @@
                 <app-cases-based-on-contact-status-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                     [globalFilterDate]="globalFilterDate"
-                    [globalFilterLocationId]="globalFilterLocationId">
+                    [globalFilterLocationId]="globalFilterLocationId"
+                    [globalFilterClassificationId]="globalFilterClassificationId">
                 </app-cases-based-on-contact-status-dashlet>
             </mat-card>
 
@@ -249,7 +253,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-cases-deceased-dashlet>
 
                             <!-- Cases hospitalised -->
@@ -262,7 +267,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-cases-hospitalised-dashlet>
 
                             <!-- Cases with Less than x Contacts -->
@@ -276,7 +282,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-cases-less-contacts-dashlet>
 
                             <!-- New cases detected in the previous x days among contacts -->
@@ -290,7 +297,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-new-cases-previous-days-contacts-dashlet>
 
                             <!-- Cases refusing to be transferred to a treatment unit -->
@@ -304,7 +312,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-cases-refusing-treatment-dashlet>
 
                             <!-- New cases in previous x days in known transmission chains -->

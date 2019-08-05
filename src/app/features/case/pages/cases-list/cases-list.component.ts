@@ -28,11 +28,12 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
-import { EntityModel } from '../../../../core/models/entity.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-cases-list',
@@ -53,6 +54,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     // list of existing cases
     casesList$: Observable<CaseModel[]>;
     casesListCount$: Observable<any>;
+
+    // user list
+    userList$: Observable<UserModel[]>;
 
     caseClassifications$: Observable<any>;
     // cases grouped by classification
@@ -398,7 +402,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
         private genericDataService: GenericDataService,
-        private clusterDataService: ClusterDataService
+        private clusterDataService: ClusterDataService,
+        private userDataService: UserDataService
     ) {
         super(
             snackbarService,
@@ -415,6 +420,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // retrieve users
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
@@ -546,6 +554,22 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 field: 'deleted',
                 label: 'LNG_CASE_FIELD_LABEL_DELETED',
                 visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'createdBy',
+                label: 'LNG_CASE_FIELD_LABEL_CREATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'createdAt',
+                label: 'LNG_CASE_FIELD_LABEL_CREATED_AT'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedBy',
+                label: 'LNG_CASE_FIELD_LABEL_UPDATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedAt',
+                label: 'LNG_CASE_FIELD_LABEL_UPDATED_AT'
             })
         ];
     }
@@ -741,6 +765,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         if (this.selectedOutbreak) {
             // classification conditions - not really necessary since refreshListCount is always called before this one
             this.addClassificationConditions();
+
+            // retrieve created user & modified user information
+            this.queryBuilder.include('createdByUser', true);
+            this.queryBuilder.include('updatedByUser', true);
 
             // retrieve the list of Cases
             this.casesList$ = this.caseDataService

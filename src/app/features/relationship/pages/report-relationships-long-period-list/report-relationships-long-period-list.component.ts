@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { PERMISSION } from '../../../../core/models/permission.model';
@@ -9,12 +9,13 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
-import { ReportDifferenceOnsetRelationshipModel } from '../../../../core/models/relationship.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { tap } from 'rxjs/operators';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
+import { ReportDifferenceOnsetRelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-report-relationships-long-period',
@@ -22,7 +23,7 @@ import * as _ from 'lodash';
     templateUrl: './report-relationships-long-period-list.component.html',
     styleUrls: ['./report-relationships-long-period-list.component.less']
 })
-export class ReportRelationshipsLongPeriodListComponent extends ListComponent implements OnInit {
+export class ReportRelationshipsLongPeriodListComponent extends ListComponent implements OnInit, OnDestroy {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
@@ -34,6 +35,8 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
 
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
+
+    outbreakSubscriber: Subscription;
 
     // list of long periods in the dates of onset between cases in the chain of transmission i.e. indicate where an intermediate contact may have been missed
     relationshipList$: Observable<ReportDifferenceOnsetRelationshipModel[]>;
@@ -175,7 +178,7 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // subscribe to the Selected Outbreak Subject stream
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -183,6 +186,14 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
                 // refresh
                 this.needsRefreshList(true);
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**

@@ -11,6 +11,7 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { Subscriber, Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Moment } from '../../../../core/helperClasses/x-moment';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-histogram-transmission-chains-size-dashlet',
@@ -28,7 +29,6 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
         this._globalFilterDate = globalFilterDate;
         this.refreshDataCaller.call();
     }
-
     get globalFilterDate(): Moment {
         return this._globalFilterDate;
     }
@@ -39,9 +39,18 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
         this._globalFilterLocationId = globalFilterLocationId;
         this.refreshDataCaller.call();
     }
-
     get globalFilterLocationId(): string {
         return this._globalFilterLocationId;
+    }
+
+    // Global Filters => Case Classification
+    private _globalFilterClassificationId: string[];
+    @Input() set globalFilterClassificationId(globalFilterClassificationId: string[]) {
+        this._globalFilterClassificationId = globalFilterClassificationId;
+        this.refreshDataCaller.call();
+    }
+    get globalFilterClassificationId(): string[] {
+        return this._globalFilterClassificationId;
     }
 
     // outbreak
@@ -167,7 +176,8 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
         // construct global filter
         const global: {
             date?: Moment,
-            locationId?: string
+            locationId?: string,
+            classificationId?: string[]
         } = {};
 
         // do we have a global date set ?
@@ -178,6 +188,11 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
         // do we have a global location Id set ?
         if (!_.isEmpty(this.globalFilterLocationId)) {
             global.locationId = this.globalFilterLocationId;
+        }
+
+        // do we have a global classification Ids set ?
+        if (!_.isEmpty(this.globalFilterClassificationId)) {
+            global.classificationId = this.globalFilterClassificationId;
         }
 
         // do we need to include global filters ?
@@ -218,11 +233,31 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
                 );
             }
 
+            // person query
+            const personQuery = qb.addChildQueryBuilder('person');
+
+            // exclude discarded cases
+            personQuery.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
+
             // location
             if (this.globalFilterLocationId) {
-                qb.addChildQueryBuilder('person').filter.byEquality(
+                personQuery.filter.byEquality(
                     'addresses.parentLocationIdFilter',
                     this.globalFilterLocationId
+                );
+            }
+
+            // classification
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
+                personQuery.filter.bySelect(
+                    'classification',
+                    this.globalFilterClassificationId,
+                    false,
+                    null
                 );
             }
 

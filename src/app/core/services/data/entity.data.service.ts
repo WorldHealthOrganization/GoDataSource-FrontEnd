@@ -10,7 +10,7 @@ import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
 import { HttpClient } from '@angular/common/http';
 import * as _ from 'lodash';
-import { EntityModel } from '../../models/entity.model';
+import { EntityModel } from '../../models/entity-and-relationship.model';
 import { LabelValuePair } from '../../models/label-value-pair';
 import { Constants } from '../../models/constants';
 import { I18nService } from '../helper/i18n.service';

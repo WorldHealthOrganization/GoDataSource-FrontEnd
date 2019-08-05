@@ -50,6 +50,16 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
         return this._globalFilterLocationId;
     }
 
+    // Global Filters => Case Classification
+    private _globalFilterClassificationId: string[];
+    @Input() set globalFilterClassificationId(globalFilterClassificationId: string[]) {
+        this._globalFilterClassificationId = globalFilterClassificationId;
+        this.refreshDataCaller.call();
+    }
+    get globalFilterClassificationId(): string[] {
+        return this._globalFilterClassificationId;
+    }
+
     // outbreak
     outbreakId: string;
 
@@ -144,9 +154,9 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
         const chartData = {};
 
         // build chart data
-        _.forEach(metricData, (metric) => {
+        _.forEach(metricData, (metric: MetricCasesCountStratifiedOutcome) => {
             // create the array with categories ( dates displayed on x axis )
-            this.chartDataCategories.push(moment(metric.start).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+            this.chartDataCategories.push(metric.start.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
 
             // create an array with data for each classification
             _.each(metric.outcome, (data, key) => {
@@ -211,7 +221,12 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
             if (this.globalFilterDate) {
                 qb.filter.byEquality(
                     'endDate',
-                    this.globalFilterDate.format('YYYY-MM-DD')
+                    this.globalFilterDate.clone().endOf('day').toISOString()
+                );
+            } else {
+                qb.filter.byEquality(
+                    'endDate',
+                    moment().endOf('day').toISOString()
                 );
             }
 
@@ -228,6 +243,23 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
                 'periodType',
                 this.viewType
             );
+
+            // exclude discarded cases
+            qb.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
+
+            // classification
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
+                qb.filter.bySelect(
+                    'classification',
+                    this.globalFilterClassificationId,
+                    false,
+                    null
+                );
+            }
 
             // get data
             this.displayLoading = true;

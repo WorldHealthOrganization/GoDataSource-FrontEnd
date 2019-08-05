@@ -33,6 +33,7 @@ import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-com
 import { FollowUpPage } from '../../typings/follow-up-page';
 import { throwError } from 'rxjs';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -47,6 +48,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     authUser: UserModel;
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
+
+    // user list
+    userList$: Observable<UserModel[]>;
 
     // follow ups list
     followUpsList$: Observable<FollowUpModel[]>;
@@ -74,6 +78,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     caseId: string;
     caseData: CaseModel;
 
+    selectedTeamIdFilterValue: string;
+    selectedStatusFilterValue: string[];
+
     // which follow-ups list page are we visiting?
     rootPage: FollowUpPage = FollowUpPage.DAILY;
 
@@ -81,6 +88,12 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
 
     // subscribers
     outbreakSubscriber: Subscription;
+
+    teamWorkloadData: {
+        date: Moment,
+        team: string,
+        status: string[]
+    };
 
     recordActions: HoverRowAction[] = [
         // View Follow-up
@@ -190,7 +203,8 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
-        private caseDataService: CaseDataService
+        private caseDataService: CaseDataService,
+        private userDataService: UserDataService
     ) {
         super(
             snackbarService, dialogService, followUpsDataService,
@@ -208,48 +222,73 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
 
-        // set default filter rules
-        this.initializeHeaderFilters();
+        // retrieve users
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
-        this.route.params
-            .subscribe((params: { caseId }) => {
-                // case Id arrives only from cases list, view & modify pages
-                // coming directly to daily page doesn't provide us with a case id
-                this.caseId = params.caseId;
-
-                // no need to retrieve any data? then we can initialize breadcrumbs
-                if (!this.caseId) {
-                    this.initializeBreadcrumbs();
-                } else {
-                    this.rootPage = FollowUpPage.CASE_RELATED;
+        // retrieve query params
+        this.route.queryParams
+            .subscribe((queryParams: {
+                fromWorkload: boolean,
+                date: string,
+                team: string,
+                status: string[]
+            }) => {
+                // from team workload ?
+                if (queryParams.fromWorkload) {
+                    this.teamWorkloadData = {
+                        date: moment(queryParams.date),
+                        team: queryParams.team,
+                        status: queryParams.status ?
+                            queryParams.status :
+                            null,
+                    };
                 }
 
-                // outbreak subscriber
-                if (this.outbreakSubscriber) {
-                    this.outbreakSubscriber.unsubscribe();
-                    this.outbreakSubscriber = null;
-                }
+                // set default filter rules
+                this.initializeHeaderFilters();
 
-                // subscribe to the Selected Outbreak
-                this.outbreakSubscriber = this.outbreakDataService
-                    .getSelectedOutbreakSubject()
-                    .subscribe((selectedOutbreak: OutbreakModel) => {
-                        // selected outbreak
-                        this.selectedOutbreak = selectedOutbreak;
+                // retrieve route params
+                this.route.params
+                    .subscribe((routeParams: { caseId }) => {
+                        // case Id arrives only from cases list, view & modify pages
+                        // coming directly to daily page doesn't provide us with a case id
+                        this.caseId = routeParams.caseId;
 
-                        // retrieve case data
-                        if (this.caseId) {
-                            this.retrieveCaseData();
+
+                        // no need to retrieve any data? then we can initialize breadcrumbs
+                        if (!this.caseId) {
+                            this.initializeBreadcrumbs();
+                        } else {
+                            this.rootPage = FollowUpPage.CASE_RELATED;
                         }
 
-                        // initialize print and export
-                        this.initializeFollowUpsExport();
-                        this.initializeFollowUpsPrint();
+                        // outbreak subscriber
+                        if (this.outbreakSubscriber) {
+                            this.outbreakSubscriber.unsubscribe();
+                            this.outbreakSubscriber = null;
+                        }
 
-                        // initialize pagination
-                        this.initPaginator();
-                        // ...and re-load the list when the Selected Outbreak is changed
-                        this.needsRefreshList(true);
+                        // subscribe to the Selected Outbreak
+                        this.outbreakSubscriber = this.outbreakDataService
+                            .getSelectedOutbreakSubject()
+                            .subscribe((selectedOutbreak: OutbreakModel) => {
+                                // selected outbreak
+                                this.selectedOutbreak = selectedOutbreak;
+
+                                // retrieve case data
+                                if (this.caseId) {
+                                    this.retrieveCaseData();
+                                }
+
+                                // initialize print and export
+                                this.initializeFollowUpsExport();
+                                this.initializeFollowUpsPrint();
+
+                                // initialize pagination
+                                this.initPaginator();
+                                // ...and re-load the list when the Selected Outbreak is changed
+                                this.needsRefreshList(true);
+                            });
                     });
             });
 
@@ -293,7 +332,21 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     private initializeBreadcrumbs() {
         // add case / contact breadcrumbs
         if (!this.caseData) {
-            this.breadcrumbs = [
+            // init breadcrumbs
+            this.breadcrumbs = [];
+
+            // add team workload page if necessary
+            if (this.teamWorkloadData) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        'LNG_PAGE_TEAMS_WORKLOAD_TITLE',
+                        '/teams/workload'
+                    )
+                );
+            }
+
+            // add default breadcrumbs
+            this.breadcrumbs.push(
                 new BreadcrumbItemModel(
                     'LNG_PAGE_LIST_CONTACTS_TITLE',
                     '/contacts'
@@ -303,7 +356,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                     '.',
                     true
                 )
-            ];
+            );
         } else {
             this.breadcrumbs = [
                 new BreadcrumbItemModel(
@@ -384,6 +437,22 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 field: 'deleted',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
                 visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'createdBy',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'createdAt',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedBy',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedAt',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT'
             })
         ];
     }
@@ -420,7 +489,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             new FilterModel({
                 fieldName: 'index',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
-                type: FilterType.NUMBER
+                type: FilterType.RANGE_NUMBER
             }),
             new FilterModel({
                 fieldName: 'teamId',
@@ -728,7 +797,38 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      * Initialize header filters
      */
     initializeHeaderFilters() {
-        this.dateFilterDefaultValue = moment().startOf('day');
+        // from workload page ?
+        if (this.teamWorkloadData) {
+            // date
+            this.dateFilterDefaultValue = this.teamWorkloadData.date.clone().startOf('day');
+
+            // team
+            this.selectedTeamIdFilterValue = this.teamWorkloadData.team ?
+                this.teamWorkloadData.team :
+                null;
+
+            // make sure we filter by team first time
+            this.filterByTeam(new LabelValuePair(
+                '',
+                this.selectedTeamIdFilterValue
+            ));
+
+            // filter by status ?
+            if (this.teamWorkloadData.status) {
+                this.selectedStatusFilterValue = this.teamWorkloadData.status;
+
+                // filter by status
+                this.filterBySelectField(
+                    'statusId',
+                    this.selectedStatusFilterValue,
+                    null
+                );
+            }
+        } else {
+            this.dateFilterDefaultValue = moment().startOf('day');
+            this.selectedTeamIdFilterValue = this.teamIdFilterValue;
+        }
+
         this.filterByFollowUpDate(this.dateFilterDefaultValue);
     }
 
@@ -751,6 +851,10 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             if (this.caseId) {
                 this.queryBuilder.addChildQueryBuilder('case').filter.byEquality('id', this.caseId);
             }
+
+            // retrieve created user & modified user information
+            this.queryBuilder.include('createdByUser', true);
+            this.queryBuilder.include('updatedByUser', true);
 
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService

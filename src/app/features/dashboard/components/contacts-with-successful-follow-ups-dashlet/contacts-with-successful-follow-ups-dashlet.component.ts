@@ -4,6 +4,7 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 import { MetricContactsWithSuccessfulFollowUp } from '../../../../core/models/metrics/metric.contacts-with-success-follow-up.model';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { Subscription } from 'rxjs';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-contacts-with-successful-follow-ups-dashlet',
@@ -21,6 +22,9 @@ export class ContactsWithSuccessfulFollowUpsDashletComponent extends DashletComp
 
     // loading data
     displayLoading: boolean = false;
+
+    // for which date do we display data ?
+    dataForDate: Moment = moment();
 
     // subscribers
     previousSubscriber: Subscription;
@@ -56,6 +60,12 @@ export class ContactsWithSuccessfulFollowUpsDashletComponent extends DashletComp
             this.previousSubscriber = null;
         }
 
+        // update date
+        this.dataForDate = this.globalFilterDate ?
+            this.globalFilterDate.clone() :
+            moment();
+
+        // retrieve data
         this.displayLoading = true;
         this.previousSubscriber = this.listFilterDataService.filterContactsWithSuccessfulFollowup(this.globalFilterDate, this.globalFilterLocationId)
             .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {

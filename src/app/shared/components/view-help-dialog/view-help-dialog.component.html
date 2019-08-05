@@ -12,6 +12,13 @@
     </div>
 
     <div>
+        <!-- Hover question effects / actions -->
+        <app-hover-row-actions
+            #hoverRow
+            [active]="!refreshingList"
+            leftSideClass="hover-row-actions-mat-table-left"
+        ></app-hover-row-actions>
+
         <mat-table #table [dataSource]="helpItemsList$ | async" matSort (matSortChange)="sortBy($event)">
             <!-- Title -->
             <ng-container matColumnDef="title">
@@ -55,31 +62,24 @@
                 </mat-cell>
             </ng-container>
 
-            <!-- View -->
-            <ng-container matColumnDef="view">
-                <mat-header-cell *matHeaderCellDef fxFlex="120px">
-                    <div class="table-header-cell">
-                        <div mat-sort-header class="column-header"><!-- placeholder --></div>
-                        <div class="column-filter"><!-- placeholder --></div>
-                    </div>
-                </mat-header-cell>
-
-                <mat-cell *matCellDef="let item" fxFlex="120px">
-                    <button
-                        mat-flat-button
-                        type="button"
-                        (click)="viewHelpItemDetails(item)">
-                        {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
-                    </button>
-                </mat-cell>
-            </ng-container>
-
             <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-            <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+            <mat-row
+                *matRowDef="let item; columns: getTableColumns()"
+                app-hover-row-actions
+                [hoverRowActionsComponent]="hoverRow"
+                [hoverRowActions]="recordActions"
+                [hoverRowActionData]="item"
+            ></mat-row>
         </mat-table>
 
         <div
-            *ngIf="isEmptyList"
+            *ngIf="refreshingList"
+            class="mat-table-loading-data">
+            <mat-spinner></mat-spinner>
+        </div>
+
+        <div
+            *ngIf="!refreshingList && isEmptyList"
             class="mat-table">
             <div class="mat-row">
                 <div class="mat-cell">

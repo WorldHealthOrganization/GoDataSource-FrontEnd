@@ -77,8 +77,16 @@ export class CasesHospitalisedDashletComponent extends DashletComponent implemen
             // add global filters
             const qb = this.getGlobalFilterQB(
                 null,
-                'addresses.parentLocationIdFilter'
+                'addresses.parentLocationIdFilter',
+                true
             );
+
+            // exclude discarded cases
+            qb.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
 
             // release previous subscriber
             if (this.previousSubscriber) {

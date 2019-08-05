@@ -8,7 +8,7 @@ import { StorageKey, StorageService } from '../helper/storage.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { AuthDataService } from './auth.data.service';
 import { SnackbarService } from '../helper/snackbar.service';
-import { EntityModel } from '../../models/entity.model';
+import { EntityModel } from '../../models/entity-and-relationship.model';
 import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
@@ -112,11 +112,15 @@ export class OutbreakDataService {
     /**
      * Retrieve an Outbreak
      * @param {string} outbreakId
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<OutbreakModel>}
      */
-    getOutbreak(outbreakId: string): Observable<OutbreakModel> {
+    getOutbreak(
+        outbreakId: string,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<OutbreakModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}`),
+            this.http.get(`outbreaks/${outbreakId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`),
             OutbreakModel
         );
     }
@@ -125,11 +129,16 @@ export class OutbreakDataService {
      * Modify an existing Outbreak
      * @param {string} outbreakId
      * @param data
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<OutbreakModel>}
      */
-    modifyOutbreak(outbreakId: string, data: any): Observable<OutbreakModel> {
+    modifyOutbreak(
+        outbreakId: string,
+        data: any,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<OutbreakModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.patch(`outbreaks/${outbreakId}`, data)
+            this.http.patch(`outbreaks/${outbreakId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, data)
                 .pipe(
                     mergeMap((res) => {
                         // re-determine the selected Outbreak

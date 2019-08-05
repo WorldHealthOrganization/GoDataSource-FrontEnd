@@ -15,6 +15,9 @@ export class OutbreakResolver implements Resolve<Observable<OutbreakModel>> {
     resolve(
         route: ActivatedRouteSnapshot
     ) {
-        return this.outbreakDataService.getOutbreak(route.paramMap.get('outbreakId'));
+        return this.outbreakDataService.getOutbreak(
+            route.paramMap.get('outbreakId'),
+            true
+        );
     }
 }

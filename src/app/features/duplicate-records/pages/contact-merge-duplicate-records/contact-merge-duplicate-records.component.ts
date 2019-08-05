@@ -9,7 +9,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-import { EntityModel } from '../../../../core/models/entity.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { I18nService } from '../../../../core/services/helper/i18n.service';

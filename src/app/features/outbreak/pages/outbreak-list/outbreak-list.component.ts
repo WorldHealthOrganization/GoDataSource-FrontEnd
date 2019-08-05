@@ -56,6 +56,9 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     // authenticated user
     authUser: UserModel;
 
+    // user list
+    userList$: Observable<UserModel[]>;
+
     geographicalLevelsList$: Observable<any[]>;
 
     // provide constants to template
@@ -250,6 +253,9 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                 )
             );
 
+        // retrieve users
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
+
         // initialize Side Table Columns
         this.initializeSideTableColumns();
 
@@ -300,6 +306,22 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                 field: 'deleted',
                 label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
                 visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'createdBy',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'createdAt',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_AT'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedBy',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedAt',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_AT'
             })
         ];
     }
@@ -308,6 +330,10 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
      * Re(load) the Outbreaks list
      */
     refreshList(finishCallback: () => void) {
+        // retrieve created user & modified user information
+        this.queryBuilder.include('createdByUser', true);
+        this.queryBuilder.include('updatedByUser', true);
+
         // retrieve the list of Outbreaks
         this.outbreaksList$ = this.outbreakDataService
             .getOutbreaksList(this.queryBuilder)

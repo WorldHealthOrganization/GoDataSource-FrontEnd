@@ -492,7 +492,7 @@
             </mat-cell>
         </ng-container>
 
-        <!--Was contact-->
+        <!-- Was contact -->
         <ng-container matColumnDef="wasContact">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -516,6 +516,108 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Created By -->
+        <ng-container matColumnDef="createdBy">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_CASE_FIELD_LABEL_CREATED_BY' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="createdByFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="userList$ | async"
+                            (optionChanged)="filterBySelectField('createdBy', $event, 'id')"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            [multiple]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.createdByUser?.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Created At -->
+        <ng-container matColumnDef="createdAt">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_CASE_FIELD_LABEL_CREATED_AT' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="createdAtFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('createdAt', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                {{ item.createdAt | dateTimeDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Modified By -->
+        <ng-container matColumnDef="updatedBy">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_CASE_FIELD_LABEL_UPDATED_BY' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="updatedByFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="userList$ | async"
+                            (optionChanged)="filterBySelectField('updatedBy', $event, 'id')"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            [multiple]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.updatedByUser?.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Updated At -->
+        <ng-container matColumnDef="updatedAt">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_CASE_FIELD_LABEL_UPDATED_AT' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="updatedAtFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('updatedAt', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                {{ item.updatedAt | dateTimeDefault }}
+            </mat-cell>
+        </ng-container>
+
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
         <mat-row
             *matRowDef="let item; columns: visibleTableColumns"
@@ -527,7 +629,13 @@
     </mat-table>
 
     <div
-        *ngIf="isEmptyList"
+        *ngIf="refreshingList"
+        class="mat-table-loading-data">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div
+        *ngIf="!refreshingList && isEmptyList"
         class="mat-table"
     >
         <div class="mat-row">

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -16,6 +16,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { tap } from 'rxjs/operators';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-transmission-chains-list',
@@ -23,12 +24,14 @@ import { tap } from 'rxjs/operators';
     templateUrl: './transmission-chains-list.component.html',
     styleUrls: ['./transmission-chains-list.component.less']
 })
-export class TransmissionChainsListComponent extends ListComponent implements OnInit {
+export class TransmissionChainsListComponent extends ListComponent implements OnInit, OnDestroy {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', '/transmission-chains'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE', null, true)
     ];
+
+    outbreakSubscriber: Subscription;
 
     // authenticated user
     authUser: UserModel;
@@ -77,7 +80,7 @@ export class TransmissionChainsListComponent extends ListComponent implements On
             });
 
         // subscribe to the Selected Outbreak Subject stream
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -85,6 +88,14 @@ export class TransmissionChainsListComponent extends ListComponent implements On
                 // re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**

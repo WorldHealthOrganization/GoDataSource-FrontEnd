@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Observable } from 'rxjs';
@@ -24,6 +24,8 @@ import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-lab-results',
@@ -31,7 +33,7 @@ import { Router } from '@angular/router';
     encapsulation: ViewEncapsulation.None,
     styleUrls: ['./lab-results-list.component.less']
 })
-export class LabResultsListComponent extends ListComponent implements OnInit {
+export class LabResultsListComponent extends ListComponent implements OnInit, OnDestroy {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_LAB_RESULTS_TITLE', '.', true),
@@ -47,10 +49,15 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
     labTestResultsList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any>;
 
+    // user list
+    userList$: Observable<UserModel[]>;
+
     // authenticated user
     authUser: UserModel;
     // selected outbreak
     selectedOutbreak: OutbreakModel;
+
+    outbreakSubscriber: Subscription;
 
     // available side filters
     availableSideFilters: FilterModel[];
@@ -149,7 +156,8 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
         private labResultDataService: LabResultDataService,
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private userDataService: UserDataService
     ) {
         super(snackbarService);
     }
@@ -164,8 +172,11 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
         this.labTestResultsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT).pipe(share());
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions().pipe(share());
 
+        // retrieve users
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
+
         // subscribe to the Selected Outbreak
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -181,6 +192,14 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
 
         // initialize side filters
         this.initializeSideFilters();
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
@@ -241,6 +260,22 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
                 field: 'deleted',
                 label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DELETED',
                 visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'createdBy',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'createdAt',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_AT'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedBy',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedAt',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_AT'
             })
         ];
     }
@@ -314,6 +349,10 @@ export class LabResultsListComponent extends ListComponent implements OnInit {
      */
     refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
+            // retrieve created user & modified user information
+            this.queryBuilder.include('createdByUser', true);
+            this.queryBuilder.include('updatedByUser', true);
+
             // retrieve the list of lab results
             this.labResultsList$ = this.labResultDataService.getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(

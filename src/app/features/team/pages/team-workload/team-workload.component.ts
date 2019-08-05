@@ -160,13 +160,13 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                 this.i18nService.instant('LNG_PAGE_TEAMS_WORKLOAD_TEAM_LABEL')
             ];
             const currentDate = moment(this.sliderDateFilterValue.low);
-            while (currentDate.isBefore(this.sliderDateFilterValue.high)) {
+            while (currentDate.isSameOrBefore(this.sliderDateFilterValue.high)) {
                 dates.push(currentDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
                 currentDate.add(1, 'days');
             }
 
             // retrieve data
-            if (dates.length > 2) {
+            if (dates.length > 1) {
                 // add filter period
                 this.queryBuilder.filter.byDateRange(
                     'date', {

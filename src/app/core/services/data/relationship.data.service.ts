@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ReportDifferenceOnsetRelationshipModel, RelationshipModel } from '../../models/relationship.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { MetricContactsPerCaseModel } from '../../models/metrics/metric-contacts-per-case.model';
@@ -13,7 +12,7 @@ import { ReportCasesWithOnsetModel } from '../../models/report-cases-with-onset.
 import { LabelValuePair } from '../../models/label-value-pair';
 import { Constants } from '../../models/constants';
 import * as _ from 'lodash';
-import { EntityModel } from '../../models/entity.model';
+import { EntityModel, RelationshipModel, ReportDifferenceOnsetRelationshipModel } from '../../models/entity-and-relationship.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
 import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';

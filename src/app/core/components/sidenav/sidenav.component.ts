@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
 import { PERMISSION } from '../../models/permission.model';
@@ -7,6 +7,7 @@ import { ChildNavItem, NavItem } from './nav-item.class';
 import { OutbreakDataService } from '../../services/data/outbreak.data.service';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { SnackbarService } from '../../services/helper/snackbar.service';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-sidenav',
@@ -14,7 +15,9 @@ import { SnackbarService } from '../../services/helper/snackbar.service';
     templateUrl: './sidenav.component.html',
     styleUrls: ['./sidenav.component.less']
 })
-export class SidenavComponent implements OnInit {
+export class SidenavComponent implements OnInit, OnDestroy {
+
+    outbreakSubscriber: Subscription;
 
     // authenticated user
     authUser: UserModel;
@@ -410,7 +413,7 @@ export class SidenavComponent implements OnInit {
         }
 
         // subscribe to the selected outbreak stream
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((outbreak: OutbreakModel) => {
                 if (outbreak) {
@@ -418,6 +421,14 @@ export class SidenavComponent implements OnInit {
                     this.selectedOutbreak = outbreak;
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**

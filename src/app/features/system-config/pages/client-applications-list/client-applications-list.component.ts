@@ -307,7 +307,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                 const cleanClientApplication: SystemClientApplicationModel = _.cloneDeep(clientApplication);
                 cleanClientApplication.active = !clientApplication.active;
                 delete cleanClientApplication.outbreaks;
-                const clientApplicationItem: SystemClientApplicationModel = _.find(settings.clientApplications, cleanClientApplication);
+                const clientApplicationItem: SystemClientApplicationModel = _.find(settings.clientApplications, cleanClientApplication) as SystemClientApplicationModel;
                 if (clientApplicationItem) {
                     // set flag
                     clientApplicationItem.active = clientApplication.active;

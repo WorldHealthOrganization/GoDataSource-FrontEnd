@@ -193,7 +193,7 @@
     </ng-container>
 
     <div
-        *ngIf="isEmptyList"
+        *ngIf="!refreshingList && isEmptyList"
         class="mat-table"
     >
         <div class="mat-row">

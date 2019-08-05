@@ -1,8 +1,7 @@
 import * as _ from 'lodash';
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, AfterViewInit } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, FormControl } from '@angular/forms';
 import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
-import { RelationshipModel } from '../../../core/models/relationship.model';
 import { Observable } from 'rxjs';
 import { ClusterDataService } from '../../../core/services/data/cluster.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
@@ -13,6 +12,8 @@ import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { Constants } from '../../../core/models/constants';
 import { share } from 'rxjs/operators';
 import { moment } from '../../../core/helperClasses/x-moment';
+import { RelationshipModel } from '../../../core/models/entity-and-relationship.model';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-form-relationship-quick',
@@ -25,7 +26,7 @@ import { moment } from '../../../core/helperClasses/x-moment';
         multi: true
     }]
 })
-export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel> implements OnInit, AfterViewInit, GroupDirtyFields {
+export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel> implements OnInit, AfterViewInit, GroupDirtyFields, OnDestroy {
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
 
@@ -37,6 +38,8 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
     clusterOptions$: Observable<any[]>;
 
     currentDate = Constants.getCurrentDate();
+
+    outbreakSubscriber: Subscription;
 
     // selected outbreak
     selectedOutbreak: OutbreakModel;
@@ -69,7 +72,7 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
         this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION);
 
         // subscribe to the Selected Outbreak
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -78,6 +81,14 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
                     this.clusterOptions$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id);
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     ngAfterViewInit() {

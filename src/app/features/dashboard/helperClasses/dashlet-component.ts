@@ -27,6 +27,16 @@ export abstract class DashletComponent {
         return this._globalFilterLocationId;
     }
 
+    // Global Filters => Case Classification
+    private _globalFilterClassificationId: string[];
+    @Input() set globalFilterClassificationId(globalFilterClassificationId: string[]) {
+        this._globalFilterClassificationId = globalFilterClassificationId;
+        this.refreshDataCaller.call();
+    }
+    get globalFilterClassificationId(): string[] {
+        return this._globalFilterClassificationId;
+    }
+
     @Output() hide = new EventEmitter<void>();
     @Output() moveBefore = new EventEmitter<void>();
     @Output() moveAfter = new EventEmitter<void>();
@@ -65,13 +75,17 @@ export abstract class DashletComponent {
      */
     getGlobalFilterQB(
         dateFieldPath: string | null,
-        locationFieldPath: string | null
+        locationFieldPath: string | null,
+        classification: boolean
     ): RequestQueryBuilder {
         return this.listFilterDataService.getGlobalFilterQB(
             dateFieldPath,
             this.globalFilterDate,
             locationFieldPath,
-            this.globalFilterLocationId
+            this.globalFilterLocationId,
+            classification ?
+                this.globalFilterClassificationId :
+                null
         );
     }
 
@@ -85,7 +99,8 @@ export abstract class DashletComponent {
         // construct global filter
         const global: {
             date?: Moment,
-            locationId?: string
+            locationId?: string,
+            classificationId?: string[]
         } = {};
 
         // do we have a global date set ?
@@ -96,6 +111,11 @@ export abstract class DashletComponent {
         // do we have a global location Id set ?
         if (!_.isEmpty(this.globalFilterLocationId)) {
             global.locationId = this.globalFilterLocationId;
+        }
+
+        // do we have a global classification Ids set ?
+        if (!_.isEmpty(this.globalFilterClassificationId)) {
+            global.classificationId = this.globalFilterClassificationId;
         }
 
         // do we need to include global filters ?

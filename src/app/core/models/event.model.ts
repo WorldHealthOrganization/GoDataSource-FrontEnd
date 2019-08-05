@@ -3,8 +3,9 @@ import { AddressModel } from './address.model';
 import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
+import { BaseModel } from './base.model';
 
-export class EventModel {
+export class EventModel extends BaseModel {
     id: string;
     name: string;
     date: string;
@@ -15,7 +16,6 @@ export class EventModel {
     dateOfReporting: string;
     isDateOfReportingApproximate: boolean;
     outbreakId: string;
-    deleted: boolean;
 
     inconsistencies: InconsistencyModel[];
     relationship: any;
@@ -23,6 +23,8 @@ export class EventModel {
     matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
 
     constructor(data = null) {
+        super(data);
+
         this.id = _.get(data, 'id');
         this.name = _.get(data, 'name');
         this.date = _.get(data, 'date');
@@ -31,7 +33,6 @@ export class EventModel {
         this.dateOfReporting = _.get(data, 'dateOfReporting');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.outbreakId = _.get(data, 'outbreakId');
-        this.deleted = _.get(data, 'deleted');
 
         // we need the object to use the custom getter that constructs the address from all fields
         const location = _.get(data, 'location');

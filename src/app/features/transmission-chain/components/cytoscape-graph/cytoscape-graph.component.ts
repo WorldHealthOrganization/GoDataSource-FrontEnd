@@ -15,7 +15,7 @@ import { TransmissionChainModel } from '../../../../core/models/transmission-cha
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { EntityModel } from '../../../../core/models/entity.model';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ViewCotNodeDialogComponent } from '../../../../shared/components/view-cot-node-dialog/view-cot-node-dialog.component';
@@ -29,7 +29,6 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { EventModel } from '../../../../core/models/event.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { UserModel } from '../../../../core/models/user.model';

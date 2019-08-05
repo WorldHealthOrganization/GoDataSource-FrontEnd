@@ -9,13 +9,14 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { PERMISSION } from '../../../../core/models/permission.model';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 
 @Component({
     selector: 'app-reference-data-category-entries-list',
@@ -33,6 +34,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
     categoryId: ReferenceDataCategory;
 
     authUser: UserModel;
+
+    UserSettings = UserSettings;
 
     recordActions: HoverRowAction[] = [
         // View Item
@@ -91,6 +94,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
         // get the route params
         this.route.params
             .subscribe((params: { categoryId }) => {
@@ -108,6 +112,62 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                         );
                     });
             });
+
+        // initialize Side Table Columns
+        this.initializeSideTableColumns();
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'label',
+                label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE'
+            }),
+            new VisibleColumnModel({
+                field: 'description',
+                label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION'
+            }),
+            new VisibleColumnModel({
+                field: 'icon',
+                label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON'
+            }),
+            new VisibleColumnModel({
+                field: 'color',
+                label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR'
+            }),
+            new VisibleColumnModel({
+                field: 'order',
+                label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER'
+            }),
+            new VisibleColumnModel({
+                field: 'active',
+                label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE'
+            }),
+            new VisibleColumnModel({
+                field: 'readonly',
+                label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_SYSTEM_VALUE'
+            }),
+            new VisibleColumnModel({
+                field: 'createdBy',
+                label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'createdAt',
+                label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_AT'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedBy',
+                label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'updatedAt',
+                label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_AT'
+            })
+        ];
     }
 
     refreshList(finishCallback: () => void) {
@@ -153,22 +213,6 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                         });
                 }
             });
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'label',
-            'description',
-            'icon',
-            'color',
-            'order',
-            'active',
-            'readonly'
-        ];
     }
 
     /**

@@ -30,7 +30,6 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
         this._globalFilterDate = globalFilterDate;
         this.refreshDataCaller.call();
     }
-
     get globalFilterDate(): Moment {
         return this._globalFilterDate;
     }
@@ -41,9 +40,18 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
         this._globalFilterLocationId = globalFilterLocationId;
         this.refreshDataCaller.call();
     }
-
     get globalFilterLocationId(): string {
         return this._globalFilterLocationId;
+    }
+
+    // Global Filters => Case Classification
+    private _globalFilterClassificationId: string[];
+    @Input() set globalFilterClassificationId(globalFilterClassificationId: string[]) {
+        this._globalFilterClassificationId = globalFilterClassificationId;
+        this.refreshDataCaller.call();
+    }
+    get globalFilterClassificationId(): string[] {
+        return this._globalFilterClassificationId;
     }
 
     // outbreak
@@ -164,7 +172,7 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
                 queryParams: {
                     global: JSON.stringify(global),
                     applyListFilter: Constants.APPLY_LIST_FILTER.CASE_SUMMARY,
-                    x: pressed.extra,
+                    x: pressed.extra
                 }
             });
     }
@@ -216,6 +224,23 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
                 qb.filter.byEquality(
                     'addresses.parentLocationIdFilter',
                     this.globalFilterLocationId
+                );
+            }
+
+            // ignore not a case records
+            qb.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
+
+            // classification
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
+                qb.filter.bySelect(
+                    'classification',
+                    this.globalFilterClassificationId,
+                    false,
+                    null
                 );
             }
 

@@ -258,10 +258,16 @@ export class ListFilterDataService {
      * Create the query builder for filtering the list of cases
      * @param date
      * @param location
+     * @param classificationId
      * @param {number} noLessContacts
      * @returns {Observable<RequestQueryBuilder>}
      */
-    filterCasesLessThanContacts(date, location, noLessContacts): Observable<RequestQueryBuilder> {
+    filterCasesLessThanContacts(
+        date,
+        location,
+        classificationId,
+        noLessContacts
+    ): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // add global filters
             const qb = new RequestQueryBuilder();
@@ -282,6 +288,18 @@ export class ListFilterDataService {
             if (location) {
                 qb.include('people').queryBuilder.filter
                     .byEquality('addresses.parentLocationIdFilter', location);
+            }
+
+            // classification
+            if (!_.isEmpty(classificationId)) {
+                qb.include('people').queryBuilder.filter
+                    .where({
+                        and: [{
+                            classification: {
+                                inq: classificationId
+                            }
+                        }]
+                    });
             }
 
             // convert noLessContacts to number as the API expects
@@ -420,18 +438,32 @@ export class ListFilterDataService {
      * Create the query builder for filtering the list of cases
      * @param date
      * @param location
+     * @param classificationId
      * @param {number} noDaysAmongContacts
      * @returns {Observable<RequestQueryBuilder>}
      */
-    filterCasesAmongKnownContacts(date, location, noDaysAmongContacts): Observable<RequestQueryBuilder> {
+    filterCasesAmongKnownContacts(
+        date,
+        location,
+        classificationId,
+        noDaysAmongContacts
+    ): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // add global filters
             const qb = this.getGlobalFilterQB(
                 null,
                 null,
                 'addresses.parentLocationIdFilter',
-                location
+                location,
+                classificationId
             );
+
+            // exclude discarded cases
+            qb.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
 
             // change the way we build query
             qb.filter.firstLevelConditions();
@@ -647,12 +679,14 @@ export class ListFilterDataService {
      * @param dateFieldValue
      * @param locationFieldPath
      * @param locationFieldValue
+     * @param classificationFieldValue
      */
     getGlobalFilterQB(
         dateFieldPath: string,
         dateFieldValue: Moment,
         locationFieldPath: string,
-        locationFieldValue: string
+        locationFieldValue: string,
+        classificationFieldValue?: string[]
     ): RequestQueryBuilder {
         // construct query builder
         const qb = new RequestQueryBuilder();
@@ -679,6 +713,17 @@ export class ListFilterDataService {
                 locationFieldPath,
                 locationFieldValue
             );
+        }
+
+        // classification
+        if (!_.isEmpty(classificationFieldValue)) {
+            qb.filter.where({
+                and: [{
+                    classification: {
+                        inq: classificationFieldValue
+                    }
+                }]
+            });
         }
 
         // finished

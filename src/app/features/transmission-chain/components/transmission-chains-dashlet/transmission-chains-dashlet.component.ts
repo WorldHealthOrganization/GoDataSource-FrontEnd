@@ -52,7 +52,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
     Constants = Constants;
     showSettings: boolean = false;
-    filters: any = {};
+    filters: any | TransmissionChainFilters = {};
     resetFiltersData: any;
     locationsList: LocationModel[];
     personName: string = '';
@@ -208,7 +208,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             // do we need to decode global filters ?
             const global: {
                 date?: Moment,
-                locationId?: string
+                locationId?: string,
+                classificationId?: string[]
             } = !queryParams.global ?
                 {} : (
                     _.isString(queryParams.global) ?
@@ -229,6 +230,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             // location
             if (global.locationId) {
                 this.filters.locationId = global.locationId;
+            }
+
+            // classification
+            if (global.classificationId) {
+                this.filters.classificationId = global.classificationId;
             }
         });
 
@@ -300,14 +306,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             const requestQueryBuilder = new RequestQueryBuilder();
             requestQueryBuilder.filter.firstLevelConditions();
 
-            // do we have person filters?
-            if (!_.isEmpty(this.filters)) {
-                // include custom person builder that will handle these filters
-                const personRequestQueryBuilder: RequestQueryBuilder = requestQueryBuilder.addChildQueryBuilder('person');
-                const filterObject = new TransmissionChainFilters(this.filters);
-                filterObject.attachConditionsToRequestQueryBuilder(personRequestQueryBuilder);
-            }
-
             // do we have chainIncludesPerson filters ?
             if (this.personId) {
                 // include custom person builder that will handle these filters
@@ -337,6 +335,23 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             // add flags
             if (this.filters.showContacts) {
                 requestQueryBuilder.filter.flag('includeContacts', 1);
+            }
+
+            // person query
+            const personQuery = requestQueryBuilder.addChildQueryBuilder('person');
+
+            // exclude discarded cases
+            personQuery.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
+
+            // attach other filters ( locations & classifications & others... )
+            if (!_.isEmpty(this.filters)) {
+                // include custom person builder that will handle these filters
+                const filterObject = new TransmissionChainFilters(this.filters);
+                filterObject.attachConditionsToRequestQueryBuilder(personQuery);
             }
 
             // get chain data and convert to graph nodes

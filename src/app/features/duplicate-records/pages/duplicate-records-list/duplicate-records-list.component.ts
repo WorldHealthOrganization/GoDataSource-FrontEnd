@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -14,8 +14,9 @@ import { AddressModel } from '../../../../core/models/address.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { FormControl, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { EntityModel } from '../../../../core/models/entity.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { share, tap } from 'rxjs/operators';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-duplicate-records-list',
@@ -23,10 +24,12 @@ import { share, tap } from 'rxjs/operators';
     templateUrl: './duplicate-records-list.component.html',
     styleUrls: ['./duplicate-records-list.component.less']
 })
-export class DuplicateRecordsListComponent extends ListComponent implements OnInit {
+export class DuplicateRecordsListComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '.', true)
     ];
+
+    outbreakSubscriber: Subscription;
 
     // constants
     EntityType = EntityType;
@@ -72,7 +75,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // subscribe to the Selected Outbreak
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -82,6 +85,14 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**

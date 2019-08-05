@@ -3,14 +3,14 @@ import { AddressModel } from './address.model';
 import { ContactModel } from './contact.model';
 import { DateDefaultPipe } from '../../shared/pipes/date-default-pipe/date-default.pipe';
 import { IAnswerData, QuestionModel } from './question.model';
+import { BaseModel } from './base.model';
 
-export class FollowUpModel {
+export class FollowUpModel extends BaseModel {
     id: string;
     date: string;
     address: AddressModel;
     personId: string;
     contact: ContactModel;
-    deleted: boolean;
     targeted: boolean;
     questionnaireAnswers: {
         [variable: string]: IAnswerData[];
@@ -26,10 +26,11 @@ export class FollowUpModel {
         data = null,
         includeContact: boolean = true
     ) {
+        super(data);
+
         this.id = _.get(data, 'id');
         this.date = _.get(data, 'date');
         this.personId = _.get(data, 'personId');
-        this.deleted = _.get(data, 'deleted');
         this.targeted = _.get(data, 'targeted', true);
         this.statusId = _.get(data, 'statusId');
         this.outbreakId = _.get(data, 'outbreakId');

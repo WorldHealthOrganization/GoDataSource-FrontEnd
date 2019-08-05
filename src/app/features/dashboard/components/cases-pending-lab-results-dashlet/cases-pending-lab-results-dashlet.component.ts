@@ -77,7 +77,8 @@ export class CasesPendingLabResultsDashletComponent extends DashletComponent imp
             // add global filters
             const qb = this.getGlobalFilterQB(
                 null,
-                'addresses.parentLocationIdFilter'
+                'addresses.parentLocationIdFilter',
+                true
             );
 
             // date

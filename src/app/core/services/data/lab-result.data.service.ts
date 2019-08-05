@@ -61,10 +61,11 @@ export class LabResultDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<any> {
-
         const filter = queryBuilder.buildQuery();
-
-        return this.http.get(`outbreaks/${outbreakId}/lab-results/aggregate?filter=${filter}`);
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/lab-results/aggregate?filter=${filter}`),
+            LabResultModel
+        );
     }
 
     /**
@@ -97,11 +98,17 @@ export class LabResultDataService {
      * @param {string} outbreakId
      * @param {string} labResultId
      * @param labResultData
+     * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<LabResultModel>}
      */
-    modifyLabResult(outbreakId: string, labResultId: string, labResultData): Observable<LabResultModel> {
+    modifyLabResult(
+        outbreakId: string,
+        labResultId: string,
+        labResultData,
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<LabResultModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.put(`outbreaks/${outbreakId}/lab-results/${labResultId}`, labResultData),
+            this.http.put(`outbreaks/${outbreakId}/lab-results/${labResultId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, labResultData),
             LabResultModel
         );
     }
