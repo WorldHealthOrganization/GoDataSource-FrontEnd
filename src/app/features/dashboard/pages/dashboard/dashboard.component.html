@@ -195,7 +195,8 @@
                 <app-contact-follow-up-overview-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                     [globalFilterDate]="globalFilterDate"
-                    [globalFilterLocationId]="globalFilterLocationId">
+                    [globalFilterLocationId]="globalFilterLocationId"
+                    [globalFilterClassificationId]="globalFilterClassificationId">
                 </app-contact-follow-up-overview-dashlet>
             </mat-card>
 
