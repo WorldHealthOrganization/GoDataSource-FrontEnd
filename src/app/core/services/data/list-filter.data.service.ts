@@ -710,9 +710,14 @@ export class ListFilterDataService {
      * Create the query builder for filtering the contacts that have been successfully followed up
      * @param {date} date
      * @param {string} location
+     * @param {string[]} lassificationId
      * @returns {Observable<any>}
      */
-    filterContactsWithSuccessfulFollowup(date: Moment, location: string): Observable<any> {
+    filterContactsWithSuccessfulFollowup(
+        date: Moment,
+        location: string,
+        classificationId: string[]
+    ): Observable<any> {
         // get the outbreakId
         return this.handleFilteringOfLists((selectedOutbreak: OutbreakModel) => {
             // build the query builder
@@ -736,6 +741,17 @@ export class ListFilterDataService {
             if (location) {
                 qb.include('contact').queryBuilder.filter
                     .byEquality('addresses.parentLocationIdFilter', location);
+            }
+
+            // case classification
+            if (!_.isEmpty(classificationId)) {
+                qb.include('case').queryBuilder.filter
+                    .bySelect(
+                        'classification',
+                        classificationId,
+                        false,
+                        null
+                    );
             }
 
             // filter
