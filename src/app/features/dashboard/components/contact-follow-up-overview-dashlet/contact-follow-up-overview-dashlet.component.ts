@@ -215,6 +215,7 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
             }
 
             // classification
+            // !!! must be on first level and not under $and
             if (!_.isEmpty(this.globalFilterClassificationId)) {
                 qb.filter.bySelect(
                     'classification',

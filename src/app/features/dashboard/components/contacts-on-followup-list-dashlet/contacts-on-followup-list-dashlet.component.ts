@@ -6,6 +6,8 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { Subscription } from 'rxjs';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-contacts-on-followup-list-dashlet',
@@ -22,6 +24,9 @@ export class ContactsOnFollowupListDashletComponent extends DashletComponent imp
 
     // outbreak
     outbreakId: string;
+
+    // for which date do we display data ?
+    dataForDate: Moment = moment();
 
     // loading data
     displayLoading: boolean = false;
@@ -73,11 +78,28 @@ export class ContactsOnFollowupListDashletComponent extends DashletComponent imp
     refreshData() {
         if (this.outbreakId) {
             // add global filters
+            // classification is handled by api...
             const qb = this.getGlobalFilterQB(
                 null,
                 'address.parentLocationIdFilter',
-                true
+                false
             );
+
+            // classification
+            // !!! must be on first level and not under $and
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
+                qb.filter.bySelect(
+                    'classification',
+                    this.globalFilterClassificationId,
+                    false,
+                    null
+                );
+            }
+
+            // update date
+            this.dataForDate = this.globalFilterDate ?
+                this.globalFilterDate.clone() :
+                moment();
 
             // date
             if (this.globalFilterDate) {

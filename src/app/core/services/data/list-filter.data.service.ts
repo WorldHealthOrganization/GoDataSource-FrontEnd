@@ -44,7 +44,11 @@ export class ListFilterDataService {
      * Create the query builder for filtering the list of contacts
      * @returns {RequestQueryBuilder}
      */
-    filterContactsOnFollowUpLists(date, location): Observable<RequestQueryBuilder> {
+    filterContactsOnFollowUpLists(
+        date,
+        location,
+        classificationId
+    ): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // add global filters
             const qb = this.getGlobalFilterQB(
@@ -64,6 +68,17 @@ export class ListFilterDataService {
                         'endDate',
                         moment(date).endOf('day').toISOString()
                     );
+            }
+
+            // classification
+            // !!! must be on first level and not under $and
+            if (!_.isEmpty(classificationId)) {
+                qb.filter.bySelect(
+                    'classification',
+                    classificationId,
+                    false,
+                    null
+                );
             }
 
             // change the way we build query

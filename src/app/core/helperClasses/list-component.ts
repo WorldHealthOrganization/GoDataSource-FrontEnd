@@ -761,7 +761,11 @@ export abstract class ListComponent implements OnDestroy {
             case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST:
 
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterContactsOnFollowUpLists(globalFilters.date, globalFilters.locationId)
+                this.listFilterDataService.filterContactsOnFollowUpLists(
+                    globalFilters.date,
+                    globalFilters.locationId,
+                    globalFilters.classificationId
+                )
                     .subscribe((qbFilterContactsOnFollowUpLists) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterContactsOnFollowUpLists;
