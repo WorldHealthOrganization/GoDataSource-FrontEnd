@@ -1312,7 +1312,11 @@ export abstract class ListComponent implements OnDestroy {
 
             // Filter contacts seen
             case Constants.APPLY_LIST_FILTER.CONTACTS_SEEN:
-                this.listFilterDataService.filterContactsSeen(globalFilters.date, globalFilters.locationId)
+                this.listFilterDataService.filterContactsSeen(
+                    globalFilters.date,
+                    globalFilters.locationId,
+                    globalFilters.classificationId
+                )
                     .subscribe((result: MetricContactsSeenEachDays) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = new RequestQueryBuilder();

@@ -658,9 +658,14 @@ export class ListFilterDataService {
      * Create the query builder for filtering the contacts seen on selected date
      * @param {date} date
      * @param {string} location
+     * @param {string[]} lassificationId
      * @returns {Observable<any>}
      */
-    filterContactsSeen(date: Moment, location: string): Observable<any> {
+    filterContactsSeen(
+        date: Moment,
+        location: string,
+        classificationId: string[]
+    ): Observable<any> {
         // get the outbreakId
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // build the query builder
@@ -684,6 +689,17 @@ export class ListFilterDataService {
             if (location) {
                 qb.include('contact').queryBuilder.filter
                     .byEquality('addresses.parentLocationIdFilter', location);
+            }
+
+            // case classification
+            if (!_.isEmpty(classificationId)) {
+                qb.include('case').queryBuilder.filter
+                    .bySelect(
+                        'classification',
+                        classificationId,
+                        false,
+                        null
+                    );
             }
 
             return this.contactDataService.getNumberOfContactsSeenEachDay(selectedOutbreak.id, qb);

@@ -6,5 +6,5 @@
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()"
     [displayLoading]="displayLoading">
-    {{ 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY' | translate }}
+    {{ 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY' | translate:{date: (dataForDate | dateDefault)} }}
 </app-dashboard-custom-metric-dashlet>
