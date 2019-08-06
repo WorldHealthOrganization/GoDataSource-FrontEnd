@@ -106,10 +106,16 @@ export class ListFilterDataService {
      * Create the query builder for filtering the list of contacts
      * @param date
      * @param location
+     * @param classificationId
      * @param {number} noDaysNotSeen
      * @returns {Observable<RequestQueryBuilder>}
      */
-    filterContactsNotSeen(date, location, noDaysNotSeen): Observable<RequestQueryBuilder> {
+    filterContactsNotSeen(
+        date,
+        location,
+        classificationId,
+        noDaysNotSeen
+    ): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // add global filters
             const qb = new RequestQueryBuilder();
@@ -145,6 +151,17 @@ export class ListFilterDataService {
             if (location) {
                 qb.include('contact').queryBuilder.filter
                     .byEquality('addresses.parentLocationIdFilter', location);
+            }
+
+            // classification
+            // !!! must be on first level and not under $and
+            if (!_.isEmpty(classificationId)) {
+                qb.filter.bySelect(
+                    'classification',
+                    classificationId,
+                    false,
+                    null
+                );
             }
 
             return this.followUpDataService
