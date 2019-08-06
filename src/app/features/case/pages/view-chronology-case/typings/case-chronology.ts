@@ -3,10 +3,27 @@ import * as _ from 'lodash';
 import { CaseModel } from '../../../../../core/models/case.model';
 import { LabResultModel } from '../../../../../core/models/lab-result.model';
 import { I18nService } from '../../../../../core/services/helper/i18n.service';
+import { RelationshipModel } from '../../../../../core/models/entity-and-relationship.model';
 
 export class CaseChronology {
-    static getChronologyEntries(i18nService: I18nService, caseData: CaseModel, labResults: LabResultModel[]): ChronologyItem[] {
+    static getChronologyEntries(i18nService: I18nService,
+                                caseData: CaseModel,
+                                labResults: LabResultModel[],
+                                relationshipsData?: RelationshipModel[]): ChronologyItem[] {
         const chronologyEntries: ChronologyItem [] = [];
+
+        // finding if the selected case is a contact for any exposure
+        if (!_.isEmpty(relationshipsData)) {
+            relationshipsData.forEach((relationship) => {
+                if (relationship.sourcePerson.id !== caseData.id) {
+                    chronologyEntries.push(new ChronologyItem({
+                        date: relationship.contactDate,
+                        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_EXPOSURE',
+                        translateData: {caseName: caseData.name}
+                    }));
+                }
+            });
+        }
 
         // date of onset
         if (!_.isEmpty(caseData.dateOfOnset)) {

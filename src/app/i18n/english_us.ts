@@ -42,7 +42,12 @@ export const EnglishUsLang = {
         /**
          * uiGlobalFilterFields
          */
-        'LNG_GLOBAL_FILTERS_FIELD_LABEL_CLASSIFICATION': 'Classification'
+        'LNG_GLOBAL_FILTERS_FIELD_LABEL_CLASSIFICATION': 'Classification',
+
+        /**
+         * uiCaseFields
+         */
+        'LNG_CASE_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ( {{caseName}})'
 
         /**
          * REMOVE the tokens from below
