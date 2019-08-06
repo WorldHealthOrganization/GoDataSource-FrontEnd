@@ -348,7 +348,11 @@ export class ListFilterDataService {
      * Create the query builder for filtering the list of contacts that are lost to follow-up
      * @returns {RequestQueryBuilder}
      */
-    filterContactsLostToFollowUp(date, location): Observable<RequestQueryBuilder> {
+    filterContactsLostToFollowUp(
+        date,
+        location,
+        classificationId
+    ): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // add global filters
             const qb = new RequestQueryBuilder();
@@ -368,6 +372,17 @@ export class ListFilterDataService {
             // location
             if (location) {
                 qb.filter.byEquality('addresses.parentLocationIdFilter', location);
+            }
+
+            // classification
+            // !!! must be on first level and not under $and
+            if (!_.isEmpty(classificationId)) {
+                qb.filter.bySelect(
+                    'classification',
+                    classificationId,
+                    false,
+                    null
+                );
             }
 
             return this.followUpDataService

@@ -9,6 +9,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-contacts-lost-to-follow-up-dashlet',
@@ -95,6 +96,17 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
             // location
             if (this.globalFilterLocationId) {
                 qb.filter.byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
+            }
+
+            // classification
+            // !!! must be on first level and not under $and
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
+                qb.filter.bySelect(
+                    'classification',
+                    this.globalFilterClassificationId,
+                    false,
+                    null
+                );
             }
 
             // release previous subscriber
