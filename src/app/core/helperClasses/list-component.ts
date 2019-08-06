@@ -1250,7 +1250,8 @@ export abstract class ListComponent implements OnDestroy {
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
-                    globalFilters.locationId
+                    globalFilters.locationId,
+                    globalFilters.classificationId
                 );
 
                 // date
