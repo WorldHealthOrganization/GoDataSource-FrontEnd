@@ -1464,7 +1464,8 @@ export abstract class ListComponent implements OnDestroy {
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
-                    globalFilters.locationId
+                    globalFilters.locationId,
+                    globalFilters.classificationId
                 );
 
                 // date
@@ -1477,6 +1478,10 @@ export abstract class ListComponent implements OnDestroy {
                 }
 
                 // get the correct query builder and merge with the existing one
+                // includes
+                // classification: {
+                //     neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                // }
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesNotIdentifiedThroughContacts();
                 if (!globalQb.isEmpty()) {
                     this.appliedListFilterQueryBuilder.merge(globalQb);
