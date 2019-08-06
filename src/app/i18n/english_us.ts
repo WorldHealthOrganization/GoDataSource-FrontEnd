@@ -13,6 +13,12 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiDashboardPage
+         */
+        'LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE': 'Contacts on the follow-up list ( {{date}} )',
+        'LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY': 'Contacts seen ( {{date}} )',
+
+        /**
          * uiChainsOfTransmissionBars
          */
         'LNG_PAGE_TRANSMISSION_CHAIN_BARS_CENTER_NAME_LABEL': 'Center name: {{name}}',

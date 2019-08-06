@@ -30,10 +30,17 @@
     <!-- Content -->
     <div class="dashboard-box-content">
         <span
-            *ngIf="!displayLoading"
-            [routerLink]="link"
-            [queryParams]="params">
-            {{ value }}
+            *ngIf="!displayLoading">
+            <span
+                *ngIf="link; else noLink"
+                [routerLink]="link"
+                [queryParams]="params">
+                {{ value }}
+            </span>
+            <ng-template
+                #noLink>
+                {{ value }}
+            </ng-template>
         </span>
 
         <!-- Loading data -->

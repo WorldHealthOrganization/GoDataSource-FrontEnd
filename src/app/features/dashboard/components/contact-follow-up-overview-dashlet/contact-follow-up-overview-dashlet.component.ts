@@ -48,6 +48,16 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
         return this._globalFilterLocationId;
     }
 
+    // Global Filters => Case Classification
+    private _globalFilterClassificationId: string[];
+    @Input() set globalFilterClassificationId(globalFilterClassificationId: string[]) {
+        this._globalFilterClassificationId = globalFilterClassificationId;
+        this.refreshDataCaller.call();
+    }
+    get globalFilterClassificationId(): string[] {
+        return this._globalFilterClassificationId;
+    }
+
     // outbreak
     outbreakId: string;
     outbreak: OutbreakModel;
@@ -196,16 +206,31 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
                 );
             }
 
-            // location
+            // location - follow-up address
             if (this.globalFilterLocationId) {
                 qb.filter.byEquality(
-                    'addresses.parentLocationIdFilter',
+                    'address.parentLocationIdFilter',
                     this.globalFilterLocationId
                 );
             }
 
+            // classification
+            // !!! must be on first level and not under $and
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
+                qb.filter.bySelect(
+                    'classification',
+                    this.globalFilterClassificationId,
+                    false,
+                    null
+                );
+            }
+
+            // start data
+            const reportData = {
+                startDate: this.outbreak.startDate
+            };
+
             // get data - start Date will be set to start of outbreak
-            const reportData = {startDate: this.outbreak.startDate};
             this.displayLoading = true;
             this.previousSubscriber = this.contactDataService
                 .getContactsFollowedUpReport(this.outbreakId, reportData, qb)
