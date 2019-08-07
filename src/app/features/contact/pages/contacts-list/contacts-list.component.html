@@ -13,11 +13,16 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
-                    <button
-                        mat-menu-item
-                        [routerLink]="['/import-export-data', 'contact-data', 'import']">
-                        {{'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON' | translate}}
-                    </button>
+                    <ng-container
+                        *ngIf="hasContactWriteAccess()">
+                        <button
+                            mat-menu-item
+                            (click)="changeContactFinalFollowUpStatus()">
+                            {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS' | translate }}
+                        </button>
+
+                        <mat-divider></mat-divider>
+                    </ng-container>
 
                     <app-export-button
                         *ngIf="exportContactsUrl"
@@ -36,10 +41,22 @@
                     </app-export-button>
 
                     <button
+                        *ngIf="hasContactWriteAccess()"
+                        mat-menu-item
+                        [routerLink]="['/import-export-data', 'contact-data', 'import']">
+                        {{'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON' | translate}}
+                    </button>
+
+                    <mat-divider></mat-divider>
+
+                    <button
                         mat-menu-item
                         (click)="exportFilteredContactsRelationships()">
                         {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_EXPORT_CONTACTS_RELATIONSHIPS' | translate }}
                     </button>
+
+                    <mat-divider
+                        *ngIf="exportContactsDailyFollowUpListUrl || exportContactsDailyFollowUpsFormUrl"></mat-divider>
 
                     <app-export-button
                         *ngIf="exportContactsDailyFollowUpListUrl"

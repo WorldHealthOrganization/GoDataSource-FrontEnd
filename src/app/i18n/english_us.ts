@@ -12,6 +12,13 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
+        /**
+         * uiContactsListPage
+         */
+        'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS': 'Change Contact Final Follow-Up Status',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE': 'Are you sure you want to change the "Final Follow-Up Status" for {{count}} contact(s)?',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_SUCCESS_MSG': 'Final status updated for {{count}} contact(s)'
+
 
 
         /**
