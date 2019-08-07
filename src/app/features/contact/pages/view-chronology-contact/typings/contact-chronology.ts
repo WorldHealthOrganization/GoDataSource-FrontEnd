@@ -3,10 +3,50 @@ import { FollowUpModel } from '../../../../../core/models/follow-up.model';
 import { ChronologyItem } from '../../../../../shared/components/chronology/typings/chronology-item';
 import * as _ from 'lodash';
 import { Constants } from '../../../../../core/models/constants';
+import { RelationshipModel } from '../../../../../core/models/entity-and-relationship.model';
 
 export class ContactChronology {
-    static getChronologyEntries(contactData: ContactModel, followUps: FollowUpModel[]): ChronologyItem[] {
+    static getChronologyEntries(contactData: ContactModel,
+                                followUps: FollowUpModel[],
+                                relationshipsData?: RelationshipModel[]): ChronologyItem[] {
+
         const chronologyEntries: ChronologyItem [] = [];
+        const sourcePersons = [];
+
+        // create function that return all source persons for every relationship
+        const getSourcePersons = (contactDataId: string,
+                                  relationships: RelationshipModel[]) => {
+            _.forEach(relationships, (relationship) => {
+                _.forEach(relationship.people, (people) => {
+                    if (people.model.id === relationship.sourcePerson.id) {
+                        sourcePersons.push(people.model);
+                    }
+                });
+            });
+            return sourcePersons;
+        };
+
+        // retrieve source persons
+        if (!_.isEmpty(relationshipsData)) {
+            getSourcePersons(contactData.id, relationshipsData);
+        }
+
+        // displaying the exposure dates for each relationship
+        if (!_.isEmpty(sourcePersons) && !_.isEmpty(relationshipsData)) {
+            relationshipsData.forEach((relationship) => {
+                if (relationship.sourcePerson.id !== contactData.id) {
+                    const sourcePerson = _.find(sourcePersons, (person) => {
+                       return person.id === relationship.sourcePerson.id;
+                    });
+                    // create chronology entries with exposure dates
+                    chronologyEntries.push(new ChronologyItem({
+                        date: relationship.contactDate,
+                        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_EXPOSURE',
+                        translateData: {exposureName: sourcePerson.name}
+                    }));
+                }
+            });
+        }
 
         // build chronology items from followUp
         _.forEach(followUps, (followUp: FollowUpModel) => {

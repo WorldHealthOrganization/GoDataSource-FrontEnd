@@ -14,6 +14,7 @@ import { forkJoin } from 'rxjs/index';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 
 @Component({
     selector: 'app-view-chronology-case',
@@ -61,13 +62,18 @@ export class ViewChronologyCaseComponent implements OnInit {
                                     this.caseData
                                 )
                             );
+
+                            const qb = new RequestQueryBuilder();
+                            qb.include('people', true);
+
                             forkJoin(
                                 // get relationships
                                 this.relationshipDataService
                                     .getEntityRelationships(
                                         selectedOutbreak.id,
                                         this.caseData.type,
-                                        this.caseData.id
+                                        this.caseData.id,
+                                        qb
                                     ),
                                 // lab sample taken and lab result dates
                                 this.labResultDataService

@@ -11,15 +11,38 @@ export class CaseChronology {
                                 labResults: LabResultModel[],
                                 relationshipsData?: RelationshipModel[]): ChronologyItem[] {
         const chronologyEntries: ChronologyItem [] = [];
+        const sourcePersons = [];
 
-        // finding if the selected case is a contact for any exposure
+        // function that return all source persons for every relationship
+        const getSourcePersons = (caseDataId: string,
+                                  relationships: RelationshipModel[]) => {
+            _.forEach(relationships, (relationship) => {
+                _.forEach(relationship.people, (people) => {
+                    if (people.model.id === relationship.sourcePerson.id) {
+                        sourcePersons.push(people.model);
+                    }
+                });
+            });
+            return sourcePersons;
+        };
+
+        // retrieve source persons
         if (!_.isEmpty(relationshipsData)) {
+            getSourcePersons(caseData.id, relationshipsData);
+        }
+
+        // displaying the exposure dates for each relationship
+        if (!_.isEmpty(sourcePersons) && !_.isEmpty(relationshipsData)) {
             relationshipsData.forEach((relationship) => {
                 if (relationship.sourcePerson.id !== caseData.id) {
+                    const sourcePerson = _.find(sourcePersons, (person) => {
+                        return person.id === relationship.sourcePerson.id;
+                    });
+                    // create chronology entries with exposure dates
                     chronologyEntries.push(new ChronologyItem({
                         date: relationship.contactDate,
                         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_EXPOSURE',
-                        translateData: {caseName: caseData.name}
+                        translateData: {exposureName: sourcePerson.name}
                     }));
                 }
             });
