@@ -10,299 +10,302 @@
     <mat-sidenav-container>
 
         <mat-sidenav #sideNav mode="over" fixedInViewport>
-
             <form #form="ngForm" (submit)="apply(form)">
-                <!-- Filters -->
-                <div *ngIf="filterOptions.length > 0" class="section filters-section" fxLayout="column">
+                <!-- Filters & Sort -->
+                <div
+                    class="filters-sort-actions">
+                    <!-- Filters -->
+                    <div *ngIf="filterOptions.length > 0" class="section filters-section" fxLayout="column">
 
-                    <div>
-                        <app-form-select
-                            name="loadFilter"
-                            [ngModel]="loadedFilter?.id"
-                            [placeholder]="'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL' | translate"
-                            [options]="savedFilters$ | async"
-                            (optionChanged)="loadSavedFilter($event)"
-                            optionLabelKey="name"
-                            optionValueKey="id">
-                        </app-form-select>
-                    </div>
-
-                    <div class="title">
-                        {{'LNG_SIDE_FILTERS_TITLE' | translate}}
-                    </div>
-
-                    <div
-                        *ngIf="!fixedFilters"
-                        class="actions"
-                        fxLayout="column"
-                    >
-                        <div fxLayout="row" class="switch-buttons">
-                            <button fxFlex type="button" mat-raised-button
-                                    [color]="isFilterOperator(RequestFilterOperator.AND) ? 'primary' : ''"
-                                    (click)="setFilterOperator(RequestFilterOperator.AND)">
-                                {{'LNG_SIDE_FILTERS_OPERATOR_LABEL_AND' | translate}}
-                            </button>
-                            <button fxFlex type="button" mat-raised-button
-                                    [color]="isFilterOperator(RequestFilterOperator.OR) ? 'primary' : ''"
-                                    (click)="setFilterOperator(RequestFilterOperator.OR)">
-                                {{'LNG_SIDE_FILTERS_OPERATOR_LABEL_OR' | translate}}
-                            </button>
-
-                            <input type="hidden" name="filter[operator]" [(ngModel)]="appliedFilterOperator"/>
-                        </div>
-                    </div>
-
-                    <div *ngFor="let filter of appliedFilters; let i = index" class="applied-filter" fxLayout="column">
-
-                        <div *ngIf="i > 0" class="operator">
-                            {{appliedFilterOperator}}
+                        <div>
+                            <app-form-select
+                                name="loadFilter"
+                                [ngModel]="loadedFilter?.id"
+                                [placeholder]="'LNG_SIDE_FILTERS_LOAD_FILTER_LABEL' | translate"
+                                [options]="savedFilters$ | async"
+                                (optionChanged)="loadSavedFilter($event)"
+                                optionLabelKey="name"
+                                optionValueKey="id">
+                            </app-form-select>
                         </div>
 
-                        <div class="filter-container" fxLayout="row" fxLayoutAlign="start center">
-                            <mat-card class="filter-details" fxFlex>
+                        <div class="title">
+                            {{'LNG_SIDE_FILTERS_TITLE' | translate}}
+                        </div>
 
-                                <!-- Filter Type -->
-                                <app-form-select
-                                    [name]="'filter[filters][' + i + '][filter]'"
-                                    [(ngModel)]="filter.filter"
-                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                    [options]="filterOptions"
-                                    optionLabelKey="fieldLabel"
-                                    optionLabelPrefixKey="relationshipLabel"
-                                    optionValueKey="self"
-                                    [clearable]="false"
-                                    [disabled]="filter.readonly">
-                                </app-form-select>
+                        <div
+                            *ngIf="!fixedFilters"
+                            class="actions"
+                            fxLayout="column"
+                        >
+                            <div fxLayout="row" class="switch-buttons">
+                                <button fxFlex type="button" mat-raised-button
+                                        [color]="isFilterOperator(RequestFilterOperator.AND) ? 'primary' : ''"
+                                        (click)="setFilterOperator(RequestFilterOperator.AND)">
+                                    {{'LNG_SIDE_FILTERS_OPERATOR_LABEL_AND' | translate}}
+                                </button>
+                                <button fxFlex type="button" mat-raised-button
+                                        [color]="isFilterOperator(RequestFilterOperator.OR) ? 'primary' : ''"
+                                        (click)="setFilterOperator(RequestFilterOperator.OR)">
+                                    {{'LNG_SIDE_FILTERS_OPERATOR_LABEL_OR' | translate}}
+                                </button>
 
-                                <!-- Filter Comparator -->
-                                <app-form-select
-                                    *ngIf="filter.filter && filter.hasMoreThanOneComparator"
-                                    [name]="'filter[filters][' + i + '][comparator]'"
-                                    [(ngModel)]="filter.comparator"
-                                    [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL' | translate"
-                                    [options]="filter.filter.allowedComparators ? filter.filter.allowedComparators : AppliedFilterModel.allowedComparators[filter.filter.type]"
-                                    [clearable]="false">
-                                </app-form-select>
+                                <input type="hidden" name="filter[operator]" [(ngModel)]="appliedFilterOperator"/>
+                            </div>
+                        </div>
 
-                                <!-- TEXT Filter -->
-                                <app-form-input
-                                    *ngIf="
+                        <div *ngFor="let filter of appliedFilters; let i = index" class="applied-filter" fxLayout="column">
+
+                            <div *ngIf="i > 0" class="operator">
+                                {{appliedFilterOperator}}
+                            </div>
+
+                            <div class="filter-container" fxLayout="row" fxLayoutAlign="start center">
+                                <mat-card class="filter-details" fxFlex>
+
+                                    <!-- Filter Type -->
+                                    <app-form-select
+                                        [name]="'filter[filters][' + i + '][filter]'"
+                                        [(ngModel)]="filter.filter"
+                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                        [options]="filterOptions"
+                                        optionLabelKey="fieldLabel"
+                                        optionLabelPrefixKey="relationshipLabel"
+                                        optionValueKey="self"
+                                        [clearable]="false"
+                                        [disabled]="filter.readonly">
+                                    </app-form-select>
+
+                                    <!-- Filter Comparator -->
+                                    <app-form-select
+                                        *ngIf="filter.filter && filter.hasMoreThanOneComparator"
+                                        [name]="'filter[filters][' + i + '][comparator]'"
+                                        [(ngModel)]="filter.comparator"
+                                        [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL' | translate"
+                                        [options]="filter.filter.allowedComparators ? filter.filter.allowedComparators : AppliedFilterModel.allowedComparators[filter.filter.type]"
+                                        [clearable]="false">
+                                    </app-form-select>
+
+                                    <!-- TEXT Filter -->
+                                    <app-form-input
+                                        *ngIf="
                                         filter.filter?.type === FilterType.TEXT ||
                                         filter.filter?.type === FilterType.NUMBER ||
                                          filter.filter?.type === FilterType.ADDRESS_PHONE_NUMBER || (
                                             filter.filter?.type === FilterType.ADDRESS &&
                                             filter.comparator === FilterComparator.CONTAINS
                                         )"
-                                    [name]="'filter[filters][' + i + '][value]'"
-                                    [(ngModel)]="filter.value"
-                                    [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD' | translate"
-                                    [type]="filter.filter?.type === FilterType.NUMBER ? 'number' : 'text'">
-                                </app-form-input>
+                                        [name]="'filter[filters][' + i + '][value]'"
+                                        [(ngModel)]="filter.value"
+                                        [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD' | translate"
+                                        [type]="filter.filter?.type === FilterType.NUMBER ? 'number' : 'text'">
+                                    </app-form-input>
 
-                                <!-- SELECT Filter -->
-                                <!-- had to split these two selects into one select because we can't change multiple property after initialization -->
-                                <!-- so in case we switched from a multi select to a single select an exception was raised -->
-                                <app-form-select
-                                    *ngIf="filter.filter?.type === FilterType.SELECT"
-                                    [name]="'filter[filters][' + i + '][value]'"
-                                    [(ngModel)]="filter.value"
-                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                    [options]="filter.filter.options$ | async"
-                                    [multiple]="false"
-                                    [allowSelectionOfDisabledItems]="true"
-                                    [displayInvisibleItems]="true"
-                                    [optionValueKey]="filter.filter.optionsValueKey"
-                                    [optionLabelKey]="filter.filter.optionsLabelKey">
-                                </app-form-select>
+                                    <!-- SELECT Filter -->
+                                    <!-- had to split these two selects into one select because we can't change multiple property after initialization -->
+                                    <!-- so in case we switched from a multi select to a single select an exception was raised -->
+                                    <app-form-select
+                                        *ngIf="filter.filter?.type === FilterType.SELECT"
+                                        [name]="'filter[filters][' + i + '][value]'"
+                                        [(ngModel)]="filter.value"
+                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                        [options]="filter.filter.options$ | async"
+                                        [multiple]="false"
+                                        [allowSelectionOfDisabledItems]="true"
+                                        [displayInvisibleItems]="true"
+                                        [optionValueKey]="filter.filter.optionsValueKey"
+                                        [optionLabelKey]="filter.filter.optionsLabelKey">
+                                    </app-form-select>
 
-                                <!-- MULTI-SELECT Filter -->
-                                <!-- had to split these two selects into one select because we can't change multiple property after initialization -->
-                                <!-- so in case we switched from a multi select to a single select an exception was raised -->
-                                <app-form-select
-                                    *ngIf="filter.filter?.type === FilterType.MULTISELECT"
-                                    [name]="'filter[filters][' + i + '][value]'"
-                                    [(ngModel)]="filter.value"
-                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                    [options]="filter.filter.options$ | async"
-                                    [multiple]="true"
-                                    [allowSelectionOfDisabledItems]="true"
-                                    [displayInvisibleItems]="true"
-                                    [optionValueKey]="filter.filter.optionsValueKey"
-                                    [optionLabelKey]="filter.filter.optionsLabelKey">
-                                </app-form-select>
+                                    <!-- MULTI-SELECT Filter -->
+                                    <!-- had to split these two selects into one select because we can't change multiple property after initialization -->
+                                    <!-- so in case we switched from a multi select to a single select an exception was raised -->
+                                    <app-form-select
+                                        *ngIf="filter.filter?.type === FilterType.MULTISELECT"
+                                        [name]="'filter[filters][' + i + '][value]'"
+                                        [(ngModel)]="filter.value"
+                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                        [options]="filter.filter.options$ | async"
+                                        [multiple]="true"
+                                        [allowSelectionOfDisabledItems]="true"
+                                        [displayInvisibleItems]="true"
+                                        [optionValueKey]="filter.filter.optionsValueKey"
+                                        [optionLabelKey]="filter.filter.optionsLabelKey">
+                                    </app-form-select>
 
-                                <!-- NUMBER / AGE RANGE Filter -->
-                                <app-form-range
-                                    *ngIf="filter.filter?.type === FilterType.RANGE_NUMBER || filter.filter?.type === FilterType.RANGE_AGE"
-                                    [name]="'filter[filters][' + i + '][value]'"
-                                    [ngModel]="filter.value"
-                                    (changed)="filter.value = $event;"
-                                    [fromVisible]="
+                                    <!-- NUMBER / AGE RANGE Filter -->
+                                    <app-form-range
+                                        *ngIf="filter.filter?.type === FilterType.RANGE_NUMBER || filter.filter?.type === FilterType.RANGE_AGE"
+                                        [name]="'filter[filters][' + i + '][value]'"
+                                        [ngModel]="filter.value"
+                                        (changed)="filter.value = $event;"
+                                        [fromVisible]="
                                         filter.comparator === FilterComparator.BETWEEN ||
                                         filter.comparator === FilterComparator.AFTER"
-                                    [toVisible]="
+                                        [toVisible]="
                                         filter.comparator === FilterComparator.BETWEEN ||
                                         filter.comparator === FilterComparator.BEFORE"
-                                    [step]="filter.filter?.type === FilterType.RANGE_AGE ? 0.1 : undefined"
-                                    [min]="filter.filter?.type === FilterType.RANGE_AGE ? 0 : undefined"
-                                    [max]="filter.filter?.type === FilterType.RANGE_AGE ? Constants.DEFAULT_AGE_MAX_YEARS : undefined"
-                                    [fromPlaceholder]="filter.filter?.type === FilterType.RANGE_AGE ? 'LNG_AGE_FIELD_FILTER_LABEL_FROM' : 'LNG_FORM_RANGE_FIELD_LABEL_FROM'"
-                                    [toPlaceholder]="filter.filter?.type === FilterType.RANGE_AGE ? 'LNG_AGE_FIELD_FILTER_LABEL_TO' : 'LNG_FORM_RANGE_FIELD_LABEL_TO'">
-                                </app-form-range>
+                                        [step]="filter.filter?.type === FilterType.RANGE_AGE ? 0.1 : undefined"
+                                        [min]="filter.filter?.type === FilterType.RANGE_AGE ? 0 : undefined"
+                                        [max]="filter.filter?.type === FilterType.RANGE_AGE ? Constants.DEFAULT_AGE_MAX_YEARS : undefined"
+                                        [fromPlaceholder]="filter.filter?.type === FilterType.RANGE_AGE ? 'LNG_AGE_FIELD_FILTER_LABEL_FROM' : 'LNG_FORM_RANGE_FIELD_LABEL_FROM'"
+                                        [toPlaceholder]="filter.filter?.type === FilterType.RANGE_AGE ? 'LNG_AGE_FIELD_FILTER_LABEL_TO' : 'LNG_FORM_RANGE_FIELD_LABEL_TO'">
+                                    </app-form-range>
 
-                                <!-- DATE -->
-                                <app-form-datepicker
-                                    *ngIf="filter.filter?.type === FilterType.DATE"
-                                    [name]="'filter[filters][' + i + '][value]'"
-                                    [(ngModel)]="filter.value"
-                                    [maxDate]="filter.filter?.maxDate">
-                                </app-form-datepicker>
+                                    <!-- DATE -->
+                                    <app-form-datepicker
+                                        *ngIf="filter.filter?.type === FilterType.DATE"
+                                        [name]="'filter[filters][' + i + '][value]'"
+                                        [(ngModel)]="filter.value"
+                                        [maxDate]="filter.filter?.maxDate">
+                                    </app-form-datepicker>
 
-                                <!-- DATE RANGE Filter-->
-                                <app-form-daterange
-                                    *ngIf="filter.filter?.type === FilterType.RANGE_DATE"
-                                    [name]="'filter[filters][' + i + '][value]'"
-                                    [ngModel]="filter.value"
-                                    (changed)="filter.value = $event;"
-                                    [startDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.AFTER"
-                                    [endDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.BEFORE">
-                                </app-form-daterange>
+                                    <!-- DATE RANGE Filter-->
+                                    <app-form-daterange
+                                        *ngIf="filter.filter?.type === FilterType.RANGE_DATE"
+                                        [name]="'filter[filters][' + i + '][value]'"
+                                        [ngModel]="filter.value"
+                                        (changed)="filter.value = $event;"
+                                        [startDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.AFTER"
+                                        [endDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.BEFORE">
+                                    </app-form-daterange>
 
-                                <!-- Address Location / Location -->
-                                <app-form-location-dropdown
-                                    *ngIf="(filter.filter?.type === FilterType.ADDRESS || filter.filter?.type === FilterType.LOCATION) && filter.comparator === FilterComparator.LOCATION"
-                                    [name]="'filter[filters][' + i + '][value]'"
-                                    [ngModel]="filter.value"
-                                    [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION' | translate"
-                                    [multiple]="filter.filter?.multipleOptions"
-                                    [useOutbreakLocations]="true"
-                                    (changed)="filter.value = $event;">
-                                </app-form-location-dropdown>
-
-                                <!-- Address Within Radius -->
-                                <ng-container
-                                    *ngIf="filter.filter?.type === FilterType.ADDRESS &&
-                                        filter.comparator === FilterComparator.WITHIN">
-                                    <input
-                                        [name]="'filter[filters][' + i + '][extraValues][location]'"
-                                        [ngModel]="filter.extraValues.location"
-                                        type="hidden"/>
-
+                                    <!-- Address Location / Location -->
                                     <app-form-location-dropdown
+                                        *ngIf="(filter.filter?.type === FilterType.ADDRESS || filter.filter?.type === FilterType.LOCATION) && filter.comparator === FilterComparator.LOCATION"
                                         [name]="'filter[filters][' + i + '][value]'"
                                         [ngModel]="filter.value"
                                         [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION' | translate"
-                                        [multiple]="false"
+                                        [multiple]="filter.filter?.multipleOptions"
                                         [useOutbreakLocations]="true"
-                                        (changed)="filter.value = $event;"
-                                        (itemChanged)="filter.extraValues.location = $event;">
+                                        (changed)="filter.value = $event;">
                                     </app-form-location-dropdown>
 
-                                    <app-form-input
-                                        [name]="'filter[filters][' + i + '][extraValues][radius]'"
-                                        [(ngModel)]="filter.extraValues.radius"
-                                        [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_MAX_DISTANCE' | translate">
-                                    </app-form-input>
-                                </ng-container>
-                            </mat-card>
+                                    <!-- Address Within Radius -->
+                                    <ng-container
+                                        *ngIf="filter.filter?.type === FilterType.ADDRESS &&
+                                        filter.comparator === FilterComparator.WITHIN">
+                                        <input
+                                            [name]="'filter[filters][' + i + '][extraValues][location]'"
+                                            [ngModel]="filter.extraValues.location"
+                                            type="hidden"/>
 
-                            <!-- Delete filter item -->
-                            <button
-                                *ngIf="!filter.readonly"
-                                class="filter-details-delete-button"
-                                type="button" mat-icon-button
-                                (click)="deleteFilter(i)">
-                                <span class="xt-icon">delete</span>
-                            </button>
+                                        <app-form-location-dropdown
+                                            [name]="'filter[filters][' + i + '][value]'"
+                                            [ngModel]="filter.value"
+                                            [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION' | translate"
+                                            [multiple]="false"
+                                            [useOutbreakLocations]="true"
+                                            (changed)="filter.value = $event;"
+                                            (itemChanged)="filter.extraValues.location = $event;">
+                                        </app-form-location-dropdown>
+
+                                        <app-form-input
+                                            [name]="'filter[filters][' + i + '][extraValues][radius]'"
+                                            [(ngModel)]="filter.extraValues.radius"
+                                            [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_MAX_DISTANCE' | translate">
+                                        </app-form-input>
+                                    </ng-container>
+                                </mat-card>
+
+                                <!-- Delete filter item -->
+                                <button
+                                    *ngIf="!filter.readonly"
+                                    class="filter-details-delete-button"
+                                    type="button" mat-icon-button
+                                    (click)="deleteFilter(i)">
+                                    <span class="xt-icon">delete</span>
+                                </button>
+                            </div>
+
                         </div>
 
+                        <button
+                            *ngIf="!fixedFilters"
+                            type="button"
+                            mat-button
+                            color="primary"
+                            class="add-side-filter"
+                            (click)="addFilter()">
+                            {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
+                        </button>
+
                     </div>
 
-                    <button
-                        *ngIf="!fixedFilters"
-                        type="button"
-                        mat-button
-                        color="primary"
-                        class="add-side-filter"
-                        (click)="addFilter()">
-                        {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
-                    </button>
-
-                </div>
-
-                <!-- Sort Criteria -->
-                <div
-                    *ngIf="sortOptions.length > 0"
-                    class="section sort-section"
-                    fxLayout="column">
-
-                    <div class="title">
-                        {{'LNG_SIDE_FILTERS_SECTION_SORT_TITLE' | translate}}
-                    </div>
-
+                    <!-- Sort Criteria -->
                     <div
-                        *ngFor="let sort of appliedSort; let i = index"
-                        class="applied-sort"
+                        *ngIf="sortOptions.length > 0"
+                        class="section sort-section"
                         fxLayout="column">
 
-                        <div
-                            class="sort-container"
-                            fxLayout="row"
-                            fxLayoutAlign="start center">
-                            <mat-card
-                                class="sort-details"
-                                fxFlex fxLayout="column"
-                            >
-                                <div fxLayout="row">
-                                    <!-- Sort By Field -->
-                                    <app-form-select
-                                        [name]="'sortBy[items][' + i + '][sort]'"
-                                        [(ngModel)]="sort.sort"
-                                        [placeholder]="'LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER' | translate"
-                                        [options]="sortOptions"
-                                        optionLabelKey="fieldLabel"
-                                        optionValueKey="self"
-                                        [clearable]="false">
-                                    </app-form-select>
-                                </div>
-
-                                <div fxLayout="row">
-                                    <!-- Sort Direction ( ASC / DESC ) -->
-                                    <app-form-select
-                                        *ngIf="sort.sort"
-                                        [name]="'sortBy[items][' + i + '][direction]'"
-                                        [(ngModel)]="sort.direction"
-                                        [placeholder]="'LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL' | translate"
-                                        [options]="sortDirections"
-                                        [clearable]="false">
-                                    </app-form-select>
-                                </div>
-                            </mat-card>
-
-                            <!-- Delete sort item -->
-                            <button
-                                class="sort-details-delete-button"
-                                type="button" mat-icon-button
-                                (click)="deleteSort(i)">
-                                <span class="xt-icon">delete</span>
-                            </button>
-
+                        <div class="title">
+                            {{'LNG_SIDE_FILTERS_SECTION_SORT_TITLE' | translate}}
                         </div>
+
+                        <div
+                            *ngFor="let sort of appliedSort; let i = index"
+                            class="applied-sort"
+                            fxLayout="column">
+
+                            <div
+                                class="sort-container"
+                                fxLayout="row"
+                                fxLayoutAlign="start center">
+                                <mat-card
+                                    class="sort-details"
+                                    fxFlex fxLayout="column"
+                                >
+                                    <div fxLayout="row">
+                                        <!-- Sort By Field -->
+                                        <app-form-select
+                                            [name]="'sortBy[items][' + i + '][sort]'"
+                                            [(ngModel)]="sort.sort"
+                                            [placeholder]="'LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER' | translate"
+                                            [options]="sortOptions"
+                                            optionLabelKey="fieldLabel"
+                                            optionValueKey="self"
+                                            [clearable]="false">
+                                        </app-form-select>
+                                    </div>
+
+                                    <div fxLayout="row">
+                                        <!-- Sort Direction ( ASC / DESC ) -->
+                                        <app-form-select
+                                            *ngIf="sort.sort"
+                                            [name]="'sortBy[items][' + i + '][direction]'"
+                                            [(ngModel)]="sort.direction"
+                                            [placeholder]="'LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL' | translate"
+                                            [options]="sortDirections"
+                                            [clearable]="false">
+                                        </app-form-select>
+                                    </div>
+                                </mat-card>
+
+                                <!-- Delete sort item -->
+                                <button
+                                    class="sort-details-delete-button"
+                                    type="button" mat-icon-button
+                                    (click)="deleteSort(i)">
+                                    <span class="xt-icon">delete</span>
+                                </button>
+
+                            </div>
+                        </div>
+
+                        <button
+                            *ngIf="!fixedFilters"
+                            class="add-side-filter"
+                            type="button"
+                            mat-button
+                            color="primary"
+                            (click)="addSort()">
+                            {{'LNG_SIDE_FILTERS_ADD_ANOTHER_SORT_BUTTON' | translate}}
+                        </button>
                     </div>
-
-                    <button
-                        *ngIf="!fixedFilters"
-                        class="add-side-filter"
-                        type="button"
-                        mat-button
-                        color="primary"
-                        (click)="addSort()">
-                        {{'LNG_SIDE_FILTERS_ADD_ANOTHER_SORT_BUTTON' | translate}}
-                    </button>
-
                 </div>
 
-                <div class="buttons-container">
+                <div
+                    class="buttons-container">
                     <button
                         *ngIf="appliedFilters.length > 0 || appliedSort.length > 0"
                         class="stretched-button"
@@ -322,7 +325,8 @@
 
                 </div>
 
-                <div>
+                <div
+                    class="buttons-container">
                     <button
                         class="save-filter-button"
                         mat-raised-button

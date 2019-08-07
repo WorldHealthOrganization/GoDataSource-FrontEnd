@@ -22,7 +22,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
-import { RequestQueryBuilder, RequestRelationBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestRelationBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
@@ -492,7 +492,15 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL'
             }),
             new VisibleColumnModel({
-                field: 'finalStatus',
+                field: 'dateOfLastContact',
+                label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
+            }),
+            new VisibleColumnModel({
+                field: 'followUp.endDate',
+                label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE'
+            }),
+            new VisibleColumnModel({
+                field: 'followUp.status',
                 label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS'
             }),
             new VisibleColumnModel({
@@ -592,10 +600,22 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 type: FilterType.ADDRESS_PHONE_NUMBER,
             }),
             new FilterModel({
-                fieldName: 'finalStatus',
+                fieldName: 'followUp.status',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
                 type: FilterType.MULTISELECT,
                 options$: this.finalFollowUpStatus$,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'followUp.endDate',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE',
+                type: FilterType.RANGE_DATE,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'dateOfLastContact',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+                type: FilterType.RANGE_DATE,
                 sortable: true
             })
         ];

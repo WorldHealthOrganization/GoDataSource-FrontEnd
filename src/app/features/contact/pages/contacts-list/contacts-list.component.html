@@ -386,12 +386,56 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Date of last contact -->
+        <ng-container matColumnDef="dateOfLastContact">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="dateOfLastContactFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('dateOfLastContact', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                {{ item.dateOfLastContact | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Date of the end of the Followup -->
+        <ng-container matColumnDef="followUp.endDate">
+            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="dateOfTheEndOfTheFollowUpFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('followUp.endDate', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                {{ item.followUp?.endDate | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Final Follow-up Status -->
-        <ng-container matColumnDef="finalStatus">
+        <ng-container matColumnDef="followUp.status">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS' | translate
-                        }}
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS' | translate }}
                     </div>
                     <div class="column-filter">
                         <app-form-select
