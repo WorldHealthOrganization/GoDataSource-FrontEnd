@@ -44,7 +44,11 @@ export class ListFilterDataService {
      * Create the query builder for filtering the list of contacts
      * @returns {RequestQueryBuilder}
      */
-    filterContactsOnFollowUpLists(date, location): Observable<RequestQueryBuilder> {
+    filterContactsOnFollowUpLists(
+        date,
+        location,
+        classificationId
+    ): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // add global filters
             const qb = this.getGlobalFilterQB(
@@ -64,6 +68,17 @@ export class ListFilterDataService {
                         'endDate',
                         moment(date).endOf('day').toISOString()
                     );
+            }
+
+            // classification
+            // !!! must be on first level and not under $and
+            if (!_.isEmpty(classificationId)) {
+                qb.filter.bySelect(
+                    'classification',
+                    classificationId,
+                    false,
+                    null
+                );
             }
 
             // change the way we build query
@@ -91,10 +106,16 @@ export class ListFilterDataService {
      * Create the query builder for filtering the list of contacts
      * @param date
      * @param location
+     * @param classificationId
      * @param {number} noDaysNotSeen
      * @returns {Observable<RequestQueryBuilder>}
      */
-    filterContactsNotSeen(date, location, noDaysNotSeen): Observable<RequestQueryBuilder> {
+    filterContactsNotSeen(
+        date,
+        location,
+        classificationId,
+        noDaysNotSeen
+    ): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // add global filters
             const qb = new RequestQueryBuilder();
@@ -130,6 +151,17 @@ export class ListFilterDataService {
             if (location) {
                 qb.include('contact').queryBuilder.filter
                     .byEquality('addresses.parentLocationIdFilter', location);
+            }
+
+            // classification
+            // !!! must be on first level and not under $and
+            if (!_.isEmpty(classificationId)) {
+                qb.filter.bySelect(
+                    'classification',
+                    classificationId,
+                    false,
+                    null
+                );
             }
 
             return this.followUpDataService
@@ -333,7 +365,11 @@ export class ListFilterDataService {
      * Create the query builder for filtering the list of contacts that are lost to follow-up
      * @returns {RequestQueryBuilder}
      */
-    filterContactsLostToFollowUp(date, location): Observable<RequestQueryBuilder> {
+    filterContactsLostToFollowUp(
+        date,
+        location,
+        classificationId
+    ): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // add global filters
             const qb = new RequestQueryBuilder();
@@ -353,6 +389,17 @@ export class ListFilterDataService {
             // location
             if (location) {
                 qb.filter.byEquality('addresses.parentLocationIdFilter', location);
+            }
+
+            // classification
+            // !!! must be on first level and not under $and
+            if (!_.isEmpty(classificationId)) {
+                qb.filter.bySelect(
+                    'classification',
+                    classificationId,
+                    false,
+                    null
+                );
             }
 
             return this.followUpDataService
@@ -376,10 +423,16 @@ export class ListFilterDataService {
      * Create the query builder for filtering the list of cases
      * @param date
      * @param location
+     * @param classificationId
      * @param {number} noDaysInChains
      * @returns {Observable<RequestQueryBuilder>}
      */
-    filterCasesInKnownChains(date, location, noDaysInChains): Observable<RequestQueryBuilder> {
+    filterCasesInKnownChains(
+        date,
+        location,
+        classificationId,
+        noDaysInChains
+    ): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // add global filters
             const qb = new RequestQueryBuilder();
@@ -411,10 +464,29 @@ export class ListFilterDataService {
                 });
             }
 
+            // exclude discarded cases
+            qb.include('people').queryBuilder.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
+
             // location
             if (location) {
                 qb.include('people').queryBuilder.filter
                     .byEquality('addresses.parentLocationIdFilter', location);
+            }
+
+            // classification
+            if (!_.isEmpty(classificationId)) {
+                qb.include('people').queryBuilder.filter
+                    .where({
+                        and: [{
+                            classification: {
+                                inq: classificationId
+                            }
+                        }]
+                    });
             }
 
             return this.relationshipDataService
@@ -586,9 +658,14 @@ export class ListFilterDataService {
      * Create the query builder for filtering the contacts seen on selected date
      * @param {date} date
      * @param {string} location
+     * @param {string[]} lassificationId
      * @returns {Observable<any>}
      */
-    filterContactsSeen(date: Moment, location: string): Observable<any> {
+    filterContactsSeen(
+        date: Moment,
+        location: string,
+        classificationId: string[]
+    ): Observable<any> {
         // get the outbreakId
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // build the query builder
@@ -614,6 +691,17 @@ export class ListFilterDataService {
                     .byEquality('addresses.parentLocationIdFilter', location);
             }
 
+            // case classification
+            if (!_.isEmpty(classificationId)) {
+                qb.include('case').queryBuilder.filter
+                    .bySelect(
+                        'classification',
+                        classificationId,
+                        false,
+                        null
+                    );
+            }
+
             return this.contactDataService.getNumberOfContactsSeenEachDay(selectedOutbreak.id, qb);
         });
     }
@@ -622,9 +710,14 @@ export class ListFilterDataService {
      * Create the query builder for filtering the contacts that have been successfully followed up
      * @param {date} date
      * @param {string} location
+     * @param {string[]} lassificationId
      * @returns {Observable<any>}
      */
-    filterContactsWithSuccessfulFollowup(date: Moment, location: string): Observable<any> {
+    filterContactsWithSuccessfulFollowup(
+        date: Moment,
+        location: string,
+        classificationId: string[]
+    ): Observable<any> {
         // get the outbreakId
         return this.handleFilteringOfLists((selectedOutbreak: OutbreakModel) => {
             // build the query builder
@@ -648,6 +741,17 @@ export class ListFilterDataService {
             if (location) {
                 qb.include('contact').queryBuilder.filter
                     .byEquality('addresses.parentLocationIdFilter', location);
+            }
+
+            // case classification
+            if (!_.isEmpty(classificationId)) {
+                qb.include('case').queryBuilder.filter
+                    .bySelect(
+                        'classification',
+                        classificationId,
+                        false,
+                        null
+                    );
             }
 
             // filter

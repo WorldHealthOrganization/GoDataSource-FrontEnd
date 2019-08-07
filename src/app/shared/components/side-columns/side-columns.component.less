@@ -17,13 +17,19 @@
         z-index: 10;
 
         mat-sidenav {
-            margin-top: 10vh;
-            max-height: 80vh;
+            margin-top: 5vh;
+            max-height: 90vh;
             width: 300px;
-            padding: 15px;
+            padding: 15px 0 15px 15px;
             height: auto;
             bottom: unset !important;
-            overflow-x: hidden;
+            overflow: hidden;
+
+            .actions {
+                overflow-y: auto;
+                max-height: calc(90vh - 122px);
+                padding-bottom: 7px;
+            }
 
             .side-filters-reset-button {
                 font-weight: 600
@@ -32,6 +38,7 @@
             .buttons-container {
                 display: flex;
                 margin-top: 20px;
+                margin-right: 15px;
 
                 .stretched-button {
                     flex: 1 auto;

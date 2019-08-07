@@ -195,7 +195,8 @@
                 <app-contact-follow-up-overview-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                     [globalFilterDate]="globalFilterDate"
-                    [globalFilterLocationId]="globalFilterLocationId">
+                    [globalFilterLocationId]="globalFilterLocationId"
+                    [globalFilterClassificationId]="globalFilterClassificationId">
                 </app-contact-follow-up-overview-dashlet>
             </mat-card>
 
@@ -327,7 +328,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-new-cases-previous-days-transmission-chains-dashlet>
 
                             <!-- Suspect Cases where the lab result is pending -->
@@ -341,7 +343,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-cases-pending-lab-results-dashlet>
 
                             <!-- Number of cases who are not identified though known contact list -->
@@ -355,7 +358,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-cases-not-identified-through-contacts-dashlet>
 
                             <!-- Contacts per case mean -->
@@ -369,7 +373,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-contacts-per-case-mean-dashlet>
 
                             <!-- Contacts per case median -->
@@ -383,7 +388,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-contacts-per-case-median-dashlet>
 
                             <!-- Contacts on the follow-up list -->
@@ -397,7 +403,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-contacts-on-followup-list-dashlet>
 
                             <!-- Contacts Lost to follow-up -->
@@ -411,7 +418,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-contacts-lost-to-follow-up-dashlet>
 
                             <!-- Contacts Not Seen -->
@@ -425,7 +433,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-contacts-not-seen-dashlet>
 
                             <!-- Number of contacts becoming cases in period & location -->
@@ -439,7 +448,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-contacts-become-cases-dashlet>
 
                             <!-- Contacts seen each day -->
@@ -453,7 +463,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-contacts-seen-each-day-dashlet>
 
                             <!-- Contacts with successful follow-ups -->
@@ -467,7 +478,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-contacts-with-successful-follow-ups-dashlet>
 
                             <!-- number of independent chains of transmission -->

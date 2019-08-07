@@ -132,10 +132,29 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
                 });
             }
 
+            // exclude discarded cases
+            qb.include('people').queryBuilder.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
+
             // location
             if (this.globalFilterLocationId) {
                 qb.include('people').queryBuilder.filter
                     .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
+            }
+
+            // classification
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
+                qb.include('people').queryBuilder.filter
+                    .where({
+                        and: [{
+                            classification: {
+                                inq: this.globalFilterClassificationId
+                            }
+                        }]
+                    });
             }
 
             // release previous subscriber

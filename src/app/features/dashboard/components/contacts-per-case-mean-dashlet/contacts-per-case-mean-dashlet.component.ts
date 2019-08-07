@@ -6,6 +6,8 @@ import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { Constants } from '../../../../core/models/constants';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-contacts-per-case-mean-dashlet',
@@ -82,10 +84,29 @@ export class ContactsPerCaseMeanDashletComponent extends DashletComponent implem
                 );
             }
 
+            // exclude discarded cases
+            qb.include('people').queryBuilder.filter.where({
+                classification: {
+                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                }
+            });
+
             // location
             if (this.globalFilterLocationId) {
                 qb.include('people').queryBuilder.filter
                     .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
+            }
+
+            // classification
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
+                qb.include('people').queryBuilder.filter
+                    .where({
+                        and: [{
+                            classification: {
+                                inq: this.globalFilterClassificationId
+                            }
+                        }]
+                    });
             }
 
             // release previous subscriber
@@ -99,7 +120,7 @@ export class ContactsPerCaseMeanDashletComponent extends DashletComponent implem
             this.previousSubscriber = this.relationshipDataService
                 .getMetricsOfContactsPerCase(this.outbreakId, qb)
                 .subscribe((result) => {
-                    this.meanNoContactsPerCase = result.meanNoContactsPerCase;
+                    this.meanNoContactsPerCase = Math.round(result.meanNoContactsPerCase);
                     this.displayLoading = false;
                 });
         }
