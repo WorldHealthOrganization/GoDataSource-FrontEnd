@@ -13,6 +13,12 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiContactFields
+         */
+        'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE': 'End of the followup',
+        'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE_DESCRIPTION': '',
+
+        /**
          * uiDashboardPage
          */
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE': 'Contacts on the follow-up list ( {{date}} )',
