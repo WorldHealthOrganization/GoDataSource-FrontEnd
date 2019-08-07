@@ -120,7 +120,7 @@ export class ContactsPerCaseMeanDashletComponent extends DashletComponent implem
             this.previousSubscriber = this.relationshipDataService
                 .getMetricsOfContactsPerCase(this.outbreakId, qb)
                 .subscribe((result) => {
-                    this.meanNoContactsPerCase = result.meanNoContactsPerCase;
+                    this.meanNoContactsPerCase = Math.round(result.meanNoContactsPerCase);
                     this.displayLoading = false;
                 });
         }
