@@ -13,7 +13,7 @@ export class CaseChronology {
         const chronologyEntries: ChronologyItem [] = [];
         const sourcePersons = [];
 
-        // function that return all source persons for every relationship
+        // create function that return all source persons for every relationship
         const getSourcePersons = (caseDataId: string,
                                   relationships: RelationshipModel[]) => {
             _.forEach(relationships, (relationship) => {
