@@ -17,7 +17,8 @@
                     <!-- Filters -->
                     <div *ngIf="filterOptions.length > 0" class="section filters-section" fxLayout="column">
 
-                        <div>
+                        <div
+                            class="filters-load-filter">
                             <app-form-select
                                 name="loadFilter"
                                 [ngModel]="loadedFilter?.id"
