@@ -108,7 +108,8 @@ export class TransmissionChainBarsService {
         dateOutcomeBurialColor: '#990000',
         dateOutcomeBurialTextColor: 'black',
         // opacity for cells that are before date of onset
-        beforeDateOfOnsetOpacity: 0.35
+        beforeDateOfOnsetOpacity: 0.35,
+        relationshipStrokeColor: '#555555'
     };
 
     // data used to draw the graph
@@ -941,9 +942,8 @@ export class TransmissionChainBarsService {
             .attr('height', (moment(entityData.lastGraphDate).startOf('day').diff(dateMoment, 'days') + 1) * this.cellHeight)
             .attr('fill', 'transparent')
             .attr('stroke', 'black')
-            .attr('stroke-width', '1')
-            // .attr('shape-rendering', 'crispEdges');
-            .attr('shape-rendering', 'optimizeQuality');
+            .attr('stroke-width', '2')
+            .attr('shape-rendering', 'optimizeSpeed');
 
         /**
          * Show relationships with different color when hover on a Case / Event
@@ -1092,7 +1092,7 @@ export class TransmissionChainBarsService {
             // draw connection line
             this.graphEntityContainer.append('line')
                 .attr('class', `relationship source-entity-${sourceEntityId}`)
-                .attr('stroke', 'black')
+                .attr('stroke', this.graphConfig.relationshipStrokeColor)
                 .attr('stroke-width', `${this.relationshipStrokeWidth}px`)
                 .attr('x1', lineStartX)
                 .attr('y1', y)
@@ -1103,7 +1103,7 @@ export class TransmissionChainBarsService {
         // draw the horizontal line from the source case / event to the target case / event
         this.graphEntityContainer.append('line')
             .attr('class', `relationship source-entity-${sourceEntityId}`)
-            .attr('stroke', 'black')
+            .attr('stroke', this.graphConfig.relationshipStrokeColor)
             .attr('stroke-width', `${this.relationshipStrokeWidth}px`)
             .attr('x1', lineStartX)
             .attr('y1', lineStartY)
@@ -1129,7 +1129,7 @@ export class TransmissionChainBarsService {
         // draw the vertical line (arrow's base)
         this.graphEntityContainer.append('line')
             .attr('class', `relationship source-entity-${sourceEntityId}`)
-            .attr('stroke', 'black')
+            .attr('stroke', this.graphConfig.relationshipStrokeColor)
             .attr('stroke-width', `${this.relationshipStrokeWidth}px`)
             .attr('x1', lineEndX)
             .attr('y1', lineEndY)
@@ -1139,12 +1139,12 @@ export class TransmissionChainBarsService {
         // draw the top of the arrow
         this.graphEntityContainer.append('polygon')
             .attr('class', `relationship source-entity-${sourceEntityId}`)
-            .attr('fill', 'black')
+            .attr('fill', this.graphConfig.relationshipStrokeColor)
             .attr('points', `${arrowX},${arrowY} ${arrowX - 5},${(arrowY - 8)} ${arrowX + 5},${arrowY - 8}`);
     }
 
     /**
-     * Draw graph center cenlls
+     * Draw graph center cells
      */
     private drawGraphCenterNames() {
         // position svg
@@ -1195,7 +1195,7 @@ export class TransmissionChainBarsService {
                 .attr('fill', 'transparent')
                 .attr('stroke', 'black')
                 .attr('stroke-width', '1')
-                .attr('shape-rendering', 'optimizeQuality');
+                .attr('shape-rendering', 'optimizeSpeed');
 
             // draw color rectangle
             group.append('rect')
