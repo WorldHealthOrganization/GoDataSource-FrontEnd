@@ -73,7 +73,7 @@ export class TransmissionChainBarsService {
     // regular cell height
     private cellHeight = 25;
     // space between cases / events
-    private marginBetween = 7;
+    private marginBetween = 10;
     // date cell width (first column)
     private dateCellWidth = 100;
     // case / event details cell height (first row)
@@ -87,13 +87,33 @@ export class TransmissionChainBarsService {
     private graphExtraHeight = 30;
     // keep occupied space so we determine intersection
     private relationshipOccupiedSpaces: {
-        [y: number]: Line[]
-    } = {};
-    private relationshipOccupiedSpacesMaxY: number = 0;
+        yLines: {
+            values: {
+                [y: number]: Line[]
+            },
+            max: number
+        },
+        xLines: {
+            values: {
+                [x: number]: Line[]
+            },
+            max: number
+        }
+    } = {
+        yLines: {
+            values: {},
+            max: 0
+        },
+        xLines: {
+            values: {},
+            max: 0
+        }
+    };
     // relationship line width
     private relationshipStrokeWidth: number = 1;
-    // relationship line width
-    private relationshipSpaceBetweenStrokes: number = 3;
+    // relationship spaces between lines
+    private relationshipSpaceBetweenStrokesY: number = 3;
+    private relationshipSpaceBetweenStrokesX: number = 8;
 
     // keeping this config centralized in case / event we need to make the graph configurable by the user
     public graphConfig = {
@@ -580,8 +600,16 @@ export class TransmissionChainBarsService {
         const entitiesGraphWidth = this.graphData.personsOrder.length * (this.marginBetween + this.cellWidth) + 20;
 
         // reset occupied spaces
-        this.relationshipOccupiedSpaces = {};
-        this.relationshipOccupiedSpacesMaxY = 0;
+        this.relationshipOccupiedSpaces = {
+            yLines: {
+                values: {},
+                max: 0
+            },
+            xLines: {
+                values: {},
+                max: 0
+            }
+        };
 
         // create entities container
         this.graphEntityContainer = this.graphContainer.append('div')
@@ -1049,42 +1077,81 @@ export class TransmissionChainBarsService {
 
         // determine line coordinates
         const leftOrRight = (sourceEntityColumnIdx < targetEntityColumnIdx) ? 1 : 0;
-        let lineStartX = (sourceEntityColumnIdx * (this.marginBetween + this.cellWidth)) + (leftOrRight * this.cellWidth);
         const halfCellHeight = Math.round(this.cellHeight / 2);
         const lineInitialStartY = this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight + (this.datesMap[sourceEntityFirstGraphDate] * this.cellHeight) + halfCellHeight;
         let lineStartY = lineInitialStartY;
         // stop at the horizontal of the target case's / event's bar
-        const lineEndX = (targetEntityColumnIdx * (this.marginBetween + this.cellWidth)) + this.relationshipXMargin;
         let lineEndY = lineStartY;
-        // draw the arrow at the horizontal middle of the target case's / event's bar, but touching the bar
-        const arrowX = lineEndX;
-        const arrowY = this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight + (this.datesMap[targetEntityFirstGraphDate] * this.cellHeight);
+
+        // x coordinates
+        const initialLineStartX: number = (sourceEntityColumnIdx * (this.marginBetween + this.cellWidth)) + (leftOrRight * this.cellWidth);
+        let lineStartX = initialLineStartX;
+        const initialLineStartY: number = (targetEntityColumnIdx * (this.marginBetween + this.cellWidth)) + this.relationshipXMargin;
+        let lineEndX = initialLineStartY;
 
         // determine if line intersects another relationship line
         const x1: number = lineStartX <= lineEndX ? lineStartX : lineEndX;
         const x2: number = lineStartX <= lineEndX ? lineEndX : lineStartX;
         while (
-            this.relationshipOccupiedSpaces[lineStartY] !== undefined &&
+            this.relationshipOccupiedSpaces.yLines.values[lineStartY] !== undefined &&
             _.find(
-                this.relationshipOccupiedSpaces[lineStartY],
-                (line: Line) => {
-                    return (x1 >= line.x1 && x1 <= line.x2) ||
-                        (x2 >= line.x1 && x2 <= line.x2) ||
-                        (line.x1 >= x1 && line.x1 <= x2) ||
-                        (line.x2 >= x1 && line.x2 <= x2);
+                this.relationshipOccupiedSpaces.yLines.values[lineStartY],
+                (yLine: Line) => {
+                    return (x1 >= yLine.x1 && x1 <= yLine.x2) ||
+                        (x2 >= yLine.x1 && x2 <= yLine.x2) ||
+                        (yLine.x1 >= x1 && yLine.x1 <= x2) ||
+                        (yLine.x2 >= x1 && yLine.x2 <= x2);
                 }
             )
         ) {
             // try next one
-            lineStartY += this.relationshipStrokeWidth + this.relationshipSpaceBetweenStrokes;
+            lineStartY += this.relationshipStrokeWidth + this.relationshipSpaceBetweenStrokesY;
             lineEndY = lineStartY;
+        }
+
+        // draw the arrow at the horizontal middle of the target case's / event's bar, but touching the bar
+        const arrowY = this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight + (this.datesMap[targetEntityFirstGraphDate] * this.cellHeight);
+
+        // update x position if necessary
+        // in some cases we might need to update y position after this one, but this case has few chances and until we encounter it there is no point to put more stress on performance
+        const y1: number = arrowY <= lineEndY ? arrowY : lineEndY;
+        const y2: number = arrowY <= lineEndY ? lineEndY : arrowY;
+        while (
+            this.relationshipOccupiedSpaces.xLines.values[lineEndX] !== undefined &&
+            _.find(
+                this.relationshipOccupiedSpaces.xLines.values[lineEndX],
+                (xLine: Line) => {
+                    return (y1 >= xLine.y1 && y1 <= xLine.y2) ||
+                        (y2 >= xLine.y1 && y2 <= xLine.y2) ||
+                        (xLine.y1 >= y1 && xLine.y1 <= y2) ||
+                        (xLine.y2 >= y1 && xLine.y2 <= y2);
+                }
+            )
+        ) {
+            // try next one
+            lineEndX += this.relationshipStrokeWidth + this.relationshipSpaceBetweenStrokesX;
+
+            // if bigger then parent cell width, then we need to draw it on top...we can't draw it somewhere else...
+            if (lineEndX > initialLineStartY + this.cellWidth - this.relationshipXMargin) {
+                // reset position to the beg of the cell
+                lineEndX = initialLineStartY;
+
+                // we might want to extend this behaviour, to move it on Y when X is full..
+                // #TODO
+
+                // force break so we don't do an infinite while
+                break;
+            }
         }
 
         // draw connection lines ?
         if (lineStartY > lineInitialStartY) {
             // draw line a bit more on the right if needed
             let y: number = lineInitialStartY;
-            if (lineStartY > lineInitialStartY + halfCellHeight) {
+            if (
+                lineStartY > lineInitialStartY + halfCellHeight &&
+                lineStartX === initialLineStartX
+            ) {
                 lineStartX += this.relationshipXMargin;
                 y = lineInitialStartY + halfCellHeight;
             }
@@ -1110,21 +1177,35 @@ export class TransmissionChainBarsService {
             .attr('x2', lineEndX)
             .attr('y2', lineEndY);
 
-        // add line to list of intersections
-        if (!this.relationshipOccupiedSpaces[lineStartY]) {
-            this.relationshipOccupiedSpaces[lineStartY] = [];
-        }
-        this.relationshipOccupiedSpaces[lineStartY].push({
+        // define line of intersection
+        const line: Line = {
             x1: x1,
             x2: x2,
-            y1: lineStartY,
-            y2: lineEndY
-        });
+            y1: y1,
+            y2: y2
+        };
 
-        // ste max relationship line y
-        this.relationshipOccupiedSpacesMaxY = lineStartY < this.relationshipOccupiedSpacesMaxY ?
-            this.relationshipOccupiedSpacesMaxY :
+        // add Y line to list of intersections
+        if (!this.relationshipOccupiedSpaces.yLines.values[lineStartY]) {
+            this.relationshipOccupiedSpaces.yLines.values[lineStartY] = [];
+        }
+        this.relationshipOccupiedSpaces.yLines.values[lineStartY].push(line);
+
+        // set max relationship line y
+        this.relationshipOccupiedSpaces.yLines.max = lineStartY < this.relationshipOccupiedSpaces.yLines.max ?
+            this.relationshipOccupiedSpaces.yLines.max :
             lineStartY;
+
+        // add X line to list of intersections
+        if (!this.relationshipOccupiedSpaces.xLines.values[lineEndX]) {
+            this.relationshipOccupiedSpaces.xLines.values[lineEndX] = [];
+        }
+        this.relationshipOccupiedSpaces.xLines.values[lineEndX].push(line);
+
+        // set max relationship line x
+        this.relationshipOccupiedSpaces.xLines.max = lineEndX < this.relationshipOccupiedSpaces.xLines.max ?
+            this.relationshipOccupiedSpaces.xLines.max :
+            lineEndX;
 
         // draw the vertical line (arrow's base)
         this.graphEntityContainer.append('line')
@@ -1133,14 +1214,14 @@ export class TransmissionChainBarsService {
             .attr('stroke-width', `${this.relationshipStrokeWidth}px`)
             .attr('x1', lineEndX)
             .attr('y1', lineEndY)
-            .attr('x2', arrowX)
+            .attr('x2', lineEndX)
             .attr('y2', arrowY);
 
         // draw the top of the arrow
         this.graphEntityContainer.append('polygon')
             .attr('class', `relationship source-entity-${sourceEntityId}`)
             .attr('fill', this.graphConfig.relationshipStrokeColor)
-            .attr('points', `${arrowX},${arrowY} ${arrowX - 5},${(arrowY - 8)} ${arrowX + 5},${arrowY - 8}`);
+            .attr('points', `${lineEndX},${arrowY} ${lineEndX - 5},${(arrowY - 8)} ${lineEndX + 5},${arrowY - 8}`);
     }
 
     /**
@@ -1237,7 +1318,7 @@ export class TransmissionChainBarsService {
         const datesHeight: number = this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight + daysNo * this.cellHeight;
 
         // visual-id-column-height + days-no * cell-height
-        return Math.max(datesHeight, this.relationshipOccupiedSpacesMaxY)
+        return Math.max(datesHeight, this.relationshipOccupiedSpaces.yLines.max)
             + this.graphExtraHeight;
     }
 
