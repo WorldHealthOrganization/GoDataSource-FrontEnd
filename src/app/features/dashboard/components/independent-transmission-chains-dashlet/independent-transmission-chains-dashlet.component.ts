@@ -6,6 +6,7 @@ import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-independent-transmission-chains-dashlet',
@@ -81,16 +82,57 @@ export class IndependentTransmissionChainsDashletComponent extends DashletCompon
             if (this.globalFilterDate) {
                 qb.filter.byEquality(
                     'endDate',
-                    this.globalFilterDate.format('YYYY-MM-DD')
+                    this.globalFilterDate.toISOString()
                 );
             }
 
             // location
             if (this.globalFilterLocationId) {
-                qb.addChildQueryBuilder('person').filter.byEquality(
-                    'addresses.parentLocationIdFilter',
-                    this.globalFilterLocationId
-                );
+                qb.addChildQueryBuilder('person').filter.where({
+                    or: [
+                        {
+                            type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT',
+                            'address.parentLocationIdFilter': this.globalFilterLocationId
+                        }, {
+                            type: {
+                                inq: [
+                                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
+                                ]
+                            },
+                            'addresses.parentLocationIdFilter': this.globalFilterLocationId
+                        }
+                    ]
+                });
+            }
+
+            // discarded cases
+            // handled by API
+            // NOTHING to do here
+
+            // classification
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
+                // define classification conditions
+                const classificationConditions = {
+                    or: [
+                        {
+                            type: {
+                                neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
+                            }
+                        }, {
+                            type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                            classification: {
+                                inq: this.globalFilterClassificationId
+                            }
+                        }
+                    ]
+                };
+
+                // isolated classification
+                qb.filter.where(classificationConditions);
+
+                // person
+                qb.addChildQueryBuilder('person').filter.where(classificationConditions);
             }
 
             // release previous subscriber

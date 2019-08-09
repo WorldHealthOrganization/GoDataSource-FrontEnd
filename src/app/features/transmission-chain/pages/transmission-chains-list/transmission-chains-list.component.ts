@@ -130,9 +130,47 @@ export class TransmissionChainsListComponent extends ListComponent implements On
 
                     // location
                     if (globalFilters.locationId) {
-                        qb.include('people').queryBuilder.filter
-                            .byEquality('type', EntityType.CASE)
-                            .byEquality('addresses.parentLocationIdFilter', globalFilters.locationId);
+                        qb.addChildQueryBuilder('person').filter.where({
+                            or: [
+                                {
+                                    type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT',
+                                    'address.parentLocationIdFilter': globalFilters.locationId
+                                }, {
+                                    type: {
+                                        inq: [
+                                            'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                            'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
+                                        ]
+                                    },
+                                    'addresses.parentLocationIdFilter': globalFilters.locationId
+                                }
+                            ]
+                        });
+                    }
+
+                    // classification
+                    if (globalFilters.classificationId) {
+                        // define classification conditions
+                        const classificationConditions = {
+                            or: [
+                                {
+                                    type: {
+                                        neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
+                                    }
+                                }, {
+                                    type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                    classification: {
+                                        inq: globalFilters.classificationId
+                                    }
+                                }
+                            ]
+                        };
+
+                        // top level classification
+                        qb.filter.where(classificationConditions);
+
+                        // person
+                        qb.addChildQueryBuilder('person').filter.where(classificationConditions);
                     }
             }
 
