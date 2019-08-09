@@ -310,7 +310,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="locationsListOptions$ | async"
-                            (optionChanged)="filterByRelation('locations').bySelect('id', $event)"
+                            (optionChanged)="filterBySelectField('addresses.locationId', $event)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [displayInvisibleItems]="true"

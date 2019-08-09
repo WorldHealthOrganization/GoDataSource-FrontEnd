@@ -492,6 +492,10 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID'
             }),
             new VisibleColumnModel({
+                field: 'location',
+                label: 'LNG_CONTACT_FIELD_LABEL_LOCATION'
+            }),
+            new VisibleColumnModel({
                 field: 'age',
                 label: 'LNG_CONTACT_FIELD_LABEL_AGE'
             }),
@@ -510,10 +514,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             new VisibleColumnModel({
                 field: 'dateOfLastContact',
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
-            }),
-            new VisibleColumnModel({
-                field: 'location',
-                label: 'LNG_CONTACT_FIELD_LABEL_LOCATION'
             }),
             new VisibleColumnModel({
                 field: 'followUp.endDate',
