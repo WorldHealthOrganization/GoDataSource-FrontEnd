@@ -82,7 +82,7 @@ export class IndependentTransmissionChainsDashletComponent extends DashletCompon
             if (this.globalFilterDate) {
                 qb.filter.byEquality(
                     'endDate',
-                    this.globalFilterDate.toISOString()
+                    this.globalFilterDate.endOf('day').toISOString()
                 );
             }
 

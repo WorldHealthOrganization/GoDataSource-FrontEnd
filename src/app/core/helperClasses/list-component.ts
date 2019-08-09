@@ -1224,16 +1224,56 @@ export abstract class ListComponent implements OnDestroy {
 
                 // date
                 if (globalFilters.date) {
-                    this.appliedListFilterQueryBuilder.filter.byEquality(
-                        'endDate',
-                        globalFilters.date.endOf('day').format('YYYY-MM-DD')
+                    this.appliedListFilterQueryBuilder.filter.byDateRange(
+                        'contactDate', {
+                            endDate: globalFilters.date.endOf('day').format()
+                        }
                     );
                 }
 
                 // location
                 if (globalFilters.locationId) {
-                    this.appliedListFilterQueryBuilder.include('people').queryBuilder.filter
-                        .byEquality('addresses.parentLocationIdFilter', globalFilters.locationId);
+                    this.appliedListFilterQueryBuilder.addChildQueryBuilder('person').filter.where({
+                        or: [
+                            {
+                                type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT',
+                                'address.parentLocationIdFilter': globalFilters.locationId
+                            }, {
+                                type: {
+                                    inq: [
+                                        'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                        'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
+                                    ]
+                                },
+                                'addresses.parentLocationIdFilter': globalFilters.locationId
+                            }
+                        ]
+                    });
+                }
+
+                // classification
+                if (globalFilters.classificationId) {
+                    // define classification conditions
+                    const classificationConditions = {
+                        or: [
+                            {
+                                type: {
+                                    neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
+                                }
+                            }, {
+                                type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                classification: {
+                                    inq: globalFilters.classificationId
+                                }
+                            }
+                        ]
+                    };
+
+                    // top level classification
+                    this.appliedListFilterQueryBuilder.filter.where(classificationConditions);
+
+                    // person
+                    this.appliedListFilterQueryBuilder.addChildQueryBuilder('person').filter.where(classificationConditions);
                 }
 
                 // merge query builder
