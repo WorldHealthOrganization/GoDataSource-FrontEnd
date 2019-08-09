@@ -734,7 +734,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
 
-            // ...
+            // retrieve location list
             this.queryBuilder.include('locations', true);
 
             // retrieve the list of Contacts
