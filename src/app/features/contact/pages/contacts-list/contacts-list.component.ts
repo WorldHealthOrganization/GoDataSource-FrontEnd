@@ -11,7 +11,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, DialogField, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -34,6 +34,7 @@ import { RequestFilter } from '../../../../core/helperClasses/request-query-buil
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 
 @Component({
     selector: 'app-contacts-list',
@@ -513,19 +514,23 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             }),
             new VisibleColumnModel({
                 field: 'createdBy',
-                label: 'LNG_CONTACT_FIELD_LABEL_CREATED_BY'
+                label: 'LNG_CONTACT_FIELD_LABEL_CREATED_BY',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'createdAt',
-                label: 'LNG_CONTACT_FIELD_LABEL_CREATED_AT'
+                label: 'LNG_CONTACT_FIELD_LABEL_CREATED_AT',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'updatedBy',
-                label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_BY'
+                label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_BY',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'updatedAt',
-                label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_AT'
+                label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_AT',
+                visible: false
             })
         ];
     }
@@ -1141,5 +1146,109 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 }
             }
         );
+    }
+
+    /**
+     * Change Contact Followup status for all records matching this.queryBuilder
+     */
+    changeContactFinalFollowUpStatus() {
+        // to continue we need to make sure we have an outbreak selected
+        if (
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id
+        ) {
+            return;
+        }
+
+        // construct query builder user to count & update contacts
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
+        countQueryBuilder.fields('id', 'followUp');
+
+        // display loading while determining how many records will be deleted
+        this.showLoadingDialog();
+
+        // make all requests in parallel
+        forkJoin(
+            // retrieve follow-up statuses
+            this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS),
+
+            // count contacts
+            this.contactDataService.getContactsList(this.selectedOutbreak.id, countQueryBuilder)
+        ).subscribe((
+            [statuses, records]: [LabelValuePair[], ContactModel[]]
+        ) => {
+            // hide loading
+            this.closeLoadingDialog();
+
+            // display change status dialog
+            this.dialogService
+                .showInput(
+                    new DialogConfiguration({
+                        message: 'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE',
+                        translateData: {
+                            count: records.length
+                        },
+                        yesLabel: 'LNG_COMMON_BUTTON_UPDATE',
+                        fieldsList: [
+                            new DialogField({
+                                name: 'followUp.status',
+                                placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
+                                description: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION',
+                                required: true,
+                                fieldType: DialogFieldType.SELECT,
+                                inputOptionsMultiple: false,
+                                inputOptionsClearable: false,
+                                inputOptions: statuses
+                            })
+                        ]
+                    })
+                )
+                .subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        // update contacts
+                        const putRecordsData = records.map((contact: ContactModel) => ({
+                            id: contact.id,
+                            followUp: Object.assign(
+                                contact.followUp, {
+                                    status: answer.inputValue.value.followUp.status
+                                }
+                            )
+                        }));
+
+                        // display loading while determining how many records will be deleted
+                        this.showLoadingDialog();
+
+                        // update statuses
+                        this.contactDataService
+                            .bulkModifyContacts(
+                                this.selectedOutbreak.id,
+                                putRecordsData
+                            )
+                            .pipe(
+                                catchError((err) => {
+                                    this.closeLoadingDialog();
+                                    this.snackbarService.showApiError(err);
+                                    return throwError(err);
+                                })
+                            )
+                            .subscribe(() => {
+                                // success message
+                                this.snackbarService.showSuccess(
+                                    'LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE', {
+                                        count: records.length
+                                    }
+                                );
+
+                                // close dialog
+                                this.closeLoadingDialog();
+
+                                // refresh list
+                                this.needsRefreshList(true);
+                            });
+                    }
+                });
+        });
     }
 }

@@ -440,19 +440,23 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             }),
             new VisibleColumnModel({
                 field: 'createdBy',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY'
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'createdAt',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT'
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'updatedBy',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY'
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'updatedAt',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT'
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT',
+                visible: false
             })
         ];
     }
