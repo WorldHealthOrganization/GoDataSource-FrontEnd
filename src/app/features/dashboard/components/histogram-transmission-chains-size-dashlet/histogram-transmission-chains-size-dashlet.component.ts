@@ -11,7 +11,6 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { Subscriber, Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Moment } from '../../../../core/helperClasses/x-moment';
-import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-histogram-transmission-chains-size-dashlet',
@@ -229,36 +228,57 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
             if (this.globalFilterDate) {
                 qb.filter.byEquality(
                     'endDate',
-                    this.globalFilterDate.format('YYYY-MM-DD')
+                    this.globalFilterDate.toISOString()
                 );
             }
 
-            // person query
-            const personQuery = qb.addChildQueryBuilder('person');
-
-            // exclude discarded cases
-            personQuery.filter.where({
-                classification: {
-                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
-                }
-            });
+            // discarded cases
+            // handled by API
+            // NOTHING to do here
 
             // location
             if (this.globalFilterLocationId) {
-                personQuery.filter.byEquality(
-                    'addresses.parentLocationIdFilter',
-                    this.globalFilterLocationId
-                );
+                qb.addChildQueryBuilder('person').filter.where({
+                    or: [
+                        {
+                            type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT',
+                            'address.parentLocationIdFilter': this.globalFilterLocationId
+                        }, {
+                            type: {
+                                inq: [
+                                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
+                                ]
+                            },
+                            'addresses.parentLocationIdFilter': this.globalFilterLocationId
+                        }
+                    ]
+                });
             }
 
             // classification
             if (!_.isEmpty(this.globalFilterClassificationId)) {
-                personQuery.filter.bySelect(
-                    'classification',
-                    this.globalFilterClassificationId,
-                    false,
-                    null
-                );
+                // define classification conditions
+                const classificationConditions = {
+                    or: [
+                        {
+                            type: {
+                                neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
+                            }
+                        }, {
+                            type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                            classification: {
+                                inq: this.globalFilterClassificationId
+                            }
+                        }
+                    ]
+                };
+
+                // isolated classification
+                qb.filter.where(classificationConditions);
+
+                // person
+                qb.addChildQueryBuilder('person').filter.where(classificationConditions);
             }
 
             // get chain data and convert to array of size and number
