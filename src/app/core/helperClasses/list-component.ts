@@ -1252,7 +1252,7 @@ export abstract class ListComponent implements OnDestroy {
                 }
 
                 // classification
-                if (globalFilters.classificationId) {
+                if (!_.isEmpty(globalFilters.classificationId)) {
                     // define classification conditions
                     const classificationConditions = {
                         or: [
