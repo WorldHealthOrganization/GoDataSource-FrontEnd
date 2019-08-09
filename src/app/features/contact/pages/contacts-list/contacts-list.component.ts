@@ -35,6 +35,8 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { LocationModel } from '../../../../core/models/location.model';
 
 @Component({
     selector: 'app-contacts-list',
@@ -68,6 +70,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
     // gender list
     genderList$: Observable<any[]>;
+
+    // location list
+    locationsListOptions$: Observable<any[]>;
 
     // contacts grouped by risk level
     countedContactsByRiskLevel$: Observable<any[]>;
@@ -342,7 +347,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
+        private locationDataService: LocationDataService
     ) {
         super(
             snackbarService,
@@ -387,6 +393,15 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
+        const locationsList = this.locationDataService.getLocationsList().pipe(share());
+        this.locationsListOptions$ = locationsList
+            .pipe(
+                map((data: LocationModel[]) => {
+                    return _.map(data, (entry: LocationModel) =>
+                        new LabelValuePair(entry.name, entry.id)
+                    );
+                })
+            );
         this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
         this.riskLevelRefData$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).pipe(share());
         this.riskLevelsList$ = this.riskLevelRefData$
@@ -495,6 +510,10 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             new VisibleColumnModel({
                 field: 'dateOfLastContact',
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
+            }),
+            new VisibleColumnModel({
+                field: 'location',
+                label: 'LNG_CONTACT_FIELD_LABEL_LOCATION'
             }),
             new VisibleColumnModel({
                 field: 'followUp.endDate',
@@ -714,6 +733,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
+
+            // ...
+            this.queryBuilder.include('locations', true);
 
             // retrieve the list of Contacts
             this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder)
