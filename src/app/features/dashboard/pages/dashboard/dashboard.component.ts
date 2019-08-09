@@ -474,6 +474,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
             );
         }
 
+        // classification
+        // since we display all classifications in the exported file, it would be strange to filter them by classification
+        // so there is nothing to filter here
+        // if (this.globalFilterClassificationId) {
+        //     qb.filter.bySelect(
+        //         'classification',
+        //         this.globalFilterClassificationId,
+        //         false,
+        //         null
+        //     );
+        // }
+
         // finished
         return qb;
     }
@@ -501,6 +513,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 this.globalFilterLocationId
             );
         }
+
+        // classification
+        // there is no need to filter by classification since this api filters contacts and not cases...
+        // if (this.globalFilterClassificationId) {
+        //     qb.filter.bySelect(
+        //         'classification',
+        //         this.globalFilterClassificationId,
+        //         false,
+        //         null
+        //     );
+        // }
 
         // finished
         return qb;
