@@ -285,25 +285,25 @@ export class TransmissionChainBarsService {
             const entityData: EntityBarModel = this.graphData.personsMap[entityId];
             entityData.centerNames.forEach((centerName: string) => {
                 // init data for this center name
-                const centerNameLowerCase = centerName.toLowerCase();
+                const centerNameKey: string = _.camelCase(centerName);
 
                 // check if we need to create a new cell or we can use the previous one
                 if (
-                    centerNameMapLastCells[centerNameLowerCase] &&
-                    centerNameMapLastCells[centerNameLowerCase].entityStartIndex + centerNameMapLastCells[centerNameLowerCase].cells >= entityIndex
+                    centerNameMapLastCells[centerNameKey] &&
+                    centerNameMapLastCells[centerNameKey].entityStartIndex + centerNameMapLastCells[centerNameKey].cells >= entityIndex
                 ) {
                     // extend the existing one
-                    centerNameMapLastCells[centerNameLowerCase].cells++;
+                    centerNameMapLastCells[centerNameKey].cells++;
 
                     // map entity to cell
                     if (!this.entityToCenterNameCell[entityId]) {
                         this.entityToCenterNameCell[entityId] = {};
                     }
-                    this.entityToCenterNameCell[entityId][centerNameLowerCase] = centerNameMapLastCells[centerNameLowerCase];
+                    this.entityToCenterNameCell[entityId][centerNameKey] = centerNameMapLastCells[centerNameKey];
                 } else {
                     // create a new one
                     const newCenterNameCell: GroupCell = {
-                        nameCompare: centerNameLowerCase,
+                        nameCompare: centerNameKey,
                         name: centerName,
                         entityStartIndex: entityIndex,
                         cells: 1,
@@ -943,16 +943,16 @@ export class TransmissionChainBarsService {
                             .attr('y', this.cellHeight / 2);
 
                         // render center name color
-                        const centerNameLowerCase: string = drawCell.centerName ? drawCell.centerName.trim().toLowerCase() : null;
+                        const centerNameKey: string = drawCell.centerName ? _.camelCase(drawCell.centerName) : null;
                         if (
-                            centerNameLowerCase &&
-                            this.entityToCenterNameCell[entityId][centerNameLowerCase]
+                            centerNameKey &&
+                            this.entityToCenterNameCell[entityId][centerNameKey]
                         ) {
                             // render rect
                             group.append('rect')
                                 .attr('width', rectWidth)
                                 .attr('height', this.centerNameCellHeight)
-                                .attr('fill', this.entityToCenterNameCell[entityId][centerNameLowerCase].bgColor)
+                                .attr('fill', this.entityToCenterNameCell[entityId][centerNameKey].bgColor)
                                 .attr('fill-opacity', opacity);
                         }
                     }
