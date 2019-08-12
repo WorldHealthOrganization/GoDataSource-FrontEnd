@@ -57,13 +57,12 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     personTypesListMap: { [id: string]: ReferenceDataEntryModel };
     clusterOptions$: Observable<any[]>;
 
-    relationshipTypeContact: boolean = false;
-
     // provide constants to template
     Constants = Constants;
     ReferenceDataCategory = ReferenceDataCategory;
     EntityType = EntityType;
     UserSettings = UserSettings;
+    RelationshipType = RelationshipType;
 
     checkedEntityModels: {
         [idRelationship: string]: EntityModel
@@ -169,10 +168,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                 {}
             );
         });
-
-        if (this.relationshipType === RelationshipType.CONTACT) {
-            this.relationshipTypeContact = true;
-        }
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
@@ -526,26 +521,23 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
 
     changeSourceForSelectedRelationships() {
         const selectedRecords: false | string [] = this.validateCheckedRecords();
-        const selectedTargetPersons: string[] = [];
+        const selectedTargetPersons = {};
         // pass the selected target persons for not including them in available peoples
         _.forEach(this.checkedEntityModels, (model) => {
             const targetPerson: RelationshipPersonModel = _.find(model.relationship.persons, 'target');
-            selectedTargetPersons.push(targetPerson.id);
+            selectedTargetPersons[targetPerson.id] = true;
         });
+
         if (!selectedRecords) {
             return;
         }
-        // keep only unique values
-        const filteredIds = selectedTargetPersons.filter((personId, index, self) => {
-            return self.indexOf(personId) === index;
-        });
 
         this.router.navigate(
             [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/switch`],
             {
                 queryParams: {
                     selectedTargetIds: JSON.stringify(selectedRecords),
-                    selectedPersonsIds: JSON.stringify(filteredIds),
+                    selectedPersonsIds: JSON.stringify(Object.keys(selectedTargetPersons)),
                     entityType: JSON.stringify(this.entityType)
                 }
             }

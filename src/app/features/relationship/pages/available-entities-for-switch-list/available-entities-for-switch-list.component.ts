@@ -317,6 +317,9 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
             }
         });
 
+        // display loading
+        const loadingDialog = this.dialogService.showLoadingDialog();
+
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CHANGE_SOURCE')
             .subscribe((answer: DialogAnswer) => {
                   if (answer.button === DialogAnswerButton.Yes) {
@@ -327,14 +330,20 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                               qb)
                           .pipe(
                               catchError((err) => {
+                                  // hide dialog
+                                  loadingDialog.close();
+
                                   this.snackbarService.showApiError(err);
                                   return throwError(err);
                               })
                           )
                           .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
+                              // hide dialog
+                              loadingDialog.close();
 
-                            this.router.navigate(['/relationships', this.entityType, selectedRecordId, 'contacts']);
+                              this.snackbarService.showSuccess('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
+
+                              this.router.navigate(['/relationships', this.entityType, selectedRecordId, 'contacts']);
 
                           });
                   }

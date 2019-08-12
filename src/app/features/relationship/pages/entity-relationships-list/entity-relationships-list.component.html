@@ -108,7 +108,7 @@
                                 <mat-divider></mat-divider>
 
                                 <button
-                                    *ngIf="relationshipTypeContact && (hasCaseWriteAccess() || hasContactWriteAccess())"
+                                    *ngIf="relationshipType === RelationshipType.CONTACT && (hasCaseWriteAccess() || hasContactWriteAccess())"
                                     mat-menu-item
                                     [disabled]="checkedRecords.length === 0"
                                     (click)="changeSourceForSelectedRelationships()">

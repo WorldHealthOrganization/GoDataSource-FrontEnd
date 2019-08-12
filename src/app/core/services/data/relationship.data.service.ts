@@ -506,7 +506,7 @@ export class RelationshipDataService {
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder
     ): Observable<any> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
-        return this.http.post(`/outbreaks/${outbreakId}/relationships/bulk-change-source?where=${whereFilter}`, {sourceId: sourceId, where: JSON.parse(whereFilter)});
+        return this.http.post(`/outbreaks/${outbreakId}/relationships/bulk-change-source`, {sourceId: sourceId, where: JSON.parse(whereFilter)});
     }
 }
 

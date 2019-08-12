@@ -13,6 +13,10 @@
     [savedFiltersType]="savedFiltersType">
 </app-side-filters>
 
+<app-total-number-of-records
+    [value]="(entitiesListCount$ | async)?.count">
+</app-total-number-of-records>
+
 <div class="page-content form-section">
     <div class="form-content">
 
@@ -175,16 +179,7 @@
                                 <div class="column-header">
                                     {{'LNG_ENTITY_FIELD_LABEL_PLACE' | translate}}
                                 </div>
-                                <div class="column-filter">
-                                    <!--<app-form-location-dropdown-->
-                                    <!--name="locationFilter"-->
-                                    <!--ngModel-->
-                                    <!--[placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
-                                    <!--(changed)="filterBySelectField('address.locationId', $event)"-->
-                                    <!--multiple="true"-->
-                                    <!--app-reset-input-on-side-filter>-->
-                                    <!--</app-form-location-dropdown>-->
-                                </div>
+                                <div class="column-filter"></div>
                             </div>
                         </mat-header-cell>
 
@@ -198,7 +193,13 @@
                 </mat-table>
 
                 <div
-                    *ngIf="isEmptyList"
+                    *ngIf="refreshingList"
+                    class="mat-table-loading-data">
+                    <mat-spinner></mat-spinner>
+                </div>
+
+                <div
+                    *ngIf="!refreshingList  && isEmptyList"
                     class="mat-table"
                 >
                     <div class="mat-row">
