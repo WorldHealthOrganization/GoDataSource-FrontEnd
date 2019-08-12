@@ -4,6 +4,7 @@ import { Constants } from '../../../../core/models/constants';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { Subscription } from 'rxjs';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-contacts-seen-each-day-dashlet',
@@ -18,6 +19,9 @@ export class ContactsSeenEachDayDashletComponent extends DashletComponent implem
     queryParams: any = {
         applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_SEEN
     };
+
+    // for which date do we display data ?
+    dataForDate: Moment = moment();
 
     // constants to be used for applyListFilter
     Constants: any = Constants;
@@ -59,8 +63,17 @@ export class ContactsSeenEachDayDashletComponent extends DashletComponent implem
             this.previousSubscriber = null;
         }
 
+        // update date
+        this.dataForDate = this.globalFilterDate ?
+            this.globalFilterDate.clone() :
+            moment();
+
         this.displayLoading = true;
-        this.previousSubscriber = this.listFilterDataService.filterContactsSeen(this.globalFilterDate, this.globalFilterLocationId)
+        this.previousSubscriber = this.listFilterDataService.filterContactsSeen(
+            this.globalFilterDate,
+            this.globalFilterLocationId,
+            this.globalFilterClassificationId
+        )
             .subscribe((result: MetricContactsSeenEachDays) => {
                 this.contactsSeenEachDay = result.contactsSeenCount;
                 this.displayLoading = false;

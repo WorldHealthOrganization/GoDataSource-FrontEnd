@@ -67,7 +67,11 @@ export class ContactsWithSuccessfulFollowUpsDashletComponent extends DashletComp
 
         // retrieve data
         this.displayLoading = true;
-        this.previousSubscriber = this.listFilterDataService.filterContactsWithSuccessfulFollowup(this.globalFilterDate, this.globalFilterLocationId)
+        this.previousSubscriber = this.listFilterDataService.filterContactsWithSuccessfulFollowup(
+            this.globalFilterDate,
+            this.globalFilterLocationId,
+            this.globalFilterClassificationId
+        )
             .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {
                 this.contactsWithSuccessfulFollowup = result;
                 this.displayLoading = false;

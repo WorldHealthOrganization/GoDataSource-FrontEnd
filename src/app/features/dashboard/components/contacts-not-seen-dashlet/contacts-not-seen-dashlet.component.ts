@@ -138,6 +138,17 @@ export class ContactsNotSeenDashletComponent extends DashletComponent implements
                     .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
             }
 
+            // classification
+            // !!! must be on first level and not under $and
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
+                qb.filter.bySelect(
+                    'classification',
+                    this.globalFilterClassificationId,
+                    false,
+                    null
+                );
+            }
+
             // release previous subscriber
             if (this.previousSubscriber) {
                 this.previousSubscriber.unsubscribe();

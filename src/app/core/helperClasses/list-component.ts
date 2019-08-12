@@ -762,7 +762,11 @@ export abstract class ListComponent implements OnDestroy {
             case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST:
 
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterContactsOnFollowUpLists(globalFilters.date, globalFilters.locationId)
+                this.listFilterDataService.filterContactsOnFollowUpLists(
+                    globalFilters.date,
+                    globalFilters.locationId,
+                    globalFilters.classificationId
+                )
                     .subscribe((qbFilterContactsOnFollowUpLists) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterContactsOnFollowUpLists;
@@ -939,7 +943,12 @@ export abstract class ListComponent implements OnDestroy {
                 // get the number of days if it was updated
                 const noDaysNotSeen = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterContactsNotSeen(globalFilters.date, globalFilters.locationId, noDaysNotSeen)
+                this.listFilterDataService.filterContactsNotSeen(
+                    globalFilters.date,
+                    globalFilters.locationId,
+                    globalFilters.classificationId,
+                    noDaysNotSeen
+                )
                     .subscribe((qbFilterContactsNotSeen) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterContactsNotSeen;
@@ -1067,7 +1076,11 @@ export abstract class ListComponent implements OnDestroy {
             // Filter contacts lost to follow-up
             case Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP:
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterContactsLostToFollowUp(globalFilters.date, globalFilters.locationId)
+                this.listFilterDataService.filterContactsLostToFollowUp(
+                    globalFilters.date,
+                    globalFilters.locationId,
+                    globalFilters.classificationId
+                )
                     .subscribe((qbFilterContactsLostToFollowUp) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterContactsLostToFollowUp;
@@ -1083,7 +1096,12 @@ export abstract class ListComponent implements OnDestroy {
                 // get the number of days if it was updated
                 const noDaysInChains = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterCasesInKnownChains(globalFilters.date, globalFilters.locationId, noDaysInChains)
+                this.listFilterDataService.filterCasesInKnownChains(
+                    globalFilters.date,
+                    globalFilters.locationId,
+                    globalFilters.classificationId,
+                    noDaysInChains
+                )
                     .subscribe((qbFilterCasesInKnownChains) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterCasesInKnownChains;
@@ -1122,8 +1140,17 @@ export abstract class ListComponent implements OnDestroy {
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
-                    globalFilters.locationId
+                    globalFilters.locationId,
+                    globalFilters.classificationId
                 );
+
+                // condition already include by default on cases list page
+                // globalQb.filter.bySelect(
+                //     'classification',
+                //     this.globalFilterClassificationId,
+                //     false,
+                //     null
+                // );
 
                 // date
                 if (globalFilters.date) {
@@ -1198,16 +1225,56 @@ export abstract class ListComponent implements OnDestroy {
 
                 // date
                 if (globalFilters.date) {
-                    this.appliedListFilterQueryBuilder.filter.byEquality(
-                        'endDate',
-                        globalFilters.date.endOf('day').format('YYYY-MM-DD')
+                    this.appliedListFilterQueryBuilder.filter.byDateRange(
+                        'contactDate', {
+                            endDate: globalFilters.date.endOf('day').format()
+                        }
                     );
                 }
 
                 // location
                 if (globalFilters.locationId) {
-                    this.appliedListFilterQueryBuilder.include('people').queryBuilder.filter
-                        .byEquality('addresses.parentLocationIdFilter', globalFilters.locationId);
+                    this.appliedListFilterQueryBuilder.addChildQueryBuilder('person').filter.where({
+                        or: [
+                            {
+                                type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT',
+                                'address.parentLocationIdFilter': globalFilters.locationId
+                            }, {
+                                type: {
+                                    inq: [
+                                        'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                        'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
+                                    ]
+                                },
+                                'addresses.parentLocationIdFilter': globalFilters.locationId
+                            }
+                        ]
+                    });
+                }
+
+                // classification
+                if (!_.isEmpty(globalFilters.classificationId)) {
+                    // define classification conditions
+                    const classificationConditions = {
+                        or: [
+                            {
+                                type: {
+                                    neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
+                                }
+                            }, {
+                                type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                classification: {
+                                    inq: globalFilters.classificationId
+                                }
+                            }
+                        ]
+                    };
+
+                    // top level classification
+                    this.appliedListFilterQueryBuilder.filter.where(classificationConditions);
+
+                    // person
+                    this.appliedListFilterQueryBuilder.addChildQueryBuilder('person').filter.where(classificationConditions);
                 }
 
                 // merge query builder
@@ -1224,7 +1291,8 @@ export abstract class ListComponent implements OnDestroy {
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
-                    globalFilters.locationId
+                    globalFilters.locationId,
+                    globalFilters.classificationId
                 );
 
                 // date
@@ -1285,7 +1353,11 @@ export abstract class ListComponent implements OnDestroy {
 
             // Filter contacts seen
             case Constants.APPLY_LIST_FILTER.CONTACTS_SEEN:
-                this.listFilterDataService.filterContactsSeen(globalFilters.date, globalFilters.locationId)
+                this.listFilterDataService.filterContactsSeen(
+                    globalFilters.date,
+                    globalFilters.locationId,
+                    globalFilters.classificationId
+                )
                     .subscribe((result: MetricContactsSeenEachDays) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
@@ -1303,7 +1375,11 @@ export abstract class ListComponent implements OnDestroy {
 
             // Filter contacts witch successful follow-up
             case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP:
-                this.listFilterDataService.filterContactsWithSuccessfulFollowup(globalFilters.date, globalFilters.locationId)
+                this.listFilterDataService.filterContactsWithSuccessfulFollowup(
+                    globalFilters.date,
+                    globalFilters.locationId,
+                    globalFilters.classificationId
+                )
                     .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {
                         const contactIDs: string[] = _.chain(result.contacts)
                             .filter((item: ContactFollowedUp) => item.successfulFollowupsCount > 0)
@@ -1451,7 +1527,8 @@ export abstract class ListComponent implements OnDestroy {
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
-                    globalFilters.locationId
+                    globalFilters.locationId,
+                    globalFilters.classificationId
                 );
 
                 // date
@@ -1464,6 +1541,10 @@ export abstract class ListComponent implements OnDestroy {
                 }
 
                 // get the correct query builder and merge with the existing one
+                // includes
+                // classification: {
+                //     neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+                // }
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesNotIdentifiedThroughContacts();
                 if (!globalQb.isEmpty()) {
                     this.appliedListFilterQueryBuilder.merge(globalQb);

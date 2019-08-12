@@ -328,7 +328,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             if (this.dateGlobalFilter) {
                 requestQueryBuilder.filter.byEquality(
                     'endDate',
-                    moment(this.dateGlobalFilter).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+                    moment(this.dateGlobalFilter).toISOString()
                 );
             }
 
@@ -340,18 +340,34 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             // person query
             const personQuery = requestQueryBuilder.addChildQueryBuilder('person');
 
-            // exclude discarded cases
-            personQuery.filter.where({
-                classification: {
-                    neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
-                }
-            });
+            // discarded cases
+            // handled by API
+            // NOTHING to do here
 
             // attach other filters ( locations & classifications & others... )
             if (!_.isEmpty(this.filters)) {
                 // include custom person builder that will handle these filters
                 const filterObject = new TransmissionChainFilters(this.filters);
                 filterObject.attachConditionsToRequestQueryBuilder(personQuery);
+
+                // attach classification conditions to parent qb as well ( besides personQuery )
+                // isolated classification
+                if (!_.isEmpty(filterObject.classificationId)) {
+                    requestQueryBuilder.filter.where({
+                        or: [
+                            {
+                                type: {
+                                    neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
+                                }
+                            }, {
+                                type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                classification: {
+                                    inq: filterObject.classificationId
+                                }
+                            }
+                        ]
+                    });
+                }
             }
 
             // get chain data and convert to graph nodes

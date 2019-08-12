@@ -91,6 +91,10 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
             }
 
             // merge other conditions
+            // includes
+            // classification: {
+            //     neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+            // }
             qb.merge(this.listFilterDataService.filterCasesNotIdentifiedThroughContacts());
 
             // release previous subscriber
