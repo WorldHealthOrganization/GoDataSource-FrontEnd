@@ -1269,6 +1269,15 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         const isNew: boolean = this.questionInEditModeClone.new;
         delete this.questionInEditModeClone.new;
 
+        // clean extra data which isn't needed anymore if type is markup
+        if (this.questionInEditModeClone.answerType === this.answerTypes.MARKUP.value) {
+            delete this.questionInEditModeClone.variable;
+            delete this.questionInEditModeClone.answersDisplay;
+            delete this.questionInEditModeClone.required;
+            delete this.questionInEditModeClone.multiAnswer;
+            delete this.questionInEditModeClone.answers;
+        }
+
         // clean answers
         if (
             this.questionInEditModeClone.answerType !== this.answerTypes.MULTIPLE_OPTIONS.value &&

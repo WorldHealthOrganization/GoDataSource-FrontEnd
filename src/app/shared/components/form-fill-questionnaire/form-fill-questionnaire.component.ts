@@ -24,6 +24,15 @@ interface UploaderData {
     uploading: boolean;
 }
 
+interface QuestionGroup {
+    category: string;
+    questions: QuestionModel[];
+    questionNo: {
+        [questionIndex: number]: number
+    };
+    startIndex: number;
+}
+
 @Component({
     selector: 'app-form-fill-questionnaire',
     encapsulation: ViewEncapsulation.None,
@@ -57,11 +66,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         return this._parentDate;
     }
 
-    questionsGroupedByCategory: {
-        category: string,
-        questions: QuestionModel[],
-        startIndex: number
-    }[];
+    questionsGroupedByCategory: QuestionGroup[];
 
     additionalQuestions: {
         [ variable: string ]: {
@@ -131,11 +136,8 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         // group them by category, keeping in mind the questions order
         this._uploadersData = this._uploadersDataLocked ? this.uploadersData : {};
         this.questionsGroupedByCategory = [];
-        let currentCategory: {
-            category: string,
-            questions: QuestionModel[],
-            startIndex: number
-        } = null;
+        let currentCategory: QuestionGroup = null;
+        let markupNo: number = 0;
         _.each(questions, (question: QuestionModel) => {
             // ignore inactive questions
             if (question.inactive) {
@@ -173,6 +175,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
                 currentCategory = {
                     category: question.category,
                     questions: [],
+                    questionNo: {},
                     startIndex: currentCategory ? (
                         currentCategory.startIndex + currentCategory.questions.length
                     ) : 0
@@ -182,8 +185,14 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
                 this.questionsGroupedByCategory.push(currentCategory);
             }
 
+            // this question is a markup question ?
+            if (question.answerType === Constants.ANSWER_TYPES.MARKUP.value) {
+                markupNo++;
+            }
+
             // add question
             currentCategory.questions.push(question);
+            currentCategory.questionNo[currentCategory.questions.length - 1] = currentCategory.startIndex + currentCategory.questions.length - markupNo;
         });
 
         // init value
