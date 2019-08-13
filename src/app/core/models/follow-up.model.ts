@@ -4,6 +4,7 @@ import { ContactModel } from './contact.model';
 import { DateDefaultPipe } from '../../shared/pipes/date-default-pipe/date-default.pipe';
 import { IAnswerData, QuestionModel } from './question.model';
 import { BaseModel } from './base.model';
+import { FillLocationModel } from './fill-location.model';
 
 export class FollowUpModel extends BaseModel {
     id: string;
@@ -22,6 +23,8 @@ export class FollowUpModel extends BaseModel {
 
     alerted: boolean = false;
 
+    fillLocation: FillLocationModel;
+
     constructor(
         data = null,
         includeContact: boolean = true
@@ -36,6 +39,9 @@ export class FollowUpModel extends BaseModel {
         this.outbreakId = _.get(data, 'outbreakId');
 
         this.address = new AddressModel(_.get(data, 'address'));
+
+        this.fillLocation = _.get(data, 'fillLocation');
+        this.fillLocation = _.isEmpty(this.fillLocation) ? undefined : new FillLocationModel(this.fillLocation);
 
         if (includeContact) {
             this.contact = _.get(data, 'contact', {});
