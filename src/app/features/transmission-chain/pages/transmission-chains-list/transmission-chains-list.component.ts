@@ -17,6 +17,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { tap } from 'rxjs/operators';
 import { Subscription } from 'rxjs/internal/Subscription';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-transmission-chains-list',
@@ -114,7 +115,38 @@ export class TransmissionChainsListComponent extends ListComponent implements On
                     // NOTHING - IGNORE
                     break;
 
-                // case ApplyListFilter.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES:
+                case ApplyListFilter.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES:
+                    // date
+                    qb = new RequestQueryBuilder();
+
+                    // date
+                    if (globalFilters.date) {
+                        qb.filter.byDateRange(
+                            'contactDate', {
+                                endDate: globalFilters.date.endOf('day').toISOString()
+                            }
+                        );
+                    }
+
+                    // location
+                    if (globalFilters.locationId) {
+                        qb.addChildQueryBuilder('case').filter
+                            .byEquality('addresses.parentLocationIdFilter', globalFilters.locationId);
+                    }
+
+                    // classification
+                    if (!_.isEmpty(globalFilters.classificationId)) {
+                        // person
+                        qb.addChildQueryBuilder('case').filter.where({
+                            classification: {
+                                inq: globalFilters.classificationId
+                            }
+                        });
+                    }
+
+                    // finished
+                    break;
+
                 default:
                     // date
                     qb = new RequestQueryBuilder();
@@ -123,16 +155,54 @@ export class TransmissionChainsListComponent extends ListComponent implements On
                     if (globalFilters.date) {
                         qb.filter.byDateRange(
                             'contactDate', {
-                                endDate: globalFilters.date.endOf('day').format()
+                                endDate: globalFilters.date.endOf('day').toISOString()
                             }
                         );
                     }
 
                     // location
                     if (globalFilters.locationId) {
-                        qb.include('people').queryBuilder.filter
-                            .byEquality('type', EntityType.CASE)
-                            .byEquality('addresses.parentLocationIdFilter', globalFilters.locationId);
+                        qb.addChildQueryBuilder('person').filter.where({
+                            or: [
+                                {
+                                    type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT',
+                                    'address.parentLocationIdFilter': globalFilters.locationId
+                                }, {
+                                    type: {
+                                        inq: [
+                                            'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                            'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
+                                        ]
+                                    },
+                                    'addresses.parentLocationIdFilter': globalFilters.locationId
+                                }
+                            ]
+                        });
+                    }
+
+                    // classification
+                    if (!_.isEmpty(globalFilters.classificationId)) {
+                        // define classification conditions
+                        const classificationConditions = {
+                            or: [
+                                {
+                                    type: {
+                                        neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
+                                    }
+                                }, {
+                                    type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                    classification: {
+                                        inq: globalFilters.classificationId
+                                    }
+                                }
+                            ]
+                        };
+
+                        // top level classification
+                        qb.filter.where(classificationConditions);
+
+                        // person
+                        qb.addChildQueryBuilder('person').filter.where(classificationConditions);
                     }
             }
 

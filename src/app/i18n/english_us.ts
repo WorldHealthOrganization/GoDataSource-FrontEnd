@@ -20,6 +20,14 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_SUCCESS_MSG': 'Final status updated for {{count}} contact(s)',
 
         /**
+         * uiColumnActionsOnListPages
+         */
+        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_HIDE': 'Hide',
+        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_HIDE_ALL': 'Hide All',
+        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_SHOW': 'Show',
+        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_SHOW_ALL': 'Show All',
+
+        /**
          * uiContactFields
          */
         'LNG_CONTACT_FIELD_LABEL_LOCATION': 'Location',

@@ -5,9 +5,9 @@ import { Constants } from '../../../../core/models/constants';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { EntityType } from '../../../../core/models/entity-type';
 import { Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-new-chains-of-transmission-from-registered-contacts-dashlet',
@@ -91,9 +91,18 @@ export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent exten
 
             // location
             if (this.globalFilterLocationId) {
-                qb.include('people').queryBuilder.filter
-                    .byEquality('type', EntityType.CASE)
+                qb.addChildQueryBuilder('case').filter
                     .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
+            }
+
+            // classification
+            if (!_.isEmpty(this.globalFilterClassificationId)) {
+                // person
+                qb.addChildQueryBuilder('case').filter.where({
+                    classification: {
+                        inq: this.globalFilterClassificationId
+                    }
+                });
             }
 
             // release previous subscriber

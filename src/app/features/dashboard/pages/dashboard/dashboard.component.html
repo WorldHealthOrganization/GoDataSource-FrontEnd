@@ -4,54 +4,55 @@
             <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
                 <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
-                <div class="topnav-actions">
+                <div
+                    *ngIf="!!selectedOutbreak?.id"
+                    class="topnav-actions">
 
-                    <button mat-raised-button color="accent"
-                            [matMenuTriggerFor]="quickActionsMenu">
+                    <button
+                        mat-raised-button color="accent"
+                        [matMenuTriggerFor]="quickActionsMenu">
                         {{'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL' | translate}} <span class="xt-icon">arrowDown</span>
                     </button>
 
                     <mat-menu #quickActionsMenu="matMenu">
-                        <ng-container>
-                            <app-export-button
-                                [menuItem]="true"
-                                [fileType]="ExportDataExtension.PDF"
-                                [label]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"
-                                [message]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"
-                                [url]="casesByClassificationAndLocationReportUrl"
-                                [fileName]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"
-                                (exportStart)="showLoadingDialog()"
-                                (exportFinished)="closeLoadingDialog()"
-                                [queryBuilder]="qbCaseByClassification()">
-                            </app-export-button>
+                        <app-export-button
+                            [menuItem]="true"
+                            [fileType]="ExportDataExtension.PDF"
+                            [label]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"
+                            [message]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"
+                            [url]="casesByClassificationAndLocationReportUrl"
+                            [fileName]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"
+                            (exportStart)="showLoadingDialog()"
+                            (exportFinished)="closeLoadingDialog()"
+                            [queryBuilder]="qbCaseByClassification()">
+                        </app-export-button>
 
-                            <app-export-button
-                                [menuItem]="true"
-                                [fileType]="ExportDataExtension.PDF"
-                                [label]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate"
-                                [message]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate"
-                                [url]="contactsFollowupSuccessRateReportUrl"
-                                [fileName]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate"
-                                (exportStart)="showLoadingDialog()"
-                                (exportFinished)="closeLoadingDialog()"
-                                [queryBuilder]="qbContactsFollowUpSuccessRate()">
-                            </app-export-button>
+                        <app-export-button
+                            [menuItem]="true"
+                            [fileType]="ExportDataExtension.PDF"
+                            [label]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate"
+                            [message]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate"
+                            [url]="contactsFollowupSuccessRateReportUrl"
+                            [fileName]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate"
+                            (exportStart)="showLoadingDialog()"
+                            (exportFinished)="closeLoadingDialog()"
+                            [queryBuilder]="qbContactsFollowUpSuccessRate()">
+                        </app-export-button>
 
-                            <button
-                                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
-                                mat-menu-item
-                                [disabled]="x86Architecture"
-                                (click)="generateEpiCurveReport()">
-                                {{'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL' | translate}}
-                            </button>
+                        <button
+                            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+                            mat-menu-item
+                            [disabled]="x86Architecture"
+                            (click)="generateEpiCurveReport()">
+                            {{'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL' | translate}}
+                        </button>
 
-                            <button
-                                mat-menu-item
-                                [disabled]="x86Architecture"
-                                (click)="generateKpisReport()">
-                                {{'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL' | translate}}
-                            </button>
-                        </ng-container>
+                        <button
+                            mat-menu-item
+                            [disabled]="x86Architecture"
+                            (click)="generateKpisReport()">
+                            {{'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL' | translate}}
+                        </button>
                     </mat-menu>
                 </div>
             </div>
@@ -493,7 +494,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-independent-transmission-chains-dashlet>
 
                             <!-- Number of active chains of transmission -->
@@ -507,7 +509,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-number-of-active-chains-of-transmission-dashlet>
 
                             <!-- Number of new chains of transmission from registered contacts who have became cases-->
@@ -521,7 +524,8 @@
                                 (moveBefore)="moveDashletBefore(dashlet)"
                                 (moveAfter)="moveDashletAfter(dashlet)"
                                 [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId">
+                                [globalFilterLocationId]="globalFilterLocationId"
+                                [globalFilterClassificationId]="globalFilterClassificationId">
                             </app-new-chains-of-transmission-from-registered-contacts-dashlet>
                         </ng-container>
                     </div>

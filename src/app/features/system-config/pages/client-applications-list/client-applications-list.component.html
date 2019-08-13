@@ -59,12 +59,63 @@
         <ng-container matColumnDef="credentials">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREDENTIALS' | translate}}</div>
+                    <div class="column-header">
+                        {{'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREDENTIALS' | translate}}
+
+                        <button
+                            type="button"
+                            mat-icon-button
+                            class="column-actions-button"
+                            [disableRipple]="true"
+                            [matMenuTriggerFor]="columnActions"
+                            color="accent"
+                        >
+                            <span class="xt-icon">arrowDropdownCircle</span>
+                        </button>
+
+                        <mat-menu #columnActions="matMenu">
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('credentials', true)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_SHOW_ALL' | translate }}
+                            </button>
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('credentials', false)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_HIDE_ALL' | translate }}
+                            </button>
+                        </mat-menu>
+                    </div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.credentials?.clientId + ' / ' + item.credentials?.clientSecret }}
+                <!-- Hidden Credentials -->
+                <ng-container *ngIf="!isCellExpanded('credentials', item.id); else displayCredentialsDiv">
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('credentials', item.id, true)"
+                    >
+                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_SHOW' | translate}}
+                    </button>
+                </ng-container>
+
+                <!-- Visible Credentials -->
+                <ng-template
+                    #displayCredentialsDiv>
+                    {{ item.credentials?.clientId + ' / ' + item.credentials?.clientSecret }}
+
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('credentials', item.id, false)"
+                    >
+                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_HIDE' | translate}}
+                    </button>
+                </ng-template>
             </mat-cell>
         </ng-container>
 
