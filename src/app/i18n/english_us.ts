@@ -25,7 +25,12 @@ export const EnglishUsLang = {
         'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_HIDE': 'Hide',
         'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_HIDE_ALL': 'Hide All',
         'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_SHOW': 'Show',
-        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_SHOW_ALL': 'Show All'
+        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_SHOW_ALL': 'Show All',
+
+        /**
+         * uiFollowUpFields
+         */
+        'LNG_FOLLOW_UP_FIELD_LABEL_FILL_LOCATION_NO_LOCATION': 'Not available'
 
 
 
