@@ -305,17 +305,7 @@
                 <div class="table-header-cell" fxLayout="column">
                     <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_LOCATION' | translate }}</div>
                     <div class="column-filter">
-                        <app-form-select
-                            name="locationFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="locationsListOptions$ | async"
-                            (optionChanged)="filterBySelectField('addresses.locationId', $event)"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+                        <!--Placeholder -->
                     </div>
                 </div>
             </mat-header-cell>
