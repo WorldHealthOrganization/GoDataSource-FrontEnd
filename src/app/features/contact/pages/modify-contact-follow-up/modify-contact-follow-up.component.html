@@ -4,7 +4,11 @@
     </ng-container>
 </app-topnav>
 
-<form class="page-content form-section" #form="ngForm" (submit)="modifyFollowUp(form)">
+<form
+    #form="ngForm"
+    class="page-content form-section"
+    [class.form-view-only]="viewOnly"
+    (submit)="modifyFollowUp(form)">
 
     <div class="form-content">
         <mat-tab-group class="page-tabs-navbar">
