@@ -301,11 +301,19 @@
 
         <!-- Location  -->
         <ng-container matColumnDef="location">
-            <mat-header-cell *matHeaderCellDef>
+            <mat-header-cell *matHeaderCellDef
+                             class="location-drop-down-column-header">
                 <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_LOCATION' | translate }}</div>
-                    <div class="column-filter">
-                        <!--Placeholder -->
+                    <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_LOCATION' | translate }}</div>
+                    <div class="column-filter location-drop-down-column-header-container" >
+                        <app-form-location-dropdown
+                            fxFlex
+                            name="locationIds"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            tooltip="LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_LOCATIONS_DESCRIPTION"
+                            multiple="true"
+                            (itemChanged)="filterByLocation($event)"
+                        ></app-form-location-dropdown>
                     </div>
                 </div>
             </mat-header-cell>

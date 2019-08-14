@@ -37,6 +37,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
+import { AddressType } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-contacts-list',
@@ -55,7 +56,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     // authenticated user
     authUser: UserModel;
 
-    // list of existing contacts
     // list of existing contacts
     contactsList$: Observable<ContactModel[]>;
     contactsListCount$: Observable<any>;
@@ -1132,6 +1132,40 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
         // refresh list
         this.needsRefreshList();
+    }
+
+    /**
+     * Filter by locations selected in location-drop-down
+     * @param locations
+     */
+    filterByLocation(locations) {
+        // remove previous condition
+        this.queryBuilder.filter.remove('and');
+        console.log(locations);
+        if (!_.isEmpty(locations)) {
+            // mapping all the locations to get the ids
+            const locationsIds = _.map(locations, (location) => {
+                return location.id;
+            });
+            console.log(locationsIds);
+
+            // build query
+            this.queryBuilder.filter.where({
+                and: [{
+                    addresses: {
+                        elemMatch: {
+                            typeId: AddressType.CURRENT_ADDRESS
+                        }
+                    },
+                    'addresses.locationId': {
+                        inq: locationsIds
+                    }
+                }]
+            });
+
+            // refresh list
+            this.needsRefreshList();
+        }
     }
 
     /**
