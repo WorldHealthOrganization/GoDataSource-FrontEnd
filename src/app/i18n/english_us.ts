@@ -12,6 +12,11 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
+        /**
+         * uiEntityFields
+         */
+        'LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET': 'Date of onset'
+
 
 
         /**
