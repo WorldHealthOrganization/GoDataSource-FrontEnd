@@ -4,7 +4,11 @@
     </ng-container>
 </app-topnav>
 
-<form class="page-content form-section" #form="ngForm" (submit)="modifyHelpCategoryItem(form)">
+<form
+    #form="ngForm"
+    class="page-content form-section"
+    [class.form-view-only]="viewOnly"
+    (submit)="modifyHelpCategoryItem(form)">
 
     <div class="form-content">
         <mat-tab-group class="page-tabs-navbar">

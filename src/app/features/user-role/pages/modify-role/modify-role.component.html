@@ -4,7 +4,11 @@
     </ng-container>
 </app-topnav>
 
-<form #form="ngForm" (submit)="modifyRole(form)" class="page-content form-section">
+<form
+    #form="ngForm"
+    class="page-content form-section"
+    [class.form-view-only]="viewOnly"
+    (submit)="modifyRole(form)">
 
     <div class="form-content">
 
