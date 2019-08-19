@@ -223,6 +223,26 @@ html, body, ul, li, div, span {
     }
 }
 
+form.form-view-only {
+    mat-slide-toggle.mat-disabled {
+        opacity: 1;
+        color: rgba(0, 0, 0, 0.38);
+    }
+
+    input.mat-input-element:disabled,
+    textarea.mat-input-element:disabled,
+    mat-select.mat-select-disabled .mat-select-value,
+    ng-select.ng-select-disabled .ng-select-container .ng-value-container .ng-value,
+    mat-slide-toggle.mat-disabled {
+        color: black;
+    }
+
+    mat-form-field.mat-form-field-disabled .mat-form-field-label,
+    ng-select.ng-select-disabled .ng-placeholder {
+        color: #333 !important;
+    }
+}
+
 // form elements having dynamic width
 .form-element-host {
     flex: 1 1;
