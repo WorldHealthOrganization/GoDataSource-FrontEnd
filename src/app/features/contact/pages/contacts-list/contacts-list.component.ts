@@ -1141,13 +1141,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     filterByLocation(locations) {
         // remove previous condition
         this.queryBuilder.filter.remove('and');
-        console.log(locations);
         if (!_.isEmpty(locations)) {
             // mapping all the locations to get the ids
             const locationsIds = _.map(locations, (location) => {
                 return location.id;
             });
-            console.log(locationsIds);
 
             // build query
             this.queryBuilder.filter.where({
@@ -1164,6 +1162,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             });
 
             // refresh list
+            this.needsRefreshList();
+        } else {
+            // refresh list if there's no locations
             this.needsRefreshList();
         }
     }
