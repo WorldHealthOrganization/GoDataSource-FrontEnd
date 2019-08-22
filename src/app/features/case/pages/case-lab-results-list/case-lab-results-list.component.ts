@@ -9,7 +9,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { Observable } from 'rxjs';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import {
+    ReferenceDataCategory, ReferenceDataCategoryModel,
+    ReferenceDataEntryModel
+} from '../../../../core/models/reference-data.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
@@ -26,6 +29,8 @@ import { HoverRowAction, HoverRowActionType } from '../../../../shared/component
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { map } from 'rxjs/internal/operators';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -58,6 +63,9 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     sampleTypesList$: Observable<any[]>;
     labNamesList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any[]>;
+    caseClassifications$: Observable<any>;
+    caseClassificationsList$: Observable<any[]>;
+    caseClassificationsListMap: { [id: string]: ReferenceDataEntryModel };
 
     // constants
     ReferenceDataCategory = ReferenceDataCategory;
@@ -199,6 +207,26 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE).pipe(share());
         this.labNamesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME).pipe(share());
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+
+        this.caseClassifications$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION).pipe(share());
+        this.caseClassificationsList$ = this.caseClassifications$
+            .pipe(
+                map((data: ReferenceDataCategoryModel) => {
+                    return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
+                        new LabelValuePair(entry.value, entry.id, null, null, entry.iconUrl)
+                    );
+                })
+            );
+        this.caseClassifications$.subscribe((caseClassificationCategory: ReferenceDataCategoryModel) => {
+            this.caseClassificationsListMap = _.transform(
+                caseClassificationCategory.entries,
+                (result, entry: ReferenceDataEntryModel) => {
+                    // groupBy won't work here since groupBy will put an array instead of one value
+                    result[entry.id] = entry;
+                },
+                {}
+            );
+        });
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
@@ -449,6 +477,17 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                             // reload data
                             this.needsRefreshList(true);
                         });
+                }
+            });
+    }
+
+    changeCaseClassification(classificationOption: LabelValuePair) {
+        console.log(classificationOption);
+        this.dialogService
+            .showConfirm('do this?')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.caseDataService.modifyCase(this.selectedOutbreak.id, this.caseId, {classification: classificationOption.value});
                 }
             });
     }
