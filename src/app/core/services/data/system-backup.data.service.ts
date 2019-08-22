@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { BackupModel } from '../../models/backup.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { RequestSortDirection } from '../../helperClasses/request-query-builder/request-sort';
 
 @Injectable()
 export class SystemBackupDataService {
@@ -30,10 +31,15 @@ export class SystemBackupDataService {
      * Retrieve the list of backups
      */
     getBackupList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<BackupModel[]> {
+        // sort backup list by descending date
+        const qb = new RequestQueryBuilder();
+        qb.sort.by('date', RequestSortDirection.DESC);
+
         // include user data
         queryBuilder.include(`user`);
+        qb.merge(queryBuilder);
 
-        const filter = queryBuilder.buildQuery();
+        const filter = qb.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`backups?filter=${filter}`),
             BackupModel
