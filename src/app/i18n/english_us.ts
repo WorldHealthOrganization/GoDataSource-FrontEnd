@@ -15,9 +15,14 @@ export const EnglishUsLang = {
         /**
          * uiEntityFields
          */
-        'LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET': 'Date of onset'
+        'LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET': 'Date of onset',
 
-
+        /**
+         * uiCaseLabResultsFields
+         */
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION': 'Classification',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION_DESCRIPTION': '',
+        'LNG_PAGE_CASE_LAB_RESULT_CLASSIFICATION_INFO_LABEL': 'Classification: "{{ caseClassification }}"'
 
         /**
          * REMOVE the tokens from below

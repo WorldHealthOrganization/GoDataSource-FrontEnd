@@ -15,7 +15,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
@@ -26,6 +26,8 @@ import { HoverRowAction, HoverRowActionType } from '../../../../shared/component
 import { Router } from '@angular/router';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { map } from 'rxjs/internal/operators';
 
 @Component({
     selector: 'app-lab-results',
@@ -48,6 +50,9 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
     testTypesList$: Observable<any[]>;
     labTestResultsList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any>;
+    caseClassifications$: Observable<any>;
+    caseClassificationsList$: Observable<any[]>;
+    caseClassificationsListMap: { [id: string]: ReferenceDataEntryModel };
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -175,6 +180,26 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         // retrieve users
         this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
+        this.caseClassifications$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION).pipe(share());
+        this.caseClassificationsList$ = this.caseClassifications$
+            .pipe(
+                map((data: ReferenceDataCategoryModel) => {
+                    return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
+                        new LabelValuePair(entry.value, entry.id, null, null, entry.iconUrl)
+                    );
+                })
+            );
+        this.caseClassifications$.subscribe((caseClassificationCategory: ReferenceDataCategoryModel) => {
+            this.caseClassificationsListMap = _.transform(
+                caseClassificationCategory.entries,
+                (result, entry: ReferenceDataEntryModel) => {
+                    // groupBy won't work here since groupBy will put an array instead of one value
+                    result[entry.id] = entry;
+                },
+                {}
+            );
+        });
+
         // subscribe to the Selected Outbreak
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -219,6 +244,10 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
             new VisibleColumnModel({
                 field: 'case.firstName',
                 label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_FIRST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'case.classification',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION'
             }),
             new VisibleColumnModel({
                 field: 'sampleIdentifier',
@@ -444,5 +473,20 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
                         });
                 }
             });
+    }
+
+    /**
+     * Filter by Classification field
+     * @param values
+     */
+    filterByClassificationField(values) {
+        // create condition
+        const condition = { 'case.classification' : {inq: values}};
+
+        // remove existing filter
+        this.queryBuilder.filter.removeExactCondition(condition);
+
+        // add new filter
+        this.filterBySelectField('case.classification', values, 'value', false);
     }
 }

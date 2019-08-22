@@ -41,6 +41,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
 
     // case
     caseId: string;
+    caseData: CaseModel = new CaseModel();
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -178,6 +179,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                         .getCase(this.selectedOutbreak.id, params.caseId)
                         .subscribe((caseData: CaseModel) => {
                             this.caseId = caseData.id;
+                            this.caseData = new CaseModel(caseData);
 
                             // setup breadcrumbs
                             this.breadcrumbs.push(new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/view`));
