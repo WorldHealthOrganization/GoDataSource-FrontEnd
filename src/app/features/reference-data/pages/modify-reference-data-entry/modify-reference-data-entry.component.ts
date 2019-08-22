@@ -31,7 +31,6 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
     entryId: string;
     // new Entry model
     entry: ReferenceDataEntryModel = new ReferenceDataEntryModel();
-    categoryName: string;
 
     authUser: UserModel;
 
@@ -75,7 +74,7 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
                         this.referenceDataDataService
                             .getReferenceDataByCategory(this.categoryId)
                             .subscribe((category: ReferenceDataCategoryModel) => {
-                                this.categoryName = category.name;
+                                this.entry.category = category;
                                 this.createBreadcrumbs();
                             });
                     });
@@ -119,7 +118,9 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
             )
             .subscribe((modifiedReferenceDataEntry) => {
                 // update model
+                const category = this.entry.category;
                 this.entry = modifiedReferenceDataEntry;
+                this.entry.category = category;
 
                 // mark form as pristine
                 form.form.markAsPristine();
@@ -148,13 +149,15 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
      */
     createBreadcrumbs() {
         this.breadcrumbs = [];
-        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data'));
+        if (this.entry) {
+            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data'));
 
-        if (this.categoryName) {
-            this.breadcrumbs.push(new BreadcrumbItemModel(this.categoryName, `/reference-data/${this.categoryId}`));
+            if (this.entry.category) {
+                this.breadcrumbs.push(new BreadcrumbItemModel(this.entry.category.name, `/reference-data/${this.categoryId}`));
+            }
+
+            this.breadcrumbs.push(new BreadcrumbItemModel(this.entry.value, '.', true));
         }
-
-        this.breadcrumbs.push(new BreadcrumbItemModel(this.entry.value, '.', true));
     }
 
 }
