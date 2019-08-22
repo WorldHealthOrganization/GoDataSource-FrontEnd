@@ -3,10 +3,9 @@ import { ActivatedRoute } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { NgForm } from '@angular/forms';
-import * as _ from 'lodash';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
@@ -70,12 +69,15 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
                 this.referenceDataDataService
                     .getEntry(params.entryId, true)
                     .subscribe((entry: ReferenceDataEntryModel) => {
-                        const category = this.entry.category;
                         this.entry = entry;
-                        this.entry.category = category;
 
-                        this.categoryName = _.get(this.entry, 'category.name');
-                        this.createBreadcrumbs();
+                        // retrieve Reference Data Category info
+                        this.referenceDataDataService
+                            .getReferenceDataByCategory(this.categoryId)
+                            .subscribe((category: ReferenceDataCategoryModel) => {
+                                this.categoryName = category.name;
+                                this.createBreadcrumbs();
+                            });
                     });
             });
     }
@@ -146,16 +148,13 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
      */
     createBreadcrumbs() {
         this.breadcrumbs = [];
-        this.route.params
-            .subscribe((params: { categoryId, entryId }) => {
-                this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data'));
+        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data'));
 
-                if (this.categoryName) {
-                    this.breadcrumbs.push(new BreadcrumbItemModel(this.categoryName, `/reference-data/${params.categoryId}`));
-                }
+        if (this.categoryName) {
+            this.breadcrumbs.push(new BreadcrumbItemModel(this.categoryName, `/reference-data/${this.categoryId}`));
+        }
 
-                this.breadcrumbs.push(new BreadcrumbItemModel(this.entry.value, '.', true));
-            });
+        this.breadcrumbs.push(new BreadcrumbItemModel(this.entry.value, '.', true));
     }
 
 }
