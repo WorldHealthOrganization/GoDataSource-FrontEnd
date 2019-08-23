@@ -22,7 +22,17 @@ export const EnglishUsLang = {
          */
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION': 'Classification',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION_DESCRIPTION': '',
-        'LNG_PAGE_CASE_LAB_RESULT_CLASSIFICATION_INFO_LABEL': 'Classification:'
+        'LNG_PAGE_CASE_LAB_RESULT_CLASSIFICATION_INFO_LABEL': 'Classification:',
+
+        /**
+         * uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION': 'Are you sure you want to change "{{ caseName }}" classification to "{{ classification }}"?',
+
+        /**
+         * uiLabResultsListPage
+         */
+        'LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE': 'Case classification modified!'
 
         /**
          * REMOVE the tokens from below

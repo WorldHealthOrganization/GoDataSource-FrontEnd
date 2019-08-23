@@ -31,6 +31,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { map } from 'rxjs/internal/operators';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -159,7 +160,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
+        private i18nService: I18nService
     ) {
         super(
             snackbarService
@@ -481,13 +483,30 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
             });
     }
 
+    /**
+     * Change case classification
+     * @param {LabelValuePair} classificationOption
+     */
     changeCaseClassification(classificationOption: LabelValuePair) {
-        console.log(classificationOption);
+        const translateData = {
+            caseName: this.i18nService.instant(this.caseData.name),
+            classification: this.i18nService.instant(classificationOption.value)
+        };
+        // show confirm dialog
         this.dialogService
-            .showConfirm('do this?')
+            .showConfirm('LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION', translateData)
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
-                    this.caseDataService.modifyCase(this.selectedOutbreak.id, this.caseId, {classification: classificationOption.value});
+                    this.caseDataService.modifyCase(this.selectedOutbreak.id, this.caseId, {classification: classificationOption.value})
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE');
+                        });
                 }
             });
     }
