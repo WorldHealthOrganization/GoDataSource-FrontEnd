@@ -57,18 +57,29 @@
             fxLayout="column" fxLayoutGap="20px"
         >
             <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="20px">
-                <app-form-input
-                    name="contactName"
-                    [(ngModel)]="filters.contactName"
-                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_NAME' | translate">
-                </app-form-input>
+                <div
+                    fxFlex fxLayout="row" fxLayoutGap="20px">
+                    <app-form-input
+                        name="contactName"
+                        [(ngModel)]="filters.contactName"
+                        [placeholder]="'LNG_CONTACT_FIELD_LABEL_NAME' | translate">
+                    </app-form-input>
 
-                <app-form-input
-                    name="visualId"
-                    [(ngModel)]="filters.visualId"
-                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
-                    app-reset-input-on-side-filter>
-                </app-form-input>
+                    <app-form-input
+                        name="visualId"
+                        [(ngModel)]="filters.visualId"
+                        [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate">
+                    </app-form-input>
+                </div>
+
+                <app-form-location-dropdown
+                    fxFlex
+                    name="locationIds"
+                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION' | translate"
+                    multiple="true"
+                    [useOutbreakLocations]="true"
+                    [(ngModel)]="filters.locationIds">
+                </app-form-location-dropdown>
             </div>
 
             <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="20px">
@@ -187,6 +198,13 @@
                     {{ 'LNG_CONTACT_FIELD_LABEL_NAME' | translate }}
                 </div>
 
+                <!-- Contact current address location -->
+                <div
+                    fxFlex="200px"
+                    class="follow-up-range-date-header">
+                    {{ 'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION' | translate }}
+                </div>
+
                 <!--Date of last contact-->
                 <div fxFlex="100px"
                      class="follow-up-range-date-header">
@@ -236,6 +254,17 @@
                             [routerLink]="['/contacts', contactFollowUpData.contact.id, 'view' ]">
                             {{ contactFollowUpData.contact.name + ( contactFollowUpData.contact.visualId ? ' ( ' + contactFollowUpData.contact.visualId + ' )' : '' ) }}
                         </a>
+                    </div>
+
+                    <!-- Contact current address location -->
+                    <div
+                        fxFlex="200px"
+                        class="follow-up-range-column-data follow-up-range-name-column-data follow-up-range-name-column-data-no-wrap">
+                        <span
+                            *ngIf="contactFollowUpData.contact.mainAddress?.location?.name; let locationName"
+                            [matTooltip]="locationName">
+                            {{ locationName }}
+                        </span>
                     </div>
 
                     <!--Date of last contact-->
