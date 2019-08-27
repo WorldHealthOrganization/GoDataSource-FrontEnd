@@ -238,6 +238,20 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                     teamsMap['N'].dates = dates;
                 }
             });
+
+            const filteredTeamData = [];
+            _.forEach(this.teamsData, (tData) => {
+                _.forEach(tData.dates, (dates) => {
+                    if (dates.totalFollowupsCount) {
+                        filteredTeamData.push(tData);
+                    }
+                });
+            });
+
+            this.teamsData = filteredTeamData.filter((date, index, self) => {
+                // keep only unique dates
+                return self.indexOf(date) === index;
+            });
         }
 
         // hide loading
