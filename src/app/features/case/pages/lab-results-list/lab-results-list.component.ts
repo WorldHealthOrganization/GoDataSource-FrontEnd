@@ -50,9 +50,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
     testTypesList$: Observable<any[]>;
     labTestResultsList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any>;
-    caseClassifications$: Observable<any>;
     caseClassificationsList$: Observable<any[]>;
-    caseClassificationsListMap: { [id: string]: ReferenceDataEntryModel };
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -179,26 +177,8 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
 
         // retrieve users
         this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
-
-        this.caseClassifications$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION).pipe(share());
-        this.caseClassificationsList$ = this.caseClassifications$
-            .pipe(
-                map((data: ReferenceDataCategoryModel) => {
-                    return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
-                        new LabelValuePair(entry.value, entry.id, null, null, entry.iconUrl)
-                    );
-                })
-            );
-        this.caseClassifications$.subscribe((caseClassificationCategory: ReferenceDataCategoryModel) => {
-            this.caseClassificationsListMap = _.transform(
-                caseClassificationCategory.entries,
-                (result, entry: ReferenceDataEntryModel) => {
-                    // groupBy won't work here since groupBy will put an array instead of one value
-                    result[entry.id] = entry;
-                },
-                {}
-            );
-        });
+        // case classification
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
 
         // subscribe to the Selected Outbreak
         this.outbreakSubscriber = this.outbreakDataService
@@ -475,18 +455,4 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
             });
     }
 
-    /**
-     * Filter by Classification field
-     * @param values
-     */
-    filterByClassificationField(values) {
-        // create condition
-        const condition = { 'case.classification' : {inq: values}};
-
-        // remove existing filter
-        this.queryBuilder.filter.removeExactCondition(condition);
-
-        // add new filter
-        this.filterBySelectField('case.classification', values, 'value', false);
-    }
 }

@@ -27,7 +27,7 @@ export const EnglishUsLang = {
          */
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION': 'Classification',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION_DESCRIPTION': '',
-        'LNG_PAGE_CASE_LAB_RESULT_CLASSIFICATION_INFO_LABEL': 'Classification:',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION_INFO': 'Current classification of the case:',
 
         /**
          * uiDialogs

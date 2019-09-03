@@ -34,22 +34,24 @@
 
 <mat-card class="page-section page-content">
     <div class="top-section-wrapper">
-        <div class="epi-classification-wrapper">
-            <!--Epi Classification-->
-            <div class="epi-classification-info">
-                {{ 'LNG_PAGE_CASE_LAB_RESULT_CLASSIFICATION_INFO_LABEL' | translate }}
-            </div>
+        <div *ngIf="hasCaseWriteAccess()"
+            fxFlex fxLayout="column">
+            <div fxFlex fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="start center">
+                <div class="info-label">
+                    {{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION_INFO' | translate }}
+                </div>
 
-            <div>
-                <app-form-select
-                    name="classificationFilter"
-                    [ngModel]="caseData.classification"
-                    [options]="caseClassificationsList$ | async"
-                    (optionChanged)="changeCaseClassification($event)"
-                    app-reset-input-on-side-filter
-                    [allowSelectionOfDisabledItems]="true"
-                    [displayInvisibleItems]="true">
-                </app-form-select>
+                <div>
+                    <app-form-select
+                        name="classificationFilter"
+                        [(ngModel)]="caseData.classification"
+                        [options]="caseClassificationsList$ | async"
+                        (optionChanged)="changeCaseClassification($event)"
+                        required="true"
+                        [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION' | translate"
+                        [tooltip]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION_DESCRIPTION' | translate">
+                    </app-form-select>
+                </div>
             </div>
         </div>
 

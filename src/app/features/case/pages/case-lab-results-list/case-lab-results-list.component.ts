@@ -48,6 +48,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     // case
     caseId: string;
     caseData: CaseModel = new CaseModel();
+    initialCaseClassification: string;
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -64,9 +65,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     sampleTypesList$: Observable<any[]>;
     labNamesList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any[]>;
-    caseClassifications$: Observable<any>;
     caseClassificationsList$: Observable<any[]>;
-    caseClassificationsListMap: { [id: string]: ReferenceDataEntryModel };
 
     // constants
     ReferenceDataCategory = ReferenceDataCategory;
@@ -190,6 +189,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                         .subscribe((caseData: CaseModel) => {
                             this.caseId = caseData.id;
                             this.caseData = new CaseModel(caseData);
+                            this.initialCaseClassification = caseData.classification
 
                             // setup breadcrumbs
                             this.breadcrumbs.push(new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/view`));
@@ -210,25 +210,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         this.labNamesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME).pipe(share());
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
-        this.caseClassifications$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION).pipe(share());
-        this.caseClassificationsList$ = this.caseClassifications$
-            .pipe(
-                map((data: ReferenceDataCategoryModel) => {
-                    return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
-                        new LabelValuePair(entry.value, entry.id, null, null, entry.iconUrl)
-                    );
-                })
-            );
-        this.caseClassifications$.subscribe((caseClassificationCategory: ReferenceDataCategoryModel) => {
-            this.caseClassificationsListMap = _.transform(
-                caseClassificationCategory.entries,
-                (result, entry: ReferenceDataEntryModel) => {
-                    // groupBy won't work here since groupBy will put an array instead of one value
-                    result[entry.id] = entry;
-                },
-                {}
-            );
-        });
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
@@ -431,6 +413,14 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         }
     }
 
+    /**
+     * Check if we have write access to cases
+     * @returns {boolean}
+     */
+    hasCaseWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
+    }
+
     deleteLabResult(labResult: LabResultModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT')
@@ -488,6 +478,10 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
      * @param {LabelValuePair} classificationOption
      */
     changeCaseClassification(classificationOption: LabelValuePair) {
+        if (_.isEmpty(this.caseData)) {
+            return;
+        }
+
         const translateData = {
             caseName: this.i18nService.instant(this.caseData.name),
             classification: this.i18nService.instant(classificationOption.value)
@@ -507,6 +501,11 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE');
                         });
+                } else {
+                    if (answer.button === DialogAnswerButton.Cancel) {
+                        // update the ngModel for select
+                        this.caseData.classification = this.initialCaseClassification;
+                    }
                 }
             });
     }
