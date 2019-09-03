@@ -304,7 +304,7 @@
             <mat-header-cell *matHeaderCellDef
                              class="location-drop-down-column-header">
                 <div class="table-header-cell" fxLayout="column">
-                    <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_LOCATION' | translate }}</div>
+                    <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION' | translate }}</div>
                     <div class="column-filter location-drop-down-column-header-container" >
                         <app-form-location-dropdown
                             fxFlex
@@ -319,7 +319,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
-                {{ item.mainAddress.location.name | translate }}
+                {{ item.mainAddress?.location?.name }}
             </mat-cell>
 
         </ng-container>

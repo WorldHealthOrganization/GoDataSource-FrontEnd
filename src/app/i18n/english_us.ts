@@ -18,11 +18,6 @@ export const EnglishUsLang = {
         'LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET': 'Date of onset',
 
         /**
-         * uiContactFields
-         */
-        'LNG_CONTACT_FIELD_LABEL_LOCATION': 'Location',
-
-        /**
          * REMOVE the tokens from below
          */
         // ...

@@ -35,8 +35,6 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { LocationModel } from '../../../../core/models/location.model';
 import { AddressType } from '../../../../core/models/address.model';
 
 @Component({
@@ -70,9 +68,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
     // gender list
     genderList$: Observable<any[]>;
-
-    // location list
-    locationsListOptions$: Observable<any[]>;
 
     // contacts grouped by risk level
     countedContactsByRiskLevel$: Observable<any[]>;
@@ -348,7 +343,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
         private userDataService: UserDataService,
-        private locationDataService: LocationDataService
     ) {
         super(
             snackbarService,
@@ -393,15 +387,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
-        const locationsList = this.locationDataService.getLocationsList().pipe(share());
-        this.locationsListOptions$ = locationsList
-            .pipe(
-                map((data: LocationModel[]) => {
-                    return _.map(data, (entry: LocationModel) =>
-                        new LabelValuePair(entry.name, entry.id)
-                    );
-                })
-            );
         this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
         this.riskLevelRefData$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).pipe(share());
         this.riskLevelsList$ = this.riskLevelRefData$
@@ -1140,7 +1125,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      */
     filterByLocation(locations) {
         // remove previous condition
-        this.queryBuilder.filter.remove('and');
+        this.queryBuilder.filter.remove('addresses');
         if (!_.isEmpty(locations)) {
             // mapping all the locations to get the ids
             const locationsIds = _.map(locations, (location) => {
@@ -1149,24 +1134,19 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
             // build query
             this.queryBuilder.filter.where({
-                and: [{
-                    addresses: {
-                        elemMatch: {
-                            typeId: AddressType.CURRENT_ADDRESS
+                addresses: {
+                    elemMatch: {
+                        typeId: AddressType.CURRENT_ADDRESS,
+                        parentLocationIdFilter: {
+                            $in: locationsIds
                         }
-                    },
-                    'addresses.locationId': {
-                        inq: locationsIds
                     }
-                }]
+                }
             });
-
-            // refresh list
-            this.needsRefreshList();
-        } else {
-            // refresh list if there's no locations
-            this.needsRefreshList();
         }
+
+        // refresh list
+        this.needsRefreshList();
     }
 
     /**
