@@ -13,16 +13,6 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
-         * uiEntityFields
-         */
-        'LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET': 'Date of onset',
-
-        /**
-         * uiContactFields
-         */
-        'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION': 'Area',
-
-        /**
          * uiCaseLabResultsFields
          */
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION': 'Classification',
@@ -38,6 +28,7 @@ export const EnglishUsLang = {
          * uiLabResultsListPage
          */
         'LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE': 'Case classification modified!'
+
 
         /**
          * REMOVE the tokens from below
