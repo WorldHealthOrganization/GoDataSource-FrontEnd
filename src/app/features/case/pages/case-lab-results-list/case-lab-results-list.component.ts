@@ -189,7 +189,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                         .subscribe((caseData: CaseModel) => {
                             this.caseId = caseData.id;
                             this.caseData = new CaseModel(caseData);
-                            this.initialCaseClassification = caseData.classification
+                            this.initialCaseClassification = caseData.classification;
 
                             // setup breadcrumbs
                             this.breadcrumbs.push(new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/view`));
