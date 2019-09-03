@@ -12,8 +12,6 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
-
-
         /**
          * REMOVE the tokens from below
          */
