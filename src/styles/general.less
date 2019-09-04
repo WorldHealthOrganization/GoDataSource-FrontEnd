@@ -197,7 +197,28 @@ html, body, ul, li, div, span {
         }
 
         .location-drop-down-column-header-container {
+            margin-top: 5px;
             padding-top: 0 !important;
+            align-items: center;
+            height: 65px !important;
+
+            app-form-location-dropdown {
+                .ng-value-container {
+                    white-space: nowrap;
+                    flex-wrap: nowrap;
+                    width: 45px;
+                    display: flex;
+                }
+                .ng-value {
+                    padding-right: 5px;
+                    overflow: hidden !important;
+                }
+            }
+
+            .ng-placeholder {
+                font-weight: normal !important;
+                overflow: hidden;
+            }
         }
     }
 
