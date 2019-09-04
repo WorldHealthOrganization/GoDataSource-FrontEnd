@@ -35,6 +35,7 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { AddressType } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-contacts-list',
@@ -53,7 +54,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     // authenticated user
     authUser: UserModel;
 
-    // list of existing contacts
     // list of existing contacts
     contactsList$: Observable<ContactModel[]>;
     contactsListCount$: Observable<any>;
@@ -342,7 +342,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
     ) {
         super(
             snackbarService,
@@ -491,6 +491,10 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             new VisibleColumnModel({
                 field: 'riskLevel',
                 label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL'
+            }),
+            new VisibleColumnModel({
+                field: 'location',
+                label: 'LNG_CONTACT_FIELD_LABEL_LOCATION'
             }),
             new VisibleColumnModel({
                 field: 'dateOfLastContact',
@@ -718,6 +722,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
+
+            // retrieve location list
+            this.queryBuilder.include('locations', true);
 
             // retrieve the list of Contacts
             this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder)
@@ -1102,6 +1109,36 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                                 .replace(/%/g, '.*')
                                 .replace(/\\\?/g, '.'),
                             $options: 'i'
+                        }
+                    }
+                }
+            });
+        }
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
+     * Filter by locations selected in location-drop-down
+     * @param locations
+     */
+    filterByLocation(locations) {
+        // remove previous condition
+        this.queryBuilder.filter.remove('addresses');
+        if (!_.isEmpty(locations)) {
+            // mapping all the locations to get the ids
+            const locationsIds = _.map(locations, (location) => {
+                return location.id;
+            });
+
+            // build query
+            this.queryBuilder.filter.where({
+                addresses: {
+                    elemMatch: {
+                        typeId: AddressType.CURRENT_ADDRESS,
+                        parentLocationIdFilter: {
+                            $in: locationsIds
                         }
                     }
                 }
