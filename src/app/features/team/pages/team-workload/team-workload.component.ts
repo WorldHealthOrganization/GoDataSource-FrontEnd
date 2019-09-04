@@ -239,6 +239,7 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                 }
             });
 
+            // create filtered team data
             const filteredTeamData = [];
             _.forEach(this.teamsData, (tData) => {
                 _.forEach(tData.dates, (dates) => {
