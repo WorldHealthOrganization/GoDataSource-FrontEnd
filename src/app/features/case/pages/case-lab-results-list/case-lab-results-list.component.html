@@ -44,7 +44,7 @@
                 <div>
                     <app-form-select
                         name="classificationFilter"
-                        [(ngModel)]="caseData.classification"
+                        [ngModel]="caseData.classification"
                         [options]="caseClassificationsList$ | async"
                         (optionChanged)="changeCaseClassification($event)"
                         required="true"

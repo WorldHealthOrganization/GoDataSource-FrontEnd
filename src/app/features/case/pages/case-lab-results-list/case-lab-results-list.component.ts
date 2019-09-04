@@ -498,7 +498,9 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                                 return throwError(err);
                             })
                         )
-                        .subscribe(() => {
+                        .subscribe((caseData: CaseModel) => {
+                            // update the initial case classification
+                            this.initialCaseClassification = caseData.classification;
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE');
                         });
                 } else {
