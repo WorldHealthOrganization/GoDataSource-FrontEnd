@@ -9,7 +9,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { Observable } from 'rxjs';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import {
+    ReferenceDataCategory, ReferenceDataCategoryModel,
+    ReferenceDataEntryModel
+} from '../../../../core/models/reference-data.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
@@ -26,6 +29,9 @@ import { HoverRowAction, HoverRowActionType } from '../../../../shared/component
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { map } from 'rxjs/internal/operators';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -41,6 +47,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
 
     // case
     caseId: string;
+    caseData: CaseModel = new CaseModel();
+    initialCaseClassification: string;
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -57,6 +65,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     sampleTypesList$: Observable<any[]>;
     labNamesList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any[]>;
+    caseClassificationsList$: Observable<any[]>;
 
     // constants
     ReferenceDataCategory = ReferenceDataCategory;
@@ -150,7 +159,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
+        private i18nService: I18nService
     ) {
         super(
             snackbarService
@@ -178,6 +188,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                         .getCase(this.selectedOutbreak.id, params.caseId)
                         .subscribe((caseData: CaseModel) => {
                             this.caseId = caseData.id;
+                            this.caseData = new CaseModel(caseData);
+                            this.initialCaseClassification = caseData.classification;
 
                             // setup breadcrumbs
                             this.breadcrumbs.push(new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/view`));
@@ -197,6 +209,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE).pipe(share());
         this.labNamesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME).pipe(share());
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
@@ -399,6 +413,14 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         }
     }
 
+    /**
+     * Check if we have write access to cases
+     * @returns {boolean}
+     */
+    hasCaseWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
+    }
+
     deleteLabResult(labResult: LabResultModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT')
@@ -447,6 +469,45 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                             // reload data
                             this.needsRefreshList(true);
                         });
+                }
+            });
+    }
+
+    /**
+     * Change case classification
+     * @param {LabelValuePair} classificationOption
+     */
+    changeCaseClassification(classificationOption: LabelValuePair) {
+        if (_.isEmpty(this.caseData)) {
+            return;
+        }
+
+        const translateData = {
+            caseName: this.i18nService.instant(this.caseData.name),
+            classification: this.i18nService.instant(classificationOption.value)
+        };
+        // show confirm dialog
+        this.dialogService
+            .showConfirm('LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION', translateData)
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.caseDataService.modifyCase(this.selectedOutbreak.id, this.caseId, {classification: classificationOption.value})
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe((caseData: CaseModel) => {
+                            // update the initial case classification
+                            this.initialCaseClassification = caseData.classification;
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE');
+                        });
+                } else {
+                    if (answer.button === DialogAnswerButton.Cancel) {
+                        // update the ngModel for select
+                        this.caseData.classification = this.initialCaseClassification;
+                    }
                 }
             });
     }
