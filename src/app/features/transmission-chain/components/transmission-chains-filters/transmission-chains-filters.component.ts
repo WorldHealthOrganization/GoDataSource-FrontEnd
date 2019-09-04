@@ -50,11 +50,18 @@ export class TransmissionChainFilters {
         // case classification
         if (!_.isEmpty(this.classificationId)) {
             qb.filter.where({
-                and: [{
-                    classification: {
-                        inq: this.classificationId
+                or: [
+                    {
+                        type: {
+                            neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
+                        }
+                    }, {
+                        type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                        classification: {
+                            inq: this.classificationId
+                        }
                     }
-                }]
+                ]
             });
         }
 
@@ -106,12 +113,24 @@ export class TransmissionChainFilters {
             );
         }
 
-        // case location
+        // location
         if (!_.isEmpty(this.locationId)) {
-            qb.filter.byEquality(
-                'addresses.parentLocationIdFilter',
-                this.locationId
-            );
+            qb.filter.where({
+                or: [
+                    {
+                        type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT',
+                        'address.parentLocationIdFilter': this.locationId
+                    }, {
+                        type: {
+                            inq: [
+                                'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                                'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
+                            ]
+                        },
+                        'addresses.parentLocationIdFilter': this.locationId
+                    }
+                ]
+            });
         }
 
         // age

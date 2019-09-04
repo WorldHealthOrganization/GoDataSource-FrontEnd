@@ -4,7 +4,11 @@
     </ng-container>
 </app-topnav>
 
-<form class="page-content form-section" #form="ngForm" (submit)="modifyLocation(form)">
+<form
+    #form="ngForm"
+    class="page-content form-section"
+    [class.form-view-only]="viewOnly"
+    (submit)="modifyLocation(form)">
 
     <div
         fxFlex fxLayout="column" fxLayoutGap="20px"

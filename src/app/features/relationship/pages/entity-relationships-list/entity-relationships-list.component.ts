@@ -40,6 +40,9 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
 
     // list of relationships
     relationshipsList$: Observable<EntityModel[]>;
+    relationshipsListRecordsMap: {
+        [idRelationship: string]: EntityModel
+    } = {};
     relationshipsListCount$: Observable<any>;
 
     outbreakSubscriber: Subscription;
@@ -61,10 +64,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     ReferenceDataCategory = ReferenceDataCategory;
     EntityType = EntityType;
     UserSettings = UserSettings;
-
-    checkedEntityModels: {
-        [idRelationship: string]: EntityModel
-    } = {};
 
     recordActions: HoverRowAction[] = [
         // View Relationship
@@ -323,9 +322,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             this.entityId &&
             this.selectedOutbreak
         ) {
-            // reset checked items
-            this.checkedEntityModels = {};
-
+            // request data
             if (this.relationshipType === RelationshipType.EXPOSURE) {
                 // retrieve the list of exposures
                 this.relationshipsList$ = this.relationshipDataService.getEntityExposures(
@@ -336,7 +333,14 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                 )
                     .pipe(
                         tap(this.checkEmptyList.bind(this)),
-                        tap(() => {
+                        tap((entities: EntityModel[]) => {
+                            // map models
+                            this.relationshipsListRecordsMap = {};
+                            (entities || []).forEach((entity) => {
+                                this.relationshipsListRecordsMap[entity.relationship.id] = entity;
+                            });
+
+                            // finished
                             finishCallback();
                         })
                     );
@@ -350,7 +354,14 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                 )
                     .pipe(
                         tap(this.checkEmptyList.bind(this)),
-                        tap(() => {
+                        tap((entities: EntityModel[]) => {
+                            // map models
+                            this.relationshipsListRecordsMap = {};
+                            (entities || []).forEach((entity) => {
+                                this.relationshipsListRecordsMap[entity.relationship.id] = entity;
+                            });
+
+                            // finished
                             finishCallback();
                         })
                     );
@@ -474,26 +485,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     }
 
     /**
-     * Send further selected relationships
-     * @param {EntityModel} model
-     * @param {boolean} checked
-     */
-    checkedRecordRelationship(
-        model: EntityModel,
-        checked: boolean
-    ) {
-        // keep model for further use
-        if (checked) {
-            this.checkedEntityModels[model.relationship.id] = model;
-        } else {
-            delete this.checkedEntityModels[model.relationship.id];
-        }
-
-        // send data further
-        this.checkedRecord(model.relationship.id, checked);
-    }
-
-    /**
      * Share selected relationships with other people
      */
     shareSelectedRelationships() {
@@ -504,7 +495,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         }
 
         // determine list of model ids
-        const selectedRecords: string[] = _.map(selectedRelationshipRecords, (idRelationship: string) => this.checkedEntityModels[idRelationship].model.id)
+        const selectedRecords: string[] = _.map(selectedRelationshipRecords, (idRelationship: string) => this.relationshipsListRecordsMap[idRelationship].model.id)
             .filter((record, index, self) => {
                 // keep only unique dates
                 return self.indexOf(record) === index;

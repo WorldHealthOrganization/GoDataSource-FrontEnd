@@ -76,7 +76,11 @@ export class ImportDataComponent implements OnInit {
         [ImportDataExtension.XML]: 'text/xml',
         [ImportDataExtension.ODS]: 'application/vnd.oasis.opendocument.spreadsheet',
         [ImportDataExtension.JSON]: 'application/json',
-        [ImportDataExtension.ZIP]: 'application/x-zip-compressed'
+        [ImportDataExtension.ZIP]: [
+            'application/x-zip-compressed',
+            'application/zip',
+            'multipart/x-zip'
+        ]
     };
 
     /**
@@ -88,11 +92,17 @@ export class ImportDataComponent implements OnInit {
 
         this.translationData.types = this.allowedExtensions.join(', ');
 
-        this.allowedMimeTypes = this.allowedExtensions.map((extension: string): string => {
-            return this.allowedMimeTypesMap[extension] ?
-                this.allowedMimeTypesMap[extension] :
-                extension;
-        });
+        this.allowedMimeTypes = _.transform(this.allowedExtensions, (acc, extension: string) => {
+            if (this.allowedMimeTypesMap[extension]) {
+                if (_.isArray(this.allowedMimeTypesMap[extension])) {
+                    acc.push(...this.allowedMimeTypesMap[extension]);
+                } else {
+                    acc.push(this.allowedMimeTypesMap[extension]);
+                }
+            } else {
+                acc.push(extension);
+            }
+        }, []);
 
         if (this.uploader) {
             this.uploader.options.allowedMimeType = this.allowedMimeTypes;
@@ -346,8 +356,11 @@ export class ImportDataComponent implements OnInit {
                     size: file.size,
                     type: file.type ?
                         file.type : (
-                            file.name && file.name.lastIndexOf('.') > -1 ?
-                                this.allowedMimeTypesMap[file.name.substr(file.name.lastIndexOf('.')).toLowerCase()] :
+                            file.name && file.name.lastIndexOf('.') > -1 ? (
+                                    _.isArray(this.allowedMimeTypesMap[file.name.substr(file.name.lastIndexOf('.')).toLowerCase()]) ?
+                                        this.allowedMimeTypesMap[file.name.substr(file.name.lastIndexOf('.')).toLowerCase()][0] :
+                                        this.allowedMimeTypesMap[file.name.substr(file.name.lastIndexOf('.')).toLowerCase()]
+                                ) :
                                 ''
                         ),
                     name: file.name

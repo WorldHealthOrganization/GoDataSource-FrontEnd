@@ -4,7 +4,11 @@
     </ng-container>
 </app-topnav>
 
-<form class="page-content form-section" #form="ngForm" (submit)="modifyDevice(form)">
+<form
+    #form="ngForm"
+    class="page-content form-section"
+    [class.form-view-only]="viewOnly"
+    (submit)="modifyDevice(form)">
 
     <div class="form-content">
 
