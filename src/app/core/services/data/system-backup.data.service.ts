@@ -33,7 +33,10 @@ export class SystemBackupDataService {
     getBackupList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<BackupModel[]> {
         // sort backup list by descending date
         const qb = new RequestQueryBuilder();
-        qb.sort.by('date', RequestSortDirection.DESC);
+
+        if (queryBuilder.sort.isEmpty()) {
+            qb.sort.by('date', RequestSortDirection.DESC);
+        }
 
         // include user data
         queryBuilder.include(`user`);
