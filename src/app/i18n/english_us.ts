@@ -20,6 +20,12 @@ export const EnglishUsLang = {
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION_INFO': 'Current classification of the case:',
 
         /**
+         * uiBulkAddContactsPage
+         */
+        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_API_ERROR_MSG': ' - row {{row}} is invalid: {{err}}',
+        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_PARTIAL_ERROR_MSG': ' - records that were created with success were removed from the spreadsheet so we don\'t create duplicates',
+
+        /**
          * uiDialogs
          */
         'LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION': 'Are you sure you want to change "{{ caseName }}" classification to "{{ classification }}"?',
