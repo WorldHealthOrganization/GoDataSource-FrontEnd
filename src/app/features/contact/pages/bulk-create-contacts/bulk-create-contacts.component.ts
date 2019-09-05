@@ -27,7 +27,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { NgModel } from '@angular/forms';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { throwError } from 'rxjs';
-import { catchError, map, mergeMap, share } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';
@@ -76,13 +76,16 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     // error messages
     errorMessages: {
         message: string,
-        data: {
+        data?: {
             row: number,
-            columns: string
+            columns?: string,
+            err?: string
         }
     }[] = [];
 
-    contactVisualIdModel: {mask: string};
+    contactVisualIdModel: {
+        mask: string
+    };
 
     afterChangeCallback: (
         sheetCore: Handsontable,
@@ -157,7 +160,9 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
                 // setting the contact visual id model
-                this.contactVisualIdModel = {mask : ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)};
+                this.contactVisualIdModel = {
+                    mask : ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
+                };
 
                 this.retrieveRelatedPerson();
             });
@@ -235,7 +240,14 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                             this.selectedOutbreak.id,
                             visualIDTranslateData.mask,
                             value
-                        ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                        )
+                        .pipe(
+                            catchError((err) => {
+                                callback(false);
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
                             if (isValid === true) {
                                 callback(true);
                             } else {
@@ -531,6 +543,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
         // validate sheet
         const loadingDialog = this.dialogService.showLoadingDialog();
+        this.errorMessages = [];
         this.bulkContactsService
             .validateTable(sheetCore)
             .subscribe((response) => {
@@ -548,33 +561,6 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 } else {
                     // collect data from table
                     this.bulkContactsService.getData(sheetCore, this.sheetColumns)
-                        .pipe(
-                            mergeMap((data) => {
-                                // get Contact mask configured on outbreak
-                                const contactMask = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);
-
-                                return this.contactDataService.checkContactVisualIDValidity(
-                                    this.selectedOutbreak.id,
-                                    contactMask,
-                                    contactMask
-                                )
-                                    .pipe(
-                                        map((isValid) => {
-                                            if (isValid === true) {
-                                                // add mask on all contacts
-                                                data = data.map((contactEntry) => {
-                                                    contactEntry.contact.visualId = contactMask;
-                                                    return contactEntry;
-                                                });
-                                            } else {
-                                                // do nothing; the mask will be omitted and the contacts will be created without a visual ID
-                                            }
-
-                                            return data;
-                                        })
-                                    );
-                            })
-                        )
                         .subscribe((data) => {
                             // no data to save ?
                             if (_.isEmpty(data)) {
@@ -583,11 +569,92 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                                 this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_NO_DATA');
                             } else {
                                 // create contacts
-                                this.contactDataService.bulkAddContacts(this.selectedOutbreak.id, this.relatedEntityType, this.relatedEntityId, data)
+                                this.contactDataService
+                                    .bulkAddContacts(
+                                        this.selectedOutbreak.id,
+                                        this.relatedEntityType,
+                                        this.relatedEntityId,
+                                        data
+                                    )
                                     .pipe(
                                         catchError((err) => {
+                                            // close dialog
                                             loadingDialog.close();
-                                            this.snackbarService.showApiError(err.message);
+
+                                            // mark success records
+                                            this.errorMessages = [];
+                                            if (sheetCore) {
+                                                // display partial success message
+                                                if (!_.isEmpty(_.get(err, 'details.success'))) {
+                                                    this.errorMessages.push({
+                                                        message: 'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_PARTIAL_ERROR_MSG'
+                                                    });
+                                                }
+
+                                                // remove success records
+                                                (_.get(err, 'details.success') || []).reverse().forEach((successRecord) => {
+                                                    // remove record that was added
+                                                    if (_.isNumber(successRecord.recordNo)) {
+                                                        // remove row
+                                                        sheetCore.alter(
+                                                            'remove_row',
+                                                            successRecord.recordNo,
+                                                            1
+                                                        );
+
+                                                        // substract row numbers
+                                                        _.each(
+                                                            _.get(err, 'details.failed'),
+                                                            (item) => {
+                                                                if (!_.isNumber(item.recordNo)) {
+                                                                    return;
+                                                                }
+
+                                                                // if record is after the one that we removed then we need to substract 1 value
+                                                                if (item.recordNo > successRecord.recordNo) {
+                                                                    item.recordNo = item.recordNo - 1;
+                                                                }
+                                                            }
+                                                        );
+                                                    }
+                                                });
+                                            }
+
+                                            // prepare errors to parse later into more readable errors
+                                            const errors = [];
+                                            (_.get(err, 'details.failed') || []).forEach((childError) => {
+                                                if (!_.isEmpty(childError.error)) {
+                                                    errors.push({
+                                                        err: childError.error,
+                                                        echo: childError
+                                                    });
+                                                }
+                                            });
+
+                                            // try to parse into more clear errors
+                                            this.snackbarService.translateApiErrors(errors)
+                                                .subscribe((translatedErrors) => {
+                                                    // transform errors
+                                                    (translatedErrors || []).forEach((translatedError) => {
+                                                        // determine row number
+                                                        let row: number = _.get(translatedError, 'echo.recordNo', null);
+                                                        if (_.isNumber(row)) {
+                                                            row++;
+                                                        }
+
+                                                        // add to error list
+                                                        this.errorMessages.push({
+                                                            message: 'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_API_ERROR_MSG',
+                                                            data: {
+                                                                row: row,
+                                                                err: translatedError.message
+                                                            }
+                                                        });
+                                                    });
+                                                });
+
+                                            // display error
+                                            this.snackbarService.showApiError(err);
                                             return throwError(err);
                                         })
                                     )
