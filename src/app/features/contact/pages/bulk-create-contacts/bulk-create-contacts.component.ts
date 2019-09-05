@@ -592,6 +592,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                                                 }
 
                                                 // remove success records
+                                                // items should be ordered by recordNo
+                                                //  - so in this case if we reverse we can remove records from sheet without having to take in account that we removed other rows as well
                                                 (_.get(err, 'details.success') || []).reverse().forEach((successRecord) => {
                                                     // remove record that was added
                                                     if (_.isNumber(successRecord.recordNo)) {
