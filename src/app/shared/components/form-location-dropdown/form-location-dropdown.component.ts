@@ -49,6 +49,9 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     @Input() locationsForOutbrakId: string;
     @Input() useOutbreakLocations: boolean = false;
 
+    // floatable drop panel
+    @Input() fixedDropPanel: boolean = false;
+
     @Output() itemChanged = new EventEmitter<LocationAutoItem | undefined | LocationAutoItem[]>();
     @Output() locationsLoaded = new EventEmitter<LocationAutoItem[]>();
 
@@ -81,6 +84,8 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     needToRetrieveBackData: boolean = false;
 
     outbreakSubscriber: Subscription;
+
+    repositionTimer: any;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -151,6 +156,9 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
                 // retrieve data
                 this.refreshLocationList();
             });
+
+        // init timer to reposition fixed dropdown panel
+        this.repositionDropDownPanel();
     }
 
     /**
@@ -167,6 +175,72 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
             this.previousSubscription.unsubscribe();
             this.previousSubscription = null;
         }
+
+        // remove reposition timer
+        this.clearRepositionDropDownPanel();
+    }
+
+    /**
+     * Clear reposition timer
+     */
+    clearRepositionDropDownPanel() {
+        if (this.repositionTimer) {
+            clearTimeout(this.repositionTimer);
+            this.repositionTimer = null;
+        }
+    }
+
+    /**
+     * Reposition dropdown timer & call again reposition after some time
+     */
+    repositionDropDownPanel() {
+        // clear reposition
+        this.clearRepositionDropDownPanel();
+
+        // do we need to reposition this dropdown
+        if (!this.fixedDropPanel) {
+            return;
+        }
+
+        // wait for debounce time
+        this.repositionTimer = setTimeout(() => {
+            // reposition dropdown
+            if (
+                this.locationHandler.isOpen &&
+                this.locationHandler.element
+            ) {
+                // retrieve involved items
+                const dropSelectContainer: any = this.locationHandler.element.querySelector('.ng-select-container');
+                const dropDownPanel: any = this.locationHandler.element.querySelector('.ng-dropdown-panel');
+                if (
+                    dropSelectContainer &&
+                    dropDownPanel
+                ) {
+                    // retrieve items
+                    const dropDownPanelItems: any = dropDownPanel.querySelector('.ng-dropdown-panel-items');
+                    const dropDownPanelItemsPosition = dropDownPanelItems ?
+                        dropDownPanelItems.getBoundingClientRect() :
+                        null;
+
+                    // determine position
+                    const dropSelectContainerPosition = dropSelectContainer.getBoundingClientRect();
+                    let top: number = dropSelectContainerPosition.top + dropSelectContainerPosition.height;
+                    if (
+                        dropDownPanelItemsPosition &&
+                        top + dropDownPanelItemsPosition.height > window.innerHeight
+                    ) {
+                        top = dropSelectContainerPosition.top - dropDownPanelItemsPosition.height;
+                    }
+
+                    // reposition item
+                    dropDownPanel.style.left = `${dropSelectContainerPosition.left}px`;
+                    dropDownPanel.style.top = `${top}px`;
+                }
+            }
+
+            // reposition again after some time
+            this.repositionDropDownPanel();
+        }, 100);
     }
 
     /**
