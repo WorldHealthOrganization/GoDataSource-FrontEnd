@@ -1007,7 +1007,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         return _.map(data.team, (teamData) => {
                             return new CountedItemsListItem(
                                 teamData.count ? teamData.count : 0,
-                                teamData.team ? teamData.team.name : '',
+                                teamData.team ? teamData.team.name : 'LNG_PAGE_LIST_FOLLOW_UPS_NO_TEAM_LABEL',
                                 teamData.team ? teamData.team.id : []
                             );
                         });
