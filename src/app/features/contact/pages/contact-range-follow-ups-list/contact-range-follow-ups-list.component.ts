@@ -25,6 +25,7 @@ import { Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { AddressType } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -95,12 +96,14 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         contactName: any,
         visualId: any,
         dateOfLastContact: any,
-        dateOfTheEndOfTheFollowUp: any
+        dateOfTheEndOfTheFollowUp: any,
+        locationIds: string[]
     } = {
         contactName: null,
         visualId: null,
         dateOfLastContact: null,
-        dateOfTheEndOfTheFollowUp: null
+        dateOfTheEndOfTheFollowUp: null,
+        locationIds: []
     };
 
     /**
@@ -375,7 +378,8 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             contactName: null,
             visualId: null,
             dateOfLastContact: null,
-            dateOfTheEndOfTheFollowUp: null
+            dateOfTheEndOfTheFollowUp: null,
+            locationIds: []
         };
 
         // reset applied filters
@@ -420,6 +424,22 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         if (this.filters.dateOfTheEndOfTheFollowUp !== null) {
             this.queryBuilder.addChildQueryBuilder('contact')
                 .filter.byDateRange('followUp.endDate', this.filters.dateOfTheEndOfTheFollowUp);
+        }
+
+        // filter by contact locations
+        // only current addresses
+        if (!_.isEmpty(this.filters.locationIds)) {
+            this.queryBuilder.addChildQueryBuilder('contact').filter
+                .where({
+                    addresses: {
+                        $elemMatch: {
+                            typeId: AddressType.CURRENT_ADDRESS,
+                            parentLocationIdFilter: {
+                                $in: this.filters.locationIds
+                            }
+                        }
+                    }
+                });
         }
 
         // hide filters

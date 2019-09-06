@@ -9,13 +9,12 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { UserModel } from '../../../../core/models/user.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 @Component({
@@ -47,7 +46,11 @@ export class CreateTeamComponent extends ConfirmOnFormChanges implements OnInit 
     }
 
     ngOnInit() {
-        this.usersList$ = this.userDataService.getUsersList();
+        const qbUsers = new RequestQueryBuilder();
+        qbUsers.sort
+            .by('firstName', RequestSortDirection.ASC)
+            .by('lastName', RequestSortDirection.ASC);
+        this.usersList$ = this.userDataService.getUsersList(qbUsers);
     }
 
     /**

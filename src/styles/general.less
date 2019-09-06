@@ -191,6 +191,35 @@ html, body, ul, li, div, span {
                 }
             }
         }
+
+        .location-drop-down-column-header {
+            overflow: visible;
+        }
+
+        .location-drop-down-column-header-container {
+            margin-top: 5px;
+            padding-top: 0 !important;
+            align-items: center;
+            height: 65px !important;
+
+            app-form-location-dropdown {
+                .ng-value-container {
+                    white-space: nowrap;
+                    flex-wrap: nowrap;
+                    width: 45px;
+                    display: flex;
+                }
+                .ng-value {
+                    padding-right: 5px;
+                    overflow: hidden !important;
+                }
+            }
+
+            .ng-placeholder {
+                font-weight: normal !important;
+                overflow: hidden;
+            }
+        }
     }
 
     .mat-table-loading-data {
@@ -212,6 +241,26 @@ html, body, ul, li, div, span {
 
     app-form-slide-toggle {
         display: inline-block;
+    }
+}
+
+form.form-view-only {
+    mat-slide-toggle.mat-disabled {
+        opacity: 1;
+        color: rgba(0, 0, 0, 0.38);
+    }
+
+    input.mat-input-element:disabled,
+    textarea.mat-input-element:disabled,
+    mat-select.mat-select-disabled .mat-select-value,
+    ng-select.ng-select-disabled .ng-select-container .ng-value-container .ng-value,
+    mat-slide-toggle.mat-disabled {
+        color: black;
+    }
+
+    mat-form-field.mat-form-field-disabled .mat-form-field-label,
+    ng-select.ng-select-disabled .ng-placeholder {
+        color: #333 !important;
     }
 }
 

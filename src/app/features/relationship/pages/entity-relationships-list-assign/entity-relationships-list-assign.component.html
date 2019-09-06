@@ -13,6 +13,13 @@
     [savedFiltersType]="savedFiltersType">
 </app-side-filters>
 
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.SHARE_RELATIONSHIPS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
 <app-total-number-of-records
     [value]="(entitiesListCount$ | async)?.count">
 </app-total-number-of-records>
@@ -150,6 +157,28 @@
                     </mat-cell>
                 </ng-container>
 
+                <!-- Case / Contact Visual Id -->
+                <ng-container matColumnDef="visualId">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell" fxLayout="column" >
+                            <div mat-sort-header class="column-header">{{'LNG_ENTITY_FIELD_LABEL_VISUAL_ID' | translate}}</div>
+                            <div class="column-filter">
+                                <app-form-input
+                                    name="visualIdFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    (optionChanged)="filterByTextField('visualId', $event)"
+                                    [displayFilterIcon]="true">
+                                </app-form-input>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item">
+                        {{ item.visualId }}
+                    </mat-cell>
+                </ng-container>
+
                 <!-- Age -->
                 <ng-container matColumnDef="age">
                     <mat-header-cell *matHeaderCellDef>
@@ -265,21 +294,23 @@
                     </mat-cell>
                 </ng-container>
 
-                <!-- Last follow-up -->
-                <ng-container matColumnDef="lastFollowUp">
-                    <mat-header-cell *matHeaderCellDef>
+                <!-- Date of onset -->
+                <ng-container matColumnDef="dateOfOnset">
+                    <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                         <div class="table-header-cell">
-                            <div class="column-header">
-                                {{'LNG_ENTITY_FIELD_LABEL_LAST_FOLLOW_UP' | translate}}
-                            </div>
+                            <div mat-sort-header class="column-header">{{'LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET' | translate }}</div>
                             <div class="column-filter">
-                                <!-- placeholder -->
+                                <app-form-daterange
+                                    name="dateFilter"
+                                    ngModel
+                                    (changed)="filterByDateRangeField('dateOfOnset', $event)"
+                                    app-reset-input-on-side-filter>
+                                </app-form-daterange>
                             </div>
                         </div>
                     </mat-header-cell>
-
-                    <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
-                        <!-- placeholder -->
+                    <mat-cell class="has-date-range-filter" *matCellDef="let item">
+                        {{ item.dateOfOnset | dateDefault }}
                     </mat-cell>
                 </ng-container>
 
@@ -290,9 +321,7 @@
                             <div class="column-header">
                                 {{'LNG_ENTITY_FIELD_LABEL_PLACE' | translate}}
                             </div>
-                            <div class="column-filter">
-
-                            </div>
+                            <div class="column-filter"></div>
                         </div>
                     </mat-header-cell>
 
@@ -320,8 +349,8 @@
                 </ng-container>
 
 
-                <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-                <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+                <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+                <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
             </mat-table>
 
             <div

@@ -13,20 +13,32 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
-         * uiContactsListPage
+         * uiCaseLabResultsFields
          */
-        'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS': 'Change Contact Final Follow-Up Status',
-        'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE': 'Are you sure you want to change the "Final Follow-Up Status" for {{count}} contact(s)?',
-        'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_SUCCESS_MSG': 'Final status updated for {{count}} contact(s)',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION': 'Classification',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION_DESCRIPTION': '',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION_INFO': 'Current classification of the case:',
 
         /**
-         * uiColumnActionsOnListPages
+         * uiBulkAddContactsPage
          */
-        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_HIDE': 'Hide',
-        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_HIDE_ALL': 'Hide All',
-        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_SHOW': 'Show',
-        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_SHOW_ALL': 'Show All'
+        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_API_ERROR_MSG': ' - row {{row}} is invalid: {{err}}',
+        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_PARTIAL_ERROR_MSG': ' - records that were created with success were removed from the spreadsheet so we don\'t create duplicates',
 
+        /**
+         * uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION': 'Are you sure you want to change "{{ caseName }}" classification to "{{ classification }}"?',
+
+        /**
+         * uiFollowUpsListPage
+         */
+        'LNG_PAGE_LIST_FOLLOW_UPS_NO_TEAM_LABEL': 'No Team',
+
+        /**
+         * uiLabResultsListPage
+         */
+        'LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE': 'Case classification modified!'
 
 
         /**

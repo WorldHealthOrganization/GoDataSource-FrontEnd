@@ -8,6 +8,8 @@ import { BaseModel } from './base.model';
 
 export class LabResultModel extends BaseModel {
     entity: CaseModel | ContactModel;
+    case: CaseModel;
+
     id: string;
     sampleIdentifier: string;
     dateSampleTaken: string;
@@ -34,6 +36,11 @@ export class LabResultModel extends BaseModel {
         this.entity = this.entity && this.entity.type === EntityType.CONTACT ?
             new ContactModel(this.entity) :
             new CaseModel(this.entity);
+
+        this.case = _.get(data, 'case');
+        if (!_.isEmpty(this.case)) {
+            this.case = new CaseModel(this.case);
+        }
 
         this.id = _.get(data, 'id');
         this.sampleIdentifier = _.get(data, 'sampleIdentifier', '');
