@@ -26,7 +26,7 @@
                     <div fxLayout="column">
                         <div
                             *ngFor="let question of categoryData.questions; let questionIndex = index"
-                            class="questionnaire-category-question"
+                            [class]="question.answerType === Constants.ANSWER_TYPES.MARKUP.value ? 'questionnaire-category-question-markup' : 'questionnaire-category-question'"
                             fxLayout="column"
                         >
                             <!-- Go through each question answer -->
@@ -47,9 +47,10 @@
                                         >
                                             <!-- Question no. -->
                                             <div
+                                                *ngIf="question.answerType !== Constants.ANSWER_TYPES.MARKUP.value"
                                                 fxFlex="48px">
                                                 <div class="questionnaire-category-question-nr">
-                                                    {{ ( 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE' | translate )  + (categoryData.startIndex + questionIndex + 1) }}
+                                                    {{ ( 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE' | translate ) + categoryData.questionNo[questionIndex] }}
                                                 </div>
                                             </div>
 

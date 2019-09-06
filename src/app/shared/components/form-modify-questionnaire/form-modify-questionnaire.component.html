@@ -296,8 +296,24 @@
                                 </app-form-input>
                             </div>
 
+                            <!-- question - answer type -->
+                            <div
+                                fxFlex="200px">
+                                <app-form-select
+                                    name="questionAnswerType"
+                                    [(ngModel)]="questionInEditModeClone.answerType"
+                                    [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate"
+                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE_DESCRIPTION"
+                                    [required]="true"
+                                    [options]="answerTypesInstantList"
+                                    [disabled]="questionAnswerIndexInEditMode !== null"
+                                    (optionChanged)="questionAnswerTypeChanged($event)">
+                                </app-form-select>
+                            </div>
+
                             <!-- question variable -->
                             <div
+                                *ngIf="questionInEditModeClone?.answerType !== answerTypes.MARKUP.value"
                                 fxFlex="200px">
                                 <app-form-input
                                     name="questionVariable"
@@ -329,23 +345,9 @@
                                 </app-form-select>
                             </div>
 
-                            <!-- question - answer type -->
-                            <div
-                                fxFlex="200px">
-                                <app-form-select
-                                    name="questionAnswerType"
-                                    [(ngModel)]="questionInEditModeClone.answerType"
-                                    [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate"
-                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE_DESCRIPTION"
-                                    [required]="true"
-                                    [options]="answerTypesInstantList"
-                                    [disabled]="questionAnswerIndexInEditMode !== null"
-                                    (optionChanged)="questionAnswerTypeChanged($event)">
-                                </app-form-select>
-                            </div>
-
                             <!-- question - answers display -->
                             <div
+                                *ngIf="questionInEditModeClone?.answerType !== answerTypes.MARKUP.value"
                                 fxFlex="200px">
                                 <app-form-select
                                     name="questionAnswersDisplay"
@@ -372,6 +374,7 @@
 
                             <!-- question required -->
                             <div
+                                *ngIf="questionInEditModeClone?.answerType !== answerTypes.MARKUP.value"
                                 fxFlex="150px">
                                 <app-form-slide-toggle
                                     name="questionRequired"
@@ -384,7 +387,7 @@
 
                             <!-- question multi answer -->
                             <div
-                                *ngIf="!displayChangeButton"
+                                *ngIf="!displayChangeButton && questionInEditModeClone?.answerType !== answerTypes.MARKUP.value"
                                 fxFlex="150px">
                                 <app-form-slide-toggle
                                     name="questionMultiAnswer"
