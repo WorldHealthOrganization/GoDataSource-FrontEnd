@@ -1577,8 +1577,10 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
         // check if we need to add a new answer
         if (
-            value.value === this.answerTypes.MULTIPLE_OPTIONS.value ||
-            value.value === this.answerTypes.SINGLE_SELECTION.value
+            value && (
+                value.value === this.answerTypes.MULTIPLE_OPTIONS.value ||
+                value.value === this.answerTypes.SINGLE_SELECTION.value
+            )
         ) {
             // add a new answer only if we don't have answers already
             if (_.isEmpty(this.questionInEditModeClone.answers)) {
