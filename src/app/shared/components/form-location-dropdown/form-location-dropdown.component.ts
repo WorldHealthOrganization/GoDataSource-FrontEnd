@@ -202,6 +202,13 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
             return;
         }
 
+        // check if item is visible on screen
+        const checkVisible = (elm): boolean => {
+            const rect = elm.getBoundingClientRect();
+            const viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+            return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
+        };
+
         // wait for debounce time
         this.repositionTimer = setTimeout(() => {
             // reposition dropdown
@@ -212,9 +219,11 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
                 // retrieve involved items
                 const dropSelectContainer: any = this.locationHandler.element.querySelector('.ng-select-container');
                 const dropDownPanel: any = this.locationHandler.element.querySelector('.ng-dropdown-panel');
+                const isVisible: boolean = checkVisible(dropSelectContainer);
                 if (
                     dropSelectContainer &&
-                    dropDownPanel
+                    dropDownPanel &&
+                    isVisible
                 ) {
                     // retrieve items
                     const dropDownPanelItems: any = dropDownPanel.querySelector('.ng-dropdown-panel-items');
@@ -235,6 +244,8 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
                     // reposition item
                     dropDownPanel.style.left = `${dropSelectContainerPosition.left}px`;
                     dropDownPanel.style.top = `${top}px`;
+                } else if (!isVisible) {
+                    this.locationHandler.close();
                 }
             }
 
