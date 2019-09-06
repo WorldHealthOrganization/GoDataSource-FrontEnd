@@ -42,7 +42,7 @@
                         {{ date }}
                     </th>
                 </tr>
-                <tr *ngFor="let teamData of teamsData">
+                <tr *ngFor="let teamData of teamsDataShow">
                     <td *ngFor="let date of dates; let first = first">
                         <ng-container
                             *ngIf="first">
