@@ -76,6 +76,13 @@
             {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT' | translate }}
         </div>
 
+        <!-- Answer Type -->
+        <div
+            fxFlex="200px"
+            class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
+            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate }}
+        </div>
+
         <!-- Question Variable -->
         <div
             fxFlex="200px"
@@ -88,13 +95,6 @@
             fxFlex
             class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
             {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY' | translate }}
-        </div>
-
-        <!-- Answer Type -->
-        <div
-            fxFlex="200px"
-            class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
-            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate }}
         </div>
 
         <!-- Answer Display -->
@@ -165,6 +165,13 @@
                     {{ question.text }}
                 </div>
 
+                <!-- Answer Type -->
+                <div
+                    fxFlex="200px"
+                    class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
+                    {{ question.answerType | translate }}
+                </div>
+
                 <!-- Question Variable -->
                 <div
                     fxFlex="200px"
@@ -177,13 +184,6 @@
                     fxFlex
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
                     {{ question.category | translate }}
-                </div>
-
-                <!-- Answer Type -->
-                <div
-                    fxFlex="200px"
-                    class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
-                    {{ question.answerType | translate }}
                 </div>
 
                 <!-- Answers Display -->
