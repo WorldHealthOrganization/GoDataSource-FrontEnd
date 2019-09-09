@@ -37,26 +37,8 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
     selectedOutbreak: OutbreakModel;
 
     dates: string[] = [];
-    teamsDataShow: {
-        id: string,
-        name: string,
-        dates: {
-            [formattedDate: string]: {
-                totalFollowupsCount: number,
-                successfulFollowupsCount: number
-            }
-        }
-    }[] = [];
-    teamsData: {
-        id: string,
-        name: string,
-        dates: {
-            [formattedDate: string]: {
-                totalFollowupsCount: number,
-                successfulFollowupsCount: number
-            }
-        }
-    }[];
+    teamsDataShow: TeamMapModel[] = [];
+    teamsData: TeamMapModel[];
 
     // loading flag - display spinner instead of table
     displayLoading: boolean = false;
