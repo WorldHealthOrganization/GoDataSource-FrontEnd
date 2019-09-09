@@ -190,7 +190,7 @@
                 <div
                     fxFlex="200px"
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
-                    {{ question.answerType === answerTypes.MARKUP.value ? '-' : question.answersDisplay | translate }}
+                    {{ question.answerType === answerTypes.MARKUP.value ? '-' : (question.answersDisplay | translate) }}
                 </div>
 
                 <!-- Inactive ? -->
