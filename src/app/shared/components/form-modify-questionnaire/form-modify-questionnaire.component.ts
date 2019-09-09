@@ -1271,11 +1271,18 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
         // clean extra data which isn't needed anymore if type is markup
         if (this.questionInEditModeClone.answerType === this.answerTypes.MARKUP.value) {
-            delete this.questionInEditModeClone.variable;
             delete this.questionInEditModeClone.answersDisplay;
             delete this.questionInEditModeClone.required;
             delete this.questionInEditModeClone.multiAnswer;
             delete this.questionInEditModeClone.answers;
+
+            // generate uuid since variable is required
+            if (
+                isNew ||
+                !this.questionInEditModeClone.variable
+            ) {
+                this.questionInEditModeClone.variable = uuid();
+            }
         }
 
         // clean answers

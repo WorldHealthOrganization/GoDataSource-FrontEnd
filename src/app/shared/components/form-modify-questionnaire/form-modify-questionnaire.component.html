@@ -176,7 +176,7 @@
                 <div
                     fxFlex="200px"
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
-                    {{ question.variable }}
+                    {{ question.answerType === answerTypes.MARKUP.value ? '-' : question.variable }}
                 </div>
 
                 <!-- Question Category -->
@@ -190,7 +190,7 @@
                 <div
                     fxFlex="200px"
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
-                    {{ question.answersDisplay | translate }}
+                    {{ question.answerType === answerTypes.MARKUP.value ? '-' : question.answersDisplay | translate }}
                 </div>
 
                 <!-- Inactive ? -->
@@ -204,7 +204,7 @@
                 <div
                     fxFlex="100px"
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
-                    {{ (question.required ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
+                    {{ question.answerType === answerTypes.MARKUP.value ? '-' :  ((question.required ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate) }}
                 </div>
 
                 <!-- Multi answer ? -->
@@ -212,7 +212,7 @@
                     *ngIf="!displayChangeButton"
                     fxFlex="120px"
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
-                    {{ (question.multiAnswer ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
+                    {{ question.answerType === answerTypes.MARKUP.value ? '-' : ((question.multiAnswer ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate) }}
                 </div>
             </div>
 
