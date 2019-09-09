@@ -72,14 +72,27 @@
                     </app-form-input>
                 </div>
 
-                <app-form-location-dropdown
-                    fxFlex
-                    name="locationIds"
-                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION' | translate"
-                    multiple="true"
-                    [useOutbreakLocations]="true"
-                    [(ngModel)]="filters.locationIds">
-                </app-form-location-dropdown>
+                <div
+                    fxFlex fxLayout="row" fxLayoutGap="20px">
+                    <app-form-select
+                        name="teamIdFilter"
+                        [(ngModel)]="filters.teamIds"
+                        [placeholder]="'LNG_CONTACT_FIELD_LABEL_TEAM' | translate"
+                        [options]="teamsList$ | async"
+                        optionLabelKey="name"
+                        optionValueKey="id">
+                    </app-form-select>
+
+                    <app-form-location-dropdown
+                        fxFlex
+                        name="locationIds"
+                        [placeholder]="'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION' | translate"
+                        multiple="true"
+                        [useOutbreakLocations]="true"
+                        [(ngModel)]="filters.locationIds">
+                    </app-form-location-dropdown>
+                </div>
+
             </div>
 
             <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="20px">

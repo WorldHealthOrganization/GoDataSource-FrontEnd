@@ -13,6 +13,11 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiContactFields
+         */
+        'LNG_CONTACT_FIELD_LABEL_TEAM': 'Team'
+
+        /**
          * REMOVE the tokens from below
          */
         // ...

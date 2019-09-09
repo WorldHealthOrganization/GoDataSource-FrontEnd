@@ -26,6 +26,8 @@ import { share } from 'rxjs/operators';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { AddressType } from '../../../../core/models/address.model';
+import { TeamModel } from '../../../../core/models/team.model';
+import { TeamDataService } from '../../../../core/services/data/team.data.service';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -72,6 +74,8 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
     // used for pagination
     followUpsGroupedByContactCount$: Observable<any>;
+    teamsList$: Observable<TeamModel[]>;
+
 
     // loading flag - display spinner instead of table
     displayLoading: boolean = false;
@@ -97,13 +101,15 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         visualId: any,
         dateOfLastContact: any,
         dateOfTheEndOfTheFollowUp: any,
-        locationIds: string[]
+        locationIds: string[],
+        teamIds: string[]
     } = {
         contactName: null,
         visualId: null,
         dateOfLastContact: null,
         dateOfTheEndOfTheFollowUp: null,
-        locationIds: []
+        locationIds: [],
+        teamIds: []
     };
 
     /**
@@ -135,7 +141,8 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         private referenceDataDataService: ReferenceDataDataService,
         private i18nService: I18nService,
         private genericDataService: GenericDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private teamDataService: TeamDataService
     ) {
         super(
             snackbarService
@@ -145,6 +152,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+        this.teamsList$ = this.teamDataService.getTeamsList().pipe(share());
 
         // add page title
         this.exportRangeFollowUpsFileName = this.i18nService.instant('LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE') +
@@ -379,7 +387,8 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             visualId: null,
             dateOfLastContact: null,
             dateOfTheEndOfTheFollowUp: null,
-            locationIds: []
+            locationIds: [],
+            teamIds: []
         };
 
         // reset applied filters
@@ -424,6 +433,12 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         if (this.filters.dateOfTheEndOfTheFollowUp !== null) {
             this.queryBuilder.addChildQueryBuilder('contact')
                 .filter.byDateRange('followUp.endDate', this.filters.dateOfTheEndOfTheFollowUp);
+        }
+
+        if (this.filters.teamIds !== null) {
+            console.log(this.filters.teamIds);
+            this.queryBuilder.addChildQueryBuilder('contact')
+                .filter.bySelect('teamId', this.filters.teamIds);
         }
 
         // filter by contact locations
