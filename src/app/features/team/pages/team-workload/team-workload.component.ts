@@ -37,7 +37,16 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
     selectedOutbreak: OutbreakModel;
 
     dates: string[] = [];
-    teamsDataShow: {}[] = [];
+    teamsDataShow: {
+        id: string,
+        name: string,
+        dates: {
+            [formattedDate: string]: {
+                totalFollowupsCount: number,
+                successfulFollowupsCount: number
+            }
+        }
+    }[] = [];
     teamsData: {
         id: string,
         name: string,
@@ -241,10 +250,11 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
             });
 
             // iterate through follow-ups to create data to show
+            const mappedTeamsFollowups = [];
             _.forEach(metricTeamsFollowups.teams, (tData: MetricTeamFollowup) => {
                 _.forEach(teamsMap, (team: TeamMapModel) => {
                     if (tData.id === team.id) {
-                        this.teamsDataShow.push({
+                        mappedTeamsFollowups.push({
                             id: tData.id,
                             name: team.name,
                             dates: team.dates
@@ -252,6 +262,8 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                     }
                 });
             });
+            // set data to show
+            this.teamsDataShow = mappedTeamsFollowups;
         }
 
         // hide loading
