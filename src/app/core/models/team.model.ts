@@ -17,3 +17,18 @@ export class TeamModel {
         this.locationIds = _.get(data, 'locationIds', []);
     }
 }
+
+// classes created to prevent TS compiler error "Property 'x' does not exist on type 'never'"
+export class MetricTeamFollowup {
+    dates: [{}];
+    id: string;
+    successfulFollowupsCount: number;
+    totalFollowupsCount: number;
+}
+
+export class TeamMapModel {
+    dates: {};
+    id: string;
+    name: string;
+}
+

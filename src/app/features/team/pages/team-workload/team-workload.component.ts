@@ -12,7 +12,7 @@ import { TeamDataService } from '../../../../core/services/data/team.data.servic
 import * as _ from 'lodash';
 import { FormDateRangeSliderData } from '../../../../shared/xt-forms/components/form-date-range-slider/form-date-range-slider.component';
 import { Subscription } from 'rxjs';
-import { TeamModel } from '../../../../core/models/team.model';
+import { MetricTeamFollowup, TeamMapModel, TeamModel } from '../../../../core/models/team.model';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
@@ -240,11 +240,11 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                 }
             });
 
-            const formattedData = [];
-            _.forEach(metricTeamsFollowups.teams, (tData) => {
-                _.forEach(teamsMap, (team) => {
+            // iterate through follow-ups to create data to show
+            _.forEach(metricTeamsFollowups.teams, (tData: MetricTeamFollowup) => {
+                _.forEach(teamsMap, (team: TeamMapModel) => {
                     if (tData.id === team.id) {
-                        formattedData.push({
+                        this.teamsDataShow.push({
                             id: tData.id,
                             name: team.name,
                             dates: team.dates
@@ -252,11 +252,6 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                     }
                 });
             });
-            console.log(formattedData);
-            this.teamsDataShow = formattedData;
-            // console.log('teams map', teamsMap);
-            // console.log('metric teams', metricTeamsFollowups);
-
         }
 
         // hide loading
