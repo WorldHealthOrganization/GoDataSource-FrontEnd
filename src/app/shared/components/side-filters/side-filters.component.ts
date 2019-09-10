@@ -117,7 +117,6 @@ export class SideFiltersComponent implements OnInit {
     FilterType = FilterType;
     FilterComparator = FilterComparator;
     AppliedFilterModel = AppliedFilterModel;
-    QuestionWhichAnswer = QuestionWhichAnswer;
     Constants = Constants;
 
     // keep query builder
@@ -130,7 +129,7 @@ export class SideFiltersComponent implements OnInit {
     ];
 
     // which types of question
-    questionWhichAnswer: LabelValuePair[] = [
+    questionWhichAnswerOptions: LabelValuePair[] = [
         new LabelValuePair(
             'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_ANY',
             QuestionWhichAnswer.ANY_ANSWER

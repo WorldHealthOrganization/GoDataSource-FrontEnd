@@ -239,7 +239,7 @@
                                                 [name]="'filter[filters][' + i + '][extraValues][whichAnswer]'"
                                                 [ngModel]="getQuestionExtraWhichAnswer(filter)"
                                                 [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER' | translate"
-                                                [options]="questionWhichAnswer"
+                                                [options]="questionWhichAnswerOptions"
                                                 [clearable]="false"
                                                 (optionChanged)="filter.extraValues.whichAnswer = $event.value">
                                             </app-form-select>
