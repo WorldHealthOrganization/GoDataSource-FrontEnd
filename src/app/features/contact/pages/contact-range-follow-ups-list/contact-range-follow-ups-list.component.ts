@@ -394,7 +394,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         // reset applied filters
         this.resetFiltersToSideFilters();
 
-        // apply default filter
+        // apply default filters
         if (this.sliderDateFilterValue) {
             this.filterByDateRange(this.sliderDateFilterValue);
         }
