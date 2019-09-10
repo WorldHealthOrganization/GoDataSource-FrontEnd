@@ -3,6 +3,8 @@ import { Observable } from 'rxjs';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { Moment } from '../../../core/helperClasses/x-moment';
+import { AnswerModel, QuestionModel } from '../../../core/models/question.model';
+import { Constants } from '../../../core/models/constants';
 
 // value types
 enum ValueType {
@@ -12,7 +14,8 @@ enum ValueType {
     RANGE_NUMBER = 'range_number',
     RANGE_DATE = 'range_date',
     DATE = 'date',
-    LAT_LNG_WITHIN = 'address_within'
+    LAT_LNG_WITHIN = 'address_within',
+    QUESTIONNAIRE_ANSWERS = 'questionnaire_answers'
 }
 
 // filter types
@@ -27,7 +30,8 @@ export enum FilterType {
     DATE = 'date',
     ADDRESS = 'address',
     LOCATION = 'location',
-    ADDRESS_PHONE_NUMBER = 'address_phone_number'
+    ADDRESS_PHONE_NUMBER = 'address_phone_number',
+    QUESTIONNAIRE_ANSWERS = 'questionnaire_answers'
 }
 
 // comparator types
@@ -43,6 +47,37 @@ export enum FilterComparator {
     LOCATION = 'location',
     WITHIN = 'within',
     DATE = 'date'
+}
+
+// which answer to check
+export enum QuestionWhichAnswer {
+    ANY_ANSWER = 'any',
+    LAST_ANSWER = 'last'
+}
+
+// Model for questionnaire question side filters
+export class QuestionSideFilterModel extends QuestionModel {
+    orderLabel: string;
+    multiAnswerParent: boolean;
+    self: QuestionSideFilterModel;
+
+    /**
+     * Constructor
+     */
+    constructor(data?: {
+        orderLabel: string,
+        multiAnswerParent: boolean
+    }) {
+        // no need to assign data since we assign it here
+        super(data);
+
+        // assign data
+        this.orderLabel = _.get(data, 'orderLabel');
+        this.multiAnswerParent = _.get(data, 'multiAnswerParent');
+
+        // keep ref to itself for easy access from select
+        this.self = this;
+    }
 }
 
 // Model for Available Filter
@@ -160,6 +195,67 @@ export class FilterModel {
     // flag where property instead of creating specific rules...
     flagIt: boolean;
 
+    // questionnaire template
+    private _questionnaireTemplate: QuestionModel[];
+    questionnaireTemplateQuestions: QuestionSideFilterModel[];
+    public set questionnaireTemplate(questionnaireTemplate: QuestionModel[]) {
+        // set questionnaire template
+        this._questionnaireTemplate = questionnaireTemplate;
+
+        // function that adds questions recursively
+        // the list of questions should already be sorted, so we don't need to sort them before adding them to the list
+        this.questionnaireTemplateQuestions = [];
+        const addQuestion = (
+            question: QuestionModel,
+            prefixOrder: string,
+            multiAnswerParent: boolean
+        ) => {
+            // ignore some types of questions
+            if (question.answerType === Constants.ANSWER_TYPES.MARKUP.value) {
+                return;
+            }
+
+            // add question to list
+            const orderLabel: string = (
+                prefixOrder ?
+                    (prefixOrder + '.') :
+                    ''
+            ) + question.order;
+            this.questionnaireTemplateQuestions.push(new QuestionSideFilterModel({
+                ...question,
+                orderLabel: orderLabel,
+                multiAnswerParent: multiAnswerParent
+            }));
+
+            // add recursive sub-questions
+            if (!_.isEmpty(question.answers)) {
+                question.answers.forEach((answer: AnswerModel) => {
+                    if (!_.isEmpty(answer.additionalQuestions)) {
+                        answer.additionalQuestions.forEach((childQuestion: QuestionModel) => {
+                            addQuestion(
+                                childQuestion,
+                                orderLabel,
+                                multiAnswerParent
+                            );
+                        });
+                    }
+                });
+            }
+        };
+
+        // determine list of questions to display
+        (this.questionnaireTemplate || []).forEach((question: QuestionModel) => {
+            addQuestion(
+                question,
+                '',
+                question.multiAnswer
+            );
+        });
+    }
+    public get questionnaireTemplate(): QuestionModel[] {
+        return this._questionnaireTemplate;
+    }
+
     /**
      * Unique key
      */
@@ -190,7 +286,8 @@ export class FilterModel {
             value: FilterComparator,
             valueType: ValueType
         }[],
-        flagIt?: boolean
+        flagIt?: boolean,
+        questionnaireTemplate?: QuestionModel[]
     }) {
         // set handler
         this.self = this;
@@ -346,14 +443,29 @@ export class AppliedFilterModel {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS',
             value: FilterComparator.CONTAINS,
             valueType: ValueType.STRING
+        }],
+
+        // questionnaire
+        [FilterType.QUESTIONNAIRE_ANSWERS]: [{
+            value: FilterComparator.NONE,
+            valueType: ValueType.QUESTIONNAIRE_ANSWERS
         }]
     };
 
-    // can't remove filter
-    public readonly: boolean = false;
+    // question answer mapping
+    public static allowedQuestionComparators: {
+        [key: string]: FilterType
+    } = {
+        [Constants.ANSWER_TYPES.FREE_TEXT.value]: FilterType.TEXT,
+        [Constants.ANSWER_TYPES.DATE_TIME.value]: FilterType.RANGE_DATE,
+        [Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value]: FilterType.MULTISELECT,
+        [Constants.ANSWER_TYPES.SINGLE_SELECTION.value]: FilterType.MULTISELECT,
+        [Constants.ANSWER_TYPES.NUMERIC.value]: FilterType.RANGE_NUMBER,
+        [Constants.ANSWER_TYPES.FILE_UPLOAD.value]: FilterType.SELECT
+    };
 
     // default comparators
-    private defaultComparator = {
+    public static defaultComparator = {
         [FilterType.TEXT]: FilterComparator.TEXT_STARTS_WITH,
         [FilterType.NUMBER]: FilterComparator.IS,
         [FilterType.RANGE_NUMBER]: FilterComparator.BETWEEN,
@@ -364,6 +476,9 @@ export class AppliedFilterModel {
         [FilterType.LOCATION]: FilterComparator.LOCATION,
         [FilterType.ADDRESS_PHONE_NUMBER]: FilterComparator.CONTAINS
     };
+
+    // can't remove filter
+    public readonly: boolean = false;
 
     // applied filter
     private _previousFilter: FilterModel;
@@ -376,8 +491,8 @@ export class AppliedFilterModel {
         this._filter = value;
 
         // determine the default comparator
-        this.comparator = this.defaultComparator[this.filter.type] ?
-            this.defaultComparator[this.filter.type] : (
+        this.comparator = AppliedFilterModel.defaultComparator[this.filter.type] ?
+            AppliedFilterModel.defaultComparator[this.filter.type] : (
                 AppliedFilterModel.allowedComparators[this.filter.type] &&
                 AppliedFilterModel.allowedComparators[this.filter.type].length > 0 ?
                     AppliedFilterModel.allowedComparators[this.filter.type][0].value :
@@ -437,16 +552,19 @@ export class AppliedFilterModel {
             this.filter &&
             this.comparator
         ) {
+            // exclude questionnaire answers since we have fields that we need to reset inside ( like comparators and other that may be different from question to question )
             const prevVT = _.find(AppliedFilterModel.allowedComparators[this._previousFilter.type], { value: this._previousComparator });
             const currentVT = _.find(AppliedFilterModel.allowedComparators[this.filter.type], { value: this.comparator });
             if (
                 prevVT &&
                 currentVT &&
-                prevVT.valueType === currentVT.valueType
+                prevVT.valueType === currentVT.valueType &&
+                prevVT.valueType !== ValueType.QUESTIONNAIRE_ANSWERS
             ) {
                 // don't reset value
                 // NOTHING TO DO
             } else {
+                // reset values
                 this.value = null;
                 this.extraValues = {};
             }

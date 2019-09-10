@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatDialogRef, MatSidenav } from '@angular/material';
-import { AppliedFilterModel, AppliedSortModel, FilterComparator, FilterModel, FilterType, SortModel } from './model';
+import { AppliedFilterModel, AppliedSortModel, FilterComparator, FilterModel, FilterType, QuestionWhichAnswer, SortModel } from './model';
 import { RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
@@ -21,6 +21,7 @@ import { RequestFilter } from '../../../core/helperClasses/request-query-builder
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { moment } from '../../../core/helperClasses/x-moment';
+import { LabelValuePair } from '../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-side-filters',
@@ -33,7 +34,30 @@ export class SideFiltersComponent implements OnInit {
     _filterOptions: FilterModel[] = [];
     @Input() set filterOptions(values: FilterModel[]) {
         // filter options
-        this._filterOptions = values;
+        // clone array since we alter it later
+        this._filterOptions = values ? [
+            ...values
+        ] : values;
+
+        // sort applied filters
+        if (!_.isEmpty(this._filterOptions)) {
+            this._filterOptions.sort((item1: FilterModel, item2: FilterModel): number => {
+                // get names
+                let name1: string = this.i18nService.instant(item1.fieldLabel).toLowerCase();
+                let name2: string = this.i18nService.instant(item2.fieldLabel).toLowerCase();
+
+                // add prefix ?
+                if (item1.relationshipLabel) {
+                    name1 = `${this.i18nService.instant(item1.relationshipLabel).toLowerCase()} ${name1}`;
+                }
+                if (item2.relationshipLabel) {
+                    name2 = `${this.i18nService.instant(item2.relationshipLabel).toLowerCase()} ${name2}`;
+                }
+
+                // compare
+                return name1.localeCompare(name2);
+            });
+        }
 
         // required applied fields
         this.addRequiredAndValueFilters();
@@ -93,6 +117,7 @@ export class SideFiltersComponent implements OnInit {
     FilterType = FilterType;
     FilterComparator = FilterComparator;
     AppliedFilterModel = AppliedFilterModel;
+    QuestionWhichAnswer = QuestionWhichAnswer;
     Constants = Constants;
 
     // keep query builder
@@ -102,6 +127,30 @@ export class SideFiltersComponent implements OnInit {
     sortDirections: any[] = [
         {label: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER', value: RequestSortDirection.ASC},
         {label: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER', value: RequestSortDirection.DESC}
+    ];
+
+    // which types of question
+    questionWhichAnswer: LabelValuePair[] = [
+        new LabelValuePair(
+            'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_ANY',
+            QuestionWhichAnswer.ANY_ANSWER
+        ),
+        new LabelValuePair(
+            'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_LAST',
+            QuestionWhichAnswer.LAST_ANSWER
+        )
+    ];
+
+    // file exist or not condition
+    questionFileOptions: LabelValuePair[] = [
+        new LabelValuePair(
+            'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_FILE_EXIST',
+            true
+        ),
+        new LabelValuePair(
+            'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_FILE_DOESNT_EXIST',
+            false
+        )
     ];
 
     @ViewChild('sideNav') sideNav: MatSidenav;
@@ -710,5 +759,33 @@ export class SideFiltersComponent implements OnInit {
 
         // close side nav
         this.closeSideNav();
+    }
+
+    /**
+     * Reset values on question change
+     * @param filter
+     */
+    questionChanged(filter) {
+        filter.extraValues = {};
+    }
+
+    /**
+     * Which answer
+     * @param filter
+     */
+    getQuestionExtraWhichAnswer(filter) {
+        return filter.extraValues.whichAnswer || (
+            filter.extraValues.whichAnswer = QuestionWhichAnswer.LAST_ANSWER
+        );
+    }
+
+    /**
+     * Which comparator
+     * @param filter
+     */
+    getQuestionExtraComparator(filter) {
+        return filter.extraValues.comparator || (
+            filter.extraValues.comparator = AppliedFilterModel.defaultComparator[AppliedFilterModel.allowedQuestionComparators[filter.value.answerType]]
+        );
     }
 }

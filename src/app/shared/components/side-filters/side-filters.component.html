@@ -1,4 +1,6 @@
-<div class="side-filters">
+<div
+    *ngIf="filterOptions?.length > 0 || sortOptions?.length > 0"
+    class="side-filters">
 
     <button class="sidenav-toggle" mat-raised-button (click)="openSideNav()">
         <span class="xt-icon">filter</span>
@@ -15,7 +17,7 @@
                 <div
                     class="filters-sort-actions">
                     <!-- Filters -->
-                    <div *ngIf="filterOptions.length > 0" class="section filters-section" fxLayout="column">
+                    <div *ngIf="filterOptions?.length > 0" class="section filters-section" fxLayout="column">
 
                         <div
                             class="filters-load-filter">
@@ -209,6 +211,100 @@
                                             [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_MAX_DISTANCE' | translate">
                                         </app-form-input>
                                     </ng-container>
+
+                                    <!-- Questionnaire answers -->
+                                    <ng-container
+                                        *ngIf="filter.filter?.type === FilterType.QUESTIONNAIRE_ANSWERS">
+                                        <!-- Question -->
+                                        <app-form-select
+                                            [name]="'filter[filters][' + i + '][value]'"
+                                            [(ngModel)]="filter.value"
+                                            [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION' | translate"
+                                            [options]="filter.filter.questionnaireTemplateQuestions"
+                                            [multiple]="false"
+                                            optionLabelKey="text"
+                                            optionLabelPrefixKey="orderLabel"
+                                            optionLabelPrefixDelimiter=" "
+                                            optionValueKey="self"
+                                            optionTooltipKey="text"
+                                            (optionChanged)="questionChanged(filter)">
+                                        </app-form-select>
+
+                                        <!-- Filter details -->
+                                        <ng-container
+                                            *ngIf="filter.value">
+                                            <!-- Last answer or any of them -->
+                                            <app-form-select
+                                                *ngIf="filter.value.multiAnswerParent"
+                                                [name]="'filter[filters][' + i + '][extraValues][whichAnswer]'"
+                                                [ngModel]="getQuestionExtraWhichAnswer(filter)"
+                                                [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER' | translate"
+                                                [options]="questionWhichAnswer"
+                                                [clearable]="false"
+                                                (optionChanged)="filter.extraValues.whichAnswer = $event.value">
+                                            </app-form-select>
+
+                                            <!-- Comparator used accordingly to field type -->
+                                            <app-form-select
+                                                *ngIf="
+                                                    AppliedFilterModel.allowedQuestionComparators[filter.value.answerType] &&
+                                                    AppliedFilterModel.allowedComparators[AppliedFilterModel.allowedQuestionComparators[filter.value.answerType]] &&
+                                                    AppliedFilterModel.allowedComparators[AppliedFilterModel.allowedQuestionComparators[filter.value.answerType]].length > 1"
+                                                [name]="'filter[filters][' + i + '][extraValues][comparator]'"
+                                                [ngModel]="getQuestionExtraComparator(filter)"
+                                                [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL' | translate"
+                                                [options]="AppliedFilterModel.allowedComparators[AppliedFilterModel.allowedQuestionComparators[filter.value.answerType]]"
+                                                [clearable]="false"
+                                                (optionChanged)="filter.extraValues.comparator = $event.value">
+                                            </app-form-select>
+
+                                            <!-- TEXT Filter -->
+                                            <app-form-input
+                                                *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value"
+                                                [name]="'filter[filters][' + i + '][extraValues][filterValue]'"
+                                                [(ngModel)]="filter.extraValues.filterValue"
+                                                [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD' | translate">
+                                            </app-form-input>
+
+                                            <!-- DATE RANGE Filter-->
+                                            <app-form-daterange
+                                                *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.DATE_TIME.value"
+                                                [name]="'filter[filters][' + i + '][extraValues][filterValue]'"
+                                                [(ngModel)]="filter.extraValues.filterValue"
+                                                [startDateVisible]="filter.extraValues.comparator && (filter.extraValues.comparator === FilterComparator.BETWEEN || filter.extraValues.comparator === FilterComparator.AFTER)"
+                                                [endDateVisible]="filter.extraValues.comparator && (filter.extraValues.comparator === FilterComparator.BETWEEN || filter.extraValues.comparator === FilterComparator.BEFORE)">
+                                            </app-form-daterange>
+
+                                            <!-- SELECT Filter -->
+                                            <app-form-select
+                                                *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value || filter.value.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value"
+                                                [name]="'filter[filters][' + i + '][extraValues][filterValue]'"
+                                                [(ngModel)]="filter.extraValues.filterValue"
+                                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                                [options]="filter.value.answers"
+                                                [multiple]="true">
+                                            </app-form-select>
+
+                                            <!-- NUMBER Filter -->
+                                            <app-form-range
+                                                *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.NUMERIC.value"
+                                                [name]="'filter[filters][' + i + '][extraValues][filterValue]'"
+                                                [(ngModel)]="filter.extraValues.filterValue"
+                                                [fromVisible]="filter.extraValues.comparator && (filter.extraValues.comparator === FilterComparator.BETWEEN || filter.extraValues.comparator === FilterComparator.AFTER)"
+                                                [toVisible]="filter.extraValues.comparator && (filter.extraValues.comparator === FilterComparator.BETWEEN || filter.extraValues.comparator === FilterComparator.BEFORE)">
+                                            </app-form-range>
+
+                                            <!-- File Filter -->
+                                            <app-form-select
+                                                *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value"
+                                                [name]="'filter[filters][' + i + '][extraValues][filterValue]'"
+                                                [(ngModel)]="filter.extraValues.filterValue"
+                                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                                [options]="questionFileOptions"
+                                                [multiple]="false">
+                                            </app-form-select>
+                                        </ng-container>
+                                    </ng-container>
                                 </mat-card>
 
                                 <!-- Delete filter item -->
@@ -237,7 +333,7 @@
 
                     <!-- Sort Criteria -->
                     <div
-                        *ngIf="sortOptions.length > 0"
+                        *ngIf="sortOptions?.length > 0"
                         class="section sort-section"
                         fxLayout="column">
 
