@@ -12,8 +12,14 @@ import { TeamDataService } from '../../../../core/services/data/team.data.servic
 import * as _ from 'lodash';
 import { FormDateRangeSliderData } from '../../../../shared/xt-forms/components/form-date-range-slider/form-date-range-slider.component';
 import { Subscription } from 'rxjs';
-import { TeamModel } from '../../../../core/models/team.model';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
+import { TeamModel } from '../../../../core/models/team.model';
+
+interface ITeamMap {
+    id: string;
+    dates: {};
+    name: string;
+}
 
 @Component({
     selector: 'app-team-workload',
@@ -37,16 +43,8 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
     selectedOutbreak: OutbreakModel;
 
     dates: string[] = [];
-    teamsData: {
-        id: string,
-        name: string,
-        dates: {
-            [formattedDate: string]: {
-                totalFollowupsCount: number,
-                successfulFollowupsCount: number
-            }
-        }
-    }[];
+    teamsDataShow: ITeamMap[] = [];
+    teamsData: ITeamMap[];
 
     // loading flag - display spinner instead of table
     displayLoading: boolean = false;
@@ -212,7 +210,7 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
             // map teams for team search
             const teamsMap = {};
             this.teamsData.forEach((teamData) => {
-                teamsMap[teamData.id ? teamData.id : 'N'] = teamData;
+                teamsMap[teamData.id ? teamData.id : 'N'] = _.cloneDeep(teamData);
             });
 
             // go through teams and create list of date information
@@ -237,6 +235,11 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                 } else {
                     teamsMap['N'].dates = dates;
                 }
+            });
+
+            // set data to show
+            this.teamsDataShow = _.filter(teamsMap, (v: ITeamMap) => {
+                return !_.isEmpty(v.dates);
             });
         }
 

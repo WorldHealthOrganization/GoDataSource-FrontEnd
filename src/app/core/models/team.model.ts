@@ -17,3 +17,4 @@ export class TeamModel {
         this.locationIds = _.get(data, 'locationIds', []);
     }
 }
+
