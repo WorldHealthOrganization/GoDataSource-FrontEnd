@@ -38,7 +38,15 @@ export const EnglishUsLang = {
         /**
          * uiLabResultsListPage
          */
-        'LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE': 'Case classification modified!'
+        'LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE': 'Case classification modified!',
+
+        /**
+         * uiCaseFields
+         */
+        'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL': 'Place of burial',
+        'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME': 'Burial place name',
+        'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION': '',
 
 
         /**
