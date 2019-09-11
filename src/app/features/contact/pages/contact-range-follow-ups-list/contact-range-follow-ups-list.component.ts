@@ -436,9 +436,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         }
 
         if (this.filters.teamIds !== null) {
-            console.log(this.filters.teamIds);
-            this.queryBuilder.addChildQueryBuilder('contact')
-                .filter.bySelect('teamId', this.filters.teamIds);
+            this.filterBySelectField('teamId', this.filters.teamIds, null);
         }
 
         // filter by contact locations

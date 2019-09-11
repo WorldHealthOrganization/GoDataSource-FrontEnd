@@ -80,7 +80,8 @@
                         [placeholder]="'LNG_CONTACT_FIELD_LABEL_TEAM' | translate"
                         [options]="teamsList$ | async"
                         optionLabelKey="name"
-                        optionValueKey="id">
+                        optionValueKey="id"
+                        [multiple]="true">
                     </app-form-select>
 
                     <app-form-location-dropdown
