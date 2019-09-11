@@ -76,7 +76,6 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     followUpsGroupedByContactCount$: Observable<any>;
     teamsList$: Observable<TeamModel[]>;
 
-
     // loading flag - display spinner instead of table
     displayLoading: boolean = false;
 
@@ -394,7 +393,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         // reset applied filters
         this.resetFiltersToSideFilters();
 
-        // apply default filters
+        // apply default filter
         if (this.sliderDateFilterValue) {
             this.filterByDateRange(this.sliderDateFilterValue);
         }
