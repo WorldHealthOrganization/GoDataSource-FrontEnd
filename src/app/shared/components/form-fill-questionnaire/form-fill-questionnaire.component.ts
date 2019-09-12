@@ -1008,4 +1008,35 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
                 }
             });
     }
+
+    /**
+     * Text value changed
+     */
+    textValueChanged(
+        answerType,
+        answerData: IAnswerData,
+        value
+    ) {
+        // convert value to proper value
+        if (answerType === Constants.ANSWER_TYPES.NUMERIC.value) {
+            if (_.isString(value)) {
+                // parse value
+                if (value) {
+                    try {
+                        value = parseFloat(value);
+                    } catch {
+                        value = null;
+                    }
+                } else {
+                    value = null;
+                }
+            }
+        }
+
+        // set value
+        answerData.value = value;
+
+        // call parent on change
+        super.onChange();
+    }
 }

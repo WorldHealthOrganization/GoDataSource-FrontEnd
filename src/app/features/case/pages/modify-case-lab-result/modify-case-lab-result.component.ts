@@ -31,7 +31,6 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./modify-case-lab-result.component.less']
 })
 export class ModifyCaseLabResultComponent extends ViewModifyComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     authUser: UserModel;

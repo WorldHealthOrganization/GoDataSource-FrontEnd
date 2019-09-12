@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatDialogRef, MatSidenav } from '@angular/material';
-import { AppliedFilterModel, AppliedSortModel, FilterComparator, FilterModel, FilterType, QuestionWhichAnswer, SortModel } from './model';
-import { RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
+import { AppliedFilterModel, AppliedSortModel, FilterComparator, FilterModel, FilterType, QuestionSideFilterModel, QuestionWhichAnswer, SortModel } from './model';
+import { RequestFilterGenerator, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
@@ -22,6 +22,7 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { moment } from '../../../core/helperClasses/x-moment';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
+import { DateRangeModel } from '../../../core/models/date-range.model';
 
 @Component({
     selector: 'app-side-filters',
@@ -712,6 +713,130 @@ export class SideFiltersComponent implements OnInit {
                             false,
                             null
                         );
+                        break;
+
+                    case FilterType.QUESTIONNAIRE_ANSWERS:
+                        // get data
+                        const question: QuestionSideFilterModel = appliedFilter.value;
+                        const fieldName: string = filter.fieldName;
+                        const whichAnswer: QuestionWhichAnswer = _.get(appliedFilter, 'extraValues.whichAnswer');
+                        const extraComparator: FilterComparator = _.get(appliedFilter, 'extraValues.comparator');
+                        const value: any = _.get(appliedFilter, 'extraValues.filterValue');
+                        const whichAnswerDate: DateRangeModel = _.get(appliedFilter, 'extraValues.whichAnswerDate');
+
+                        // we don't need to add filter if no filter value was provided
+                        if (
+                            !_.isEmpty(value) ||
+                            _.isBoolean(value) ||
+                            !_.isEmpty(whichAnswerDate)
+                        ) {
+                            // construct answer date query
+                            let dateQuery;
+                            let valueQuery;
+                            if (!_.isEmpty(whichAnswerDate)) {
+                                dateQuery = RequestFilterGenerator.dateRangeCompare(whichAnswerDate);
+                            }
+
+                            // take action accordingly to question type
+                            if (
+                                !_.isEmpty(value) ||
+                                _.isBoolean(value)
+                            ) {
+                                switch (question.answerType) {
+                                    // Text
+                                    case Constants.ANSWER_TYPES.FREE_TEXT.value:
+                                        switch (extraComparator) {
+                                            case FilterComparator.IS:
+                                                valueQuery = RequestFilterGenerator.textIs(value);
+                                                break;
+                                            case FilterComparator.CONTAINS_TEXT:
+                                                valueQuery = RequestFilterGenerator.textContains(value);
+                                                break;
+
+                                            // FilterComparator.TEXT_STARTS_WITH
+                                            default:
+                                                valueQuery = RequestFilterGenerator.textStartWith(value);
+                                        }
+
+                                        // finished
+                                        break;
+
+                                    // Date
+                                    case Constants.ANSWER_TYPES.DATE_TIME.value:
+                                        valueQuery = RequestFilterGenerator.dateRangeCompare(value);
+
+                                        // finished
+                                        break;
+
+                                    // Dropdown
+                                    case Constants.ANSWER_TYPES.SINGLE_SELECTION.value:
+                                    case Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value:
+                                        valueQuery = {
+                                            inq: value
+                                        };
+
+                                        // finished
+                                        break;
+
+                                    // Number
+                                    case Constants.ANSWER_TYPES.NUMERIC.value:
+                                        valueQuery = RequestFilterGenerator.rangeCompare(value);
+
+                                        // finished
+                                        break;
+
+                                    // File
+                                    case Constants.ANSWER_TYPES.FILE_UPLOAD.value:
+                                        valueQuery = value ? {
+                                            neq: null
+                                        } : {
+                                            eq: null
+                                        };
+
+                                        // finished
+                                        break;
+                                }
+                            }
+
+                            // search through all answers or just the last one ?
+                            const query: any = {};
+                            if (
+                                !whichAnswer ||
+                                whichAnswer === QuestionWhichAnswer.LAST_ANSWER
+                            ) {
+                                // do we need to attach a value condition as well ?
+                                if (valueQuery) {
+                                    query[`${fieldName}.${question.variable}.0.value`] = valueQuery;
+                                }
+
+                                // do we need to attach a date condition as well ?
+                                if (dateQuery) {
+                                    query[`${fieldName}.${question.variable}.0.date`] = dateQuery;
+                                }
+
+                                // register query
+                                qb.filter.where(query);
+                            } else {
+                                // do we need to attach a value condition as well ?
+                                if (valueQuery) {
+                                    query.value = valueQuery;
+                                }
+
+                                // do we need to attach a date condition as well ?
+                                if (dateQuery) {
+                                    query.date = dateQuery;
+                                }
+
+                                // register query
+                                qb.filter.where({
+                                    [`${fieldName}.${question.variable}`]: {
+                                        $elemMatch: query
+                                    }
+                                });
+                            }
+                        }
+
+                        // finished
                         break;
                 }
             }

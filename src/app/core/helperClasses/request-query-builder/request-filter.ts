@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { moment } from '../x-moment';
+import { RequestFilterGenerator } from './request-filter-generator';
 
 export enum RequestFilterOperator {
     AND = 'and',
@@ -21,10 +22,7 @@ export class RequestFilter {
      * @param value
      */
     static escapeStringForRegex(value: string) {
-        return value.replace(
-            /[.*+?^${}()|[\]\\]/g,
-            '\\$&'
-        );
+        return RequestFilterGenerator.escapeStringForRegex(value);
     }
 
     /**
@@ -73,13 +71,7 @@ export class RequestFilter {
         } else {
             // filter with 'startsWith' criteria
             this.where({
-                [property]: {
-                    regexp: '/^' +
-                        RequestFilter.escapeStringForRegex(value)
-                            .replace(/%/g, '.*')
-                            .replace(/\\\?/g, '.') +
-                        '/i'
-                }
+                [property]: RequestFilterGenerator.textStartWith(value)
             }, replace);
         }
 
@@ -104,11 +96,7 @@ export class RequestFilter {
         const condition = {
             [operator]: _.map(properties, (prop) => ({
                 [prop]: {
-                    regexp: '/^' +
-                        RequestFilter.escapeStringForRegex(value)
-                            .replace(/%/g, '.*')
-                            .replace(/\\\?/g, '.') +
-                        '/i'
+                    regexp: RequestFilterGenerator.textStartWith(value)
                 }
             }))
         };
@@ -142,13 +130,7 @@ export class RequestFilter {
         } else {
             // filter with 'startsWith' criteria
             this.where({
-                [property]: {
-                    regexp: '/' +
-                        RequestFilter.escapeStringForRegex(value)
-                            .replace(/%/g, '.*')
-                            .replace(/\\\?/g, '.') +
-                        '/i'
-                }
+                [property]: RequestFilterGenerator.textContains(value)
             }, replace);
         }
         return this;
@@ -177,13 +159,7 @@ export class RequestFilter {
             // use regexp for case insensitive compare
             if (caseInsensitive) {
                 this.where({
-                    [property]: {
-                        regexp: '/^' +
-                            RequestFilter.escapeStringForRegex(value as string)
-                                .replace(/%/g, '.*')
-                                .replace(/\\\?/g, '.') +
-                            '$/i'
-                    }
+                    [property]: RequestFilterGenerator.textIs(value as string)
                 }, replace);
             } else {
                 // case sensitive search
@@ -263,26 +239,8 @@ export class RequestFilter {
             this.remove(property);
         } else {
             // filter by range (from / to)
-
-            // determine operator & value
-            let operator;
-            let valueToCompare;
-            if (!fromValueIsEmpty && !toValueIsEmpty) {
-                operator = 'between';
-                valueToCompare = [fromValue, toValue];
-            } else if (!fromValueIsEmpty) {
-                operator = 'gte';
-                valueToCompare = fromValue;
-            } else {
-                operator = 'lte';
-                valueToCompare = toValue;
-            }
-
-            // filter
             this.where({
-                [property]: {
-                    [operator]: valueToCompare
-                }
+                [property]: RequestFilterGenerator.rangeCompare(value)
             }, replace);
         }
 

@@ -21,6 +21,8 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_LAST': 'Last Answer',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_FILE_EXIST': 'Has uploaded file',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_FILE_DOESNT_EXIST': 'Hasn\'t uploaded file',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_DATE_FROM': 'Answer date - from',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_DATE_TO': 'Answer date - to',
 
         /**
          * uiCaseLabResultsFields

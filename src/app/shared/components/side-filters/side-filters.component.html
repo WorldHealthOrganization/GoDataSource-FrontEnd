@@ -244,6 +244,16 @@
                                                 (optionChanged)="filter.extraValues.whichAnswer = $event.value">
                                             </app-form-select>
 
+                                            <!-- Which Answer Date -->
+                                            <app-form-daterange
+                                                *ngIf="filter.value.multiAnswerParent"
+                                                [name]="'filter[filters][' + i + '][extraValues][whichAnswerDate]'"
+                                                [ngModel]="filter.extraValues.whichAnswerDate"
+                                                (changed)="filter.extraValues.whichAnswerDate = $event"
+                                                fromTooltip="LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_DATE_FROM"
+                                                toTooltip="LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_DATE_TO">
+                                            </app-form-daterange>
+
                                             <!-- Comparator used accordingly to field type -->
                                             <app-form-select
                                                 *ngIf="
@@ -270,7 +280,8 @@
                                             <app-form-daterange
                                                 *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.DATE_TIME.value"
                                                 [name]="'filter[filters][' + i + '][extraValues][filterValue]'"
-                                                [(ngModel)]="filter.extraValues.filterValue"
+                                                [ngModel]="filter.extraValues.filterValue"
+                                                (changed)="filter.extraValues.filterValue = $event;"
                                                 [startDateVisible]="filter.extraValues.comparator && (filter.extraValues.comparator === FilterComparator.BETWEEN || filter.extraValues.comparator === FilterComparator.AFTER)"
                                                 [endDateVisible]="filter.extraValues.comparator && (filter.extraValues.comparator === FilterComparator.BETWEEN || filter.extraValues.comparator === FilterComparator.BEFORE)">
                                             </app-form-daterange>
@@ -282,6 +293,7 @@
                                                 [(ngModel)]="filter.extraValues.filterValue"
                                                 [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                                 [options]="filter.value.answers"
+                                                optionTooltipKey="label"
                                                 [multiple]="true">
                                             </app-form-select>
 
@@ -289,7 +301,8 @@
                                             <app-form-range
                                                 *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.NUMERIC.value"
                                                 [name]="'filter[filters][' + i + '][extraValues][filterValue]'"
-                                                [(ngModel)]="filter.extraValues.filterValue"
+                                                [ngModel]="filter.extraValues.filterValue"
+                                                (changed)="filter.extraValues.filterValue = $event;"
                                                 [fromVisible]="filter.extraValues.comparator && (filter.extraValues.comparator === FilterComparator.BETWEEN || filter.extraValues.comparator === FilterComparator.AFTER)"
                                                 [toVisible]="filter.extraValues.comparator && (filter.extraValues.comparator === FilterComparator.BETWEEN || filter.extraValues.comparator === FilterComparator.BEFORE)">
                                             </app-form-range>
