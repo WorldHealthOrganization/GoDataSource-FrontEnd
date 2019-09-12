@@ -38,7 +38,13 @@ export const EnglishUsLang = {
         /**
          * uiLabResultsListPage
          */
-        'LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE': 'Case classification modified!'
+        'LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE': 'Case classification modified!',
+
+        /**
+         * uiSyncPackage
+         */
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_USE_QUESTION_VARIABLE': 'Use question variable',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_USE_QUESTION_VARIABLE_DESCRIPTION': ''
 
 
         /**
