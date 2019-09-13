@@ -32,17 +32,17 @@
                             <!-- Go through each question answer -->
                             <div
                                 *ngFor="let answerData of (childValueIndex === undefined ? value[question.variable] : [value[question.variable][childValueIndex]]); let answerDataIndex = index"
-                                fxLayout="column" fxLayoutGap="20px">
+                                fxLayout="column">
 
                                 <!-- Questions and answers & remove buttons -->
-                                <div fxLayout="row" fxLayoutGap="20px">
+                                <div fxLayout="row">
                                     <!-- Questions and answers -->
-                                    <div fxFlex [fxLayout]="question.multiAnswer ? 'column' : 'row'" fxLayoutGap="20px">
+                                    <div fxFlex [fxLayout]="question.multiAnswer ? 'column' : 'row'">
 
                                         <!-- Question -->
                                         <div
                                             *ngIf="answerDataIndex < 1"
-                                            fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px"
+                                            fxLayout="row" fxLayoutAlign="start center"
                                             [fxFlex]="question.multiAnswer ? 'none' : '1 1'"
                                         >
                                             <!-- Question no. -->
