@@ -603,6 +603,9 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
 
                     // touch control
                     fileHiddenInput.control.markAsTouched();
+
+                    // trigger parent on change
+                    this.onChange();
                 }
             });
     }

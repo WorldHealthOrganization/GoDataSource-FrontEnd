@@ -388,6 +388,38 @@ export class RequestFilter {
     }
 
     /**
+     * Filter all records that have a value on a specific field
+     * @param property
+     */
+    byHasValue(
+        property: string
+    ) {
+        // filter no values
+        this.where({
+            [property]: RequestFilterGenerator.hasValue()
+        });
+
+        // finished
+        return this;
+    }
+
+    /**
+     * Filter all records that don't have value on a specific field
+     * @param property
+     */
+    byNotHavingValue(
+        property: string
+    ) {
+        // filter no values
+        this.where(
+            RequestFilterGenerator.doesntHaveValue(property)
+        );
+
+        // finished
+        return this;
+    }
+
+    /**
      * Set the operator to be applied between conditions
      * @param {RequestFilterOperator} operator
      * @return {RequestFilter}

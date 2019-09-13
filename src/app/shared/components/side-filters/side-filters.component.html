@@ -91,13 +91,15 @@
 
                                     <!-- TEXT Filter -->
                                     <app-form-input
-                                        *ngIf="
+                                        *ngIf="(
                                         filter.filter?.type === FilterType.TEXT ||
                                         filter.filter?.type === FilterType.NUMBER ||
                                          filter.filter?.type === FilterType.ADDRESS_PHONE_NUMBER || (
                                             filter.filter?.type === FilterType.ADDRESS &&
                                             filter.comparator === FilterComparator.CONTAINS
-                                        )"
+                                        )) &&
+                                            filter.comparator !== FilterComparator.HAS_VALUE &&
+                                            filter.comparator !== FilterComparator.DOESNT_HAVE_VALUE"
                                         [name]="'filter[filters][' + i + '][value]'"
                                         [(ngModel)]="filter.value"
                                         [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD' | translate"
@@ -108,7 +110,9 @@
                                     <!-- had to split these two selects into one select because we can't change multiple property after initialization -->
                                     <!-- so in case we switched from a multi select to a single select an exception was raised -->
                                     <app-form-select
-                                        *ngIf="filter.filter?.type === FilterType.SELECT"
+                                        *ngIf="filter.filter?.type === FilterType.SELECT &&
+                                            filter.comparator !== FilterComparator.HAS_VALUE &&
+                                            filter.comparator !== FilterComparator.DOESNT_HAVE_VALUE"
                                         [name]="'filter[filters][' + i + '][value]'"
                                         [(ngModel)]="filter.value"
                                         [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
@@ -124,7 +128,9 @@
                                     <!-- had to split these two selects into one select because we can't change multiple property after initialization -->
                                     <!-- so in case we switched from a multi select to a single select an exception was raised -->
                                     <app-form-select
-                                        *ngIf="filter.filter?.type === FilterType.MULTISELECT"
+                                        *ngIf="filter.filter?.type === FilterType.MULTISELECT &&
+                                            filter.comparator !== FilterComparator.HAS_VALUE &&
+                                            filter.comparator !== FilterComparator.DOESNT_HAVE_VALUE"
                                         [name]="'filter[filters][' + i + '][value]'"
                                         [(ngModel)]="filter.value"
                                         [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
@@ -138,7 +144,12 @@
 
                                     <!-- NUMBER / AGE RANGE Filter -->
                                     <app-form-range
-                                        *ngIf="filter.filter?.type === FilterType.RANGE_NUMBER || filter.filter?.type === FilterType.RANGE_AGE"
+                                        *ngIf="(
+                                            filter.filter?.type === FilterType.RANGE_NUMBER ||
+                                            filter.filter?.type === FilterType.RANGE_AGE
+                                        ) &&
+                                            filter.comparator !== FilterComparator.HAS_VALUE &&
+                                            filter.comparator !== FilterComparator.DOESNT_HAVE_VALUE"
                                         [name]="'filter[filters][' + i + '][value]'"
                                         [ngModel]="filter.value"
                                         (changed)="filter.value = $event;"
@@ -165,7 +176,9 @@
 
                                     <!-- DATE RANGE Filter-->
                                     <app-form-daterange
-                                        *ngIf="filter.filter?.type === FilterType.RANGE_DATE"
+                                        *ngIf="filter.filter?.type === FilterType.RANGE_DATE &&
+                                            filter.comparator !== FilterComparator.HAS_VALUE &&
+                                            filter.comparator !== FilterComparator.DOESNT_HAVE_VALUE"
                                         [name]="'filter[filters][' + i + '][value]'"
                                         [ngModel]="filter.value"
                                         (changed)="filter.value = $event;"
@@ -270,7 +283,9 @@
 
                                             <!-- TEXT Filter -->
                                             <app-form-input
-                                                *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value"
+                                                *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value &&
+                                                    filter.extraValues.comparator !== FilterComparator.HAS_VALUE &&
+                                                    filter.extraValues.comparator !== FilterComparator.DOESNT_HAVE_VALUE"
                                                 [name]="'filter[filters][' + i + '][extraValues][filterValue]'"
                                                 [(ngModel)]="filter.extraValues.filterValue"
                                                 [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD' | translate">
@@ -278,7 +293,9 @@
 
                                             <!-- DATE RANGE Filter-->
                                             <app-form-daterange
-                                                *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.DATE_TIME.value"
+                                                *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.DATE_TIME.value &&
+                                                    filter.extraValues.comparator !== FilterComparator.HAS_VALUE &&
+                                                    filter.extraValues.comparator !== FilterComparator.DOESNT_HAVE_VALUE"
                                                 [name]="'filter[filters][' + i + '][extraValues][filterValue]'"
                                                 [ngModel]="filter.extraValues.filterValue"
                                                 (changed)="filter.extraValues.filterValue = $event;"
@@ -288,7 +305,12 @@
 
                                             <!-- SELECT Filter -->
                                             <app-form-select
-                                                *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value || filter.value.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value"
+                                                *ngIf="(
+                                                    filter.value.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ||
+                                                    filter.value.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value
+                                                ) &&
+                                                    filter.extraValues.comparator !== FilterComparator.HAS_VALUE &&
+                                                    filter.extraValues.comparator !== FilterComparator.DOESNT_HAVE_VALUE"
                                                 [name]="'filter[filters][' + i + '][extraValues][filterValue]'"
                                                 [(ngModel)]="filter.extraValues.filterValue"
                                                 [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
@@ -299,7 +321,9 @@
 
                                             <!-- NUMBER Filter -->
                                             <app-form-range
-                                                *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.NUMERIC.value"
+                                                *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.NUMERIC.value &&
+                                                    filter.extraValues.comparator !== FilterComparator.HAS_VALUE &&
+                                                    filter.extraValues.comparator !== FilterComparator.DOESNT_HAVE_VALUE"
                                                 [name]="'filter[filters][' + i + '][extraValues][filterValue]'"
                                                 [ngModel]="filter.extraValues.filterValue"
                                                 (changed)="filter.extraValues.filterValue = $event;"
@@ -308,14 +332,8 @@
                                             </app-form-range>
 
                                             <!-- File Filter -->
-                                            <app-form-select
-                                                *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value"
-                                                [name]="'filter[filters][' + i + '][extraValues][filterValue]'"
-                                                [(ngModel)]="filter.extraValues.filterValue"
-                                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                                [options]="questionFileOptions"
-                                                [multiple]="false">
-                                            </app-form-select>
+                                            <!-- Handled by comparator -->
+                                            <!-- NOTHING TO DO HERE -->
                                         </ng-container>
                                     </ng-container>
                                 </mat-card>

@@ -11,15 +11,11 @@ import { Constants } from '../../../core/models/constants';
 import { SavedFiltersService } from '../../../core/services/data/saved-filters.data.service';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../dialog/dialog.component';
-import {
-    SavedFilterData, SavedFilterDataAppliedFilter, SavedFilterDataAppliedSort,
-    SavedFilterModel
-} from '../../../core/models/saved-filters.model';
+import { SavedFilterData, SavedFilterDataAppliedFilter, SavedFilterDataAppliedSort, SavedFilterModel } from '../../../core/models/saved-filters.model';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { RequestFilter } from '../../../core/helperClasses/request-query-builder/request-filter';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { moment } from '../../../core/helperClasses/x-moment';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { DateRangeModel } from '../../../core/models/date-range.model';
@@ -138,18 +134,6 @@ export class SideFiltersComponent implements OnInit {
         new LabelValuePair(
             'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_LAST',
             QuestionWhichAnswer.LAST_ANSWER
-        )
-    ];
-
-    // file exist or not condition
-    questionFileOptions: LabelValuePair[] = [
-        new LabelValuePair(
-            'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_FILE_EXIST',
-            true
-        ),
-        new LabelValuePair(
-            'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_FILE_DOESNT_EXIST',
-            false
         )
     ];
 
@@ -504,8 +488,13 @@ export class SideFiltersComponent implements OnInit {
 
             // there is no point in adding a condition if no value is provided
             if (
-                appliedFilter.value === undefined ||
-                appliedFilter.value === null
+                (
+                    appliedFilter.value === undefined ||
+                    appliedFilter.value === null
+                ) && (
+                    appliedFilter.comparator !== FilterComparator.HAS_VALUE &&
+                    appliedFilter.comparator !== FilterComparator.DOESNT_HAVE_VALUE
+                )
             ) {
                 return;
             }
@@ -571,6 +560,16 @@ export class SideFiltersComponent implements OnInit {
                                 break;
                             case FilterComparator.CONTAINS_TEXT:
                                 qb.filter.byContainingText(filter.fieldName, appliedFilter.value, false);
+                                break;
+                            case FilterComparator.HAS_VALUE:
+                                qb.filter.byHasValue(
+                                    filter.fieldName
+                                );
+                                break;
+                            case FilterComparator.DOESNT_HAVE_VALUE:
+                                qb.filter.byNotHavingValue(
+                                    filter.fieldName
+                                );
                                 break;
 
                             // FilterComparator.TEXT_STARTS_WITH
@@ -674,8 +673,23 @@ export class SideFiltersComponent implements OnInit {
                         break;
 
                     case FilterType.RANGE_NUMBER:
-                        // between / from / to
-                        qb.filter.byRange(filter.fieldName, appliedFilter.value, false);
+                        switch (comparator) {
+                            case FilterComparator.HAS_VALUE:
+                                qb.filter.byHasValue(
+                                    filter.fieldName
+                                );
+                                break;
+                            case FilterComparator.DOESNT_HAVE_VALUE:
+                                qb.filter.byNotHavingValue(
+                                    filter.fieldName
+                                );
+                                break;
+
+                            // others...
+                            default:
+                                // between / from / to
+                                qb.filter.byRange(filter.fieldName, appliedFilter.value, false);
+                        }
                         break;
 
                     case FilterType.RANGE_AGE:
@@ -684,8 +698,23 @@ export class SideFiltersComponent implements OnInit {
                         break;
 
                     case FilterType.RANGE_DATE:
-                        // between / before / after
-                        qb.filter.byDateRange(filter.fieldName, appliedFilter.value, false);
+                        switch (comparator) {
+                            case FilterComparator.HAS_VALUE:
+                                qb.filter.byHasValue(
+                                    filter.fieldName
+                                );
+                                break;
+                            case FilterComparator.DOESNT_HAVE_VALUE:
+                                qb.filter.byNotHavingValue(
+                                    filter.fieldName
+                                );
+                                break;
+
+                            // others...
+                            default:
+                                // between / before / after
+                                qb.filter.byDateRange(filter.fieldName, appliedFilter.value, false);
+                        }
                         break;
 
                     case FilterType.DATE:
@@ -707,12 +736,27 @@ export class SideFiltersComponent implements OnInit {
 
                     case FilterType.SELECT:
                     case FilterType.MULTISELECT:
-                        qb.filter.bySelect(
-                            filter.fieldName,
-                            appliedFilter.value,
-                            false,
-                            null
-                        );
+                        switch (comparator) {
+                            case FilterComparator.HAS_VALUE:
+                                qb.filter.byHasValue(
+                                    filter.fieldName
+                                );
+                                break;
+                            case FilterComparator.DOESNT_HAVE_VALUE:
+                                qb.filter.byNotHavingValue(
+                                    filter.fieldName
+                                );
+                                break;
+
+                            // FilterComparator.NONE
+                            default:
+                                qb.filter.bySelect(
+                                    filter.fieldName,
+                                    appliedFilter.value,
+                                    false,
+                                    null
+                                );
+                        }
                         break;
 
                     case FilterType.QUESTIONNAIRE_ANSWERS:
@@ -728,7 +772,9 @@ export class SideFiltersComponent implements OnInit {
                         if (
                             !_.isEmpty(value) ||
                             _.isBoolean(value) ||
-                            !_.isEmpty(whichAnswerDate)
+                            !_.isEmpty(whichAnswerDate) ||
+                            extraComparator === FilterComparator.HAS_VALUE ||
+                            extraComparator === FilterComparator.DOESNT_HAVE_VALUE
                         ) {
                             // construct answer date query
                             let dateQuery;
@@ -740,7 +786,9 @@ export class SideFiltersComponent implements OnInit {
                             // take action accordingly to question type
                             if (
                                 !_.isEmpty(value) ||
-                                _.isBoolean(value)
+                                _.isBoolean(value) ||
+                                extraComparator === FilterComparator.HAS_VALUE ||
+                                extraComparator === FilterComparator.DOESNT_HAVE_VALUE
                             ) {
                                 switch (question.answerType) {
                                     // Text
@@ -751,6 +799,13 @@ export class SideFiltersComponent implements OnInit {
                                                 break;
                                             case FilterComparator.CONTAINS_TEXT:
                                                 valueQuery = RequestFilterGenerator.textContains(value);
+                                                break;
+                                            case FilterComparator.HAS_VALUE:
+                                                valueQuery = RequestFilterGenerator.hasValue();
+                                                break;
+                                            case FilterComparator.DOESNT_HAVE_VALUE:
+                                                // doesn't have value if handled bellow
+                                                // NOTHING TO DO
                                                 break;
 
                                             // FilterComparator.TEXT_STARTS_WITH
@@ -763,7 +818,19 @@ export class SideFiltersComponent implements OnInit {
 
                                     // Date
                                     case Constants.ANSWER_TYPES.DATE_TIME.value:
-                                        valueQuery = RequestFilterGenerator.dateRangeCompare(value);
+                                        switch (extraComparator) {
+                                            case FilterComparator.HAS_VALUE:
+                                                valueQuery = RequestFilterGenerator.hasValue();
+                                                break;
+                                            case FilterComparator.DOESNT_HAVE_VALUE:
+                                                // doesn't have value if handled bellow
+                                                // NOTHING TO DO
+                                                break;
+
+                                            // FilterComparator.TEXT_STARTS_WITH
+                                            default:
+                                                valueQuery = RequestFilterGenerator.dateRangeCompare(value);
+                                        }
 
                                         // finished
                                         break;
@@ -771,27 +838,56 @@ export class SideFiltersComponent implements OnInit {
                                     // Dropdown
                                     case Constants.ANSWER_TYPES.SINGLE_SELECTION.value:
                                     case Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value:
-                                        valueQuery = {
-                                            inq: value
-                                        };
+                                        switch (extraComparator) {
+                                            case FilterComparator.HAS_VALUE:
+                                                valueQuery = RequestFilterGenerator.hasValue();
+                                                break;
+                                            case FilterComparator.DOESNT_HAVE_VALUE:
+                                                // doesn't have value if handled bellow
+                                                // NOTHING TO DO
+                                                break;
+
+                                            // FilterComparator.TEXT_STARTS_WITH
+                                            default:
+                                                valueQuery = {
+                                                    inq: value
+                                                };
+                                        }
 
                                         // finished
                                         break;
 
                                     // Number
                                     case Constants.ANSWER_TYPES.NUMERIC.value:
-                                        valueQuery = RequestFilterGenerator.rangeCompare(value);
+                                        switch (extraComparator) {
+                                            case FilterComparator.HAS_VALUE:
+                                                valueQuery = RequestFilterGenerator.hasValue();
+                                                break;
+                                            case FilterComparator.DOESNT_HAVE_VALUE:
+                                                // doesn't have value if handled bellow
+                                                // NOTHING TO DO
+                                                break;
+
+                                            // FilterComparator.TEXT_STARTS_WITH
+                                            default:
+                                                valueQuery = RequestFilterGenerator.rangeCompare(value);
+                                        }
 
                                         // finished
                                         break;
 
                                     // File
                                     case Constants.ANSWER_TYPES.FILE_UPLOAD.value:
-                                        valueQuery = value ? {
-                                            neq: null
-                                        } : {
-                                            eq: null
-                                        };
+                                        // neq: null / $eq null doesn't work due to a mongodb bug ( the issue occurs when trying to filter an element from an array which is this case )
+                                        switch (extraComparator) {
+                                            case FilterComparator.HAS_VALUE:
+                                                valueQuery = RequestFilterGenerator.hasValue();
+                                                break;
+                                            case FilterComparator.DOESNT_HAVE_VALUE:
+                                                // doesn't have value if handled bellow
+                                                // NOTHING TO DO
+                                                break;
+                                        }
 
                                         // finished
                                         break;
@@ -807,6 +903,11 @@ export class SideFiltersComponent implements OnInit {
                                 // do we need to attach a value condition as well ?
                                 if (valueQuery) {
                                     query[`${fieldName}.${question.variable}.0.value`] = valueQuery;
+                                } else if (extraComparator === FilterComparator.DOESNT_HAVE_VALUE) {
+                                    // handle no value case
+                                    const condition: any = RequestFilterGenerator.doesntHaveValue(`${fieldName}.${question.variable}.0.value`);
+                                    const key: string = Object.keys(condition)[0];
+                                    query[key] = condition[key];
                                 }
 
                                 // do we need to attach a date condition as well ?
@@ -820,6 +921,14 @@ export class SideFiltersComponent implements OnInit {
                                 // do we need to attach a value condition as well ?
                                 if (valueQuery) {
                                     query.value = valueQuery;
+                                } else if (extraComparator === FilterComparator.DOESNT_HAVE_VALUE) {
+                                    // handle no value case
+                                    const condition: any = RequestFilterGenerator.doesntHaveValue(
+                                        'value',
+                                        true
+                                    );
+                                    const key: string = Object.keys(condition)[0];
+                                    query[key] = condition[key];
                                 }
 
                                 // do we need to attach a date condition as well ?
@@ -827,12 +936,39 @@ export class SideFiltersComponent implements OnInit {
                                     query.date = dateQuery;
                                 }
 
-                                // register query
-                                qb.filter.where({
-                                    [`${fieldName}.${question.variable}`]: {
-                                        $elemMatch: query
-                                    }
-                                });
+                                // add extra check if date not provided and we need to retrieve all records that don't have a value
+                                if (
+                                    !dateQuery &&
+                                    extraComparator === FilterComparator.DOESNT_HAVE_VALUE
+                                ) {
+                                    qb.filter.where({
+                                        or: [
+                                            {
+                                                [`${fieldName}.${question.variable}`]: {
+                                                    $elemMatch: query
+                                                }
+                                            }, {
+                                                [`${fieldName}.${question.variable}`]: {
+                                                    exists: false
+                                                }
+                                            }, {
+                                                [`${fieldName}.${question.variable}`]: {
+                                                    type: 'null'
+                                                }
+                                            }, {
+                                                [`${fieldName}.${question.variable}`]: {
+                                                    size: 0
+                                                }
+                                            }
+                                        ]
+                                    });
+                                } else {
+                                    qb.filter.where({
+                                        [`${fieldName}.${question.variable}`]: {
+                                            $elemMatch: query
+                                        }
+                                    });
+                                }
                             }
                         }
 

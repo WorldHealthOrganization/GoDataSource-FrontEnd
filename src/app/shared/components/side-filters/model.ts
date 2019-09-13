@@ -31,7 +31,8 @@ export enum FilterType {
     ADDRESS = 'address',
     LOCATION = 'location',
     ADDRESS_PHONE_NUMBER = 'address_phone_number',
-    QUESTIONNAIRE_ANSWERS = 'questionnaire_answers'
+    QUESTIONNAIRE_ANSWERS = 'questionnaire_answers',
+    FILE = 'file'
 }
 
 // comparator types
@@ -46,7 +47,9 @@ export enum FilterComparator {
     CONTAINS = 'contains',
     LOCATION = 'location',
     WITHIN = 'within',
-    DATE = 'date'
+    DATE = 'date',
+    HAS_VALUE = 'has_value',
+    DOESNT_HAVE_VALUE = 'doesnt_have_value'
 }
 
 // which answer to check
@@ -335,6 +338,14 @@ export class AppliedFilterModel {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS_TEXT',
             value: FilterComparator.CONTAINS_TEXT,
             valueType: ValueType.STRING
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_HAS_VALUE',
+            value: FilterComparator.HAS_VALUE,
+            valueType: ValueType.SELECT
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DOESNT_HAVE_VALUE',
+            value: FilterComparator.DOESNT_HAVE_VALUE,
+            valueType: ValueType.SELECT
         }],
 
         // number
@@ -355,12 +366,30 @@ export class AppliedFilterModel {
         // select
         [FilterType.SELECT]: [{
             value: FilterComparator.NONE,
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_SELECT_HAS_AT_LEAST_ONE',
+            valueType: ValueType.SELECT
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_HAS_VALUE',
+            value: FilterComparator.HAS_VALUE,
+            valueType: ValueType.SELECT
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DOESNT_HAVE_VALUE',
+            value: FilterComparator.DOESNT_HAVE_VALUE,
             valueType: ValueType.SELECT
         }],
 
         // multi-select
         [FilterType.MULTISELECT]: [{
             value: FilterComparator.NONE,
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_SELECT_HAS_AT_LEAST_ONE',
+            valueType: ValueType.SELECT
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_HAS_VALUE',
+            value: FilterComparator.HAS_VALUE,
+            valueType: ValueType.SELECT
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DOESNT_HAVE_VALUE',
+            value: FilterComparator.DOESNT_HAVE_VALUE,
             valueType: ValueType.SELECT
         }],
 
@@ -377,6 +406,14 @@ export class AppliedFilterModel {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_GREATER_OR_EQUAL',
             value: FilterComparator.AFTER,
             valueType: ValueType.RANGE_NUMBER
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_HAS_VALUE',
+            value: FilterComparator.HAS_VALUE,
+            valueType: ValueType.SELECT
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DOESNT_HAVE_VALUE',
+            value: FilterComparator.DOESNT_HAVE_VALUE,
+            valueType: ValueType.SELECT
         }],
 
         // range age
@@ -407,6 +444,14 @@ export class AppliedFilterModel {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_AFTER',
             value: FilterComparator.AFTER,
             valueType: ValueType.RANGE_DATE
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_HAS_VALUE',
+            value: FilterComparator.HAS_VALUE,
+            valueType: ValueType.SELECT
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DOESNT_HAVE_VALUE',
+            value: FilterComparator.DOESNT_HAVE_VALUE,
+            valueType: ValueType.SELECT
         }],
 
         // date
@@ -449,6 +494,17 @@ export class AppliedFilterModel {
         [FilterType.QUESTIONNAIRE_ANSWERS]: [{
             value: FilterComparator.NONE,
             valueType: ValueType.QUESTIONNAIRE_ANSWERS
+        }],
+
+        // file
+        [FilterType.FILE]: [{
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_HAS_VALUE',
+            value: FilterComparator.HAS_VALUE,
+            valueType: ValueType.SELECT
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DOESNT_HAVE_VALUE',
+            value: FilterComparator.DOESNT_HAVE_VALUE,
+            valueType: ValueType.SELECT
         }]
     };
 
@@ -461,12 +517,14 @@ export class AppliedFilterModel {
         [Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value]: FilterType.MULTISELECT,
         [Constants.ANSWER_TYPES.SINGLE_SELECTION.value]: FilterType.MULTISELECT,
         [Constants.ANSWER_TYPES.NUMERIC.value]: FilterType.RANGE_NUMBER,
-        [Constants.ANSWER_TYPES.FILE_UPLOAD.value]: FilterType.SELECT
+        [Constants.ANSWER_TYPES.FILE_UPLOAD.value]: FilterType.FILE
     };
 
     // default comparators
     public static defaultComparator = {
         [FilterType.TEXT]: FilterComparator.TEXT_STARTS_WITH,
+        [FilterType.SELECT]: FilterComparator.NONE,
+        [FilterType.MULTISELECT]: FilterComparator.NONE,
         [FilterType.NUMBER]: FilterComparator.IS,
         [FilterType.RANGE_NUMBER]: FilterComparator.BETWEEN,
         [FilterType.RANGE_AGE]: FilterComparator.BETWEEN,

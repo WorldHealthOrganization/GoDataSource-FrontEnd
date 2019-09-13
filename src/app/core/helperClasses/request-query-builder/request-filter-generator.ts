@@ -114,4 +114,62 @@ export class RequestFilterGenerator {
             rangeValue
         );
     }
+
+    /**
+     * Check if field has value
+     */
+    static hasValue() {
+        // since some mongo filters don't work with $neq null / $eq null, we need to find different solution
+        return {
+            exists: true,
+            not: {
+                $type: 'null'
+            },
+            $ne: ''
+        };
+    }
+
+    /**
+     * Check if field doesn't have value
+     * @param field
+     */
+    static doesntHaveValue(
+        field: string,
+        forMongo: boolean = false
+    ) {
+        // since some mongo filters don't work with $neq null / $eq null, we need to find different solution
+        return forMongo ? {
+            $or: [
+                {
+                    [field]: {
+                        $exists: false
+                    }
+                }, {
+                    [field]: {
+                        $type: 'null'
+                    }
+                }, {
+                    [field]: {
+                        $eq: ''
+                    }
+                }
+            ]
+        } : {
+            or: [
+                {
+                    [field]: {
+                        exists: false
+                    }
+                }, {
+                    [field]: {
+                        type: 'null'
+                    }
+                }, {
+                    [field]: {
+                        eq: ''
+                    }
+                }
+            ]
+        };
+    }
 }
