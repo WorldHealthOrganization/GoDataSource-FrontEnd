@@ -69,6 +69,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     occupationsList$: Observable<any[]>;
     outcomeList$: Observable<any[]>;
     clustersListAsLabelValuePair$: Observable<LabelValuePair[]>;
+    caseRiskLevelsList$: Observable<any[]>;
+    yesNoOptionsWithoutAllList$: Observable<any[]>;
+    outcomeList: Observable<any[]>;
 
     // available side filters
     availableSideFilters: FilterModel[] = [];
@@ -449,6 +452,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
 
+        // init side filters
+        this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+        this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
+        this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -582,9 +590,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * Initialize Side Filters
      */
     initializeSideFilters() {
-        const caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
-        const yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
-        const outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+        // if there is no outbreak, we can't fully initialize side filters
+        if (
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id
+        ) {
+            return;
+        }
 
         // set available side filters
         this.availableSideFilters = [
@@ -648,7 +660,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 fieldName: 'riskLevel',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
                 type: FilterType.MULTISELECT,
-                options$: caseRiskLevelsList$
+                options$: this.caseRiskLevelsList$
             }),
             new FilterModel({
                 fieldName: 'riskReason',
@@ -692,13 +704,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 fieldName: 'safeBurial',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
                 type: FilterType.SELECT,
-                options$: yesNoOptionsWithoutAllList$
+                options$: this.yesNoOptionsWithoutAllList$
             }),
             new FilterModel({
                 fieldName: 'isDateOfOnsetApproximate',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
                 type: FilterType.SELECT,
-                options$: yesNoOptionsWithoutAllList$
+                options$: this.yesNoOptionsWithoutAllList$
             }),
             new FilterModel({
                 fieldName: 'dateOfReporting',
@@ -709,25 +721,25 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 fieldName: 'isDateOfReportingApproximate',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
                 type: FilterType.SELECT,
-                options$: yesNoOptionsWithoutAllList$
+                options$: this.yesNoOptionsWithoutAllList$
             }),
             new FilterModel({
                 fieldName: 'transferRefused',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
                 type: FilterType.SELECT,
-                options$: yesNoOptionsWithoutAllList$
+                options$: this.yesNoOptionsWithoutAllList$
             }),
             new FilterModel({
                 fieldName: 'outcomeId',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_OUTCOME',
                 type: FilterType.MULTISELECT,
-                options$: outcomeList$
+                options$: this.outcomeList$
             }),
             new FilterModel({
                 fieldName: 'wasContact',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
                 type: FilterType.SELECT,
-                options$: yesNoOptionsWithoutAllList$
+                options$: this.yesNoOptionsWithoutAllList$
             }),
             new FilterModel({
                 fieldName: 'clusterId',
@@ -736,6 +748,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 options$: this.clustersListAsLabelValuePair$,
                 relationshipPath: ['relationships'],
                 relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER'
+            }),
+            new FilterModel({
+                fieldName: 'questionnaireAnswers',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+                type: FilterType.QUESTIONNAIRE_ANSWERS,
+                questionnaireTemplate: this.selectedOutbreak.caseInvestigationTemplate
             })
         ];
     }
