@@ -312,7 +312,6 @@
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL' | translate"
                                     tooltip="LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION"
                                     [useOutbreakLocations]="true"
-                                    [disabled]="viewOnly"
                                     [fixedDropPanel]="true"
                                 >
                                 </app-form-location-dropdown>
@@ -322,7 +321,6 @@
                                     [(ngModel)]="caseData.burialPlaceName"
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME' | translate"
                                     tooltip="LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION"
-                                    [disabled]="viewOnly"
                                 >
                                 </app-form-input>
                             </ng-container>

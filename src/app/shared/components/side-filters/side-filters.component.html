@@ -238,17 +238,17 @@
                                             optionLabelKey="text"
                                             optionLabelPrefixKey="orderLabel"
                                             optionLabelPrefixDelimiter=" "
-                                            optionValueKey="self"
+                                            optionValueKey="variable"
                                             optionTooltipKey="text"
                                             (optionChanged)="questionChanged(filter)">
                                         </app-form-select>
 
                                         <!-- Filter details -->
                                         <ng-container
-                                            *ngIf="filter.value">
+                                            *ngIf="filter.selectedQuestion">
                                             <!-- Last answer or any of them -->
                                             <app-form-select
-                                                *ngIf="filter.value.multiAnswerParent"
+                                                *ngIf="filter.selectedQuestion.multiAnswerParent"
                                                 [name]="'filter[filters][' + i + '][extraValues][whichAnswer]'"
                                                 [ngModel]="getQuestionExtraWhichAnswer(filter)"
                                                 [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER' | translate"
@@ -259,7 +259,7 @@
 
                                             <!-- Which Answer Date -->
                                             <app-form-daterange
-                                                *ngIf="filter.value.multiAnswerParent"
+                                                *ngIf="filter.selectedQuestion.multiAnswerParent"
                                                 [name]="'filter[filters][' + i + '][extraValues][whichAnswerDate]'"
                                                 [ngModel]="filter.extraValues.whichAnswerDate"
                                                 (changed)="filter.extraValues.whichAnswerDate = $event"
@@ -270,20 +270,20 @@
                                             <!-- Comparator used accordingly to field type -->
                                             <app-form-select
                                                 *ngIf="
-                                                    AppliedFilterModel.allowedQuestionComparators[filter.value.answerType] &&
-                                                    AppliedFilterModel.allowedComparators[AppliedFilterModel.allowedQuestionComparators[filter.value.answerType]] &&
-                                                    AppliedFilterModel.allowedComparators[AppliedFilterModel.allowedQuestionComparators[filter.value.answerType]].length > 1"
+                                                    AppliedFilterModel.allowedQuestionComparators[filter.selectedQuestion.answerType] &&
+                                                    AppliedFilterModel.allowedComparators[AppliedFilterModel.allowedQuestionComparators[filter.selectedQuestion.answerType]] &&
+                                                    AppliedFilterModel.allowedComparators[AppliedFilterModel.allowedQuestionComparators[filter.selectedQuestion.answerType]].length > 1"
                                                 [name]="'filter[filters][' + i + '][extraValues][comparator]'"
                                                 [ngModel]="getQuestionExtraComparator(filter)"
                                                 [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL' | translate"
-                                                [options]="AppliedFilterModel.allowedComparators[AppliedFilterModel.allowedQuestionComparators[filter.value.answerType]]"
+                                                [options]="AppliedFilterModel.allowedComparators[AppliedFilterModel.allowedQuestionComparators[filter.selectedQuestion.answerType]]"
                                                 [clearable]="false"
                                                 (optionChanged)="filter.extraValues.comparator = $event.value">
                                             </app-form-select>
 
                                             <!-- TEXT Filter -->
                                             <app-form-input
-                                                *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value &&
+                                                *ngIf="filter.selectedQuestion.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value &&
                                                     filter.extraValues.comparator !== FilterComparator.HAS_VALUE &&
                                                     filter.extraValues.comparator !== FilterComparator.DOESNT_HAVE_VALUE"
                                                 [name]="'filter[filters][' + i + '][extraValues][filterValue]'"
@@ -293,7 +293,7 @@
 
                                             <!-- DATE RANGE Filter-->
                                             <app-form-daterange
-                                                *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.DATE_TIME.value &&
+                                                *ngIf="filter.selectedQuestion.answerType === Constants.ANSWER_TYPES.DATE_TIME.value &&
                                                     filter.extraValues.comparator !== FilterComparator.HAS_VALUE &&
                                                     filter.extraValues.comparator !== FilterComparator.DOESNT_HAVE_VALUE"
                                                 [name]="'filter[filters][' + i + '][extraValues][filterValue]'"
@@ -306,22 +306,22 @@
                                             <!-- SELECT Filter -->
                                             <app-form-select
                                                 *ngIf="(
-                                                    filter.value.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ||
-                                                    filter.value.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value
+                                                    filter.selectedQuestion.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ||
+                                                    filter.selectedQuestion.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value
                                                 ) &&
                                                     filter.extraValues.comparator !== FilterComparator.HAS_VALUE &&
                                                     filter.extraValues.comparator !== FilterComparator.DOESNT_HAVE_VALUE"
                                                 [name]="'filter[filters][' + i + '][extraValues][filterValue]'"
                                                 [(ngModel)]="filter.extraValues.filterValue"
                                                 [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                                [options]="filter.value.answers"
+                                                [options]="filter.selectedQuestion.answers"
                                                 optionTooltipKey="label"
                                                 [multiple]="true">
                                             </app-form-select>
 
                                             <!-- NUMBER Filter -->
                                             <app-form-range
-                                                *ngIf="filter.value.answerType === Constants.ANSWER_TYPES.NUMERIC.value &&
+                                                *ngIf="filter.selectedQuestion.answerType === Constants.ANSWER_TYPES.NUMERIC.value &&
                                                     filter.extraValues.comparator !== FilterComparator.HAS_VALUE &&
                                                     filter.extraValues.comparator !== FilterComparator.DOESNT_HAVE_VALUE"
                                                 [name]="'filter[filters][' + i + '][extraValues][filterValue]'"
