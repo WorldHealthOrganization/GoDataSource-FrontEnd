@@ -588,12 +588,6 @@ export class BackupsComponent extends ListComponent implements OnInit {
                         placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD',
                         description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD_DESCRIPTION',
                         fieldType: DialogFieldType.TEXT
-                    }),
-                    new DialogField({
-                        name: 'filter[where][useQuestionVariable]',
-                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_USE_QUESTION_VARIABLE',
-                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_USE_QUESTION_VARIABLE_DESCRIPTION',
-                        fieldType: DialogFieldType.BOOLEAN,
                     })
                 ]
             });

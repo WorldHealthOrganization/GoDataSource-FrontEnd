@@ -3,7 +3,7 @@ import { MatDialog, MatDialogRef } from '@angular/material';
 import {
     DialogAnswer, DialogAnswerButton,
     DialogComponent,
-    DialogConfiguration, DialogField
+    DialogConfiguration, DialogField, DialogFieldType
 } from '../../../shared/components/dialog/dialog.component';
 import { Observable, Subscriber } from 'rxjs';
 import * as _ from 'lodash';
@@ -119,6 +119,8 @@ export class DialogService {
         anonymizeFieldsKey?: string,
         anonymizePlaceholder?: string,
         anonymizeFields?: LabelValuePair[],
+        useQuestionVariable?: boolean,
+        useQuestionVariablePlaceholder?: string,
         yesLabel?: string,
         queryBuilder?: RequestQueryBuilder,
         queryBuilderClearOthers?: string[],
@@ -149,6 +151,10 @@ export class DialogService {
         }
         if (!data.encryptPlaceholder) {
             data.encryptPlaceholder = 'LNG_COMMON_LABEL_EXPORT_ENCRYPT_PASSWORD';
+        }
+
+        if (!data.useQuestionVariablePlaceholder) {
+            data.useQuestionVariablePlaceholder = 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE';
         }
         if (!data.anonymizePlaceholder) {
             data.anonymizePlaceholder = 'LNG_COMMON_LABEL_EXPORT_ANONYMIZE_FIELDS';
@@ -204,6 +210,16 @@ export class DialogService {
             );
         }
 
+        if (data.useQuestionVariable) {
+            fieldsList.push(
+                new DialogField({
+                    name: 'useQuestionVariable',
+                    placeholder: data.useQuestionVariablePlaceholder,
+                    fieldType: DialogFieldType.BOOLEAN
+                })
+            )
+        }
+
         // check if we have a different anonymize key
         if (!data.anonymizeFieldsKey) {
             data.anonymizeFieldsKey = 'anonymizeFields';
@@ -252,6 +268,7 @@ export class DialogService {
             fieldsList: fieldsList
         }))
             .subscribe((answer: DialogAnswer) => {
+            console.log(data);
                 if (answer.button === DialogAnswerButton.Yes) {
                     // call export start
                     if (data.exportStart) {
