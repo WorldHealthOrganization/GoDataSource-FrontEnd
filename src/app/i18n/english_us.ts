@@ -71,12 +71,12 @@ export const EnglishUsLang = {
         /**
          * uiCaseFields
          */
-        'LNG_CASE_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ({{exposureName}})',
+        'LNG_CASE_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ( {{exposureName}} )',
 
         /**
          * uiContactFields
          */
-        'LNG_CONTACT_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ({{exposureName}})'
+        'LNG_CONTACT_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ( {{exposureName}} )'
 
 
 

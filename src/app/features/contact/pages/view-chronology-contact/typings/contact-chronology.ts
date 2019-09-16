@@ -4,6 +4,8 @@ import { ChronologyItem } from '../../../../../shared/components/chronology/typi
 import * as _ from 'lodash';
 import { Constants } from '../../../../../core/models/constants';
 import { RelationshipModel } from '../../../../../core/models/entity-and-relationship.model';
+import { CaseModel } from '../../../../../core/models/case.model';
+import { EventModel } from '../../../../../core/models/event.model';
 
 export class ContactChronology {
     static getChronologyEntries(contactData: ContactModel,
@@ -32,17 +34,29 @@ export class ContactChronology {
         }
 
         // displaying the exposure dates for each relationship
-        if (!_.isEmpty(sourcePersons) && !_.isEmpty(relationshipsData)) {
+        if (
+            !_.isEmpty(sourcePersons) &&
+            !_.isEmpty(relationshipsData)
+        ) {
+            const sourcePersonsMap: {
+                [id: string]: CaseModel | ContactModel | EventModel
+            } = _.transform(
+                sourcePersons,
+                (a, m) => {
+                    a[m.id] = m;
+                },
+                {}
+            );
+
             relationshipsData.forEach((relationship) => {
                 if (relationship.sourcePerson.id !== contactData.id) {
-                    const sourcePerson = _.find(sourcePersons, (person) => {
-                       return person.id === relationship.sourcePerson.id;
-                    });
+                    const sourcePerson = sourcePersonsMap[relationship.sourcePerson.id];
+
                     // create chronology entries with exposure dates
                     chronologyEntries.push(new ChronologyItem({
                         date: relationship.contactDate,
                         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_EXPOSURE',
-                        translateData: {exposureName: sourcePerson.name}
+                        translateData: {exposureName: sourcePerson ? sourcePerson.name : ''}
                     }));
                 }
             });

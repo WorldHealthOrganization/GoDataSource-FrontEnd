@@ -19,9 +19,10 @@ import { ChronologyItem } from '../../../../../shared/components/chronology/typi
 import { ChronologyComponent } from '../../../../../shared/components/chronology/chronology.component';
 import { By } from '@angular/platform-browser';
 import { moment } from '../../../../../core/helperClasses/x-moment';
-import { RelationshipModel } from '../../../../../core/models/entity-and-relationship.model';
+import { RelationshipDataService } from '../../../../../core/services/data/relationship.data.service';
+import { RelationshipDataServiceMock } from '../../../../../core/services/data/relationship.data.service.spec';
 
-xdescribe('ContactChronology', () => {
+describe('ContactChronology', () => {
     const date = moment();
     const followUps: FollowUpModel[] =
         [
@@ -89,7 +90,6 @@ xdescribe('ContactChronology', () => {
             }),
         ];
     const contact = new ContactModel({
-        id: 'asdfr123',
         dateOfReporting: date,
         followUp : {
             startDate: date,
@@ -99,34 +99,6 @@ xdescribe('ContactChronology', () => {
         dateOfLastContact: date,
     });
 
-    const relationshipsData = [
-      new RelationshipModel({
-          id: 'asdfr123',
-          persons: [
-              {
-                  id: 'asdfr123',
-                  source: true,
-                  target: false
-              },
-              {
-                  id: 'asdfr123',
-                  source: false,
-                  target: true
-              }
-          ],
-          contactDate: moment(),
-          people: [
-              {
-                  model: {id: 'asdfr123'},
-                  relationship: new RelationshipModel({id: 'asdfr123'})
-              },
-              {
-                  model: {id: 'asdfr123'},
-                  relationship: new RelationshipModel({id: 'asdfr123'})
-              }
-          ]
-      })
-    ];
     const contactChronology = ContactChronology.getChronologyEntries(contact, followUps);
 
     // Conversion tests
@@ -155,11 +127,6 @@ xdescribe('ContactChronology', () => {
             const item = _.find(contactChronology, {label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'});
             expect(item).toBeTruthy();
         });
-
-        // it('should show date of exposure', () => {
-        //     const item = _.find(contactChronology, {label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_EXPOSURE' });
-        //     expect(item).toBeTruthy();
-        // });
     });
 
     // Component tests
@@ -172,7 +139,8 @@ xdescribe('ContactChronology', () => {
             {provide: ActivatedRoute, useValue: ActivatedRouteMock},
             {provide: OutbreakDataService, useValue: OutbreakDataServiceMock},
             {provide: ContactDataService, useValue: ContactDataServiceMock},
-            {provide: FollowUpsDataService, useValue: FollowUpsDataServiceMock}
+            {provide: FollowUpsDataService, useValue: FollowUpsDataServiceMock},
+            {provide: RelationshipDataService, useValue: RelationshipDataServiceMock},
         ]);
 
         // Handle fixture initialization

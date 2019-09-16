@@ -19,6 +19,8 @@ import { I18nServiceMock } from '../../../../../core/services/helper/i18n.servic
 import { ChronologyItem } from '../../../../../shared/components/chronology/typings/chronology-item';
 import * as _ from 'lodash';
 import { moment } from '../../../../../core/helperClasses/x-moment';
+import { RelationshipDataService } from '../../../../../core/services/data/relationship.data.service';
+import { RelationshipDataServiceMock } from '../../../../../core/services/data/relationship.data.service.spec';
 
 describe('CaseChronology', () => {
     // Component tests
@@ -32,7 +34,8 @@ describe('CaseChronology', () => {
             {provide: OutbreakDataService, useValue: OutbreakDataServiceMock},
             {provide: CaseDataService, useValue: CaseDataServiceMock},
             {provide: LabResultDataService, useValue: LabResultDataServiceMock},
-            {provide: I18nService, useValue: I18nServiceMock}
+            {provide: I18nService, useValue: I18nServiceMock},
+            {provide: RelationshipDataService, useValue: RelationshipDataServiceMock},
         ]);
 
         // Handle fixture initialization

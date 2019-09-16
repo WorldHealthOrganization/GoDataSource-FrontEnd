@@ -4,6 +4,8 @@ import { CaseModel } from '../../../../../core/models/case.model';
 import { LabResultModel } from '../../../../../core/models/lab-result.model';
 import { I18nService } from '../../../../../core/services/helper/i18n.service';
 import { RelationshipModel } from '../../../../../core/models/entity-and-relationship.model';
+import { ContactModel } from '../../../../../core/models/contact.model';
+import { EventModel } from '../../../../../core/models/event.model';
 
 export class CaseChronology {
     static getChronologyEntries(i18nService: I18nService,
@@ -32,17 +34,29 @@ export class CaseChronology {
         }
 
         // displaying the exposure dates for each relationship
-        if (!_.isEmpty(sourcePersons) && !_.isEmpty(relationshipsData)) {
+        if (
+            !_.isEmpty(sourcePersons) &&
+            !_.isEmpty(relationshipsData)
+        ) {
+            const sourcePersonsMap: {
+                [id: string]: CaseModel | ContactModel | EventModel
+            } = _.transform(
+                sourcePersons,
+                (a, m) => {
+                    a[m.id] = m;
+                },
+                {}
+            );
+
             relationshipsData.forEach((relationship) => {
                 if (relationship.sourcePerson.id !== caseData.id) {
-                    const sourcePerson = _.find(sourcePersons, (person) => {
-                        return person.id === relationship.sourcePerson.id;
-                    });
+                    const sourcePerson = sourcePersonsMap[relationship.sourcePerson.id];
+
                     // create chronology entries with exposure dates
                     chronologyEntries.push(new ChronologyItem({
                         date: relationship.contactDate,
                         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_EXPOSURE',
-                        translateData: {exposureName: sourcePerson.name}
+                        translateData: {exposureName: sourcePerson ? sourcePerson.name : ''}
                     }));
                 }
             });
