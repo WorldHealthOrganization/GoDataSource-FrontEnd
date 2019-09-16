@@ -19,6 +19,8 @@ import { ChronologyItem } from '../../../../../shared/components/chronology/typi
 import { ChronologyComponent } from '../../../../../shared/components/chronology/chronology.component';
 import { By } from '@angular/platform-browser';
 import { moment } from '../../../../../core/helperClasses/x-moment';
+import { RelationshipDataService } from '../../../../../core/services/data/relationship.data.service';
+import { RelationshipDataServiceMock } from '../../../../../core/services/data/relationship.data.service.spec';
 
 describe('ContactChronology', () => {
     const date = moment();
@@ -96,6 +98,7 @@ describe('ContactChronology', () => {
         dateBecomeContact: date,
         dateOfLastContact: date,
     });
+
     const contactChronology = ContactChronology.getChronologyEntries(contact, followUps);
 
     // Conversion tests
@@ -136,7 +139,8 @@ describe('ContactChronology', () => {
             {provide: ActivatedRoute, useValue: ActivatedRouteMock},
             {provide: OutbreakDataService, useValue: OutbreakDataServiceMock},
             {provide: ContactDataService, useValue: ContactDataServiceMock},
-            {provide: FollowUpsDataService, useValue: FollowUpsDataServiceMock}
+            {provide: FollowUpsDataService, useValue: FollowUpsDataServiceMock},
+            {provide: RelationshipDataService, useValue: RelationshipDataServiceMock},
         ]);
 
         // Handle fixture initialization
