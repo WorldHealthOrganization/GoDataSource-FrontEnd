@@ -561,9 +561,31 @@ export class AppliedFilterModel {
         this.resetValueIfNecessary();
     }
 
+    // question answers
+    selectedQuestion: QuestionSideFilterModel;
+
     // selected value for the filter
-    public value: any;
     public extraValues: any = {};
+    private _value: any;
+    public set value(value: any) {
+        // set value
+        this._value = value;
+
+        // determine selected question
+        if (
+            this.value &&
+            this.filter &&
+            this.filter.questionnaireTemplateQuestions &&
+            this.filter.type === FilterType.QUESTIONNAIRE_ANSWERS
+        ) {
+            this.selectedQuestion = _.find(this.filter.questionnaireTemplateQuestions, { variable: this.value }) as QuestionSideFilterModel;
+        } else {
+            this.selectedQuestion = null;
+        }
+    }
+    public get value(): any {
+        return this._value;
+    }
 
     // selected comparator
     private _previousComparator: FilterComparator;
@@ -654,7 +676,8 @@ export class AppliedFilterModel {
         return {
             filter: this.filter.sanitizeForSave(),
             comparator: this.comparator,
-            value: this.value
+            value: this.value,
+            extraValues: this.extraValues
         };
     }
 }

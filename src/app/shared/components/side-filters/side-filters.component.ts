@@ -307,12 +307,22 @@ export class SideFiltersComponent implements OnInit {
      */
     toSaveData(): SavedFilterData {
         // exclude required filters
-        this.appliedFilters = _.filter(this.appliedFilters, appliedFilter => !appliedFilter.filter.required);
+        this.appliedFilters = _.filter(
+            this.appliedFilters,
+            (appliedFilter) => !appliedFilter.filter.required
+        );
 
+        // construct save data
         return new SavedFilterData({
-            appliedFilters: _.map(this.appliedFilters, (filter) => filter.sanitizeForSave()),
+            appliedFilters: _.map(
+                this.appliedFilters,
+                (filter: AppliedFilterModel) => filter.sanitizeForSave()
+            ),
             appliedFilterOperator: this.appliedFilterOperator,
-            appliedSort: _.map(this.appliedSort, (sort) => sort.sanitizeForSave()),
+            appliedSort: _.map(
+                this.appliedSort,
+                (sort: AppliedSortModel) => sort.sanitizeForSave()
+            ),
         });
     }
 
@@ -332,10 +342,12 @@ export class SideFiltersComponent implements OnInit {
                 // search through our current filters for our own filter
                 const ourFilter = _.find(this.filterOptions, (filterOption: FilterModel) => filterOption.uniqueKey === filter.filter.uniqueKey);
                 if (ourFilter) {
-                    this.appliedFilters.push(new AppliedFilterModel({
+                    // create filter
+                    this.appliedFilters.push( new AppliedFilterModel({
                         filter: ourFilter,
                         comparator: filter.comparator as FilterComparator,
-                        value: filter.value
+                        value: filter.value,
+                        extraValues: filter.extraValues
                     }));
                 }
             });
@@ -484,7 +496,8 @@ export class SideFiltersComponent implements OnInit {
         const appliedFilters: AppliedFilterModel[] = [];
         _.each(filters, (appliedFilter: AppliedFilterModel) => {
             // construct list of applied filters
-            appliedFilters.push(new AppliedFilterModel(appliedFilter));
+            appliedFilter = new AppliedFilterModel(appliedFilter);
+            appliedFilters.push(appliedFilter);
 
             // there is no point in adding a condition if no value is provided
             if (
@@ -761,7 +774,7 @@ export class SideFiltersComponent implements OnInit {
 
                     case FilterType.QUESTIONNAIRE_ANSWERS:
                         // get data
-                        const question: QuestionSideFilterModel = appliedFilter.value;
+                        const question: QuestionSideFilterModel = appliedFilter.selectedQuestion;
                         const fieldName: string = filter.fieldName;
                         const whichAnswer: QuestionWhichAnswer = _.get(appliedFilter, 'extraValues.whichAnswer');
                         const extraComparator: FilterComparator = _.get(appliedFilter, 'extraValues.comparator');
@@ -770,11 +783,13 @@ export class SideFiltersComponent implements OnInit {
 
                         // we don't need to add filter if no filter value was provided
                         if (
-                            !_.isEmpty(value) ||
-                            _.isBoolean(value) ||
-                            !_.isEmpty(whichAnswerDate) ||
-                            extraComparator === FilterComparator.HAS_VALUE ||
-                            extraComparator === FilterComparator.DOESNT_HAVE_VALUE
+                            question && (
+                                !_.isEmpty(value) ||
+                                _.isBoolean(value) ||
+                                !_.isEmpty(whichAnswerDate) ||
+                                extraComparator === FilterComparator.HAS_VALUE ||
+                                extraComparator === FilterComparator.DOESNT_HAVE_VALUE
+                            )
                         ) {
                             // construct answer date query
                             let dateQuery;
@@ -1025,7 +1040,7 @@ export class SideFiltersComponent implements OnInit {
      * Reset values on question change
      * @param filter
      */
-    questionChanged(filter) {
+    questionChanged(filter: AppliedFilterModel) {
         filter.extraValues = {};
     }
 
@@ -1033,7 +1048,7 @@ export class SideFiltersComponent implements OnInit {
      * Which answer
      * @param filter
      */
-    getQuestionExtraWhichAnswer(filter) {
+    getQuestionExtraWhichAnswer(filter: AppliedFilterModel) {
         return filter.extraValues.whichAnswer || (
             filter.extraValues.whichAnswer = QuestionWhichAnswer.LAST_ANSWER
         );
@@ -1043,9 +1058,9 @@ export class SideFiltersComponent implements OnInit {
      * Which comparator
      * @param filter
      */
-    getQuestionExtraComparator(filter) {
+    getQuestionExtraComparator(filter: AppliedFilterModel) {
         return filter.extraValues.comparator || (
-            filter.extraValues.comparator = AppliedFilterModel.defaultComparator[AppliedFilterModel.allowedQuestionComparators[filter.value.answerType]]
+            filter.extraValues.comparator = (filter.selectedQuestion ? AppliedFilterModel.defaultComparator[AppliedFilterModel.allowedQuestionComparators[filter.selectedQuestion.answerType]] : null)
         );
     }
 }
