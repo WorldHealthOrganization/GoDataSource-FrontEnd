@@ -51,6 +51,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
 
     // dropdowns values
     yesNoOptionsList$: Observable<any[]>;
+    yesNoOptionsWithoutAllList$: Observable<any[]>;
     dailyStatusTypeOptions$: Observable<any[]>;
 
     availableSideFilters: FilterModel[];
@@ -201,6 +202,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
+        // filter options
+        this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
+
         this.route.params
             .subscribe((params: { contactId }) => {
                 this.contactId = params.contactId;
@@ -218,6 +222,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                         // selected outbreak
                         this.selectedOutbreak = selectedOutbreak;
 
+                        // initialize side filters
+                        this.initializeSideFilters();
+
                         // retrieve contact data
                         this.retrieveContactData();
 
@@ -234,9 +241,6 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
-
-        // initialize side filters
-        this.initializeSideFilters();
     }
 
     ngOnDestroy() {
@@ -393,8 +397,13 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
      * Initialize Side Filters
      */
     private initializeSideFilters() {
-        // filter options
-        const yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
+        // if there is no outbreak, we can't fully initialize side filters
+        if (
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id
+        ) {
+            return;
+        }
 
         // set available side filters
         // Follow-ups
@@ -421,7 +430,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 fieldName: 'targeted',
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
                 type: FilterType.SELECT,
-                options$: yesNoOptionsWithoutAllList$
+                options$: this.yesNoOptionsWithoutAllList$
             }),
             new FilterModel({
                 fieldName: 'statusId',
@@ -446,6 +455,12 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                     _.find(AppliedFilterModel.allowedComparators[FilterType.DATE], {value: FilterComparator.IS})
                 ],
                 flagIt: true
+            }),
+            new FilterModel({
+                fieldName: 'questionnaireAnswers',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+                type: FilterType.QUESTIONNAIRE_ANSWERS,
+                questionnaireTemplate: this.selectedOutbreak.contactFollowUpTemplate
             })
         ];
     }

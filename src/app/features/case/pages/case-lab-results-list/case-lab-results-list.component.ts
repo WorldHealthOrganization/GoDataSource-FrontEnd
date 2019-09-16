@@ -9,10 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { Observable } from 'rxjs';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
-import {
-    ReferenceDataCategory, ReferenceDataCategoryModel,
-    ReferenceDataEntryModel
-} from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
@@ -30,7 +27,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { map } from 'rxjs/internal/operators';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
@@ -183,6 +179,9 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                     // selected outbreak
                     this.selectedOutbreak = selectedOutbreak;
 
+                    // initialize side filters
+                    this.initializeSideFilters();
+
                     // get case data
                     this.caseDataService
                         .getCase(this.selectedOutbreak.id, params.caseId)
@@ -214,9 +213,6 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
-
-        // initialize side filters
-        this.initializeSideFilters();
     }
 
     /**
@@ -293,6 +289,15 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
      * Initialize Side Filters
      */
     initializeSideFilters() {
+        // if there is no outbreak, we can't fully initialize side filters
+        if (
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id
+        ) {
+            return;
+        }
+
+        // init side filters
         this.availableSideFilters = [
             new FilterModel({
                 fieldName: 'sampleIdentifier',
@@ -368,6 +373,12 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS',
                 type: FilterType.TEXT,
                 sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'questionnaireAnswers',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+                type: FilterType.QUESTIONNAIRE_ANSWERS,
+                questionnaireTemplate: this.selectedOutbreak.labResultsTemplate
             })
         ];
     }

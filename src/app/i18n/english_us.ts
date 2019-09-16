@@ -13,6 +13,19 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiSideFilter
+         */
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION': 'Question',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER': 'Which answer',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_ANY': 'Any of the answers',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_LAST': 'Last Answer',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_DATE_FROM': 'Answer date - from',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_DATE_TO': 'Answer date - to',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_HAS_VALUE': 'Has value',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DOESNT_HAVE_VALUE': 'Doesn\'t have value',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_SELECT_HAS_AT_LEAST_ONE': 'Has at least one of these values',
+
+        /**
          * uiCaseLabResultsFields
          */
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION': 'Classification',
@@ -41,9 +54,14 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE': 'Case classification modified!',
 
         /**
-         * uiContactFields
+         * uiCaseFields
          */
-        'LNG_CONTACT_FIELD_LABEL_TEAM': 'Team'
+        'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL': 'Place of burial',
+        'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME': 'Burial place name',
+        'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION': '',
+
+
 
         /**
          * REMOVE the tokens from below

@@ -21,6 +21,8 @@ export class CaseModel extends BaseModel {
     riskReason: string;
     documents: DocumentModel[];
     addresses: AddressModel[];
+    burialPlaceName: string;
+    burialLocationId: string;
     classification: string;
     dateOfInfection: string;
     dateOfOnset: string;
@@ -74,6 +76,8 @@ export class CaseModel extends BaseModel {
         this.lastName = _.get(data, 'lastName');
         this.gender = _.get(data, 'gender');
         this.occupation = _.get(data, 'occupation');
+        this.burialPlaceName = _.get(data, 'burialPlaceName');
+        this.burialLocationId = _.get(data, 'burialLocationId');
         this.documents = _.get(data, 'documents', []);
 
         const locationsList = _.get(data, 'locations', []);
