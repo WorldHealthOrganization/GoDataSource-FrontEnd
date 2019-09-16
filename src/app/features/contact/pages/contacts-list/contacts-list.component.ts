@@ -428,7 +428,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     this.exportContactsUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/export`;
                     this.exportContactsDailyFollowUpListUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/daily-list/export`;
                     this.exportContactsDailyFollowUpsFormUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/export-daily-follow-up-form`;
+
+                    // initialize side filters
+                    this.initializeSideFilters();
                 }
+
                 // get contacts grouped by risk level
                 this.getContactsGroupedByRiskLevel();
 
@@ -440,9 +444,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
-
-        // initialize side filters
-        this.initializeSideFilters();
     }
 
     ngOnDestroy() {
@@ -663,6 +664,14 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         options$: dailyStatusTypeOptions$,
                         relationshipPath: ['followUps'],
                         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+                    }),
+                    new FilterModel({
+                        fieldName: 'questionnaireAnswers',
+                        fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+                        type: FilterType.QUESTIONNAIRE_ANSWERS,
+                        questionnaireTemplate: this.selectedOutbreak.contactFollowUpTemplate,
+                        relationshipPath: ['followUps'],
+                        relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
                     })
                 ]
             ];
@@ -702,6 +711,15 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         fieldName: 'age',
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_AGE',
                         type: FilterType.RANGE_AGE,
+                        relationshipPath: ['relationships', 'people'],
+                        relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+                        extraConditions: caseCondition
+                    }),
+                    new FilterModel({
+                        fieldName: 'questionnaireAnswers',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+                        type: FilterType.QUESTIONNAIRE_ANSWERS,
+                        questionnaireTemplate: this.selectedOutbreak.caseInvestigationTemplate,
                         relationshipPath: ['relationships', 'people'],
                         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
                         extraConditions: caseCondition

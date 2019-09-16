@@ -15,7 +15,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
@@ -26,8 +26,6 @@ import { HoverRowAction, HoverRowActionType } from '../../../../shared/component
 import { Router } from '@angular/router';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { map } from 'rxjs/internal/operators';
 
 @Component({
     selector: 'app-lab-results',
@@ -186,6 +184,9 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
 
+                // initialize side filters
+                this.initializeSideFilters();
+
                 // initialize pagination
                 this.initPaginator();
                 // ...and re-load the list when the Selected Outbreak is changed
@@ -194,9 +195,6 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
-
-        // initialize side filters
-        this.initializeSideFilters();
     }
 
     ngOnDestroy() {
@@ -296,6 +294,15 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
      * Initialize Side Filters
      */
     initializeSideFilters() {
+        // if there is no outbreak, we can't fully initialize side filters
+        if (
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id
+        ) {
+            return;
+        }
+
+        // init side filters
         this.availableSideFilters = [
             new FilterModel({
                 fieldName: 'sampleIdentifier',
@@ -353,6 +360,12 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
                 type: FilterType.TEXT,
                 sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'questionnaireAnswers',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+                type: FilterType.QUESTIONNAIRE_ANSWERS,
+                questionnaireTemplate: this.selectedOutbreak.labResultsTemplate
             })
         ];
     }
