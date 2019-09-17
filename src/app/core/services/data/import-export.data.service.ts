@@ -38,7 +38,6 @@ export class ImportExportDataService {
         },
         queryBuilder?: RequestQueryBuilder
     ): Observable<Blob>  {
-        console.log(data);
         // clone data object
         data = _.cloneDeep(data);
 
@@ -95,7 +94,6 @@ export class ImportExportDataService {
         data: any,
         queryBuilder?: RequestQueryBuilder
     ): Observable<Blob>  {
-        console.log(data);
         // filter ?
         if (
             queryBuilder &&

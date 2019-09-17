@@ -242,7 +242,7 @@ export class DialogService {
                     placeholder: data.useQuestionVariablePlaceholder,
                     fieldType: DialogFieldType.BOOLEAN
                 })
-            )
+            );
         }
 
         // construct query builder
@@ -268,7 +268,6 @@ export class DialogService {
             fieldsList: fieldsList
         }))
             .subscribe((answer: DialogAnswer) => {
-            console.log(data);
                 if (answer.button === DialogAnswerButton.Yes) {
                     // call export start
                     if (data.exportStart) {
