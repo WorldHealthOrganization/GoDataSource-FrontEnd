@@ -525,16 +525,17 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
 
     changeSourceForSelectedRelationships() {
         const selectedRecords: false | string [] = this.validateCheckedRecords();
+
+        if (!selectedRecords) {
+            return;
+        }
+
         const selectedTargetPersons = {};
         // pass the selected target persons for not including them in available peoples
         _.forEach(this.checkedEntityModels, (model) => {
             const targetPerson: RelationshipPersonModel = _.find(model.relationship.persons, 'target');
             selectedTargetPersons[targetPerson.id] = true;
         });
-
-        if (!selectedRecords) {
-            return;
-        }
 
         this.router.navigate(
             [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/switch`],
