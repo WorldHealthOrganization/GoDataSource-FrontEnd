@@ -235,6 +235,7 @@ export class DialogService {
             ];
         }
 
+        // add field for use question variable
         if (data.useQuestionVariable) {
             fieldsList.push(
                 new DialogField({
