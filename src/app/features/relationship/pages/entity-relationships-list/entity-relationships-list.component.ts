@@ -28,6 +28,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -64,6 +65,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     ReferenceDataCategory = ReferenceDataCategory;
     EntityType = EntityType;
     UserSettings = UserSettings;
+    RelationshipType = RelationshipType;
 
     recordActions: HoverRowAction[] = [
         // View Relationship
@@ -507,6 +509,32 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             {
                 queryParams: {
                     selectedTargetIds: JSON.stringify(selectedRecords)
+                }
+            }
+        );
+    }
+
+    changeSourceForSelectedRelationships() {
+        const selectedRecords: false | string [] = this.validateCheckedRecords();
+
+        if (!selectedRecords) {
+            return;
+        }
+
+        const selectedTargetPersons = {};
+        // pass the selected target persons for not including them in available peoples
+        _.forEach(this.relationshipsListRecordsMap, (model) => {
+            const targetPerson: RelationshipPersonModel = _.find(model.relationship.persons, 'target');
+            selectedTargetPersons[targetPerson.id] = true;
+        });
+
+        this.router.navigate(
+            [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/switch`],
+            {
+                queryParams: {
+                    selectedTargetIds: JSON.stringify(selectedRecords),
+                    selectedPersonsIds: JSON.stringify(Object.keys(selectedTargetPersons)),
+                    entityType: JSON.stringify(this.entityType)
                 }
             }
         );

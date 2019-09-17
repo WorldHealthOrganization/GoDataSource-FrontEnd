@@ -37,7 +37,7 @@
                         [src]="option[optionLabelImgKey]"/>
 
                     <!-- Prefix -->
-                    {{ optionLabelPrefixKey && option[optionLabelPrefixKey] ? (option[optionLabelPrefixKey] | translate) + ' => ' : '' }}
+                    {{ optionLabelPrefixKey && option[optionLabelPrefixKey] ? (option[optionLabelPrefixKey] | translate) + optionLabelPrefixDelimiter : '' }}
 
                     <!-- Label -->
                     {{option[optionLabelKey] | translate}}
@@ -62,7 +62,7 @@
                         [src]="option[optionLabelImgKey]"/>
 
                     <!-- Prefix -->
-                    {{ optionLabelPrefixKey && option[optionLabelPrefixKey] ? (option[optionLabelPrefixKey] | translate) + ' => ' : '' }}
+                    {{ optionLabelPrefixKey && option[optionLabelPrefixKey] ? (option[optionLabelPrefixKey] | translate) + optionLabelPrefixDelimiter : '' }}
 
                     <!-- Label -->
                     {{option[optionLabelKey] | translate}}

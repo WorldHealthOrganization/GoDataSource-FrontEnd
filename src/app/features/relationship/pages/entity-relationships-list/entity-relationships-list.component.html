@@ -105,6 +105,14 @@
                                     {{ shareSelectedRelationshipsButtonLabel | translate }}
                                 </button>
 
+                                <button
+                                    *ngIf="relationshipType === RelationshipType.CONTACT && (hasCaseWriteAccess() || hasContactWriteAccess())"
+                                    mat-menu-item
+                                    [disabled]="checkedRecords.length === 0"
+                                    (click)="changeSourceForSelectedRelationships()">
+                                    {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE' | translate }}
+                                </button>
+
                                 <mat-divider></mat-divider>
 
                                 <button

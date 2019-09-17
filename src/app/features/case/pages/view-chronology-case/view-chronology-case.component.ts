@@ -10,6 +10,11 @@ import { ChronologyItem } from '../../../../shared/components/chronology/typings
 
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { CaseChronology } from './typings/case-chronology';
+import { forkJoin } from 'rxjs/index';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 
 @Component({
     selector: 'app-view-chronology-case',
@@ -30,7 +35,8 @@ export class ViewChronologyCaseComponent implements OnInit {
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
         private labResultDataService: LabResultDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private relationshipDataService: RelationshipDataService
     ) {}
 
     ngOnInit() {
@@ -57,13 +63,25 @@ export class ViewChronologyCaseComponent implements OnInit {
                                 )
                             );
 
-                            // lab sample taken and lab result dates
-                            this.labResultDataService
-                                .getCaseLabResults(selectedOutbreak.id, this.caseData.id)
-                                .subscribe((labResults) => {
-                                    // set data
-                                    this.chronologyEntries = CaseChronology.getChronologyEntries(this.i18nService, this.caseData, labResults);
-                                });
+                            const qb = new RequestQueryBuilder();
+                            qb.include('people', true);
+
+                            forkJoin(
+                                // get relationships
+                                this.relationshipDataService
+                                    .getEntityRelationships(
+                                        selectedOutbreak.id,
+                                        this.caseData.type,
+                                        this.caseData.id,
+                                        qb
+                                    ),
+                                // lab sample taken and lab result dates
+                                this.labResultDataService
+                                    .getCaseLabResults(selectedOutbreak.id, this.caseData.id)
+                            ).subscribe(([relationshipData, labResults]: [RelationshipModel[], LabResultModel[]]) => {
+                                // set data
+                                this.chronologyEntries = CaseChronology.getChronologyEntries(this.i18nService, this.caseData, labResults, relationshipData);
+                            });
                         });
                 });
         });

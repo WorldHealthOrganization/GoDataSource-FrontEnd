@@ -32,12 +32,12 @@
                             <!-- Go through each question answer -->
                             <div
                                 *ngFor="let answerData of (childValueIndex === undefined ? value[question.variable] : [value[question.variable][childValueIndex]]); let answerDataIndex = index"
-                                fxLayout="column" fxLayoutGap="20px">
+                                fxLayout="column">
 
                                 <!-- Questions and answers & remove buttons -->
-                                <div fxLayout="row" fxLayoutGap="20px">
+                                <div fxLayout="row">
                                     <!-- Questions and answers -->
-                                    <div fxFlex [fxLayout]="question.multiAnswer ? 'column' : 'row'" fxLayoutGap="20px">
+                                    <div fxFlex [fxLayout]="question.multiAnswer ? 'column' : 'row'">
 
                                         <!-- Question -->
                                         <div
@@ -116,10 +116,10 @@
                                                         *ngIf="question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value || question.answerType === Constants.ANSWER_TYPES.NUMERIC.value"
                                                         [name]="name + '[' + question.variable + ']' + '[' + (childValueIndex === undefined ? answerDataIndex : childValueIndex) + '][value]'"
                                                         [alternativeName]="alternativeName + '[' + questionIndex + ']'"
-                                                        [(ngModel)]="answerData.value"
+                                                        [ngModel]="answerData.value"
+                                                        (optionChanged)="textValueChanged(question.answerType, answerData, $event)"
                                                         [placeholder]="(question.answerType === Constants.ANSWER_TYPES.NUMERIC.value ? 'LNG_QUESTIONNAIRE_LABEL_WRITE_NUMERIC_ANSWER' : 'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER') | translate"
                                                         [required]="!skipRequired && question.required"
-                                                        (optionChanged)="onChange()"
                                                         [disabled]="disabled"
                                                         [type]="question.answerType === Constants.ANSWER_TYPES.NUMERIC.value ? 'number' : 'text'">
                                                     </app-form-input>
