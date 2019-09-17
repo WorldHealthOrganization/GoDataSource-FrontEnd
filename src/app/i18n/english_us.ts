@@ -96,7 +96,7 @@ export const EnglishUsLang = {
         /**
          * uiEntityRelationshipsListPage
          */
-        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE': 'Change source',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE': 'Change source for selected items',
 
         /**
          * uiAvailableEntitiesForSwitchRelationshipPage
