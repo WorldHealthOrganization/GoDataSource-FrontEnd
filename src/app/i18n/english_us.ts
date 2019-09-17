@@ -76,9 +76,40 @@ export const EnglishUsLang = {
         /**
          * uiContactFields
          */
-        'LNG_CONTACT_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ( {{exposureName}} )'
+        'LNG_CONTACT_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ( {{exposureName}} )',
 
+        /**
+         * uiGlobalFilterFields
+         */
+        'LNG_GLOBAL_FILTERS_FIELD_LABEL_CLASSIFICATION': 'Classification',
 
+        /**
+         * uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_CHANGE_SOURCE': 'Are you sure you want to set this entity as source for selected contacts?',
+
+        /**
+         * uiModifyCaseLabResultPage
+         */
+        'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT_WITH_INFO': '* This person is now a contact and lab tests were performed at the time when "{{ caseName }}" was registered as a case',
+
+        /**
+         * uiEntityRelationshipsListPage
+         */
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE': 'Change source',
+
+        /**
+         * uiAvailableEntitiesForSwitchRelationshipPage
+         */
+        'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_TITLE': 'Available people for switch',
+        'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_NO_CONTACTS_SELECTED': 'No contacts were selected',
+        'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_SET_SOURCE_BUTTON': 'Set as source',
+        'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE': 'Source set successful',
+
+        /**
+         * uiSavedFiltersForPagesLabels
+         */
+        'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_SWITCH': 'Available entities for switch'
 
         /**
          * REMOVE the tokens from below

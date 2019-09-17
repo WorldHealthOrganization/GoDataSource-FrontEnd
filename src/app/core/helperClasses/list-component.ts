@@ -148,6 +148,7 @@ export abstract class ListComponent implements OnDestroy {
             });
         }
     }
+
     get checkedAllRecords(): boolean {
         return this.checkboxModels.checkAll;
     }
@@ -1628,7 +1629,7 @@ export abstract class ListComponent implements OnDestroy {
     /**
      * Individual Checkbox
      */
-    checkedRecord(id: string, checked: boolean) {
+    checkedRecord(id: string, checked: boolean, singleRecord?: boolean) {
         // set value
         this.checkboxModels.individualCheck[id] = checked ? true : false;
 
@@ -1640,7 +1641,21 @@ export abstract class ListComponent implements OnDestroy {
                 return false;
             }
         });
-
+        // getting all the object keys
+        const objKeys = Object.keys((this.checkboxModels.individualCheck));
+        if (singleRecord && objKeys.length > 1) {
+            _.forEach(objKeys, (key) => {
+                if (key !== id) {
+                    this.checkboxModels.individualCheck[key] = false;
+                    // update the view
+                    this.listCheckedIndividualInputs.forEach((checkbox: FormCheckboxComponent) => {
+                        if (checkbox.name === 'listCheckedIndividual[' + key + ']') {
+                            checkbox.value = false;
+                        }
+                    });
+                }
+            });
+        }
         // set check all value
         this.checkboxModels.checkAll = checkedAll;
     }

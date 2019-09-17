@@ -108,6 +108,14 @@
                                 <mat-divider></mat-divider>
 
                                 <button
+                                    *ngIf="relationshipType === RelationshipType.CONTACT && (hasCaseWriteAccess() || hasContactWriteAccess())"
+                                    mat-menu-item
+                                    [disabled]="checkedRecords.length === 0"
+                                    (click)="changeSourceForSelectedRelationships()">
+                                    {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE' | translate }}
+                                </button>
+
+                                <button
                                     [disabled]="checkedRecords.length < 1"
                                     mat-menu-item
                                     (click)="deleteSelectedRelationships()">

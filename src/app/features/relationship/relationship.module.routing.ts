@@ -40,6 +40,11 @@ const relationshipTypeChildrenRoutes = [
             PageChangeConfirmationGuard
         ]
     },
+    // Switch Contact or Source for selected relationships
+    {
+        path: 'switch',
+        component: fromPages.AvailableEntitiesForSwitchListComponent
+    },
     // View Relationship
     {
         path: ':relationshipId/view',
