@@ -46,7 +46,6 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE': 'Use question variable',
         'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION': ''
 
-
         /**
          * REMOVE the tokens from below
          */
