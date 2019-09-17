@@ -523,7 +523,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
 
         const selectedTargetPersons = {};
         // pass the selected target persons for not including them in available peoples
-        _.forEach(this.checkedEntityModels, (model) => {
+        _.forEach(this.relationshipsListRecordsMap, (model) => {
             const targetPerson: RelationshipPersonModel = _.find(model.relationship.persons, 'target');
             selectedTargetPersons[targetPerson.id] = true;
         });
