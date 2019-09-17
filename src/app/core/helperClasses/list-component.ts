@@ -453,7 +453,16 @@ export abstract class ListComponent implements OnDestroy {
      * @param {boolean} replace
      */
     filterBySelectField(property: string, values: any | any[], valueKey: string = 'value', replace: boolean = true) {
-        this.queryBuilder.filter.bySelect(property, values, replace, valueKey);
+        // no value ?
+        if (values === false) {
+            this.queryBuilder.filter.byBoolean(
+                property,
+                false,
+                true
+            );
+        } else {
+            this.queryBuilder.filter.bySelect(property, values, replace, valueKey);
+        }
 
         // refresh list
         this.needsRefreshList();

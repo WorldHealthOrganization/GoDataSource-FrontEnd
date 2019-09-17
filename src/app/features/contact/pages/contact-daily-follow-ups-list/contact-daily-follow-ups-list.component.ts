@@ -62,6 +62,12 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     // dropdowns values
     yesNoOptionsList$: Observable<any[]>;
     dailyStatusTypeOptions$: Observable<any[]>;
+    genderOptionsList$: Observable<any[]>;
+    occupationsList$: Observable<any[]>;
+    caseRiskLevelsList$: Observable<any[]>;
+    caseClassificationsList$: Observable<any[]>;
+    yesNoOptionsWithoutAllList$: Observable<any[]>;
+    outcomeList$: Observable<any[]>;
 
     // provide constants to template
     Constants = Constants;
@@ -225,6 +231,14 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         // retrieve users
         this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
+        // filter options
+        this.genderOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+        this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        this.yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
+        this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+
         // retrieve query params
         this.route.queryParams
             .subscribe((queryParams: {
@@ -275,6 +289,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                                 // selected outbreak
                                 this.selectedOutbreak = selectedOutbreak;
 
+                                // initialize side filters
+                                this.initializeSideFilters();
+
                                 // retrieve case data
                                 if (this.caseId) {
                                     this.retrieveCaseData();
@@ -294,9 +311,6 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
-
-        // initialize side filters
-        this.initializeSideFilters();
     }
 
     ngOnDestroy() {
@@ -465,13 +479,13 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      * Initialize Side Filters
      */
     private initializeSideFilters() {
-        // filter options
-        const genderOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
-        const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
-        const caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
-        const caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
-        const yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
-        const outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+        // if there is no outbreak, we can't fully initialize side filters
+        if (
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id
+        ) {
+            return;
+        }
 
         // set available side filters
         // Follow-ups
@@ -507,7 +521,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 fieldName: 'targeted',
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
                 type: FilterType.SELECT,
-                options$: yesNoOptionsWithoutAllList$
+                options$: this.yesNoOptionsWithoutAllList$
             }),
             new FilterModel({
                 fieldName: 'statusId',
@@ -532,6 +546,12 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                     _.find(AppliedFilterModel.allowedComparators[FilterType.DATE], {value: FilterComparator.IS})
                 ],
                 flagIt: true
+            }),
+            new FilterModel({
+                fieldName: 'questionnaireAnswers',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+                type: FilterType.QUESTIONNAIRE_ANSWERS,
+                questionnaireTemplate: this.selectedOutbreak.contactFollowUpTemplate
             })
         ];
 
@@ -565,7 +585,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         fieldName: 'gender',
                         fieldLabel: 'LNG_CONTACT_FIELD_LABEL_GENDER',
                         type: FilterType.MULTISELECT,
-                        options$: genderOptionsList$,
+                        options$: this.genderOptionsList$,
                         relationshipPath: ['contact'],
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
                     }),
@@ -601,7 +621,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         fieldName: 'occupation',
                         fieldLabel: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
                         type: FilterType.MULTISELECT,
-                        options$: occupationsList$,
+                        options$: this.occupationsList$,
                         relationshipPath: ['contact'],
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
                     })
@@ -639,7 +659,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         fieldName: 'gender',
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_GENDER',
                         type: FilterType.MULTISELECT,
-                        options$: genderOptionsList$,
+                        options$: this.genderOptionsList$,
                         relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
                         childQueryBuilderKey: 'case'
                     }),
@@ -654,7 +674,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         fieldName: 'riskLevel',
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
                         type: FilterType.MULTISELECT,
-                        options$: caseRiskLevelsList$,
+                        options$: this.caseRiskLevelsList$,
                         relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
                         childQueryBuilderKey: 'case'
                     }),
@@ -669,7 +689,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         fieldName: 'classification',
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
                         type: FilterType.MULTISELECT,
-                        options$: caseClassificationsList$,
+                        options$: this.caseClassificationsList$,
                         relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
                         childQueryBuilderKey: 'case'
                     }),
@@ -677,7 +697,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         fieldName: 'occupation',
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
                         type: FilterType.MULTISELECT,
-                        options$: occupationsList$,
+                        options$: this.occupationsList$,
                         relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
                         childQueryBuilderKey: 'case'
                     }),
@@ -734,7 +754,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         fieldName: 'safeBurial',
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
                         type: FilterType.SELECT,
-                        options$: yesNoOptionsWithoutAllList$,
+                        options$: this.yesNoOptionsWithoutAllList$,
                         relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
                         childQueryBuilderKey: 'case'
                     }),
@@ -742,7 +762,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         fieldName: 'isDateOfOnsetApproximate',
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
                         type: FilterType.SELECT,
-                        options$: yesNoOptionsWithoutAllList$,
+                        options$: this.yesNoOptionsWithoutAllList$,
                         relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
                         childQueryBuilderKey: 'case'
                     }),
@@ -757,7 +777,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         fieldName: 'isDateOfReportingApproximate',
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
                         type: FilterType.SELECT,
-                        options$: yesNoOptionsWithoutAllList$,
+                        options$: this.yesNoOptionsWithoutAllList$,
                         relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
                         childQueryBuilderKey: 'case'
                     }),
@@ -765,7 +785,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         fieldName: 'transferRefused',
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
                         type: FilterType.SELECT,
-                        options$: yesNoOptionsWithoutAllList$,
+                        options$: this.yesNoOptionsWithoutAllList$,
                         relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
                         childQueryBuilderKey: 'case'
                     }),
@@ -773,7 +793,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         fieldName: 'outcomeId',
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_OUTCOME',
                         type: FilterType.MULTISELECT,
-                        options$: outcomeList$,
+                        options$: this.outcomeList$,
                         relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
                         childQueryBuilderKey: 'case'
                     }),
@@ -781,7 +801,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         fieldName: 'wasContact',
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
                         type: FilterType.SELECT,
-                        options$: yesNoOptionsWithoutAllList$,
+                        options$: this.yesNoOptionsWithoutAllList$,
                         relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
                         childQueryBuilderKey: 'case'
                     }),
@@ -789,6 +809,14 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         fieldName: 'addresses',
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
                         type: FilterType.ADDRESS,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'case'
+                    }),
+                    new FilterModel({
+                        fieldName: 'questionnaireAnswers',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+                        type: FilterType.QUESTIONNAIRE_ANSWERS,
+                        questionnaireTemplate: this.selectedOutbreak.caseInvestigationTemplate,
                         relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
                         childQueryBuilderKey: 'case'
                     })
@@ -1007,7 +1035,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         return _.map(data.team, (teamData) => {
                             return new CountedItemsListItem(
                                 teamData.count ? teamData.count : 0,
-                                teamData.team ? teamData.team.name : '',
+                                teamData.team ? teamData.team.name : 'LNG_PAGE_LIST_FOLLOW_UPS_NO_TEAM_LABEL',
                                 teamData.team ? teamData.team.id : []
                             );
                         });

@@ -13,6 +13,55 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiSideFilter
+         */
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION': 'Question',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER': 'Which answer',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_ANY': 'Any of the answers',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_LAST': 'Last Answer',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_DATE_FROM': 'Answer date - from',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER_DATE_TO': 'Answer date - to',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_HAS_VALUE': 'Has value',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DOESNT_HAVE_VALUE': 'Doesn\'t have value',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_SELECT_HAS_AT_LEAST_ONE': 'Has at least one of these values',
+
+        /**
+         * uiCaseLabResultsFields
+         */
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION': 'Classification',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION_DESCRIPTION': '',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION_INFO': 'Current classification of the case:',
+
+        /**
+         * uiBulkAddContactsPage
+         */
+        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_API_ERROR_MSG': ' - row {{row}} is invalid: {{err}}',
+        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_PARTIAL_ERROR_MSG': ' - records that were created with success were removed from the spreadsheet so we don\'t create duplicates',
+
+        /**
+         * uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION': 'Are you sure you want to change "{{ caseName }}" classification to "{{ classification }}"?',
+
+        /**
+         * uiFollowUpsListPage
+         */
+        'LNG_PAGE_LIST_FOLLOW_UPS_NO_TEAM_LABEL': 'No Team',
+
+        /**
+         * uiLabResultsListPage
+         */
+        'LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE': 'Case classification modified!',
+
+        /**
+         * uiCaseFields
+         */
+        'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL': 'Place of burial',
+        'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME': 'Burial place name',
+        'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION': '',
+
+        /**
          * uiContactsListPage
          */
         'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS': 'Change Contact Final Follow-Up Status',
@@ -20,12 +69,14 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_SUCCESS_MSG': 'Final status updated for {{count}} contact(s)',
 
         /**
-         * uiColumnActionsOnListPages
+         * uiCaseFields
          */
-        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_HIDE': 'Hide',
-        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_HIDE_ALL': 'Hide All',
-        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_SHOW': 'Show',
-        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_SHOW_ALL': 'Show All',
+        'LNG_CASE_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ( {{exposureName}} )',
+
+        /**
+         * uiContactFields
+         */
+        'LNG_CONTACT_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ( {{exposureName}} )',
 
         /**
          * uiGlobalFilterFields

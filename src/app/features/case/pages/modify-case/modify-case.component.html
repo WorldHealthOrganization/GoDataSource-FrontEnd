@@ -4,7 +4,11 @@
     </ng-container>
 </app-topnav>
 
-<form class="page-content form-section" #form="ngForm" (submit)="modifyCase(form)">
+<form
+    #form="ngForm"
+    class="page-content form-section"
+    [class.form-view-only]="viewOnly"
+    (submit)="modifyCase(form)">
 
     <div class="form-content">
         <mat-tab-group class="page-tabs-navbar">
@@ -326,12 +330,12 @@
                             ]">
                             </app-form-datepicker>
 
-                            <ng-container *ngIf="caseData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED">
-                                <div fxFlex><!-- placeholder --></div>
-                                <div fxFlex><!-- placeholder --></div>
-                            </ng-container>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
 
-                            <ng-container *ngIf="caseData.outcomeId === Constants.OUTCOME_STATUS.DECEASED">
+                        <div fxLayout="row" fxLayoutGap="20px" *ngIf="caseData.outcomeId === Constants.OUTCOME_STATUS.DECEASED">
+                            <ng-container>
                                 <app-form-slide-toggle
                                     name="safeBurial"
                                     [(ngModel)]="caseData.safeBurial"
@@ -353,6 +357,27 @@
                                     ]"
                                     [disabled]="viewOnly">
                                 </app-form-datepicker>
+
+                                <app-form-location-dropdown
+                                    name="burialLocationId"
+                                    [(ngModel)]="caseData.burialLocationId"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION"
+                                    [useOutbreakLocations]="true"
+                                    [disabled]="viewOnly"
+                                    [fixedDropPanel]="true"
+                                >
+                                </app-form-location-dropdown>
+
+                                <app-form-input
+                                    name="burialPlaceName"
+                                    [(ngModel)]="caseData.burialPlaceName"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION"
+                                    [disabled]="viewOnly"
+                                >
+                                </app-form-input>
+
                             </ng-container>
                         </div>
                     </div>

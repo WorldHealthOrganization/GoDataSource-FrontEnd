@@ -135,8 +135,8 @@
                     [name]="'listCheckedIndividual[' + item.relationship.id + ']'"
                     class="table-checkbox"
                     ngModel
-                    (optionChanged)="checkedRecordRelationship(item, $event)"
-                    (afterInitialize)="checkedRecordRelationship(item, false)">
+                    (optionChanged)="checkedRecord(item.relationship.id, $event)"
+                    (afterInitialize)="checkedRecord(item.relationship.id, false)">
                 </app-form-checkbox>
             </mat-cell>
         </ng-container>

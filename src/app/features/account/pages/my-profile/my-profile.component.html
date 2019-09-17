@@ -4,7 +4,10 @@
     </ng-container>
 </app-topnav>
 
-<form #form="ngForm" class="page-content form-section">
+<form
+    #form="ngForm"
+    [class.form-view-only]="viewOnly"
+    class="page-content form-section">
 
     <div class="form-content">
 

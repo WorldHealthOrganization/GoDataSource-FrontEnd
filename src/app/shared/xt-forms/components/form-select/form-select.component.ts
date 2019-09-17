@@ -36,6 +36,7 @@ export class FormSelectComponent extends ElementBase<string | string[]> implemen
     }
     @Input() optionLabelKey: string = 'label';
     @Input() optionLabelPrefixKey: string = null;
+    @Input() optionLabelPrefixDelimiter: string = ' => ';
     @Input() optionLabelImgKey: string = 'iconUrl';
     @Input() optionValueKey: string = 'value';
     @Input() optionTooltipKey: string = 'tooltip';

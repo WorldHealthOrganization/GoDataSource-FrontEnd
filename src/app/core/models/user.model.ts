@@ -22,7 +22,8 @@ export enum UserSettings {
     SYNC_UPSTREAM_SERVERS_FIELDS = 'syncUpstreamServersFields',
     SYNC_CLIENT_APPLICATIONS_FIELDS = 'syncClientApplicationsFields',
     SYNC_LOGS_FIELDS = 'syncLogsFields',
-    REF_DATA_CAT_ENTRIES_FIELDS = 'refDataCatEntriesFields'
+    REF_DATA_CAT_ENTRIES_FIELDS = 'refDataCatEntriesFields',
+    SHARE_RELATIONSHIPS = 'shareRelationships'
 }
 
 /**
@@ -47,6 +48,7 @@ abstract class UserSettingsHandlers {
     static SYNC_CLIENT_APPLICATIONS_FIELDS = [];
     static SYNC_LOGS_FIELDS = [];
     static REF_DATA_CAT_ENTRIES_FIELDS = [];
+    static SHARE_RELATIONSHIPS = [];
 }
 
 export class UserModel {

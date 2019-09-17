@@ -48,6 +48,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
     testTypesList$: Observable<any[]>;
     labTestResultsList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any>;
+    caseClassificationsList$: Observable<any[]>;
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -174,12 +175,17 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
 
         // retrieve users
         this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
+        // case classification
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
 
         // subscribe to the Selected Outbreak
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+
+                // initialize side filters
+                this.initializeSideFilters();
 
                 // initialize pagination
                 this.initPaginator();
@@ -189,9 +195,6 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
-
-        // initialize side filters
-        this.initializeSideFilters();
     }
 
     ngOnDestroy() {
@@ -219,6 +222,10 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
             new VisibleColumnModel({
                 field: 'case.firstName',
                 label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_FIRST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'case.classification',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION'
             }),
             new VisibleColumnModel({
                 field: 'sampleIdentifier',
@@ -287,6 +294,15 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
      * Initialize Side Filters
      */
     initializeSideFilters() {
+        // if there is no outbreak, we can't fully initialize side filters
+        if (
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id
+        ) {
+            return;
+        }
+
+        // init side filters
         this.availableSideFilters = [
             new FilterModel({
                 fieldName: 'sampleIdentifier',
@@ -344,6 +360,12 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
                 type: FilterType.TEXT,
                 sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'questionnaireAnswers',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+                type: FilterType.QUESTIONNAIRE_ANSWERS,
+                questionnaireTemplate: this.selectedOutbreak.labResultsTemplate
             })
         ];
     }
@@ -445,4 +467,5 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
                 }
             });
     }
+
 }

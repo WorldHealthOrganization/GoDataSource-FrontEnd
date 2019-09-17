@@ -10,6 +10,9 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ContactChronology } from './typings/contact-chronology';
+import { forkJoin } from 'rxjs/index';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 
 @Component({
     selector: 'app-view-chronology-contact',
@@ -29,7 +32,8 @@ export class ViewChronologyContactComponent implements OnInit {
         protected route: ActivatedRoute,
         private contactDataService: ContactDataService,
         private outbreakDataService: OutbreakDataService,
-        private followUpsDataService: FollowUpsDataService
+        private followUpsDataService: FollowUpsDataService,
+        private relationshipDataService: RelationshipDataService
     ) {}
 
     ngOnInit() {
@@ -62,13 +66,27 @@ export class ViewChronologyContactComponent implements OnInit {
                                 'personId',
                                 this.contactData.id
                             );
-                            // get followUps for specified contact
-                            this.followUpsDataService
-                                .getFollowUpsList(selectedOutbreak.id, qb)
-                                .subscribe((followUps: FollowUpModel[]) => {
-                                    // set data
-                                    this.chronologyEntries = ContactChronology.getChronologyEntries(this.contactData, followUps);
-                                });
+
+                            // build query to get the people for all relationships
+                            const qqb = new RequestQueryBuilder();
+                            qqb.include('people', true);
+
+                            forkJoin(
+                                // get relationships
+                                this.relationshipDataService
+                                    .getEntityRelationships(
+                                        selectedOutbreak.id,
+                                        this.contactData.type,
+                                        this.contactData.id,
+                                        qqb
+                                    ),
+                                this.followUpsDataService
+                                    .getFollowUpsList(selectedOutbreak.id, qb)
+                            ).subscribe(([relationshipsData, followUps]: [RelationshipModel[], FollowUpModel[]]) => {
+                                // set data
+                                this.chronologyEntries = ContactChronology.getChronologyEntries(this.contactData, followUps, relationshipsData);
+                            });
+
                         });
                 });
         });

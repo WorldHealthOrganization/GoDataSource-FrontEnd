@@ -13,7 +13,7 @@ import { TeamDataService } from '../../../../core/services/data/team.data.servic
 import { Observable } from 'rxjs';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import * as _ from 'lodash';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -62,7 +62,12 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
-        this.usersList$ = this.userDataService.getUsersList();
+
+        const qbUsers = new RequestQueryBuilder();
+        qbUsers.sort
+            .by('firstName', RequestSortDirection.ASC)
+            .by('lastName', RequestSortDirection.ASC);
+        this.usersList$ = this.userDataService.getUsersList(qbUsers);
 
         this.route.params
             .subscribe((params: { teamId }) => {

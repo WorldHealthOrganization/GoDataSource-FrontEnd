@@ -6,13 +6,15 @@ export class SavedFilterDataAppliedFilter {
     };
     comparator: string;
     value: any;
+    extraValues: any;
 
     constructor(data: {
         filter?: {
             uniqueKey: string
         },
         comparator?: string,
-        value?: any
+        value?: any,
+        extraValues?: any
     } = {}) {
         Object.assign(
             this,

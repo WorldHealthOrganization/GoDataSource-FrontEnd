@@ -20,6 +20,8 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { map, share, tap } from 'rxjs/operators';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { UserSettings } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-entity-relationships-list-assign',
@@ -38,6 +40,9 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
     availableSideFilters: FilterModel[];
     // values for side filter
     savedFiltersType = Constants.APP_PAGE.PEOPLE_TO_SHARE_RELATIONSHIPS_WITH.value;
+
+    // constants
+    UserSettings = UserSettings;
 
     // reference data
     genderList$: Observable<any[]>;
@@ -110,6 +115,63 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
                     this.onDataInitialized();
                 }
             });
+
+        // initialize Side Table Columns
+        this.initializeSideTableColumns();
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'checkbox',
+                required: true,
+                excludeFromSave: true
+            }),
+            new VisibleColumnModel({
+                field: 'lastName',
+                label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'firstName',
+                label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'visualId',
+                label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID'
+            }),
+            new VisibleColumnModel({
+                field: 'age',
+                label: 'LNG_ENTITY_FIELD_LABEL_AGE'
+            }),
+            new VisibleColumnModel({
+                field: 'gender',
+                label: 'LNG_ENTITY_FIELD_LABEL_GENDER'
+            }),
+            new VisibleColumnModel({
+                field: 'riskLevel',
+                label: 'LNG_ENTITY_FIELD_LABEL_RISK'
+            }),
+            new VisibleColumnModel({
+                field: 'classification',
+                label: 'LNG_ENTITY_FIELD_LABEL_CLASSIFICATION'
+            }),
+            new VisibleColumnModel({
+                field: 'dateOfOnset',
+                label: 'LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET'
+            }),
+            new VisibleColumnModel({
+                field: 'place',
+                label: 'LNG_ENTITY_FIELD_LABEL_PLACE'
+            }),
+            new VisibleColumnModel({
+                field: 'address',
+                label: 'LNG_ENTITY_FIELD_LABEL_ADDRESS'
+            })
+        ];
     }
 
     /**
@@ -340,19 +402,6 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
     getPersonTypeColor(personType: string) {
         const personTypeData = _.get(this.personTypesListMap, personType);
         return _.get(personTypeData, 'colorCode', '');
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        const columns = [
-            'checkbox', 'lastName', 'firstName', 'age', 'gender', 'riskLevel', 'classification',
-            'place', 'address'
-        ];
-
-        return columns;
     }
 
     selectEntities() {
