@@ -210,16 +210,6 @@ export class DialogService {
             );
         }
 
-        if (data.useQuestionVariable) {
-            fieldsList.push(
-                new DialogField({
-                    name: 'useQuestionVariable',
-                    placeholder: data.useQuestionVariablePlaceholder,
-                    fieldType: DialogFieldType.BOOLEAN
-                })
-            )
-        }
-
         // check if we have a different anonymize key
         if (!data.anonymizeFieldsKey) {
             data.anonymizeFieldsKey = 'anonymizeFields';
@@ -243,6 +233,16 @@ export class DialogService {
                 ...fieldsList,
                 ...data.extraDialogFields
             ];
+        }
+
+        if (data.useQuestionVariable) {
+            fieldsList.push(
+                new DialogField({
+                    name: 'useQuestionVariable',
+                    placeholder: data.useQuestionVariablePlaceholder,
+                    fieldType: DialogFieldType.BOOLEAN
+                })
+            )
         }
 
         // construct query builder

@@ -33,6 +33,7 @@ export class ImportExportDataService {
             fileType: string,
             encryptPassword?: string,
             anonymizeFields?: string[],
+            useQuestionVariable?: boolean,
             [otherData: string]: any
         },
         queryBuilder?: RequestQueryBuilder
@@ -67,6 +68,11 @@ export class ImportExportDataService {
             queryBuilder &&
             !queryBuilder.isEmpty()
         ) {
+            queryBuilder.filter.flag(
+                'useQuestionVariable',
+                data.useQuestionVariable
+            );
+
             const filter = queryBuilder.buildQuery();
             completeURL += `&filter=${filter}`;
         }
