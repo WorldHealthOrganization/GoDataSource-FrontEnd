@@ -45,7 +45,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     selectedPeopleIds: string[];
 
     // saved filters type
-    savedFiltersType = Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_RELATIONSHIPS.value;
+    savedFiltersType = Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_SWITCH.value;
 
     // reference data
     genderList$: Observable<any[]>;
