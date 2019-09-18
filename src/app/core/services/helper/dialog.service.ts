@@ -3,7 +3,7 @@ import { MatDialog, MatDialogRef } from '@angular/material';
 import {
     DialogAnswer, DialogAnswerButton,
     DialogComponent,
-    DialogConfiguration, DialogField
+    DialogConfiguration, DialogField, DialogFieldType
 } from '../../../shared/components/dialog/dialog.component';
 import { Observable, Subscriber } from 'rxjs';
 import * as _ from 'lodash';
@@ -119,6 +119,9 @@ export class DialogService {
         anonymizeFieldsKey?: string,
         anonymizePlaceholder?: string,
         anonymizeFields?: LabelValuePair[],
+        displayUseQuestionVariable?: boolean,
+        useQuestionVariablePlaceholder?: string,
+        useQuestionVariableDescription?: string,
         yesLabel?: string,
         queryBuilder?: RequestQueryBuilder,
         queryBuilderClearOthers?: string[],
@@ -150,6 +153,15 @@ export class DialogService {
         if (!data.encryptPlaceholder) {
             data.encryptPlaceholder = 'LNG_COMMON_LABEL_EXPORT_ENCRYPT_PASSWORD';
         }
+
+        if (!data.useQuestionVariablePlaceholder) {
+            data.useQuestionVariablePlaceholder = 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE';
+        }
+
+        if (!data.useQuestionVariableDescription) {
+            data.useQuestionVariableDescription = 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION';
+        }
+
         if (!data.anonymizePlaceholder) {
             data.anonymizePlaceholder = 'LNG_COMMON_LABEL_EXPORT_ANONYMIZE_FIELDS';
         }
@@ -227,6 +239,18 @@ export class DialogService {
                 ...fieldsList,
                 ...data.extraDialogFields
             ];
+        }
+
+        // add field for use question variable
+        if (data.displayUseQuestionVariable) {
+            fieldsList.push(
+                new DialogField({
+                    name: 'useQuestionVariable',
+                    placeholder: data.useQuestionVariablePlaceholder,
+                    fieldType: DialogFieldType.BOOLEAN,
+                    description: data.useQuestionVariableDescription
+                })
+            );
         }
 
         // construct query builder

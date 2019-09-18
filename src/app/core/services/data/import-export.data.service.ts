@@ -33,6 +33,7 @@ export class ImportExportDataService {
             fileType: string,
             encryptPassword?: string,
             anonymizeFields?: string[],
+            useQuestionVariable?: boolean,
             [otherData: string]: any
         },
         queryBuilder?: RequestQueryBuilder
@@ -54,6 +55,15 @@ export class ImportExportDataService {
         if (!_.isEmpty(data.anonymizeFields)) {
             completeURL += '&anonymizeFields=' + JSON.stringify(data.anonymizeFields);
             delete data.anonymizeFields;
+        }
+
+        // add flag useQuestionVariable
+        if (!_.isUndefined(data.useQuestionVariable)) {
+            queryBuilder.filter.flag(
+                'useQuestionVariable',
+                data.useQuestionVariable
+            );
+            delete data.useQuestionVariable;
         }
 
         // add other custom fields caused by API inconsistencies...

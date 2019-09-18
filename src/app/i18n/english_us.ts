@@ -109,7 +109,13 @@ export const EnglishUsLang = {
         /**
          * uiSavedFiltersForPagesLabels
          */
-        'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_SWITCH': 'Available entities for switch'
+        'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_SWITCH': 'Available entities for switch',
+
+        /**
+         * uiCommonLabels
+         */
+        'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE': 'Use question variable',
+        'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION': 'When checked, questionnaire column headers will use question variables instead of question text',
 
         /**
          * REMOVE the tokens from below

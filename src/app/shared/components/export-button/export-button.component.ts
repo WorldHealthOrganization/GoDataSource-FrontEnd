@@ -32,6 +32,9 @@ export class ExportButtonComponent {
     @Input() queryBuilderClearOthers: string[];
     @Input() menuItem: boolean = false;
     @Input() isPOST: boolean = false;
+    @Input() displayUseQuestionVariable: boolean = false;
+    @Input() useQuestionVariableDescription: string;
+    @Input() useQuestionVariablePlaceholder: string;
     @Input() extraAPIData: {
         [key: string]: any
     };
@@ -58,6 +61,9 @@ export class ExportButtonComponent {
             anonymizePlaceholder: this.anonymizePlaceholder,
             displayEncrypt: this.displayEncrypt,
             displayAnonymize: this.displayAnonymize,
+            displayUseQuestionVariable: this.displayUseQuestionVariable,
+            useQuestionVariablePlaceholder: this.useQuestionVariablePlaceholder,
+            useQuestionVariableDescription: this.useQuestionVariableDescription,
             anonymizeFields: this.anonymizeFields,
             url: this.url,
             fileType: this.fileType,
