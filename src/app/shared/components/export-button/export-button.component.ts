@@ -33,6 +33,7 @@ export class ExportButtonComponent {
     @Input() menuItem: boolean = false;
     @Input() isPOST: boolean = false;
     @Input() displayUseQuestionVariable: boolean = false;
+    @Input() useQuestionVariableDescription: string;
     @Input() useQuestionVariablePlaceholder: string;
     @Input() extraAPIData: {
         [key: string]: any
