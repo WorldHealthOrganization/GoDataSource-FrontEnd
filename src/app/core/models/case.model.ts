@@ -113,7 +113,12 @@ export class CaseModel extends BaseModel {
             .map((dateRangeData) => {
                 return new CaseCenterDateRangeModel(dateRangeData, dateRangeLocations);
             });
-
+        // vaccines received
+        const vaccinesReceived = _.get(data, 'vaccinesReceived');
+        this.vaccinesReceived = _.map(vaccinesReceived, (vaccineData) => {
+            return new VaccineModel(vaccineData);
+        });
+        this.pregnancyStatus = _.get(data, 'pregnancyStatus');
         this.dateOfReporting = _.get(data, 'dateOfReporting');
         this.dateOfLastContact = _.get(data, 'dateOfLastContact');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');

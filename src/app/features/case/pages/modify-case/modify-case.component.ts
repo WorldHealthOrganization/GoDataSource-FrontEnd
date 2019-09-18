@@ -286,6 +286,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                     // breadcrumbs
                     this.buildBreadcrumbs();
+                    console.log(this.caseData);
+
                 });
         }
     }

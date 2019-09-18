@@ -1,21 +1,39 @@
 <div fxLayout="column">
-    <div fxLayout="row" fxLayoutGap="20px">
-        <!--Vaccine-->
-        <app-form-select
 
-        >
-        </app-form-select>
+    <!--Edit mode-->
+    <form
+        *ngIf="!disabled"
+        #groupForm="ngForm"
+        fxLayout="column"
+    >
+        <div
+            *ngFor="let vaccine of values; let i = index; trackBy: trackByIndex"
+            fxLayout="row" fxLayoutGap="20px">
+            <!--Vaccine-->
+            <app-form-select
+                [name]="name + '[' + i + ']' + '[vaccine]'"
+                [ngModel]="values.vaccine"
+                (changed)="onChange(false)"
+                [required]="required"
+                [disabled]="disabled"
+                (groupValidated)="validateGroup()"
+            >
+            </app-form-select>
 
-        <!--Vaccine Date-->
-        <app-form-datepicker
+            <!--Vaccine Date-->
+            <app-form-datepicker
+                [name]="name + '[' + i + ']' + '[date]'"
+                [ngModel]="vaccine.date"
+            >
+            </app-form-datepicker>
 
-        >
-        </app-form-datepicker>
+            <!--Vaccine status-->
+            <app-form-select
+                [name]="name + '[' + i + ']' + '[status]'"
+                [ngModel]="vaccine.status"
+            >
 
-        <!--Vaccine status-->
-        <app-form-select
-        >
-
-        </app-form-select>
-    </div>
+            </app-form-select>
+        </div>
+    </form>
 </div>
