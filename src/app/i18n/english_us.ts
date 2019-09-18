@@ -115,7 +115,7 @@ export const EnglishUsLang = {
          * uiCommonLabels
          */
         'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE': 'Use question variable',
-        'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION': 'IWhen checked, questionnaire column headers will use question variables instead of question text',
+        'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION': 'When checked, questionnaire column headers will use question variables instead of question text',
 
         /**
          * REMOVE the tokens from below
