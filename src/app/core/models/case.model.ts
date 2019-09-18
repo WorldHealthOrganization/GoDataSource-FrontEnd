@@ -9,6 +9,7 @@ import { IAnswerData } from './question.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
 import { moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
+import { VaccineModel } from './vaccine.model';
 
 export class CaseModel extends BaseModel {
     id: string;
@@ -61,6 +62,9 @@ export class CaseModel extends BaseModel {
         startDate: string,
         endDate: string
     }[];
+
+    vaccinesReceived: VaccineModel[];
+    pregnancyStatus: string;
 
     alerted: boolean = false;
     relationship: any;

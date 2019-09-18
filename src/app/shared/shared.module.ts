@@ -34,7 +34,7 @@ import * as fromSharedPipes from './pipes';
     declarations: [
         ...fromSharedComponents.components,
         ...fromSharedDirectives.directives,
-        ...fromSharedPipes.pipes
+        ...fromSharedPipes.pipes,
     ],
     providers: [],
     exports: [
