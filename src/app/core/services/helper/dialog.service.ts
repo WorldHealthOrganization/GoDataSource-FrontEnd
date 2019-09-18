@@ -119,7 +119,7 @@ export class DialogService {
         anonymizeFieldsKey?: string,
         anonymizePlaceholder?: string,
         anonymizeFields?: LabelValuePair[],
-        useQuestionVariable?: boolean,
+        displayUseQuestionVariable?: boolean,
         useQuestionVariablePlaceholder?: string,
         yesLabel?: string,
         queryBuilder?: RequestQueryBuilder,
@@ -156,6 +156,7 @@ export class DialogService {
         if (!data.useQuestionVariablePlaceholder) {
             data.useQuestionVariablePlaceholder = 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE';
         }
+
         if (!data.anonymizePlaceholder) {
             data.anonymizePlaceholder = 'LNG_COMMON_LABEL_EXPORT_ANONYMIZE_FIELDS';
         }
@@ -236,7 +237,7 @@ export class DialogService {
         }
 
         // add field for use question variable
-        if (data.useQuestionVariable) {
+        if (data.displayUseQuestionVariable) {
             fieldsList.push(
                 new DialogField({
                     name: 'useQuestionVariable',

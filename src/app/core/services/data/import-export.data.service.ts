@@ -57,6 +57,15 @@ export class ImportExportDataService {
             delete data.anonymizeFields;
         }
 
+        // add flag useQuestionVariable
+        if (!_.isUndefined(data.useQuestionVariable)) {
+            queryBuilder.filter.flag(
+                'useQuestionVariable',
+                data.useQuestionVariable
+            );
+            delete data.useQuestionVariable;
+        }
+
         // add other custom fields caused by API inconsistencies...
         _.each(data, (value: any, key: string) => {
             completeURL += `&${key}=` + (_.isString(value) || _.isNumber(value) ? value : JSON.stringify(value));
@@ -67,11 +76,6 @@ export class ImportExportDataService {
             queryBuilder &&
             !queryBuilder.isEmpty()
         ) {
-            queryBuilder.filter.flag(
-                'useQuestionVariable',
-                data.useQuestionVariable
-            );
-
             const filter = queryBuilder.buildQuery();
             completeURL += `&filter=${filter}`;
         }
