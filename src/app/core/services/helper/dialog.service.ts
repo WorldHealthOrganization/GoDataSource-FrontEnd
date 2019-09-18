@@ -248,7 +248,7 @@ export class DialogService {
                     name: 'useQuestionVariable',
                     placeholder: data.useQuestionVariablePlaceholder,
                     fieldType: DialogFieldType.BOOLEAN,
-                    description: 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION'
+                    description: data.useQuestionVariableDescription
                 })
             );
         }

@@ -63,6 +63,7 @@ export class ExportButtonComponent {
             displayAnonymize: this.displayAnonymize,
             displayUseQuestionVariable: this.displayUseQuestionVariable,
             useQuestionVariablePlaceholder: this.useQuestionVariablePlaceholder,
+            useQuestionVariableDescription: this.useQuestionVariableDescription,
             anonymizeFields: this.anonymizeFields,
             url: this.url,
             fileType: this.fileType,
