@@ -293,6 +293,11 @@ export class ImportDataComponent implements OnInit {
     errMsgDetails: {
         details: {
             failed: {
+                // used internally
+                showData: boolean,
+
+                // from server
+                data: any,
                 recordNo: number,
                 message: string,
                 error: {
@@ -1372,5 +1377,4 @@ export class ImportDataComponent implements OnInit {
         // validate control and mark for change detection
         sourceControl.validateAndMarkForCheck();
     }
-
 }

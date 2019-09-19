@@ -301,7 +301,7 @@
     <!-- Import failed errors -->
     <div
         *ngIf="!displayLoading && importableObject && errMsgDetails"
-        fxLayout="column" fxLayoutGap="5px"
+        fxLayout="column" fxLayoutGap="10px"
         class="import-data-errors"
     >
         <div class="import-data-errors-title">
@@ -312,26 +312,53 @@
             class="import-data-errors-err"
             fxLayout="column"
         >
-            <ng-container [ngSwitch]="err.error?.code">
-                <span *ngSwitchCase="ImportServerErrorCodes.DUPLICATE_RECORD">
-                    {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_DUPLICATE' | translate:{ recordNo: err.recordNo } }}
-                </span>
-                <span *ngSwitchCase="ImportServerErrorCodes.INVALID_VISUAL_ID_MASK">
-                    {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_INVALID_VISUAL_ID_MASK' | translate:{ recordNo: err.recordNo } }}
-                </span>
-                <span *ngSwitchCase="ImportServerErrorCodes.ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE">
-                    {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE' | translate:{ recordNo: err.recordNo } }}
-                </span>
-                <span *ngSwitchCase="ImportServerErrorCodes.ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE">
-                    {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE' | translate:{ recordNo: err.recordNo } }}
-                </span>
-                <span *ngSwitchCase="ImportServerErrorCodes.ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE">
-                    {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE' | translate:{ recordNo: err.recordNo } }}
-                </span>
-                <span *ngSwitchDefault>
-                    {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_GENERAL' | translate:{ recordNo: err.recordNo, message: err.error ? ( err.error.errmsg ? ( 'LNG_API_ERROR_CODE_UNKNOWN_ERROR' | translate ) : err.error.message ) : err.message } }}
-                </span>
-            </ng-container>
+            <div
+                fxLayout="row" fxLayoutGap="10px">
+                <!-- More details -->
+                <div
+                    *ngIf="err.data"
+                    fxGrow="0">
+
+                    <!-- Hide / Show details -->
+                    <button
+                        mat-raised-button color="accent"
+                        class="import-data-errors-err-view-record-button"
+                        (click)="err.showData = !err.showData">
+                        {{ (err.showData ? 'LNG_PAGE_IMPORT_DATA_BUTTON_HIDE_ERR_RECORD_DETAILS' : 'LNG_PAGE_IMPORT_DATA_BUTTON_SHOW_ERR_RECORD_DETAILS') | translate }}
+                    </button>
+                </div>
+
+                <!-- Errors -->
+                <div
+                    [ngSwitch]="err.error?.code"
+                    fxLayoutAlign="start center">
+                    <span *ngSwitchCase="ImportServerErrorCodes.DUPLICATE_RECORD">
+                        {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_DUPLICATE' | translate:{ recordNo: err.recordNo } }}
+                    </span>
+                        <span *ngSwitchCase="ImportServerErrorCodes.INVALID_VISUAL_ID_MASK">
+                        {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_INVALID_VISUAL_ID_MASK' | translate:{ recordNo: err.recordNo } }}
+                    </span>
+                        <span *ngSwitchCase="ImportServerErrorCodes.ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE">
+                        {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE' | translate:{ recordNo: err.recordNo } }}
+                    </span>
+                        <span *ngSwitchCase="ImportServerErrorCodes.ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE">
+                        {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE' | translate:{ recordNo: err.recordNo } }}
+                    </span>
+                        <span *ngSwitchCase="ImportServerErrorCodes.ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE">
+                        {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE' | translate:{ recordNo: err.recordNo } }}
+                    </span>
+                        <span *ngSwitchDefault>
+                        {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_GENERAL' | translate:{ recordNo: err.recordNo, message: err.error ? ( err.error.errmsg ? ( 'LNG_API_ERROR_CODE_UNKNOWN_ERROR' | translate ) : err.error.message ) : err.message } }}
+                    </span>
+                </div>
+            </div>
+            <div
+                *ngIf="err.data && err.showData"
+                class="import-data-errors-err-view-record-details">
+                <code>
+                    <pre>{{ err.data | json }}</pre>
+                </code>
+            </div>
         </div>
         <div fxLayout="row" fxLayoutAlign="end">
             <button

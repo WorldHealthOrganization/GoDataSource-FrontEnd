@@ -62,6 +62,12 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION': '',
 
         /**
+         * uiImportData
+         */
+        'LNG_PAGE_IMPORT_DATA_BUTTON_SHOW_ERR_RECORD_DETAILS': 'Show details',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_HIDE_ERR_RECORD_DETAILS': 'Hide details',
+
+        /**
          * uiContactsListPage
          */
         'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS': 'Change Contact Final Follow-Up Status',
