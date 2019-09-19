@@ -1,39 +1,59 @@
-<div fxLayout="column">
+<div class="form-element "
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
-    <!--Edit mode-->
     <form
-        *ngIf="!disabled"
         #groupForm="ngForm"
         fxLayout="column"
     >
         <div
             *ngFor="let vaccine of values; let i = index; trackBy: trackByIndex"
-            fxLayout="row" fxLayoutGap="20px">
-            <!--Vaccine-->
-            <app-form-select
-                [name]="name + '[' + i + ']' + '[vaccine]'"
-                [ngModel]="values.vaccine"
-                (changed)="onChange(false)"
-                [required]="required"
-                [disabled]="disabled"
-                (groupValidated)="validateGroup()"
-            >
-            </app-form-select>
+            fxLayout="row" fxLayoutAlign="start center"
+        >
+            <mat-card
+                class="page-section"
+                fxFlex fxLayout="row" fxLayoutGap="15px"
 
-            <!--Vaccine Date-->
-            <app-form-datepicker
-                [name]="name + '[' + i + ']' + '[date]'"
-                [ngModel]="vaccine.date"
             >
-            </app-form-datepicker>
+                <!--Vaccine-->
+                <app-form-select
+                    [name]="name + '[' + i + ']' + '[vaccine]'"
+                    [ngModel]="vaccine.vaccine"
+                    (changed)="onChange(false)"
+                    [required]="required"
+                    [disabled]="disabled"
+                    (groupValidated)="validateGroup()"
+                >
+                </app-form-select>
 
-            <!--Vaccine status-->
-            <app-form-select
-                [name]="name + '[' + i + ']' + '[status]'"
-                [ngModel]="vaccine.status"
-            >
+                <!--Vaccine Date-->
+                <app-form-datepicker
+                    [name]="name + '[' + i + ']' + '[date]'"
+                    [ngModel]="vaccine.date"
+                >
+                </app-form-datepicker>
 
-            </app-form-select>
+                <!--Vaccine status-->
+                <app-form-select
+                    [name]="name + '[' + i + ']' + '[status]'"
+                    [ngModel]="vaccine.status"
+                >
+
+                </app-form-select>
+
+            </mat-card>
+
+            <div fxLayout="column">
+                <button *ngIf="!disabled" type="button" mat-icon-button (click)="delete(i)">
+                    <span class="xt-icon">delete</span>
+                </button>
+            </div>
+        </div>
+
+        <div fxLayout="row">
+            <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
+                {{'LNG_COMMON_BUTTON_ADD_DATE_RANGE' | translate}}
+            </button>
         </div>
     </form>
 </div>
+
