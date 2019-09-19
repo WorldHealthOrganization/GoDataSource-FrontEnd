@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 export class ImportableLabelValuePair {
     constructor(
@@ -197,12 +198,19 @@ export class ImportableFileModel {
     }
 }
 
+export interface IMappedOption {
+    id: string;
+    sourceOption?: string;
+    destinationOption?: string;
+    readOnly?: boolean;
+}
+
 export class ImportableMapField {
-    public mappedOptions: {
-        id: string;
-        sourceOption?: string;
-        destinationOption?: string;
-    }[] = [];
+    public mappedOptions: IMappedOption[] = [];
+
+    private _readOnlyValues: {
+        [id: string]: LabelValuePair[]
+    } = {};
 
     public readonly: boolean = false;
 
@@ -258,5 +266,28 @@ export class ImportableMapField {
             ( this.destinationField.match(/\[\]/g) || [] ) :
             [];
         this.numberOfMaxLevels = sourceArray.length < destinationArray.length ? destinationArray : sourceArray;
+    }
+
+    public getOptionsForReadOnlySource(option: IMappedOption): LabelValuePair[] {
+        // if not readonly, then there is no point in constructing a list of label / values since it should exist in the main dropdown options
+        if (!option.readOnly) {
+            return [];
+        }
+
+        // do we need to init / reinit the options ?
+        if (
+            !this._readOnlyValues[option.id] ||
+            this._readOnlyValues[option.id][0].value !== option.sourceOption
+        ) {
+            this._readOnlyValues[option.id] = [
+                new LabelValuePair(
+                    option.sourceOption,
+                    option.sourceOption
+                )
+            ];
+        }
+
+        // finished
+        return this._readOnlyValues[option.id];
     }
 }

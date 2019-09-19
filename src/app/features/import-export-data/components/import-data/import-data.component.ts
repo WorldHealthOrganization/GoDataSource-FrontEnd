@@ -980,11 +980,14 @@ export class ImportDataComponent implements OnInit {
                     {};
 
                 // filter out items that aren't mapped out
-                mapField.mappedOptions = _.filter(mapField.mappedOptions, (
-                    item: { sourceOption?: string }
+                // make not match value appear but ignored when sent to server, this way we can save import mappings without loosing old values
+                _.each(mapField.mappedOptions, (
+                    item: { sourceOption?: string, readOnly?: boolean }
                 ) => {
-                    return item.sourceOption && optionValuesMap[item.sourceOption];
-                }) as any;
+                    if (item.sourceOption && !optionValuesMap[item.sourceOption]) {
+                        item.readOnly = true;
+                    }
+                });
             }
 
             // map sub levels ( array indexes )
@@ -1336,6 +1339,7 @@ export class ImportDataComponent implements OnInit {
         this.uploader.clearQueue();
         this.mappedFields = [];
         this.decryptPassword = null;
+        this.loadedImportMapping = undefined;
     }
 
     /**
