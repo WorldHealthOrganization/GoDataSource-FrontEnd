@@ -216,7 +216,7 @@
                         <app-form-select-change-detection-push
                             [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][sourceOption]'"
                             app-unique-validator
-                            [appUniqueValidatorExpression]="'\\[' + item.id + '\\]\\[options\\]\\[\\d+\\]\\[sourceOption\\]$'"
+                            [appUniqueValidatorExpression]="'\\[' + item.id + '\\]\\[options\\]\\[[^\\]]+\\]\\[sourceOption\\]$'"
                             required="true"
                             [ngModel]="mappedOpt.sourceOption"
                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
