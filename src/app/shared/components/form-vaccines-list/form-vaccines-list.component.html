@@ -17,10 +17,13 @@
                 <!--Vaccine-->
                 <app-form-select
                     [name]="name + '[' + i + ']' + '[vaccine]'"
-                    [ngModel]="vaccine.vaccine"
-                    (changed)="onChange(false)"
+                    [(ngModel)]="vaccine.vaccine"
+                    (optionChanged)="onChange(false)"
+                    [placeholder]="AAA"
                     [required]="required"
                     [disabled]="disabled"
+                    optionLabelKey="label"
+                    optionValueKey="value"
                     (groupValidated)="validateGroup()"
                 >
                 </app-form-select>
@@ -28,16 +31,24 @@
                 <!--Vaccine Date-->
                 <app-form-datepicker
                     [name]="name + '[' + i + ']' + '[date]'"
-                    [ngModel]="vaccine.date"
-                >
+                    [(ngModel)]="vaccine.date"
+                    (optionChanged)="onChange(false)"
+                    [required]="required"
+                    [disabled]="disabled"
+                    (groupValidated)="validateGroup()">
                 </app-form-datepicker>
 
                 <!--Vaccine status-->
                 <app-form-select
                     [name]="name + '[' + i + ']' + '[status]'"
-                    [ngModel]="vaccine.status"
-                >
-
+                    [(ngModel)]="vaccine.status"
+                    (changed)="onChange(false)"
+                    [placeholder]="BBB"
+                    [required]="required"
+                    [disabled]="disabled"
+                    optionLabelKey="label"
+                    optionValueKey="value"
+                    (groupValidated)="validateGroup()">
                 </app-form-select>
 
             </mat-card>

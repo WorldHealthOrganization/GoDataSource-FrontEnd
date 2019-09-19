@@ -3,6 +3,8 @@ import { ListBase } from '../../xt-forms/core/list-base';
 import { VaccineModel } from '../../../core/models/vaccine.model';
 import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { DialogService } from '../../../core/services/helper/dialog.service';
+import { Subscriber } from 'rxjs/index';
+import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 
 @Component({
     selector: 'app-form-vaccines-list',
@@ -37,6 +39,15 @@ export class FormVaccinesListComponent extends ListBase<VaccineModel> implements
     }
 
     ngOnInit() {
+        // handle remove item confirmation
+        this.deleteConfirm.subscribe((observer: Subscriber<void>) => {
+            this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_VACCINE')
+                .subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        observer.next();
+                    }
+                });
+        });
     }
 
 }
