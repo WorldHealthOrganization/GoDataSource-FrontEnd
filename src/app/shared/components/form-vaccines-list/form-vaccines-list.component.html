@@ -18,8 +18,9 @@
                 <app-form-select
                     [name]="name + '[' + i + ']' + '[vaccine]'"
                     [(ngModel)]="vaccine.vaccine"
+                    [options]="vaccinesList$ | async"
                     (optionChanged)="onChange(false)"
-                    [placeholder]="AAA"
+                    [placeholder]="'AAA'"
                     [required]="required"
                     [disabled]="disabled"
                     optionLabelKey="label"
@@ -32,18 +33,20 @@
                 <app-form-datepicker
                     [name]="name + '[' + i + ']' + '[date]'"
                     [(ngModel)]="vaccine.date"
+                    [maxDate]="serverToday"
+                    app-date-validator
+                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
                     (optionChanged)="onChange(false)"
-                    [required]="required"
-                    [disabled]="disabled"
-                    (groupValidated)="validateGroup()">
+                    [disabled]="disabled">
                 </app-form-datepicker>
 
                 <!--Vaccine status-->
                 <app-form-select
                     [name]="name + '[' + i + ']' + '[status]'"
                     [(ngModel)]="vaccine.status"
+                    [options]="vaccinesStatusList$ | async"
                     (changed)="onChange(false)"
-                    [placeholder]="BBB"
+                    [placeholder]="'BBB'"
                     [required]="required"
                     [disabled]="disabled"
                     optionLabelKey="label"

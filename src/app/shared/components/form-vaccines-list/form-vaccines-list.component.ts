@@ -3,8 +3,11 @@ import { ListBase } from '../../xt-forms/core/list-base';
 import { VaccineModel } from '../../../core/models/vaccine.model';
 import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { DialogService } from '../../../core/services/helper/dialog.service';
-import { Subscriber } from 'rxjs/index';
+import { Observable, Subscriber } from 'rxjs/index';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
+import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
+import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
+import { Moment, moment } from '../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-form-vaccines-list',
@@ -22,11 +25,17 @@ export class FormVaccinesListComponent extends ListBase<VaccineModel> implements
     @Input() required: boolean = false;
     @Input() disabled: boolean = false;
 
+    serverToday: Moment = moment();
+
+    vaccinesList$: Observable<any[]>;
+    vaccinesStatusList$: Observable<any[]>;
+
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(controlContainer, validators, asyncValidators);
     }
@@ -48,6 +57,10 @@ export class FormVaccinesListComponent extends ListBase<VaccineModel> implements
                     }
                 });
         });
+
+        this.vaccinesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES);
+        this.vaccinesStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES_STATUS);
+
     }
 
 }
