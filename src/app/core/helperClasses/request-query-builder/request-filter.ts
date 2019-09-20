@@ -95,9 +95,7 @@ export class RequestFilter {
         // construct or condition if necessary
         const condition = {
             [operator]: _.map(properties, (prop) => ({
-                [prop]: {
-                    regexp: RequestFilterGenerator.textStartWith(value)
-                }
+                [prop]: RequestFilterGenerator.textStartWith(value)
             }))
         };
 
