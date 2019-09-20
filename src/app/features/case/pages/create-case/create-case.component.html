@@ -118,6 +118,21 @@
                                 ]">
                             </app-form-datepicker>
 
+                            <div fxFlex><!--Placeholder--></div>
+                            <div fxFlex><!--Placeholder--></div>
+
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                name="pregnancyStatus"
+                                [(ngModel)]="caseData.pregnancyStatus"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
+                                [options]="pregnancyStatusList$ | async"
+                                [disabled]="viewOnly">
+                            </app-form-select>
+
                             <app-form-slide-toggle
                                 name="isDateOfReportingApproximate"
                                 [(ngModel)]="caseData.isDateOfReportingApproximate"
@@ -131,6 +146,8 @@
                                 [label]="'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED' | translate"
                                 tooltip="LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION">
                             </app-form-slide-toggle>
+
+                            <div fxFlex><!--Placeholder--></div>
                         </div>
 
                         <div fxLayout="row">

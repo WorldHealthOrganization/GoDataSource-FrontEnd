@@ -53,6 +53,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     caseClassificationsList$: Observable<any[]>;
     caseRiskLevelsList$: Observable<any[]>;
     outcomeList$: Observable<any[]>;
+    pregnancyStatusList$: Observable<any[]>;
 
     // provide constants to template
     EntityType = EntityType;
@@ -100,6 +101,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
         this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+        this.pregnancyStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
 
         // retrieve query params
         this.route.queryParams

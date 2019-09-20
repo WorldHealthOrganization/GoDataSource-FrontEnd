@@ -7,6 +7,7 @@ import { AgeModel } from './age.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
 import { moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
+import { VaccineModel } from './vaccine.model';
 
 export class ContactModel extends BaseModel {
     id: string;
@@ -39,6 +40,9 @@ export class ContactModel extends BaseModel {
     dob: string;
     age: AgeModel;
 
+    vaccinesReceived: VaccineModel[];
+    pregnancyStatus: string;
+
     inconsistencies: InconsistencyModel[];
     relationship: any;
 
@@ -68,6 +72,13 @@ export class ContactModel extends BaseModel {
                 return new AddressModel(addressData, locationsList);
             }
         );
+
+        // vaccines received
+        const vaccinesReceived = _.get(data, 'vaccinesReceived');
+        this.vaccinesReceived = _.map(vaccinesReceived, (vaccineData) => {
+            return new VaccineModel(vaccineData);
+        });
+        this.pregnancyStatus = _.get(data, 'pregnancyStatus');
 
         this.riskLevel = _.get(data, 'riskLevel');
         this.riskReason = _.get(data, 'riskReason');

@@ -20,7 +20,7 @@
                     [(ngModel)]="vaccine.vaccine"
                     [options]="vaccinesList$ | async"
                     (optionChanged)="onChange(false)"
-                    [placeholder]="'AAA'"
+                    [placeholder]="'LNG_ENTITY_FIELD_LABEL_VACCINE' | translate"
                     [required]="required"
                     [disabled]="disabled"
                     optionLabelKey="label"
@@ -35,7 +35,7 @@
                     [(ngModel)]="vaccine.date"
                     [maxDate]="serverToday"
                     app-date-validator
-                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
+                    [placeholder]="'LNG_ENTITY_FIELD_LABEL_VACCINE_DATE'| translate"
                     (optionChanged)="onChange(false)"
                     [disabled]="disabled">
                 </app-form-datepicker>
@@ -46,7 +46,7 @@
                     [(ngModel)]="vaccine.status"
                     [options]="vaccinesStatusList$ | async"
                     (changed)="onChange(false)"
-                    [placeholder]="'BBB'"
+                    [placeholder]="'LNG_ENTITY_FIELD_LABEL_VACCINE_STATUS' | translate"
                     [required]="required"
                     [disabled]="disabled"
                     optionLabelKey="label"
@@ -65,7 +65,7 @@
 
         <div fxLayout="row">
             <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
-                {{'LNG_COMMON_BUTTON_ADD_DATE_RANGE' | translate}}
+                {{'LNG_COMMON_BUTTON_ADD_VACCINE' | translate}}
             </button>
         </div>
     </form>

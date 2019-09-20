@@ -42,6 +42,7 @@ export const EnglishUsLang = {
          * uiDialogs
          */
         'LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION': 'Are you sure you want to change "{{ caseName }}" classification to "{{ classification }}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_VACCINE': 'Are you sure you want to delete this vaccine?',
 
         /**
          * uiFollowUpsListPage
@@ -73,11 +74,14 @@ export const EnglishUsLang = {
          * uiCaseFields
          */
         'LNG_CASE_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ( {{exposureName}} )',
+        'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS': 'Pregnancy status',
+        'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION': '',
 
         /**
          * uiContactFields
          */
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ( {{exposureName}} )',
+        'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS': 'Vaccines received',
 
         /**
          * uiGlobalFilterFields
@@ -116,9 +120,19 @@ export const EnglishUsLang = {
          * uiCommonLabels
          */
         'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE': 'Use question variable',
-        'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION_CHECKED': '',
-        'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION_UNCHECKED': ''
+        'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION': '',
 
+        /**
+         * uiEntityFields
+         */
+        'LNG_ENTITY_FIELD_LABEL_VACCINE': 'Vaccine',
+        'LNG_ENTITY_FIELD_LABEL_VACCINE_DATE': 'Vaccine date',
+        'LNG_ENTITY_FIELD_LABEL_VACCINE_STATUS': 'Vaccine status',
+
+        /**
+         * uiCommonButtons
+         */
+        'LNG_COMMON_BUTTON_ADD_VACCINE': 'Add another vaccine'
 
         /**
          * REMOVE the tokens from below
