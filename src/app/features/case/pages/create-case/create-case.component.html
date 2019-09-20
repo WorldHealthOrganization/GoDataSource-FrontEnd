@@ -129,8 +129,7 @@
                                 [(ngModel)]="caseData.pregnancyStatus"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS' | translate"
                                 tooltip="LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
-                                [options]="pregnancyStatusList$ | async"
-                                [disabled]="viewOnly">
+                                [options]="pregnancyStatusList$ | async">
                             </app-form-select>
 
                             <app-form-slide-toggle

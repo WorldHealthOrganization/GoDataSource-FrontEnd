@@ -95,8 +95,7 @@
                                 [(ngModel)]="contactData.pregnancyStatus"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS' | translate"
                                 tooltip="LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
-                                [options]="pregnancyStatusList$ | async"
-                                [disabled]="viewOnly">
+                                [options]="pregnancyStatusList$ | async">
                             </app-form-select>
 
                             <app-form-datepicker
@@ -130,7 +129,6 @@
                 <app-form-vaccines-list
                     name="vaccinesReceived"
                     [(ngModel)]="contactData.vaccinesReceived"
-                    [disabled]="viewOnly"
                     [required]="true">
                 </app-form-vaccines-list>
 
