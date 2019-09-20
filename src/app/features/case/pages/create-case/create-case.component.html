@@ -344,6 +344,15 @@
                     </div>
                 </mat-card>
 
+                <div class="section-title">{{'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS' | translate}}</div>
+
+                <!--Vaccines received section-->
+                <app-form-vaccines-list
+                    name="vaccinesReceived"
+                    [(ngModel)]="caseData.vaccinesReceived"
+                    [required]="true">
+                </app-form-vaccines-list>
+
                 <div class="section-title">{{'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS' | translate}}</div>
                 <!-- Dates section -->
                 <app-form-case-center-daterange-list
