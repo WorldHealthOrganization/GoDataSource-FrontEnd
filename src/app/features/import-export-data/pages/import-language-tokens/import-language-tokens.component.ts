@@ -15,7 +15,7 @@ export class ImportLanguageTokensComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
             'LNG_PAGE_LIST_LANGUAGES_TITLE',
-            '/languages',
+            '/languages'
         ),
         new BreadcrumbItemModel(
             'LNG_PAGE_IMPORT_LANGUAGE_TOKENS_TITLE',

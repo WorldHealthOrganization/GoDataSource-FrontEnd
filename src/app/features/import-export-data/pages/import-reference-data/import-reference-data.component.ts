@@ -16,7 +16,7 @@ export class ImportReferenceDataComponent {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
             'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
-            '/reference-data',
+            '/reference-data'
         ),
         new BreadcrumbItemModel(
             'LNG_PAGE_IMPORT_REFERENCE_DATA_TITLE',

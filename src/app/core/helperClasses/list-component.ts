@@ -341,7 +341,7 @@ export abstract class ListComponent implements OnDestroy {
      */
     filterByEquality(
         property: string | string[],
-        value: any,
+        value: any
     ) {
         this.queryBuilder.filter.byEquality(
             property as string,

@@ -17,7 +17,7 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
             'LNG_PAGE_LIST_CASES_TITLE',
-            '/cases',
+            '/cases'
         ),
         new BreadcrumbItemModel(
             'LNG_PAGE_IMPORT_CASE_DATA_TITLE',

@@ -20,7 +20,7 @@ import { map } from 'rxjs/operators';
 export class UniqueAsyncValidatorDirective {
 
     constructor(
-        @Attribute('app-unique-async-validator') public type: string,
+        @Attribute('app-unique-async-validator') public type: string
     ) {
     }
 

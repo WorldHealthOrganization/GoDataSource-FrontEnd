@@ -40,7 +40,7 @@ export class LanguageResolver implements Resolve<any> {
 
                             // finished
                             return throwError(err);
-                        }),
+                        })
                     )
                     .subscribe(() => {
                         // hide loading

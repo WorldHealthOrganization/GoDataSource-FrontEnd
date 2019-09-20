@@ -238,7 +238,7 @@ export class RelationshipDataService {
         outbreakId: string,
         entityType: EntityType,
         entityId: string,
-        relationshipId: string,
+        relationshipId: string
     ): Observable<any> {
         return this.http.delete(
             `outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/${relationshipId}`

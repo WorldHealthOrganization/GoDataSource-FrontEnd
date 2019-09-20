@@ -342,7 +342,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
-        private userDataService: UserDataService,
+        private userDataService: UserDataService
     ) {
         super(
             snackbarService,
@@ -495,7 +495,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             }),
             new VisibleColumnModel({
                 field: 'location',
-                label: 'LNG_CONTACT_FIELD_LABEL_LOCATION'
+                label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION'
             }),
             new VisibleColumnModel({
                 field: 'dateOfLastContact',
