@@ -60,6 +60,7 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME': 'Burial place name',
         'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION': 'Area',
 
         /**
          * uiImportData

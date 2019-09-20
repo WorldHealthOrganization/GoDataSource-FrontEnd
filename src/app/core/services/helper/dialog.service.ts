@@ -34,7 +34,7 @@ export class DialogService {
     constructor(
         private dialog: MatDialog,
         private importExportDataService: ImportExportDataService,
-        private snackbarService: SnackbarService,
+        private snackbarService: SnackbarService
     ) {
     }
 

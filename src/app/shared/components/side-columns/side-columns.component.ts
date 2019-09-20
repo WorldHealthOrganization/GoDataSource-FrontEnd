@@ -7,6 +7,7 @@ import * as _ from 'lodash';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-side-columns',
@@ -75,7 +76,8 @@ export class SideColumnsComponent {
     constructor(
         private authDataService: AuthDataService,
         private formHelper: FormHelperService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private i18nService: I18nService
     ) {}
 
     /**
@@ -124,6 +126,18 @@ export class SideColumnsComponent {
                 this.displayColumns.push(new VisibleColumnModel(column));
             }
         });
+
+        // sort
+        if (!_.isEmpty(this.displayColumns)) {
+            this.displayColumns.sort((item1: VisibleColumnModel, item2: VisibleColumnModel): number => {
+                // get names
+                const name1: string = item1.label ? this.i18nService.instant(item1.label).toLowerCase() : '';
+                const name2: string = item2.label ? this.i18nService.instant(item2.label).toLowerCase() : '';
+
+                // compare
+                return name1.localeCompare(name2);
+            });
+        }
 
         // initialize visible data columns
         this.initializeVisibleTableColumns();
