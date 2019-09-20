@@ -316,7 +316,7 @@
                 fxLayout="row" fxLayoutGap="10px">
                 <!-- More details -->
                 <div
-                    *ngIf="err.data"
+                    *ngIf="err.data?.file"
                     fxGrow="0">
 
                     <!-- Hide / Show details -->
@@ -353,11 +353,34 @@
                 </div>
             </div>
             <div
-                *ngIf="err.data && err.showData"
+                *ngIf="err.data?.file && err.showData"
                 class="import-data-errors-err-view-record-details">
-                <code>
-                    <pre>{{ err.data | json }}</pre>
-                </code>
+                <div
+                    fxLayout="row" fxLayoutGap="20px">
+                    <div
+                        fxFlex
+                        class="import-data-errors-err-view-record-details-code">
+                        <div
+                            class="view-record-details-code-title">
+                            {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_FILE_TITLE' | translate }}
+                        </div>
+                        <code>
+                            <pre>{{ err.data?.file | json }}</pre>
+                        </code>
+                    </div>
+                    <div
+                        *ngIf="err.data?.save"
+                        fxFlex
+                        class="import-data-errors-err-view-record-details-code">
+                        <div
+                            class="view-record-details-code-title">
+                            {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_MODEL_TITLE' | translate }}
+                        </div>
+                        <code>
+                            <pre>{{ err.data?.save | json }}</pre>
+                        </code>
+                    </div>
+                </div>
             </div>
         </div>
         <div fxLayout="row" fxLayoutAlign="end">

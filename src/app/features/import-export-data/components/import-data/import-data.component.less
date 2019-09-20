@@ -119,11 +119,21 @@ app-import-data {
         .import-data-errors-err {
             .import-data-errors-err-view-record-button {}
             .import-data-errors-err-view-record-details {
-                border: 1px solid #CCC;
                 padding: 5px;
 
-                pre {
-                    margin: 0px;
+                .import-data-errors-err-view-record-details-code {
+                    border: 1px solid #CCC;
+
+                    .view-record-details-code-title {
+                        text-align: center;
+                        border-bottom: 1px solid #CCC;
+                        font-weight: bold;
+                        padding: 5px;
+                    }
+
+                    pre {
+                        margin: 0px;
+                    }
                 }
             }
         }

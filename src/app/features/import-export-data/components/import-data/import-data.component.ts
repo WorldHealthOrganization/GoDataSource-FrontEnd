@@ -297,7 +297,14 @@ export class ImportDataComponent implements OnInit {
                 showData: boolean,
 
                 // from server
-                data: any,
+                data: {
+                    file: {
+                        [prop: string]: any
+                    },
+                    save: {
+                        [prop: string]: any
+                    }
+                },
                 recordNo: number,
                 message: string,
                 error: {
