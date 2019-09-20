@@ -34,6 +34,7 @@ import { RequestFilter } from '../../../../core/helperClasses/request-query-buil
 import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { AddressType } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-cases-list',
@@ -42,7 +43,6 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
     styleUrls: ['./cases-list.component.less']
 })
 export class CasesListComponent extends ListComponent implements OnInit, OnDestroy {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '.', true)
     ];
@@ -545,6 +545,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER'
             }),
             new VisibleColumnModel({
+                field: 'location',
+                label: 'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION'
+            }),
+            new VisibleColumnModel({
                 field: 'dateOfOnset',
                 label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
             }),
@@ -791,6 +795,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
+
+            // retrieve location list
+            this.queryBuilder.include('locations', true);
 
             // retrieve the list of Cases
             this.casesList$ = this.caseDataService
@@ -1263,5 +1270,35 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             this.loadingDialog.close();
             this.loadingDialog = null;
         }
+    }
+
+    /**
+     * Filter by locations selected in location-drop-down
+     * @param locations
+     */
+    filterByLocation(locations) {
+        // remove previous condition
+        this.queryBuilder.filter.remove('addresses');
+        if (!_.isEmpty(locations)) {
+            // mapping all the locations to get the ids
+            const locationsIds = _.map(locations, (location) => {
+                return location.id;
+            });
+
+            // build query
+            this.queryBuilder.filter.where({
+                addresses: {
+                    elemMatch: {
+                        typeId: AddressType.CURRENT_ADDRESS,
+                        parentLocationIdFilter: {
+                            $in: locationsIds
+                        }
+                    }
+                }
+            });
+        }
+
+        // refresh list
+        this.needsRefreshList();
     }
 }
