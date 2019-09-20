@@ -7,7 +7,7 @@ import { ApplyListFilter, Constants } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { ResetInputOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
+import { ResetInputOnSideFilterDirective, ResetLocationOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
 import { MatPaginator, MatSort, MatSortable, PageEvent } from '@angular/material';
 import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
 import { DebounceTimeCaller } from './debounce-time-caller';
@@ -32,6 +32,11 @@ export abstract class ListComponent implements OnDestroy {
      * Determine all children that we need to reset when side filters are being applied
      */
     @ViewChildren(ResetInputOnSideFilterDirective) protected filterInputs: QueryList<ResetInputOnSideFilterDirective>;
+
+    /**
+     * Determine all location children that we need to reset when side filters are being applied
+     */
+    @ViewChildren(ResetLocationOnSideFilterDirective) protected filterLocationInputs: QueryList<ResetLocationOnSideFilterDirective>;
 
     /**
      * Retrieve Mat Table sort handler
@@ -341,7 +346,7 @@ export abstract class ListComponent implements OnDestroy {
      */
     filterByEquality(
         property: string | string[],
-        value: any,
+        value: any
     ) {
         this.queryBuilder.filter.byEquality(
             property as string,
@@ -582,6 +587,13 @@ export abstract class ListComponent implements OnDestroy {
         // clear header filters
         if (this.filterInputs) {
             this.filterInputs.forEach((input: ResetInputOnSideFilterDirective) => {
+                input.reset();
+            });
+        }
+
+        // clear location header filters
+        if (this.filterLocationInputs) {
+            this.filterLocationInputs.forEach((input: ResetLocationOnSideFilterDirective) => {
                 input.reset();
             });
         }

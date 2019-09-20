@@ -14,7 +14,7 @@ export class ImportHierarchicalLocationsComponent {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
             'LNG_PAGE_LIST_LOCATIONS_TITLE',
-            '/locations',
+            '/locations'
         ),
         new BreadcrumbItemModel(
             'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE',

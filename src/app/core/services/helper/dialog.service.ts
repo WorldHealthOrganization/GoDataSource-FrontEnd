@@ -34,7 +34,7 @@ export class DialogService {
     constructor(
         private dialog: MatDialog,
         private importExportDataService: ImportExportDataService,
-        private snackbarService: SnackbarService,
+        private snackbarService: SnackbarService
     ) {
     }
 
@@ -121,6 +121,7 @@ export class DialogService {
         anonymizeFields?: LabelValuePair[],
         displayUseQuestionVariable?: boolean,
         useQuestionVariablePlaceholder?: string,
+        useQuestionVariableDescription?: string,
         yesLabel?: string,
         queryBuilder?: RequestQueryBuilder,
         queryBuilderClearOthers?: string[],
@@ -155,6 +156,10 @@ export class DialogService {
 
         if (!data.useQuestionVariablePlaceholder) {
             data.useQuestionVariablePlaceholder = 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE';
+        }
+
+        if (!data.useQuestionVariableDescription) {
+            data.useQuestionVariableDescription = 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION';
         }
 
         if (!data.anonymizePlaceholder) {
@@ -242,7 +247,8 @@ export class DialogService {
                 new DialogField({
                     name: 'useQuestionVariable',
                     placeholder: data.useQuestionVariablePlaceholder,
-                    fieldType: DialogFieldType.BOOLEAN
+                    fieldType: DialogFieldType.BOOLEAN,
+                    description: data.useQuestionVariableDescription
                 })
             );
         }

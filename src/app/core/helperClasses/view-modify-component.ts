@@ -16,7 +16,7 @@ export abstract class ViewModifyComponent extends ConfirmOnFormChanges {
     public viewOnly: boolean = false;
 
     protected constructor(
-        protected route: ActivatedRoute,
+        protected route: ActivatedRoute
     ) {
         // create parent :)
         super();

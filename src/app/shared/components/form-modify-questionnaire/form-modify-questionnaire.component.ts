@@ -277,7 +277,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         forkJoin(
             this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.QUESTION_CATEGORY),
             this.genericDataService.getAnswerTypesList(),
-            this.genericDataService.getAnswersDisplayOrientationsList(),
+            this.genericDataService.getAnswersDisplayOrientationsList()
         ).subscribe(([
                          questionCategoriesList,
                          answerTypesInstantList,
@@ -1607,7 +1607,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             this.allowQuestionVariableChange
         ) {
             // set variable
-            this.questionInEditModeClone.variable = _.camelCase(value);
+            this.questionInEditModeClone.variable = _.snakeCase(value);
 
             // update variables
             this.determineQuestionnaireVariables();

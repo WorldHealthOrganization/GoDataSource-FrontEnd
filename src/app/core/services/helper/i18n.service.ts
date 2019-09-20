@@ -7,10 +7,11 @@ import { Observable } from 'rxjs';
 import { ModelHelperService } from './model-helper.service';
 import { UserDataService } from '../data/user.data.service';
 import { AuthDataService } from '../data/auth.data.service';
-import { map, mergeMap } from 'rxjs/operators';
+import { catchError, map, mergeMap } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { AuthModel } from '../../models/auth.model';
 import { moment } from '../../helperClasses/x-moment';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Injectable()
 export class I18nService {
@@ -176,11 +177,19 @@ export class I18nService {
         return this.languageDataService
             .getLanguage(langId)
             .pipe(
+                catchError((err) => {
+                    this.languageLoadedEvent.error(err);
+                    return throwError(err);
+                }),
                 mergeMap((language: LanguageModel) => {
                     // get the tokens for the selected language
                     return this.languageDataService
                         .getLanguageTokens(language, this.determineCurrentLanguageSinceDate(language))
                         .pipe(
+                            catchError((err) => {
+                                this.languageLoadedEvent.error(err);
+                                return throwError(err);
+                            }),
                             map((tokenData: LanguageTokenDetails) => {
                                 // update translation tokens
                                 this.setTranslationTokens(

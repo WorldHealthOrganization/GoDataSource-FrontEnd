@@ -15,7 +15,7 @@ export class ImportLocationDataComponent {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
             'LNG_PAGE_LIST_LOCATIONS_TITLE',
-            '/locations',
+            '/locations'
         ),
         new BreadcrumbItemModel(
             'LNG_PAGE_IMPORT_LOCATION_DATA_TITLE',

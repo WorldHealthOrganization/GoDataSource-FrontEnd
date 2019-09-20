@@ -61,7 +61,17 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME': 'Burial place name',
         'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION': 'Area',
         'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS': 'Vaccines received',
+
+
+        /**
+         * uiImportData
+         */
+        'LNG_PAGE_IMPORT_DATA_BUTTON_SHOW_ERR_RECORD_DETAILS': 'Show details',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_HIDE_ERR_RECORD_DETAILS': 'Hide details',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_FILE_TITLE': 'File input',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_MODEL_TITLE': 'Data to be saved in database',
 
         /**
          * uiContactsListPage
@@ -120,7 +130,7 @@ export const EnglishUsLang = {
          * uiCommonLabels
          */
         'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE': 'Use question variable',
-        'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION': '',
+        'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION': 'When checked, questionnaire column headers will use question variables instead of question text',
 
         /**
          * uiEntityFields

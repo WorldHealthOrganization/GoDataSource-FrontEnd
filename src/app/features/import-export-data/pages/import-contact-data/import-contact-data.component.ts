@@ -17,7 +17,7 @@ export class ImportContactDataComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
             'LNG_PAGE_LIST_CONTACTS_TITLE',
-            '/contacts',
+            '/contacts'
         ),
         new BreadcrumbItemModel(
             'LNG_PAGE_IMPORT_CONTACT_DATA_TITLE',

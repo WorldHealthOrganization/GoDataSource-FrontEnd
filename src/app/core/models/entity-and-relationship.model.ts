@@ -139,7 +139,7 @@ export class EntityModel {
         records: EntityModel[],
         path: string,
         valueParser: (value: any) => any,
-        labelValueMap: (value: any) => LabelValuePair,
+        labelValueMap: (value: any) => LabelValuePair
     ): { options: LabelValuePair[], value: any } {
         // construct options
         const options: LabelValuePair[] = _.chain(records)

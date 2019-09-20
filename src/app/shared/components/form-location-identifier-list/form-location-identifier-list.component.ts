@@ -20,7 +20,7 @@ export class FormLocationIdentifierListComponent extends ListBase<LocationIdenti
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
     ) {
         super(controlContainer, validators, asyncValidators);
     }

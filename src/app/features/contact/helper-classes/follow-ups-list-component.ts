@@ -75,7 +75,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
         protected followUpsDataService: FollowUpsDataService,
         protected router: Router,
         protected i18nService: I18nService,
-        protected teamDataService: TeamDataService,
+        protected teamDataService: TeamDataService
     ) {
         super(
             snackbarService

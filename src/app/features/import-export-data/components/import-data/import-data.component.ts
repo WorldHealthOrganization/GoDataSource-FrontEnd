@@ -293,6 +293,18 @@ export class ImportDataComponent implements OnInit {
     errMsgDetails: {
         details: {
             failed: {
+                // used internally
+                showData: boolean,
+
+                // from server
+                data: {
+                    file: {
+                        [prop: string]: any
+                    },
+                    save: {
+                        [prop: string]: any
+                    }
+                },
                 recordNo: number,
                 message: string,
                 error: {
@@ -718,10 +730,14 @@ export class ImportDataComponent implements OnInit {
     /**
      * Add drop-downs for mapping a drop-down type options
      * @param importableItem
+     * @param reInitOptions
      */
-    addMapOptionsIfNecessary(importableItem: ImportableMapField) {
+    addMapOptionsIfNecessary(
+        importableItem: ImportableMapField,
+        reInitOptions: boolean = true
+    ) {
         // add all distinct source as items that we need to map
-        importableItem.mappedOptions = [];
+        importableItem.mappedOptions = reInitOptions ? [] : (importableItem.mappedOptions || []);
 
         // there is no point in setting mapped values if we  don't have to map something
         if (
@@ -947,10 +963,13 @@ export class ImportDataComponent implements OnInit {
         const mapOfRequiredDestinationFields = this.requiredDestinationFieldsMap ? _.clone(this.requiredDestinationFieldsMap) : {};
         this.mappedFields = [];
         _.each(savedImportMapping.mappingData, (option: SavedImportField) => {
+            // create new map field
             const mapField = new ImportableMapField(
                 option.destination,
                 option.source
             );
+
+            // had sub options ?
             mapField.mappedOptions = (option.options || []).map((item: SavedImportOption) => {
                 return {
                     id: uuid(),
@@ -958,6 +977,32 @@ export class ImportDataComponent implements OnInit {
                     destinationOption: item.destination
                 };
             });
+
+            // filter out for which source doesn't exist anymore
+            if (!_.isEmpty(mapField.mappedOptions)) {
+                // map possible source options
+                const optionValuesMap = this.importableObject.distinctFileColumnValuesKeyValue ?
+                    _.transform(
+                        this.importableObject.distinctFileColumnValuesKeyValue[mapField.sourceFieldWithoutIndexes],
+                        (a, v) => {
+                            a[v.value] = v;
+                        },
+                        {}
+                    ) :
+                    {};
+
+                // filter out items that aren't mapped out
+                // make not match value appear but ignored when sent to server, this way we can save import mappings without loosing old values
+                _.each(mapField.mappedOptions, (
+                    item: { sourceOption?: string, readOnly?: boolean }
+                ) => {
+                    if (item.sourceOption && !optionValuesMap[item.sourceOption]) {
+                        item.readOnly = true;
+                    }
+                });
+            }
+
+            // map sub levels ( array indexes )
             mapField.sourceDestinationLevel = option.levels;
 
             // required ?
@@ -968,6 +1013,12 @@ export class ImportDataComponent implements OnInit {
 
             // add it to the list
             this.mappedFields.push(mapField);
+
+            // add new source items that weren't saved previously
+            this.addMapOptionsIfNecessary(
+                mapField,
+                false
+            );
         });
 
         // add missing required fields
@@ -1300,6 +1351,7 @@ export class ImportDataComponent implements OnInit {
         this.uploader.clearQueue();
         this.mappedFields = [];
         this.decryptPassword = null;
+        this.loadedImportMapping = undefined;
     }
 
     /**
@@ -1332,5 +1384,4 @@ export class ImportDataComponent implements OnInit {
         // validate control and mark for change detection
         sourceControl.validateAndMarkForCheck();
     }
-
 }

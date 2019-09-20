@@ -106,6 +106,36 @@ app-import-data {
 
         .import-data-map-fields-children {
             margin: 0 70px 20px 70px;
+
+            .import-data-map-fields-children-source-readonly {
+                background: round url('assets/images/inactive.png');
+            }
+        }
+    }
+
+    .import-data-errors {
+        .import-data-errors-title {}
+
+        .import-data-errors-err {
+            .import-data-errors-err-view-record-button {}
+            .import-data-errors-err-view-record-details {
+                padding: 5px;
+
+                .import-data-errors-err-view-record-details-code {
+                    border: 1px solid #CCC;
+
+                    .view-record-details-code-title {
+                        text-align: center;
+                        border-bottom: 1px solid #CCC;
+                        font-weight: bold;
+                        padding: 5px;
+                    }
+
+                    pre {
+                        margin: 0px;
+                    }
+                }
+            }
         }
     }
 }
