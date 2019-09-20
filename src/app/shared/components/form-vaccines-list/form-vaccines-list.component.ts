@@ -43,7 +43,7 @@ export class FormVaccinesListComponent extends ListBase<VaccineModel> implements
     /**
      * Create new item
      */
-    protected generateNewItem(): VaccineModel{
+    protected generateNewItem(): VaccineModel {
         return new VaccineModel();
     }
 
