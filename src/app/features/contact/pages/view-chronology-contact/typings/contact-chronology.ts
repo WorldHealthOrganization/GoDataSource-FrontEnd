@@ -1,4 +1,4 @@
-import { ContactModel } from '../../../../../core/models/contact.model';
+import { ContactModel, IFollowUpHistory } from '../../../../../core/models/contact.model';
 import { FollowUpModel } from '../../../../../core/models/follow-up.model';
 import { ChronologyItem } from '../../../../../shared/components/chronology/typings/chronology-item';
 import * as _ from 'lodash';
@@ -6,9 +6,11 @@ import { Constants } from '../../../../../core/models/constants';
 import { RelationshipModel } from '../../../../../core/models/entity-and-relationship.model';
 import { CaseModel } from '../../../../../core/models/case.model';
 import { EventModel } from '../../../../../core/models/event.model';
+import { I18nService } from '../../../../../core/services/helper/i18n.service';
 
 export class ContactChronology {
-    static getChronologyEntries(contactData: ContactModel,
+    static getChronologyEntries(i18nService: I18nService,
+                                contactData: ContactModel,
                                 followUps: FollowUpModel[],
                                 relationshipsData?: RelationshipModel[]): ChronologyItem[] {
 
@@ -72,6 +74,32 @@ export class ContactChronology {
                 }));
             }
         });
+
+        // followup history
+        if (!_.isEmpty(contactData.followUpHistory)) {
+            _.each(
+                contactData.followUpHistory, (
+                    followUpHistory: IFollowUpHistory
+                ) => {
+                    const translateData = {
+                        status: i18nService.instant(followUpHistory.status)
+                    };
+                    if (!_.isEmpty(followUpHistory.startDate)) {
+                        chronologyEntries.push(new ChronologyItem({
+                            date: followUpHistory.startDate,
+                            label: 'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_LABEL_FOLLOW_UP_HISTORY_START_DATE',
+                            translateData: translateData
+                        }));
+                    }
+                    if (!_.isEmpty(followUpHistory.endDate)) {
+                        chronologyEntries.push(new ChronologyItem({
+                            date: followUpHistory.endDate,
+                            label: 'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_LABEL_FOLLOW_UP_HISTORY_END_DATE',
+                            translateData: translateData
+                        }));
+                    }
+                });
+        }
 
         // date of onset
         if (!_.isEmpty(contactData.dateOfReporting)) {

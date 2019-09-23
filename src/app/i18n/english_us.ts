@@ -139,7 +139,13 @@ export const EnglishUsLang = {
         /**
          * uiCommonButtons
          */
-        'LNG_COMMON_BUTTON_ADD_VACCINE': 'Add another vaccine'
+        'LNG_COMMON_BUTTON_ADD_VACCINE': 'Add another vaccine',
+
+        /**
+         * uiChronologyContactPage
+         */
+        'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_LABEL_FOLLOW_UP_HISTORY_END_DATE': 'Classification \\"{{ status }}\\" End Date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_LABEL_FOLLOW_UP_HISTORY_START_DATE': 'Classification \\"{{ status }}\\" Start Date'
 
         /**
          * REMOVE the tokens from below
