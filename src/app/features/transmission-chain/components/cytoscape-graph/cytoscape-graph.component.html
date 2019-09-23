@@ -151,9 +151,33 @@
         </app-form-slide-toggle>
     </div>
 
-    <!-- cytoscape element -->
-    <div class="cy xt-icon" id="cy"
-         [fxShow]="!showLoading && transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
+    <div
+        [fxShow]="!showLoading && transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
+        <!-- zoom in / out buttons -->
+        <div
+            class="cy-zoom-buttons">
+            <button
+                mat-raised-button
+                class="cy-zoom-button"
+                [disableRipple]="true"
+                (click)="zoomInGraph()">
+                +
+            </button>
+            <br />
+            <button
+                mat-raised-button
+                class="cy-zoom-button"
+                [disableRipple]="true"
+                (click)="zoomOutGraph()">
+                -
+            </button>
+        </div>
+
+        <!-- cytoscape element -->
+        <div
+            id="cy"
+            class="cy xt-icon">
+        </div>
     </div>
 
     <!-- Geospatial map -->
