@@ -45,6 +45,8 @@ import { moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./cytoscape-graph.component.less']
 })
 export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
+    static wheelSensitivity: number = 0.3;
+
     private _elements: IConvertChainToGraphElements;
     @Input() set elements(elements: IConvertChainToGraphElements) {
         // set elements
@@ -365,7 +367,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
             elements: this.elements,
             minZoom: this.defaultZoom.min,
             maxZoom: this.defaultZoom.max,
-            wheelSensitivity: 0.3,
+            wheelSensitivity: CytoscapeGraphComponent.wheelSensitivity,
             // #TODO replace with new cytoscape version equivalent?
             // ready: () => {
             //     // show spinner when layout starts to draw
@@ -1107,6 +1109,57 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                     });
                 });
         }
+    }
+
+    /**
+     * Zoom graph
+     * @param value
+     */
+    zoomGraph(value: number) {
+        // there is no graph initialized ?
+        if (!this.cy) {
+            return;
+        }
+
+        // restrict zoom to boundaries
+        let zoomValue: number = Math.round((this.cy.zoom() + value) * 100) / 100.0;
+        if (zoomValue < this.cy.minZoom()) {
+            zoomValue = this.cy.minZoom();
+        } else if (zoomValue > this.cy.maxZoom()) {
+            zoomValue = this.cy.maxZoom();
+        }
+
+        // no point in trying to zoom if zoom level is already there
+        if (zoomValue === this.cy.zoom()) {
+            return;
+        }
+
+        // zoom
+        this.cy.animate({
+            zoom: {
+                level: zoomValue,
+                renderedPosition: {
+                    x: this.cy.width() / 2,
+                    y: this.cy.height() / 2
+                }
+            }
+        }, {
+            duration: 200
+        });
+    }
+
+    /**
+     * Zoom in graph
+     */
+    zoomInGraph() {
+        this.zoomGraph(CytoscapeGraphComponent.wheelSensitivity);
+    }
+
+    /**
+     * Zoom out graph
+     */
+    zoomOutGraph() {
+        this.zoomGraph(-CytoscapeGraphComponent.wheelSensitivity);
     }
 }
 

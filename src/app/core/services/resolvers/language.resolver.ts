@@ -36,7 +36,7 @@ export class LanguageResolver implements Resolve<any> {
                             loadingDialog.close();
 
                             // display error message
-                            alert('Error retrieving languages ( api might be down )');
+                            alert('Error retrieving languages ( api might be down - please try a hard refresh )');
 
                             // finished
                             return throwError(err);
