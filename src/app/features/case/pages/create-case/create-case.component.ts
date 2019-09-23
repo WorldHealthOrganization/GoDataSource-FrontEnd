@@ -49,6 +49,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
     caseRiskLevelsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
     outcomeList$: Observable<any[]>;
+    pregnancyStatusList$: Observable<any[]>;
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
@@ -81,6 +82,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
         this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+        this.pregnancyStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
 
         this.route.queryParams
             .subscribe((params: { uid }) => {

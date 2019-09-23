@@ -1,0 +1,74 @@
+<div class="form-element "
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <form
+        #groupForm="ngForm"
+        fxLayout="column"
+    >
+        <div
+            *ngFor="let vaccine of values; let i = index; trackBy: trackByIndex"
+            fxLayout="row" fxLayoutAlign="start center"
+        >
+            <mat-card
+                class="page-section"
+                fxFlex fxLayout="row" fxLayoutGap="15px"
+
+            >
+                <!--Vaccine-->
+                <app-form-select
+                    [name]="name + '[' + i + ']' + '[vaccine]'"
+                    [(ngModel)]="vaccine.vaccine"
+                    [options]="vaccinesList$ | async"
+                    (optionChanged)="onChange(false)"
+                    [placeholder]="'LNG_ENTITY_FIELD_LABEL_VACCINE' | translate"
+                    [required]="required"
+                    [disabled]="disabled"
+                    optionLabelKey="label"
+                    optionValueKey="value"
+                    (groupValidated)="validateGroup()"
+                >
+                </app-form-select>
+
+                <!--Vaccine Date-->
+                <app-form-datepicker
+                    [name]="name + '[' + i + ']' + '[date]'"
+                    [(ngModel)]="vaccine.date"
+                    [maxDate]="serverToday"
+                    [dateSameOrBefore]="serverToday"
+                    app-date-validator
+                    [placeholder]="'LNG_ENTITY_FIELD_LABEL_VACCINE_DATE'| translate"
+                    (optionChanged)="onChange(false)"
+                    [disabled]="disabled">
+                </app-form-datepicker>
+
+                <!--Vaccine status-->
+                <app-form-select
+                    [name]="name + '[' + i + ']' + '[status]'"
+                    [(ngModel)]="vaccine.status"
+                    [options]="vaccinesStatusList$ | async"
+                    (changed)="onChange(false)"
+                    [placeholder]="'LNG_ENTITY_FIELD_LABEL_VACCINE_STATUS' | translate"
+                    [required]="required"
+                    [disabled]="disabled"
+                    optionLabelKey="label"
+                    optionValueKey="value"
+                    (groupValidated)="validateGroup()">
+                </app-form-select>
+
+            </mat-card>
+
+            <div fxLayout="column">
+                <button *ngIf="!disabled" type="button" mat-icon-button (click)="delete(i)">
+                    <span class="xt-icon">delete</span>
+                </button>
+            </div>
+        </div>
+
+        <div fxLayout="row">
+            <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
+                {{'LNG_COMMON_BUTTON_ADD_VACCINE' | translate}}
+            </button>
+        </div>
+    </form>
+</div>
+

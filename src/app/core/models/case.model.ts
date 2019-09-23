@@ -9,6 +9,7 @@ import { IAnswerData } from './question.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
 import { moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
+import { VaccineModel } from './vaccine.model';
 
 export class CaseModel extends BaseModel {
     id: string;
@@ -62,6 +63,9 @@ export class CaseModel extends BaseModel {
         endDate: string
     }[];
 
+    vaccinesReceived: VaccineModel[];
+    pregnancyStatus: string;
+
     alerted: boolean = false;
     relationship: any;
 
@@ -109,7 +113,12 @@ export class CaseModel extends BaseModel {
             .map((dateRangeData) => {
                 return new CaseCenterDateRangeModel(dateRangeData, dateRangeLocations);
             });
-
+        // vaccines received
+        const vaccinesReceived = _.get(data, 'vaccinesReceived');
+        this.vaccinesReceived = _.map(vaccinesReceived, (vaccineData) => {
+            return new VaccineModel(vaccineData);
+        });
+        this.pregnancyStatus = _.get(data, 'pregnancyStatus');
         this.dateOfReporting = _.get(data, 'dateOfReporting');
         this.dateOfLastContact = _.get(data, 'dateOfLastContact');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');

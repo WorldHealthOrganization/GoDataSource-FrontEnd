@@ -118,6 +118,20 @@
                                 ]">
                             </app-form-datepicker>
 
+                            <div fxFlex><!--Placeholder--></div>
+                            <div fxFlex><!--Placeholder--></div>
+
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                name="pregnancyStatus"
+                                [(ngModel)]="caseData.pregnancyStatus"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
+                                [options]="pregnancyStatusList$ | async">
+                            </app-form-select>
+
                             <app-form-slide-toggle
                                 name="isDateOfReportingApproximate"
                                 [(ngModel)]="caseData.isDateOfReportingApproximate"
@@ -131,6 +145,8 @@
                                 [label]="'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED' | translate"
                                 tooltip="LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION">
                             </app-form-slide-toggle>
+
+                            <div fxFlex><!--Placeholder--></div>
                         </div>
 
                         <div fxLayout="row">
@@ -327,6 +343,15 @@
                         </div>
                     </div>
                 </mat-card>
+
+                <div class="section-title">{{'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS' | translate}}</div>
+
+                <!--Vaccines received section-->
+                <app-form-vaccines-list
+                    name="vaccinesReceived"
+                    [(ngModel)]="caseData.vaccinesReceived"
+                    [required]="true">
+                </app-form-vaccines-list>
 
                 <div class="section-title">{{'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS' | translate}}</div>
                 <!-- Dates section -->

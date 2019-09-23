@@ -42,6 +42,7 @@ export const EnglishUsLang = {
          * uiDialogs
          */
         'LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION': 'Are you sure you want to change "{{ caseName }}" classification to "{{ classification }}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_VACCINE': 'Are you sure you want to delete this vaccine?',
 
         /**
          * uiFollowUpsListPage
@@ -61,6 +62,10 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME': 'Burial place name',
         'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION': 'Area',
+        'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS': 'Vaccines received',
+        'LNG_CASE_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ( {{exposureName}} )',
+        'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS': 'Pregnancy status',
+        'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION': '',
 
         /**
          * uiImportData
@@ -78,14 +83,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_SUCCESS_MSG': 'Final status updated for {{count}} contact(s)',
 
         /**
-         * uiCaseFields
-         */
-        'LNG_CASE_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ( {{exposureName}} )',
-
-        /**
          * uiContactFields
          */
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ( {{exposureName}} )',
+        'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS': 'Vaccines received',
+        'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS': 'Pregnancy status',
+        'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION': '',
 
         /**
          * uiGlobalFilterFields
@@ -125,6 +128,18 @@ export const EnglishUsLang = {
          */
         'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE': 'Use question variable',
         'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION': 'When checked, questionnaire column headers will use question variables instead of question text',
+
+        /**
+         * uiEntityFields
+         */
+        'LNG_ENTITY_FIELD_LABEL_VACCINE': 'Vaccine',
+        'LNG_ENTITY_FIELD_LABEL_VACCINE_DATE': 'Vaccine date',
+        'LNG_ENTITY_FIELD_LABEL_VACCINE_STATUS': 'Vaccine status',
+
+        /**
+         * uiCommonButtons
+         */
+        'LNG_COMMON_BUTTON_ADD_VACCINE': 'Add another vaccine'
 
         /**
          * REMOVE the tokens from below

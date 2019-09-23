@@ -102,6 +102,15 @@
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                name="pregnancyStatus"
+                                [(ngModel)]="contactData.pregnancyStatus"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS' | translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
+                                [options]="pregnancyStatusList$ | async"
+                                [disabled]="viewOnly">
+                            </app-form-select>
+
                             <app-form-datepicker
                                 fxFlex
                                 name="dateOfReporting"
@@ -134,7 +143,6 @@
                                 [clearable]="false">
                             </app-form-select>
 
-                            <div fxFlex><!-- placeholder --></div>
                         </div>
 
                     </div>
@@ -217,6 +225,16 @@
                         </div>
                     </div>
                 </mat-card>
+
+                <div class="section-title">{{'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS' | translate}}</div>
+
+                <!--Vaccines received section-->
+                <app-form-vaccines-list
+                    name="vaccinesReceived"
+                    [(ngModel)]="contactData.vaccinesReceived"
+                    [disabled]="viewOnly"
+                    [required]="true">
+                </app-form-vaccines-list>
 
                 <!-- Documents section -->
                 <div class="section-title">{{'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_DOCUMENTS_TITLE'| translate}}</div>

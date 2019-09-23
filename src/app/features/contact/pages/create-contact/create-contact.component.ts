@@ -49,6 +49,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
 
     genderList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
+    pregnancyStatusList$: Observable<any[]>;
 
     relatedEntityData: CaseModel | EventModel;
     relationship: RelationshipModel = new RelationshipModel();
@@ -82,6 +83,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+        this.pregnancyStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
 
         // by default, enforce Contact having an address
         this.contactData.addresses.push(new AddressModel());

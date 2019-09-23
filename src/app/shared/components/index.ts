@@ -48,6 +48,7 @@ import { FormEventQuickComponent } from './form-event-quick/form-event-quick.com
 import { FormSelectChangeDetectionPushComponent } from './form-select-change-detection-push/form-select-change-detection-push.component';
 import { ListItemLabelComponent } from './list-item-label/list-item-label.component';
 import { FormNgxWigComponent } from './form-ngx-wig/form-ngx-wig.component';
+import { FormVaccinesListComponent } from './form-vaccines-list/form-vaccines-list.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -98,6 +99,7 @@ export const components: any[] = [
     FormLocationIdentifierListComponent,
     FormLocationIdentifierComponent,
     FormNgxWigComponent,
+    FormVaccinesListComponent,
 
     // display information
     CountedItemsListComponent,
