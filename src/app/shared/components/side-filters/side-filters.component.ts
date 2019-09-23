@@ -483,10 +483,10 @@ export class SideFiltersComponent implements OnInit {
         const queryBuilder = new RequestQueryBuilder();
 
         // apply filters
-        const filters = _.chain(fields)
-            .get('filter.filters', [])
-            .filter('filter')
-            .value();
+        const filters = _.filter(
+            _.get(fields, 'filter.filters', []),
+            'filter'
+        );
         const filterOperator = _.get(fields, 'filter.operator', RequestFilterOperator.AND);
 
         // set operator
@@ -994,10 +994,10 @@ export class SideFiltersComponent implements OnInit {
         });
 
         // apply sort
-        const sorts = _.chain(fields)
-            .get('sortBy.items', [])
-            .filter('sort')
-            .value();
+        const sorts = _.filter(
+            _.get(fields, 'sortBy.items', []),
+            'sort'
+        );
 
         // set sort by fields
         const objectDetailsSort: {
