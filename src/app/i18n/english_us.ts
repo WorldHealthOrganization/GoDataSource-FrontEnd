@@ -63,7 +63,9 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION': 'Area',
         'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS': 'Vaccines received',
-
+        'LNG_CASE_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ( {{exposureName}} )',
+        'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS': 'Pregnancy status',
+        'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION': '',
 
         /**
          * uiImportData
@@ -81,17 +83,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_SUCCESS_MSG': 'Final status updated for {{count}} contact(s)',
 
         /**
-         * uiCaseFields
-         */
-        'LNG_CASE_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ( {{exposureName}} )',
-        'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS': 'Pregnancy status',
-        'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION': '',
-
-        /**
          * uiContactFields
          */
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ( {{exposureName}} )',
         'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS': 'Vaccines received',
+        'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS': 'Pregnancy status',
+        'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION': '',
 
         /**
          * uiGlobalFilterFields

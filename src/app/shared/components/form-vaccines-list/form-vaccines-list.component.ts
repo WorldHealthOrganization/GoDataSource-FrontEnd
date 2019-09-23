@@ -60,7 +60,5 @@ export class FormVaccinesListComponent extends ListBase<VaccineModel> implements
 
         this.vaccinesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES);
         this.vaccinesStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES_STATUS);
-
     }
-
 }

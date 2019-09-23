@@ -34,6 +34,7 @@
                     [name]="name + '[' + i + ']' + '[date]'"
                     [(ngModel)]="vaccine.date"
                     [maxDate]="serverToday"
+                    [dateSameOrBefore]="serverToday"
                     app-date-validator
                     [placeholder]="'LNG_ENTITY_FIELD_LABEL_VACCINE_DATE'| translate"
                     (optionChanged)="onChange(false)"
