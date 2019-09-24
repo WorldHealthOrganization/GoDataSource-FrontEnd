@@ -9,6 +9,12 @@ import { moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { VaccineModel } from './vaccine.model';
 
+export interface IFollowUpHistory {
+    startDate: string;
+    endDate: string;
+    status: string;
+}
+
 export class ContactModel extends BaseModel {
     id: string;
     firstName: string;
@@ -37,6 +43,8 @@ export class ContactModel extends BaseModel {
         status: string
     };
 
+    followUpHistory: IFollowUpHistory[];
+
     dob: string;
     age: AgeModel;
 
@@ -60,7 +68,7 @@ export class ContactModel extends BaseModel {
         this.outbreakId = _.get(data, 'outbreakId');
         this.documents = _.get(data, 'documents', []);
         this.dateBecomeCase = _.get(data, 'dateBecomeCase');
-        this.wasCase = _.get(data, 'wasCase', []);
+        this.wasCase = _.get(data, 'wasCase', false);
 
         this.dob = _.get(data, 'dob');
         this.age = new AgeModel(_.get(data, 'age'));
@@ -89,6 +97,7 @@ export class ContactModel extends BaseModel {
         this.visualId = _.get(data, 'visualId', '');
 
         this.followUp = _.get(data, 'followUp', {});
+        this.followUpHistory = _.get(data, 'followUpHistory', []);
 
         this.inconsistencies = _.get(data, 'inconsistencies', []);
         _.each(this.inconsistencies, (inconsistency, index) => {
