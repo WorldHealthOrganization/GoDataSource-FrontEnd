@@ -6,8 +6,6 @@
             class="page-section"
             fxLayout="column"
         >
-            <ng-content></ng-content>
-
             <div
                 *ngIf="questionsGroupedByCategory?.length > 0"
                 fxLayout="column" fxLayoutGap="40px"
@@ -35,7 +33,8 @@
                                 fxLayout="column">
 
                                 <!-- Questions and answers & remove buttons -->
-                                <div fxLayout="row">
+                                <div fxLayout="row"
+                                >
                                     <!-- Questions and answers -->
                                     <div fxFlex [fxLayout]="question.multiAnswer ? 'column' : 'row'">
 
@@ -89,7 +88,7 @@
                                                     [ngModel]="answerData.date"
                                                     [placeholder]="'LNG_QUESTIONNAIRE_LABEL_MULTI_ANSWER_DATE' | translate"
                                                     [required]="!!answerData.value"
-                                                    [disabled]="disabled"
+                                                    [disabled]="disabled || question.inactive"
                                                     (optionChanged)="changedAnswerDate(answerData, $event)"
                                                     app-date-validator>
                                                 </app-form-datepicker>
@@ -109,7 +108,8 @@
                                             </div>
 
                                             <!-- Answer -->
-                                            <div fxFlex fxLayout="column">
+                                            <div fxFlex fxLayout="column"
+                                            >
                                                 <div fxLayout="row" fxLayoutGap="5px">
                                                     <!-- Free Text -->
                                                     <app-form-input
@@ -120,7 +120,7 @@
                                                         (optionChanged)="textValueChanged(question.answerType, answerData, $event)"
                                                         [placeholder]="(question.answerType === Constants.ANSWER_TYPES.NUMERIC.value ? 'LNG_QUESTIONNAIRE_LABEL_WRITE_NUMERIC_ANSWER' : 'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER') | translate"
                                                         [required]="!skipRequired && question.required"
-                                                        [disabled]="disabled"
+                                                        [disabled]="disabled || question.inactive"
                                                         [type]="question.answerType === Constants.ANSWER_TYPES.NUMERIC.value ? 'number' : 'text'">
                                                     </app-form-input>
 
@@ -132,7 +132,7 @@
                                                         [(ngModel)]="answerData.value"
                                                         [placeholder]="'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE' | translate"
                                                         [required]="!skipRequired && question.required"
-                                                        [disabled]="disabled"
+                                                        [disabled]="disabled || question.inactive"
                                                         (optionChanged)="onChange()"
                                                         app-date-validator>
                                                     </app-form-datepicker>
@@ -150,7 +150,7 @@
                                                         optionValueKey="value"
                                                         [multiple]="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value"
                                                         (optionChanged)="selectedDropdownAnswer(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex), $event)"
-                                                        [disabled]="disabled">
+                                                        [disabled]="disabled || question.inactive">
                                                     </app-form-select>
 
                                                     <!-- Upload File -->
@@ -162,6 +162,7 @@
                                                             #importDataBtn
                                                             type="file"
                                                             ng2FileSelect
+                                                            [disabled]="question.inactive"
                                                             [uploader]="uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploader"/>
                                                         <div
                                                             fxFlex fxLayout="row" fxLayoutGap="20px">
@@ -217,7 +218,7 @@
                                                                     mat-raised-button
                                                                     color="primary"
                                                                     (click)="importAttachment(importDataBtn, fileHiddenInput)"
-                                                                    [disabled]="uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploading">
+                                                                    [disabled]="uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploading || question.inactive">
                                                                     {{ (answerData.value ? 'LNG_QUESTIONNAIRE_BUTTON_REPLACE' : 'LNG_QUESTIONNAIRE_BUTTON_BROWSE') | translate }}
                                                                 </button>
                                                             </div>
@@ -261,7 +262,7 @@
                                             [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                             [ngModel]="value"
                                             [questions]="additionalQuestions[question.variable][answer]"
-                                            [disabled]="disabled"
+                                            [disabled]="disabled || question.inactive"
                                             [hideCategories]="true"
                                             (changed)="onChange(false)"
                                             (groupValidated)="validateGroup()"
