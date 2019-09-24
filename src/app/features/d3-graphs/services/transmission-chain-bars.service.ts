@@ -1396,7 +1396,7 @@ export class TransmissionChainBarsService {
      */
     private centerNameToCompareValue(centerName): string {
         return centerName ?
-            centerName.trim().toLowerCase().replace(/\s\s+/g, ' ') :
+            centerName.trim().toLowerCase().replace(/[^a-z0-9\s]/gi, '').replace(/\s\s+/g, ' ') :
             centerName;
     }
 }
