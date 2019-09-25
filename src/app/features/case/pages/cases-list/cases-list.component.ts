@@ -118,7 +118,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         new LabelValuePair('LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE', 'isDateOfOnsetApproximate'),
         new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME', 'dateOfOutcome'),
         new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE', 'dateBecomeCase'),
-        new LabelValuePair('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS', 'dateRanges'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_RANGES', 'dateRanges'),
         new LabelValuePair('LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers'),
         new LabelValuePair('LNG_CASE_FIELD_LABEL_TYPE', 'type'),
         new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),

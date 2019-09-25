@@ -51,7 +51,7 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
         questionnaireAnswers: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
         'addresses[]': 'LNG_CASE_FIELD_LABEL_ADDRESSES',
         'documents[]': 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
-        'dateRanges[]': 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS',
+        'dateRanges[]': 'LNG_CASE_FIELD_LABEL_DATE_RANGES',
         'vaccinesReceived[]': 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED'
     };
 
