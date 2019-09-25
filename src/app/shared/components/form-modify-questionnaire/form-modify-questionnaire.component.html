@@ -413,7 +413,7 @@
                                     mat-flat-button color="accent"
                                     class="modify-questionnaire-more-left"
                                     (click)="addNewAnswer()"
-                                    [disabled]="savingData || questionAnswerIndexInEditMode !== null || question.inactive">
+                                    [disabled]="savingData || questionAnswerIndexInEditMode !== null">
                                     {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW'| translate }}
                                 </button>
                                 <button
@@ -421,7 +421,7 @@
                                     mat-flat-button color="accent"
                                     class="modify-questionnaire-more-right"
                                     [matMenuTriggerFor]="answersMenu"
-                                    [disabled]="savingData || questionAnswerIndexInEditMode !== null || question.inactive">
+                                    [disabled]="savingData || questionAnswerIndexInEditMode !== null">
                                     <span class="xt-icon expand">thinArrowDown</span>
                                 </button>
 
@@ -431,7 +431,6 @@
                                     <button
                                         mat-menu-item
                                         type="button"
-                                        [disabled]="question.inactive"
                                         (click)="addNewAnswer(0)">
                                         {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW_TOP' | translate }}
                                     </button>
@@ -439,7 +438,6 @@
                                     <button
                                         mat-menu-item
                                         type="button"
-                                        [disabled]="question.inactive"
                                         (click)="addMoveQuestionAnswerPosition()">
                                         {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW_AT_POSITION_X' | translate }}
                                     </button>
@@ -447,7 +445,6 @@
                                     <button
                                         mat-menu-item
                                         type="button"
-                                        [disabled]="question.inactive"
                                         (click)="addNewAnswer()">
                                         {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW_BOTTOM' | translate }}
                                     </button>

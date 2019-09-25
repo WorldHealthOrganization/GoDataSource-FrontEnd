@@ -233,14 +233,6 @@ export class DialogService {
             );
         }
 
-        // add custom fields to dialog
-        if (data.extraDialogFields) {
-            fieldsList = [
-                ...fieldsList,
-                ...data.extraDialogFields
-            ];
-        }
-
         // add field for use question variable
         if (data.displayUseQuestionVariable) {
             fieldsList.push(
@@ -251,6 +243,14 @@ export class DialogService {
                     description: data.useQuestionVariableDescription
                 })
             );
+        }
+
+        // add custom fields to dialog
+        if (data.extraDialogFields) {
+            fieldsList = [
+                ...fieldsList,
+                ...data.extraDialogFields
+            ];
         }
 
         // construct query builder

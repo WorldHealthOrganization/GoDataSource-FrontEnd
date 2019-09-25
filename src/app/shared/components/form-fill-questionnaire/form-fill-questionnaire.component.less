@@ -22,6 +22,14 @@ app-form-fill-questionnaire {
     .questionnaire-category-question {
         padding: 2px 20px;
 
+        .question-is-inactive {
+            background-image: url('/assets/images/inactive.png');
+            background-repeat: repeat-y;
+            background-blend-mode: luminosity;
+            background-size: cover;
+            color: #AAA;
+        }
+
         &:nth-child(odd) {
             background-color: @color-gray-background;
 
