@@ -52,7 +52,7 @@ export class ImportContactDataComponent implements OnInit, OnDestroy {
         'addresses[]': 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
         'documents[]': 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS',
         'relationship.persons[]': 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP_PERSONS',
-        'vaccinesReceived[]': 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED'
+        'vaccinesReceived[]': 'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED'
     };
 
     requiredDestinationFields = [
