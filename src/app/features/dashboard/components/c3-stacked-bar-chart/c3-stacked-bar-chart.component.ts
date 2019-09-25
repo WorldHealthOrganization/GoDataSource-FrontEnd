@@ -125,8 +125,8 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
                 }
             },
             padding: {
-                left: 20,
-                right: 20
+                left: 25,
+                right: 25
             },
             color: {
                 pattern: this.colorPattern

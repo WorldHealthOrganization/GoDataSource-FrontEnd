@@ -21,6 +21,8 @@ import { By } from '@angular/platform-browser';
 import { moment } from '../../../../../core/helperClasses/x-moment';
 import { RelationshipDataService } from '../../../../../core/services/data/relationship.data.service';
 import { RelationshipDataServiceMock } from '../../../../../core/services/data/relationship.data.service.spec';
+import { I18nServiceMock } from '../../../../../core/services/helper/i18n.service.spec';
+import { I18nService } from '../../../../../core/services/helper/i18n.service';
 
 describe('ContactChronology', () => {
     const date = moment();
@@ -99,7 +101,7 @@ describe('ContactChronology', () => {
         dateOfLastContact: date,
     });
 
-    const contactChronology = ContactChronology.getChronologyEntries(contact, followUps);
+    const contactChronology = ContactChronology.getChronologyEntries(I18nServiceMock as any, contact, followUps);
 
     // Conversion tests
     describe('Conversion tests', () => {
@@ -140,6 +142,7 @@ describe('ContactChronology', () => {
             {provide: OutbreakDataService, useValue: OutbreakDataServiceMock},
             {provide: ContactDataService, useValue: ContactDataServiceMock},
             {provide: FollowUpsDataService, useValue: FollowUpsDataServiceMock},
+            {provide: I18nService, useValue: I18nServiceMock},
             {provide: RelationshipDataService, useValue: RelationshipDataServiceMock},
         ]);
 
@@ -166,6 +169,7 @@ describe('ContactChronology', () => {
             const contactData: ContactModel = getObserverData(await ContactDataServiceMock.getContact(OutbreakDataServiceMock.selectedOutbreakId, ContactDataServiceMock.selectedContactId));
             const followUpsData: FollowUpModel[] = getObserverData(await FollowUpsDataServiceMock.getContactFollowUpsList(OutbreakDataServiceMock.selectedOutbreakId, contactData.id));
             let expectedChronologyItems = ContactChronology.getChronologyEntries(
+                I18nServiceMock as any,
                 contactData,
                 followUpsData
             );

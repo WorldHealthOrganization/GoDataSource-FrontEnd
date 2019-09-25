@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import * as c3 from 'c3';
+import { FormatFunction } from 'c3';
 
 @Component({
     selector: 'app-c3-combination-stacked-bar-chart',
@@ -12,7 +13,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
     @Input() chartData;
     @Input() chartDataColumns;
     @Input() chartDataCategories;
-    @Input() showLabels: boolean = false;
+    @Input() showLabels: boolean | { format: FormatFunction } | { format: { [key: string]: boolean | FormatFunction } } = false;
     @Input() xLabel: string = '';
     @Input() yLabel: string = '';
     @Input() y2Label: string = '';
@@ -146,8 +147,8 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
                 }
             },
             padding: {
-                left: 20,
-                right: 20
+                left: 25,
+                right: 25
             },
             color: {
                 pattern: this.colorPattern
