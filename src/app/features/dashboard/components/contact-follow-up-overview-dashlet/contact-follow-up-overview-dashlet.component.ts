@@ -10,6 +10,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { MetricContactsFollowedUpReportModel } from '../../../../core/models/metrics/metric-contacts-followed-up-report.model';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { FormatFunction } from 'c3';
 
 @Component({
     selector: 'app-contact-follow-up-overview-dashlet',
@@ -24,6 +25,8 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
     lineData: any = '';
     viewType = Constants.EPI_CURVE_VIEW_TYPE.MONTH.value;
     colorPattern: string[] = [];
+
+    showLabels: { format: { [key: string]: boolean | FormatFunction } };
 
     // constants
     Constants = Constants;
@@ -130,6 +133,18 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
         const followedUpTranslated = this.i18nService.instant('LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_FOLLOWED_UP_LABEL');
         const notFollowedUpTranslated = this.i18nService.instant('LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_NOT_FOLLOWED_UP_LABEL');
         const percentageTranslated = this.i18nService.instant('LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_NOT_PERCENTAGE_LABEL');
+
+        // set label renderer
+        this.showLabels = {
+            format: {
+                [followedUpTranslated]: (v: number): string => {
+                    return v.toString();
+                },
+                [notFollowedUpTranslated]: (v: number): string => {
+                    return v.toString();
+                }
+            }
+        };
 
         // build chart data
         _.forEach(metricData, (metric) => {

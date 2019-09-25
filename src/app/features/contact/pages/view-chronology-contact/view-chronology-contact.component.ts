@@ -13,6 +13,7 @@ import { ContactChronology } from './typings/contact-chronology';
 import { forkJoin } from 'rxjs/index';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-view-chronology-contact',
@@ -33,7 +34,8 @@ export class ViewChronologyContactComponent implements OnInit {
         private contactDataService: ContactDataService,
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
-        private relationshipDataService: RelationshipDataService
+        private relationshipDataService: RelationshipDataService,
+        private i18nService: I18nService
     ) {}
 
     ngOnInit() {
@@ -84,7 +86,7 @@ export class ViewChronologyContactComponent implements OnInit {
                                     .getFollowUpsList(selectedOutbreak.id, qb)
                             ).subscribe(([relationshipsData, followUps]: [RelationshipModel[], FollowUpModel[]]) => {
                                 // set data
-                                this.chronologyEntries = ContactChronology.getChronologyEntries(this.contactData, followUps, relationshipsData);
+                                this.chronologyEntries = ContactChronology.getChronologyEntries(this.i18nService, this.contactData, followUps, relationshipsData);
                             });
 
                         });
