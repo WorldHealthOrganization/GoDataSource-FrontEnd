@@ -638,8 +638,22 @@ export class ImportDataComponent implements OnInit {
                             );
                         } else {
                             // NOT FOUND
-                            // search though flat values - for arrays
+                            // check if parent key should be translated
+                            // IMPORTANT: for now this is done only on the first level & for arrays of objects, checking recursively will put even more pressure on performance
+                            const parentKey: string = parentPath ? parentPath.split('.').pop() : null;
                             if (
+                                parentKey &&
+                                this.fieldsWithoutTokens &&
+                                this.fieldsWithoutTokens[parentKey] &&
+                                (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(this.fieldsWithoutTokens[parentKey])}[].${this.i18nService.instant(value)}`).toLowerCase()])
+                            ) {
+                                pushNewMapField(
+                                    `${parentPath}.${property}`,
+                                    mappedHeaderObj.value
+                                );
+
+                            // search though flat values - for arrays
+                            } else if (
                                 mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}[1]`).toLowerCase()] ||
                                 mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[1]`).toLowerCase()]
                             ) {
