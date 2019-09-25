@@ -141,7 +141,6 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         _.each(questions, (question: QuestionModel) => {
             // ignore inactive questions
             // if (question.inactive) {
-                console.log(question);
                 // jump over this question
                 // return;
             // }
