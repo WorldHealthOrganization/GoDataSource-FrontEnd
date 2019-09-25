@@ -36,6 +36,7 @@
 
                                 <!-- Questions and answers & remove buttons -->
                                 <div fxLayout="row"
+                                     [ngClass]="{'question-is-inactive': question.inactive}"
                                 >
                                     <!-- Questions and answers -->
                                     <div fxFlex [fxLayout]="question.multiAnswer ? 'column' : 'row'">
@@ -69,6 +70,7 @@
                                                 <button
                                                     mat-raised-button color="accent"
                                                     type="button"
+                                                    [disabled]="question.inactive"
                                                     (click)="addMultiAnswer(question.variable)">
                                                     {{'LNG_QUESTIONNAIRE_BUTTON_ADD_MULTI_ANSWER' | translate}}
                                                 </button>

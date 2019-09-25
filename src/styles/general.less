@@ -245,9 +245,12 @@ html, body, ul, li, div, span {
         display: inline-block;
     }
 
-    .inactive-question {
-        pointer-events: none;
-        opacity: 0.5;
+    .question-is-inactive {
+        background-image: url('/assets/images/inactive.png');
+        background-repeat: repeat-y;
+        background-blend-mode: luminosity;
+        background-size: cover;
+        color: #AAA;
     }
 }
 
