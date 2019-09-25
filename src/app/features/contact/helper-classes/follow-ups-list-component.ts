@@ -287,6 +287,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayUseQuestionVariable: true,
             anonymizeFields: this.anonymizeFields,
             exportStart: () => {
                 this.showLoadingDialog();
