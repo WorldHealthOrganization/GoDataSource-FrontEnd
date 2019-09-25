@@ -640,13 +640,15 @@ export class ImportDataComponent implements OnInit {
                             // NOT FOUND
                             // search though flat values - for arrays
                             if (
-                                (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[1]`).toLowerCase()])
+                                mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}[1]`).toLowerCase()] ||
+                                mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[1]`).toLowerCase()]
                             ) {
                                 // map all determined levels
                                 _.each(
                                     this.possibleSourceDestinationLevels,
                                     (supportedLevel: LabelValuePair) => {
                                         if (
+                                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()]) ||
                                             (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()])
                                         ) {
                                             // create object

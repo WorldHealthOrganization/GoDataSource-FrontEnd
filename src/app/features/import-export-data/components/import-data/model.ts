@@ -93,7 +93,9 @@ export class ImportableFileModel {
         } = {}
     ) {
         this.id = _.get(data, 'id');
-        this.fileHeaders = _.get(data, 'fileHeaders', []);
+        this.fileHeaders = (_.get(data, 'fileHeaders', []) || []).map((value: any) => {
+            return typeof value === 'string' ? value : value.toString();
+        });
         this.modelProperties = _.get(data, 'modelProperties', {});
         this.modelPropertyValues = _.get(data, 'modelPropertyValues', {});
         this.suggestedFieldMapping = _.get(data, 'suggestedFieldMapping', {});
