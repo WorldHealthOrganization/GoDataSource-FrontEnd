@@ -100,6 +100,7 @@
                                                         class="copy-field-button"
                                                         type="button"
                                                         mat-icon-button
+                                                        [disabled]="question.inactive"
                                                         [title]="'LNG_QUESTIONNAIRE_LABEL_MULTI_ANSWER_COPY_DATE_DESCRIPTION' | translate"
                                                         (click)="triggerCopyDate(answerData.date)">
                                                         <span class="xt-icon">fileCopy</span>
@@ -184,6 +185,7 @@
                                                                     [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                                                     [placeholder]="'LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE' | translate"
                                                                     [ngModel]="answerData.value"
+                                                                    [disabled]="question.inactive"
                                                                     [required]="uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploading || (!skipRequired && question.required)">
                                                                 </app-form-hidden-input>
                                                             </div>
@@ -194,6 +196,7 @@
                                                                 <button
                                                                     type="button"
                                                                     mat-raised-button
+                                                                    [disabled]="question.inactive"
                                                                     (click)="downloadAttachment(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex))">
                                                                     {{ 'LNG_QUESTIONNAIRE_BUTTON_DOWNLOAD' | translate }}
                                                                 </button>
@@ -205,6 +208,7 @@
                                                                 <button
                                                                     type="button"
                                                                     mat-raised-button
+                                                                    [disabled]="question.inactive"
                                                                     (click)="removeAttachment(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex), importDataBtn, fileHiddenInput)">
                                                                     {{ 'LNG_QUESTIONNAIRE_BUTTON_REMOVE' | translate }}
                                                                 </button>
@@ -237,6 +241,7 @@
                                             *ngIf="value[question.variable].length > 1"
                                             type="button"
                                             mat-icon-button
+                                            [disabled]="question.inactive"
                                             class="questionnaire-category-question-remove-btn"
                                             (click)="removeMultiAnswer(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex))">
                                             <span class="xt-icon">delete</span>
