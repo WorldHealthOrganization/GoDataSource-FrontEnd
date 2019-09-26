@@ -98,7 +98,7 @@
                                                 <div
                                                     fxFlex="40px">
                                                     <button
-                                                        *ngIf="answerData.date || !question.inactive"
+                                                        *ngIf="answerData.date && !question.inactive"
                                                         class="copy-field-button"
                                                         type="button"
                                                         mat-icon-button
@@ -163,7 +163,6 @@
                                                             #importDataBtn
                                                             type="file"
                                                             ng2FileSelect
-                                                            [disabled]="question.inactive"
                                                             [uploader]="uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploader"/>
                                                         <div
                                                             fxFlex fxLayout="row" fxLayoutGap="20px">
@@ -201,26 +200,25 @@
                                                             </div>
 
                                                             <div
-                                                                *ngIf="!disabled && answerData.value"
+                                                                *ngIf="(!disabled && answerData.value) || !question.inactive"
                                                                 fxFlex="90px">
                                                                 <button
                                                                     type="button"
                                                                     mat-raised-button
-                                                                    [disabled]="question.inactive"
                                                                     (click)="removeAttachment(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex), importDataBtn, fileHiddenInput)">
                                                                     {{ 'LNG_QUESTIONNAIRE_BUTTON_REMOVE' | translate }}
                                                                 </button>
                                                             </div>
 
                                                             <div
-                                                                *ngIf="!disabled"
+                                                                *ngIf="!disabled && question.inactive"
                                                                 fxFlex="90px">
                                                                 <button
                                                                     type="button"
                                                                     mat-raised-button
                                                                     color="primary"
                                                                     (click)="importAttachment(importDataBtn, fileHiddenInput)"
-                                                                    [disabled]="uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploading || question.inactive">
+                                                                    [disabled]="uploadersData[question.variable][(childValueIndex === undefined ? answerDataIndex : childValueIndex)].uploading">
                                                                     {{ (answerData.value ? 'LNG_QUESTIONNAIRE_BUTTON_REPLACE' : 'LNG_QUESTIONNAIRE_BUTTON_BROWSE') | translate }}
                                                                 </button>
                                                             </div>
@@ -236,7 +234,7 @@
                                         *ngIf="!disabled && question.multiAnswer"
                                         fxFlex="48px" fxLayout="column" fxLayoutAlign="end">
                                         <button
-                                            *ngIf="value[question.variable].length > 1 || !question.inactive"
+                                            *ngIf="value[question.variable].length > 1 && !question.inactive"
                                             type="button"
                                             mat-icon-button
                                             class="questionnaire-category-question-remove-btn"
