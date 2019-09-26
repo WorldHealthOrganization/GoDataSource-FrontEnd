@@ -190,15 +190,27 @@
                     </div>
 
                     <div
-                        fxFlex="70px">
-                        <button
-                            *ngIf="!item.readonly"
-                            mat-icon-button
-                            color="warn"
-                            (click)="removeFieldMap(indexMapField)"
-                            type="button">
-                            <span class="xt-icon">delete</span>
-                        </button>
+                        fxFlex="80px">
+                        <ng-container
+                            *ngIf="!item.readonly">
+                            <!-- Clone -->
+                            <button
+                                mat-icon-button
+                                color="accent"
+                                (click)="cloneFieldMap(indexMapField)"
+                                type="button">
+                                <span class="xt-icon">fileCopy</span>
+                            </button>
+
+                            <!-- Delete -->
+                            <button
+                                mat-icon-button
+                                color="warn"
+                                (click)="removeFieldMap(indexMapField)"
+                                type="button">
+                                <span class="xt-icon">delete</span>
+                            </button>
+                        </ng-container>
                     </div>
                 </div>
                 <div

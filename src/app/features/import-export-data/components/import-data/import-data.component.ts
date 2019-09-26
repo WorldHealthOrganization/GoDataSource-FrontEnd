@@ -1147,6 +1147,20 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
+     * Clone field map
+     */
+    cloneFieldMap(index: number) {
+        this.mappedFields.splice(
+            index + 1,
+            0,
+            new ImportableMapField(
+                this.mappedFields[index].destinationField,
+                this.mappedFields[index].sourceField
+            )
+        );
+    }
+
+    /**
      * Remove field map option
      */
     removeOptionMap(indexMapField: number, indexMapOption: number) {
