@@ -286,7 +286,20 @@ export class ImportDataComponent implements OnInit {
         new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_4', 3),
         new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_5', 4),
         new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_6', 5),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_7', 6)
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_7', 6),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_8', 7),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_9', 8),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_10', 9),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_11', 10),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_12', 11),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_13', 12),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_14', 13),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_15', 14),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_16', 15),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_17', 16),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_18', 17),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_19', 18),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_20', 19)
     ];
 
     /**
