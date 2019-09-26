@@ -279,28 +279,7 @@ export class ImportDataComponent implements OnInit {
     /**
      * Source / Destination level value
      */
-    possibleSourceDestinationLevels: LabelValuePair[] = [
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_1', 0),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_2', 1),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_3', 2),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_4', 3),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_5', 4),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_6', 5),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_7', 6),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_8', 7),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_9', 8),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_10', 9),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_11', 10),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_12', 11),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_13', 12),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_14', 13),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_15', 14),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_16', 15),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_17', 16),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_18', 17),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_19', 18),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_20', 19)
-    ];
+    possibleSourceDestinationLevels: LabelValuePair[];
 
     /**
      * Mapped fields
@@ -415,6 +394,15 @@ export class ImportDataComponent implements OnInit {
     ngOnInit() {
         // get saved import mapping
         this.getImportMappings();
+
+        // init array levels
+        this.possibleSourceDestinationLevels = [];
+        for (let level = 0; level < 100; level++) {
+            this.possibleSourceDestinationLevels.push(new LabelValuePair(
+                (level + 1).toString(),
+                level
+            ));
+        }
 
         // init uploader
         this.uploader = new FileUploader({
