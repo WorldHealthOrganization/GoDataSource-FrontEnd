@@ -6,6 +6,7 @@ import { ImportDataExtension, ImportServerModelNames } from '../../components/im
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Constants } from '../../../../core/models/constants';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { QuestionModel } from '../../../../core/models/question.model';
 
 @Component({
     selector: 'app-import-case-lab-data',
@@ -54,6 +55,8 @@ export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
         'personId',
         'dateSampleTaken'
     ];
+
+    formatDataBeforeUse = QuestionModel.formatQuestionnaireImportDefs;
 
     /**
      * Constructor

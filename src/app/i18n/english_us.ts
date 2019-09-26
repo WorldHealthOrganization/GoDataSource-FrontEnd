@@ -74,6 +74,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_BUTTON_HIDE_ERR_RECORD_DETAILS': 'Hide details',
         'LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_FILE_TITLE': 'File input',
         'LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_MODEL_TITLE': 'Data to be saved in database',
+        'LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_DATE': 'Date',
+        'LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_VALUE': 'Value',
 
         /**
          * uiContactsListPage
@@ -150,6 +152,6 @@ export const EnglishUsLang = {
         /**
          * REMOVE the tokens from below
          */
-        // ...
+        // LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS
     }
 };

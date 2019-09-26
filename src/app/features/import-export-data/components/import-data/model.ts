@@ -90,7 +90,14 @@ export class ImportableFileModel {
         } = {},
         excludeDestinationProperties: {
             [property: string]: boolean
-        } = {}
+        } = {},
+        formatDataBeforeUse: (
+            modelProperties: ImportableFilePropertiesModel,
+            modelPropertyValues: ImportableFilePropertyValuesModel,
+            fieldsWithoutTokens: {
+                [property: string]: string
+            }
+        ) => void
     ) {
         this.id = _.get(data, 'id');
         this.fileHeaders = (_.get(data, 'fileHeaders', []) || []).map((value: any) => {
@@ -101,6 +108,16 @@ export class ImportableFileModel {
         this.suggestedFieldMapping = _.get(data, 'suggestedFieldMapping', {});
         this.distinctFileColumnValues = _.get(data, 'distinctFileColumnValues', {});
 
+        // format response
+        if (formatDataBeforeUse) {
+            formatDataBeforeUse(
+                this.modelProperties,
+                this.modelPropertyValues,
+                fieldsWithoutTokens
+            );
+        }
+
+        // map file headers
         this.fileHeadersKeyValue = _.chain(this.fileHeaders)
             .map((value: string) => {
                 return new ImportableLabelValuePair(

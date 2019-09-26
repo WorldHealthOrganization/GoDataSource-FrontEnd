@@ -6,6 +6,7 @@ import { ImportDataExtension, ImportServerModelNames } from '../../components/im
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Constants } from '../../../../core/models/constants';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { QuestionModel } from '../../../../core/models/question.model';
 
 @Component({
     selector: 'app-import-case-data',
@@ -61,6 +62,8 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
         'classification',
         'dateOfOnset'
     ];
+
+    formatDataBeforeUse = QuestionModel.formatQuestionnaireImportDefs;
 
     /**
      * Constructor

@@ -47,7 +47,6 @@ export class ImportContactDataComponent implements OnInit, OnDestroy {
     ImportServerModelNames = ImportServerModelNames;
 
     fieldsWithoutTokens = {
-        questionnaireAnswers: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
         relationship: 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP',
         'addresses[]': 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
         'documents[]': 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS',

@@ -2,6 +2,7 @@
 import * as _ from 'lodash';
 import { Constants } from './constants';
 import { Moment } from '../helperClasses/x-moment';
+import { ImportableFilePropertiesModel, ImportableFilePropertyValuesModel } from '../../features/import-export-data/components/import-data/model';
 
 export interface IAnswerData {
     date?: string | Moment;
@@ -150,6 +151,48 @@ export class QuestionModel {
 
         // finished
         return alertQuestionAnswers;
+    }
+
+    /**
+     * Used to format questionnaire properties before we use them to map and import data
+     * @param modelProperties
+     * @param modelPropertyValues
+     */
+    static formatQuestionnaireImportDefs(
+        modelProperties: ImportableFilePropertiesModel,
+        modelPropertyValues: ImportableFilePropertyValuesModel,
+        fieldsWithoutTokens: {
+            [property: string]: string
+        }
+    ) {
+        // prepare questionnaire answers to be displayed properly by import system
+        if (modelProperties.questionnaireAnswers) {
+            const oldModelProperties: any = modelProperties.questionnaireAnswers;
+            modelProperties.questionnaireAnswers = {};
+            _.each(oldModelProperties, (answerLabel: string, variable: string) => {
+                // map questionnaire answer to object with date & value properties
+                modelProperties.questionnaireAnswers[`${variable}[]`] = {
+                    value: 'LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_VALUE',
+                    date: 'LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_DATE'
+                };
+
+                // add parent object name
+                if (!fieldsWithoutTokens[`questionnaireAnswers.${variable}[]`]) {
+                    fieldsWithoutTokens[`questionnaireAnswers.${variable}[]`] = answerLabel;
+                }
+            });
+        }
+
+        // prepare questionnaire answers dropdown possible values
+        if (modelPropertyValues.questionnaireAnswers) {
+            const oldModelPropertyValues: any = modelPropertyValues.questionnaireAnswers;
+            modelPropertyValues.questionnaireAnswers = {};
+            _.each(oldModelPropertyValues, (dropdownOptions: any, variable: string) => {
+                modelPropertyValues.questionnaireAnswers[`${variable}[]`] = {
+                    value: dropdownOptions
+                };
+            });
+        }
     }
 
     /**

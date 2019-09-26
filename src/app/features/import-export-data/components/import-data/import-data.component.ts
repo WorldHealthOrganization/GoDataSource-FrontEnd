@@ -3,7 +3,7 @@ import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { environment } from '../../../../../environments/environment';
-import { ImportableFileModel, ImportableFilePropertiesModel, ImportableLabelValuePair, ImportableMapField } from './model';
+import { ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField } from './model';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -258,6 +258,18 @@ export class ImportDataComponent implements OnInit {
      * Alis under which we upload the file
      */
     @Input() fileUploadAlias: string;
+
+    /**
+     * Callback called after we receive model definitions from api
+     *  - through this callback we can alter the api response
+     */
+    @Input() formatDataBeforeUse: (
+        modelProperties: ImportableFilePropertiesModel,
+        modelPropertyValues: ImportableFilePropertyValuesModel,
+        fieldsWithoutTokens: {
+            [property: string]: string
+        }
+    ) => void;
 
     /**
      * Keep all file data ( header columns, module information, drop-down options etc )
@@ -518,7 +530,8 @@ export class ImportDataComponent implements OnInit {
                         return this.i18nService.instant(token);
                     },
                     this.fieldsWithoutTokens,
-                    this.excludeDestinationProperties
+                    this.excludeDestinationProperties,
+                    this.formatDataBeforeUse
                 );
 
                 // we should have at least the headers of the file
