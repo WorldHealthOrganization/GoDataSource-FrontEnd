@@ -96,6 +96,9 @@ export class ImportableFileModel {
             modelPropertyValues: ImportableFilePropertyValuesModel,
             fieldsWithoutTokens: {
                 [property: string]: string
+            },
+            suggestedFieldMapping: {
+                [fileHeader: string]: string
             }
         ) => void
     ) {
@@ -113,7 +116,8 @@ export class ImportableFileModel {
             formatDataBeforeUse(
                 this.modelProperties,
                 this.modelPropertyValues,
-                fieldsWithoutTokens
+                fieldsWithoutTokens,
+                this.suggestedFieldMapping
             );
         }
 

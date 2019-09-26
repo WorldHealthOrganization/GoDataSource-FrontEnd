@@ -163,8 +163,23 @@ export class QuestionModel {
         modelPropertyValues: ImportableFilePropertyValuesModel,
         fieldsWithoutTokens: {
             [property: string]: string
+        },
+        suggestedFieldMapping: {
+            [fileHeader: string]: string
         }
     ) {
+        // remap questionnaire answers api suggested maps
+        if (suggestedFieldMapping) {
+            _.each(suggestedFieldMapping, (modelKey: string, fileKey: string) => {
+                if (
+                    modelKey.startsWith('questionnaireAnswers.') &&
+                    !modelKey.endsWith('[].value')
+                ) {
+                    suggestedFieldMapping[fileKey] = `${suggestedFieldMapping[fileKey]}[].value`;
+                }
+            });
+        }
+
         // prepare questionnaire answers to be displayed properly by import system
         if (modelProperties.questionnaireAnswers) {
             const oldModelProperties: any = modelProperties.questionnaireAnswers;

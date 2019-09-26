@@ -268,6 +268,9 @@ export class ImportDataComponent implements OnInit {
         modelPropertyValues: ImportableFilePropertyValuesModel,
         fieldsWithoutTokens: {
             [property: string]: string
+        },
+        suggestedFieldMapping: {
+            [fileHeader: string]: string
         }
     ) => void;
 
