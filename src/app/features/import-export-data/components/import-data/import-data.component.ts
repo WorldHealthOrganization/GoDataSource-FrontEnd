@@ -573,16 +573,51 @@ export class ImportDataComponent implements OnInit {
                 });
 
                 // do some multilevel mappings
+                interface IMappedHeader {
+                    value: string;
+                    level?: number;
+                }
                 const mappedHeaders: {
-                    [key: string]: {
-                        value: string
-                    }
+                    [key: string]: IMappedHeader[]
                 } = {};
                 _.each(this.importableObject.fileHeaders, (fHeader: string) => {
-                    mappedHeaders[_.camelCase(fHeader).toLowerCase()] = {
-                        value: fHeader
-                    };
+                    // determine if this is a multi level header
+                    const fHeaderMultiLevelData = /\s+\[((MD)|(MV))\s+(\d+)\]$/g.exec(fHeader);
+                    let mapKey: string;
+                    let level: number;
+                    if (fHeaderMultiLevelData) {
+                        // value / date ?
+                        mapKey = fHeaderMultiLevelData[1] === 'MD' ?
+                            `${fHeader.substring(0, fHeaderMultiLevelData.index)}.${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_DATE')}` :
+                            `${fHeader.substring(0, fHeaderMultiLevelData.index)}.${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_VALUE')}`;
+
+                        // set level
+                        level = _.parseInt(fHeaderMultiLevelData[4]);
+                    } else {
+                        mapKey = fHeader;
+                    }
+
+                    // add to mapped headers
+                    mapKey = _.camelCase(mapKey).toLowerCase();
+                    if (!mappedHeaders[mapKey]) {
+                        mappedHeaders[mapKey] = [];
+                    }
+
+                    // add the new option
+                    mappedHeaders[mapKey].push({
+                        value: fHeader,
+                        level: level - 1
+                    });
                 });
+
+                // sort map headers by their level since we will use the array index instead of the level provided by the file
+                _.each(mappedHeaders, (headers: IMappedHeader[]) => {
+                    headers.sort((h1: IMappedHeader, h2: IMappedHeader) => {
+                        return h1.level - h2.level;
+                    });
+                });
+
+                // map file headers with model properties
                 const mapToHeaderFile = (
                     value: string | ImportableFilePropertiesModel,
                     property: string,
@@ -601,49 +636,50 @@ export class ImportDataComponent implements OnInit {
                         // push new mapped field
                         const pushNewMapField = (
                             destination: string,
-                            source: string
-                        ): ImportableMapField | null => {
-                            // check identical maps...
-                            const itemExistsAlready = _.find(this.mappedFields, {
-                                destinationField: destination,
-                                sourceField: source
-                            }) !== undefined;
+                            sourceData: IMappedHeader[]
+                        ) => {
+                            // map all file levels
+                            (sourceData || []).forEach((source: IMappedHeader, level: number) => {
+                                // check identical maps...
+                                const foundModel: ImportableMapField = _.find(this.mappedFields, {
+                                    destinationField: destination,
+                                    sourceField: source.value
+                                });
 
-                            // ignore identical maps
-                            if (itemExistsAlready) {
-                                return null;
-                            }
+                                // ignore identical maps
+                                if (foundModel) {
+                                    return;
+                                }
 
-                            // allow other kinda.. duplicate maps that need to be solved by user
-                            // this should work for options mapping..in case you want to map different options from different properties
-                            // NOTHING
+                                // allow other kinda.. duplicate maps that need to be solved by user
+                                // this should work for options mapping..in case you want to map different options from different properties
+                                // NOTHING
 
-                            // create new possible map item
-                            const importableItem = new ImportableMapField(
-                                destination,
-                                source
-                            );
+                                // create new possible map item
+                                const importableItem = new ImportableMapField(
+                                    destination,
+                                    source.value
+                                );
 
-                            // add options if necessary
-                            this.addMapOptionsIfNecessary(importableItem);
+                                // add options if necessary
+                                this.addMapOptionsIfNecessary(importableItem);
 
-                            // do we need to make this one readonly ?
-                            if (mapOfRequiredDestinationFields[importableItem.destinationField]) {
-                                importableItem.readonly = true;
-                                delete mapOfRequiredDestinationFields[importableItem.destinationField];
-                            }
+                                // do we need to make this one readonly ?
+                                if (mapOfRequiredDestinationFields[importableItem.destinationField]) {
+                                    importableItem.readonly = true;
+                                    delete mapOfRequiredDestinationFields[importableItem.destinationField];
+                                }
 
-                            // add to list
-                            this.mappedFields.push(importableItem);
+                                // check if we need to set level
+                                importableItem.sourceDestinationLevel[0] = level;
 
-                            // finished
-                            return importableItem;
+                                // add to list
+                                this.mappedFields.push(importableItem);
+                            });
                         };
 
                         // found the language tokens
-                        let mappedHeaderObj: {
-                            value: string
-                        };
+                        let mappedHeaderObj: IMappedHeader[];
                         if (
                             (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}`).toLowerCase()]) ||
                             (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${property}`).toLowerCase()]) ||
@@ -651,7 +687,7 @@ export class ImportDataComponent implements OnInit {
                         ) {
                             pushNewMapField(
                                 `${parentPath}.${property}`,
-                                mappedHeaderObj.value
+                                mappedHeaderObj
                             );
                         } else {
                             // NOT FOUND
@@ -670,7 +706,7 @@ export class ImportDataComponent implements OnInit {
                             ) {
                                 pushNewMapField(
                                     `${parentPath}.${property}`,
-                                    mappedHeaderObj.value
+                                    mappedHeaderObj
                                 );
 
                             // search though flat values - for arrays
@@ -687,15 +723,10 @@ export class ImportDataComponent implements OnInit {
                                             (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()])
                                         ) {
                                             // create object
-                                            const pushedItem = pushNewMapField(
+                                            pushNewMapField(
                                                 `${parentPath}.${property}`,
-                                                mappedHeaderObj.value
+                                                mappedHeaderObj
                                             );
-
-                                            // did we succeed in creating the new object?
-                                            if (pushedItem) {
-                                                pushedItem.sourceDestinationLevel[0] = supportedLevel.value;
-                                            }
                                         } else {
                                             // there is no point going further
                                             return false;
