@@ -636,7 +636,8 @@ export class ImportDataComponent implements OnInit {
                         // push new mapped field
                         const pushNewMapField = (
                             destination: string,
-                            sourceData: IMappedHeader[]
+                            sourceData: IMappedHeader[],
+                            overwriteLevel?: number
                         ) => {
                             // map all file levels
                             (sourceData || []).forEach((source: IMappedHeader, level: number) => {
@@ -671,7 +672,7 @@ export class ImportDataComponent implements OnInit {
                                 }
 
                                 // check if we need to set level
-                                importableItem.sourceDestinationLevel[0] = level;
+                                importableItem.sourceDestinationLevel[0] = overwriteLevel !== undefined ? overwriteLevel : level;
 
                                 // add to list
                                 this.mappedFields.push(importableItem);
@@ -725,7 +726,8 @@ export class ImportDataComponent implements OnInit {
                                             // create object
                                             pushNewMapField(
                                                 `${parentPath}.${property}`,
-                                                mappedHeaderObj
+                                                mappedHeaderObj,
+                                                supportedLevel.value
                                             );
                                         } else {
                                             // there is no point going further
