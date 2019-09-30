@@ -1064,6 +1064,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
+            displayUseQuestionVariable: true,
             anonymizeFields: this.anonymizeFields,
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }

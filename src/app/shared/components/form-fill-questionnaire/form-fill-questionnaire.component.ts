@@ -139,12 +139,6 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         let currentCategory: QuestionGroup = null;
         let markupNo: number = 0;
         _.each(questions, (question: QuestionModel) => {
-            // ignore inactive questions
-            if (question.inactive) {
-                // jump over this question
-                return;
-            }
-
             // add file upload handler if necessary
             if (question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value) {
                 // create file uploader

@@ -6,8 +6,6 @@
             class="page-section"
             fxLayout="column"
         >
-            <ng-content></ng-content>
-
             <div
                 *ngIf="questionsGroupedByCategory?.length > 0"
                 fxLayout="column" fxLayoutGap="40px"
@@ -28,6 +26,8 @@
                             *ngFor="let question of categoryData.questions; let questionIndex = index"
                             [class]="question.answerType === Constants.ANSWER_TYPES.MARKUP.value ? 'questionnaire-category-question-markup' : 'questionnaire-category-question'"
                             fxLayout="column"
+                            [ngClass]="{'inactive-question-wrapper': question.inactive}"
+                            [fxShow]="!question.inactive || (value[question.variable] && value[question.variable][0]?.value)"
                         >
                             <!-- Go through each question answer -->
                             <div
@@ -35,7 +35,9 @@
                                 fxLayout="column">
 
                                 <!-- Questions and answers & remove buttons -->
-                                <div fxLayout="row">
+                                <div fxLayout="row"
+                                     [ngClass]="{'question-is-inactive': question.inactive}"
+                                >
                                     <!-- Questions and answers -->
                                     <div fxFlex [fxLayout]="question.multiAnswer ? 'column' : 'row'">
 
@@ -66,6 +68,7 @@
                                                 *ngIf="!disabled && question.multiAnswer && answerDataIndex < 1"
                                                 fxFlex="140px" fxLayout="row" fxLayoutAlign="end center">
                                                 <button
+                                                    *ngIf="!question.inactive"
                                                     mat-raised-button color="accent"
                                                     type="button"
                                                     (click)="addMultiAnswer(question.variable)">
@@ -89,7 +92,7 @@
                                                     [ngModel]="answerData.date"
                                                     [placeholder]="'LNG_QUESTIONNAIRE_LABEL_MULTI_ANSWER_DATE' | translate"
                                                     [required]="!!answerData.value"
-                                                    [disabled]="disabled"
+                                                    [disabled]="disabled || question.inactive"
                                                     (optionChanged)="changedAnswerDate(answerData, $event)"
                                                     app-date-validator>
                                                 </app-form-datepicker>
@@ -97,7 +100,7 @@
                                                 <div
                                                     fxFlex="40px">
                                                     <button
-                                                        *ngIf="answerData.date"
+                                                        *ngIf="answerData.date && !question.inactive"
                                                         class="copy-field-button"
                                                         type="button"
                                                         mat-icon-button
@@ -120,7 +123,7 @@
                                                         (optionChanged)="textValueChanged(question.answerType, answerData, $event)"
                                                         [placeholder]="(question.answerType === Constants.ANSWER_TYPES.NUMERIC.value ? 'LNG_QUESTIONNAIRE_LABEL_WRITE_NUMERIC_ANSWER' : 'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER') | translate"
                                                         [required]="!skipRequired && question.required"
-                                                        [disabled]="disabled"
+                                                        [disabled]="disabled || question.inactive"
                                                         [type]="question.answerType === Constants.ANSWER_TYPES.NUMERIC.value ? 'number' : 'text'">
                                                     </app-form-input>
 
@@ -132,7 +135,7 @@
                                                         [(ngModel)]="answerData.value"
                                                         [placeholder]="'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE' | translate"
                                                         [required]="!skipRequired && question.required"
-                                                        [disabled]="disabled"
+                                                        [disabled]="disabled || question.inactive"
                                                         (optionChanged)="onChange()"
                                                         app-date-validator>
                                                     </app-form-datepicker>
@@ -150,7 +153,7 @@
                                                         optionValueKey="value"
                                                         [multiple]="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value"
                                                         (optionChanged)="selectedDropdownAnswer(question.variable, (childValueIndex === undefined ? answerDataIndex : childValueIndex), $event)"
-                                                        [disabled]="disabled">
+                                                        [disabled]="disabled || question.inactive">
                                                     </app-form-select>
 
                                                     <!-- Upload File -->
@@ -199,7 +202,7 @@
                                                             </div>
 
                                                             <div
-                                                                *ngIf="!disabled && answerData.value"
+                                                                *ngIf="(!disabled && answerData.value) && !question.inactive"
                                                                 fxFlex="90px">
                                                                 <button
                                                                     type="button"
@@ -210,7 +213,7 @@
                                                             </div>
 
                                                             <div
-                                                                *ngIf="!disabled"
+                                                                *ngIf="!disabled && !question.inactive"
                                                                 fxFlex="90px">
                                                                 <button
                                                                     type="button"
@@ -233,7 +236,7 @@
                                         *ngIf="!disabled && question.multiAnswer"
                                         fxFlex="48px" fxLayout="column" fxLayoutAlign="end">
                                         <button
-                                            *ngIf="value[question.variable].length > 1"
+                                            *ngIf="value[question.variable].length > 1 && !question.inactive"
                                             type="button"
                                             mat-icon-button
                                             class="questionnaire-category-question-remove-btn"
@@ -261,7 +264,7 @@
                                             [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                             [ngModel]="value"
                                             [questions]="additionalQuestions[question.variable][answer]"
-                                            [disabled]="disabled"
+                                            [disabled]="disabled || question.inactive"
                                             [hideCategories]="true"
                                             (changed)="onChange(false)"
                                             (groupValidated)="validateGroup()"
