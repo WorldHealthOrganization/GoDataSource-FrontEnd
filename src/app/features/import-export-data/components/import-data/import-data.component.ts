@@ -557,72 +557,167 @@ export class ImportDataComponent implements OnInit {
                     return;
                 }
 
-                // populate deducted mappings
+                // required fields
                 const mapOfRequiredDestinationFields = this.requiredDestinationFieldsMap ? _.clone(this.requiredDestinationFieldsMap) : {};
-                _.each(this.importableObject.suggestedFieldMapping, (destinationField: string, sourceField: string) => {
-                    // create new possible map item
-                    const importableItem = new ImportableMapField(
-                        destinationField,
-                        sourceField
-                    );
-
-                    // add options if necessary
-                    this.addMapOptionsIfNecessary(importableItem);
-
-                    // do we need to make this one readonly ?
-                    if (mapOfRequiredDestinationFields[importableItem.destinationField]) {
-                        importableItem.readonly = true;
-                        delete mapOfRequiredDestinationFields[importableItem.destinationField];
-                    }
-
-                    // add to list
-                    this.mappedFields.push(importableItem);
-                });
 
                 // do some multilevel mappings
                 interface IMappedHeader {
                     value: string;
                     level?: number;
+                    subLevel?: number;
                 }
                 const mappedHeaders: {
                     [key: string]: IMappedHeader[]
                 } = {};
                 _.each(this.importableObject.fileHeaders, (fHeader: string) => {
                     // determine if this is a multi level header
-                    const fHeaderMultiLevelData = /\s+\[((MD)|(MV))\s+(\d+)\]$/g.exec(fHeader);
+                    const fHeaderMultiLevelData = /\s\[((MD)|(MV))\s+(\d+)\]$/g.exec(fHeader);
                     let mapKey: string;
                     let level: number;
+                    let fHeaderWithoutMultiLevel: string = fHeader;
+                    let addValue: boolean = true;
                     if (fHeaderMultiLevelData) {
                         // value / date ?
+                        fHeaderWithoutMultiLevel = fHeader.substring(0, fHeaderMultiLevelData.index);
                         mapKey = fHeaderMultiLevelData[1] === 'MD' ?
-                            `${fHeader.substring(0, fHeaderMultiLevelData.index)}.${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_DATE')}` :
-                            `${fHeader.substring(0, fHeaderMultiLevelData.index)}.${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_VALUE')}`;
+                            `${fHeaderWithoutMultiLevel}.${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_DATE')}` :
+                            `${fHeaderWithoutMultiLevel}.${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_VALUE')}`;
 
                         // set level
-                        level = _.parseInt(fHeaderMultiLevelData[4]);
+                        level = _.parseInt(fHeaderMultiLevelData[4]) - 1;
+
+                        // no need to add value anymore
+                        addValue = false;
                     } else {
                         mapKey = fHeader;
                     }
 
                     // add to mapped headers
-                    mapKey = _.camelCase(mapKey).toLowerCase();
-                    if (!mappedHeaders[mapKey]) {
-                        mappedHeaders[mapKey] = [];
+                    let mapKeyCamelCase: string = _.camelCase(mapKey).toLowerCase();
+                    if (!mappedHeaders[mapKeyCamelCase]) {
+                        mappedHeaders[mapKeyCamelCase] = [];
                     }
 
                     // add the new option
-                    mappedHeaders[mapKey].push({
+                    mappedHeaders[mapKeyCamelCase].push({
                         value: fHeader,
-                        level: level - 1
+                        level: level
                     });
+
+                    // add an extra map containing value since it might be a questionnaire answer
+                    let mapKeyCamelCaseWithValue: string;
+                    if (addValue) {
+                        mapKeyCamelCaseWithValue = _.camelCase(`${mapKey}.${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_VALUE')}`).toLowerCase();
+                        if (!mappedHeaders[mapKeyCamelCaseWithValue]) {
+                            mappedHeaders[mapKeyCamelCaseWithValue] = [];
+                        }
+
+                        // add the new option
+                        mappedHeaders[mapKeyCamelCaseWithValue].push({
+                            value: fHeader,
+                            level: level
+                        });
+                    }
+
+
+                    // do we need to add a more shorter version for determining headers ?
+                    // strip option numbers
+                    const stripEndingNumbers = /\s(\d+)$/g.exec(fHeaderWithoutMultiLevel);
+                    if (stripEndingNumbers) {
+                        // determine sub-level
+                        const subLevel: number = _.parseInt(stripEndingNumbers[1]) - 1;
+
+                        // remove index value
+                        mapKey = fHeaderWithoutMultiLevel.substring(0, stripEndingNumbers.index);
+                        mapKeyCamelCase = _.camelCase(mapKey).toLowerCase();
+                        mapKeyCamelCaseWithValue = _.camelCase(`${mapKey}.${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_VALUE')}`).toLowerCase();
+
+                        // determine if we need to add this one
+                        let canAdd: boolean = true;
+                        if (!mappedHeaders[mapKeyCamelCaseWithValue]) {
+                            mappedHeaders[mapKeyCamelCaseWithValue] = [];
+                        }
+                        if (!mappedHeaders[mapKeyCamelCase]) {
+                            mappedHeaders[mapKeyCamelCase] = [];
+                        } else {
+                            canAdd = !_.find(mappedHeaders[mapKeyCamelCase], {
+                                value: fHeader,
+                                level: _.isNumber(level) ? level : subLevel,
+                                subLevel: _.isNumber(level) ? subLevel : undefined
+                            });
+                        }
+
+                        // push the new possible map option
+                        if (canAdd) {
+                            mappedHeaders[mapKeyCamelCase].push({
+                                value: fHeader,
+                                level: _.isNumber(level) ? level : subLevel,
+                                subLevel: _.isNumber(level) ? subLevel : undefined
+                            });
+
+                            // add value
+                            mappedHeaders[mapKeyCamelCaseWithValue].push({
+                                value: fHeader,
+                                level: _.isNumber(level) ? level : subLevel,
+                                subLevel: _.isNumber(level) ? subLevel : undefined
+                            });
+                        }
+                    }
                 });
 
-                // sort map headers by their level since we will use the array index instead of the level provided by the file
-                _.each(mappedHeaders, (headers: IMappedHeader[]) => {
-                    headers.sort((h1: IMappedHeader, h2: IMappedHeader) => {
-                        return h1.level - h2.level;
+                // push new mapped field
+                let foundModel: ImportableMapField;
+                const pushNewMapField = (
+                    destination: string,
+                    sourceData: IMappedHeader[],
+                    overwriteLevel?: number
+                ) => {
+                    // map all file levels
+                    (sourceData || []).forEach((source: IMappedHeader) => {
+                        // check identical maps...
+                        foundModel = _.find(this.mappedFields, {
+                            destinationField: destination,
+                            sourceField: source.value
+                        });
+
+                        // ignore identical maps
+                        if (foundModel) {
+                            return;
+                        }
+
+                        // allow other kinda.. duplicate maps that need to be solved by user
+                        // this should work for options mapping..in case you want to map different options from different properties
+                        // NOTHING
+
+                        // create new possible map item
+                        const importableItem = new ImportableMapField(
+                            destination,
+                            source.value
+                        );
+
+                        // add options if necessary
+                        this.addMapOptionsIfNecessary(importableItem);
+
+                        // do we need to make this one readonly ?
+                        if (mapOfRequiredDestinationFields[importableItem.destinationField]) {
+                            importableItem.readonly = true;
+                            delete mapOfRequiredDestinationFields[importableItem.destinationField];
+                        }
+
+                        // check if we need to set levels
+                        importableItem.sourceDestinationLevel[0] = overwriteLevel !== undefined ? overwriteLevel : (
+                            source.level !== undefined ?
+                                source.level :
+                                0
+                        );
+                        importableItem.sourceDestinationLevel[1] = source.subLevel !== undefined ?
+                            source.subLevel :
+                            0;
+
+                        // add to list
+                        this.mappedFields.push(importableItem);
                     });
-                });
+                };
 
                 // map file headers with model properties
                 const mapToHeaderFile = (
@@ -640,52 +735,6 @@ export class ImportDataComponent implements OnInit {
                             );
                         });
                     } else {
-                        // push new mapped field
-                        const pushNewMapField = (
-                            destination: string,
-                            sourceData: IMappedHeader[],
-                            overwriteLevel?: number
-                        ) => {
-                            // map all file levels
-                            (sourceData || []).forEach((source: IMappedHeader, level: number) => {
-                                // check identical maps...
-                                const foundModel: ImportableMapField = _.find(this.mappedFields, {
-                                    destinationField: destination,
-                                    sourceField: source.value
-                                });
-
-                                // ignore identical maps
-                                if (foundModel) {
-                                    return;
-                                }
-
-                                // allow other kinda.. duplicate maps that need to be solved by user
-                                // this should work for options mapping..in case you want to map different options from different properties
-                                // NOTHING
-
-                                // create new possible map item
-                                const importableItem = new ImportableMapField(
-                                    destination,
-                                    source.value
-                                );
-
-                                // add options if necessary
-                                this.addMapOptionsIfNecessary(importableItem);
-
-                                // do we need to make this one readonly ?
-                                if (mapOfRequiredDestinationFields[importableItem.destinationField]) {
-                                    importableItem.readonly = true;
-                                    delete mapOfRequiredDestinationFields[importableItem.destinationField];
-                                }
-
-                                // check if we need to set level
-                                importableItem.sourceDestinationLevel[0] = overwriteLevel !== undefined ? overwriteLevel : level;
-
-                                // add to list
-                                this.mappedFields.push(importableItem);
-                            });
-                        };
-
                         // found the language tokens
                         let mappedHeaderObj: IMappedHeader[];
                         if (
@@ -750,6 +799,8 @@ export class ImportDataComponent implements OnInit {
                         }
                     }
                 };
+
+                // go through each property of the model and try to map it to a property from the imported file
                 _.each(this.importableObject.modelProperties, (value: ImportableFilePropertiesModel, property: string) => {
                     if (_.isObject(value)) {
                         mapToHeaderFile(
@@ -761,6 +812,38 @@ export class ImportDataComponent implements OnInit {
                         // TOKEN
                         // ALREADY MAPPED BY SERVER
                     }
+                });
+
+                // populate deducted mappings
+                _.each(this.importableObject.suggestedFieldMapping, (destinationField: string, sourceField: string) => {
+                    // check identical maps...
+                    foundModel = _.find(this.mappedFields, {
+                        destinationField: destinationField,
+                        sourceField: sourceField
+                    });
+
+                    // ignore identical maps
+                    if (foundModel) {
+                        return;
+                    }
+
+                    // create new possible map item
+                    const importableItem = new ImportableMapField(
+                        destinationField,
+                        sourceField
+                    );
+
+                    // add options if necessary
+                    this.addMapOptionsIfNecessary(importableItem);
+
+                    // do we need to make this one readonly ?
+                    if (mapOfRequiredDestinationFields[importableItem.destinationField]) {
+                        importableItem.readonly = true;
+                        delete mapOfRequiredDestinationFields[importableItem.destinationField];
+                    }
+
+                    // add to list
+                    this.mappedFields.push(importableItem);
                 });
 
                 // do we still have required fields? then we need to add a field map for each one of them  to force user to enter data
