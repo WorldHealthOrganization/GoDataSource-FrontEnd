@@ -26,7 +26,7 @@
                             *ngFor="let question of categoryData.questions; let questionIndex = index"
                             [class]="question.answerType === Constants.ANSWER_TYPES.MARKUP.value ? 'questionnaire-category-question-markup' : 'questionnaire-category-question'"
                             fxLayout="column"
-                            [ngClass]="{'inactive-question-wrapper': question.inactive}"
+                            [ngClass]="{'inactive-question-wrapper': question.inactive || inactiveSubquestion}"
                             [fxShow]="!question.inactive || (value[question.variable] && value[question.variable][0]?.value)"
                         >
                             <!-- Go through each question answer -->
@@ -36,7 +36,7 @@
 
                                 <!-- Questions and answers & remove buttons -->
                                 <div fxLayout="row"
-                                     [ngClass]="{'question-is-inactive': question.inactive}"
+                                     [ngClass]="{'question-is-inactive': question.inactive || inactiveSubquestion}"
                                 >
                                     <!-- Questions and answers -->
                                     <div fxFlex [fxLayout]="question.multiAnswer ? 'column' : 'row'">
@@ -266,6 +266,7 @@
                                             [questions]="additionalQuestions[question.variable][answer]"
                                             [disabled]="disabled || question.inactive"
                                             [hideCategories]="true"
+                                            [inactiveSubquestion]="true"
                                             (changed)="onChange(false)"
                                             (groupValidated)="validateGroup()"
                                             [componentTitle]="'LNG_QUESTIONNAIRE_SUB_QUESTIONS_TITLE' | translate"

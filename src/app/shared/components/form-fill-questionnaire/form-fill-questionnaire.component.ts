@@ -83,6 +83,11 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
     @Input() hideCategories: boolean = false;
 
     /**
+     * Inactive sub-question
+     */
+    @Input() inactiveSubquestion: boolean = false;
+
+    /**
      * Child Index Value
      */
     private _childValueIndex: number;
