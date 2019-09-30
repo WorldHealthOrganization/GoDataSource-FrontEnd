@@ -1345,6 +1345,11 @@ export class ImportDataComponent implements OnInit {
                 }
             );
 
+            // meanwhile in a different universe the item was destroyed, so there is no point in adding indexes
+            if (!item) {
+                return value;
+            }
+
             // retrieve value with indexes
             return this.addIndexesToArrays(
                 value,
