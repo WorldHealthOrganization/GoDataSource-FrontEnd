@@ -266,7 +266,7 @@
                                             [questions]="additionalQuestions[question.variable][answer]"
                                             [disabled]="disabled || question.inactive"
                                             [hideCategories]="true"
-                                            [inactiveSubquestion]="true"
+                                            [inactiveSubquestion]="question.inactive || inactiveSubquestion"
                                             (changed)="onChange(false)"
                                             (groupValidated)="validateGroup()"
                                             [componentTitle]="'LNG_QUESTIONNAIRE_SUB_QUESTIONS_TITLE' | translate"
