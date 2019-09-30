@@ -285,7 +285,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                             observer.complete();
                         });
                     });
-
                     // breadcrumbs
                     this.buildBreadcrumbs();
 

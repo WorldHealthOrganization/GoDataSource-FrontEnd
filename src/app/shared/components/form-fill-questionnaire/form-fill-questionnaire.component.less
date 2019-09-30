@@ -19,8 +19,21 @@ app-form-fill-questionnaire {
         border-bottom: 1px solid #CCC;
     }
 
+    .inactive-question-wrapper {
+        padding: 2px 0 !important;
+    }
+
     .questionnaire-category-question {
         padding: 2px 20px;
+
+        .question-is-inactive {
+            background-image: url('/assets/images/inactive.png');
+            background-repeat: repeat-y;
+            background-blend-mode: luminosity;
+            background-size: cover;
+            color: #AAA;
+            padding: 2px 20px;
+        }
 
         &:nth-child(odd) {
             background-color: @color-gray-background;
