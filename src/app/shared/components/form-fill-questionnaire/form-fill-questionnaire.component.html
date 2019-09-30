@@ -26,6 +26,8 @@
                             *ngFor="let question of categoryData.questions; let questionIndex = index"
                             [class]="question.answerType === Constants.ANSWER_TYPES.MARKUP.value ? 'questionnaire-category-question-markup' : 'questionnaire-category-question'"
                             fxLayout="column"
+                            [ngClass]="{'inactive-question-wrapper': question.inactive}"
+                            [fxShow]="!question.inactive || (value[question.variable] && value[question.variable][0]?.value)"
                         >
                             <!-- Go through each question answer -->
                             <div
