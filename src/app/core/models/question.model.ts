@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 import { Constants } from './constants';
 import { Moment } from '../helperClasses/x-moment';
-import { ImportableFilePropertiesModel, ImportableFilePropertyValuesModel } from '../../features/import-export-data/components/import-data/model';
+import { IModelArrayProperties, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel } from '../../features/import-export-data/components/import-data/model';
 
 export interface IAnswerData {
     date?: string | Moment;
@@ -167,6 +167,9 @@ export class QuestionModel {
         suggestedFieldMapping: {
             [fileHeader: string]: string
         },
+        modelArrayProperties: {
+            [propertyPath: string]: IModelArrayProperties
+        },
         extraDataUsedToFormat: any
     ) {
         // determine questionnaire question types
@@ -189,14 +192,13 @@ export class QuestionModel {
         determineTypes(extraDataUsedToFormat);
 
         // remap questionnaire answers api suggested maps
+        const questionnaireParentKey: string = 'questionnaireAnswers.';
         if (suggestedFieldMapping) {
-            const questionnaireParentKey: string = 'questionnaireAnswers.';
-            const questionnaireParentKeyLength: number = questionnaireParentKey.length;
             _.each(suggestedFieldMapping, (modelKey: string, fileKey: string) => {
                 // determine if we need to add type
                 if (modelKey.startsWith(questionnaireParentKey)) {
                     // retrieve variable
-                    const questionVariable: string = modelKey.substring(questionnaireParentKeyLength);
+                    const questionVariable: string = modelKey.substring(questionnaireParentKey.length);
                     const qType: string = questionTypes[questionVariable];
 
                     // map only if not already mapped
@@ -220,8 +222,8 @@ export class QuestionModel {
                 };
 
                 // add parent object name
-                if (!fieldsWithoutTokens[`questionnaireAnswers.${variable}[]`]) {
-                    fieldsWithoutTokens[`questionnaireAnswers.${variable}[]`] = answerLabel;
+                if (!fieldsWithoutTokens[`${questionnaireParentKey}${variable}[]`]) {
+                    fieldsWithoutTokens[`${questionnaireParentKey}${variable}[]`] = answerLabel;
                 }
             });
         }
@@ -236,6 +238,19 @@ export class QuestionModel {
                 };
             });
         }
+
+        // prepare array props for questionnaires
+        _.each(modelArrayProperties, (definition: IModelArrayProperties, propertyPath: string) => {
+            if (propertyPath.startsWith(questionnaireParentKey)) {
+                // determine question variable
+                const variable: string = propertyPath.substring(questionnaireParentKey.length);
+                delete modelArrayProperties[propertyPath];
+
+                // add the new options
+                modelArrayProperties[`${questionnaireParentKey}${variable}[].${questionTypes[variable] === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ? 'value[]' : 'value'}`] = definition;
+                modelArrayProperties[`${questionnaireParentKey}${variable}[].date`] = definition;
+            }
+        });
     }
 
     /**

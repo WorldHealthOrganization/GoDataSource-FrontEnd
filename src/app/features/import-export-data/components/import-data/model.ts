@@ -2,6 +2,10 @@ import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
+export interface IModelArrayProperties {
+    maxItems: number;
+}
+
 export class ImportableLabelValuePair {
     constructor(
         public label: string,
@@ -43,6 +47,10 @@ export class ImportableFileModel {
     };
     distinctFileColumnValuesKeyValue: {
         [fileHeader: string]: ImportableLabelValuePair[]
+    };
+
+    modelArrayProperties: {
+        [propertyPath: string]: IModelArrayProperties
     };
 
     /**
@@ -101,6 +109,9 @@ export class ImportableFileModel {
             suggestedFieldMapping: {
                 [fileHeader: string]: string
             },
+            modelArrayProperties: {
+                [propertyPath: string]: IModelArrayProperties
+            },
             extraDataUsedToFormat: any
         ) => void
     ) {
@@ -112,6 +123,7 @@ export class ImportableFileModel {
         this.modelPropertyValues = _.get(data, 'modelPropertyValues', {});
         this.suggestedFieldMapping = _.get(data, 'suggestedFieldMapping', {});
         this.distinctFileColumnValues = _.get(data, 'distinctFileColumnValues', {});
+        this.modelArrayProperties = _.get(data, 'modelArrayProperties', {});
 
         // format response
         if (formatDataBeforeUse) {
@@ -120,6 +132,7 @@ export class ImportableFileModel {
                 this.modelPropertyValues,
                 fieldsWithoutTokens,
                 this.suggestedFieldMapping,
+                this.modelArrayProperties,
                 extraDataUsedToFormatData
             );
         }

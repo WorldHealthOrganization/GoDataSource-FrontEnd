@@ -3,7 +3,7 @@ import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { environment } from '../../../../../environments/environment';
-import { ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField } from './model';
+import { IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField } from './model';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -276,6 +276,9 @@ export class ImportDataComponent implements OnInit {
         },
         suggestedFieldMapping: {
             [fileHeader: string]: string
+        },
+        modelArrayProperties: {
+            [propertyPath: string]: IModelArrayProperties
         },
         extraDataUsedToFormat: any
     ) => void;
@@ -670,14 +673,23 @@ export class ImportDataComponent implements OnInit {
                 const pushNewMapField = (
                     destination: string,
                     sourceData: IMappedHeader[],
-                    overwriteLevel?: number
+                    overwriteLevel?: number,
+                    ignoreArrayLevels?: boolean
                 ) => {
                     // map all file levels
                     (sourceData || []).forEach((source: IMappedHeader) => {
+                        // determine map level
+                        const level: number = overwriteLevel !== undefined ? overwriteLevel : (
+                            source.level !== undefined ?
+                                source.level :
+                                0
+                        );
+
                         // check identical maps...
-                        foundModel = _.find(this.mappedFields, {
-                            destinationField: destination,
-                            sourceField: source.value
+                        foundModel = _.find(this.mappedFields, (mappedItem: ImportableMapField) => {
+                            return mappedItem.destinationField === destination &&
+                                mappedItem.sourceField === source.value &&
+                                mappedItem.sourceDestinationLevel[0] === level;
                         });
 
                         // ignore identical maps
@@ -705,11 +717,7 @@ export class ImportDataComponent implements OnInit {
                         }
 
                         // check if we need to set levels
-                        importableItem.sourceDestinationLevel[0] = overwriteLevel !== undefined ? overwriteLevel : (
-                            source.level !== undefined ?
-                                source.level :
-                                0
-                        );
+                        importableItem.sourceDestinationLevel[0] = level;
                         importableItem.sourceDestinationLevel[1] = source.subLevel !== undefined ?
                             source.subLevel :
                             0;
@@ -717,6 +725,24 @@ export class ImportDataComponent implements OnInit {
                         // add to list
                         this.mappedFields.push(importableItem);
                     });
+
+                    // add array maps
+                    if (
+                        !ignoreArrayLevels &&
+                        destination &&
+                        this.importableObject &&
+                        this.importableObject.modelArrayProperties[destination] &&
+                        this.importableObject.modelArrayProperties[destination].maxItems > 1
+                    ) {
+                        for (let newLevel: number = 1; newLevel < this.importableObject.modelArrayProperties[destination].maxItems; newLevel++) {
+                            pushNewMapField(
+                                destination,
+                                sourceData,
+                                newLevel,
+                                true
+                            );
+                        }
+                    }
                 };
 
                 // map file headers with model properties
