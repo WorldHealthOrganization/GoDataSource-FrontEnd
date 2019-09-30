@@ -166,16 +166,44 @@ export class QuestionModel {
         },
         suggestedFieldMapping: {
             [fileHeader: string]: string
-        }
+        },
+        extraDataUsedToFormat: any
     ) {
+        // determine questionnaire question types
+        const questionTypes: {
+            [variable: string]: string
+        } = {};
+        const determineTypes = (questions: QuestionModel[]) => {
+            _.each(questions, (question: QuestionModel) => {
+                // map current question
+                questionTypes[question.variable] = question.answerType;
+
+                // check for sub-questions
+                if (!_.isEmpty(question.answers)) {
+                    _.each(question.answers, (answer: AnswerModel) => {
+                        determineTypes(answer.additionalQuestions);
+                    });
+                }
+            });
+        };
+        determineTypes(extraDataUsedToFormat);
+
         // remap questionnaire answers api suggested maps
         if (suggestedFieldMapping) {
+            const questionnaireParentKey: string = 'questionnaireAnswers.';
+            const questionnaireParentKeyLength: number = questionnaireParentKey.length;
             _.each(suggestedFieldMapping, (modelKey: string, fileKey: string) => {
-                if (
-                    modelKey.startsWith('questionnaireAnswers.') &&
-                    !modelKey.endsWith('[].value')
-                ) {
-                    suggestedFieldMapping[fileKey] = `${suggestedFieldMapping[fileKey]}[].value`;
+                // determine if we need to add type
+                if (modelKey.startsWith(questionnaireParentKey)) {
+                    // retrieve variable
+                    const questionVariable: string = modelKey.substring(questionnaireParentKeyLength);
+                    const qType: string = questionTypes[questionVariable];
+
+                    // map only if not already mapped
+                    const mustEndWith: string = qType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ? '[].value[]' : '[].value';
+                    if (!modelKey.endsWith(mustEndWith)) {
+                        suggestedFieldMapping[fileKey] = `${modelKey}${mustEndWith}`;
+                    }
                 }
             });
         }
@@ -187,7 +215,7 @@ export class QuestionModel {
             _.each(oldModelProperties, (answerLabel: string, variable: string) => {
                 // map questionnaire answer to object with date & value properties
                 modelProperties.questionnaireAnswers[`${variable}[]`] = {
-                    value: 'LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_VALUE',
+                    [questionTypes[variable.replace('_____A', '')] === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ? 'value[]' : 'value']: 'LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_VALUE',
                     date: 'LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_DATE'
                 };
 
@@ -204,7 +232,7 @@ export class QuestionModel {
             modelPropertyValues.questionnaireAnswers = {};
             _.each(oldModelPropertyValues, (dropdownOptions: any, variable: string) => {
                 modelPropertyValues.questionnaireAnswers[`${variable}[]`] = {
-                    value: dropdownOptions
+                    [questionTypes[variable.replace('_____A', '')] === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ? 'value[]' : 'value']: dropdownOptions
                 };
             });
         }

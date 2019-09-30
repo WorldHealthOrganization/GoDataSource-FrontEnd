@@ -260,6 +260,11 @@ export class ImportDataComponent implements OnInit {
     @Input() fileUploadAlias: string;
 
     /**
+     * Data to send to format callback
+     */
+    @Input() extraDataUsedToFormatData: any;
+
+    /**
      * Callback called after we receive model definitions from api
      *  - through this callback we can alter the api response
      */
@@ -271,7 +276,8 @@ export class ImportDataComponent implements OnInit {
         },
         suggestedFieldMapping: {
             [fileHeader: string]: string
-        }
+        },
+        extraDataUsedToFormat: any
     ) => void;
 
     /**
@@ -535,6 +541,7 @@ export class ImportDataComponent implements OnInit {
                     },
                     this.fieldsWithoutTokens,
                     this.excludeDestinationProperties,
+                    this.extraDataUsedToFormatData,
                     this.formatDataBeforeUse
                 );
 

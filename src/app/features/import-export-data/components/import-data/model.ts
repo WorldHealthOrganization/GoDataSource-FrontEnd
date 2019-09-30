@@ -91,6 +91,7 @@ export class ImportableFileModel {
         excludeDestinationProperties: {
             [property: string]: boolean
         } = {},
+        extraDataUsedToFormatData: any,
         formatDataBeforeUse: (
             modelProperties: ImportableFilePropertiesModel,
             modelPropertyValues: ImportableFilePropertyValuesModel,
@@ -99,7 +100,8 @@ export class ImportableFileModel {
             },
             suggestedFieldMapping: {
                 [fileHeader: string]: string
-            }
+            },
+            extraDataUsedToFormat: any
         ) => void
     ) {
         this.id = _.get(data, 'id');
@@ -117,7 +119,8 @@ export class ImportableFileModel {
                 this.modelProperties,
                 this.modelPropertyValues,
                 fieldsWithoutTokens,
-                this.suggestedFieldMapping
+                this.suggestedFieldMapping,
+                extraDataUsedToFormatData
             );
         }
 

@@ -65,6 +65,8 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
 
     formatDataBeforeUse = QuestionModel.formatQuestionnaireImportDefs;
 
+    selectedOutbreak: OutbreakModel;
+
     /**
      * Constructor
      * @param router
@@ -81,6 +83,9 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
+                    // outbreak
+                    this.selectedOutbreak = selectedOutbreak;
+
                     // set URLs
                     this.importFileUrl = `outbreaks/${selectedOutbreak.id}/importable-files`;
                     this.importDataUrl = `outbreaks/${selectedOutbreak.id}/cases/import-importable-file-using-map`;
