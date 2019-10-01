@@ -46,7 +46,10 @@
                     <td *ngFor="let date of dates; let first = first">
                         <ng-container
                             *ngIf="first">
-                            {{ teamData.name }}
+                            <span
+                                [matTooltip]="teamData.name">
+                                {{ teamData.name }}
+                            </span>
                         </ng-container>
                         <div
                             *ngIf="!first">
