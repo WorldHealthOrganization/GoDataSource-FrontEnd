@@ -2,10 +2,11 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { ImportDataExtension, ImportServerModelNames } from '../../components/import-data/import-data.component';
+import { ImportServerModelNames } from '../../components/import-data/import-data.component';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Constants } from '../../../../core/models/constants';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { ImportDataExtension } from '../../components/import-data/model';
 
 @Component({
     selector: 'app-import-contact-data',
@@ -47,11 +48,11 @@ export class ImportContactDataComponent implements OnInit, OnDestroy {
     ImportServerModelNames = ImportServerModelNames;
 
     fieldsWithoutTokens = {
-        questionnaireAnswers: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
         relationship: 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP',
         'addresses[]': 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
         'documents[]': 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS',
-        'relationship.persons[]': 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP_PERSONS'
+        'relationship.persons[]': 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP_PERSONS',
+        'vaccinesReceived[]': 'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED'
     };
 
     requiredDestinationFields = [

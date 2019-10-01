@@ -2,6 +2,20 @@ import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
+export enum ImportDataExtension {
+    CSV = '.csv',
+    XLS = '.xls',
+    XLSX = '.xlsx',
+    XML = '.xml',
+    ODS = '.ods',
+    JSON = '.json',
+    ZIP = '.zip'
+}
+
+export interface IModelArrayProperties {
+    maxItems: number;
+}
+
 export class ImportableLabelValuePair {
     constructor(
         public label: string,
@@ -45,6 +59,10 @@ export class ImportableFileModel {
         [fileHeader: string]: ImportableLabelValuePair[]
     };
 
+    modelArrayProperties: {
+        [propertyPath: string]: IModelArrayProperties
+    };
+
     /**
      * Fix issue with lodash not supporting _.get(a, 'aaa[].b'), since it tries to interpret [] as an array
      * @param object
@@ -85,20 +103,54 @@ export class ImportableFileModel {
     constructor(
         data = null,
         translate: (string) => string,
+        fileType: ImportDataExtension,
         fieldsWithoutTokens: {
             [property: string]: string
         } = {},
         excludeDestinationProperties: {
             [property: string]: boolean
-        } = {}
+        } = {},
+        extraDataUsedToFormatData: any,
+        formatDataBeforeUse: (
+            modelProperties: ImportableFilePropertiesModel,
+            modelPropertyValues: ImportableFilePropertyValuesModel,
+            fieldsWithoutTokens: {
+                [property: string]: string
+            },
+            suggestedFieldMapping: {
+                [fileHeader: string]: string
+            },
+            modelArrayProperties: {
+                [propertyPath: string]: IModelArrayProperties
+            },
+            fileType: ImportDataExtension,
+            extraDataUsedToFormat: any
+        ) => void
     ) {
         this.id = _.get(data, 'id');
-        this.fileHeaders = _.get(data, 'fileHeaders', []);
+        this.fileHeaders = (_.get(data, 'fileHeaders', []) || []).map((value: any) => {
+            return typeof value === 'string' ? value : value.toString();
+        });
         this.modelProperties = _.get(data, 'modelProperties', {});
         this.modelPropertyValues = _.get(data, 'modelPropertyValues', {});
         this.suggestedFieldMapping = _.get(data, 'suggestedFieldMapping', {});
         this.distinctFileColumnValues = _.get(data, 'distinctFileColumnValues', {});
+        this.modelArrayProperties = _.get(data, 'modelArrayProperties', {});
 
+        // format response
+        if (formatDataBeforeUse) {
+            formatDataBeforeUse(
+                this.modelProperties,
+                this.modelPropertyValues,
+                fieldsWithoutTokens,
+                this.suggestedFieldMapping,
+                this.modelArrayProperties,
+                fileType,
+                extraDataUsedToFormatData
+            );
+        }
+
+        // map file headers
         this.fileHeadersKeyValue = _.chain(this.fileHeaders)
             .map((value: string) => {
                 return new ImportableLabelValuePair(

@@ -3,7 +3,7 @@ import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { environment } from '../../../../../environments/environment';
-import { ImportableFileModel, ImportableFilePropertiesModel, ImportableLabelValuePair, ImportableMapField } from './model';
+import { IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField, ImportDataExtension } from './model';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -29,16 +29,6 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { MatDialogRef } from '@angular/material';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-
-export enum ImportDataExtension {
-    CSV = '.csv',
-    XLS = '.xls',
-    XLSX = '.xlsx',
-    XML = '.xml',
-    ODS = '.ods',
-    JSON = '.json',
-    ZIP = '.zip'
-}
 
 export enum ImportServerModelNames {
     CASE_LAB_RESULTS = 'labResult',
@@ -260,6 +250,31 @@ export class ImportDataComponent implements OnInit {
     @Input() fileUploadAlias: string;
 
     /**
+     * Data to send to format callback
+     */
+    @Input() extraDataUsedToFormatData: any;
+
+    /**
+     * Callback called after we receive model definitions from api
+     *  - through this callback we can alter the api response
+     */
+    @Input() formatDataBeforeUse: (
+        modelProperties: ImportableFilePropertiesModel,
+        modelPropertyValues: ImportableFilePropertyValuesModel,
+        fieldsWithoutTokens: {
+            [property: string]: string
+        },
+        suggestedFieldMapping: {
+            [fileHeader: string]: string
+        },
+        modelArrayProperties: {
+            [propertyPath: string]: IModelArrayProperties
+        },
+        fileType: ImportDataExtension,
+        extraDataUsedToFormat: any
+    ) => void;
+
+    /**
      * Keep all file data ( header columns, module information, drop-down options etc )
      */
     importableObject: ImportableFileModel;
@@ -267,15 +282,7 @@ export class ImportDataComponent implements OnInit {
     /**
      * Source / Destination level value
      */
-    possibleSourceDestinationLevels: LabelValuePair[] = [
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_1', 0),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_2', 1),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_3', 2),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_4', 3),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_5', 4),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_6', 5),
-        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_7', 6)
-    ];
+    possibleSourceDestinationLevels: LabelValuePair[];
 
     /**
      * Mapped fields
@@ -390,6 +397,15 @@ export class ImportDataComponent implements OnInit {
     ngOnInit() {
         // get saved import mapping
         this.getImportMappings();
+
+        // init array levels
+        this.possibleSourceDestinationLevels = [];
+        for (let level = 0; level < 100; level++) {
+            this.possibleSourceDestinationLevels.push(new LabelValuePair(
+                (level + 1).toString(),
+                level
+            ));
+        }
 
         // init uploader
         this.uploader = new FileUploader({
@@ -511,14 +527,43 @@ export class ImportDataComponent implements OnInit {
                     return;
                 }
 
+                // determine what kind of file did we import
+                let fileType: ImportDataExtension;
+                if (
+                    item.file.rawFile &&
+                    (item.file.rawFile as any).type
+                ) {
+                    const mimeToFind: string = (item.file.rawFile as any).type.toLowerCase();
+                    fileType = _.findKey(
+                        this.allowedMimeTypesMap,
+                        (mimes: string | string[]) => {
+                            if (_.isString(mimes)) {
+                                return mimes.toLowerCase() === mimeToFind;
+                            } else {
+                                let found: boolean = false;
+                                (mimes || []).forEach((mime: string) => {
+                                    if (mime.toLowerCase() === mimeToFind) {
+                                        found = true;
+                                        return false;
+                                    }
+                                });
+                                return found;
+                            }
+                        }
+                    ) as ImportDataExtension;
+                }
+
                 // construct importable file object
                 this.importableObject = new ImportableFileModel(
                     jsonResponse,
                     (token: string): string => {
                         return this.i18nService.instant(token);
                     },
+                    fileType,
                     this.fieldsWithoutTokens,
-                    this.excludeDestinationProperties
+                    this.excludeDestinationProperties,
+                    this.extraDataUsedToFormatData,
+                    this.formatDataBeforeUse
                 );
 
                 // we should have at least the headers of the file
@@ -533,9 +578,299 @@ export class ImportDataComponent implements OnInit {
                     return;
                 }
 
-                // populate deducted mappings
+                // required fields
                 const mapOfRequiredDestinationFields = this.requiredDestinationFieldsMap ? _.clone(this.requiredDestinationFieldsMap) : {};
+
+                // do some multilevel mappings
+                interface IMappedHeader {
+                    value: string;
+                    level?: number;
+                    subLevel?: number;
+                }
+                const mappedHeaders: {
+                    [key: string]: IMappedHeader[]
+                } = {};
+                _.each(this.importableObject.fileHeaders, (fHeader: string) => {
+                    // determine if this is a multi level header
+                    const fHeaderMultiLevelData = /\s\[((MD)|(MV))\s+(\d+)\]$/g.exec(fHeader);
+                    let mapKey: string;
+                    let level: number;
+                    let fHeaderWithoutMultiLevel: string = fHeader;
+                    let addValue: boolean = true;
+                    if (fHeaderMultiLevelData) {
+                        // value / date ?
+                        fHeaderWithoutMultiLevel = fHeader.substring(0, fHeaderMultiLevelData.index);
+                        mapKey = fHeaderMultiLevelData[1] === 'MD' ?
+                            `${fHeaderWithoutMultiLevel}.${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_DATE')}` :
+                            `${fHeaderWithoutMultiLevel}.${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_VALUE')}`;
+
+                        // set level
+                        level = _.parseInt(fHeaderMultiLevelData[4]) - 1;
+
+                        // no need to add value anymore
+                        addValue = false;
+                    } else {
+                        mapKey = fHeader;
+                    }
+
+                    // add to mapped headers
+                    let mapKeyCamelCase: string = _.camelCase(mapKey).toLowerCase();
+                    if (!mappedHeaders[mapKeyCamelCase]) {
+                        mappedHeaders[mapKeyCamelCase] = [];
+                    }
+
+                    // add the new option
+                    mappedHeaders[mapKeyCamelCase].push({
+                        value: fHeader,
+                        level: level
+                    });
+
+                    // add an extra map containing value since it might be a questionnaire answer
+                    let mapKeyCamelCaseWithValue: string;
+                    if (addValue) {
+                        mapKeyCamelCaseWithValue = _.camelCase(`${mapKey}.${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_VALUE')}`).toLowerCase();
+                        if (!mappedHeaders[mapKeyCamelCaseWithValue]) {
+                            mappedHeaders[mapKeyCamelCaseWithValue] = [];
+                        }
+
+                        // add the new option
+                        mappedHeaders[mapKeyCamelCaseWithValue].push({
+                            value: fHeader,
+                            level: level
+                        });
+                    }
+
+
+                    // do we need to add a more shorter version for determining headers ?
+                    // strip option numbers
+                    const stripEndingNumbers = /\s(\d+)$/g.exec(fHeaderWithoutMultiLevel);
+                    if (stripEndingNumbers) {
+                        // determine sub-level
+                        const subLevel: number = _.parseInt(stripEndingNumbers[1]) - 1;
+
+                        // remove index value
+                        mapKey = fHeaderWithoutMultiLevel.substring(0, stripEndingNumbers.index);
+                        mapKeyCamelCase = _.camelCase(mapKey).toLowerCase();
+                        mapKeyCamelCaseWithValue = _.camelCase(`${mapKey}.${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_VALUE')}`).toLowerCase();
+
+                        // determine if we need to add this one
+                        let canAdd: boolean = true;
+                        if (!mappedHeaders[mapKeyCamelCaseWithValue]) {
+                            mappedHeaders[mapKeyCamelCaseWithValue] = [];
+                        }
+                        if (!mappedHeaders[mapKeyCamelCase]) {
+                            mappedHeaders[mapKeyCamelCase] = [];
+                        } else {
+                            canAdd = !_.find(mappedHeaders[mapKeyCamelCase], {
+                                value: fHeader,
+                                level: _.isNumber(level) ? level : subLevel,
+                                subLevel: _.isNumber(level) ? subLevel : undefined
+                            });
+                        }
+
+                        // push the new possible map option
+                        if (canAdd) {
+                            mappedHeaders[mapKeyCamelCase].push({
+                                value: fHeader,
+                                level: _.isNumber(level) ? level : subLevel,
+                                subLevel: _.isNumber(level) ? subLevel : undefined
+                            });
+
+                            // add value
+                            mappedHeaders[mapKeyCamelCaseWithValue].push({
+                                value: fHeader,
+                                level: _.isNumber(level) ? level : subLevel,
+                                subLevel: _.isNumber(level) ? subLevel : undefined
+                            });
+                        }
+                    }
+                });
+
+                // push new mapped field
+                let foundModel: ImportableMapField;
+                const pushNewMapField = (
+                    destination: string,
+                    sourceData: IMappedHeader[],
+                    overwriteLevel?: number,
+                    ignoreArrayLevels?: boolean
+                ) => {
+                    // map all file levels
+                    (sourceData || []).forEach((source: IMappedHeader) => {
+                        // determine map level
+                        const level: number = overwriteLevel !== undefined ? overwriteLevel : (
+                            source.level !== undefined ?
+                                source.level :
+                                0
+                        );
+
+                        // check identical maps...
+                        foundModel = _.find(this.mappedFields, (mappedItem: ImportableMapField) => {
+                            return mappedItem.destinationField === destination &&
+                                mappedItem.sourceField === source.value &&
+                                mappedItem.sourceDestinationLevel[0] === level;
+                        });
+
+                        // ignore identical maps
+                        if (foundModel) {
+                            return;
+                        }
+
+                        // allow other kinda.. duplicate maps that need to be solved by user
+                        // this should work for options mapping..in case you want to map different options from different properties
+                        // NOTHING
+
+                        // create new possible map item
+                        const importableItem = new ImportableMapField(
+                            destination,
+                            source.value
+                        );
+
+                        // add options if necessary
+                        this.addMapOptionsIfNecessary(importableItem);
+
+                        // do we need to make this one readonly ?
+                        if (mapOfRequiredDestinationFields[importableItem.destinationField]) {
+                            importableItem.readonly = true;
+                            delete mapOfRequiredDestinationFields[importableItem.destinationField];
+                        }
+
+                        // check if we need to set levels
+                        importableItem.sourceDestinationLevel[0] = level;
+                        importableItem.sourceDestinationLevel[1] = source.subLevel !== undefined ?
+                            source.subLevel :
+                            0;
+
+                        // add to list
+                        this.mappedFields.push(importableItem);
+                    });
+
+                    // add array maps
+                    if (
+                        !ignoreArrayLevels &&
+                        destination &&
+                        this.importableObject &&
+                        this.importableObject.modelArrayProperties[destination] &&
+                        this.importableObject.modelArrayProperties[destination].maxItems > 1
+                    ) {
+                        for (let newLevel: number = 1; newLevel < this.importableObject.modelArrayProperties[destination].maxItems; newLevel++) {
+                            pushNewMapField(
+                                destination,
+                                sourceData,
+                                newLevel,
+                                true
+                            );
+                        }
+                    }
+                };
+
+                // map file headers with model properties
+                const mapToHeaderFile = (
+                    value: string | ImportableFilePropertiesModel,
+                    property: string,
+                    parentPath: string = ''
+                ) => {
+                    // if object we need to go further into it
+                    if (_.isObject(value)) {
+                        _.each(value, (childValue: string | ImportableFilePropertiesModel, childProperty: string) => {
+                            mapToHeaderFile(
+                                childValue,
+                                childProperty,
+                                _.isObject(childValue) ? `${parentPath}.${childProperty}` : parentPath
+                            );
+                        });
+                    } else {
+                        // found the language tokens
+                        let mappedHeaderObj: IMappedHeader[];
+                        if (
+                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}`).toLowerCase()]) ||
+                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${property}`).toLowerCase()]) ||
+                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${value}`).toLowerCase()])
+                        ) {
+                            pushNewMapField(
+                                `${parentPath}.${property}`,
+                                mappedHeaderObj
+                            );
+                        } else {
+                            // NOT FOUND
+                            // check if parent key should be translated
+                            const parentPrefixIndex: number = parentPath ? parentPath.lastIndexOf('.') : -1;
+                            const parentPrefix = parentPrefixIndex > -1 ? parentPath.substring(0, parentPrefixIndex) : null;
+                            if (
+                                parentPath &&
+                                this.fieldsWithoutTokens &&
+                                this.fieldsWithoutTokens[parentPath] && (
+                                    (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(this.fieldsWithoutTokens[parentPath])}[].${this.i18nService.instant(value)}`).toLowerCase()]) || (
+                                        parentPrefix &&
+                                        (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPrefix}.${this.i18nService.instant(this.fieldsWithoutTokens[parentPath])}[].${this.i18nService.instant(value)}`).toLowerCase()])
+                                    )
+                                )
+                            ) {
+                                pushNewMapField(
+                                    `${parentPath}.${property}`,
+                                    mappedHeaderObj
+                                );
+
+                            // search though flat values - for arrays
+                            } else if (
+                                mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}[1]`).toLowerCase()] ||
+                                mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[1]`).toLowerCase()]
+                            ) {
+                                // map all determined levels
+                                _.each(
+                                    this.possibleSourceDestinationLevels,
+                                    (supportedLevel: LabelValuePair) => {
+                                        if (
+                                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()]) ||
+                                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()])
+                                        ) {
+                                            // create object
+                                            pushNewMapField(
+                                                `${parentPath}.${property}`,
+                                                mappedHeaderObj,
+                                                supportedLevel.value
+                                            );
+                                        } else {
+                                            // there is no point going further
+                                            return false;
+                                        }
+                                    }
+                                );
+                            } else {
+                                // NOT FOUND
+                                // can't map by flat property since they are too common
+                                // e.g. start date ( fileHeader[startdate] === model[incubationdates[].startdate] )
+                            }
+                        }
+                    }
+                };
+
+                // go through each property of the model and try to map it to a property from the imported file
+                _.each(this.importableObject.modelProperties, (value: ImportableFilePropertiesModel, property: string) => {
+                    if (_.isObject(value)) {
+                        mapToHeaderFile(
+                            value,
+                            property,
+                            property
+                        );
+                    } else {
+                        // TOKEN
+                        // ALREADY MAPPED BY SERVER
+                    }
+                });
+
+                // populate deducted mappings
                 _.each(this.importableObject.suggestedFieldMapping, (destinationField: string, sourceField: string) => {
+                    // check identical maps...
+                    foundModel = _.find(this.mappedFields, {
+                        destinationField: destinationField,
+                        sourceField: sourceField
+                    });
+
+                    // ignore identical maps
+                    if (foundModel) {
+                        return;
+                    }
+
                     // create new possible map item
                     const importableItem = new ImportableMapField(
                         destinationField,
@@ -553,137 +888,6 @@ export class ImportDataComponent implements OnInit {
 
                     // add to list
                     this.mappedFields.push(importableItem);
-                });
-
-                // do some multilevel mappings
-                const mappedHeaders: {
-                    [key: string]: {
-                        value: string
-                    }
-                } = {};
-                _.each(this.importableObject.fileHeaders, (fHeader: string) => {
-                    mappedHeaders[_.camelCase(fHeader).toLowerCase()] = {
-                        value: fHeader
-                    };
-                });
-                const mapToHeaderFile = (
-                    value: string | ImportableFilePropertiesModel,
-                    property: string,
-                    parentPath: string = ''
-                ) => {
-                    // if object we need to go further into it
-                    if (_.isObject(value)) {
-                        _.each(value, (childValue: string | ImportableFilePropertiesModel, childProperty: string) => {
-                            mapToHeaderFile(
-                                childValue,
-                                childProperty,
-                                _.isObject(childValue) ? `${parentPath}.${childProperty}` : parentPath
-                            );
-                        });
-                    } else {
-                        // push new mapped field
-                        const pushNewMapField = (
-                            destination: string,
-                            source: string
-                        ): ImportableMapField | null => {
-                            // check identical maps...
-                            const itemExistsAlready = _.find(this.mappedFields, {
-                                destinationField: destination,
-                                sourceField: source
-                            }) !== undefined;
-
-                            // ignore identical maps
-                            if (itemExistsAlready) {
-                                return null;
-                            }
-
-                            // allow other kinda.. duplicate maps that need to be solved by user
-                            // this should work for options mapping..in case you want to map different options from different properties
-                            // NOTHING
-
-                            // create new possible map item
-                            const importableItem = new ImportableMapField(
-                                destination,
-                                source
-                            );
-
-                            // add options if necessary
-                            this.addMapOptionsIfNecessary(importableItem);
-
-                            // do we need to make this one readonly ?
-                            if (mapOfRequiredDestinationFields[importableItem.destinationField]) {
-                                importableItem.readonly = true;
-                                delete mapOfRequiredDestinationFields[importableItem.destinationField];
-                            }
-
-                            // add to list
-                            this.mappedFields.push(importableItem);
-
-                            // finished
-                            return importableItem;
-                        };
-
-                        // found the language tokens
-                        let mappedHeaderObj: {
-                            value: string
-                        };
-                        if (
-                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}`).toLowerCase()]) ||
-                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${property}`).toLowerCase()]) ||
-                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${value}`).toLowerCase()])
-                        ) {
-                            pushNewMapField(
-                                `${parentPath}.${property}`,
-                                mappedHeaderObj.value
-                            );
-                        } else {
-                            // NOT FOUND
-                            // search though flat values - for arrays
-                            if (
-                                (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[1]`).toLowerCase()])
-                            ) {
-                                // map all determined levels
-                                _.each(
-                                    this.possibleSourceDestinationLevels,
-                                    (supportedLevel: LabelValuePair) => {
-                                        if (
-                                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()])
-                                        ) {
-                                            // create object
-                                            const pushedItem = pushNewMapField(
-                                                `${parentPath}.${property}`,
-                                                mappedHeaderObj.value
-                                            );
-
-                                            // did we succeed in creating the new object?
-                                            if (pushedItem) {
-                                                pushedItem.sourceDestinationLevel[0] = supportedLevel.value;
-                                            }
-                                        } else {
-                                            // there is no point going further
-                                            return false;
-                                        }
-                                    }
-                                );
-                            } else {
-                                // NOT FOUND
-                                // can't map by flat property since they are too common
-                                // e.g. start date ( fileHeader[startdate] === model[incubationdates[].startdate] )
-                            }
-                        }
-                    }
-                };
-                _.each(this.importableObject.modelProperties, (value: ImportableFilePropertiesModel, property: string) => {
-                    if (_.isObject(value)) {
-                        mapToHeaderFile(
-                            value,
-                            property,
-                            property
-                        );
-                    } else {
-                        // TOKEN
-                        // ALREADY MAPPED BY SERVER
-                    }
                 });
 
                 // do we still have required fields? then we need to add a field map for each one of them  to force user to enter data
@@ -1113,6 +1317,20 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
+     * Clone field map
+     */
+    cloneFieldMap(index: number) {
+        this.mappedFields.splice(
+            index + 1,
+            0,
+            new ImportableMapField(
+                this.mappedFields[index].destinationField,
+                this.mappedFields[index].sourceField
+            )
+        );
+    }
+
+    /**
      * Remove field map option
      */
     removeOptionMap(indexMapField: number, indexMapOption: number) {
@@ -1144,6 +1362,11 @@ export class ImportDataComponent implements OnInit {
                     id: id
                 }
             );
+
+            // meanwhile in a different universe the item was destroyed, so there is no point in adding indexes
+            if (!item) {
+                return value;
+            }
 
             // retrieve value with indexes
             return this.addIndexesToArrays(

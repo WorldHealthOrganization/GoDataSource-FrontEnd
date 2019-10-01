@@ -1,10 +1,11 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
-import { ImportDataExtension, ImportServerModelNames } from '../../components/import-data/import-data.component';
+import { ImportServerModelNames } from '../../components/import-data/import-data.component';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Constants } from '../../../../core/models/constants';
+import { ImportDataExtension } from '../../components/import-data/model';
 
 @Component({
     selector: 'app-import-case-lab-data',

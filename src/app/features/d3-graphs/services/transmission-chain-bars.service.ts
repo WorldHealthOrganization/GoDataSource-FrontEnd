@@ -285,7 +285,7 @@ export class TransmissionChainBarsService {
             const entityData: EntityBarModel = this.graphData.personsMap[entityId];
             entityData.centerNames.forEach((centerName: string) => {
                 // init data for this center name
-                const centerNameKey: string = _.camelCase(centerName);
+                const centerNameKey: string = this.centerNameToCompareValue(centerName);
 
                 // check if we need to create a new cell or we can use the previous one
                 if (
@@ -943,7 +943,7 @@ export class TransmissionChainBarsService {
                             .attr('y', this.cellHeight / 2);
 
                         // render center name color
-                        const centerNameKey: string = drawCell.centerName ? _.camelCase(drawCell.centerName) : null;
+                        const centerNameKey: string = drawCell.centerName ? this.centerNameToCompareValue(drawCell.centerName) : null;
                         if (
                             centerNameKey &&
                             this.entityToCenterNameCell[entityId][centerNameKey]
@@ -1388,5 +1388,15 @@ export class TransmissionChainBarsService {
 
         // hide div if we don't have anything to display
         this.graphHoverDiv.style.display = 'none';
+    }
+
+    /**
+     * Determine center name used for determining same centers
+     * @param centerName
+     */
+    private centerNameToCompareValue(centerName): string {
+        return centerName ?
+            centerName.trim().toLowerCase().replace(/[^a-z0-9\s]/gi, '').replace(/\s\s+/g, ' ') :
+            centerName;
     }
 }

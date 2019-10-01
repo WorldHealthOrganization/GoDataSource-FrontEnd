@@ -2,10 +2,12 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { ImportDataExtension, ImportServerModelNames } from '../../components/import-data/import-data.component';
+import { ImportServerModelNames } from '../../components/import-data/import-data.component';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Constants } from '../../../../core/models/constants';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { QuestionModel } from '../../../../core/models/question.model';
+import { ImportDataExtension } from '../../components/import-data/model';
 
 @Component({
     selector: 'app-import-case-data',
@@ -51,7 +53,8 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
         questionnaireAnswers: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
         'addresses[]': 'LNG_CASE_FIELD_LABEL_ADDRESSES',
         'documents[]': 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
-        'dateRanges[]': 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
+        'dateRanges[]': 'LNG_CASE_FIELD_LABEL_DATE_RANGES',
+        'vaccinesReceived[]': 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED'
     };
 
     requiredDestinationFields = [
@@ -60,6 +63,10 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
         'classification',
         'dateOfOnset'
     ];
+
+    formatDataBeforeUse = QuestionModel.formatQuestionnaireImportDefs;
+
+    selectedOutbreak: OutbreakModel;
 
     /**
      * Constructor
@@ -77,6 +84,9 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
+                    // outbreak
+                    this.selectedOutbreak = selectedOutbreak;
+
                     // set URLs
                     this.importFileUrl = `outbreaks/${selectedOutbreak.id}/importable-files`;
                     this.importDataUrl = `outbreaks/${selectedOutbreak.id}/cases/import-importable-file-using-map`;

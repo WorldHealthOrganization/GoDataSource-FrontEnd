@@ -14,5 +14,7 @@
     [model]="ImportServerModelNames.CASE"
     [fieldsWithoutTokens]="fieldsWithoutTokens"
     [requiredDestinationFields]="requiredDestinationFields"
-    [savedImportPage]="Constants.APP_IMPORT_PAGE.CASE.value">
+    [savedImportPage]="Constants.APP_IMPORT_PAGE.CASE.value"
+    [extraDataUsedToFormatData]="selectedOutbreak?.caseInvestigationTemplate"
+    [formatDataBeforeUse]="formatDataBeforeUse">
 </app-import-data>
