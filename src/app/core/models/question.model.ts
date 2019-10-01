@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 import { Constants } from './constants';
 import { Moment } from '../helperClasses/x-moment';
-import { IModelArrayProperties, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel } from '../../features/import-export-data/components/import-data/model';
+import { IModelArrayProperties, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportDataExtension } from '../../features/import-export-data/components/import-data/model';
 
 export interface IAnswerData {
     date?: string | Moment;
@@ -170,8 +170,12 @@ export class QuestionModel {
         modelArrayProperties: {
             [propertyPath: string]: IModelArrayProperties
         },
+        fileType: ImportDataExtension,
         extraDataUsedToFormat: any
     ) {
+        // determine if this is a flat file
+        const isFlat: boolean = fileType !== ImportDataExtension.JSON && fileType !== ImportDataExtension.XML;
+
         // determine questionnaire question types
         const questionTypes: {
             [variable: string]: string
@@ -202,7 +206,7 @@ export class QuestionModel {
                     const qType: string = questionTypes[questionVariable];
 
                     // map only if not already mapped
-                    const mustEndWith: string = qType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ? '[].value[]' : '[].value';
+                    const mustEndWith: string = (isFlat && qType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value) ? '[].value[]' : '[].value';
                     if (!modelKey.endsWith(mustEndWith)) {
                         suggestedFieldMapping[fileKey] = `${modelKey}${mustEndWith}`;
                     }
@@ -216,8 +220,9 @@ export class QuestionModel {
             modelProperties.questionnaireAnswers = {};
             _.each(oldModelProperties, (answerLabel: string, variable: string) => {
                 // map questionnaire answer to object with date & value properties
+                const trimmedVar: string = variable.replace('_____A', '');
                 modelProperties.questionnaireAnswers[`${variable}[]`] = {
-                    [questionTypes[variable.replace('_____A', '')] === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ? 'value[]' : 'value']: 'LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_VALUE',
+                    [(isFlat && questionTypes[trimmedVar] === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value) ? 'value[]' : 'value']: 'LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_VALUE',
                     date: 'LNG_PAGE_IMPORT_DATA_LABEL_QUESTIONNAIRE_ANSWERS_DATE'
                 };
 
@@ -233,8 +238,9 @@ export class QuestionModel {
             const oldModelPropertyValues: any = modelPropertyValues.questionnaireAnswers;
             modelPropertyValues.questionnaireAnswers = {};
             _.each(oldModelPropertyValues, (dropdownOptions: any, variable: string) => {
+                const trimmedVar: string = variable.replace('_____A', '');
                 modelPropertyValues.questionnaireAnswers[`${variable}[]`] = {
-                    [questionTypes[variable.replace('_____A', '')] === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ? 'value[]' : 'value']: dropdownOptions
+                    [(isFlat && questionTypes[trimmedVar] === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value) ? 'value[]' : 'value']: dropdownOptions
                 };
             });
         }
@@ -247,7 +253,7 @@ export class QuestionModel {
                 delete modelArrayProperties[propertyPath];
 
                 // add the new options
-                modelArrayProperties[`${questionnaireParentKey}${variable}[].${questionTypes[variable] === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ? 'value[]' : 'value'}`] = definition;
+                modelArrayProperties[`${questionnaireParentKey}${variable}[].${(isFlat && questionTypes[variable] === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value) ? 'value[]' : 'value'}`] = definition;
                 modelArrayProperties[`${questionnaireParentKey}${variable}[].date`] = definition;
             }
         });

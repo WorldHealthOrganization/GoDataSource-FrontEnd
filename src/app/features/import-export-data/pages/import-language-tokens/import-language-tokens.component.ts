@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ImportDataExtension } from '../../components/import-data/import-data.component';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
+import { ImportDataExtension } from '../../components/import-data/model';
 
 @Component({
     selector: 'app-import-language-tokens',

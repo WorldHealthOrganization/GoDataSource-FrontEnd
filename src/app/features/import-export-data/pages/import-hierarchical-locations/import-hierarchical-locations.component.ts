@@ -1,8 +1,8 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { Router } from '@angular/router';
-import { ImportDataExtension } from '../../components/import-data/import-data.component';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { ImportDataExtension } from '../../components/import-data/model';
 
 @Component({
     selector: 'app-import-hierarchical-locations',

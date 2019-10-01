@@ -3,7 +3,7 @@ import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { environment } from '../../../../../environments/environment';
-import { IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField } from './model';
+import { IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField, ImportDataExtension } from './model';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -29,16 +29,6 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { MatDialogRef } from '@angular/material';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-
-export enum ImportDataExtension {
-    CSV = '.csv',
-    XLS = '.xls',
-    XLSX = '.xlsx',
-    XML = '.xml',
-    ODS = '.ods',
-    JSON = '.json',
-    ZIP = '.zip'
-}
 
 export enum ImportServerModelNames {
     CASE_LAB_RESULTS = 'labResult',
@@ -280,6 +270,7 @@ export class ImportDataComponent implements OnInit {
         modelArrayProperties: {
             [propertyPath: string]: IModelArrayProperties
         },
+        fileType: ImportDataExtension,
         extraDataUsedToFormat: any
     ) => void;
 
@@ -536,12 +527,39 @@ export class ImportDataComponent implements OnInit {
                     return;
                 }
 
+                // determine what kind of file did we import
+                let fileType: ImportDataExtension;
+                if (
+                    item.file.rawFile &&
+                    (item.file.rawFile as any).type
+                ) {
+                    const mimeToFind: string = (item.file.rawFile as any).type.toLowerCase();
+                    fileType = _.findKey(
+                        this.allowedMimeTypesMap,
+                        (mimes: string | string[]) => {
+                            if (_.isString(mimes)) {
+                                return mimes.toLowerCase() === mimeToFind;
+                            } else {
+                                let found: boolean = false;
+                                (mimes || []).forEach((mime: string) => {
+                                    if (mime.toLowerCase() === mimeToFind) {
+                                        found = true;
+                                        return false;
+                                    }
+                                });
+                                return found;
+                            }
+                        }
+                    ) as ImportDataExtension;
+                }
+
                 // construct importable file object
                 this.importableObject = new ImportableFileModel(
                     jsonResponse,
                     (token: string): string => {
                         return this.i18nService.instant(token);
                     },
+                    fileType,
                     this.fieldsWithoutTokens,
                     this.excludeDestinationProperties,
                     this.extraDataUsedToFormatData,

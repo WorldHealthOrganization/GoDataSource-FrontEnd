@@ -2,6 +2,16 @@ import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
+export enum ImportDataExtension {
+    CSV = '.csv',
+    XLS = '.xls',
+    XLSX = '.xlsx',
+    XML = '.xml',
+    ODS = '.ods',
+    JSON = '.json',
+    ZIP = '.zip'
+}
+
 export interface IModelArrayProperties {
     maxItems: number;
 }
@@ -93,6 +103,7 @@ export class ImportableFileModel {
     constructor(
         data = null,
         translate: (string) => string,
+        fileType: ImportDataExtension,
         fieldsWithoutTokens: {
             [property: string]: string
         } = {},
@@ -112,6 +123,7 @@ export class ImportableFileModel {
             modelArrayProperties: {
                 [propertyPath: string]: IModelArrayProperties
             },
+            fileType: ImportDataExtension,
             extraDataUsedToFormat: any
         ) => void
     ) {
@@ -133,6 +145,7 @@ export class ImportableFileModel {
                 fieldsWithoutTokens,
                 this.suggestedFieldMapping,
                 this.modelArrayProperties,
+                fileType,
                 extraDataUsedToFormatData
             );
         }
