@@ -40,8 +40,9 @@ app-team-workload {
 
     .workload-table-wrapper {
         width: 100%;
-        overflow-x: auto;
+        overflow: auto;
         min-height: 500px;
+        max-height: 500px;
     }
 
     .team-workload-table {
@@ -90,6 +91,9 @@ app-team-workload {
         tr td:first-child {
             border-right: 1px solid #ddd;
             text-align: left;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         tr:first-child {
