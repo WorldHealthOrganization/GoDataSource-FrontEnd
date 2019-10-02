@@ -12,6 +12,7 @@ import { RequiredOneOrOtherValidatorDirective } from './required-one-or-other-va
 import { MinMaxValidatorDirective } from './min-max-validator.directive';
 import { GeneralAsyncValidatorDirective } from './general-async-validator.directive';
 import { HasPropertyDirective } from './has-property.directive';
+import { NotNumberValidatorDirective } from './not-number-validator.directive';
 
 export const validatorDirectives: any[] = [
     EmailValidatorDirective,
@@ -27,5 +28,6 @@ export const validatorDirectives: any[] = [
     RequiredOneOrOtherValidatorDirective,
     MinMaxValidatorDirective,
     GeneralAsyncValidatorDirective,
-    HasPropertyDirective
+    HasPropertyDirective,
+    NotNumberValidatorDirective
 ];

@@ -12,6 +12,11 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
+        /**
+         * uiFormInputValidationErrors
+         */
+        'LNG_FORM_VALIDATION_ERROR_FIELD_NOT_NUMBER': 'Can\'t be number'
+
 
 
         /**

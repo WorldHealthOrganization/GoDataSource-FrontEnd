@@ -327,7 +327,9 @@
                                     [checkObject]="questionVariables"
                                     checkErrorMsg="LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_VARIABLE"
                                     [checkCompareValue]="questionInEditModeClone.uuid"
-                                    (blur)="questionVariableBlurred($event)">
+                                    (blur)="questionVariableBlurred($event)"
+                                    app-not-number-validator
+                                    [notNumberValidatorDisabled]="!allowQuestionVariableChange && !questionInEditModeClone.new && questionInEditModeClone.variable">
                                 </app-form-input>
                             </div>
 
