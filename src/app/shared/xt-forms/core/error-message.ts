@@ -60,6 +60,10 @@ export class ErrorMessage {
                 return new ElementBaseFailure(
                     'LNG_FORM_VALIDATION_ERROR_FIELD_EMAIL'
                 );
+            case 'notNumberValidator':
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_FIELD_NOT_NUMBER'
+                );
             case 'passwordValidator':
                 return new ElementBaseFailure(
                     'LNG_FORM_VALIDATION_ERROR_FIELD_PASSWORD'
