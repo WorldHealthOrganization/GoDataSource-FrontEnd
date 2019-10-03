@@ -153,6 +153,7 @@
                 [class.question-is-inactive]="questionIndex === questionIndexInEditMode ? questionInEditModeClone.inactive : question.inactive">
                 <!-- Order -->
                 <div
+                    [style.visibility]="question.answerType === answerTypes.MARKUP.value ? 'hidden' : 'visible'"
                     fxFlex="70px"
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
                     {{ ('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE' | translate) + question.order }}
