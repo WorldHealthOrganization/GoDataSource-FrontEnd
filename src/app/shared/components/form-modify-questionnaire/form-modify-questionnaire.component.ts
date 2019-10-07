@@ -510,8 +510,8 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             // init question answer actions
             this.initQuestionAnswerActions();
 
-            // update question order based on markup questions
-            this.updateQuestionsOrder();
+            // // update question order based on markup questions
+            // this.updateQuestionsOrder();
 
             // finished loading data
             this.loadingData = false;
@@ -660,10 +660,17 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         questions: QuestionModel[],
         recursive: boolean = true
     ) {
+        let lastNoMarkupQuestionCount: number = 0;
         // sort answer questions
         _.each(questions, (question: QuestionModel, questionIndex: number) => {
             // set question order
-            question.order = questionIndex + 1;
+            // question.order = questionIndex + 1;
+            if (question.answerType === Constants.ANSWER_TYPES.MARKUP.value) {
+                question.order = 0;
+            } else {
+                question.order = lastNoMarkupQuestionCount + 1;
+                lastNoMarkupQuestionCount++;
+            }
 
             // set additional questions index
             _.each(question.answers, (answer: AnswerModel, answerIndex: number) => {
@@ -806,8 +813,8 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // emit questionnaire save
         this.emitUpdateQuestionnaire(false);
 
-        // update the question order
-        this.updateQuestionsOrder();
+        // // update the question order
+        // this.updateQuestionsOrder();
     }
 
     /**
