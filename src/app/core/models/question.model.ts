@@ -74,6 +74,8 @@ export class QuestionModel {
     new: boolean;
     clone: boolean;
     uuid: string;
+    // we use this just for displaying the order of questions
+    displayOrder: number;
 
     constructor(
         data = null,

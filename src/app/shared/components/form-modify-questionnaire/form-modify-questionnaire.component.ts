@@ -664,12 +664,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // sort answer questions
         _.each(questions, (question: QuestionModel, questionIndex: number) => {
             // set question order
-            // question.order = questionIndex + 1;
-            if (question.answerType === Constants.ANSWER_TYPES.MARKUP.value) {
-                question.order = 0;
-            } else {
-                question.order = lastNoMarkupQuestionCount + 1;
+            if (question.answerType !== Constants.ANSWER_TYPES.MARKUP.value) {
+                question.displayOrder = lastNoMarkupQuestionCount + 1;
                 lastNoMarkupQuestionCount++;
+            } else {
+                question.order = questionIndex + 1;
             }
 
             // set additional questions index
@@ -983,6 +982,8 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 this.markQuestionFormDirty();
             });
         }
+
+        // this.setQuestionnaireQuestionsOrder(this.questionnaireData, false);
     }
 
     /**
