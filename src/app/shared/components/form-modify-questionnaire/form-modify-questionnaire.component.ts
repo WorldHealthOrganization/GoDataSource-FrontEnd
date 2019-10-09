@@ -788,7 +788,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
         // emit questionnaire save
         this.emitUpdateQuestionnaire(false);
-
     }
 
     /**
@@ -957,8 +956,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 this.markQuestionFormDirty();
             });
         }
-
-        // this.setQuestionnaireQuestionsOrder(this.questionnaireData, false);
     }
 
     /**
