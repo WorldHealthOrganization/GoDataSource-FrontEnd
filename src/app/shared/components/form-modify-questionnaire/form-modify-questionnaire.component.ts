@@ -510,9 +510,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             // init question answer actions
             this.initQuestionAnswerActions();
 
-            // // update question order based on markup questions
-            // this.updateQuestionsOrder();
-
             // finished loading data
             this.loadingData = false;
         }
@@ -537,26 +534,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
         // get variables so we don't allow duplicates
         this.determineQuestionnaireVariables();
-    }
-
-    /**
-     * Format questions order skipping markup questions
-     */
-    private updateQuestionsOrder() {
-        if (!_.isEmpty(this.questionnaireData)) {
-            // keep the last question to count
-            let lastOrder: number = 0;
-            // iterate questionnaire data and reassign order numbers
-            this.questionnaireData = _.map(this.questionnaireData, (question) => {
-                if (question.answerType === Constants.ANSWER_TYPES.MARKUP.value) {
-                    question.order = 0;
-                } else {
-                    question.order = lastOrder + 1;
-                    lastOrder++;
-                }
-                return new QuestionModel(question);
-            });
-        }
     }
 
     /**
@@ -664,11 +641,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // sort answer questions
         _.each(questions, (question: QuestionModel, questionIndex: number) => {
             // set question order
+            question.order = questionIndex + 1;
+            // if we have a markup question we should not display the question order but a display order
             if (question.answerType !== Constants.ANSWER_TYPES.MARKUP.value) {
                 question.displayOrder = lastNoMarkupQuestionCount + 1;
                 lastNoMarkupQuestionCount++;
-            } else {
-                question.order = questionIndex + 1;
             }
 
             // set additional questions index
@@ -812,8 +789,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // emit questionnaire save
         this.emitUpdateQuestionnaire(false);
 
-        // // update the question order
-        // this.updateQuestionsOrder();
     }
 
     /**
