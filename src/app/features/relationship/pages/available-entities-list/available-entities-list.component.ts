@@ -21,6 +21,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { map, share, tap } from 'rxjs/operators';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { AddressType } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -170,6 +171,9 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
             this.entityId &&
             this.selectedOutbreak
         ) {
+            // retrieve location list
+            this.queryBuilder.include('locations', true);
+
             // retrieve the list of Relationships
             this.entitiesList$ = this.relationshipDataService
                 .getEntityAvailablePeople(
@@ -362,5 +366,35 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
                 }
             }
         );
+    }
+
+    /**
+     * Filter by locations selected in location-drop-down
+     * @param locations
+     */
+    filterByLocation(locations) {
+        // remove previous condition
+        this.queryBuilder.filter.remove('addresses');
+        if (!_.isEmpty(locations)) {
+            // mapping all the locations to get the ids
+            const locationsIds = _.map(locations, (location) => {
+                return location.id;
+            });
+
+            // build query
+            this.queryBuilder.filter.where({
+                addresses: {
+                    elemMatch: {
+                        typeId: AddressType.CURRENT_ADDRESS,
+                        parentLocationIdFilter: {
+                            $in: locationsIds
+                        }
+                    }
+                }
+            });
+        }
+
+        // refresh list
+        this.needsRefreshList();
     }
 }
