@@ -203,7 +203,7 @@ export class FilterModel {
     questionnaireTemplateQuestions: QuestionSideFilterModel[];
     public set questionnaireTemplate(questionnaireTemplate: QuestionModel[]) {
         // set questionnaire template
-        this._questionnaireTemplate = questionnaireTemplate;
+        this._questionnaireTemplate = (questionnaireTemplate || []).map((question: any) => new QuestionModel(question));
 
         // function that adds questions recursively
         // the list of questions should already be sorted, so we don't need to sort them before adding them to the list
@@ -213,11 +213,6 @@ export class FilterModel {
             prefixOrder: string,
             multiAnswerParent: boolean
         ) => {
-            // ignore some types of questions
-            if (question.answerType === Constants.ANSWER_TYPES.MARKUP.value) {
-                return;
-            }
-
             // add question to list
             const orderLabel: string = (
                 prefixOrder ?
@@ -234,26 +229,34 @@ export class FilterModel {
             if (!_.isEmpty(question.answers)) {
                 question.answers.forEach((answer: AnswerModel) => {
                     if (!_.isEmpty(answer.additionalQuestions)) {
-                        answer.additionalQuestions.forEach((childQuestion: QuestionModel) => {
-                            addQuestion(
-                                childQuestion,
-                                orderLabel,
-                                multiAnswerParent
-                            );
-                        });
+                        answer.additionalQuestions
+                            // ignore some types of questions
+                            .filter((adQuestion) => adQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value)
+                            .forEach((childQuestion: QuestionModel, index: number) => {
+                                childQuestion.order = index + 1;
+                                addQuestion(
+                                    childQuestion,
+                                    orderLabel,
+                                    multiAnswerParent
+                                );
+                            });
                     }
                 });
             }
         };
 
         // determine list of questions to display
-        (this.questionnaireTemplate || []).forEach((question: QuestionModel) => {
-            addQuestion(
-                question,
-                '',
-                question.multiAnswer
-            );
-        });
+        (this.questionnaireTemplate || [])
+            // ignore some types of questions
+            .filter((adQuestion) => adQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value)
+            .forEach((question: QuestionModel, index: number) => {
+                question.order = index + 1;
+                addQuestion(
+                    question,
+                    '',
+                    question.multiAnswer
+                );
+            });
     }
     public get questionnaireTemplate(): QuestionModel[] {
         return this._questionnaireTemplate;

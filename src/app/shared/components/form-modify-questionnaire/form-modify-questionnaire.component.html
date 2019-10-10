@@ -155,7 +155,10 @@
                 <div
                     fxFlex="70px"
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
-                    {{ ('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE' | translate) + question.order }}
+                    <div
+                        *ngIf="question.answerType !== answerTypes.MARKUP.value">
+                        {{ ('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE' | translate) + question.displayOrder }}
+                    </div>
                 </div>
 
                 <!-- Question Text -->

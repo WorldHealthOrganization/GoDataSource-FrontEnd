@@ -638,9 +638,14 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         recursive: boolean = true
     ) {
         // sort answer questions
+        let lastNoMarkupQuestionCount: number = 1;
         _.each(questions, (question: QuestionModel, questionIndex: number) => {
             // set question order
             question.order = questionIndex + 1;
+            // if we have a markup question we should not display the question order but a display order
+            if (question.answerType !== Constants.ANSWER_TYPES.MARKUP.value) {
+                question.displayOrder = lastNoMarkupQuestionCount++;
+            }
 
             // set additional questions index
             _.each(question.answers, (answer: AnswerModel, answerIndex: number) => {
