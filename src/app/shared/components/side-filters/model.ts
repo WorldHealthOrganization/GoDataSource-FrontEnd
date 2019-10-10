@@ -233,13 +233,13 @@ export class FilterModel {
                             // ignore some types of questions
                             .filter((adQuestion) => adQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value)
                             .forEach((childQuestion: QuestionModel, index: number) => {
-                            childQuestion.order = index + 1;
-                            addQuestion(
-                                childQuestion,
-                                orderLabel,
-                                multiAnswerParent
-                            );
-                        });
+                                childQuestion.order = index + 1;
+                                addQuestion(
+                                    childQuestion,
+                                    orderLabel,
+                                    multiAnswerParent
+                                );
+                            });
                     }
                 });
             }
@@ -250,13 +250,13 @@ export class FilterModel {
             // ignore some types of questions
             .filter((adQuestion) => adQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value)
             .forEach((question: QuestionModel, index: number) => {
-            question.order = index + 1;
-            addQuestion(
-                question,
-                '',
-                question.multiAnswer
-            );
-        });
+                question.order = index + 1;
+                addQuestion(
+                    question,
+                    '',
+                    question.multiAnswer
+                );
+            });
     }
     public get questionnaireTemplate(): QuestionModel[] {
         return this._questionnaireTemplate;

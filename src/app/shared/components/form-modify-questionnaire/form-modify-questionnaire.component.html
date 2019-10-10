@@ -153,10 +153,10 @@
                 [class.question-is-inactive]="questionIndex === questionIndexInEditMode ? questionInEditModeClone.inactive : question.inactive">
                 <!-- Order -->
                 <div
+                    fxFlex="70px"
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
                     <div
-                        [style.visibility]="question.answerType === answerTypes.MARKUP.value ? 'hidden' : 'visible'"
-                        fxFlex="70px">
+                        *ngIf="question.answerType !== answerTypes.MARKUP.value">
                         {{ ('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE' | translate) + question.displayOrder }}
                     </div>
                 </div>
