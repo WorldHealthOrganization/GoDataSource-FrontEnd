@@ -742,9 +742,30 @@ export class ImportDataComponent implements OnInit {
 
                         // add to list
                         this.mappedFields.push(importableItem);
+
+                        // add file array maps
+                        const arrayPathIndex: number = source.value.lastIndexOf('[]');
+                        const arrayPath: string = arrayPathIndex < 0 ? null : source.value.substring(0, arrayPathIndex);
+                        if (
+                            !ignoreArrayLevels &&
+                            destination &&
+                            arrayPath &&
+                            this.importableObject &&
+                            this.importableObject.fileArrayHeaders[arrayPath] &&
+                            this.importableObject.fileArrayHeaders[arrayPath].maxItems > 1
+                        ) {
+                            for (let newLevel: number = 1; newLevel < this.importableObject.fileArrayHeaders[arrayPath].maxItems; newLevel++) {
+                                pushNewMapField(
+                                    destination,
+                                    [source],
+                                    newLevel,
+                                    true
+                                );
+                            }
+                        }
                     });
 
-                    // add array maps
+                    // add model array maps
                     if (
                         !ignoreArrayLevels &&
                         destination &&
