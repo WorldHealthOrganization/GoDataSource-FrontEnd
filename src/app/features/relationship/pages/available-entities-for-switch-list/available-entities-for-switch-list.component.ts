@@ -25,6 +25,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
+import { AddressType } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-available-entities-for-switch-list',
@@ -185,6 +186,9 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                     nin: this.selectedPeopleIds
                 }
             });
+
+            // retrieve location list
+            qb.include('locations', true);
 
             // retrieve the list of Relationships
             this.entitiesList$ = this.relationshipDataService
@@ -348,5 +352,35 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                           });
                   }
             });
+    }
+
+    /**
+     * Filter by locations selected in location-drop-down
+     * @param locations
+     */
+    filterByLocation(locations) {
+        // remove previous condition
+        this.queryBuilder.filter.remove('addresses');
+        if (!_.isEmpty(locations)) {
+            // mapping all the locations to get the ids
+            const locationsIds = _.map(locations, (location) => {
+                return location.id;
+            });
+
+            // build query
+            this.queryBuilder.filter.where({
+                addresses: {
+                    elemMatch: {
+                        typeId: AddressType.CURRENT_ADDRESS,
+                        parentLocationIdFilter: {
+                            $in: locationsIds
+                        }
+                    }
+                }
+            });
+        }
+
+        // refresh list
+        this.needsRefreshList();
     }
 }

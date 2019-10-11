@@ -329,15 +329,16 @@
                             <div class="column-header">
                                 {{'LNG_ENTITY_FIELD_LABEL_PLACE' | translate}}
                             </div>
-                            <div class="column-filter">
-                                <!--<app-form-location-dropdown-->
-                                    <!--name="locationFilter"-->
-                                    <!--ngModel-->
-                                    <!--[placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
-                                    <!--(changed)="filterBySelectField('address.locationId', $event)"-->
-                                    <!--multiple="true"-->
-                                    <!--app-reset-input-on-side-filter>-->
-                                <!--</app-form-location-dropdown>-->
+                            <div class="column-filter location-drop-down-column-header-container">
+                                <app-form-location-dropdown
+                                    name="locationFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    (itemChanged)="filterByLocation($event)"
+                                    multiple="true"
+                                    app-reset-input-on-side-filter
+                                    [fixedDropPanel]="true">
+                                </app-form-location-dropdown>
                             </div>
                         </div>
                     </mat-header-cell>
