@@ -341,8 +341,16 @@
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_AREA' | translate }}</div>
-                    <div class="column-filter">
-                        <!-- placeholder -->
+                    <div class="column-filter location-drop-down-column-header-container">
+                        <app-form-location-dropdown
+                            name="locationFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (itemChanged)="filterBySelectField('address.parentLocationIdFilter', $event, 'id')"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [fixedDropPanel]="true">
+                        </app-form-location-dropdown>
                     </div>
                 </div>
             </mat-header-cell>

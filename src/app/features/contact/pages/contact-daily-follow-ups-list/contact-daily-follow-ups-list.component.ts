@@ -427,6 +427,10 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED'
             }),
             new VisibleColumnModel({
+                field: 'area',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_AREA'
+            }),
+            new VisibleColumnModel({
                 field: 'contact.dateOfLastContact',
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
             }),
@@ -437,10 +441,6 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             new VisibleColumnModel({
                 field: 'index',
                 label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP'
-            }),
-            new VisibleColumnModel({
-                field: 'area',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_AREA'
             }),
             new VisibleColumnModel({
                 field: 'fullAddress',
