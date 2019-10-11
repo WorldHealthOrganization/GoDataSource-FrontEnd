@@ -276,10 +276,6 @@
 
             <div fxLayout="row" fxLayoutAlign="center">
                 <button
-                    *ngIf="
-                        mappedFields.length < importableObject.fileHeadersKeyValue.length ||
-                        mappedFields.length < importableObject.modelPropertiesKeyValue.length
-                    "
                     mat-raised-button
                     color="accent"
                     (click)="addNewFieldMap()"

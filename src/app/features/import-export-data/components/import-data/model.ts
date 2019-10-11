@@ -16,6 +16,10 @@ export interface IModelArrayProperties {
     maxItems: number;
 }
 
+export interface IFileArrayProperties {
+    maxItems: number;
+}
+
 export class ImportableLabelValuePair {
     constructor(
         public label: string,
@@ -39,6 +43,10 @@ export class ImportableFileModel {
     id: string;
     fileHeaders: string[] = [];
     fileHeadersKeyValue: ImportableLabelValuePair[];
+
+    fileArrayHeaders: {
+        [headerPathName: string]: IFileArrayProperties
+    };
 
     suggestedFieldMapping: {
         [fileHeader: string]: string
@@ -131,6 +139,7 @@ export class ImportableFileModel {
         this.fileHeaders = (_.get(data, 'fileHeaders', []) || []).map((value: any) => {
             return typeof value === 'string' ? value : value.toString();
         });
+        this.fileArrayHeaders = _.get(data, 'fileArrayHeaders') || [];
         this.modelProperties = _.get(data, 'modelProperties', {});
         this.modelPropertyValues = _.get(data, 'modelPropertyValues', {});
         this.suggestedFieldMapping = _.get(data, 'suggestedFieldMapping', {});
