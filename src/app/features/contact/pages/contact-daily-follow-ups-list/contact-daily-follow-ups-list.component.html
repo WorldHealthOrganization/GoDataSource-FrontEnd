@@ -346,7 +346,7 @@
                             name="locationFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (itemChanged)="filterBySelectField('address.locationId', $event, 'id')"
+                            (itemChanged)="filterBySelectField('address.parentLocationIdFilter', $event, 'id')"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [fixedDropPanel]="true">
