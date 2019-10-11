@@ -795,13 +795,20 @@ export class ImportDataComponent implements OnInit {
                             // check if parent key should be translated
                             const parentPrefixIndex: number = parentPath ? parentPath.lastIndexOf('.') : -1;
                             const parentPrefix = parentPrefixIndex > -1 ? parentPath.substring(0, parentPrefixIndex) : null;
+                            const parentPathTranslation: string = this.fieldsWithoutTokens && this.fieldsWithoutTokens[parentPath] !== undefined ?
+                                (this.fieldsWithoutTokens[parentPath] ? this.i18nService.instant(this.fieldsWithoutTokens[parentPath]) : '') :
+                                undefined;
                             if (
                                 parentPath &&
-                                this.fieldsWithoutTokens &&
-                                this.fieldsWithoutTokens[parentPath] && (
-                                    (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(this.fieldsWithoutTokens[parentPath])}[].${this.i18nService.instant(value)}`).toLowerCase()]) || (
+                                parentPathTranslation !== undefined && (
+                                    (
+                                        parentPathTranslation &&
+                                        (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPathTranslation}[].${this.i18nService.instant(value)}`).toLowerCase()])
+                                    ) || (
                                         parentPrefix &&
-                                        (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPrefix}.${this.i18nService.instant(this.fieldsWithoutTokens[parentPath])}[].${this.i18nService.instant(value)}`).toLowerCase()])
+                                        (mappedHeaderObj = mappedHeaders[_.camelCase(
+                                            `${parentPrefix}${parentPathTranslation !== '' ? ('.' + parentPathTranslation + '[]') : ''}.${this.i18nService.instant(value)}`
+                                        ).toLowerCase()])
                                     )
                                 )
                             ) {
@@ -813,7 +820,13 @@ export class ImportDataComponent implements OnInit {
                             // search though flat values - for arrays
                             } else if (
                                 mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}[1]`).toLowerCase()] ||
-                                mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[1]`).toLowerCase()]
+                                mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[1]`).toLowerCase()] || (
+                                    parentPathTranslation !== undefined &&
+                                    parentPrefix &&
+                                    mappedHeaders[_.camelCase(
+                                        `${parentPrefix}${parentPathTranslation !== '' ? ('.' + parentPathTranslation + '[]') : ''}.${this.i18nService.instant(value)}[1]`
+                                    ).toLowerCase()]
+                                )
                             ) {
                                 // map all determined levels
                                 _.each(
@@ -821,7 +834,13 @@ export class ImportDataComponent implements OnInit {
                                     (supportedLevel: LabelValuePair) => {
                                         if (
                                             (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()]) ||
-                                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()])
+                                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()]) || (
+                                                parentPathTranslation !== undefined &&
+                                                parentPrefix &&
+                                                (mappedHeaderObj = mappedHeaders[_.camelCase(
+                                                    `${parentPrefix}${parentPathTranslation !== '' ? ('.' + parentPathTranslation + '[]') : ''}.${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`
+                                                ).toLowerCase()])
+                                            )
                                         ) {
                                             // create object
                                             pushNewMapField(
