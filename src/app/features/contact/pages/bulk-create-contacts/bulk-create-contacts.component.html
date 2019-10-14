@@ -39,7 +39,7 @@
 
         <mat-step>
             <ng-template matStepLabel>{{'LNG_PAGE_BULK_ADD_CONTACTS_TAB_ADD_CONTACTS' | translate }}</ng-template>
-                <form class="form-section" (submit)="addContacts(sheetTable)">
+                <form class="form-section" (submit)="addContacts()">
                     <div class="form-content">
                         <mat-card class="page-section" fxLayout="column">
 
@@ -76,61 +76,14 @@
                                     ngModel
                                     name="addContactsHidden"/>
 
-                                <hot-table
-                                    #sheetTable
-                                    [colHeaders]="true"
-                                    [rowHeaders]="true"
-                                    [manualColumnResize]="true"
-                                    preventOverflow="horizontal"
-                                    [width]="sheetWidth"
-                                    [height]="520"
-                                    [contextMenu]="sheetContextMenu"
-                                    [colWidths]="150"
+                                <app-hot-table-wrapper
+                                    #hotTableWrapper
+                                    [sheetContextMenu]="sheetContextMenu"
+                                    [sheetColumns]="sheetColumns"
+                                    (afterBecameDirty)="afterBecameDirty()"
                                     [startRows]="20"
                                     [minSpareRows]="1"
-                                    [renderAllRows]="true"
-                                    [beforeValidate]="beforeValidateSheet"
-                                    [afterRemoveRow]="afterRemoveRow"
-                                    [afterChange]="afterChange(inputForMakingFormDirty)">
-
-                                    <ng-container *ngFor="let column of sheetColumns">
-                                        <!-- Text column -->
-                                        <hot-column
-                                            *ngIf="column.type === SheetCellType.TEXT"
-                                            [title]="(column.title | translate) + (column.required ? ' *' : '')"
-                                            [validator]="column.validationFunc">
-                                        </hot-column>
-
-                                        <!-- Numeric column -->
-                                        <hot-column
-                                            *ngIf="column.type === SheetCellType.NUMERIC"
-                                            [title]="(column.title | translate) + (column.required ? ' *' : '')"
-                                            type="numeric"
-                                            [validator]="column.validationFunc">
-                                        </hot-column>
-
-                                        <!-- Date column -->
-                                        <hot-column
-                                            *ngIf="column.type === SheetCellType.DATE"
-                                            [title]="(column.title | translate) + (column.required ? ' *' : '')"
-                                            type="date"
-                                            [dateFormat]="Constants.DEFAULT_DATE_DISPLAY_FORMAT"
-                                            [correctFormat]="true"
-                                            [validator]="column.validationFunc">
-                                        </hot-column>
-
-                                        <!-- Dropdown column -->
-                                        <hot-column
-                                            *ngIf="column.type === SheetCellType.DROPDOWN"
-                                            [title]="(column.title | translate) + (column.required ? ' *' : '')"
-                                            type="dropdown"
-                                            [trimDropdown]="false"
-                                            [source]="column.optionLabels$ | async"
-                                            [validator]="column.validationFunc">
-                                        </hot-column>
-
-                                    </ng-container>
-                                </hot-table>
+                                ></app-hot-table-wrapper>
                             </div>
 
                         </mat-card>
@@ -139,7 +92,7 @@
                 </form>
                 <div class="stepper-navigation-buttons">
                     <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-raised-button color="accent" (click)="addContacts(sheetTable)">{{'LNG_COMMON_BUTTON_SAVE' | translate}}</button>
+                    <button mat-raised-button color="accent" (click)="addContacts()">{{'LNG_COMMON_BUTTON_SAVE' | translate}}</button>
                 </div>
         </mat-step>
     </mat-horizontal-stepper>

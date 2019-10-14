@@ -40,7 +40,6 @@ import { AuthGuard } from './guards/auth-guard.service';
 import { PasswordChangeGuard } from './guards/password-change-guard.service';
 import { PageChangeConfirmationGuard } from './guards/page-change-confirmation-guard.service';
 import { LanguageResolver } from './resolvers/language.resolver';
-import { BulkContactsService } from './helper/bulk-contacts.service';
 import { AuditLogDataService } from './data/audit-log.data.service';
 import { HelpDataService } from './data/help.data.service';
 import { GlobalEntitySearchDataService } from './data/global-entity-search.data.service';
@@ -106,6 +105,5 @@ export const services: any[] = [
     CacheService,
     DialogService,
     DomService,
-    BulkContactsService,
     RedirectService
 ];

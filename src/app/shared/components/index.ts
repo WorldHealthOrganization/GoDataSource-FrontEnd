@@ -49,6 +49,7 @@ import { FormSelectChangeDetectionPushComponent } from './form-select-change-det
 import { ListItemLabelComponent } from './list-item-label/list-item-label.component';
 import { FormNgxWigComponent } from './form-ngx-wig/form-ngx-wig.component';
 import { FormVaccinesListComponent } from './form-vaccines-list/form-vaccines-list.component';
+import { HotTableWrapperComponent } from './hot-table-wrapper/hot-table-wrapper.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -100,6 +101,7 @@ export const components: any[] = [
     FormLocationIdentifierComponent,
     FormNgxWigComponent,
     FormVaccinesListComponent,
+    HotTableWrapperComponent,
 
     // display information
     CountedItemsListComponent,

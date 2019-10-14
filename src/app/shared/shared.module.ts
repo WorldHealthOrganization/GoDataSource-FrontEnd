@@ -11,6 +11,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { MglTimelineModule } from 'angular-mgl-timeline';
 import { FileUploadModule } from 'ng2-file-upload';
 import { NgxWigModule } from 'ngx-wig';
+import { HotTableModule } from '@handsontable/angular';
 
 // components
 import * as fromSharedComponents from './components';
@@ -29,7 +30,8 @@ import * as fromSharedPipes from './pipes';
         TranslateModule,
         MglTimelineModule,
         FileUploadModule,
-        NgxWigModule
+        NgxWigModule,
+        HotTableModule.forRoot()
     ],
     declarations: [
         ...fromSharedComponents.components,

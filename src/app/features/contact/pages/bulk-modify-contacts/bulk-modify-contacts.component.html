@@ -63,68 +63,15 @@
                                 ngModel
                                 name="modifyContactsHidden"/>
 
-                            <hot-table
-                                #sheetTable
-                                [colHeaders]="true"
+                            <app-hot-table-wrapper
+                                #hotTableWrapper
                                 [data]="data"
-                                [rowHeaders]="true"
-                                [manualColumnResize]="true"
-                                preventOverflow="horizontal"
-                                [width]="sheetWidth"
-                                [height]="520"
-                                [contextMenu]="sheetContextMenu"
-                                [colWidths]="150"
+                                [sheetContextMenu]="sheetContextMenu"
+                                [sheetColumns]="sheetColumns"
+                                (afterBecameDirty)="afterBecameDirty()"
                                 [startRows]="1"
                                 [minSpareRows]="0"
-                                [renderAllRows]="true"
-                                [beforeValidate]="beforeValidateSheet"
-                                [afterChange]="afterChange(inputForMakingFormDirty)">
-
-                                <ng-container *ngFor="let column of sheetColumns">
-                                    <!-- Text column -->
-                                    <hot-column
-                                        *ngIf="column.type === SheetCellType.TEXT"
-                                        [title]="(column.title | translate) + (column.required ? ' *' : '')"
-                                        [validator]="column.validationFunc">
-                                    </hot-column>
-
-                                    <!-- Numeric column -->
-                                    <hot-column
-                                        *ngIf="column.type === SheetCellType.NUMERIC"
-                                        [title]="(column.title | translate) + (column.required ? ' *' : '')"
-                                        type="numeric"
-                                        [validator]="column.validationFunc">
-                                    </hot-column>
-
-                                    <!-- Date column -->
-                                    <hot-column
-                                        *ngIf="column.type === SheetCellType.DATE"
-                                        [title]="(column.title | translate) + (column.required ? ' *' : '')"
-                                        type="date"
-                                        [dateFormat]="Constants.DEFAULT_DATE_DISPLAY_FORMAT"
-                                        [correctFormat]="true"
-                                        [validator]="column.validationFunc">
-                                    </hot-column>
-
-                                    <!-- Dropdown column -->
-                                    <hot-column
-                                        *ngIf="column.type === SheetCellType.DROPDOWN"
-                                        [title]="(column.title | translate) + (column.required ? ' *' : '')"
-                                        type="dropdown"
-                                        [trimDropdown]="false"
-                                        [source]="column.optionLabels$ | async"
-                                        [validator]="column.validationFunc">
-                                    </hot-column>
-
-                                    <!-- Button -->
-                                    <hot-column
-                                        *ngIf="column.type === SheetCellType.BUTTON"
-                                        [title]="(column.title | translate) + (column.required ? ' *' : '')"
-                                        [renderer]="buttonRenderer">
-                                    </hot-column>
-
-                                </ng-container>
-                            </hot-table>
+                            ></app-hot-table-wrapper>
                         </div>
 
                     </mat-card>
