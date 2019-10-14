@@ -91,6 +91,15 @@ export abstract class AbstractSheetColumn {
 }
 
 /**
+ * Button cell
+ */
+export class ButtonSheetColumn extends AbstractSheetColumn {
+    constructor() {
+        super(SheetCellType.BUTTON);
+    }
+}
+
+/**
  * Free text cell
  */
 export class TextSheetColumn extends AbstractSheetColumn {

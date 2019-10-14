@@ -11,7 +11,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { AbstractSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
+import { AbstractSheetColumn, ButtonSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
 import { SheetCellType } from '../../../../core/models/sheet/sheet-cell-type';
 import * as Handsontable from 'handsontable';
 import { Constants } from '../../../../core/models/constants';
@@ -343,6 +343,10 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         // configure columns
         this.sheetColumns = [
             // Contact properties
+            new ButtonSheetColumn()
+                .setTitle('button')
+                .setProperty('addresses.locationId')
+                .setRequired(),
             new TextSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_FIRST_NAME')
                 .setProperty('firstName')
@@ -607,5 +611,17 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                         });
                 }
             });
+    }
+
+    buttonRenderer(instance, td, row, col, prop, value, cellProperties) {
+        const button = document.createElement('input');
+        button.type = 'button';
+        button.value = 'Button';
+        button.onclick = (function(entry) {
+            return function() {
+                console.log(entry);
+            };
+        })(value);
+        td.appendChild(button);
     }
 }

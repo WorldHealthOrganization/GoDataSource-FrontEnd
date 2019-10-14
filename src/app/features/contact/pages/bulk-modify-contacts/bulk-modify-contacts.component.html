@@ -116,6 +116,13 @@
                                         [validator]="column.validationFunc">
                                     </hot-column>
 
+                                    <!-- Button -->
+                                    <hot-column
+                                        *ngIf="column.type === SheetCellType.BUTTON"
+                                        [title]="(column.title | translate) + (column.required ? ' *' : '')"
+                                        [renderer]="buttonRenderer">
+                                    </hot-column>
+
                                 </ng-container>
                             </hot-table>
                         </div>
