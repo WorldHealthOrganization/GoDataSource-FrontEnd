@@ -22,6 +22,8 @@ export class ForgotPasswordComponent implements OnInit {
         email: null
     };
 
+    displayLoading: boolean = false;
+
     constructor(
         private router: Router,
         private authDataService: AuthDataService,
@@ -41,6 +43,9 @@ export class ForgotPasswordComponent implements OnInit {
 
     forgotPassword(form: NgForm) {
 
+        // display loading
+        this.displayLoading = true;
+
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
         if (form.valid && !_.isEmpty(dirtyFields)) {
@@ -59,6 +64,9 @@ export class ForgotPasswordComponent implements OnInit {
                         `LNG_PAGE_FORGOT_PASSWORD_ACTION_SEND_EMAIL_SUCCESS_MESSAGE`,
                         {email: dirtyFields.email}
                     );
+
+                    // hide loading
+                    this.displayLoading = false;
 
                     // redirect to login page
                     this.router.navigate(['/auth/login']);
