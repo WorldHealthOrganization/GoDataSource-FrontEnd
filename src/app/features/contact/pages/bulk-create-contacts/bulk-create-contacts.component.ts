@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -28,6 +28,7 @@ import { LocationAutoItem } from '../../../../shared/components/form-location-dr
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { HotTableWrapperComponent } from '../../../../shared/components/hot-table-wrapper/hot-table-wrapper.component';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -35,7 +36,7 @@ import { HotTableWrapperComponent } from '../../../../shared/components/hot-tabl
     templateUrl: './bulk-create-contacts.component.html',
     styleUrls: ['./bulk-create-contacts.component.less']
 })
-export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements OnInit {
+export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     @ViewChild('inputForMakingFormDirty') inputForMakingFormDirty;
@@ -79,6 +80,9 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     contactVisualIdModel: {
         mask: string
     };
+
+    // subscribers
+    outbreakSubscriber: Subscription;
 
     constructor(
         private router: Router,
@@ -129,7 +133,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             });
 
         // get selected outbreak
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreak()
             .pipe(
                 catchError((err) => {
@@ -150,6 +154,14 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
                 this.retrieveRelatedPerson();
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
