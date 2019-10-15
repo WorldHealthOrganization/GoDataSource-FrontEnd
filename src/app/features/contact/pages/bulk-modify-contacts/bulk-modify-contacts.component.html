@@ -5,82 +5,52 @@
 </app-topnav>
 
 <div class="page-content">
-    <mat-horizontal-stepper linear #stepper>
-        <!--Pick location step-->
-        <mat-step>
-            <ng-template matStepLabel>{{'LNG_PAGE_BULK_MODIFY_CONTACTS_TAB_PICK_LOCATIONS' | translate}}</ng-template>
-            <div class="min-height-location">
-                <mat-card class="page-section">
-                    <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px">
-                            <app-form-location-dropdown
-                                fxFlex
-                                name="locationIds"
-                                [placeholder]="'LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_LOCATIONS' | translate"
-                                tooltip="LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_LOCATIONS_DESCRIPTION"
-                                multiple="true"
-                                [useOutbreakLocations]="true"
-                                (itemChanged)="publishLocationsAtLabelValue($event)">
-                            </app-form-location-dropdown>
-
-                            <div fxFlex><!-- placeholder --></div>
-                            <div fxFlex><!-- placeholder --></div>
-                            <div fxFlex><!-- placeholder --></div>
+    <form class="form-section">
+        <div class="form-content">
+            <mat-card class="page-section" fxLayout="column">
+                <ng-container
+                    *ngIf="errorMessages && errorMessages.length > 0">
+                    <div
+                        class="bulk-modify-contacts-errors">
+                        <div
+                            class="bulk-modify-contacts-errors-title">
+                            {{ 'LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_ERRORS' | translate }}
+                        </div>
+                        <div
+                            *ngFor="let err of errorMessages">
+                            {{ err.message | translate:err.data }}
                         </div>
                     </div>
-                </mat-card>
+                </ng-container>
 
-                <div class="stepper-navigation-buttons">
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                <div class="sheet-wrapper" fxLayout="row" fxLayoutAlign="center">
+                    <input
+                        #inputForMakingFormDirty="ngModel"
+                        type="hidden"
+                        ngModel
+                        name="modifyContactsHidden"/>
+
+                    <app-hot-table-wrapper
+                        #hotTableWrapper
+                        [data]="data"
+                        [sheetContextMenu]="sheetContextMenu"
+                        [sheetColumns]="sheetColumns"
+                        (afterBecameDirty)="afterBecameDirty()"
+                        [startRows]="1"
+                        [minSpareRows]="0"
+                        widthReduction="320"
+                    ></app-hot-table-wrapper>
                 </div>
-            </div>
-        </mat-step>
+            </mat-card>
+        </div>
 
-        <mat-step>
-            <ng-template matStepLabel>{{'LNG_PAGE_BULK_MODIFY_CONTACTS_TAB_MODIFY_CONTACTS' | translate }}</ng-template>
-            <form class="form-section">
-                <div class="form-content">
-                    <mat-card class="page-section" fxLayout="column">
-                        <ng-container
-                            *ngIf="errorMessages && errorMessages.length > 0">
-                            <div
-                                class="bulk-modify-contacts-errors">
-                                <div
-                                    class="bulk-modify-contacts-errors-title">
-                                    {{ 'LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_ERRORS' | translate }}
-                                </div>
-                                <div
-                                    *ngFor="let err of errorMessages">
-                                    {{ err.message | translate:err.data }}
-                                </div>
-                            </div>
-                        </ng-container>
-
-                        <div class="sheet-wrapper" fxLayout="row" fxLayoutAlign="center">
-                            <input
-                                #inputForMakingFormDirty="ngModel"
-                                type="hidden"
-                                ngModel
-                                name="modifyContactsHidden"/>
-
-                            <app-hot-table-wrapper
-                                #hotTableWrapper
-                                [data]="data"
-                                [sheetContextMenu]="sheetContextMenu"
-                                [sheetColumns]="sheetColumns"
-                                (afterBecameDirty)="afterBecameDirty()"
-                                [startRows]="1"
-                                [minSpareRows]="0"
-                            ></app-hot-table-wrapper>
-                        </div>
-
-                    </mat-card>
-                </div>
-            </form>
-            <div class="stepper-navigation-buttons">
-                <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                <button mat-raised-button color="accent" (click)="modifyContacts()">{{'LNG_COMMON_BUTTON_SAVE' | translate}}</button>
-            </div>
-        </mat-step>
-    </mat-horizontal-stepper>
+        <div class="form-actions">
+            <button
+                mat-raised-button
+                color="accent"
+                (click)="modifyContacts()">
+                {{ 'LNG_COMMON_BUTTON_SAVE' | translate }}
+            </button>
+        </div>
+    </form>
 </div>

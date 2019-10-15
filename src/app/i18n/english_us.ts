@@ -22,6 +22,9 @@ export const EnglishUsLang = {
         /**
          * REMOVE the tokens from below
          */
-        // ...
+        // LNG_PAGE_BULK_MODIFY_CONTACTS_TAB_PICK_LOCATIONS
+        // LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_LOCATIONS
+        // LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_LOCATIONS_DESCRIPTION
+        // LNG_PAGE_BULK_MODIFY_CONTACTS_TAB_MODIFY_CONTACTS
     }
 };

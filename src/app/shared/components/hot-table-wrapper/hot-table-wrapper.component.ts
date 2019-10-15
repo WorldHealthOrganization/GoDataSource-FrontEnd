@@ -52,6 +52,7 @@ export interface IHotTableWrapperEvent {
 })
 export class HotTableWrapperComponent implements OnInit {
     // input
+    @Input() widthReduction: number = 0;
     @Input() startRows: number = 1;
     @Input() minSpareRows: number = 0;
     @Input() data: any[][];
@@ -105,7 +106,7 @@ export class HotTableWrapperComponent implements OnInit {
      */
     @HostListener('window:resize')
     private setSheetWidth() {
-        this.sheetWidth = window.innerWidth - 220;
+        this.sheetWidth = window.innerWidth - this.widthReduction;
     }
 
     /**
