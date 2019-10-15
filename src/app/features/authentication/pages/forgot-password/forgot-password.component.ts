@@ -56,6 +56,10 @@ export class ForgotPasswordComponent implements OnInit {
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showError(err.message);
+
+                        // hide dialog
+                        loadingDialog.close();
+
                         return throwError(err);
                     })
                 )
