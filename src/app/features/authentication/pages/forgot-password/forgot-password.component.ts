@@ -9,6 +9,7 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import * as _ from 'lodash';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-forgot-password',
@@ -22,14 +23,13 @@ export class ForgotPasswordComponent implements OnInit {
         email: null
     };
 
-    displayLoading: boolean = false;
-
     constructor(
         private router: Router,
         private authDataService: AuthDataService,
         private userDataService: UserDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private dialogService: DialogService
     ) {
     }
 
@@ -44,7 +44,7 @@ export class ForgotPasswordComponent implements OnInit {
     forgotPassword(form: NgForm) {
 
         // display loading
-        this.displayLoading = true;
+        const loadingDialog = this.dialogService.showLoadingDialog();
 
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
@@ -66,7 +66,7 @@ export class ForgotPasswordComponent implements OnInit {
                     );
 
                     // hide loading
-                    this.displayLoading = false;
+                    loadingDialog.close();
 
                     // redirect to login page
                     this.router.navigate(['/auth/login']);
