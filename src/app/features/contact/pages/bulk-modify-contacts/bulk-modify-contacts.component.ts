@@ -114,7 +114,9 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 this.route.queryParams
                     .subscribe((params: { contactIds }) => {
                         // retrieve contacts information
-                        this.retrieveContacts(params.contactIds ? JSON.parse(params.contactIds) : []);
+                        setTimeout(() => {
+                            this.retrieveContacts(params.contactIds ? JSON.parse(params.contactIds) : []);
+                        });
                     });
             });
     }
@@ -157,9 +159,11 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         );
 
         // retrieve contacts
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.contactDataService
             .getContactsList(this.selectedOutbreak.id, qb)
             .pipe(catchError((err) => {
+                loadingDialog.close();
                 this.snackbarService.showApiError(err);
                 return throwError(err);
             }))
@@ -234,6 +238,9 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
 
                 // init table columns
                 this.configureSheetWidget();
+
+                // hide loading
+                loadingDialog.close();
             });
     }
 
