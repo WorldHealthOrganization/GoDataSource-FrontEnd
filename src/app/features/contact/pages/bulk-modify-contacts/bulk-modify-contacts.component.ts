@@ -11,7 +11,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { AbstractSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
+import { AbstractSheetColumn, LocationSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -193,11 +193,10 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                                 addressModel = AddressModel.getCurrentAddress(contact.addresses);
                                 value = addressModel ? addressModel.postalCode : null;
                                 break;
-                            // case 'addresses.locationId':
-                            //     addressModel = AddressModel.getCurrentAddress(contact.addresses);
-                            //     value = addressModel ? _.find(this.existingLocations, { value: addressModel.locationId }) : null;
-                            //     value = value ? value.label : null;
-                            //     break;
+                            case 'addresses.locationId':
+                                addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                                value = addressModel ? addressModel.locationId : null;
+                                break;
                             case 'addresses.addressLine1':
                                 addressModel = AddressModel.getCurrentAddress(contact.addresses);
                                 value = addressModel ? addressModel.addressLine1 : null;
@@ -262,10 +261,9 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
                 .setProperty('gender')
                 .setOptions(this.genderList$, this.i18nService),
-            // new DropdownSheetColumn()
-            //     .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
-            //     .setProperty('addresses.locationId')
-            //     .setOptions(this.allLocationsListOptions, this.i18nService),
+            new LocationSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
+                .setProperty('addresses.locationId'),
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
                 .setProperty('addresses.city'),

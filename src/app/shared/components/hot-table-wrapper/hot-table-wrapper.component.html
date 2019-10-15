@@ -51,5 +51,13 @@
             [source]="column.optionLabels$ | async"
             [validator]="column.validationFunc">
         </hot-column>
+
+        <!-- Location button column -->
+        <hot-column
+            *ngIf="column.type === SheetCellType.LOCATION"
+            [title]="(column.title | translate) + (column.required ? ' *' : '')"
+            [renderer]="locationRenderer()"
+            [editor]="locationEditor">
+        </hot-column>
     </ng-container>
 </hot-table>

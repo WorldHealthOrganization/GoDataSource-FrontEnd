@@ -3,5 +3,5 @@ export enum SheetCellType {
     NUMERIC = 'numeric',
     DROPDOWN = 'dropdown',
     DATE = 'date',
-    BUTTON = 'button'
+    LOCATION = 'location'
 }

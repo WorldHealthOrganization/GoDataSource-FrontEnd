@@ -15,7 +15,14 @@ export const EnglishUsLang = {
         /**
          * uiFormInputValidationErrors
          */
-        'LNG_FORM_VALIDATION_ERROR_FIELD_NOT_NUMBER': 'Can\'t be number'
+        'LNG_FORM_VALIDATION_ERROR_FIELD_NOT_NUMBER': 'Can\'t be number',
+
+        /**
+         * NEW GROUP
+         * uiFormInputHotTableWrapper
+         */
+        'LNG_FORM_HOT_TABLE_WRAPPER_NO_LOCATION_SELECTED_LABEL': '<b>None</b>',
+        'LNG_FORM_HOT_TABLE_WRAPPER_LOADING_LOCATIONS_TITLE': 'Loading locations'
 
 
 

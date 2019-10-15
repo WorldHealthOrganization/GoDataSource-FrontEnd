@@ -3,16 +3,25 @@ import * as Handsontable from 'handsontable';
 import * as _ from 'lodash';
 import { SheetCellValidator } from '../../../core/models/sheet/sheet-cell-validator';
 import { HotTableComponent } from '@handsontable/angular';
-import { ButtonSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, NumericSheetColumn, TextSheetColumn } from '../../../core/models/sheet/sheet.model';
+import { LocationSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, NumericSheetColumn, TextSheetColumn } from '../../../core/models/sheet/sheet.model';
 import { SheetCellType } from '../../../core/models/sheet/sheet-cell-type';
 import { Constants } from '../../../core/models/constants';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { GridSettings } from 'handsontable';
 import { Observable } from 'rxjs/internal/Observable';
 import { Subscriber } from 'rxjs/internal-compatibility';
-import { map, tap } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { LocationModel } from '../../../core/models/location.model';
+import { LocationDataService } from '../../../core/services/data/location.data.service';
+import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
+import { throwError } from 'rxjs/internal/observable/throwError';
+import { SnackbarService } from '../../../core/services/helper/snackbar.service';
+import { Subscription } from 'rxjs/internal/Subscription';
 
+/**
+ * Error message
+ */
 export interface InvalidTableData {
     isValid: boolean;
     invalidColumns: {
@@ -20,21 +29,33 @@ export interface InvalidTableData {
     };
 }
 
+/**
+ * Event types
+ */
 export enum IHotTableWrapperEventType {
     AfterChange,
     AfterBecameDirty
 }
 
+/**
+ * After Change event data
+ */
 export interface IHotTableWrapperEventTypeAfterChange {
     sheetCore: Handsontable;
     changes: any[];
     source: string;
 }
 
+/**
+ * After component became dirty event data
+ */
 export interface IHotTableWrapperEventTypeAfterBecameDirty {
     changes: any[];
 }
 
+/**
+ * Event
+ */
 export interface IHotTableWrapperEvent {
     // event specific data
     type: IHotTableWrapperEventType;
@@ -55,16 +76,40 @@ export class HotTableWrapperComponent implements OnInit {
     @Input() widthReduction: number = 0;
     @Input() startRows: number = 1;
     @Input() minSpareRows: number = 0;
-    @Input() data: any[][];
     @Input() sheetContextMenu: any;
-    @Input() sheetColumns: (
-        ButtonSheetColumn |
+
+    // columns input
+    private _sheetColumns: (
         TextSheetColumn |
         DateSheetColumn |
         NumericSheetColumn |
         IntegerSheetColumn |
-        DropdownSheetColumn
+        DropdownSheetColumn |
+        LocationSheetColumn
     )[] = [];
+    @Input() set sheetColumns(sheetColumns) {
+        // set columns
+        this._sheetColumns = sheetColumns;
+
+        // update cached locations
+        this.updateCachedLocations();
+    }
+    get sheetColumns() {
+        return this._sheetColumns;
+    }
+
+    // data input
+    private _data: any[][];
+    @Input() set data(data: any[][]) {
+        // set data
+        this._data = data;
+
+        // update cached locations
+        this.updateCachedLocations();
+    }
+    get data(): any[][] {
+        return this._data;
+    }
 
     // output
     @Output() afterChange = new EventEmitter<IHotTableWrapperEvent>();
@@ -79,17 +124,37 @@ export class HotTableWrapperComponent implements OnInit {
 
     // local variables
     sheetWidth: number = 500;
+
+    // callbacks
     afterChangeCallback: (
         sheetCore: Handsontable,
         changes: any[],
         source: string
     ) => void;
+    locationRendererCallback: (
+        instance,
+        td: HTMLTableCellElement,
+        row: number,
+        col: number,
+        prop: string,
+        value: any,
+        cellProperties: any
+    ) => void;
+
+    // cache locations that we need to display here
+    getLocationsListSubscriber: Subscription;
+    loadingLocations: boolean = false;
+    cachedLocations: {
+        [locationId: string]: LocationModel
+    } = {};
 
     /**
      * Constructor
      */
     constructor(
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private locationDataService: LocationDataService,
+        private snackbarService: SnackbarService
     ) {}
 
     /**
@@ -107,6 +172,187 @@ export class HotTableWrapperComponent implements OnInit {
     @HostListener('window:resize')
     private setSheetWidth() {
         this.sheetWidth = window.innerWidth - this.widthReduction;
+    }
+
+    /**
+     * Validate all table cells
+     */
+    validateTable(): Observable<InvalidTableData> {
+        return new Observable((observer: Subscriber<InvalidTableData>) => {
+            // validate all cells
+            const sheetCore: Handsontable = (this.sheetTable as any).hotInstance;
+            sheetCore.validateCells((valid) => {
+                // if not valid, then we need to determine what rows / columns are invalid
+                const invalidColumns: {
+                    [row: number]: GridSettings[]
+                } = {};
+                const countedRows: number = sheetCore.countRows();
+                let row: number = 0;
+                while (row < countedRows) {
+                    // validate row
+                    if (!sheetCore.isEmptyRow(row)) {
+                        _.each(
+                            sheetCore.getCellMetaAtRow(row),
+                            (column: GridSettings) => {
+                                if (column.valid === false) {
+                                    // initialize
+                                    if (invalidColumns[row] === undefined) {
+                                        invalidColumns[row] = [];
+                                    }
+
+                                    // add invalid column
+                                    invalidColumns[row].push(column);
+                                }
+                            }
+                        );
+                    }
+
+                    // check next row
+                    row++;
+                }
+
+                // send response back
+                observer.next({
+                    isValid: valid,
+                    invalidColumns: invalidColumns
+                });
+                observer.complete();
+            });
+        });
+    }
+
+    /**
+     * Get contacts data from table, ready to be sent in the API call for creating the contacts
+     */
+    getData(): Observable<{ data: any[], sheetCore: Handsontable}> {
+        // get the label-value map of Reference Data dropdowns (so we can replaced the labels used in the Sheet with the actual values)
+        const sheetCore: Handsontable = (this.sheetTable as any).hotInstance;
+        return this.getDropDownsLabelValueMap()
+            .pipe(
+                map((dropdownsMap) => {
+                    const data = [];
+
+                    // get table data
+                    const tableCellsData = sheetCore.getData();
+
+                    // get data row by row
+                    _.each(tableCellsData, (rowData, rowIndex) => {
+                        // check if row has any data
+                        if (!sheetCore.isEmptyRow(rowIndex)) {
+                            // create new object for current row
+                            const rowObj = {};
+
+                            // get row data cell by cell
+                            _.each(rowData, (columnValue, columnIndex) => {
+                                // omit empty cells
+                                if (
+                                    columnValue !== null &&
+                                    columnValue !== ''
+                                ) {
+                                    // by default, keep the value as it is
+                                    let cellValue = columnValue;
+
+                                    // check if column is a dropdown
+                                    if (this.sheetColumns[columnIndex].type === SheetCellType.DROPDOWN) {
+                                        // get cell value from dropdowns map
+                                        cellValue = dropdownsMap[columnIndex][columnValue];
+                                    }
+
+                                    // add cell data to the row object
+                                    _.set(rowObj, this.sheetColumns[columnIndex].property, cellValue);
+                                }
+                            });
+
+                            // add row data
+                            data.push(rowObj);
+                        }
+                    });
+
+                    // finished
+                    return {
+                        data: data,
+                        sheetCore: sheetCore
+                    };
+                })
+            );
+    }
+
+    /**
+     * Retrieve errors
+     * @param response
+     * @param errToken
+     */
+    getErrors(
+        response: any,
+        errToken: string
+    ) {
+        return _.map(
+            response.invalidColumns,
+            (columns: GridSettings[], row: string) => {
+                // initialize
+                const data: {
+                    row: number,
+                    columns: string
+                } = {
+                    row: _.parseInt(row) + 1,
+                    columns: ''
+                };
+
+                // merge columns into just one error message
+                _.each(
+                    columns,
+                    (column: GridSettings) => {
+                        data.columns += `${data.columns.length < 1 ? '' : ', '}${column.title}`;
+                    }
+                );
+
+                // finished
+                return {
+                    message: errToken,
+                    data: data
+                };
+            }
+        );
+    }
+
+    /**
+     * Get a map of (translated label - value) pairs for all dropdowns
+     */
+    private getDropDownsLabelValueMap(): Observable<any> {
+        const dropdownsMap = [];
+        const dropdownItemsObservables = [];
+
+        for (const i in this.sheetColumns) {
+            const sheetColumn = this.sheetColumns[i];
+            // check if it's a dropdown
+            if (sheetColumn.type === SheetCellType.DROPDOWN) {
+                // initialize map for each dropdown
+                dropdownsMap[i] = {};
+
+                // collect the list of observables to be called to get dropdown items
+                ((index) => {
+                    dropdownItemsObservables.push(
+                        (sheetColumn as DropdownSheetColumn).options$
+                            .pipe(
+                                tap((dropdownItems) => {
+                                    // go through all items of each dropdown
+                                    _.each(dropdownItems, (item) => {
+                                        // keep the value associated to each translated label
+                                        const label = this.i18nService.instant(item.label);
+                                        dropdownsMap[index][label] = item.value;
+                                    });
+                                })
+                            )
+                    );
+                })(i);
+            }
+        }
+
+        // retrieve all dropdowns items
+        return forkJoin(dropdownItemsObservables)
+            .pipe(
+                map(() => dropdownsMap)
+            );
     }
 
     /**
@@ -238,183 +484,214 @@ export class HotTableWrapperComponent implements OnInit {
     }
 
     /**
-     * Validate all table cells
+     * Update cached locations accordingly to data and columns
      */
-    validateTable(): Observable<InvalidTableData> {
-        return new Observable((observer: Subscriber<InvalidTableData>) => {
-            // validate all cells
-            const sheetCore: Handsontable = (this.sheetTable as any).hotInstance;
-            sheetCore.validateCells((valid) => {
-                // if not valid, then we need to determine what rows / columns are invalid
-                const invalidColumns: {
-                    [row: number]: GridSettings[]
-                } = {};
-                const countedRows: number = sheetCore.countRows();
-                let row: number = 0;
-                while (row < countedRows) {
-                    // validate row
-                    if (!sheetCore.isEmptyRow(row)) {
-                        _.each(
-                            sheetCore.getCellMetaAtRow(row),
-                            (column: GridSettings) => {
-                                if (column.valid === false) {
-                                    // initialize
-                                    if (invalidColumns[row] === undefined) {
-                                        invalidColumns[row] = [];
-                                    }
-
-                                    // add invalid column
-                                    invalidColumns[row].push(column);
-                                }
-                            }
-                        );
-                    }
-
-                    // check next row
-                    row++;
-                }
-
-                // send response back
-                observer.next({
-                    isValid: valid,
-                    invalidColumns: invalidColumns
-                });
-                observer.complete();
-            });
-        });
-    }
-
-    /**
-     * Get contacts data from table, ready to be sent in the API call for creating the contacts
-     */
-    getData(): Observable<{ data: any[], sheetCore: Handsontable}> {
-        // get the label-value map of Reference Data dropdowns (so we can replaced the labels used in the Sheet with the actual values)
-        const sheetCore: Handsontable = (this.sheetTable as any).hotInstance;
-        return this.getDropDownsLabelValueMap()
-            .pipe(
-                map((dropdownsMap) => {
-                    const data = [];
-
-                    // get table data
-                    const tableCellsData = sheetCore.getData();
-
-                    // get data row by row
-                    _.each(tableCellsData, (rowData, rowIndex) => {
-                        // check if row has any data
-                        if (!sheetCore.isEmptyRow(rowIndex)) {
-                            // create new object for current row
-                            const rowObj = {};
-
-                            // get row data cell by cell
-                            _.each(rowData, (columnValue, columnIndex) => {
-                                // omit empty cells
-                                if (
-                                    columnValue !== null &&
-                                    columnValue !== ''
-                                ) {
-                                    // by default, keep the value as it is
-                                    let cellValue = columnValue;
-
-                                    // check if column is a dropdown
-                                    if (this.sheetColumns[columnIndex].type === SheetCellType.DROPDOWN) {
-                                        // get cell value from dropdowns map
-                                        cellValue = dropdownsMap[columnIndex][columnValue];
-                                    }
-
-                                    // add cell data to the row object
-                                    _.set(rowObj, this.sheetColumns[columnIndex].property, cellValue);
-                                }
-                            });
-
-                            // add row data
-                            data.push(rowObj);
-                        }
-                    });
-
-                    // finished
-                    return {
-                        data: data,
-                        sheetCore: sheetCore
-                    };
-                })
-            );
-    }
-
-    /**
-     * Get a map of (translated label - value) pairs for all dropdowns
-     */
-    private getDropDownsLabelValueMap(): Observable<any> {
-        const dropdownsMap = [];
-        const dropdownItemsObservables = [];
-
-        for (const i in this.sheetColumns) {
-            const sheetColumn = this.sheetColumns[i];
-            // check if it's a dropdown
-            if (sheetColumn.type === SheetCellType.DROPDOWN) {
-                // initialize map for each dropdown
-                dropdownsMap[i] = {};
-
-                // collect the list of observables to be called to get dropdown items
-                ((index) => {
-                    dropdownItemsObservables.push(
-                        (sheetColumn as DropdownSheetColumn).options$
-                            .pipe(
-                                tap((dropdownItems) => {
-                                    // go through all items of each dropdown
-                                    _.each(dropdownItems, (item) => {
-                                        // keep the value associated to each translated label
-                                        const label = this.i18nService.instant(item.label);
-                                        dropdownsMap[index][label] = item.value;
-                                    });
-                                })
-                            )
-                    );
-                })(i);
-            }
+    private updateCachedLocations() {
+        // check if we have something to load
+        if (
+            _.isEmpty(this.data) ||
+            _.isEmpty(this.sheetColumns)
+        ) {
+            return;
         }
 
-        // retrieve all dropdowns items
-        return forkJoin(dropdownItemsObservables)
+        // determine locations columns
+        const locationColumns: number[] = [];
+        this.sheetColumns.forEach((
+            column,
+            columnIndex: number
+        ) => {
+            if (column instanceof LocationSheetColumn) {
+                if (!_.isEmpty(column.property)) {
+                    locationColumns.push(columnIndex);
+                }
+            }
+        });
+
+        // there are no location columns, then there is no point in continuing ?
+        if (_.isEmpty(locationColumns)) {
+            return;
+        }
+
+        // determine if we have location ids in our data for our location columns
+        const locationIds: string[] = [];
+        locationColumns.forEach((columnIndex: number) => {
+            this.data.forEach((data) => {
+                if (!_.isEmpty(data[columnIndex])) {
+                    locationIds.push(data[columnIndex]);
+                }
+            });
+        });
+
+        // check if we didn't retrieve location already
+        const locationIdsToRetrieve: string[] = _.filter(
+            locationIds,
+            (id: string) => {
+                return !this.cachedLocations[id];
+            }
+        );
+
+        // there is nothign to retrieve ?
+        if (_.isEmpty(locationIdsToRetrieve)) {
+            return;
+        }
+
+        // construct query builder
+        const qb: RequestQueryBuilder = new RequestQueryBuilder();
+        qb.filter.bySelect(
+            'id',
+            locationIdsToRetrieve,
+            false,
+            null
+        );
+
+        // stop previous request
+        if (
+            this.getLocationsListSubscriber &&
+            !this.getLocationsListSubscriber.closed
+        ) {
+            this.getLocationsListSubscriber.unsubscribe();
+        }
+
+        // retrieve locations
+        this.loadingLocations = true;
+        this.getLocationsListSubscriber = this.locationDataService
+            .getLocationsList(qb)
             .pipe(
-                map(() => dropdownsMap)
-            );
+                catchError((err) => {
+                    // display error message
+                    this.snackbarService.showApiError(err);
+
+                    // location not loading anymore
+                    this.loadingLocations = false;
+
+                    // finished
+                    return throwError(err);
+                })
+            )
+            .subscribe((locations) => {
+                // map the new locations
+                locations.forEach((location) => {
+                    this.cachedLocations[location.id] = location;
+                });
+
+                // location not loading anymore
+                this.loadingLocations = false;
+
+                // render spreedsheet
+                (this.sheetTable as any).hotInstance.render();
+            });
     }
 
     /**
-     * Retrieve errors
-     * @param response
-     * @param errToken
+     * Render location
      */
-    getErrors(
-        response: any,
-        errToken: string
-    ) {
-        return _.map(
-            response.invalidColumns,
-            (columns: GridSettings[], row: string) => {
-                // initialize
-                const data: {
-                    row: number,
-                    columns: string
-                } = {
-                    row: _.parseInt(row) + 1,
-                    columns: ''
-                };
+    locationRenderer(): (
+        instance,
+        td: HTMLTableCellElement,
+        row: number,
+        col: number,
+        prop: string,
+        value: any,
+        cellProperties: any
+    ) => void {
+        // return cached function
+        if (this.locationRendererCallback) {
+            return this.locationRendererCallback;
+        }
 
-                // merge columns into just one error message
-                _.each(
-                    columns,
-                    (column: GridSettings) => {
-                        data.columns += `${data.columns.length < 1 ? '' : ', '}${column.title}`;
-                    }
-                );
-
-                // finished
-                return {
-                    message: errToken,
-                    data: data
-                };
+        // create functions
+        const noLocationLabel: string = this.i18nService.instant('LNG_FORM_HOT_TABLE_WRAPPER_NO_LOCATION_SELECTED_LABEL');
+        const loadingTitle: string = this.i18nService.instant('LNG_FORM_HOT_TABLE_WRAPPER_LOADING_LOCATIONS_TITLE');
+        this.locationRendererCallback = (
+            instance,
+            td: HTMLTableCellElement,
+            row: number,
+            col: number,
+            prop: string,
+            value: any,
+            cellProperties: any
+        ) => {
+            // display loading ?
+            if (this.loadingLocations) {
+                td.innerHTML = `<img title="${loadingTitle}" class="hot-wrapper-loading-location" src="/assets/images/loading-32.gif"/>`;
+            } else {
+                // display location name
+                td.innerHTML = value && this.cachedLocations[value] ?
+                    this.cachedLocations[value].name :
+                    noLocationLabel;
             }
-        );
+        };
+
+        // return newly created function
+        return this.locationRendererCallback;
+    }
+
+    /**
+     * Edit location
+     */
+    locationEditor(
+        instance
+    ) {
+        // editor
+        return {
+            // properties
+            cellProperties: {
+                // NOTHING
+            },
+
+            // methods
+            prepare: (
+                row: number,
+                col: number,
+                prop: string,
+                td: HTMLTableCellElement,
+                cellProperties: any
+            ) => {
+                // #TODO
+                console.log('prepare');
+            },
+            beginEditing: (
+                initialValue?: any
+            ) => {
+                // #TODO
+                console.log('beginEditing');
+            },
+            finishEditing: (
+                revertToOriginal?: boolean,
+                ctrlDown?: boolean,
+                callback?: (value: boolean) => void
+            ) => {
+                // #TODO
+                console.log('finishEditing');
+            },
+            discardEditor: (
+                validationResult: boolean
+            ) => {
+                // #TODO
+                console.log('discardEditor');
+            },
+            saveValue: (
+                value: any,
+                ctrlDown: boolean
+            ) => {
+                // #TODO
+                console.log('saveValue');
+            },
+            isOpened: (): boolean => {
+                // #TODO
+                console.log('isOpened');
+                return false;
+            },
+            isWaiting: (): boolean => {
+                // #TODO
+                console.log('isWaiting');
+                return false;
+            },
+            enableFullEditMode: () => {
+                // #TODO
+                console.log('enableFullEditMode');
+            }
+        };
     }
 }

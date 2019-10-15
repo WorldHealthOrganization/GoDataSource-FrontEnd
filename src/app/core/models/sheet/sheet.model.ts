@@ -91,15 +91,6 @@ export abstract class AbstractSheetColumn {
 }
 
 /**
- * Button cell
- */
-export class ButtonSheetColumn extends AbstractSheetColumn {
-    constructor() {
-        super(SheetCellType.BUTTON);
-    }
-}
-
-/**
  * Free text cell
  */
 export class TextSheetColumn extends AbstractSheetColumn {
@@ -172,5 +163,14 @@ export class DropdownSheetColumn extends AbstractSheetColumn {
             );
 
         return this;
+    }
+}
+
+/**
+ * Location Button cell
+ */
+export class LocationSheetColumn extends AbstractSheetColumn {
+    constructor() {
+        super(SheetCellType.LOCATION);
     }
 }
