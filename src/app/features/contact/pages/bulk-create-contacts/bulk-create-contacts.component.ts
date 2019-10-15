@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -24,7 +24,6 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
-import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { HotTableWrapperComponent } from '../../../../shared/components/hot-table-wrapper/hot-table-wrapper.component';
@@ -48,18 +47,19 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     relatedEntityType: EntityType;
     relatedEntityId: string;
 
-    // options for dropdown cells
+    // contact options
     genderList$: Observable<LabelValuePair[]>;
     occupationsList$: Observable<LabelValuePair[]>;
-    addressTypesList$: Observable<LabelValuePair[]>;
     riskLevelsList$: Observable<LabelValuePair[]>;
+    addressTypesList$: Observable<LabelValuePair[]>;
     documentTypesList$: Observable<LabelValuePair[]>;
+
+    // relationship options
     certaintyLevelOptions$: Observable<LabelValuePair[]>;
     exposureTypeOptions$: Observable<LabelValuePair[]>;
     exposureFrequencyOptions$: Observable<LabelValuePair[]>;
     exposureDurationOptions$: Observable<LabelValuePair[]>;
     socialRelationshipOptions$: Observable<LabelValuePair[]>;
-    locationsListOptions$: Observable<LabelValuePair[]> = of([]);
 
     relatedEntityData: CaseModel | EventModel;
 
@@ -162,20 +162,6 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
-    }
-
-    /**
-     * Set the locations list options as label value pair based on what locations are selected
-     */
-    publishLocationsAtLabelValue(locations: LocationAutoItem[]) {
-        this.locationsListOptions$ = of<LabelValuePair[]>(
-            _.map(locations, (location: LocationAutoItem) => {
-                return new LabelValuePair(location.label, location.id);
-            })
-        );
-
-        // configure Sheet widget
-        this.configureSheetWidget();
     }
 
     /**
@@ -292,10 +278,10 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_TYPE')
                 .setProperty('contact.addresses[0].typeId')
                 .setOptions(this.addressTypesList$, this.i18nService),
-            new DropdownSheetColumn()
-                .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
-                .setProperty('contact.addresses[0].locationId')
-                .setOptions(this.locationsListOptions$, this.i18nService),
+            // new DropdownSheetColumn()
+            //     .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
+            //     .setProperty('contact.addresses[0].locationId')
+            //     .setOptions(this.locationsListOptions$, this.i18nService),
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
                 .setProperty('contact.addresses[0].city'),
