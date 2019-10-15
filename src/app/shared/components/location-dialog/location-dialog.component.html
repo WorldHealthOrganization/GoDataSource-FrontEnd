@@ -2,7 +2,7 @@
     <div
         fxLayout="row">
         <app-form-location-dropdown
-            [name]="'test....'"
+            [name]="'test'"
             [ngModel]="data.locationId"
             [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"
             tooltip="LNG_ADDRESS_FIELD_LABEL_LOCATION_DESCRIPTION"
@@ -16,7 +16,8 @@
         fxLayout="row" fxLayoutAlign="end">
         <button
             mat-button
-            type="button">
+            type="button"
+            (click)="closeDialog()">
             {{ 'LNG_COMMON_BUTTON_CANCEL' | translate | uppercase }}
         </button>
     </div>

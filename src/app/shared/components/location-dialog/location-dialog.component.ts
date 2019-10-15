@@ -16,7 +16,8 @@ export class LocationDialogComponent {
         hasBackdrop: true,
         panelClass: 'dialog-location',
         data: undefined,
-        width: '440px'
+        width: '440px',
+        maxWidth: '440px'
     };
 
     /**
@@ -32,4 +33,11 @@ export class LocationDialogComponent {
             useOutbreakLocations: boolean
         }
     ) {}
+
+    /**
+     * Close dialog
+     */
+    closeDialog() {
+        this.dialogRef.close();
+    }
 }
