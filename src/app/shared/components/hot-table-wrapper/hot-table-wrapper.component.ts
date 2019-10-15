@@ -18,6 +18,7 @@ import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-b
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { DialogService } from '../../../core/services/helper/dialog.service';
 
 /**
  * Error message
@@ -140,8 +141,12 @@ export class HotTableWrapperComponent implements OnInit {
         value: any,
         cellProperties: any
     ) => void;
+    locationEditorCallback: (
+        instance
+    ) => void;
 
     // cache locations that we need to display here
+    locationDialogVisible: boolean = false;
     getLocationsListSubscriber: Subscription;
     loadingLocations: boolean = false;
     cachedLocations: {
@@ -154,7 +159,8 @@ export class HotTableWrapperComponent implements OnInit {
     constructor(
         private i18nService: I18nService,
         private locationDataService: LocationDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private dialogService: DialogService
     ) {}
 
     /**
@@ -630,68 +636,108 @@ export class HotTableWrapperComponent implements OnInit {
     /**
      * Edit location
      */
-    locationEditor(
+    locationEditor(): (
         instance
-    ) {
-        // editor
-        return {
-            // properties
-            cellProperties: {
-                // NOTHING
-            },
+    ) => void {
+        // return cached function
+        if (this.locationEditorCallback) {
+            return this.locationEditorCallback;
+        }
 
-            // methods
-            prepare: (
-                row: number,
-                col: number,
-                prop: string,
-                td: HTMLTableCellElement,
-                cellProperties: any
-            ) => {
-                // #TODO
-                console.log('prepare');
-            },
-            beginEditing: (
-                initialValue?: any
-            ) => {
-                // #TODO
-                console.log('beginEditing');
-            },
-            finishEditing: (
-                revertToOriginal?: boolean,
-                ctrlDown?: boolean,
-                callback?: (value: boolean) => void
-            ) => {
-                // #TODO
-                console.log('finishEditing');
-            },
-            discardEditor: (
-                validationResult: boolean
-            ) => {
-                // #TODO
-                console.log('discardEditor');
-            },
-            saveValue: (
-                value: any,
-                ctrlDown: boolean
-            ) => {
-                // #TODO
-                console.log('saveValue');
-            },
-            isOpened: (): boolean => {
-                // #TODO
-                console.log('isOpened');
-                return false;
-            },
-            isWaiting: (): boolean => {
-                // #TODO
-                console.log('isWaiting');
-                return false;
-            },
-            enableFullEditMode: () => {
-                // #TODO
-                console.log('enableFullEditMode');
-            }
+        // editor
+        this.locationEditorCallback = (
+            instance
+        ) => {
+            // local properties
+            let selectedValue: any;
+
+            // finished
+            return {
+                // properties
+                cellProperties: {
+                    // NOTHING
+                },
+
+                // Prepare
+                prepare: (
+                    row: number,
+                    col: number,
+                    prop: string,
+                    td: HTMLTableCellElement,
+                    originalValue: any,
+                    cellProperties: any
+                ) => {
+                    // keep current value for later use
+                    selectedValue = originalValue;
+                },
+
+                // Begin editing
+                beginEditing: (
+                    initialValue?: any
+                ) => {
+                    // dialog visible
+                    this.locationDialogVisible = true;
+
+                    // display location dialog
+                    this.dialogService.showLocationDialog(
+                        selectedValue
+                    );
+                },
+
+                // Finish editing
+                finishEditing: (
+                    revertToOriginal?: boolean,
+                    ctrlDown?: boolean,
+                    callback?: (value: boolean) => void
+                ) => {
+                    // #TODO
+                    console.log('finishEditing');
+                },
+
+                // discard editor
+                discardEditor: (
+                    validationResult: boolean
+                ) => {
+                    // #TODO
+                    console.log('discardEditor');
+                },
+
+                // save value
+                saveValue: (
+                    value: any,
+                    ctrlDown: boolean
+                ) => {
+                    // #TODO
+                    console.log('saveValue');
+                },
+
+                // is opened
+                isOpened: (): boolean => {
+                    return this.locationDialogVisible;
+                },
+
+                // is waiting
+                isWaiting: (): boolean => {
+                    // #TODO
+                    console.log('isWaiting');
+                    return false;
+                },
+
+                // enable full edit mode
+                enableFullEditMode: () => {
+                    // #TODO
+                    console.log('enableFullEditMode');
+                },
+
+                // focus
+                focus: () => {
+                    // #TODO
+                    console.log('focus');
+                }
+            };
         };
+
+        // return newly created function
+        return this.locationEditorCallback;
     }
 }

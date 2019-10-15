@@ -15,6 +15,7 @@ import * as FileSaver from 'file-saver';
 import { LoadingDialogComponent, LoadingDialogModel } from '../../../shared/components/loading-dialog/loading-dialog.component';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { LocationDialogComponent } from '../../../shared/components/location-dialog/location-dialog.component';
 
 export enum ExportDataExtension {
     CSV = 'csv',
@@ -366,6 +367,29 @@ export class DialogService {
                 // close dialog
                 dialog.close();
             })
+        );
+    }
+
+    /**
+     * Display location dialog
+     */
+    showLocationDialog(
+        locationId?: string,
+        required: boolean = false,
+        useOutbreakLocations: boolean = true
+    ) {
+        // display dialog
+        this.dialog.open(
+            LocationDialogComponent, {
+                ...LocationDialogComponent.DEFAULT_CONFIG,
+                ...{
+                    data: {
+                        locationId: locationId,
+                        required: required,
+                        useOutbreakLocations: useOutbreakLocations
+                    }
+                }
+            }
         );
     }
 }

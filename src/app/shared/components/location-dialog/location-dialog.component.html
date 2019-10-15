@@ -1,0 +1,23 @@
+<div fxLayout="column" fxLayoutGap="10px">
+    <div
+        fxLayout="row">
+        <app-form-location-dropdown
+            [name]="'test....'"
+            [ngModel]="data.locationId"
+            [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"
+            tooltip="LNG_ADDRESS_FIELD_LABEL_LOCATION_DESCRIPTION"
+            [required]="data.required"
+            [useOutbreakLocations]="data.useOutbreakLocations"
+            [fixedDropPanel]="true">
+        </app-form-location-dropdown>
+    </div>
+
+    <div
+        fxLayout="row" fxLayoutAlign="end">
+        <button
+            mat-button
+            type="button">
+            {{ 'LNG_COMMON_BUTTON_CANCEL' | translate | uppercase }}
+        </button>
+    </div>
+</div>
