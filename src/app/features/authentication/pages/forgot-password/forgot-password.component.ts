@@ -42,13 +42,11 @@ export class ForgotPasswordComponent implements OnInit {
     }
 
     forgotPassword(form: NgForm) {
-
-        // display loading
-        const loadingDialog = this.dialogService.showLoadingDialog();
-
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
-
         if (form.valid && !_.isEmpty(dirtyFields)) {
+
+            // display loading
+            const loadingDialog = this.dialogService.showLoadingDialog();
 
             // send the "password reset" e-mail
             this.userDataService
