@@ -263,7 +263,8 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 .setOptions(this.genderList$, this.i18nService),
             new LocationSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
-                .setProperty('addresses.locationId'),
+                .setProperty('addresses.locationId')
+                .setUseOutbreakLocations(true),
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
                 .setProperty('addresses.city'),

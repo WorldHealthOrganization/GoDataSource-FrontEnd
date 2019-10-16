@@ -782,9 +782,9 @@ export class HotTableWrapperComponent implements OnInit {
                         message: 'LNG_FORM_HOT_TABLE_WRAPPER_CHANGE_LOCATION_DIALOG_TITLE',
                         locationId: this.preparedData && this.preparedData.originalValue ?
                             this.preparedData.originalValue :
-                            undefined
-                        // required: required,
-                        // useOutbreakLocations: useOutbreakLocations
+                            undefined,
+                        required: this.sheetColumns && this.sheetColumns[this.preparedData.col] && this.sheetColumns[this.preparedData.col].required,
+                        useOutbreakLocations: this.sheetColumns && this.sheetColumns[this.preparedData.col] && (this.sheetColumns[this.preparedData.col] as LocationSheetColumn).useOutbreakLocations
                     }
                 }
             }
