@@ -437,6 +437,11 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
 
                                     // replace with correct data
                                     contactData.addresses = this.extraContactData[index].addresses;
+                                } else {
+                                    // We should delete current address in this case
+                                    // but for now this isn't a good idea since we need to take in consideration that contact could have multiple addresses, and at least one should be current address
+                                    // so either we delete all addresses, or show error that user can't remove current location since it has other locations as well..
+                                    // #TBD
                                 }
                             });
 

@@ -263,7 +263,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             // Contact Address(es)
             new LocationSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
-                .setProperty('addresses.locationId')
+                .setProperty('contact.addresses[0].locationId')
                 .setUseOutbreakLocations(true),
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
