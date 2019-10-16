@@ -57,7 +57,8 @@
             *ngIf="column.type === SheetCellType.LOCATION"
             [title]="(column.title | translate) + (column.required ? ' *' : '')"
             [renderer]="locationRenderer()"
-            [editor]="locationEditor()">
+            [editor]="locationEditor()"
+            [validator]="column.validationFunc">
         </hot-column>
     </ng-container>
 </hot-table>

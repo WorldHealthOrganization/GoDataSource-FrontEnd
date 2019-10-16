@@ -643,6 +643,13 @@ export class HotTableWrapperComponent implements OnInit {
             value: any,
             cellProperties: any
         ) => {
+            // invalid data ?
+            if (cellProperties.valid === false) {
+                td.classList.add('htInvalid');
+            } else {
+                td.classList.remove('htInvalid');
+            }
+
             // display loading ?
             if (this.loadingLocations) {
                 td.innerHTML = `<img title="${loadingTitle}" class="hot-wrapper-loading-location" src="/assets/images/loading-32.gif"/>`;
