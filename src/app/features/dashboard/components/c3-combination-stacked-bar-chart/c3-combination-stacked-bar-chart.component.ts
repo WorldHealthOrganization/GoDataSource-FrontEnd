@@ -20,6 +20,8 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
     @Input() colorPattern: string[] = [];
     @Input() lineData: any;
     @Input() chartId: string;
+    @Input() maxTicksOnY: number;
+    @Input() minTicksOnY: number;
 
     chart: any;
 
@@ -135,7 +137,9 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
                     label: {
                         text: this.y2Label,
                         position: 'outer-middle'
-                    }
+                    },
+                    max: this.maxTicksOnY,
+                    min: this.minTicksOnY
                 }
             },
             legend: {
