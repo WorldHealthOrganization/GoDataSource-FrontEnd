@@ -135,7 +135,7 @@ export class HotTableWrapperComponent implements OnInit {
     Constants = Constants;
 
     // local variables
-    sheetWidth: number = 500;
+    sheetWidth: number = window.innerWidth - this.widthReduction;
 
     // callbacks
     afterChangeCallback: (

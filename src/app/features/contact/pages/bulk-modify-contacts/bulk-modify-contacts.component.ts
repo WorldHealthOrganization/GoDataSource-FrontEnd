@@ -92,9 +92,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
 
         // init table columns
-        setTimeout(() => {
-            this.configureSheetWidget();
-        });
+        this.configureSheetWidget();
 
         // get selected outbreak
         this.outbreakSubscriber = this.outbreakDataService
@@ -234,9 +232,6 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                     // finished
                     return contactData;
                 });
-
-                // init table columns
-                this.configureSheetWidget();
 
                 // hide loading
                 loadingDialog.close();

@@ -112,9 +112,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).pipe(share());
 
         // configure Sheet widget
-        setTimeout(() => {
-            this.configureSheetWidget();
-        });
+        this.configureSheetWidget();
 
         // retrieve query params
         this.route.queryParams
