@@ -51,7 +51,6 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     genderList$: Observable<LabelValuePair[]>;
     occupationsList$: Observable<LabelValuePair[]>;
     riskLevelsList$: Observable<LabelValuePair[]>;
-    addressTypesList$: Observable<LabelValuePair[]>;
     documentTypesList$: Observable<LabelValuePair[]>;
 
     // relationship options
@@ -103,7 +102,6 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION).pipe(share());
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).pipe(share());
-        this.addressTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.ADDRESS_TYPE).pipe(share());
         this.documentTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DOCUMENT_TYPE).pipe(share());
         this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL).pipe(share());
         this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE).pipe(share());
@@ -262,20 +260,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_REASON')
                 .setProperty('contact.riskReason'),
 
-            // Document(s)
-            new DropdownSheetColumn()
-                .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE')
-                .setProperty('contact.documents[0].type')
-                .setOptions(this.documentTypesList$, this.i18nService),
-            new TextSheetColumn()
-                .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER')
-                .setProperty('contact.documents[0].number'),
-
-            // Address(es)
-            new DropdownSheetColumn()
-                .setTitle('LNG_ADDRESS_FIELD_LABEL_TYPE')
-                .setProperty('contact.addresses[0].typeId')
-                .setOptions(this.addressTypesList$, this.i18nService),
+            // Contact Address(es)
             new LocationSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
                 .setProperty('addresses.locationId')
@@ -292,6 +277,15 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             new TextSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER')
                 .setProperty('contact.addresses[0].phoneNumber'),
+
+            // Contact Document(s)
+            new DropdownSheetColumn()
+                .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE')
+                .setProperty('contact.documents[0].type')
+                .setOptions(this.documentTypesList$, this.i18nService),
+            new TextSheetColumn()
+                .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER')
+                .setProperty('contact.documents[0].number'),
 
             // Relationship properties
             new DateSheetColumn(

@@ -256,22 +256,6 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
                 .setProperty('gender')
                 .setOptions(this.genderList$, this.i18nService),
-            new LocationSheetColumn()
-                .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
-                .setProperty('addresses.locationId')
-                .setUseOutbreakLocations(true),
-            new TextSheetColumn()
-                .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
-                .setProperty('addresses.city'),
-            new TextSheetColumn()
-                .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
-                .setProperty('addresses.addressLine1'),
-            new TextSheetColumn()
-                .setTitle('LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE')
-                .setProperty('addresses.postalCode'),
-            new TextSheetColumn()
-                .setTitle('LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER')
-                .setProperty('addresses.phoneNumber'),
             new DateSheetColumn(
                 null,
                 moment())
@@ -296,16 +280,40 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH')
                 .setProperty('dob'),
             new DropdownSheetColumn()
-                .setTitle('LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS')
-                .setProperty('followUp.status')
-                .setOptions(this.finalFollowUpStatus$, this.i18nService),
-            new DropdownSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL')
                 .setProperty('riskLevel')
                 .setOptions(this.riskLevelsList$, this.i18nService),
             new TextSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_REASON')
                 .setProperty('riskReason'),
+
+            // Contact Address(es)
+            new LocationSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
+                .setProperty('addresses.locationId')
+                .setUseOutbreakLocations(true),
+            new TextSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
+                .setProperty('addresses.city'),
+            new TextSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
+                .setProperty('addresses.addressLine1'),
+            new TextSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE')
+                .setProperty('addresses.postalCode'),
+            new TextSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER')
+                .setProperty('addresses.phoneNumber'),
+
+            // Contact Document(s)
+            // Can't edit since they are multiple
+            // or we could implement something custom..like location to edit a list of items
+
+            // only field available for update contact
+            new DropdownSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS')
+                .setProperty('followUp.status')
+                .setOptions(this.finalFollowUpStatus$, this.i18nService)
         ];
 
         // configure the context menu
