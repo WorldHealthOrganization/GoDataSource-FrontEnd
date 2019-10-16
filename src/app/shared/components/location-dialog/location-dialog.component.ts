@@ -51,9 +51,7 @@ export class LocationDialogComponent {
     closeDialog(button: DialogAnswerButton) {
         this.dialogRef.close(new DialogAnswer(
             button,
-            this.selectedLocation ?
-                new DialogAnswerInputValue(this.selectedLocation) :
-                undefined
+            new DialogAnswerInputValue(this.selectedLocation)
         ));
     }
 
@@ -69,6 +67,7 @@ export class LocationDialogComponent {
             });
         } else {
             this.selectedLocation = undefined;
+            this.data.locationId = undefined;
         }
     }
 
