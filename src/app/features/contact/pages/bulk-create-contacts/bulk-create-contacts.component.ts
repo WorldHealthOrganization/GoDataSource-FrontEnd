@@ -15,7 +15,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
+import { DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, LocationSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
 import * as Handsontable from 'handsontable';
 import { Constants } from '../../../../core/models/constants';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -278,10 +278,9 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_TYPE')
                 .setProperty('contact.addresses[0].typeId')
                 .setOptions(this.addressTypesList$, this.i18nService),
-            // new DropdownSheetColumn()
-            //     .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
-            //     .setProperty('contact.addresses[0].locationId')
-            //     .setOptions(this.locationsListOptions$, this.i18nService),
+            new LocationSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
+                .setProperty('addresses.locationId'),
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
                 .setProperty('contact.addresses[0].city'),
