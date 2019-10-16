@@ -22,7 +22,8 @@ export const EnglishUsLang = {
          * uiFormInputHotTableWrapper
          */
         'LNG_FORM_HOT_TABLE_WRAPPER_NO_LOCATION_SELECTED_LABEL': '<b>None</b>',
-        'LNG_FORM_HOT_TABLE_WRAPPER_LOADING_LOCATIONS_TITLE': 'Loading locations'
+        'LNG_FORM_HOT_TABLE_WRAPPER_LOADING_LOCATIONS_TITLE': 'Loading locations',
+        'LNG_FORM_HOT_TABLE_WRAPPER_CHANGE_LOCATION_DIALOG_TITLE': 'Change location'
 
 
 
