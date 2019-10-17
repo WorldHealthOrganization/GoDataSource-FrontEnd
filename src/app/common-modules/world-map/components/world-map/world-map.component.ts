@@ -78,7 +78,8 @@ export enum WorldMapPathType {
 }
 
 export class WorldMapPath {
-    points: WorldMapPoint[];
+    id: string;
+    points: (WorldMapPoint | WorldMapMarker)[];
     type: WorldMapPathType = WorldMapPathType.LINE;
     color: string = '#000';
     selected: (map: WorldMapComponent, data: WorldMapPath) => void;
@@ -86,10 +87,11 @@ export class WorldMapPath {
     offsetX: number = 0;
     offsetY: number = 0;
     data: any;
+    hideOnMarkerCluster: boolean = false;
 
     constructor(data: {
         // required
-        points: WorldMapPoint[],
+        points: (WorldMapPoint | WorldMapMarker)[],
 
         // optional
         type?: WorldMapPathType,
@@ -98,16 +100,23 @@ export class WorldMapPath {
         offsetX?: number,
         offsetY?: number,
         selected?: (map: WorldMapComponent, data: WorldMapPath) => void,
-        data?: any
+        data?: any,
+        hideOnMarkerCluster?: boolean
     }) {
         // assign properties
         Object.assign(
             this,
             data
         );
+
+        // generate id
+        this.id = uuid();
     }
 
-    add(point: WorldMapPoint) {
+    /**
+     * Add new point
+     */
+    add(point: WorldMapPoint | WorldMapMarker) {
         this.points.push(point);
     }
 }
@@ -336,6 +345,16 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     private _clickSelect: InteractionSelect;
 
     /**
+     * Used to hide features
+     */
+    private hiddenFeatureStyle: Style = new Style();
+
+    /**
+     * Handler for cluster update
+     */
+    private clusterUpdatePending: any;
+
+    /**
      * Constructor
      */
     constructor(
@@ -514,7 +533,12 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             // construct points array
             const points: any = [];
             let prevP: any;
-            _.each(path.points, (point: WorldMapPoint, index: number) => {
+            _.each(path.points, (pathPoint: WorldMapPoint | WorldMapMarker, index: number) => {
+                // determine actual points
+                const point: WorldMapPoint = pathPoint instanceof WorldMapPoint ?
+                    pathPoint :
+                    pathPoint.point;
+
                 // add line point
                 const p = this.transformFromLatLng(
                     point.latitude,
@@ -547,6 +571,11 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                             rotation: -rotation
                         })
                     }));
+
+                    // keep line data
+                    arrow.setProperties({
+                        dataForEventListeners: path
+                    });
 
                     // draw arrow
                     this.mapOverlayLayerSource.addFeature(arrow);
@@ -589,7 +618,6 @@ export class WorldMapComponent implements OnInit, OnDestroy {
 
     /**
      * Style Features
-     * @param feature
      */
     clusterStyleFeature(feature: Feature): Style {
         // determine number of markers
@@ -643,6 +671,135 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Hide / Reposition overlay features ( e.g. lines ) when we don't need to display them ( e.g. lines between features from the same cluster group or lines between cluster groups )
+     */
+    updateOverlayFeaturesAccordinglyToClusterGroups() {
+        // there is already a pending update ?
+        if (this.clusterUpdatePending) {
+            return;
+        }
+
+        // schedule update
+        this.clusterUpdatePending = setTimeout(() => {
+            // used to easily determine the cluster group later
+            const clusterFeaturesMap: {
+                [markerId: string]: {
+                    group: number,
+                    marker: WorldMapMarker
+                }
+            } = {};
+
+            // go through cluster features & map children features to easily determine the cluster group later
+            const clusterFeatures: Feature[] = this.mapClusterSource.getFeatures();
+            clusterFeatures.forEach((clusterFeature: Feature, groupIndex: number) => {
+                // go through each child and set the group
+                const clusterChildFeatures: Feature[] = clusterFeature.get('features');
+                clusterChildFeatures.forEach((childClusterFeature: Feature) => {
+                    const properties = childClusterFeature.getProperties();
+                    if (properties.dataForEventListeners instanceof WorldMapMarker) {
+                        clusterFeaturesMap[properties.dataForEventListeners.id] = {
+                            group: groupIndex,
+                            marker: properties.dataForEventListeners
+                        };
+                    }
+                });
+            });
+
+            // go through cluster features and determine which overlay data should be hidden and which should be visible
+            const overlayFeatures: Feature[] = this.mapOverlayLayerSource.getFeatures();
+            (overlayFeatures || []).forEach((overlayFeature: Feature) => {
+                // retrieve overlay feature properties
+                const overlayProperties: any = overlayFeature.getProperties ? overlayFeature.getProperties() : null;
+
+                // do we need to check if we should hide this feature ?
+                if (
+                    !(overlayProperties.dataForEventListeners instanceof WorldMapPath) ||
+                    !overlayProperties.dataForEventListeners.hideOnMarkerCluster
+                ) {
+                    return;
+                }
+
+                // go through points and determine if all points are under a cluster
+                let allPointsInTheSameCluster: boolean = true;
+                let previousGroup: number;
+                _.each(overlayProperties.dataForEventListeners.points, (point: WorldMapMarker | WorldMapPoint) => {
+                    if (point instanceof WorldMapMarker) {
+                        // check if this point isn't under the current cluster
+                        if (clusterFeaturesMap[point.id] === undefined) {
+                            // ignore this one since it isn't mapped by cluster groups
+                        } else {
+                            if (
+                                previousGroup !== undefined &&
+                                clusterFeaturesMap[point.id].group !== previousGroup
+                            ) {
+                                // different groups
+                                allPointsInTheSameCluster = false;
+
+                                // there is no point in checking further
+                                // break
+                                return false;
+                            } else {
+                                // keep group to check the remaining points
+                                previousGroup = clusterFeaturesMap[point.id].group;
+                            }
+                        }
+                    }
+                });
+
+                // hide features since they are all under the same cluster group ?
+                const featureStyle: Style = overlayFeature.getStyle();
+                const featureProperties: any = overlayFeature.getProperties();
+                if (allPointsInTheSameCluster) {
+                    if (
+                        featureStyle !== this.hiddenFeatureStyle ||
+                        featureProperties.clusterGroup !== previousGroup
+                    ) {
+                        // construct property update object
+                        const patchProperties: any = {};
+                        if (featureStyle !== this.hiddenFeatureStyle) {
+                            patchProperties.featureOldStyle = featureStyle;
+                        }
+                        if (featureProperties.clusterGroup !== previousGroup) {
+                            patchProperties.clusterGroup = clusterFeatures[previousGroup];
+                        }
+
+                        // keep reference to old style
+                        overlayFeature.setProperties({
+                            ...featureProperties,
+                            ...patchProperties
+                        }, true);
+
+                        // hide feature
+                        overlayFeature.setStyle(this.hiddenFeatureStyle);
+                    }
+                } else {
+                    // not under the same cluster group...
+                    // need to make just one relationship between the same cluster groups, followed by displaying popup with all items that match the same groups...
+                    // #TODO
+
+                    // show if we don't need to hide it :)
+                    if (featureStyle === this.hiddenFeatureStyle) {
+                        // make feature visible
+                        overlayFeature.setStyle(overlayFeature.getProperties().featureOldStyle);
+
+                        // remove visibility properties
+                        overlayFeature.setProperties({
+                            ...featureProperties,
+                            ...{
+                                featureOldStyle: null,
+                                clusterGroup: null
+                            }
+                        }, true);
+                    }
+                }
+            });
+
+            // finished update
+            this.clusterUpdatePending = null;
+        }, 100);
+    }
+
+    /**
      * Initialize World Map
      */
     initializeMap() {
@@ -681,13 +838,25 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             source: this.mapClusterLayerSource
         });
 
-        // add cluster layer
-        this.layers.push(new VectorLayer({
+        // update items accordingly to cluster groups
+        this.mapClusterSource.on('addfeature', () => {
+            this.updateOverlayFeaturesAccordinglyToClusterGroups();
+        });
+        this.mapClusterSource.on('removefeature', () => {
+            this.updateOverlayFeaturesAccordinglyToClusterGroups();
+        });
+
+        // create cluster layer
+        const clusterVectorLayer = new VectorLayer({
             source: this.mapClusterSource,
             style: (feature: Feature): Style => {
+                // render cluster feature
                 return this.clusterStyleFeature(feature);
             }
-        }));
+        });
+
+        // add cluster layer
+        this.layers.push(clusterVectorLayer);
 
         // initialize map
         this.map = new Map({
@@ -705,55 +874,6 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                 return _.isEmpty(properties.features) ?
                     feature.getStyle() :
                     this.clusterStyleFeature(feature);
-            },
-            filter: (feature) => {
-                if (!feature.getProperties) {
-                    return false;
-                } else {
-                    // check to see how we should handle this
-                    // - as a group of markers
-                    // - or as a single marker
-                    const properties = feature.getProperties();
-                    if (properties) {
-                        if (!_.isEmpty(properties.features)) {
-                            // if just one then we need to redirect directly to marker event
-                            if (
-                                properties.features.length === 1 &&
-                                properties.features[0].getProperties &&
-                                properties.features[0].getProperties() &&
-                                properties.features[0].getProperties().dataForEventListeners &&
-                                properties.features[0].getProperties().dataForEventListeners.selected
-                            ) {
-                                return true;
-                            } else {
-                                // all child items are markers ?
-                                let allAreMarkers: boolean = true;
-                                _.each(properties.features, (childFeature: Feature) => {
-                                    if (
-                                        !childFeature.getProperties ||
-                                        !childFeature.getProperties() ||
-                                        !childFeature.getProperties().dataForEventListeners
-                                    ) {
-                                        // invalid data
-                                        allAreMarkers = false;
-
-                                        // stop for
-                                        return false;
-                                    }
-                                });
-
-                                // can we display group items ?
-                                return allAreMarkers;
-                            }
-                        } else {
-                            // single marker
-                            return properties.dataForEventListeners &&
-                                properties.dataForEventListeners.selected;
-                        }
-                    } else {
-                        return false;
-                    }
-                }
             }
         });
         this._clickSelect.on('select', (data: {
@@ -763,7 +883,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         }) => {
             // determine feature with bigger priority
             let selectFeature: Feature;
-            _.each(data.selected, (feature: Feature | any) => {
+            _.each(data.selected, (feature: Feature) => {
                 // allow system to select again the same feature
                 this.clearSelectedItems();
 
@@ -786,11 +906,33 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                         }
                     } else {
                         // determine all clickable items from group
-                        const groupItems: (WorldMapPath | WorldMapMarker)[] = [];
+                        const groupItems: {
+                            [id: string]: WorldMapPath | WorldMapMarker
+                        } = {};
                         properties.features.forEach((item) => {
                             if (item.getProperties().dataForEventListeners.selected) {
-                                groupItems.push(item.getProperties().dataForEventListeners);
+                                groupItems[item.getProperties().dataForEventListeners.id] = item.getProperties().dataForEventListeners;
                             }
+                        });
+
+                        // go through cluster features and determine which overlay data should be hidden and which should be visible
+                        const overlayFeatures: Feature[] = this.mapOverlayLayerSource.getFeatures();
+                        (overlayFeatures || []).forEach((overlayFeature: Feature) => {
+                            // retrieve overlay feature properties
+                            const overlayProperties: any = overlayFeature.getProperties ? overlayFeature.getProperties() : null;
+
+                            // do we need to check if we should hide this feature ?
+                            if (
+                                !(overlayProperties.dataForEventListeners instanceof WorldMapPath) ||
+                                overlayProperties.clusterGroup !== feature ||
+                                !overlayProperties.dataForEventListeners.hideOnMarkerCluster ||
+                                !overlayProperties.dataForEventListeners.selected
+                            ) {
+                                return;
+                            }
+
+                            // add feature to list of items to display in dialog
+                            groupItems[overlayProperties.dataForEventListeners.id] = overlayProperties.dataForEventListeners;
                         });
 
                         // do we have clickable items in this group ?
@@ -800,7 +942,10 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                             // #TODO
                         }
                     }
-                } else {
+                } else if (
+                    properties.dataForEventListeners &&
+                    properties.dataForEventListeners.selected
+                ) {
                     // single record
                     if (properties.dataForEventListeners instanceof WorldMapPath) {
                         selectFeature = selectFeature ? selectFeature : feature;
@@ -813,6 +958,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
 
             // trigger select
             if (selectFeature) {
+                // call method
                 selectFeature.getProperties().dataForEventListeners.selected(
                     this,
                     selectFeature.getProperties().dataForEventListeners
