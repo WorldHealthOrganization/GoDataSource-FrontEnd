@@ -14,6 +14,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { MapServerModel } from '../../../../core/models/map-server.model';
 import { Observable ,  Subscriber ,  Subscription } from 'rxjs';
 import { addCommon as addCommonProjections } from 'ol/proj.js';
+import { v4 as uuid } from 'uuid';
 
 export class WorldMapPoint {
     constructor(
@@ -33,6 +34,7 @@ export enum WorldMapMarkerLayer {
 }
 
 export class WorldMapMarker {
+    id: string;
     point: WorldMapPoint;
     label: string;
     labelColor: string = '#FFF';
@@ -40,6 +42,7 @@ export class WorldMapMarker {
     radius: number = 5;
     color: string = '#000';
     layer: WorldMapMarkerLayer = WorldMapMarkerLayer.OVERLAY;
+    overlaySingleDisplayLabel: boolean = false;
     selected: (map: WorldMapComponent, data: WorldMapMarker) => void;
     data: any;
 
@@ -54,6 +57,7 @@ export class WorldMapMarker {
         radius?: number,
         color?: string,
         layer?: WorldMapMarkerLayer,
+        overlaySingleDisplayLabel?: boolean,
         selected?: (map: WorldMapComponent, data: WorldMapMarker) => void,
         data?: any
     }) {
@@ -62,6 +66,9 @@ export class WorldMapMarker {
             this,
             data
         );
+
+        // generate id
+        this.id = uuid();
     }
 }
 
@@ -185,11 +192,6 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     mapView: View;
 
     /**
-     * Map Overlay Layer
-     */
-    mapOverlayLayer: VectorLayer;
-
-    /**
      * Map Overlay Layer Source
      */
     mapOverlayLayerSource: VectorSource;
@@ -222,7 +224,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      * Style cache
      */
     styleCache: {
-        [size: number]: Style
+        [key: string]: Style
     } = {};
 
     /**
@@ -435,19 +437,6 @@ export class WorldMapComponent implements OnInit, OnDestroy {
 
         // add markers
         _.each(this.markers, (markerData: WorldMapMarker) => {
-            // do we need to draw this one to overlay ?
-            if (markerData.layer === WorldMapMarkerLayer.CLUSTER) {
-                this.mapClusterLayerSource.addFeature(new Feature(
-                    new Point(this.transformFromLatLng(
-                        markerData.point.latitude,
-                        markerData.point.longitude
-                    ))
-                ));
-
-                // finished
-                return;
-            }
-
             // create marker
             const marker: Feature = new Feature(
                 new Point(this.transformFromLatLng(
@@ -506,8 +495,13 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             // stylize marker
             marker.setStyle(new Style(style));
 
-            // add marker to map overlay
-            this.mapOverlayLayerSource.addFeature(marker);
+            // do we need to group markers ?
+            if (markerData.layer === WorldMapMarkerLayer.CLUSTER) {
+                this.mapClusterLayerSource.addFeature(marker);
+            } else {
+                // add marker to map overlay
+                this.mapOverlayLayerSource.addFeature(marker);
+            }
         });
 
         // add lines
@@ -598,34 +592,54 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      * @param feature
      */
     clusterStyleFeature(feature: Feature): Style {
-        // determine number of items
-        const size: number = feature.get('features').length;
+        // determine number of markers
+        const features: Feature[] = feature.get('features');
+        const size: number = features.length;
+
+        // in case we have just one marker in this group & we are allowed to display marker info, do it...
+        let cacheKey: string = `___${size}`;
+        let markerData: WorldMapMarker;
+        if (
+            size === 1 &&
+            features[0].getProperties &&
+            features[0].getProperties() &&
+            features[0].getProperties().dataForEventListeners &&
+            features[0].getProperties().dataForEventListeners.overlaySingleDisplayLabel
+        ) {
+            markerData = features[0].getProperties().dataForEventListeners;
+            cacheKey = markerData.id;
+        }
 
         // do we have already a style configured for what we need to display ?
-        if (this.styleCache[size]) {
-            return this.styleCache[size];
+        if (this.styleCache[cacheKey]) {
+            return this.styleCache[cacheKey];
         }
 
         // create a new style
-        this.styleCache[size] = new Style({
-            image: new Icon({
-                anchor: [0.5, 0.9],
-                anchorXUnits: 'fraction',
-                anchorYUnits: 'fraction',
-                src: '/assets/images/pin.png'
-            }),
-            text: new Text({
-                text: size.toString(),
-                offsetY: -24,
-                font: 'bold 10px Roboto',
-                fill: new Fill({
-                    color: this.clusterLabelColor
+        // - do we need to display the label of the marker instead of the number ?
+        if (markerData) {
+            this.styleCache[cacheKey] = features[0].getStyle();
+        } else {
+            this.styleCache[cacheKey] = new Style({
+                image: new Icon({
+                    anchor: [0.5, 0.9],
+                    anchorXUnits: 'fraction',
+                    anchorYUnits: 'fraction',
+                    src: '/assets/images/pin.png'
+                }),
+                text: new Text({
+                    text: size.toString(),
+                    offsetY: -24,
+                    font: 'bold 10px Roboto',
+                    fill: new Fill({
+                        color: this.clusterLabelColor
+                    })
                 })
-            })
-        });
+            });
+        }
 
         // finished
-        return this.styleCache[size];
+        return this.styleCache[cacheKey];
     }
 
     /**
@@ -653,13 +667,10 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         // create overlay layer source
         this.mapOverlayLayerSource = new VectorSource();
 
-        // create overlay layer
-        this.mapOverlayLayer = new VectorLayer({
-            source: this.mapOverlayLayerSource
-        });
-
         // add overlay - markers & lines layer
-        this.layers.push(this.mapOverlayLayer);
+        this.layers.push(new VectorLayer({
+            source: this.mapOverlayLayerSource
+        }));
 
         // initialize cluster layer source
         this.mapClusterLayerSource = new VectorSource();
@@ -689,11 +700,60 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         // create click listener
         this._clickSelect = new InteractionSelect({
             multi: true,
+            style: (feature) => {
+                const properties = feature.getProperties();
+                return _.isEmpty(properties.features) ?
+                    feature.getStyle() :
+                    this.clusterStyleFeature(feature);
+            },
             filter: (feature) => {
-                return feature.getProperties &&
-                    feature.getProperties() &&
-                    feature.getProperties().dataForEventListeners &&
-                    feature.getProperties().dataForEventListeners.selected;
+                if (!feature.getProperties) {
+                    return false;
+                } else {
+                    // check to see how we should handle this
+                    // - as a group of markers
+                    // - or as a single marker
+                    const properties = feature.getProperties();
+                    if (properties) {
+                        if (!_.isEmpty(properties.features)) {
+                            // if just one then we need to redirect directly to marker event
+                            if (
+                                properties.features.length === 1 &&
+                                properties.features[0].getProperties &&
+                                properties.features[0].getProperties() &&
+                                properties.features[0].getProperties().dataForEventListeners &&
+                                properties.features[0].getProperties().dataForEventListeners.selected
+                            ) {
+                                return true;
+                            } else {
+                                // all child items are markers ?
+                                let allAreMarkers: boolean = true;
+                                _.each(properties.features, (childFeature: Feature) => {
+                                    if (
+                                        !childFeature.getProperties ||
+                                        !childFeature.getProperties() ||
+                                        !childFeature.getProperties().dataForEventListeners
+                                    ) {
+                                        // invalid data
+                                        allAreMarkers = false;
+
+                                        // stop for
+                                        return false;
+                                    }
+                                });
+
+                                // can we display group items ?
+                                return allAreMarkers;
+                            }
+                        } else {
+                            // single marker
+                            return properties.dataForEventListeners &&
+                                properties.dataForEventListeners.selected;
+                        }
+                    } else {
+                        return false;
+                    }
+                }
             }
         });
         this._clickSelect.on('select', (data: {
@@ -704,12 +764,50 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             // determine feature with bigger priority
             let selectFeature: Feature;
             _.each(data.selected, (feature: Feature | any) => {
-                // line ?
-                if (feature.getProperties().dataForEventListeners instanceof WorldMapPath) {
-                    selectFeature = selectFeature ? selectFeature : feature;
+                // allow system to select again the same feature
+                this.clearSelectedItems();
+
+                // get feature properties
+                const properties = feature.getProperties();
+                if (!_.isEmpty(properties.features)) {
+                    if (
+                        properties.features.length === 1 &&
+                        properties.features[0].getProperties &&
+                        properties.features[0].getProperties() &&
+                        properties.features[0].getProperties().dataForEventListeners &&
+                        properties.features[0].getProperties().dataForEventListeners.selected
+                    ) {
+                        // single record
+                        if (properties.features[0].getProperties().dataForEventListeners instanceof WorldMapPath) {
+                            selectFeature = selectFeature ? selectFeature : properties.features[0];
+                        } else {
+                            // anything else is more important than a line
+                            selectFeature = properties.features[0];
+                        }
+                    } else {
+                        // determine all clickable items from group
+                        const groupItems: (WorldMapPath | WorldMapMarker)[] = [];
+                        properties.features.forEach((item) => {
+                            if (item.getProperties().dataForEventListeners.selected) {
+                                groupItems.push(item.getProperties().dataForEventListeners);
+                            }
+                        });
+
+                        // do we have clickable items in this group ?
+                        if (!_.isEmpty(groupItems)) {
+                            // call method for handling groups
+                            console.log(groupItems);
+                            // #TODO
+                        }
+                    }
                 } else {
-                    // anything else is more important than  a line
-                    selectFeature = feature;
+                    // single record
+                    if (properties.dataForEventListeners instanceof WorldMapPath) {
+                        selectFeature = selectFeature ? selectFeature : feature;
+                    } else {
+                        // anything else is more important than a line
+                        selectFeature = feature;
+                    }
                 }
             });
 
@@ -806,7 +904,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     /**
      * Clear Selected items
      */
-    clearSelectedItems() {
+    private clearSelectedItems() {
         this._clickSelect.getFeatures().clear();
     }
 
