@@ -87,10 +87,6 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW_RELATIONSHIP',
                     click: (item: ReportCasesWithOnsetModel) => {
                         // #TODO TBD - if this is correct !?
-                        // #TODO TBD - if this is correct !?
-                        // #TODO TBD - if this is correct !?
-                        // #TODO TBD - if this is correct !?
-                        // #TODO TBD - if this is correct !?
                         const relationTypePath: string = _.find(item.relationship.persons, { id: item.primaryCase.id }).source ? 'contacts' : 'exposures';
                         this.router.navigate(['/relationships', EntityType.CASE, item.primaryCase.id, relationTypePath, item.relationship.id, 'view']);
                     }
@@ -147,10 +143,6 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY_RELATIONSHIP',
                     click: (item: ReportCasesWithOnsetModel) => {
-                        // #TODO TBD - if this is correct !?
-                        // #TODO TBD - if this is correct !?
-                        // #TODO TBD - if this is correct !?
-                        // #TODO TBD - if this is correct !?
                         // #TODO TBD - if this is correct !?
                         const relationTypePath: string = _.find(item.relationship.persons, { id: item.primaryCase.id }).source ? 'contacts' : 'exposures';
                         this.router.navigate(['/relationships', EntityType.CASE, item.primaryCase.id, relationTypePath, item.relationship.id, 'modify']);
