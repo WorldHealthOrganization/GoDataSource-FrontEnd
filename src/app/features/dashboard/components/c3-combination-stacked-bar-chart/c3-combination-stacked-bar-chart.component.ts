@@ -20,8 +20,6 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
     @Input() colorPattern: string[] = [];
     @Input() lineData: any;
     @Input() chartId: string;
-    @Input() y2Max: number;
-    @Input() y2Min: number;
 
     chart: any;
 
