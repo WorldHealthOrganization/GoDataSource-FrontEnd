@@ -1,4 +1,9 @@
 <div fxLayout="column" fxLayoutGap="10px">
+    <!-- Title -->
+    <div class="dialog-title">
+        {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_TITLE' | translate:{type: entity ? (entity.type | translate) : ''} }}
+    </div>
+
     <!-- Specific model fields -->
     <div *ngFor="let info of entityInfo" class="label-value">
         <span>{{info.label | translate}}</span>

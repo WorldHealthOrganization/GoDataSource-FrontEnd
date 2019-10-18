@@ -3,18 +3,21 @@ import * as _ from 'lodash';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
-import { TileArcGISRest, Vector as VectorSource, Cluster } from 'ol/source';
+import { Cluster, TileArcGISRest, Vector as VectorSource } from 'ol/source';
 import { transform } from 'ol/proj';
 import { Select as InteractionSelect } from 'ol/interaction';
 import Feature from 'ol/Feature';
-import { Point, LineString } from 'ol/geom';
-import { Icon, Style, Text, Fill, Stroke, Circle as CircleStyle } from 'ol/style';
+import { LineString, Point } from 'ol/geom';
+import { Circle as CircleStyle, Fill, Icon, Stroke, Style, Text } from 'ol/style';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { MapServerModel } from '../../../../core/models/map-server.model';
-import { Observable ,  Subscriber ,  Subscription } from 'rxjs';
+import { Observable, Subscriber, Subscription } from 'rxjs';
 import { addCommon as addCommonProjections } from 'ol/proj.js';
 import { v4 as uuid } from 'uuid';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
+import { MatDialogRef } from '@angular/material';
 
 export class WorldMapPoint {
     constructor(
@@ -88,6 +91,7 @@ export class WorldMapPath {
     offsetY: number = 0;
     data: any;
     hideOnMarkerCluster: boolean = false;
+    label: string;
 
     constructor(data: {
         // required
@@ -101,7 +105,8 @@ export class WorldMapPath {
         offsetY?: number,
         selected?: (map: WorldMapComponent, data: WorldMapPath) => void,
         data?: any,
-        hideOnMarkerCluster?: boolean
+        hideOnMarkerCluster?: boolean,
+        label?: string
     }) {
         // assign properties
         Object.assign(
@@ -118,6 +123,26 @@ export class WorldMapPath {
      */
     add(point: WorldMapPoint | WorldMapMarker) {
         this.points.push(point);
+    }
+}
+
+class WorldMapClusterLine {
+    id: string;
+    data: WorldMapPath[];
+    selected: (map: WorldMapComponent, lines: WorldMapPath[]) => void;
+
+    constructor(data: {
+        data: WorldMapPath[],
+        selected?: (map: WorldMapComponent, clusterLine: WorldMapClusterLine) => void
+    }) {
+        // assign properties
+        Object.assign(
+            this,
+            data
+        );
+
+        // generate id
+        this.id = uuid();
     }
 }
 
@@ -204,6 +229,11 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      * Map Overlay Layer Source
      */
     mapOverlayLayerSource: VectorSource;
+
+    /**
+     * Map Overlay Layer Source used to draw cluster stuff ( grouped lines )
+     */
+    mapOverlayLayerSourceForCluster: VectorSource;
 
     /**
      * Merge distance
@@ -355,10 +385,32 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     private clusterUpdatePending: any;
 
     /**
+     * Used to draw cluster lines
+     */
+    @Input() clusterLineStyle: Style = new Style({
+        stroke: new Stroke({
+            color: '#00F',
+            width: 5,
+            lineDash: [8, 8]
+        })
+    });
+
+    /**
+     * Marker section title for group dialog
+     */
+    @Input() groupMarkerTitle: string;
+
+    /**
+     * Path ( lines ) section title for group dialog
+     */
+    @Input() groupPathTitle: string;
+
+    /**
      * Constructor
      */
     constructor(
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private dialogService: DialogService
     ) {}
 
     /**
@@ -451,6 +503,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
 
         // clear markers & lines
         this.mapOverlayLayerSource.clear();
+        this.mapOverlayLayerSourceForCluster.clear();
         this.mapClusterLayerSource.clear();
         this.styleCache = {};
 
@@ -574,6 +627,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
 
                     // keep line data
                     arrow.setProperties({
+                        notReallyALine: true,
                         dataForEventListeners: path
                     });
 
@@ -674,6 +728,24 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      * Hide / Reposition overlay features ( e.g. lines ) when we don't need to display them ( e.g. lines between features from the same cluster group or lines between cluster groups )
      */
     updateOverlayFeaturesAccordinglyToClusterGroups() {
+        // local definitions
+        interface IClusterFeatureGroup {
+            groupIndex: number;
+            groupSize: number;
+            marker: WorldMapMarker;
+        }
+        interface IOverlayFeatureGroup {
+            groups: {
+                [groupKey: string]: IClusterFeatureGroup
+            };
+            hasOnlyGroupsOfSize1: boolean;
+            sameClusterGroup: boolean;
+        }
+        interface IClusterLines {
+            sortedGroups: IClusterFeatureGroup[];
+            lines: WorldMapPath[];
+        }
+
         // there is already a pending update ?
         if (this.clusterUpdatePending) {
             return;
@@ -683,10 +755,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         this.clusterUpdatePending = setTimeout(() => {
             // used to easily determine the cluster group later
             const clusterFeaturesMap: {
-                [markerId: string]: {
-                    group: number,
-                    marker: WorldMapMarker
-                }
+                [markerId: string]: IClusterFeatureGroup
             } = {};
 
             // go through cluster features & map children features to easily determine the cluster group later
@@ -698,14 +767,36 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                     const properties = childClusterFeature.getProperties();
                     if (properties.dataForEventListeners instanceof WorldMapMarker) {
                         clusterFeaturesMap[properties.dataForEventListeners.id] = {
-                            group: groupIndex,
+                            groupIndex: groupIndex,
+                            groupSize: clusterChildFeatures.length,
                             marker: properties.dataForEventListeners
                         };
                     }
                 });
             });
 
+            // show feature & remove hide properties
+            const showOverlayFeature = (overlayFeature, featureStyle, featureProperties) => {
+                // show if we don't need to hide it :)
+                if (featureStyle === this.hiddenFeatureStyle) {
+                    // make feature visible
+                    overlayFeature.setStyle(featureProperties.featureOldStyle);
+
+                    // remove visibility properties
+                    overlayFeature.setProperties({
+                        ...featureProperties,
+                        ...{
+                            featureOldStyle: null,
+                            clusterGroupFeature: null
+                        }
+                    }, true);
+                }
+            };
+
             // go through cluster features and determine which overlay data should be hidden and which should be visible
+            const overlayGroupLines: {
+                [path: string]: IClusterLines
+            } = {};
             const overlayFeatures: Feature[] = this.mapOverlayLayerSource.getFeatures();
             (overlayFeatures || []).forEach((overlayFeature: Feature) => {
                 // retrieve overlay feature properties
@@ -720,47 +811,73 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                 }
 
                 // go through points and determine if all points are under a cluster
-                let allPointsInTheSameCluster: boolean = true;
-                let previousGroup: number;
+                let featureGroups: IOverlayFeatureGroup;
                 _.each(overlayProperties.dataForEventListeners.points, (point: WorldMapMarker | WorldMapPoint) => {
                     if (point instanceof WorldMapMarker) {
                         // check if this point isn't under the current cluster
-                        if (clusterFeaturesMap[point.id] === undefined) {
+                        if (!clusterFeaturesMap[point.id]) {
                             // ignore this one since it isn't mapped by cluster groups
-                        } else {
-                            if (
-                                previousGroup !== undefined &&
-                                clusterFeaturesMap[point.id].group !== previousGroup
-                            ) {
-                                // different groups
-                                allPointsInTheSameCluster = false;
+                            return;
+                        }
 
-                                // there is no point in checking further
-                                // break
-                                return false;
-                            } else {
-                                // keep group to check the remaining points
-                                previousGroup = clusterFeaturesMap[point.id].group;
-                            }
+                        // determine feature groups & if path is just under one group
+                        const groupKey: string = `_${clusterFeaturesMap[point.id].groupIndex}`;
+                        if (
+                            featureGroups !== undefined &&
+                            featureGroups.groups[groupKey] === undefined
+                        ) {
+                            // different groups
+                            featureGroups.sameClusterGroup = false;
+                        }
+
+                        // do we need to initialize feature groups ?
+                        if (!featureGroups) {
+                            featureGroups = {
+                                groups: {},
+                                hasOnlyGroupsOfSize1: true,
+                                sameClusterGroup: true
+                            };
+                        }
+
+                        // keep group to check the remaining points
+                        featureGroups.groups[groupKey] = clusterFeaturesMap[point.id];
+
+                        // determine if feature has groups of size bigger than 1
+                        if (clusterFeaturesMap[point.id].groupSize > 1) {
+                            featureGroups.hasOnlyGroupsOfSize1 = false;
                         }
                     }
                 });
 
-                // hide features since they are all under the same cluster group ?
+                // if not under any group then we should not hide it
                 const featureStyle: Style = overlayFeature.getStyle();
                 const featureProperties: any = overlayFeature.getProperties();
-                if (allPointsInTheSameCluster) {
+                if (!featureGroups) {
+                    // show feature & remove hide properties
+                    showOverlayFeature(overlayFeature, featureStyle, featureProperties);
+
+                    // finished
+                    return;
+                }
+
+                // hide features since they are all under the same cluster group ?
+                if (featureGroups.sameClusterGroup) {
+                    // we have just one group for this item, so we need to hide it
+                    const featureGroup: IClusterFeatureGroup = featureGroups.groups[Object.keys(featureGroups.groups)[0]];
+
+                    // check if group changed from last time we checked this feature
                     if (
                         featureStyle !== this.hiddenFeatureStyle ||
-                        featureProperties.clusterGroup !== previousGroup
+                        featureProperties.clusterGroupFeature !== clusterFeatures[featureGroup.groupIndex]
                     ) {
                         // construct property update object
                         const patchProperties: any = {};
                         if (featureStyle !== this.hiddenFeatureStyle) {
                             patchProperties.featureOldStyle = featureStyle;
                         }
-                        if (featureProperties.clusterGroup !== previousGroup) {
-                            patchProperties.clusterGroup = clusterFeatures[previousGroup];
+                        const clusterGroupFeature = featureProperties.notReallyALine ? null : clusterFeatures[featureGroup.groupIndex];
+                        if (featureProperties.clusterGroupFeature !== clusterGroupFeature) {
+                            patchProperties.clusterGroupFeature = clusterGroupFeature;
                         }
 
                         // keep reference to old style
@@ -773,30 +890,131 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                         overlayFeature.setStyle(this.hiddenFeatureStyle);
                     }
                 } else {
-                    // not under the same cluster group...
-                    // need to make just one relationship between the same cluster groups, followed by displaying popup with all items that match the same groups...
-                    // #TODO
+                    // show features that are between markers ( groups with size 1 )
+                    // - for other we need to group them & display links between groups & allow clickable group paths
+                    if (featureGroups.hasOnlyGroupsOfSize1) {
+                        // show feature & remove hide properties
+                        showOverlayFeature(overlayFeature, featureStyle, featureProperties);
+                    } else {
+                        // ignore arrows
+                        if (featureProperties.notReallyALine) {
+                            // hide line
+                            if (
+                                featureStyle !== this.hiddenFeatureStyle ||
+                                featureProperties.clusterGroupFeature
+                            ) {
+                                // construct property update object
+                                const patchProperties: any = {};
+                                if (featureStyle !== this.hiddenFeatureStyle) {
+                                    patchProperties.featureOldStyle = featureStyle;
+                                }
+                                if (featureProperties.clusterGroupFeature) {
+                                    patchProperties.clusterGroupFeature = null;
+                                }
 
-                    // show if we don't need to hide it :)
-                    if (featureStyle === this.hiddenFeatureStyle) {
-                        // make feature visible
-                        overlayFeature.setStyle(overlayFeature.getProperties().featureOldStyle);
+                                // keep reference to old style
+                                overlayFeature.setProperties({
+                                    ...featureProperties,
+                                    ...patchProperties
+                                }, true);
 
-                        // remove visibility properties
-                        overlayFeature.setProperties({
-                            ...featureProperties,
-                            ...{
-                                featureOldStyle: null,
-                                clusterGroup: null
+                                // hide feature
+                                overlayFeature.setStyle(this.hiddenFeatureStyle);
                             }
-                        }, true);
+
+                            // finished
+                            return;
+                        }
+
+                        // has multiple group connections
+                        // we need to merge them into one path with the correct positions
+                        // - for other we need to group them & display links between groups & allow clickable group paths
+                        const sortedGroups = _.sortBy(
+                            featureGroups.groups,
+                            'groupIndex'
+                        );
+
+                        // determine group path
+                        let groupLinePath: string = '';
+                        sortedGroups.forEach((group: IClusterFeatureGroup) => {
+                            groupLinePath += `_${group.groupIndex}`;
+                        });
+
+                        // initialize overlay line info for these groups if necessary
+                        if (!overlayGroupLines[groupLinePath]) {
+                            overlayGroupLines[groupLinePath] = {
+                                sortedGroups: sortedGroups,
+                                lines: []
+                            };
+                        }
+
+                        // add path to list of items under this cluster line
+                        overlayGroupLines[groupLinePath].lines.push(overlayProperties.dataForEventListeners);
+
+                        // hide line since we will draw it later under a cluster group line
+                        if (
+                            featureStyle !== this.hiddenFeatureStyle ||
+                            featureProperties.clusterGroupFeature
+                        ) {
+                            // construct property update object
+                            const patchProperties: any = {};
+                            if (featureStyle !== this.hiddenFeatureStyle) {
+                                patchProperties.featureOldStyle = featureStyle;
+                            }
+                            if (featureProperties.clusterGroupFeature) {
+                                patchProperties.clusterGroupFeature = null;
+                            }
+
+                            // keep reference to old style
+                            overlayFeature.setProperties({
+                                ...featureProperties,
+                                ...patchProperties
+                            }, true);
+
+                            // hide feature
+                            overlayFeature.setStyle(this.hiddenFeatureStyle);
+                        }
                     }
                 }
             });
 
+            // clear cluster overlay layer
+            this.mapOverlayLayerSourceForCluster.clear();
+
+            // draw groups cluster lines
+            _.each(overlayGroupLines, (lineData: IClusterLines) => {
+                // determine cluster points
+                const points: any = [];
+                lineData.sortedGroups.forEach((featureGroup: IClusterFeatureGroup) => {
+                    points.push(clusterFeatures[featureGroup.groupIndex].getGeometry().getCoordinates());
+                });
+
+                // create path
+                const featurePath = new Feature({
+                    geometry: new LineString(points)
+                });
+
+                // stylize path
+                featurePath.setStyle(this.clusterLineStyle);
+
+                // keep line data
+                featurePath.setProperties({
+                    dataForEventListeners: new WorldMapClusterLine({
+                        data: lineData.lines,
+                        selected: (map: WorldMapComponent, clusterLine: WorldMapClusterLine) => {
+                            // display dialog for grouped lines
+                            this.displayChoseFromGroupDialog(clusterLine.data);
+                        }
+                    })
+                });
+
+                // add path to overlay
+                this.mapOverlayLayerSourceForCluster.addFeature(featurePath);
+            });
+
             // finished update
             this.clusterUpdatePending = null;
-        }, 100);
+        }, 50);
     }
 
     /**
@@ -827,6 +1045,14 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         // add overlay - markers & lines layer
         this.layers.push(new VectorLayer({
             source: this.mapOverlayLayerSource
+        }));
+
+        // create overlay cluster layer source
+        this.mapOverlayLayerSourceForCluster = new VectorSource();
+
+        // add overlay - markers & lines layer
+        this.layers.push(new VectorLayer({
+            source: this.mapOverlayLayerSourceForCluster
         }));
 
         // initialize cluster layer source
@@ -924,7 +1150,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                             // do we need to check if we should hide this feature ?
                             if (
                                 !(overlayProperties.dataForEventListeners instanceof WorldMapPath) ||
-                                overlayProperties.clusterGroup !== feature ||
+                                overlayProperties.clusterGroupFeature !== feature ||
                                 !overlayProperties.dataForEventListeners.hideOnMarkerCluster ||
                                 !overlayProperties.dataForEventListeners.selected
                             ) {
@@ -938,8 +1164,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                         // do we have clickable items in this group ?
                         if (!_.isEmpty(groupItems)) {
                             // call method for handling groups
-                            console.log(groupItems);
-                            // #TODO
+                            this.displayChoseFromGroupDialog(Object.values(groupItems));
                         }
                     }
                 } else if (
@@ -947,7 +1172,10 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                     properties.dataForEventListeners.selected
                 ) {
                     // single record
-                    if (properties.dataForEventListeners instanceof WorldMapPath) {
+                    if (
+                        properties.dataForEventListeners instanceof WorldMapPath ||
+                        properties.dataForEventListeners instanceof WorldMapClusterLine
+                    ) {
                         selectFeature = selectFeature ? selectFeature : feature;
                     } else {
                         // anything else is more important than a line
@@ -1052,6 +1280,114 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      */
     private clearSelectedItems() {
         this._clickSelect.getFeatures().clear();
+    }
+
+    /**
+     * Display dialog to choose from list of items from a group
+     * @param items
+     */
+    private displayChoseFromGroupDialog(items: (WorldMapPath | WorldMapMarker)[]) {
+        // only one item in the list, then we need to display it
+        if (items.length < 2) {
+            const item: WorldMapPath | WorldMapMarker = items[0];
+            (item as any).selected(
+                this,
+                item
+            );
+
+            // finished
+            return;
+        }
+
+        // split items into markers & paths
+        const markers: WorldMapMarker[] = [];
+        const paths: WorldMapPath[] = [];
+        items.forEach((item) => {
+            if (item instanceof WorldMapMarker) {
+                markers.push(item);
+            } else {
+                paths.push(item);
+            }
+        });
+
+        // construct list of markers & relationships
+        const fieldList: DialogField[] = [];
+
+        // do we have any markers ?
+        if (!_.isEmpty(markers)) {
+            // markers section title
+            if (this.groupMarkerTitle) {
+                fieldList.push(new DialogField({
+                    name: '_',
+                    fieldType: DialogFieldType.SECTION_TITLE,
+                    placeholder: this.groupMarkerTitle
+                }));
+            }
+
+            // add markers to the list
+            markers.forEach((item: WorldMapMarker) => {
+                fieldList.push(new DialogField({
+                    name: '_',
+                    fieldType: DialogFieldType.ACTION,
+                    placeholder: item.label,
+                    actionData: item,
+                    actionCallback: (marker: WorldMapMarker) => {
+                        if (marker.selected) {
+                            marker.selected(
+                                this,
+                                marker
+                            );
+                        }
+                    }
+                }));
+            });
+        }
+
+        // do we have any paths ?
+        if (!_.isEmpty(paths)) {
+            // paths section title
+            if (this.groupPathTitle) {
+                fieldList.push(new DialogField({
+                    name: '_',
+                    fieldType: DialogFieldType.SECTION_TITLE,
+                    placeholder: this.groupPathTitle
+                }));
+            }
+
+            // add paths to the list
+            paths.forEach((item: WorldMapPath) => {
+                fieldList.push(new DialogField({
+                    name: '_',
+                    fieldType: DialogFieldType.ACTION,
+                    placeholder: item.label,
+                    actionData: item,
+                    actionCallback: (path: WorldMapPath) => {
+                        if (path.selected) {
+                            path.selected(
+                                this,
+                                path
+                            );
+                        }
+                    }
+                }));
+            });
+        }
+
+        // display dialog to choose item from list
+        this.dialogService
+            .showInput(new DialogConfiguration({
+                message: 'LNG_PAGE_WORLD_MAP_GROUP_DIALOG_TITLE',
+                buttons: [
+                    new DialogButton({
+                        label: 'LNG_COMMON_BUTTON_CLOSE',
+                        clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                            dialogHandler.close();
+                        }
+                    })
+                ],
+                fieldsList: fieldList
+            }))
+            .subscribe();
     }
 
     /**

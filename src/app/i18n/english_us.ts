@@ -15,7 +15,21 @@ export const EnglishUsLang = {
         /**
          * uiFormInputValidationErrors
          */
-        'LNG_FORM_VALIDATION_ERROR_FIELD_NOT_NUMBER': 'Can\'t be number'
+        'LNG_FORM_VALIDATION_ERROR_FIELD_NOT_NUMBER': 'Can\'t be number',
+
+        /**
+         * uiChainsOfTransmissionGraph
+         */
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_TITLE': '{{type}}',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_TITLE': 'Relationship',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RELATIONSHIP_LABEL': '{{item1}} - {{item2}}',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GROUP_DIALOG_MARKER_SECTION_TITLE': 'Entities',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GROUP_DIALOG_PATHS_SECTION_TITLE': 'Relationships',
+
+        /**
+         * uiWorldMap
+         */
+        'LNG_PAGE_WORLD_MAP_GROUP_DIALOG_TITLE': 'Grouped items'
 
 
 

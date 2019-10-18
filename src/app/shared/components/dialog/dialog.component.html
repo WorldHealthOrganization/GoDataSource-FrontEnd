@@ -156,9 +156,9 @@
                             {{ field.placeholder | translate }}
                         </a>
 
+                        <!-- Url -->
                         <div
                             *ngIf="field.fieldType === DialogFieldType.URL">
-                            <!-- Url -->
                             <app-form-input
                                 [name]="field.name"
                                 [(ngModel)]="dialogAnswerInputValue.value[field.name]"
@@ -171,6 +171,21 @@
                                 [asyncValidatorErrMsg]="field.urlAsyncErrorMsg"
                                 [asyncValidatorErrMsgTranslateData]="field.urlAsyncErrorMsgData">
                             </app-form-input>
+                        </div>
+
+                        <!-- Action -->
+                        <div
+                            *ngIf="field.fieldType === DialogFieldType.ACTION"
+                            class="dialog-action"
+                            (click)="field.actionCallback(field.actionData)">
+                            {{ field.placeholder | translate }}
+                        </div>
+
+                        <!-- Section Title -->
+                        <div
+                            *ngIf="field.fieldType === DialogFieldType.SECTION_TITLE"
+                            class="dialog-section-title">
+                            {{ field.placeholder | translate }}
                         </div>
                     </div>
                 </div>

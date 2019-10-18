@@ -66,7 +66,9 @@ export enum DialogFieldType {
     DATE = 'date',
     BOOLEAN = 'boolean',
     LINK = 'link',
-    URL = 'url'
+    URL = 'url',
+    ACTION = 'action',
+    SECTION_TITLE = 'section-title'
 }
 
 export class DialogField {
@@ -97,6 +99,10 @@ export class DialogField {
     urlAsyncErrorMsg: string;
     urlAsyncErrorMsgData: any;
 
+    // action
+    actionCallback: (actionData?: any) => void;
+    actionData: any;
+
     constructor(data: {
         name: string,
         placeholder?: string,
@@ -123,7 +129,11 @@ export class DialogField {
         // url
         urlAsyncValidator?: (url: string) => Observable<boolean>,
         urlAsyncErrorMsg?: string,
-        urlAsyncErrorMsgData?: any
+        urlAsyncErrorMsgData?: any,
+
+        // action
+        actionCallback?: (actionData?: any) => void,
+        actionData?: any
     }) {
         // set properties
         Object.assign(

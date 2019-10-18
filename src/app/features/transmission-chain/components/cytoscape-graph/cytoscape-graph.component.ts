@@ -1,15 +1,12 @@
-import {
-    Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild,
-    ViewEncapsulation
-} from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import * as cytoscape from 'cytoscape';
 import * as cola from 'cytoscape-cola';
 import * as dagre from 'cytoscape-dagre';
-import { Observable, Subscription } from 'rxjs';
+import { forkJoin, Observable, Subscription, throwError } from 'rxjs';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Constants } from '../../../../core/models/constants';
 import * as _ from 'lodash';
-import { WorldMapComponent, WorldMapMarker, WorldMapMarkerType, WorldMapPath, WorldMapPathType, WorldMapPoint } from '../../../../common-modules/world-map/components/world-map/world-map.component';
+import { WorldMapComponent, WorldMapMarker, WorldMapMarkerLayer, WorldMapMarkerType, WorldMapPath, WorldMapPathType, WorldMapPoint } from '../../../../common-modules/world-map/components/world-map/world-map.component';
 import { IConvertChainToGraphElements } from '../../../../core/services/data/transmission-chain.data.service';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -18,7 +15,6 @@ import { AddressModel, AddressType } from '../../../../core/models/address.model
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { CaseModel } from '../../../../core/models/case.model';
-import { ViewCotNodeDialogComponent } from '../../../../shared/components/view-cot-node-dialog/view-cot-node-dialog.component';
 import { ViewCotEdgeDialogComponent } from '../../../../shared/components/view-cot-edge-dialog/view-cot-edge-dialog.component';
 import { LoadingDialogModel } from '../../../../shared/components/loading-dialog/loading-dialog.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -35,8 +31,9 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { catchError } from 'rxjs/operators';
-import { throwError, forkJoin } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { ViewCotNodeDialogComponent } from '../../../../shared/components';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -91,6 +88,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     authUser: UserModel;
 
     Constants = Constants;
+    WorldMapMarkerLayer = WorldMapMarkerLayer;
     cy: any;
     container: string = 'cy';
     transmissionChainViewTypes$: Observable<any[]>;
@@ -300,10 +298,13 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
         private entityDataService: EntityDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
-        private relationshipDataService: RelationshipDataService
-    ) {
-    }
+        private relationshipDataService: RelationshipDataService,
+        private i18nService: I18nService
+    ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -940,6 +941,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                                 address.geoLocation.lat,
                                 address.geoLocation.lng
                             ),
+                            layer: WorldMapMarkerLayer.CLUSTER,
+                            overlaySingleDisplayLabel: true,
                             type: WorldMapMarkerType.CIRCLE,
                             radius: markerCircleRadius,
                             color: typeToColorMap[entity.type] ? typeToColorMap[entity.type] : Constants.DEFAULT_COLOR_CHAINS,
@@ -949,9 +952,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                                 Constants.DEFAULT_COLOR_CHAINS,
                             data: entity,
                             selected: (map: WorldMapComponent, mark: WorldMapMarker) => {
-                                // clear selected
-                                map.clearSelectedItems();
-
                                 // display entity information ( case / contact / event )
                                 const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
                                 const localEntity: EntityModel = mark.data;
@@ -1056,9 +1056,16 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                             markersMap[gEdge.data.target]
                         ) {
                             this.lines.push(new WorldMapPath({
+                                hideOnMarkerCluster: true,
+                                label: this.i18nService.instant(
+                                    'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RELATIONSHIP_LABEL', {
+                                        item1: markersMap[gEdge.data.source].label,
+                                        item2: markersMap[gEdge.data.target].label
+                                    }
+                                ),
                                 points: [
-                                    markersMap[gEdge.data.source].point,
-                                    markersMap[gEdge.data.target].point
+                                    markersMap[gEdge.data.source],
+                                    markersMap[gEdge.data.target]
                                 ],
                                 color: certaintyLevelToColorMap[relationship.certaintyLevelId] ? certaintyLevelToColorMap[relationship.certaintyLevelId] : Constants.DEFAULT_COLOR_CHAINS,
                                 type: WorldMapPathType.ARROW,
@@ -1066,9 +1073,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                                 offsetX: -(markerCircleRadius * 2 + 3),
                                 data: relationship,
                                 selected: (map: WorldMapComponent, path: WorldMapPath) => {
-                                    // clear selected
-                                    map.clearSelectedItems();
-
                                     // display relationship information
                                     const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
                                     const localRelationship: RelationshipModel = path.data;
