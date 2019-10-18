@@ -186,7 +186,35 @@
                 </app-epi-curve-reporting-dashlet>
             </mat-card>
 
+            <!-- Contact follow-up overview -->
+            <mat-card class="page-section">
+                <div class="other-kpi-header">
+                    {{'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_TITLE' | translate}}
+                </div>
 
+                <!-- Contact follow-up overview c3 chart -->
+                <app-contact-follow-up-overview-dashlet
+                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+                    [globalFilterDate]="globalFilterDate"
+                    [globalFilterLocationId]="globalFilterLocationId"
+                    [globalFilterClassificationId]="globalFilterClassificationId">
+                </app-contact-follow-up-overview-dashlet>
+            </mat-card>
+
+            <!-- Cases based on contact status -->
+            <mat-card class="page-section">
+                <div class="other-kpi-header">
+                    {{'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_TITLE' | translate}}
+                </div>
+
+                <!-- Cases based on contact status c3 chart -->
+                <app-cases-based-on-contact-status-dashlet
+                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+                    [globalFilterDate]="globalFilterDate"
+                    [globalFilterLocationId]="globalFilterLocationId"
+                    [globalFilterClassificationId]="globalFilterClassificationId">
+                </app-cases-based-on-contact-status-dashlet>
+            </mat-card>
 
             <!-- KPIs -->
             <div #kpiSection>
