@@ -137,12 +137,6 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
                     label: {
                         text: this.y2Label,
                         position: 'outer-middle'
-                    },
-                    max: this.y2Max,
-                    min: this.y2Min,
-                    padding : {
-                        top: 0,
-                        bottom: 0
                     }
                 }
             },
