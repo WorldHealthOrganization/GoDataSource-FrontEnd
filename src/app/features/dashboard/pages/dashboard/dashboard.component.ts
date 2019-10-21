@@ -358,13 +358,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.showLoadingDialog();
         switch (this.epiCurveViewType) {
             case Constants.EPI_CURVE_TYPES.CLASSIFICATION.value:
-                this.getEpiCurveDashlet();
+                this.getEpiCurveDashlet('app-epi-curve-dashlet svg');
                 break;
             case Constants.EPI_CURVE_TYPES.OUTCOME.value:
-                this.getEpiCurveOutcomeDashlet();
+                this.getEpiCurveDashlet('app-epi-curve-outcome-dashlet svg');
                 break;
             case Constants.EPI_CURVE_TYPES.REPORTING.value:
-                this.getEpiCurveTypes();
+                this.getEpiCurveDashlet('app-epi-curve-reporting-dashlet svg');
                 break;
         }
     }
@@ -372,54 +372,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     /**
      * Get Epi curve dashlet
      */
-    private getEpiCurveDashlet() {
+    private getEpiCurveDashlet(selector: string) {
         this.domService
-            .getPNGBase64('app-epi-curve-dashlet svg', '#tempCanvas')
-            .subscribe((pngBase64) => {
-                this.importExportDataService
-                    .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
-                    .pipe(
-                        catchError((err) => {
-                            this.snackbarService.showApiError(err);
-                            this.closeLoadingDialog();
-                            return throwError(err);
-                        })
-                    )
-                    .subscribe((blob) => {
-                        this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
-                    });
-            });
-    }
-
-    /**
-     * Get Epi curve outcome dashlet
-     */
-    private getEpiCurveOutcomeDashlet() {
-        this.domService
-            .getPNGBase64('app-epi-curve-outcome-dashlet svg', '#tempCanvas')
-            .subscribe((pngBase64) => {
-                this.importExportDataService
-                    .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
-                    .pipe(
-                        catchError((err) => {
-                            this.snackbarService.showApiError(err);
-                            this.closeLoadingDialog();
-                            return throwError(err);
-                        })
-                    )
-                    .subscribe((blob) => {
-                        this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
-                    });
-            });
-
-    }
-
-    /**
-     * Get Epi Curve Types
-     */
-    private getEpiCurveTypes() {
-        this.domService
-            .getPNGBase64('app-epi-curve-reporting-dashlet svg', '#tempCanvas')
+            .getPNGBase64(selector, '#tempCanvas')
             .subscribe((pngBase64) => {
                 this.importExportDataService
                     .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
