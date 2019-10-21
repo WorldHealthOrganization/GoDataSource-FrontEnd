@@ -140,7 +140,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
                     },
                     max: this.y2Max,
                     min: this.y2Min,
-                    padding : {
+                    padding: {
                         top: 0,
                         bottom: 0
                     }
