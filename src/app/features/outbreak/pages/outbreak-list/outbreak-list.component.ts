@@ -469,7 +469,9 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                 case true : {
                     this.queryBuilder.filter.where({
                         id: {
-                            'eq': this.authUser.activeOutbreakId
+                            'eq': this.authUser.activeOutbreakId ?
+                                this.authUser.activeOutbreakId :
+                                -1
                         }
                     });
                     break;
