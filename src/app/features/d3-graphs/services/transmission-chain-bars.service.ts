@@ -329,30 +329,21 @@ export class TransmissionChainBarsService {
         });
 
         // determine max number of lines used to render center names
-        let centerNameMaxLines: number = 0;
-        _.each(this.centerNameCells, (group1: GroupCell) => {
-            // determine max for this item
-            let max: number = 1;
-            _.each(this.centerNameCells, (group2: GroupCell) => {
-                // no need to compare the same objects
-                if (group1 === group2) {
-                    return;
+        const centerLines: {
+            [rowIndex: string]: number
+        } = {};
+        _.each(this.centerNameCells, (group: GroupCell) => {
+            for (let rowIndex: number = group.entityStartIndex; rowIndex < group.entityStartIndex + group.cells; rowIndex++) {
+                if (!centerLines[`_${rowIndex}`]) {
+                    centerLines[`_${rowIndex}`] = 1;
+                } else {
+                    centerLines[`_${rowIndex}`]++;
                 }
-
-                // compare
-                if (
-                    group2.entityStartIndex >= group1.entityStartIndex &&
-                    group2.entityStartIndex < group1.entityStartIndex + group1.cells
-                ) {
-                    max++;
-                }
-            });
-
-            // determine mex
-            centerNameMaxLines = centerNameMaxLines < max ?
-                max :
-                centerNameMaxLines;
+            }
         });
+
+        // determine mex
+        const centerNameMaxLines: number = _.isEmpty(centerLines) ? 0 : Math.max(...Object.values(centerLines));
 
         // add center name lines
         this.entityDetailsTextLinesHeight = centerNameMaxLines * (this.entityDetailsTextLineCellHeight + this.entityDetailsTextLineSpaceBetween) + this.entityDetailsTextLinesHeightMarginBottom;
