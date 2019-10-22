@@ -441,7 +441,9 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button
-            *ngIf="viewOnly && hasCaseWriteAccess()"
+            *ngIf="viewOnly &&
+                   hasCaseWriteAccess() &&
+                   authUser.activeOutbreakId === selectedOutbreak.id"
             type="button"
             mat-raised-button color="accent"
             [routerLink]="['/cases', caseId, 'modify']">

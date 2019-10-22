@@ -272,7 +272,9 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button *ngIf="viewOnly && hasCaseWriteAccess()"
+        <button *ngIf="viewOnly &&
+                       hasCaseWriteAccess() &&
+                       authUser.activeOutbreakId === selectedOutbreak.id"
                 mat-raised-button type="button" color="accent"
                 [routerLink]=" ['/cases', labResultData.personId, 'lab-results', labResultData.id, 'modify' ]"
                 [queryParams]="{fromLabResultsList: fromLabResultsList}">
