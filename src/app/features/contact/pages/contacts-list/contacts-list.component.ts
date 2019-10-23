@@ -602,12 +602,14 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             new FilterModel({
                 fieldName: 'addresses',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
-                type: FilterType.ADDRESS
+                type: FilterType.ADDRESS,
+                addressFieldIsArray: true
             }),
             new FilterModel({
                 fieldName: 'addresses',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
                 type: FilterType.ADDRESS_PHONE_NUMBER,
+                addressFieldIsArray: true
             }),
             new FilterModel({
                 fieldName: 'followUp.status',

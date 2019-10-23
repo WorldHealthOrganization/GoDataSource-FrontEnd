@@ -565,6 +565,7 @@ export class SideFiltersComponent implements OnInit {
                 }
             } else {
                 // filter
+                let searchQb: RequestQueryBuilder;
                 switch (filter.type) {
                     case FilterType.TEXT:
                         switch (comparator) {
@@ -665,24 +666,33 @@ export class SideFiltersComponent implements OnInit {
 
                             // FilterComparator.CONTAINS
                             default:
-                                qb.merge(AddressModel.buildSearchFilter(appliedFilter.value, filter.fieldName));
+                                // construct address search qb
+                                searchQb = AddressModel.buildSearchFilter(
+                                    appliedFilter.value,
+                                    filter.fieldName,
+                                    filter.addressFieldIsArray
+                                );
+
+                                // add condition if we were able to create it
+                                if (searchQb) {
+                                    qb.merge(searchQb);
+                                }
                         }
                         break;
 
                     // filter by phone number
                     case FilterType.ADDRESS_PHONE_NUMBER:
-                        qb.filter.where({
-                            addresses: {
-                                elemMatch: {
-                                    phoneNumber: {
-                                        $regex: RequestFilter.escapeStringForRegex(appliedFilter.value)
-                                            .replace(/%/g, '.*')
-                                            .replace(/\\\?/g, '.'),
-                                        $options: 'i'
-                                    }
-                                }
-                            }
-                        });
+                        // construct address phone number search qb
+                        searchQb = AddressModel.buildPhoneSearchFilter(
+                            appliedFilter.value,
+                            filter.fieldName,
+                            filter.addressFieldIsArray
+                        );
+
+                        // add condition if we were able to create it
+                        if (searchQb) {
+                            qb.merge(searchQb);
+                        }
                         break;
 
                     case FilterType.RANGE_NUMBER:

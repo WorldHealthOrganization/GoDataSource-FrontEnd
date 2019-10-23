@@ -337,7 +337,8 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
             new FilterModel({
                 fieldName: 'addresses',
                 fieldLabel: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
-                type: FilterType.ADDRESS
+                type: FilterType.ADDRESS,
+                addressFieldIsArray: true
             }),
             new FilterModel({
                 fieldName: 'dob',
