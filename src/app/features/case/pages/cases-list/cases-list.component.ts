@@ -639,7 +639,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             new FilterModel({
                 fieldName: 'addresses',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
-                type: FilterType.ADDRESS
+                type: FilterType.ADDRESS,
+                addressFieldIsArray: true
             }),
             new FilterModel({
                 fieldName: 'dob',

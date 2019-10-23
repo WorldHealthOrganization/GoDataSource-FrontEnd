@@ -64,44 +64,89 @@ export class AddressModel {
      */
     static buildSearchFilter(
         address: string,
-        property: string
+        property: string,
+        propertyIsArray: boolean
     ): RequestQueryBuilder {
         // initialize query builder
         const qb = new RequestQueryBuilder();
 
         // add filters
-        const matches: string[] = address.match(/(\w+\s*)+/gi);
+        const matches: string[] = address.match(/\w+/gi);
         if (
             matches &&
             matches.length > 0
         ) {
-            // add conditions
+            // construct query accordingly to property type ( array of objects / single object )
             const conditions: any[] = [];
-            matches.forEach((searchTerm: string) => {
-                conditions.push({
-                    or: [{
-                        [property + '.city']: {
-                            like: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
-                            options: 'i'
-                        }
-                    }, {
-                        [property + '.postalCode']: {
-                            like: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
-                            options: 'i'
-                        }
-                    }, {
-                        [property + '.addressLine1']: {
-                            like: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
-                            options: 'i'
-                        }
-                    }]
+            if (propertyIsArray) {
+                // add conditions
+                matches.forEach((searchTerm: string) => {
+                    conditions.push({
+                        $or: [{
+                            city: {
+                                $regex: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                                $options: 'i'
+                            }
+                        }, {
+                            postalCode: {
+                                $regex: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                                $options: 'i'
+                            }
+                        }, {
+                            addressLine1: {
+                                $regex: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                                $options: 'i'
+                            }
+                        }, {
+                            phoneNumber: {
+                                $regex: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                                $options: 'i'
+                            }
+                        }]
+                    });
                 });
-            });
 
-            // search
-            qb.filter.where({
-                and: conditions
-            }, false);
+                // search
+                qb.filter.where({
+                    [property]: {
+                        elemMatch: {
+                            $and: conditions
+                        }
+                    }
+                }, false);
+            } else {
+                // add conditions
+                matches.forEach((searchTerm: string) => {
+                    conditions.push({
+                        $or: [{
+                            [`${property}.city`]: {
+                                $regex: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                                $options: 'i'
+                            }
+                        }, {
+                            [`${property}.postalCode`]: {
+                                $regex: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                                $options: 'i'
+                            }
+                        }, {
+                            [`${property}.addressLine1`]: {
+                                $regex: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                                $options: 'i'
+                            }
+                        }, {
+                            [`${property}.phoneNumber`]: {
+                                $regex: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                                $options: 'i'
+                            }
+                        }]
+                    });
+                });
+
+                // search
+                qb.filter.where({
+                    $and: conditions
+                }, false);
+            }
 
             // finished
             return qb;

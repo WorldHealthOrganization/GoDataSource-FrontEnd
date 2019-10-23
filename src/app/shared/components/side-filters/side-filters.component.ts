@@ -665,7 +665,11 @@ export class SideFiltersComponent implements OnInit {
 
                             // FilterComparator.CONTAINS
                             default:
-                                qb.merge(AddressModel.buildSearchFilter(appliedFilter.value, filter.fieldName));
+                                qb.merge(AddressModel.buildSearchFilter(
+                                    appliedFilter.value,
+                                    filter.fieldName,
+                                    filter.addressFieldIsArray
+                                ));
                         }
                         break;
 

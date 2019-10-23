@@ -198,6 +198,9 @@ export class FilterModel {
     // flag where property instead of creating specific rules...
     flagIt: boolean;
 
+    // address field is array ?
+    addressFieldIsArray: boolean = true;
+
     // questionnaire template
     private _questionnaireTemplate: QuestionModel[];
     questionnaireTemplateQuestions: QuestionSideFilterModel[];
@@ -293,7 +296,8 @@ export class FilterModel {
             valueType: ValueType
         }[],
         flagIt?: boolean,
-        questionnaireTemplate?: QuestionModel[]
+        questionnaireTemplate?: QuestionModel[],
+        addressFieldIsArray?: boolean
     }) {
         // set handler
         this.self = this;

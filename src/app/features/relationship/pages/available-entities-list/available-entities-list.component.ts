@@ -259,7 +259,8 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
             new FilterModel({
                 fieldName: 'addresses',
                 fieldLabel: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
-                type: FilterType.ADDRESS
+                type: FilterType.ADDRESS,
+                addressFieldIsArray: true
             }),
             new FilterModel({
                 fieldName: 'dob',
