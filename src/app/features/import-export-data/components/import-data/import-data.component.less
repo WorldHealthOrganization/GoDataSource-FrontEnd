@@ -123,6 +123,7 @@ app-import-data {
 
                 .import-data-errors-err-view-record-details-code {
                     border: 1px solid #CCC;
+                    max-width: 50%;
 
                     .view-record-details-code-title {
                         text-align: center;
@@ -131,8 +132,13 @@ app-import-data {
                         padding: 5px;
                     }
 
-                    pre {
-                        margin: 0px;
+                    .view-record-details-code-data {
+                        overflow: auto;
+                        max-height: 400px;
+
+                        pre {
+                            margin: 0px;
+                        }
                     }
                 }
             }

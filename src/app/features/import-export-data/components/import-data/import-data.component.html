@@ -372,9 +372,12 @@
                             class="view-record-details-code-title">
                             {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_FILE_TITLE' | translate }}
                         </div>
-                        <code>
-                            <pre>{{ err.data?.file | json }}</pre>
-                        </code>
+                        <div
+                            class="view-record-details-code-data">
+                            <code>
+                                <pre>{{ err.data?.file | json }}</pre>
+                            </code>
+                        </div>
                     </div>
                     <div
                         *ngIf="err.data?.save"
@@ -384,9 +387,12 @@
                             class="view-record-details-code-title">
                             {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_MODEL_TITLE' | translate }}
                         </div>
-                        <code>
-                            <pre>{{ err.data?.save | json }}</pre>
-                        </code>
+                        <div
+                            class="view-record-details-code-data">
+                            <code>
+                                <pre>{{ err.data?.save | json }}</pre>
+                            </code>
+                        </div>
                     </div>
                 </div>
             </div>
