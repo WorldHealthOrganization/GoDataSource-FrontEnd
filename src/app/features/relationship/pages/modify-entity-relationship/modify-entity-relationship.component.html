@@ -96,11 +96,7 @@
                 [routerLink]="['/relationships', entityType, entityId, relationshipTypeRoutePath, relationshipId, 'modify']">
                 {{'LNG_COMMON_BUTTON_EDIT' | translate}}
             </button>
-        </ng-container>
 
-        <ng-container
-            *app-selected-outbreak-is-active
-        >
             <ng-container *ngIf="!viewOnly">
 
                 <ng-container *ngIf="canReverseRelation" >
@@ -116,12 +112,12 @@
                     <div class="page-tabs-navbar-placeholder"></div>
                 </ng-container>
 
-                    <button mat-raised-button color="accent">
-                        {{'LNG_COMMON_BUTTON_SAVE' | translate}}
-                    </button>
-                    <button type="button" [routerLink]="['/relationships', entityType, entityId, relationshipTypeRoutePath]" mat-raised-button>
-                        {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
-                    </button>
+                <button mat-raised-button color="accent">
+                    {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+                </button>
+                <button type="button" [routerLink]="['/relationships', entityType, entityId, relationshipTypeRoutePath]" mat-raised-button>
+                    {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+                </button>
             </ng-container>
         </ng-container>
     </div>
