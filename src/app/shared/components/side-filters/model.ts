@@ -199,6 +199,7 @@ export class FilterModel {
     flagIt: boolean;
 
     // address field is array ?
+    // - used also to search for phone number in an array of addresses or just one address ?
     addressFieldIsArray: boolean = true;
 
     // questionnaire template

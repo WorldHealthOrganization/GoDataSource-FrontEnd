@@ -652,7 +652,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 fieldName: 'addresses',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
                 type: FilterType.ADDRESS_PHONE_NUMBER,
-                sortable: true
+                addressFieldIsArray: true
             }),
             new FilterModel({
                 fieldName: 'occupation',
