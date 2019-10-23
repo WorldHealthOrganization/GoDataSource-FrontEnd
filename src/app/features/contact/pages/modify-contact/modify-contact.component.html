@@ -307,7 +307,7 @@
 
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button mat-raised-button type="button" [routerLink]="['/contacts/contact-related-follow-ups', contactId]">
+        <button *ngIf="hasFollowUpReadAccess()" mat-raised-button type="button" [routerLink]="['/contacts/contact-related-follow-ups', contactId]">
             {{ 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_FOLLOW_UPS' | translate }}
         </button>
         <button mat-raised-button type="button" [routerLink]="['/contacts', contactId, 'movement']">
