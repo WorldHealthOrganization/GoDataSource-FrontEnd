@@ -70,8 +70,9 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                     click: (item: ReferenceDataEntryModel) => {
                         this.deleteEntry(item);
                     },
-                    visible: (): boolean => {
-                        return this.hasReferenceDataWriteAccess();
+                    visible: (item: ReferenceDataEntryModel): boolean => {
+                        return this.hasReferenceDataWriteAccess() &&
+                            !item.readonly;
                     },
                     class: 'mat-menu-item-delete'
                 })
