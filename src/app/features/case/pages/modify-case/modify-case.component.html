@@ -440,36 +440,41 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button
-            *ngIf="viewOnly && hasCaseWriteAccess()"
-            type="button"
-            mat-raised-button color="accent"
-            [routerLink]="['/cases', caseId, 'modify']">
-            {{'LNG_COMMON_BUTTON_EDIT' | translate}}
-        </button>
-
-        <ng-container *ngIf="!viewOnly">
-            <button mat-raised-button color="accent">
-                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
-            </button>
-
-            <button type="button" [routerLink]="'/cases'" mat-raised-button>
-                {{'LNG_COMMON_BUTTON_CANCEL'| translate}}
-            </button>
-        </ng-container>
-
-        <div class="page-tabs-navbar-placeholder"></div>
-
-        <ng-container *ngIf="hasContactWriteAccess()">
+        <ng-container
+            *app-selected-outbreak-is-active
+        >
             <button
+                *ngIf="viewOnly &&
+                   hasCaseWriteAccess()"
                 type="button"
                 mat-raised-button color="accent"
-                routerLink="/contacts/create"
-                [queryParams]="{ entityType: EntityType.CASE, entityId: caseId }">
-                {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
+                [routerLink]="['/cases', caseId, 'modify']">
+                {{'LNG_COMMON_BUTTON_EDIT' | translate}}
             </button>
 
+            <ng-container *ngIf="!viewOnly">
+                <button mat-raised-button color="accent">
+                    {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+                </button>
+
+                <button type="button" [routerLink]="'/cases'" mat-raised-button>
+                    {{'LNG_COMMON_BUTTON_CANCEL'| translate}}
+                </button>
+            </ng-container>
+
             <div class="page-tabs-navbar-placeholder"></div>
+
+            <ng-container *ngIf="hasContactWriteAccess()">
+                <button
+                    type="button"
+                    mat-raised-button color="accent"
+                    routerLink="/contacts/create"
+                    [queryParams]="{ entityType: EntityType.CASE, entityId: caseId }">
+                    {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
+                </button>
+
+                <div class="page-tabs-navbar-placeholder"></div>
+            </ng-container>
         </ng-container>
 
         <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CASE, caseId, 'contacts']">
@@ -490,7 +495,7 @@
         <button mat-raised-button type="button" [routerLink]="['/cases', caseId, 'chronology']">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY' | translate }}
         </button>
-        <button mat-raised-button type="button" [routerLink]="['/contacts/case-related-follow-ups', caseId]">
+        <button *ngIf="hasFollowUpReadAccess()" mat-raised-button type="button" [routerLink]="['/contacts/case-related-follow-ups', caseId]">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS' | translate }}
         </button>
     </div>

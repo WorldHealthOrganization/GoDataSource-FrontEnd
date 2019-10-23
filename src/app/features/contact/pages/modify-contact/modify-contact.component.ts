@@ -192,6 +192,14 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
     }
 
+    /**
+     * Check if we have access to read a follow-up
+     * @returns {boolean}
+     */
+    hasFollowUpReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP);
+    }
+
     modifyContact(form: NgForm) {
         // validate form
         if (!this.formHelper.validateForm(form)) {

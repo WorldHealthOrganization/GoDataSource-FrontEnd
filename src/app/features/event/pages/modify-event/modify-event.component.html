@@ -138,34 +138,38 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button *ngIf="hasEventWriteAccess() && viewOnly"
-                mat-raised-button type="button" color="accent"
-                [routerLink]="['/events', eventId, 'modify']">
-            {{'LNG_COMMON_BUTTON_EDIT'| translate}}
-        </button>
-
-        <ng-container *ngIf="!viewOnly">
-            <button mat-raised-button color="accent">
-                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+        <ng-container
+            *app-selected-outbreak-is-active
+        >
+            <button *ngIf="hasEventWriteAccess() && viewOnly"
+                    mat-raised-button type="button" color="accent"
+                    [routerLink]="['/events', eventId, 'modify']">
+                {{'LNG_COMMON_BUTTON_EDIT'| translate}}
             </button>
 
-            <button type="button" [routerLink]="'/events'" mat-raised-button>
-                {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
-            </button>
-        </ng-container>
+            <ng-container *ngIf="!viewOnly">
+                <button mat-raised-button color="accent">
+                    {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+                </button>
 
-        <div class="page-tabs-navbar-placeholder"></div>
-
-        <ng-container *ngIf="hasContactWriteAccess()">
-            <button
-                type="button"
-                mat-raised-button color="accent"
-                routerLink="/contacts/create"
-                [queryParams]="{ entityType: EntityType.EVENT, entityId: eventId }">
-                {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
-            </button>
+                <button type="button" [routerLink]="'/events'" mat-raised-button>
+                    {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+                </button>
+            </ng-container>
 
             <div class="page-tabs-navbar-placeholder"></div>
+
+            <ng-container *ngIf="hasContactWriteAccess()">
+                <button
+                    type="button"
+                    mat-raised-button color="accent"
+                    routerLink="/contacts/create"
+                    [queryParams]="{ entityType: EntityType.EVENT, entityId: eventId }">
+                    {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
+                </button>
+
+                <div class="page-tabs-navbar-placeholder"></div>
+            </ng-container>
         </ng-container>
 
         <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.EVENT, eventId, 'contacts']">
