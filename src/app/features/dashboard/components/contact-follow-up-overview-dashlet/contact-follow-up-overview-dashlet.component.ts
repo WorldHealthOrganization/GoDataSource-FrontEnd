@@ -26,7 +26,7 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
     viewType = Constants.EPI_CURVE_VIEW_TYPE.MONTH.value;
     colorPattern: string[] = [];
 
-    showLabels: { format: { [key: string]: boolean | FormatFunction } };
+    showLabels: { format: FormatFunction };
 
     // constants
     Constants = Constants;
@@ -136,13 +136,8 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
 
         // set label renderer
         this.showLabels = {
-            format: {
-                [followedUpTranslated]: (v: number): string => {
-                    return v.toString();
-                },
-                [notFollowedUpTranslated]: (v: number): string => {
-                    return v.toString();
-                }
+            format: (v: number): string => {
+                return v.toString();
             }
         };
 
@@ -174,14 +169,14 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
             }
 
             if (chartData[percentageTranslated]) {
-                chartData[percentageTranslated].push(metric.percentage);
+                chartData[percentageTranslated].push(Math.round(metric.percentage));
             } else {
                 // this.chartDataColumns.push('percentage');
                 this.colorPattern.push(Constants.DEFAULT_COLOR_CHART_CONTACTS_PERCENTAGE);
 
                 chartData[percentageTranslated] = [];
                 chartData[percentageTranslated].push(percentageTranslated);
-                chartData[percentageTranslated].push(metric.percentage);
+                chartData[percentageTranslated].push(Math.round(metric.percentage));
             }
 
         });
