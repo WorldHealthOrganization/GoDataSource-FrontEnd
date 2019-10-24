@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import * as c3 from 'c3';
+import * as d3 from 'd3';
 import { FormatFunction } from 'c3';
 
 @Component({
@@ -59,7 +60,13 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
         this.chart = c3.generate({
             bindto: chartIdBind,
             onrendered: () => {
+                // configure ticks
                 this.configureNumberOfTicks(this.chartDataCategories.length);
+
+                // reposition labels
+                d3.selectAll('app-c3-combination-stacked-bar-chart .c3-chart-texts .c3-chart-text:nth-of-type(3) .c3-texts .c3-text').attr('y', '15px');
+                d3.selectAll('app-c3-combination-stacked-bar-chart .c3-chart-texts .c3-chart-text:nth-of-type(1) .c3-texts .c3-text').attr('y', '30px');
+                d3.selectAll('app-c3-combination-stacked-bar-chart .c3-chart-texts .c3-chart-text:nth-of-type(2) .c3-texts .c3-text').attr('y', '45px');
             },
             zoom: {
                 enabled: true,
@@ -125,10 +132,9 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
                         text: this.yLabel,
                         position: 'outer-middle'
                     },
-                    tick: {
-                        format: function (d) {
-                            return d % 1 === 0 ? String(d) : '';
-                        }
+                    padding: {
+                        top: 0,
+                        bottom: 0
                     }
                 },
                 y2: {

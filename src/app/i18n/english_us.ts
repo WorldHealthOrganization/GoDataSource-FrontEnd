@@ -29,7 +29,12 @@ export const EnglishUsLang = {
         /**
          * uiWorldMap
          */
-        'LNG_PAGE_WORLD_MAP_GROUP_DIALOG_TITLE': 'Grouped items'
+        'LNG_PAGE_WORLD_MAP_GROUP_DIALOG_TITLE': 'Grouped items',
+
+        /**
+         * uiDashboardPage
+         */
+        'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_Y2_AXIS_LABEL': '% cases from contact'
 
 
 
