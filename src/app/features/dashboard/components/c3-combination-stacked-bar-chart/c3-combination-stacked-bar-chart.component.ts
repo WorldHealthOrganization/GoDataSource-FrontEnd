@@ -65,8 +65,8 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
 
                 // reposition labels
                 d3.selectAll('app-c3-combination-stacked-bar-chart .c3-chart-texts .c3-chart-text:nth-of-type(3) .c3-texts .c3-text').attr('y', '15px');
-                d3.selectAll('app-c3-combination-stacked-bar-chart .c3-chart-texts .c3-chart-text:nth-of-type(1) .c3-texts .c3-text').attr('y', '30px');
-                d3.selectAll('app-c3-combination-stacked-bar-chart .c3-chart-texts .c3-chart-text:nth-of-type(2) .c3-texts .c3-text').attr('y', '45px');
+                d3.selectAll('app-c3-combination-stacked-bar-chart .c3-chart-texts .c3-chart-text:nth-of-type(1) .c3-texts .c3-text').attr('y', '31px');
+                d3.selectAll('app-c3-combination-stacked-bar-chart .c3-chart-texts .c3-chart-text:nth-of-type(2) .c3-texts .c3-text').attr('y', '47px');
             },
             zoom: {
                 enabled: true,
