@@ -45,8 +45,9 @@ app-dialog {
             color: #0071e1;
             margin: 3px;
             font-weight: bold;
+            overflow-wrap: break-word;
 
-            &:hover {
+            &.dialog-action-has-action:hover {
                 cursor: pointer;
                 text-decoration: underline;
             }
@@ -55,9 +56,8 @@ app-dialog {
         .dialog-main-msg {
             font-size: 20px;
             font-weight: 700;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
             font-family: @font-roboto;
-            line-height: 1.2;
             color: #000;
         }
 

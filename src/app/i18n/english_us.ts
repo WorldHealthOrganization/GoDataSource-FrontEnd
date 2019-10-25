@@ -34,7 +34,13 @@ export const EnglishUsLang = {
         /**
          * uiDashboardPage
          */
-        'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_Y2_AXIS_LABEL': '% cases from contact'
+        'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_Y2_AXIS_LABEL': '% cases from contact',
+
+        /**
+         * uiSystemBackupsPage
+         */
+        'LNG_PAGE_SYSTEM_BACKUPS_ACTION_VIEW_BACKUP_PATH': 'View backups folder',
+        'LNG_PAGE_SYSTEM_BACKUPS_VIEW_BACKUP_DIALOG_TITLE': 'Backup info'
 
 
 
