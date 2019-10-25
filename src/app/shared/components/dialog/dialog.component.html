@@ -176,8 +176,8 @@
                         <!-- Action -->
                         <div
                             *ngIf="field.fieldType === DialogFieldType.ACTION"
-                            class="dialog-action"
-                            (click)="field.actionCallback(field.actionData)">
+                            [class]="'dialog-action ' + (field.actionCallback ? 'dialog-action-has-action' : '')"
+                            (click)="field.actionCallback ? field.actionCallback(field.actionData) : false">
                             {{ field.placeholder | translate }}
                         </div>
 
