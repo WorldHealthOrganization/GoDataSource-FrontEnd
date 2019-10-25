@@ -26,7 +26,7 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
     viewType = Constants.EPI_CURVE_VIEW_TYPE.MONTH.value;
     colorPattern: string[] = [];
 
-    showLabels: { format: FormatFunction };
+    showLabels: { format: { [prop: string]: FormatFunction }};
 
     // constants
     Constants = Constants;
@@ -136,8 +136,17 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
 
         // set label renderer
         this.showLabels = {
-            format: (v: number): string => {
-                return v.toString();
+            format: {
+                [followedUpTranslated]: (v: number): string => {
+                    return v.toString();
+                },
+                [notFollowedUpTranslated]: (v: number): string => {
+                    return v.toString();
+                },
+                [percentageTranslated]: (v: number): string => {
+                    return v.toString() + ' %';
+
+                }
             }
         };
 
