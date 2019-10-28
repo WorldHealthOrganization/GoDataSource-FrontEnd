@@ -335,7 +335,7 @@ export class RelationshipDataService {
      * @param queryBuilder
      * @returns {Observable<MetricCasesTransmissionChainsModel>}
      */
-    getCountOfCasesOutsideTheTransmissionChains(
+    getCountOfCasesInTheTransmissionChains(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<MetricCasesTransmissionChainsModel> {

@@ -1113,7 +1113,7 @@ export abstract class ListComponent implements OnDestroy {
                 break;
 
             // Filter cases in known transmission chains
-            case Constants.APPLY_LIST_FILTER.CASES_OUTSIDE_THE_TRANSMISSION_CHAINS:
+            case Constants.APPLY_LIST_FILTER.CASES_IN_THE_TRANSMISSION_CHAINS:
                 // get the number of days if it was updated
                 const noDaysInChains = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
