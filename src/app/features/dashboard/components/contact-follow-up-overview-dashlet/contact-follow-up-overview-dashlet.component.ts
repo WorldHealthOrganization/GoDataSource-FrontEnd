@@ -145,7 +145,6 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
                 },
                 [percentageTranslated]: (v: number): string => {
                     return v.toString() + ' %';
-
                 }
             }
         };

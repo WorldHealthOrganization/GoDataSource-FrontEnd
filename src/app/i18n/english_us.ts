@@ -40,13 +40,17 @@ export const EnglishUsLang = {
          * uiSystemBackupsPage
          */
         'LNG_PAGE_SYSTEM_BACKUPS_ACTION_VIEW_BACKUP_PATH': 'View backups folder',
-        'LNG_PAGE_SYSTEM_BACKUPS_VIEW_BACKUP_DIALOG_TITLE': 'Backup info'
+        'LNG_PAGE_SYSTEM_BACKUPS_VIEW_BACKUP_DIALOG_TITLE': 'Backup info',
 
-
+        /**
+         * uiListFiltersPageTitles
+         */
+        'LNG_PAGE_LIST_FILTER_CASES_IN_THE_TRANSMISSION_CHAINS': 'Cases in the previous {{x}} days in known transmission chains'
 
         /**
          * REMOVE the tokens from below
          */
         // ...
+        // LNG_PAGE_LIST_FILTER_CASES_OUTSIDE_THE_TRANSMISSION_CHAINS
     }
 };
