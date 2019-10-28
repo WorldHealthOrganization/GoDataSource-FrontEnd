@@ -341,7 +341,7 @@ export class RelationshipDataService {
     ): Observable<MetricCasesTransmissionChainsModel> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/relationships/new-cases-in-transmission-chains/count?filter=${filter}`),
+            this.http.get(`outbreaks/${outbreakId}/relationships/new-cases-outside-transmission-chains/count?filter=${filter}`),
             MetricCasesTransmissionChainsModel
         );
     }
