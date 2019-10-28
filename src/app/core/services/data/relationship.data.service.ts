@@ -347,23 +347,6 @@ export class RelationshipDataService {
     }
 
     /**
-     * Get count of cases inside the transmission chains
-     * @param {string} outbreakId
-     * @param queryBuilder
-     * @returns {Observable<MetricCasesTransmissionChainsModel>}
-     */
-    getCountOfCasesInTheTransmissionChains(
-        outbreakId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<MetricCasesTransmissionChainsModel>{
-        const filter = queryBuilder.buildQuery();
-        return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/relationships/new-cases-in-transmission-chains/count?filter=${filter}`),
-            MetricCasesTransmissionChainsModel
-        );
-    }
-
-    /**
      * Get count and ids of new cases among known contacts
      * @param {string} outbreakId
      * @param queryBuilder
