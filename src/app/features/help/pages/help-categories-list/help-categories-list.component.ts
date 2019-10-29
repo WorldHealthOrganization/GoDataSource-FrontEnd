@@ -17,6 +17,7 @@ import { HelpDataService } from '../../../../core/services/data/help.data.servic
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { catchError, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-help-categories-list',
@@ -35,6 +36,7 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
 
     // list of categories
     helpCategoriesList$: Observable<HelpCategoryModel[]>;
+    helpCategoriesListCount$: Observable<any>;
 
     // provide constants to template
     Constants = Constants;
@@ -116,6 +118,9 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        // initialize pagination
+        this.initPaginator();
+
         // ...and re-load the list
         this.needsRefreshList(true);
 
@@ -162,7 +167,11 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
      * Get total number of items, based on the applied filters
      */
     refreshListCount() {
-
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
+        this.helpCategoriesListCount$ = this.helpDataService.getHelpCategoryCount(countQueryBuilder);
     }
 
     /**

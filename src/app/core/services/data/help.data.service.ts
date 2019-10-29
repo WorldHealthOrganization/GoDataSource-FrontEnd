@@ -23,13 +23,23 @@ export class HelpDataService {
      * @returns {Observable<HelpCategoryModel[]>}
      */
     getHelpCategoryList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpCategoryModel[]> {
-
         const filter = queryBuilder.buildQuery();
-
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`help-categories?filter=${filter}`),
             HelpCategoryModel
         );
+    }
+
+    /**
+     * Return count of help categories
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getHelpCategoryCount(
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`help-categories/count?where=${whereFilter}`);
     }
 
     /**
@@ -126,6 +136,20 @@ export class HelpDataService {
             this.http.get(`help-categories/${categoryId}/help-items?filter=${filter}`),
             HelpItemModel
         );
+    }
+
+    /**
+     * Return count of help items from a category
+     * @param {string} categoryId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getHelpItemsCategoryCount(
+        categoryId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`help-categories/${categoryId}/help-items/count?where=${whereFilter}`);
     }
 
     /**
