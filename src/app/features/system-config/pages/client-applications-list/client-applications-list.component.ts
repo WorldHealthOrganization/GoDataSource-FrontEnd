@@ -42,6 +42,8 @@ export class ClientApplicationsListComponent extends ListComponent implements On
 
     // client applications servers
     clientApplicationsServerList: SystemClientApplicationModel[] = [];
+    clientApplicationsServerListCount: { count: number };
+    clientApplicationsServerListAll: SystemClientApplicationModel[] = [];
 
     // settings
     settings: SystemSettingsModel;
@@ -136,6 +138,9 @@ export class ClientApplicationsListComponent extends ListComponent implements On
         // initialize Side Table Columns
         this.initializeSideTableColumns();
 
+        // initialize pagination
+        this.initPaginator();
+
         // retrieve backups
         this.needsRefreshList(true);
     }
@@ -176,6 +181,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
      */
     refreshList(finishCallback: () => void) {
         this.clientApplicationsServerList = [];
+        this.clientApplicationsServerListAll = [];
 
         const outbreaksList$: Observable<OutbreakModel[]> = this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK) ?
             this.outbreakDataService.getOutbreaksList() :
@@ -197,7 +203,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
 
                 // get settings
                 this.settings = systemSettings;
-                this.clientApplicationsServerList = _.map(
+                this.clientApplicationsServerListAll = _.map(
                     _.get(this.settings, 'clientApplications', []),
                     (item: SystemClientApplicationModel) => {
                         // set outbreak
@@ -216,12 +222,34 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                         return item;
                     });
 
+                // display only items from this page
+                if (this.queryBuilder.paginator) {
+                    this.clientApplicationsServerList = this.clientApplicationsServerListAll.slice(
+                        this.queryBuilder.paginator.skip,
+                        this.queryBuilder.paginator.skip + this.queryBuilder.paginator.limit
+                    );
+                }
+
+                // refresh the total count
+                this.refreshListCount();
+
                 // flag if list is empty
                 this.checkEmptyList(this.clientApplicationsServerList);
 
                 // finished
                 finishCallback();
             });
+    }
+
+    /**
+     * Get total number of items
+     */
+    refreshListCount() {
+        this.clientApplicationsServerListCount = {
+            count: this.clientApplicationsServerListAll ?
+                this.clientApplicationsServerListAll.length :
+                0
+        };
     }
 
     /**

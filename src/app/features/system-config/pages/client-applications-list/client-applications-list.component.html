@@ -179,4 +179,11 @@
             </div>
         </div>
     </div>
+
+    <mat-paginator
+        [length]="clientApplicationsServerListCount?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
 </mat-card>
