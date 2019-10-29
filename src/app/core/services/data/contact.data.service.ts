@@ -52,9 +52,7 @@ export class ContactDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<any> {
-
         const filter = queryBuilder.buildQuery();
-
         return this.http.get(`outbreaks/${outbreakId}/contacts/filtered-count?filter=${filter}`);
     }
 

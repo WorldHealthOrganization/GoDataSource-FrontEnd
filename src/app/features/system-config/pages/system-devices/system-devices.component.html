@@ -162,4 +162,11 @@
             </div>
         </div>
     </div>
+
+    <mat-paginator
+        [length]="(devicesListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
 </mat-card>
