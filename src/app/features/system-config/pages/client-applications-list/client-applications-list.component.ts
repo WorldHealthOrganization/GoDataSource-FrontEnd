@@ -203,8 +203,10 @@ export class ClientApplicationsListComponent extends ListComponent implements On
 
                 // get settings
                 this.settings = systemSettings;
+                let clientApplications = _.get(this.settings, 'clientApplications');
+                clientApplications = clientApplications ? clientApplications : [];
                 this.clientApplicationsServerListAll = _.map(
-                    _.get(this.settings, 'clientApplications', []),
+                    clientApplications,
                     (item: SystemClientApplicationModel) => {
                         // set outbreak
                         item.outbreaks = _.transform(

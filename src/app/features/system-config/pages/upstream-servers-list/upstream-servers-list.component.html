@@ -175,6 +175,13 @@
                 </div>
             </div>
         </div>
+
+        <mat-paginator
+            [length]="upstreamServerListCount?.count"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="changePage($event)">
+        </mat-paginator>
     </ng-container>
 
     <!-- waiting for backup -->

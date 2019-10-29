@@ -238,7 +238,10 @@ export abstract class ListComponent implements OnDestroy {
             this.triggerListCountRefresh.call(instant);
 
             // move to the first page (if not already there)
-            if (this.paginator.hasPreviousPage()) {
+            if (
+                this.paginator &&
+                this.paginator.hasPreviousPage()
+            ) {
                 this.paginator.firstPage();
                 // no need to refresh the list here, because our 'changePage' hook will trigger that again
                 return;
