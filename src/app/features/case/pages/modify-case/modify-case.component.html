@@ -180,6 +180,25 @@
                     </div>
                 </mat-card>
 
+                <div class="section-title">{{'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS' | translate}}</div>
+
+                <!--Vaccines received section-->
+                <app-form-vaccines-list
+                    name="vaccinesReceived"
+                    [(ngModel)]="caseData.vaccinesReceived"
+                    [disabled]="viewOnly"
+                    [required]="true">
+                </app-form-vaccines-list>
+
+                <!-- Documents section -->
+                <div class="section-title">{{'LNG_CASE_FIELD_LABEL_DOCUMENTS' | translate}}</div>
+                <app-form-document-list
+                    name="documents"
+                    [(ngModel)]="caseData.documents"
+                    [required]="true"
+                    [disabled]="viewOnly">
+                </app-form-document-list>
+
                 <!-- Create / update by user information section -->
                 <div class="section-title">
                     {{ 'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE' | translate }}
@@ -222,17 +241,6 @@
                         </div>
                     </div>
                 </mat-card>
-
-                <!-- Documents section -->
-                <div class="section-title">{{'LNG_CASE_FIELD_LABEL_DOCUMENTS' | translate}}</div>
-                <app-form-document-list
-                    name="documents"
-                    [(ngModel)]="caseData.documents"
-                    [required]="true"
-                    [disabled]="viewOnly">
-                </app-form-document-list>
-
-
             </mat-tab>
 
             <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_TAB_ADDRESS_TITLE' | translate">
@@ -400,16 +408,6 @@
                     </div>
                 </mat-card>
 
-                <div class="section-title">{{'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS' | translate}}</div>
-
-                <!--Vaccines received section-->
-                <app-form-vaccines-list
-                    name="vaccinesReceived"
-                    [(ngModel)]="caseData.vaccinesReceived"
-                    [disabled]="viewOnly"
-                    [required]="true">
-                </app-form-vaccines-list>
-
                 <div class="section-title">{{'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS' | translate}}</div>
                 <!-- Dates section -->
                 <app-form-case-center-daterange-list
@@ -442,36 +440,41 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button
-            *ngIf="viewOnly && hasCaseWriteAccess()"
-            type="button"
-            mat-raised-button color="accent"
-            [routerLink]="['/cases', caseId, 'modify']">
-            {{'LNG_COMMON_BUTTON_EDIT' | translate}}
-        </button>
-
-        <ng-container *ngIf="!viewOnly">
-            <button mat-raised-button color="accent">
-                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
-            </button>
-
-            <button type="button" [routerLink]="'/cases'" mat-raised-button>
-                {{'LNG_COMMON_BUTTON_CANCEL'| translate}}
-            </button>
-        </ng-container>
-
-        <div class="page-tabs-navbar-placeholder"></div>
-
-        <ng-container *ngIf="hasContactWriteAccess()">
+        <ng-container
+            *app-selected-outbreak-is-active
+        >
             <button
+                *ngIf="viewOnly &&
+                   hasCaseWriteAccess()"
                 type="button"
                 mat-raised-button color="accent"
-                routerLink="/contacts/create"
-                [queryParams]="{ entityType: EntityType.CASE, entityId: caseId }">
-                {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
+                [routerLink]="['/cases', caseId, 'modify']">
+                {{'LNG_COMMON_BUTTON_EDIT' | translate}}
             </button>
 
+            <ng-container *ngIf="!viewOnly">
+                <button mat-raised-button color="accent">
+                    {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+                </button>
+
+                <button type="button" [routerLink]="'/cases'" mat-raised-button>
+                    {{'LNG_COMMON_BUTTON_CANCEL'| translate}}
+                </button>
+            </ng-container>
+
             <div class="page-tabs-navbar-placeholder"></div>
+
+            <ng-container *ngIf="hasContactWriteAccess()">
+                <button
+                    type="button"
+                    mat-raised-button color="accent"
+                    routerLink="/contacts/create"
+                    [queryParams]="{ entityType: EntityType.CASE, entityId: caseId }">
+                    {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
+                </button>
+
+                <div class="page-tabs-navbar-placeholder"></div>
+            </ng-container>
         </ng-container>
 
         <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CASE, caseId, 'contacts']">
@@ -492,7 +495,7 @@
         <button mat-raised-button type="button" [routerLink]="['/cases', caseId, 'chronology']">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY' | translate }}
         </button>
-        <button mat-raised-button type="button" [routerLink]="['/contacts/case-related-follow-ups', caseId]">
+        <button *ngIf="hasFollowUpReadAccess()" mat-raised-button type="button" [routerLink]="['/contacts/case-related-follow-ups', caseId]">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS' | translate }}
         </button>
     </div>

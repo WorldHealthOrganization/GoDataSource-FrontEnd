@@ -308,6 +308,14 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
     }
 
+    /**
+     * Check if we have access to read a follow-up
+     * @returns {boolean}
+     */
+    hasFollowUpReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP);
+    }
+
     modifyCase(form: NgForm) {
         // validate form
         if (!this.formHelper.validateForm(form)) {

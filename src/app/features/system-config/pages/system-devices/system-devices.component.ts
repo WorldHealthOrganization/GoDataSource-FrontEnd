@@ -13,8 +13,9 @@ import { DeviceDataService } from '../../../../core/services/data/device.data.se
 import { DeviceModel } from '../../../../core/models/device.model';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-system-devices-list',
@@ -34,6 +35,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
     authUser: UserModel;
 
     devicesList$: Observable<DeviceModel[]>;
+    devicesListCount$: Observable<any>;
 
     // constants
     UserSettings = UserSettings;
@@ -138,6 +140,9 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
         // initialize Side Table Columns
         this.initializeSideTableColumns();
 
+        // initialize pagination
+        this.initPaginator();
+
         // retrieve devices
         this.needsRefreshList(true);
     }
@@ -188,12 +193,23 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
      */
     refreshList(finishCallback: () => void) {
         this.devicesList$ = this.deviceDataService
-            .getDevices()
+            .getDevices(this.queryBuilder)
             .pipe(
                 tap(() => {
                     finishCallback();
                 })
             );
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
+        this.devicesListCount$ = this.deviceDataService.getDevicesCount(countQueryBuilder).pipe(share());
     }
 
     /**

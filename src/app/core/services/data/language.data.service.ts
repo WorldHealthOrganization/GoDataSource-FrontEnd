@@ -60,6 +60,17 @@ export class LanguageDataService {
     }
 
     /**
+     * Return total number of languages
+     * @returns {Observable<any>}
+     */
+    getLanguagesCount(
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`languages/count?where=${whereFilter}`);
+    }
+
+    /**
      * Retrieve a Language
      * @returns {Observable<LanguageModel>}
      */

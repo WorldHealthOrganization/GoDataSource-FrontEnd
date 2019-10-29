@@ -82,10 +82,6 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
                     menuOptionLabel: 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_VIEW_RELATIONSHIP',
                     click: (item: ReportDifferenceOnsetRelationshipModel) => {
                         // #TODO TBD - if this is correct !?
-                        // #TODO TBD - if this is correct !?
-                        // #TODO TBD - if this is correct !?
-                        // #TODO TBD - if this is correct !?
-                        // #TODO TBD - if this is correct !?
                         const relationTypePath: string = _.find(item.persons, { id: item.people[0].model.id }).source ? 'contacts' : 'exposures';
                         this.router.navigate(['/relationships', EntityType.CASE, item.people[0].model.id, relationTypePath, item.id, 'view']);
                     }
@@ -142,10 +138,6 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_MODIFY_RELATIONSHIP',
                     click: (item: ReportDifferenceOnsetRelationshipModel) => {
-                        // #TODO TBD - if this is correct !?
-                        // #TODO TBD - if this is correct !?
-                        // #TODO TBD - if this is correct !?
-                        // #TODO TBD - if this is correct !?
                         // #TODO TBD - if this is correct !?
                         const relationTypePath: string = _.find(item.persons, { id: item.people[0].model.id }).source ? 'contacts' : 'exposures';
                         this.router.navigate(['/relationships', EntityType.CASE, item.people[0].model.id, relationTypePath, item.id, 'modify']);

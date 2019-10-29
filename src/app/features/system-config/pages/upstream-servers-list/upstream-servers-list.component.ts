@@ -41,6 +41,8 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
 
     // upstream servers
     upstreamServerList: SystemUpstreamServerModel[] = [];
+    upstreamServerListCount: { count: number };
+    upstreamServerListAll: SystemUpstreamServerModel[] = [];
 
     // sync in progress ?
     loading: boolean = false;
@@ -139,6 +141,9 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
         // initialize Side Table Columns
         this.initializeSideTableColumns();
 
+        // initialize pagination
+        this.initPaginator();
+
         // retrieve backups
         this.needsRefreshList(true);
     }
@@ -189,11 +194,24 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
      */
     refreshList(finishCallback: () => void) {
         this.upstreamServerList = [];
+        this.upstreamServerListAll = [];
         this.systemSettingsDataService
             .getSystemSettings()
             .subscribe((settings: SystemSettingsModel) => {
                 this.settings = settings;
-                this.upstreamServerList = _.get(this.settings, 'upstreamServers', []);
+                this.upstreamServerListAll = _.get(this.settings, 'upstreamServers');
+                this.upstreamServerListAll = this.upstreamServerListAll ? this.upstreamServerListAll : [];
+
+                // display only items from this page
+                if (this.queryBuilder.paginator) {
+                    this.upstreamServerList = this.upstreamServerListAll.slice(
+                        this.queryBuilder.paginator.skip,
+                        this.queryBuilder.paginator.skip + this.queryBuilder.paginator.limit
+                    );
+                }
+
+                // refresh the total count
+                this.refreshListCount();
 
                 // flag if list is empty
                 this.checkEmptyList(this.upstreamServerList);
@@ -201,6 +219,17 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
                 // finished
                 finishCallback();
             });
+    }
+
+    /**
+     * Get total number of items
+     */
+    refreshListCount() {
+        this.upstreamServerListCount = {
+            count: this.upstreamServerListAll ?
+                this.upstreamServerListAll.length :
+                0
+        };
     }
 
     /**

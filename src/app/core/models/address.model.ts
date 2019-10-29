@@ -64,51 +64,187 @@ export class AddressModel {
      */
     static buildSearchFilter(
         address: string,
-        property: string
+        property: string,
+        propertyIsArray: boolean
     ): RequestQueryBuilder {
+        // nothing provided ?
+        if (!address) {
+            return null;
+        }
+
+        // add filters
+        const matches: string[] = address.match(/\w+/gi);
+        if (
+            !matches ||
+            matches.length < 1
+        ) {
+            return null;
+        }
+
         // initialize query builder
         const qb = new RequestQueryBuilder();
 
-        // add filters
-        const matches: string[] = address.match(/(\w+\s*)+/gi);
-        if (
-            matches &&
-            matches.length > 0
-        ) {
+        // construct query accordingly to property type ( array of objects / single object )
+        const conditions: any[] = [];
+        if (propertyIsArray) {
             // add conditions
-            const conditions: any[] = [];
             matches.forEach((searchTerm: string) => {
+                // construct or condition
+                const or: any[] = [{
+                    city: {
+                        $regex: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                        $options: 'i'
+                    }
+                }, {
+                    postalCode: {
+                        $regex: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                        $options: 'i'
+                    }
+                }, {
+                    addressLine1: {
+                        $regex: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                        $options: 'i'
+                    }
+                }];
+
+                // check if we should search for phone number as well
+                const numberPattern: string = AddressModel.getPhoneNumberPattern(searchTerm);
+                if (numberPattern) {
+                    or.push({
+                        phoneNumber: {
+                            $regex: numberPattern
+                        }
+                    });
+                }
+
+                // add or to list of conditions to check
                 conditions.push({
-                    or: [{
-                        [property + '.city']: {
-                            like: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
-                            options: 'i'
-                        }
-                    }, {
-                        [property + '.postalCode']: {
-                            like: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
-                            options: 'i'
-                        }
-                    }, {
-                        [property + '.addressLine1']: {
-                            like: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
-                            options: 'i'
-                        }
-                    }]
+                    $or: or
                 });
             });
 
             // search
             qb.filter.where({
-                and: conditions
+                [property]: {
+                    elemMatch: {
+                        $and: conditions
+                    }
+                }
             }, false);
+        } else {
+            // add conditions
+            matches.forEach((searchTerm: string) => {
+                // construct or condition
+                const or: any[] = [{
+                    [`${property}.city`]: {
+                        $regex: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                        $options: 'i'
+                    }
+                }, {
+                    [`${property}.postalCode`]: {
+                        $regex: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                        $options: 'i'
+                    }
+                }, {
+                    [`${property}.addressLine1`]: {
+                        $regex: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                        $options: 'i'
+                    }
+                }];
 
-            // finished
-            return qb;
+                // check if we should search for phone number as well
+                const numberPattern: string = AddressModel.getPhoneNumberPattern(searchTerm);
+                if (numberPattern) {
+                    or.push({
+                        [`${property}.phoneNumber`]: {
+                            $regex: numberPattern
+                        }
+                    });
+                }
+
+                // add or to list of conditions to check
+                conditions.push({
+                    $or: or
+                });
+            });
+
+            // search
+            qb.filter.where({
+                $and: conditions
+            }, false);
         }
 
-        // nothing to search for
-        return null;
+        // finished
+        return qb;
+    }
+
+    /**
+     * Construct phone regex pattern used by queries
+     * @param phoneNumber
+     */
+    static getPhoneNumberPattern(
+        phoneNumber: string
+    ): string {
+        // nothing provided ?
+        if (!phoneNumber) {
+            return null;
+        }
+
+        // construct search pattern
+        const digits: string[] = phoneNumber.match(/[0-9]/g);
+        if (
+            !digits ||
+            digits.length < 1
+        ) {
+            return null;
+        }
+
+        // construct search pattern
+        return '[^0-9]*' + digits.map((digit: string) => {
+            return digit + '[^0-9]*';
+        }).join('');
+    }
+
+    /**
+     * Create query builder that will search for a phone number
+     */
+    static buildPhoneSearchFilter(
+        phoneNumber: string,
+        property: string,
+        propertyIsArray: boolean
+    ): RequestQueryBuilder {
+        // construct search pattern
+        const numberPattern: string = AddressModel.getPhoneNumberPattern(phoneNumber);
+
+        // nothing provided ?
+        if (!numberPattern) {
+            return null;
+        }
+
+        // initialize query builder
+        const qb = new RequestQueryBuilder();
+
+        // construct query accordingly to property type ( array of objects / single object )
+        if (propertyIsArray) {
+            qb.filter.where({
+                [property]: {
+                    elemMatch: {
+                        phoneNumber: {
+                            $regex: numberPattern
+                        }
+                    }
+                }
+            }, false);
+        } else {
+            qb.filter.where({
+                [`${property}.phoneNumber`]: {
+                    $regex: numberPattern
+                }
+            }, false);
+        }
+
+        // finished
+        return qb;
     }
 
     /**

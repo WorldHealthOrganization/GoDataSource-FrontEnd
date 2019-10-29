@@ -65,6 +65,15 @@ export class BackupsComponent extends ListComponent implements OnInit {
     mappedExportTypes: LabelValuePair[];
 
     recordActions: HoverRowAction[] = [
+        // View Backup Path
+        new HoverRowAction({
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_SYSTEM_BACKUPS_ACTION_VIEW_BACKUP_PATH',
+            click: (item: BackupModel) => {
+                this.showBackupData(item);
+            }
+        }),
+
         // Restore backup
         new HoverRowAction({
             icon: 'swapVertical',
@@ -592,5 +601,37 @@ export class BackupsComponent extends ListComponent implements OnInit {
                 ]
             });
         }
+    }
+
+    /**
+     * Show backup data
+     * @param item
+     */
+    showBackupData(item: BackupModel) {
+        this.dialogService
+            .showInput(new DialogConfiguration({
+                message: 'LNG_PAGE_SYSTEM_BACKUPS_VIEW_BACKUP_DIALOG_TITLE',
+                buttons: [
+                    new DialogButton({
+                        label: 'LNG_COMMON_BUTTON_CLOSE',
+                        clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                            dialogHandler.close();
+                        }
+                    })
+                ],
+                fieldsList: [
+                    new DialogField({
+                        name: '_',
+                        fieldType: DialogFieldType.SECTION_TITLE,
+                        placeholder: 'LNG_BACKUP_FIELD_LABEL_LOCATION'
+                    }),
+                    new DialogField({
+                        name: '_',
+                        fieldType: DialogFieldType.ACTION,
+                        placeholder: item.location
+                    })
+                ]
+            }))
+            .subscribe();
     }
 }

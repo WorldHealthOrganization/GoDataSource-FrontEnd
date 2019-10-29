@@ -493,7 +493,8 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             new FilterModel({
                 fieldName: 'address',
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
-                type: FilterType.ADDRESS
+                type: FilterType.ADDRESS,
+                addressFieldIsArray: false
             }),
             new FilterModel({
                 fieldName: 'date',
@@ -579,7 +580,8 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
                         type: FilterType.ADDRESS,
                         relationshipPath: ['contact'],
-                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+                        addressFieldIsArray: true
                     }),
                     new FilterModel({
                         fieldName: 'gender',
@@ -810,7 +812,8 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         fieldLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
                         type: FilterType.ADDRESS,
                         relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-                        childQueryBuilderKey: 'case'
+                        childQueryBuilderKey: 'case',
+                        addressFieldIsArray: true
                     }),
                     new FilterModel({
                         fieldName: 'questionnaireAnswers',

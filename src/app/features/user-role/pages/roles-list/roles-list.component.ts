@@ -14,6 +14,7 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-roles-list',
@@ -31,6 +32,7 @@ export class RolesListComponent extends ListComponent implements OnInit {
     authUser: UserModel;
     // list of existing roles
     rolesList$: Observable<UserRoleModel[]>;
+    rolesListCount$: Observable<any>;
     // list of permission
     availablePermissions$: Observable<any>;
 
@@ -96,6 +98,9 @@ export class RolesListComponent extends ListComponent implements OnInit {
     ngOnInit() {
         this.availablePermissions$ = this.userRoleDataService.getAvailablePermissions().pipe(share());
 
+        // initialize pagination
+        this.initPaginator();
+        // ...and re-load the list when the Selected Outbreak is changed
         this.needsRefreshList(true);
     }
 
@@ -111,6 +116,17 @@ export class RolesListComponent extends ListComponent implements OnInit {
                     finishCallback();
                 })
             );
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
+        this.rolesListCount$ = this.userRoleDataService.getRolesCount(countQueryBuilder).pipe(share());
     }
 
     deleteRole(userRole: UserRoleModel) {

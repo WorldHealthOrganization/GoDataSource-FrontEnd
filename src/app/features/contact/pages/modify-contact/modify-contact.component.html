@@ -183,6 +183,25 @@
                     </div>
                 </mat-card>
 
+                <div class="section-title">{{'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS' | translate}}</div>
+
+                <!--Vaccines received section-->
+                <app-form-vaccines-list
+                    name="vaccinesReceived"
+                    [(ngModel)]="contactData.vaccinesReceived"
+                    [disabled]="viewOnly"
+                    [required]="true">
+                </app-form-vaccines-list>
+
+                <!-- Documents section -->
+                <div class="section-title">{{'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_DOCUMENTS_TITLE'| translate}}</div>
+                <app-form-document-list
+                    name="documents"
+                    [(ngModel)]="contactData.documents"
+                    [required]="true"
+                    [disabled]="viewOnly">
+                </app-form-document-list>
+
                 <!-- Create / update by user information section -->
                 <div class="section-title">
                     {{ 'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE' | translate }}
@@ -225,26 +244,6 @@
                         </div>
                     </div>
                 </mat-card>
-
-                <div class="section-title">{{'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS' | translate}}</div>
-
-                <!--Vaccines received section-->
-                <app-form-vaccines-list
-                    name="vaccinesReceived"
-                    [(ngModel)]="contactData.vaccinesReceived"
-                    [disabled]="viewOnly"
-                    [required]="true">
-                </app-form-vaccines-list>
-
-                <!-- Documents section -->
-                <div class="section-title">{{'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_DOCUMENTS_TITLE'| translate}}</div>
-                <app-form-document-list
-                    name="documents"
-                    [(ngModel)]="contactData.documents"
-                    [required]="true"
-                    [disabled]="viewOnly">
-                </app-form-document-list>
-
             </mat-tab>
 
             <mat-tab [label]="'LNG_PAGE_MODIFY_CONTACT_TAB_ADDRESS_TITLE' | translate">
@@ -262,27 +261,32 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <ng-container *ngIf="!viewOnly">
-            <button mat-raised-button color="accent">
-                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
-            </button>
+        <ng-container
+            *app-selected-outbreak-is-active
+        >
+            <ng-container *ngIf="!viewOnly">
+                <button mat-raised-button color="accent">
+                    {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+                </button>
 
-            <button type="button" [routerLink]="'/contacts'" mat-raised-button>
-                {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
-            </button>
+                <button type="button" [routerLink]="'/contacts'" mat-raised-button>
+                    {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+                </button>
 
-            <div class="page-tabs-navbar-placeholder"></div>
-        </ng-container>
+                <div class="page-tabs-navbar-placeholder"></div>
+            </ng-container>
 
-        <ng-container *ngIf="viewOnly && hasContactWriteAccess()">
-            <button
-                mat-raised-button type="button" color="accent"
-                [routerLink]="['/contacts', contactId, 'modify']"
-            >
-                {{'LNG_COMMON_BUTTON_EDIT' | translate}}
-            </button>
+            <ng-container
+                *ngIf="viewOnly && hasContactWriteAccess()">
+                <button
+                    mat-raised-button type="button" color="accent"
+                    [routerLink]="['/contacts', contactId, 'modify']"
+                >
+                    {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+                </button>
 
-            <div class="page-tabs-navbar-placeholder"></div>
+                <div class="page-tabs-navbar-placeholder"></div>
+            </ng-container>
         </ng-container>
 
         <button
@@ -303,7 +307,7 @@
 
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button mat-raised-button type="button" [routerLink]="['/contacts/contact-related-follow-ups', contactId]">
+        <button *ngIf="hasFollowUpReadAccess()" mat-raised-button type="button" [routerLink]="['/contacts/contact-related-follow-ups', contactId]">
             {{ 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_FOLLOW_UPS' | translate }}
         </button>
         <button mat-raised-button type="button" [routerLink]="['/contacts', contactId, 'movement']">

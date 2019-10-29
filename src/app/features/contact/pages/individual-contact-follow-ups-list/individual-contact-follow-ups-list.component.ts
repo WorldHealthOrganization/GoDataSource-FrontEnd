@@ -411,7 +411,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             new FilterModel({
                 fieldName: 'address',
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
-                type: FilterType.ADDRESS
+                type: FilterType.ADDRESS,
+                addressFieldIsArray: false
             }),
             new FilterModel({
                 fieldName: 'date',

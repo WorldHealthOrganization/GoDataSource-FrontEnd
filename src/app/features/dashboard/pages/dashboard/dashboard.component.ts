@@ -356,8 +356,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
      */
     generateEpiCurveReport() {
         this.showLoadingDialog();
+        switch (this.epiCurveViewType) {
+            case Constants.EPI_CURVE_TYPES.CLASSIFICATION.value:
+                this.getEpiCurveDashlet('app-epi-curve-dashlet svg');
+                break;
+            case Constants.EPI_CURVE_TYPES.OUTCOME.value:
+                this.getEpiCurveDashlet('app-epi-curve-outcome-dashlet svg');
+                break;
+            case Constants.EPI_CURVE_TYPES.REPORTING.value:
+                this.getEpiCurveDashlet('app-epi-curve-reporting-dashlet svg');
+                break;
+        }
+    }
+
+    /**
+     * Get Epi curve dashlet
+     */
+    private getEpiCurveDashlet(selector: string) {
         this.domService
-            .getPNGBase64('app-epi-curve-dashlet svg', '#tempCanvas')
+            .getPNGBase64(selector, '#tempCanvas')
             .subscribe((pngBase64) => {
                 this.importExportDataService
                     .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
