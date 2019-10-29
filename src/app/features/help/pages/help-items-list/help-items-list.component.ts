@@ -19,6 +19,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { catchError, tap } from 'rxjs/operators';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { throwError } from 'rxjs';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-help-items-list',
@@ -38,6 +39,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
     selectedCategory: HelpCategoryModel;
 
     helpItemsList$: Observable<HelpItemModel[]>;
+    helpItemsListCount$: Observable<any>;
 
     // provide constants to template
     Constants = Constants;
@@ -142,6 +144,8 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
                             )
                         );
 
+                        // initialize pagination
+                        this.initPaginator();
                         // ...and re-load the list
                         this.needsRefreshList(true);
                         // initialize Side Table Columns
@@ -198,7 +202,14 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
      * Get total number of items, based on the applied filters
      */
     refreshListCount() {
-
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
+        this.helpItemsListCount$ = this.helpDataService.getHelpItemsCategoryCount(
+            this.categoryId,
+            countQueryBuilder
+        );
     }
 
     /**

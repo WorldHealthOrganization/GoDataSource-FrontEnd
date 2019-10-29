@@ -21,6 +21,11 @@
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
 
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="(helpCategoriesListCount$ | async)?.count">
+</app-total-number-of-records>
+
 <mat-card class="page-section page-content">
 
     <!-- Hover question effects / actions -->
@@ -101,4 +106,10 @@
         </div>
     </div>
 
+    <mat-paginator
+        [length]="(helpCategoriesListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
 </mat-card>

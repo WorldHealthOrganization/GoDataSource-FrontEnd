@@ -13,6 +13,11 @@
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
 
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="(devicesListCount$ | async)?.count">
+</app-total-number-of-records>
+
 <mat-card class="page-section page-content">
     <!-- Filters -->
     <div class="reset-filters">
@@ -162,4 +167,11 @@
             </div>
         </div>
     </div>
+
+    <mat-paginator
+        [length]="(devicesListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
 </mat-card>
