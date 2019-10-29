@@ -37,8 +37,8 @@ export class DeviceDataService {
     getDevicesCount(
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<any> {
-        const filter = queryBuilder.buildQuery();
-        return this.http.get(`devices/count?filter=${filter}`);
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`devices/count?where=${whereFilter}`);
     }
 
     /**

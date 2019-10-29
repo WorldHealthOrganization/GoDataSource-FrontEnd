@@ -15,6 +15,7 @@ import { TopnavComponent } from '../../../../shared/components/topnav/topnav.com
 import { catchError, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-languages-list',
@@ -33,6 +34,7 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
 
     // list of existing languages
     languagesList$: Observable<LanguageModel[]>;
+    languagesListCount$: Observable<any>;
 
     @ViewChild('topNav') topNav: TopnavComponent;
 
@@ -129,6 +131,9 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        // initialize pagination
+        this.initPaginator();
+
         // ...and re-load the list when the Selected Outbreak is changed
         this.needsRefreshList(true);
     }
@@ -154,6 +159,17 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
                     finishCallback();
                 })
             );
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
+        this.languagesListCount$ = this.languageDataService.getLanguagesCount(countQueryBuilder);
     }
 
     /**

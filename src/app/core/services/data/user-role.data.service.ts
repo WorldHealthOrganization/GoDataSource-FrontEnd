@@ -74,6 +74,17 @@ export class UserRoleDataService {
     }
 
     /**
+     * Return total number of user roles
+     * @returns {Observable<any>}
+     */
+    getRolesCount(
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`roles/count?where=${whereFilter}`);
+    }
+
+    /**
      * Retrieve a User Role
      * @param {string} roleId
      * @returns {Observable<UserRoleModel>}

@@ -153,7 +153,6 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                     {}
                 );
 
-                // load logs
                 // initialize pagination
                 this.initPaginator();
 
