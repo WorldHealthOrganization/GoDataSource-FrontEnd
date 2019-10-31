@@ -14,7 +14,6 @@ import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, Dialog
 import { SavedFilterData, SavedFilterDataAppliedFilter, SavedFilterDataAppliedSort, SavedFilterModel } from '../../../core/models/saved-filters.model';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { Observable, throwError } from 'rxjs';
-import { RequestFilter } from '../../../core/helperClasses/request-query-builder/request-filter';
 import { catchError } from 'rxjs/operators';
 import { moment } from '../../../core/helperClasses/x-moment';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
@@ -343,7 +342,7 @@ export class SideFiltersComponent implements OnInit {
                 const ourFilter = _.find(this.filterOptions, (filterOption: FilterModel) => filterOption.uniqueKey === filter.filter.uniqueKey);
                 if (ourFilter) {
                     // create filter
-                    this.appliedFilters.push( new AppliedFilterModel({
+                    this.appliedFilters.push(new AppliedFilterModel({
                         filter: ourFilter,
                         comparator: filter.comparator as FilterComparator,
                         value: filter.value,
@@ -426,7 +425,9 @@ export class SideFiltersComponent implements OnInit {
                 const filter: AppliedFilterModel = new AppliedFilterModel({
                     readonly: option.required,
                     filter: option,
-                    value: option.value
+                    value:  _.isArray(option.value) || _.isObject(option.value) ?
+                        _.cloneDeep(option.value) :
+                        option.value
                 });
 
                 // add filter
