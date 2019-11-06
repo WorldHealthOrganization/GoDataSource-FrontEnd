@@ -206,7 +206,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
             'event',
             [
                 PERMISSION.READ_OUTBREAK,
-                PERMISSION.READ_EVENT
+                PERMISSION.LIST_EVENT
             ],
             [],
             '/events',
@@ -447,7 +447,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
                     this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK) && (
                         this.authUser.hasPermissions(PERMISSION.READ_CASE) ||
                         this.authUser.hasPermissions(PERMISSION.READ_CONTACT) ||
-                        this.authUser.hasPermissions(PERMISSION.READ_EVENT)
+                        this.authUser.hasPermissions(PERMISSION.LIST_EVENT)
                     )
                 );
 

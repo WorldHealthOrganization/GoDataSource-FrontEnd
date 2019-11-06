@@ -8,6 +8,7 @@ import { CacheKey, CacheService } from '../helper/cache.service';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { map, share, switchMap, tap } from 'rxjs/operators';
+import { I18nService } from '../helper/i18n.service';
 
 @Injectable()
 export class UserRoleDataService {
@@ -18,10 +19,20 @@ export class UserRoleDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
-        private cacheService: CacheService
+        private cacheService: CacheService,
+        private i18nService: I18nService
     ) {
         this.userRoleList$ = this.http.get('roles').pipe(share());
-        this.availablePermissions$ = this.http.get(`roles/available-permissions`).pipe(share());
+        this.availablePermissions$ = this.http
+            .get(`roles/available-permissions`)
+            .pipe(
+                map((data: PermissionModel[]) => {
+                    return (data || []).sort((item1: PermissionModel, item2: PermissionModel): number => {
+                        return (item1.label ? this.i18nService.instant(item1.label) : '').localeCompare(item2.label ? this.i18nService.instant(item2.label) : '');
+                    });
+                }),
+                share()
+            );
     }
 
     /**

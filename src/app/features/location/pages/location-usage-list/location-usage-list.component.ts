@@ -14,6 +14,7 @@ import * as _ from 'lodash';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Constants } from '../../../../core/models/constants';
 import { HoverRowAction } from '../../../../shared/components';
+import { EventModel } from '../../../../core/models/event.model';
 
 @Component({
     selector: 'app-location-usage-list',
@@ -139,7 +140,7 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
                             }
 
                             // events
-                            if (!this.authUser.hasPermissions(PERMISSION.READ_EVENT)) {
+                            if (!EventModel.canList(this.authUser)) {
                                 locationUsage.event = [];
                             }
 

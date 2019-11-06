@@ -29,6 +29,7 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
 
     // authenticated user
     authUser: UserModel;
+    EventModel = EventModel;
 
     eventId: string;
     outbreakId: string;
@@ -117,14 +118,6 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
                 // hide dialog
                 loadingDialog.close();
             });
-    }
-
-    /**
-     * Check if we have write access to events
-     * @returns {boolean}
-     */
-    hasEventWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
     }
 
     /**

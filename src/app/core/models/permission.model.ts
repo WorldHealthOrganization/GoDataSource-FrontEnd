@@ -1,6 +1,17 @@
 import * as _ from 'lodash';
 
 export enum PERMISSION {
+    // events
+    LIST_EVENT = 'list_event',
+    VIEW_EVENT = 'view_event',
+    CREATE_EVENT = 'create_event',
+    MODIFY_EVENT = 'modify_event',
+    DELETE_EVENT = 'delete_event',
+    RESTORE_EVENT = 'restore_event',
+WRITE_EVENT = MODIFY_EVENT,
+
+
+
     // system config
     READ_SYS_CONFIG = 'read_sys_config',
     WRITE_SYS_CONFIG = 'write_sys_config',
@@ -30,11 +41,6 @@ export enum PERMISSION {
     // cases
     READ_CASE = 'read_case',
     WRITE_CASE = 'write_case',
-
-    // events
-    // right now we don't have event permissions, but later we might add one so it is better to have a constant for it than having to change later in multiple places
-    READ_EVENT = READ_CASE,
-    WRITE_EVENT = WRITE_CASE,
 
     // contacts
     READ_CONTACT = 'read_contact',

@@ -4,8 +4,11 @@ import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
 import { BaseModel } from './base.model';
+import { UserModel } from './user.model';
+import { PERMISSION } from './permission.model';
+import { IPermissionModel } from './permission.interface';
 
-export class EventModel extends BaseModel {
+export class EventModel extends BaseModel implements IPermissionModel {
     id: string;
     name: string;
     date: string;
@@ -22,6 +25,19 @@ export class EventModel extends BaseModel {
 
     matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
 
+    /**
+     * Static Permissions
+     */
+    static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.VIEW_EVENT) : false; }
+    static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.LIST_EVENT) : false; }
+    static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CREATE_EVENT) : false; }
+    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.MODIFY_EVENT) : false; }
+    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DELETE_EVENT) : false; }
+    static canRestore(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.RESTORE_EVENT) : false; }
+
+    /**
+     * Constructor
+     */
     constructor(data = null) {
         super(data);
 
@@ -50,6 +66,16 @@ export class EventModel extends BaseModel {
             this.matchedDuplicateRelationships[index] = new EntityMatchedRelationshipModel(matchedRelationship);
         });
     }
+
+    /**
+     * Permissions
+     */
+    canView(user: UserModel): boolean { return EventModel.canView(user); }
+    canList(user: UserModel): boolean { return EventModel.canList(user); }
+    canCreate(user: UserModel): boolean { return EventModel.canCreate(user); }
+    canModify(user: UserModel): boolean { return EventModel.canModify(user); }
+    canDelete(user: UserModel): boolean { return EventModel.canDelete(user); }
+    canRestore(user: UserModel): boolean { return EventModel.canRestore(user); }
 
     get firstName(): string {
         return this.name;

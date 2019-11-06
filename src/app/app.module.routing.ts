@@ -181,7 +181,7 @@ const routes: Routes = [
                 data: {
                     permissions: [
                         PERMISSION.READ_OUTBREAK,
-                        PERMISSION.READ_EVENT
+                        PERMISSION.LIST_EVENT
                     ]
                 }
             },

@@ -63,7 +63,21 @@ export class UserModel {
     languageId: string;
     roleIds: string[];
     roles: UserRoleModel[] = [];
-    permissionIds: PERMISSION[] = [];
+
+    private _permissionIds: PERMISSION[] = [];
+    permissionIdsMapped: {
+        [permissionId: string]: boolean
+    } = {};
+    set permissionIds(permissionIds: PERMISSION[]) {
+        this._permissionIds = permissionIds;
+        this.permissionIdsMapped = _.transform(permissionIds, (a, v) => {
+            a[v] = true;
+        }, {});
+    }
+    get permissionIds(): PERMISSION[] {
+        return this._permissionIds;
+    }
+
     securityQuestions: SecurityQuestionModel[] = [];
     settings: { [key: string]: any } = {};
 
@@ -85,16 +99,15 @@ export class UserModel {
     }
 
     hasPermissions(...permissionIds: PERMISSION[]): boolean {
-        // ensure that the permission IDs list has unique elements
-        permissionIds = _.uniq(permissionIds);
+        // check if all permissions are in our list allowed permissions
+        for (const permission of permissionIds) {
+            if (!this.permissionIdsMapped[permission]) {
+                return false;
+            }
+        }
 
-        // get the permissions that the user has
-        const havingPermissions = _.filter(permissionIds, (permissionId) => {
-            return this.permissionIds.indexOf(permissionId) >= 0;
-        });
-
-        // user must have all permissions
-        return havingPermissions.length === permissionIds.length;
+        // all permissions are allowed
+        return true;
     }
 
     hasRole(roleId): boolean {

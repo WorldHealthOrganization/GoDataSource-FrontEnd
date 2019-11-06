@@ -44,6 +44,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
 
     // authenticated user
     authUser: UserModel;
+    EventModel = EventModel;
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -92,7 +93,8 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 this.router.navigate(['/events', item.id, 'view']);
             },
             visible: (item: EventModel): boolean => {
-                return !item.deleted;
+                return !item.deleted &&
+                    EventModel.canView(this.authUser);
             }
         }),
 
@@ -108,7 +110,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    this.hasEventWriteAccess();
+                    EventModel.canModify(this.authUser);
             }
         }),
 
@@ -128,7 +130,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasEventWriteAccess();
+                            EventModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -142,7 +144,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasEventWriteAccess();
+                            EventModel.canDelete(this.authUser);
                     }
                 }),
 
@@ -232,7 +234,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasEventWriteAccess();
+                            EventModel.canRestore(this.authUser);
                     },
                     class: 'mat-menu-item-restore'
                 })
@@ -385,14 +387,6 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             countQueryBuilder.sort.clear();
             this.eventsListCount$ = this.eventDataService.getEventsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
-    }
-
-    /**
-     * Check if we have write access to events
-     * @returns {boolean}
-     */
-    hasEventWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
     }
 
     /**

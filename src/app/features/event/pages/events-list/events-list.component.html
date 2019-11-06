@@ -5,7 +5,7 @@
 
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
-                    <button *ngIf="hasEventWriteAccess()" mat-raised-button color="accent"
+                    <button *ngIf="EventModel.canCreate(authUser)" mat-raised-button color="accent"
                             [routerLink]="'./create'">
                         {{'LNG_COMMON_BUTTON_ADD'| translate}} <span class="xt-icon">addCircle</span>
                     </button>
