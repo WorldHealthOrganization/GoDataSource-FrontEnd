@@ -28,6 +28,7 @@ import { RequestFilter } from '../../../../core/helperClasses/request-query-buil
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 
 @Component({
     selector: 'app-events-list',
@@ -216,7 +217,9 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                         this.router.navigate(['/relationships', EntityType.EVENT, item.id, 'contacts']);
                     },
                     visible: (item: EventModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted &&
+                            RelationshipModel.canList(this.authUser) &&
+                            EventModel.canListRelationshipContacts(this.authUser);
                     }
                 }),
 
@@ -227,7 +230,9 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                         this.router.navigate(['/relationships', EntityType.EVENT, item.id, 'exposures']);
                     },
                     visible: (item: EventModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted &&
+                            RelationshipModel.canList(this.authUser) &&
+                            EventModel.canListRelationshipExposures(this.authUser);
                     }
                 }),
 

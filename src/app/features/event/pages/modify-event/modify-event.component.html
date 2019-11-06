@@ -152,7 +152,11 @@
                     {{'LNG_COMMON_BUTTON_SAVE' | translate}}
                 </button>
 
-                <button type="button" [routerLink]="'/events'" mat-raised-button>
+                <button
+                    *ngIf="EventModel.canList(authUser)"
+                    type="button"
+                    mat-raised-button
+                    [routerLink]="'/events'">
                     {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
                 </button>
             </ng-container>
@@ -172,10 +176,18 @@
             </ng-container>
         </ng-container>
 
-        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.EVENT, eventId, 'contacts']">
+        <button
+            *ngIf="EventModel.canListRelationshipContacts(authUser) && RelationshipModel.canList(this.authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/relationships', EntityType.EVENT, eventId, 'contacts']">
             {{ 'LNG_COMMON_BUTTON_EXPOSURES_FROM' | translate }}
         </button>
-        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.EVENT, eventId, 'exposures']">
+        <button
+            *ngIf="EventModel.canListRelationshipExposures(authUser) && RelationshipModel.canList(this.authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/relationships', EntityType.EVENT, eventId, 'exposures']">
             {{ 'LNG_COMMON_BUTTON_EXPOSURES_TO' | translate }}
         </button>
     </div>

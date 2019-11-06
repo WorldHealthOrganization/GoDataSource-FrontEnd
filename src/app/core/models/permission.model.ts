@@ -10,6 +10,14 @@ export enum PERMISSION {
     EVENT_RESTORE = 'event_restore',
     EVENT_CREATE_CONTACT = 'event_create_contact',
     EVENT_CREATE_BULK_CONTACT = 'event_create_bulk_contact',
+    EVENT_LIST_RELATIONSHIP_CONTACTS = 'event_list_relationship_contacts',
+    EVENT_VIEW_RELATIONSHIP_CONTACTS = '...',
+    EVENT_CREATE_RELATIONSHIP_CONTACTS = '...',
+    EVENT_MODIFY_RELATIONSHIP_CONTACTS = '...',
+    EVENT_LIST_RELATIONSHIP_EXPOSURES = 'event_list_relationship_exposures',
+    EVENT_VIEW_RELATIONSHIP_EXPOSURES = '...',
+    EVENT_CREATE_RELATIONSHIP_EXPOSURES = '...',
+    EVENT_MODIFY_RELATIONSHIP_EXPOSURES = '...',
 WRITE_EVENT = EVENT_MODIFY,
 
     // contacts
@@ -21,6 +29,15 @@ WRITE_CONTACT = 'write_contact',
     CONTACT_MODIFY = WRITE_CONTACT,
     CONTACT_DELETE = WRITE_CONTACT,
     CONTACT_BULK_CREATE = WRITE_CONTACT,
+
+    // relationships
+    RELATIONSHIP_LIST = 'relationship_list',
+    RELATIONSHIP_VIEW = 'relationship_view',
+    RELATIONSHIP_CREATE = 'relationship_create',
+    RELATIONSHIP_MODIFY = 'relationship_modify',
+    RELATIONSHIP_DELETE = 'relationship_delete',
+
+
 
     // system config
     READ_SYS_CONFIG = 'read_sys_config',

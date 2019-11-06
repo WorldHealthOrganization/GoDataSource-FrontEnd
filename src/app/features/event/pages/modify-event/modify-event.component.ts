@@ -17,6 +17,7 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 
 @Component({
     selector: 'app-modify-event',
@@ -31,6 +32,7 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
     authUser: UserModel;
     EventModel = EventModel;
     ContactModel = ContactModel;
+    RelationshipModel = RelationshipModel;
 
     eventId: string;
     outbreakId: string;

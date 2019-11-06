@@ -69,5 +69,15 @@ export interface IPermissionModel {
      */
     canBulkCreateContact?(user: UserModel): boolean;
 
+    /**
+     * Can we list relationship contacts ?
+     */
+    canListRelationshipContacts?(user: UserModel): boolean;
+
+    /**
+     * Can we list relationship exposures ?
+     */
+    canListRelationshipExposures?(user: UserModel): boolean;
+
     // END of Related Models
 }

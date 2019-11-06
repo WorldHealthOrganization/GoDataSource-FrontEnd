@@ -36,6 +36,8 @@ export class EventModel extends BaseModel implements IPermissionModel {
     static canRestore(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_RESTORE) : false; }
     static canCreateContact(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_CREATE_CONTACT) : false; }
     static canBulkCreateContact(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_CREATE_BULK_CONTACT) : false; }
+    static canListRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_LIST_RELATIONSHIP_CONTACTS) : false; }
+    static canListRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_LIST_RELATIONSHIP_EXPOSURES) : false; }
 
     /**
      * Constructor
@@ -80,6 +82,8 @@ export class EventModel extends BaseModel implements IPermissionModel {
     canRestore(user: UserModel): boolean { return EventModel.canRestore(user); }
     canCreateContact(user: UserModel): boolean { return EventModel.canCreateContact(user); }
     canBulkCreateContact(user: UserModel): boolean { return EventModel.canBulkCreateContact(user); }
+    canListRelationshipContacts(user: UserModel): boolean { return EventModel.canListRelationshipContacts(user); }
+    canListRelationshipExposures(user: UserModel): boolean { return EventModel.canListRelationshipExposures(user); }
 
     get firstName(): string {
         return this.name;
