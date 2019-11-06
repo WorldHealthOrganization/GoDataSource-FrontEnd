@@ -8,7 +8,6 @@ import { CaseModel } from '../../../core/models/case.model';
 import { ContactModel } from '../../../core/models/contact.model';
 import { EventModel } from '../../../core/models/event.model';
 import { RelationshipType } from '../../../core/enums/relationship-type.enum';
-import { PERMISSION } from '../../../core/models/permission.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
@@ -18,21 +17,23 @@ import { catchError } from 'rxjs/operators';
 
 export abstract class RelationshipsListComponent extends ListComponent implements OnInit {
     // Entities Map for specific data
-    entityMap = {
+    entityMap: {
+        [entityType: string]: {
+            label: string,
+            link: string
+        }
+    } = {
         [EntityType.CASE]: {
-            'label': 'LNG_PAGE_LIST_CASES_TITLE',
-            'link': '/cases',
-            'writePermission': PERMISSION.WRITE_CASE
+            label: 'LNG_PAGE_LIST_CASES_TITLE',
+            link: '/cases'
         },
         [EntityType.CONTACT]: {
-            'label': 'LNG_PAGE_LIST_CONTACTS_TITLE',
-            'link': '/contacts',
-            'writePermission': PERMISSION.WRITE_CONTACT
+            label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+            link: '/contacts'
         },
         [EntityType.EVENT]: {
-            'label': 'LNG_PAGE_LIST_EVENTS_TITLE',
-            'link': '/events',
-            'writePermission': PERMISSION.WRITE_EVENT
+            label: 'LNG_PAGE_LIST_EVENTS_TITLE',
+            link: '/events'
         }
     };
 
@@ -162,12 +163,5 @@ export abstract class RelationshipsListComponent extends ListComponent implement
      */
     get relationshipTypeRoutePath(): string {
         return this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures';
-    }
-
-    /**
-     * Check if the authenticated user has WRITE access for the current person type
-     */
-    hasEntityWriteAccess(): boolean {
-        return this.authUser.hasPermissions(this.entityMap[this.entityType].writePermission);
     }
 }

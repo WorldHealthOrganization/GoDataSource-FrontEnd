@@ -6,7 +6,7 @@
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
                     <button
-                        *ngIf="entityId && entityType && hasEntityWriteAccess()"
+                        *ngIf="entityId && entityType && RelationshipModel.canCreate(this.authUser)"
                         mat-raised-button color="accent"
                         [routerLink]="['/relationships', entityType, entityId, relationshipTypeRoutePath, 'available-entities']">
                         {{'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP' | translate}} <span class="xt-icon">addCircle</span>

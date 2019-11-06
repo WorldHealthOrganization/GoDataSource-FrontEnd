@@ -19,7 +19,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { catchError, share, tap } from 'rxjs/operators';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
-import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { throwError } from 'rxjs';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
@@ -66,6 +66,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     EntityType = EntityType;
     UserSettings = UserSettings;
     RelationshipType = RelationshipType;
+    RelationshipModel = RelationshipModel;
 
     recordActions: HoverRowAction[] = [
         // View Relationship
@@ -74,6 +75,10 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             iconTooltip: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_VIEW_RELATIONSHIP',
             click: (item: EntityModel) => {
                 this.router.navigate(['/relationships', this.entityType, this.entityId, this.relationshipTypeRoutePath, item.relationship.id, 'view']);
+            },
+            visible: (item: EntityModel) => {
+                return !item.relationship.deleted &&
+                    RelationshipModel.canView(this.authUser);
             }
         }),
 
@@ -88,7 +93,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                 return this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    this.hasEntityWriteAccess();
+                    RelationshipModel.canModify(this.authUser);
             }
         }),
 
@@ -107,7 +112,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                         return this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasEntityWriteAccess();
+                            RelationshipModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 })
