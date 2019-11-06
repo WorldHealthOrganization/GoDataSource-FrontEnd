@@ -17,7 +17,6 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
@@ -35,26 +34,29 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // Entities Map for specific data
-    entityMap = {
+    entityMap: {
+        [entityType: string]: {
+            label: string,
+            link: string
+        }
+    } = {
         [EntityType.CASE]: {
-            'label': 'LNG_PAGE_LIST_CASES_TITLE',
-            'link': '/cases',
-            'writePermission': PERMISSION.WRITE_CASE
+            label: 'LNG_PAGE_LIST_CASES_TITLE',
+            link: '/cases'
         },
         [EntityType.CONTACT]: {
-            'label': 'LNG_PAGE_LIST_CONTACTS_TITLE',
-            'link': '/contacts',
-            'writePermission': PERMISSION.WRITE_CONTACT
+            label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+            link: '/contacts'
         },
         [EntityType.EVENT]: {
-            'label': 'LNG_PAGE_LIST_EVENTS_TITLE',
-            'link': '/events',
-            'writePermission': PERMISSION.WRITE_EVENT
+            label: 'LNG_PAGE_LIST_EVENTS_TITLE',
+            link: '/events'
         }
     };
 
     // authenticated user
     authUser: UserModel;
+    RelationshipModel = RelationshipModel;
     // selected outbreak
     selectedOutbreak: OutbreakModel;
     // route params
@@ -280,12 +282,4 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                 }
             });
     }
-
-    /**
-     * Check if the authenticated user has WRITE access for the current person type
-     */
-    hasEntityWriteAccess(): boolean {
-        return this.authUser.hasPermissions(this.entityMap[this.entityType].writePermission);
-    }
-
 }

@@ -91,7 +91,8 @@
         <ng-container
             *app-selected-outbreak-is-active
         >
-            <button *ngIf="viewOnly && hasEntityWriteAccess()"
+            <button
+                *ngIf="viewOnly && RelationshipModel.canModify(authUser)"
                 mat-raised-button type="button" color="accent"
                 [routerLink]="['/relationships', entityType, entityId, relationshipTypeRoutePath, relationshipId, 'modify']">
                 {{'LNG_COMMON_BUTTON_EDIT' | translate}}
@@ -115,7 +116,11 @@
                 <button mat-raised-button color="accent">
                     {{'LNG_COMMON_BUTTON_SAVE' | translate}}
                 </button>
-                <button type="button" [routerLink]="['/relationships', entityType, entityId, relationshipTypeRoutePath]" mat-raised-button>
+                <button
+                    *ngIf="viewOnly && RelationshipModel.canList(authUser)"
+                    type="button"
+                    mat-raised-button
+                    [routerLink]="['/relationships', entityType, entityId, relationshipTypeRoutePath]">
                     {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
                 </button>
             </ng-container>
