@@ -28,12 +28,14 @@ export class EventModel extends BaseModel implements IPermissionModel {
     /**
      * Static Permissions
      */
-    static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.VIEW_EVENT) : false; }
-    static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.LIST_EVENT) : false; }
-    static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CREATE_EVENT) : false; }
-    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.MODIFY_EVENT) : false; }
-    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DELETE_EVENT) : false; }
-    static canRestore(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.RESTORE_EVENT) : false; }
+    static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_VIEW) : false; }
+    static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_LIST) : false; }
+    static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_CREATE) : false; }
+    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_MODIFY) : false; }
+    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_DELETE) : false; }
+    static canRestore(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_RESTORE) : false; }
+    static canCreateContact(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_CREATE_CONTACT) : false; }
+    static canBulkCreateContact(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_CREATE_BULK_CONTACT) : false; }
 
     /**
      * Constructor
@@ -76,6 +78,8 @@ export class EventModel extends BaseModel implements IPermissionModel {
     canModify(user: UserModel): boolean { return EventModel.canModify(user); }
     canDelete(user: UserModel): boolean { return EventModel.canDelete(user); }
     canRestore(user: UserModel): boolean { return EventModel.canRestore(user); }
+    canCreateContact(user: UserModel): boolean { return EventModel.canCreateContact(user); }
+    canBulkCreateContact(user: UserModel): boolean { return EventModel.canBulkCreateContact(user); }
 
     get firstName(): string {
         return this.name;

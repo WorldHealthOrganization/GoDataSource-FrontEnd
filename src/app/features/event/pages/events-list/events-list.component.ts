@@ -1,11 +1,10 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { EventModel } from '../../../../core/models/event.model';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -26,9 +25,9 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { LoadingDialogModel } from '../../../../shared/components/loading-dialog/loading-dialog.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
-import { throwError } from 'rxjs';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-events-list',
@@ -164,7 +163,8 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            ContactModel.canCreate(this.authUser) &&
+                            EventModel.canCreateContact(this.authUser);
                     }
                 }),
 
@@ -184,7 +184,8 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            ContactModel.canBulkCreate(this.authUser) &&
+                            EventModel.canBulkCreateContact(this.authUser);
                     }
                 }),
 
@@ -196,8 +197,15 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                         return !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id && (
+                                (
+                                    ContactModel.canCreate(this.authUser) &&
+                                    EventModel.canCreateContact(this.authUser)
+                                ) || (
+                                    ContactModel.canBulkCreate(this.authUser) &&
+                                    EventModel.canBulkCreateContact(this.authUser)
+                                )
+                            );
                     }
                 }),
 
@@ -387,14 +395,6 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             countQueryBuilder.sort.clear();
             this.eventsListCount$ = this.eventDataService.getEventsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
-    }
-
-    /**
-     * Check if we have access to create a contact
-     * @returns {boolean}
-     */
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
     }
 
     /**

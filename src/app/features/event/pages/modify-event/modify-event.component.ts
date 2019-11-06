@@ -11,12 +11,12 @@ import { EventDataService } from '../../../../core/services/data/event.data.serv
 import { EntityType } from '../../../../core/models/entity-type';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-modify-event',
@@ -30,6 +30,7 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
     // authenticated user
     authUser: UserModel;
     EventModel = EventModel;
+    ContactModel = ContactModel;
 
     eventId: string;
     outbreakId: string;
@@ -118,14 +119,6 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
                 // hide dialog
                 loadingDialog.close();
             });
-    }
-
-    /**
-     * Check if we have access to create a contact
-     * @returns {boolean}
-     */
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
     }
 
     /**

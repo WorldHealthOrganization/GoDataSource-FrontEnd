@@ -159,7 +159,7 @@
 
             <div class="page-tabs-navbar-placeholder"></div>
 
-            <ng-container *ngIf="hasContactWriteAccess()">
+            <ng-container *ngIf="EventModel.canCreateContact(authUser) && ContactModel.canCreate(authUser)">
                 <button
                     type="button"
                     mat-raised-button color="accent"

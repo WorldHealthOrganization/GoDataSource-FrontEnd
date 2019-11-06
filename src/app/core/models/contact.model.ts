@@ -8,6 +8,9 @@ import { EntityMatchedRelationshipModel } from './entity-matched-relationship.mo
 import { moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { VaccineModel } from './vaccine.model';
+import { IPermissionModel } from './permission.interface';
+import { UserModel } from './user.model';
+import { PERMISSION } from './permission.model';
 
 export interface IFollowUpHistory {
     startDate: string;
@@ -15,7 +18,7 @@ export interface IFollowUpHistory {
     status: string;
 }
 
-export class ContactModel extends BaseModel {
+export class ContactModel extends BaseModel implements IPermissionModel {
     id: string;
     firstName: string;
     middleName: string;
@@ -56,6 +59,37 @@ export class ContactModel extends BaseModel {
 
     matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
 
+    /**
+     * Return contact id mask with data replaced
+     * @param contactIdMask
+     */
+    static generateContactIDMask(contactIdMask: string): string {
+        // validate
+        if (_.isEmpty(contactIdMask)) {
+            return '';
+        }
+
+        // !!!!!!!!!!!!!!!
+        // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
+        // !!!!!!!!!!!!!!!
+        return contactIdMask
+            .replace(/YYYY/g, moment().format('YYYY'))
+            .replace(/\*/g, '');
+    }
+
+    /**
+     * Static Permissions
+     */
+    static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_VIEW) : false; }
+    static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_LIST) : false; }
+    static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_CREATE) : false; }
+    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_MODIFY) : false; }
+    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_DELETE) : false; }
+    static canBulkCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_BULK_CREATE) : false; }
+
+    /**
+     * Constructor
+     */
     constructor(data = null) {
         super(data);
 
@@ -113,22 +147,14 @@ export class ContactModel extends BaseModel {
     }
 
     /**
-     * Return contact id mask with data replaced
-     * @param contactIdMask
+     * Permissions
      */
-    static generateContactIDMask(contactIdMask: string): string {
-        // validate
-        if (_.isEmpty(contactIdMask)) {
-            return '';
-        }
-
-        // !!!!!!!!!!!!!!!
-        // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
-        // !!!!!!!!!!!!!!!
-        return contactIdMask
-            .replace(/YYYY/g, moment().format('YYYY'))
-            .replace(/\*/g, '');
-    }
+    canView(user: UserModel): boolean { return ContactModel.canView(user); }
+    canList(user: UserModel): boolean { return ContactModel.canList(user); }
+    canCreate(user: UserModel): boolean { return ContactModel.canCreate(user); }
+    canModify(user: UserModel): boolean { return ContactModel.canModify(user); }
+    canDelete(user: UserModel): boolean { return ContactModel.canDelete(user); }
+    canBulkCreate(user: UserModel): boolean { return ContactModel.canBulkCreate(user); }
 
     /**
      * Contact Name

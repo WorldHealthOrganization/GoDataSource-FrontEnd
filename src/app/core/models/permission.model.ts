@@ -2,15 +2,25 @@ import * as _ from 'lodash';
 
 export enum PERMISSION {
     // events
-    LIST_EVENT = 'list_event',
-    VIEW_EVENT = 'view_event',
-    CREATE_EVENT = 'create_event',
-    MODIFY_EVENT = 'modify_event',
-    DELETE_EVENT = 'delete_event',
-    RESTORE_EVENT = 'restore_event',
-WRITE_EVENT = MODIFY_EVENT,
+    EVENT_LIST = 'event_list',
+    EVENT_VIEW = 'event_view',
+    EVENT_CREATE = 'event_create',
+    EVENT_MODIFY = 'event_modify',
+    EVENT_DELETE = 'event_delete',
+    EVENT_RESTORE = 'event_restore',
+    EVENT_CREATE_CONTACT = 'event_create_contact',
+    EVENT_CREATE_BULK_CONTACT = 'event_create_bulk_contact',
+WRITE_EVENT = EVENT_MODIFY,
 
-
+    // contacts
+READ_CONTACT = 'read_contact',
+WRITE_CONTACT = 'write_contact',
+    CONTACT_LIST = READ_CONTACT,
+    CONTACT_VIEW = READ_CONTACT,
+    CONTACT_CREATE = WRITE_CONTACT,
+    CONTACT_MODIFY = WRITE_CONTACT,
+    CONTACT_DELETE = WRITE_CONTACT,
+    CONTACT_BULK_CREATE = WRITE_CONTACT,
 
     // system config
     READ_SYS_CONFIG = 'read_sys_config',
@@ -41,10 +51,6 @@ WRITE_EVENT = MODIFY_EVENT,
     // cases
     READ_CASE = 'read_case',
     WRITE_CASE = 'write_case',
-
-    // contacts
-    READ_CONTACT = 'read_contact',
-    WRITE_CONTACT = 'write_contact',
 
     // followups
     READ_FOLLOWUP = 'read_followup',

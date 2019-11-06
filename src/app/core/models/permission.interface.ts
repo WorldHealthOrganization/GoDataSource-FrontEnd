@@ -1,6 +1,8 @@
 import { UserModel } from './user.model';
 
 export interface IPermissionModel {
+    // Model specific
+
     /**
      * Has view permission ?
      */
@@ -50,4 +52,22 @@ export interface IPermissionModel {
      * Has bulk restore permission ?
      */
     canBulkRestore?(user: UserModel): boolean;
+
+    // END of Model specific
+
+
+
+    // Related Models
+
+    /**
+     * Has permission that allows user to create a related contact ?
+     */
+    canCreateContact?(user: UserModel): boolean;
+
+    /**
+     * Has permission that allows user to create multiple contacts at the same time ?
+     */
+    canBulkCreateContact?(user: UserModel): boolean;
+
+    // END of Related Models
 }

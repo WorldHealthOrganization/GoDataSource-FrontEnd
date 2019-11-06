@@ -15,7 +15,7 @@ const routes: Routes = [
         data: {
             permissions: [
                 PERMISSION.READ_OUTBREAK,
-                PERMISSION.LIST_EVENT
+                PERMISSION.EVENT_LIST
             ]
         }
     },
@@ -27,7 +27,7 @@ const routes: Routes = [
         data: {
             permissions: [
                 PERMISSION.READ_OUTBREAK,
-                PERMISSION.CREATE_EVENT
+                PERMISSION.EVENT_CREATE
             ]
         },
         canDeactivate: [
@@ -42,7 +42,7 @@ const routes: Routes = [
         data: {
             permissions: [
                 PERMISSION.READ_OUTBREAK,
-                PERMISSION.VIEW_EVENT
+                PERMISSION.EVENT_VIEW
             ],
             action: ViewModifyComponentAction.VIEW
         }
@@ -55,7 +55,7 @@ const routes: Routes = [
         data: {
             permissions: [
                 PERMISSION.READ_OUTBREAK,
-                PERMISSION.MODIFY_EVENT
+                PERMISSION.EVENT_MODIFY
             ],
             action: ViewModifyComponentAction.MODIFY
         },
