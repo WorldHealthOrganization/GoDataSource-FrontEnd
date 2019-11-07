@@ -37,20 +37,49 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     entityMap: {
         [entityType: string]: {
             label: string,
-            link: string
+            link: string,
+            can: {
+                [type: string]: {
+                    modify: (UserModel) => boolean
+                }
+            }
         }
     } = {
         [EntityType.CASE]: {
             label: 'LNG_PAGE_LIST_CASES_TITLE',
-            link: '/cases'
+            link: '/cases',
+            can: {
+                contacts: {
+                    modify: CaseModel.canModifyRelationshipContacts
+                },
+                exposures: {
+                    modify: CaseModel.canModifyRelationshipExposures
+                }
+            }
         },
         [EntityType.CONTACT]: {
             label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
-            link: '/contacts'
+            link: '/contacts',
+            can: {
+                contacts: {
+                    modify: ContactModel.canModifyRelationshipContacts
+                },
+                exposures: {
+                    modify: ContactModel.canModifyRelationshipExposures
+                }
+            }
         },
         [EntityType.EVENT]: {
             label: 'LNG_PAGE_LIST_EVENTS_TITLE',
-            link: '/events'
+            link: '/events',
+            can: {
+                contacts: {
+                    modify: EventModel.canModifyRelationshipContacts
+                },
+                exposures: {
+                    modify: EventModel.canModifyRelationshipExposures
+                }
+            }
         }
     };
 
@@ -281,5 +310,12 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                         });
                 }
             });
+    }
+
+    /**
+     * Check if we're allowed to modify event / case / contact relationships'
+     */
+    get entityCanModify(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].modify(this.authUser);
     }
 }

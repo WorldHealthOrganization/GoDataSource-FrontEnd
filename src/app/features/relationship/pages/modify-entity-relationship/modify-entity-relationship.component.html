@@ -92,7 +92,7 @@
             *app-selected-outbreak-is-active
         >
             <button
-                *ngIf="viewOnly && RelationshipModel.canModify(authUser)"
+                *ngIf="viewOnly && RelationshipModel.canModify(authUser) && entityCanModify"
                 mat-raised-button type="button" color="accent"
                 [routerLink]="['/relationships', entityType, entityId, relationshipTypeRoutePath, relationshipId, 'modify']">
                 {{'LNG_COMMON_BUTTON_EDIT' | translate}}
