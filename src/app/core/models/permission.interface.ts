@@ -57,7 +57,7 @@ export interface IPermissionModel {
 
 
 
-    // Related Models
+    // Related Models - not really necessary to be in the interface ( could be defined only in models )
 
     /**
      * Has permission that allows user to create a related contact ?
@@ -75,9 +75,49 @@ export interface IPermissionModel {
     canListRelationshipContacts?(user: UserModel): boolean;
 
     /**
+     * Can we view relationship contacts ?
+     */
+    canViewRelationshipContacts?(user: UserModel): boolean;
+
+    /**
+     * Can we create relationship contacts ?
+     */
+    canCreateRelationshipContacts?(user: UserModel): boolean;
+
+    /**
+     * Can we modify relationship contacts ?
+     */
+    canModifyRelationshipContacts?(user: UserModel): boolean;
+
+    /**
+     * Can we delete relationship contacts ?
+     */
+    canDeleteRelationshipContacts?(user: UserModel): boolean;
+
+    /**
      * Can we list relationship exposures ?
      */
     canListRelationshipExposures?(user: UserModel): boolean;
+
+    /**
+     * Can we view relationship exposures ?
+     */
+    canViewRelationshipExposures?(user: UserModel): boolean;
+
+    /**
+     * Can we create relationship exposures ?
+     */
+    canCreateRelationshipExposures?(user: UserModel): boolean;
+
+    /**
+     * Can we modify relationship exposures ?
+     */
+    canModifyRelationshipExposures?(user: UserModel): boolean;
+
+    /**
+     * Can we delete relationship exposures ?
+     */
+    canDeleteRelationshipExposures?(user: UserModel): boolean;
 
     // END of Related Models
 }

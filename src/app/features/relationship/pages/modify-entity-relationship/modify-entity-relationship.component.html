@@ -117,7 +117,7 @@
                     {{'LNG_COMMON_BUTTON_SAVE' | translate}}
                 </button>
                 <button
-                    *ngIf="viewOnly && RelationshipModel.canList(authUser)"
+                    *ngIf="RelationshipModel.canList(authUser)"
                     type="button"
                     mat-raised-button
                     [routerLink]="['/relationships', entityType, entityId, relationshipTypeRoutePath]">

@@ -37,7 +37,15 @@ export class EventModel extends BaseModel implements IPermissionModel {
     static canCreateContact(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_CREATE_CONTACT) : false; }
     static canBulkCreateContact(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_CREATE_BULK_CONTACT) : false; }
     static canListRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_LIST_RELATIONSHIP_CONTACTS) : false; }
+    static canViewRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_VIEW_RELATIONSHIP_CONTACTS) : false; }
+    static canCreateRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_CREATE_RELATIONSHIP_CONTACTS) : false; }
+    static canModifyRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_MODIFY_RELATIONSHIP_CONTACTS) : false; }
+    static canDeleteRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_DELETE_RELATIONSHIP_CONTACTS) : false; }
     static canListRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_LIST_RELATIONSHIP_EXPOSURES) : false; }
+    static canViewRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_VIEW_RELATIONSHIP_EXPOSURES) : false; }
+    static canCreateRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_CREATE_RELATIONSHIP_EXPOSURES) : false; }
+    static canModifyRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_MODIFY_RELATIONSHIP_EXPOSURES) : false; }
+    static canDeleteRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_DELETE_RELATIONSHIP_EXPOSURES) : false; }
 
     /**
      * Constructor
@@ -83,7 +91,15 @@ export class EventModel extends BaseModel implements IPermissionModel {
     canCreateContact(user: UserModel): boolean { return EventModel.canCreateContact(user); }
     canBulkCreateContact(user: UserModel): boolean { return EventModel.canBulkCreateContact(user); }
     canListRelationshipContacts(user: UserModel): boolean { return EventModel.canListRelationshipContacts(user); }
+    canViewRelationshipContacts(user: UserModel): boolean { return EventModel.canViewRelationshipContacts(user); }
+    canCreateRelationshipContacts(user: UserModel): boolean { return EventModel.canCreateRelationshipContacts(user); }
+    canModifyRelationshipContacts(user: UserModel): boolean { return EventModel.canModifyRelationshipContacts(user); }
+    canDeleteRelationshipContacts(user: UserModel): boolean { return EventModel.canDeleteRelationshipContacts(user); }
     canListRelationshipExposures(user: UserModel): boolean { return EventModel.canListRelationshipExposures(user); }
+    canViewRelationshipExposures(user: UserModel): boolean { return EventModel.canViewRelationshipExposures(user); }
+    canCreateRelationshipExposures(user: UserModel): boolean { return EventModel.canCreateRelationshipExposures(user); }
+    canModifyRelationshipExposures(user: UserModel): boolean { return EventModel.canModifyRelationshipExposures(user); }
+    canDeleteRelationshipExposures(user: UserModel): boolean { return EventModel.canDeleteRelationshipExposures(user); }
 
     get firstName(): string {
         return this.name;

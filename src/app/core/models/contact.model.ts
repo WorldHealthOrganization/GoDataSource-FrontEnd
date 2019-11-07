@@ -86,6 +86,16 @@ export class ContactModel extends BaseModel implements IPermissionModel {
     static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_MODIFY) : false; }
     static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_DELETE) : false; }
     static canBulkCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_BULK_CREATE) : false; }
+    static canListRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_LIST_RELATIONSHIP_CONTACTS) : false; }
+    static canViewRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_VIEW_RELATIONSHIP_CONTACTS) : false; }
+    static canCreateRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_CREATE_RELATIONSHIP_CONTACTS) : false; }
+    static canModifyRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_MODIFY_RELATIONSHIP_CONTACTS) : false; }
+    static canDeleteRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_DELETE_RELATIONSHIP_CONTACTS) : false; }
+    static canListRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_LIST_RELATIONSHIP_EXPOSURES) : false; }
+    static canViewRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_VIEW_RELATIONSHIP_EXPOSURES) : false; }
+    static canCreateRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_CREATE_RELATIONSHIP_EXPOSURES) : false; }
+    static canModifyRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_MODIFY_RELATIONSHIP_EXPOSURES) : false; }
+    static canDeleteRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_DELETE_RELATIONSHIP_EXPOSURES) : false; }
 
     /**
      * Constructor
@@ -155,6 +165,16 @@ export class ContactModel extends BaseModel implements IPermissionModel {
     canModify(user: UserModel): boolean { return ContactModel.canModify(user); }
     canDelete(user: UserModel): boolean { return ContactModel.canDelete(user); }
     canBulkCreate(user: UserModel): boolean { return ContactModel.canBulkCreate(user); }
+    canListRelationshipContacts(user: UserModel): boolean { return ContactModel.canListRelationshipContacts(user); }
+    canViewRelationshipContacts(user: UserModel): boolean { return ContactModel.canViewRelationshipContacts(user); }
+    canCreateRelationshipContacts(user: UserModel): boolean { return ContactModel.canCreateRelationshipContacts(user); }
+    canModifyRelationshipContacts(user: UserModel): boolean { return ContactModel.canModifyRelationshipContacts(user); }
+    canDeleteRelationshipContacts(user: UserModel): boolean { return ContactModel.canDeleteRelationshipContacts(user); }
+    canListRelationshipExposures(user: UserModel): boolean { return ContactModel.canListRelationshipExposures(user); }
+    canViewRelationshipExposures(user: UserModel): boolean { return ContactModel.canViewRelationshipExposures(user); }
+    canCreateRelationshipExposures(user: UserModel): boolean { return ContactModel.canCreateRelationshipExposures(user); }
+    canModifyRelationshipExposures(user: UserModel): boolean { return ContactModel.canModifyRelationshipExposures(user); }
+    canDeleteRelationshipExposures(user: UserModel): boolean { return ContactModel.canDeleteRelationshipExposures(user); }
 
     /**
      * Contact Name

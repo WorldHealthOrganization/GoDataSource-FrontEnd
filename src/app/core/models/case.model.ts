@@ -10,8 +10,11 @@ import { EntityMatchedRelationshipModel } from './entity-matched-relationship.mo
 import { moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { VaccineModel } from './vaccine.model';
+import { IPermissionModel } from './permission.interface';
+import { UserModel } from './user.model';
+import { PERMISSION } from './permission.model';
 
-export class CaseModel extends BaseModel {
+export class CaseModel extends BaseModel implements IPermissionModel {
     id: string;
     firstName: string;
     middleName: string;
@@ -71,6 +74,46 @@ export class CaseModel extends BaseModel {
 
     matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
 
+    /**
+     * Return case id mask with data replaced
+     * @param caseIdMask
+     */
+    static generateCaseIDMask(caseIdMask: string): string {
+        // validate
+        if (_.isEmpty(caseIdMask)) {
+            return '';
+        }
+
+        // !!!!!!!!!!!!!!!
+        // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
+        // !!!!!!!!!!!!!!!
+        return caseIdMask
+            .replace(/YYYY/g, moment().format('YYYY'))
+            .replace(/\*/g, '');
+    }
+
+    /**
+     * Static Permissions
+     */
+    static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_VIEW) : false; }
+    static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_LIST) : false; }
+    static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_CREATE) : false; }
+    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_MODIFY) : false; }
+    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_DELETE) : false; }
+    static canListRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_LIST_RELATIONSHIP_CONTACTS) : false; }
+    static canViewRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_VIEW_RELATIONSHIP_CONTACTS) : false; }
+    static canCreateRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_CREATE_RELATIONSHIP_CONTACTS) : false; }
+    static canModifyRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_MODIFY_RELATIONSHIP_CONTACTS) : false; }
+    static canDeleteRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_DELETE_RELATIONSHIP_CONTACTS) : false; }
+    static canListRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_LIST_RELATIONSHIP_EXPOSURES) : false; }
+    static canViewRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_VIEW_RELATIONSHIP_EXPOSURES) : false; }
+    static canCreateRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_CREATE_RELATIONSHIP_EXPOSURES) : false; }
+    static canModifyRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_MODIFY_RELATIONSHIP_EXPOSURES) : false; }
+    static canDeleteRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_DELETE_RELATIONSHIP_EXPOSURES) : false; }
+
+    /**
+     * Constructor
+     */
     constructor(data = null) {
         super(data);
 
@@ -147,22 +190,23 @@ export class CaseModel extends BaseModel {
     }
 
     /**
-     * Return case id mask with data replaced
-     * @param caseIdMask
+     * Permissions
      */
-    static generateCaseIDMask(caseIdMask: string): string {
-        // validate
-        if (_.isEmpty(caseIdMask)) {
-            return '';
-        }
-
-        // !!!!!!!!!!!!!!!
-        // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
-        // !!!!!!!!!!!!!!!
-        return caseIdMask
-            .replace(/YYYY/g, moment().format('YYYY'))
-            .replace(/\*/g, '');
-    }
+    canView(user: UserModel): boolean { return CaseModel.canView(user); }
+    canList(user: UserModel): boolean { return CaseModel.canList(user); }
+    canCreate(user: UserModel): boolean { return CaseModel.canCreate(user); }
+    canModify(user: UserModel): boolean { return CaseModel.canModify(user); }
+    canDelete(user: UserModel): boolean { return CaseModel.canDelete(user); }
+    canListRelationshipContacts(user: UserModel): boolean { return CaseModel.canListRelationshipContacts(user); }
+    canViewRelationshipContacts(user: UserModel): boolean { return CaseModel.canViewRelationshipContacts(user); }
+    canCreateRelationshipContacts(user: UserModel): boolean { return CaseModel.canCreateRelationshipContacts(user); }
+    canModifyRelationshipContacts(user: UserModel): boolean { return CaseModel.canModifyRelationshipContacts(user); }
+    canDeleteRelationshipContacts(user: UserModel): boolean { return CaseModel.canDeleteRelationshipContacts(user); }
+    canListRelationshipExposures(user: UserModel): boolean { return CaseModel.canListRelationshipExposures(user); }
+    canViewRelationshipExposures(user: UserModel): boolean { return CaseModel.canViewRelationshipExposures(user); }
+    canCreateRelationshipExposures(user: UserModel): boolean { return CaseModel.canCreateRelationshipExposures(user); }
+    canModifyRelationshipExposures(user: UserModel): boolean { return CaseModel.canModifyRelationshipExposures(user); }
+    canDeleteRelationshipExposures(user: UserModel): boolean { return CaseModel.canDeleteRelationshipExposures(user); }
 
     /**
      * Case Name

@@ -78,7 +78,8 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             },
             visible: (item: EntityModel) => {
                 return !item.relationship.deleted &&
-                    RelationshipModel.canView(this.authUser);
+                    RelationshipModel.canView(this.authUser) &&
+                    this.entityCanView;
             }
         }),
 
@@ -93,7 +94,8 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                 return this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    RelationshipModel.canModify(this.authUser);
+                    RelationshipModel.canModify(this.authUser) &&
+                    this.entityCanModify;
             }
         }),
 
@@ -112,7 +114,8 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                         return this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            RelationshipModel.canDelete(this.authUser);
+                            RelationshipModel.canDelete(this.authUser) &&
+                            this.entityCanDelete;
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -120,6 +123,9 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         protected snackbarService: SnackbarService,
         protected router: Router,

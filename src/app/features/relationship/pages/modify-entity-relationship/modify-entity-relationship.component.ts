@@ -67,7 +67,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     relationship: RelationshipModel = new RelationshipModel();
     // route data
     relationshipType: RelationshipType;
-    canReverseRelation: boolean = true;
+    canReverseRelation: boolean;
 
     // provide constants to template
     EntityModel = EntityModel;

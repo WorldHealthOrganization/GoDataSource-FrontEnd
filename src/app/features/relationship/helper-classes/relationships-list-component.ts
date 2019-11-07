@@ -20,20 +20,70 @@ export abstract class RelationshipsListComponent extends ListComponent implement
     entityMap: {
         [entityType: string]: {
             label: string,
-            link: string
+            link: string,
+            can: {
+                [type: string]: {
+                    view: (UserModel) => boolean,
+                    create: (UserModel) => boolean,
+                    modify: (UserModel) => boolean,
+                    delete: (UserModel) => boolean
+                }
+            }
         }
     } = {
         [EntityType.CASE]: {
             label: 'LNG_PAGE_LIST_CASES_TITLE',
-            link: '/cases'
+            link: '/cases',
+            can: {
+                contacts: {
+                    view: CaseModel.canViewRelationshipContacts,
+                    create: CaseModel.canCreateRelationshipContacts,
+                    modify: CaseModel.canModifyRelationshipContacts,
+                    delete: CaseModel.canDeleteRelationshipContacts
+                },
+                exposures: {
+                    view: CaseModel.canViewRelationshipExposures,
+                    create: CaseModel.canCreateRelationshipExposures,
+                    modify: CaseModel.canModifyRelationshipExposures,
+                    delete: CaseModel.canDeleteRelationshipExposures
+                }
+            }
         },
         [EntityType.CONTACT]: {
             label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
-            link: '/contacts'
+            link: '/contacts',
+            can: {
+                contacts: {
+                    view: ContactModel.canViewRelationshipContacts,
+                    create: ContactModel.canCreateRelationshipContacts,
+                    modify: ContactModel.canModifyRelationshipContacts,
+                    delete: ContactModel.canDeleteRelationshipContacts
+                },
+                exposures: {
+                    view: ContactModel.canViewRelationshipExposures,
+                    create: ContactModel.canCreateRelationshipExposures,
+                    modify: ContactModel.canModifyRelationshipExposures,
+                    delete: ContactModel.canDeleteRelationshipExposures
+                }
+            }
         },
         [EntityType.EVENT]: {
             label: 'LNG_PAGE_LIST_EVENTS_TITLE',
-            link: '/events'
+            link: '/events',
+            can: {
+                contacts: {
+                    view: EventModel.canViewRelationshipContacts,
+                    create: EventModel.canCreateRelationshipContacts,
+                    modify: EventModel.canModifyRelationshipContacts,
+                    delete: EventModel.canDeleteRelationshipContacts
+                },
+                exposures: {
+                    view: EventModel.canViewRelationshipExposures,
+                    create: EventModel.canCreateRelationshipExposures,
+                    modify: EventModel.canModifyRelationshipExposures,
+                    delete: EventModel.canDeleteRelationshipExposures
+                }
+            }
         }
     };
 
@@ -163,5 +213,33 @@ export abstract class RelationshipsListComponent extends ListComponent implement
      */
     get relationshipTypeRoutePath(): string {
         return this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures';
+    }
+
+    /**
+     * Check if we're allowed to view event / case / contact relationships'
+     */
+    get entityCanView(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].view(this.authUser);
+    }
+
+    /**
+     * Check if we're allowed to create event / case / contact relationships'
+     */
+    get entityCanCreate(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].create(this.authUser);
+    }
+
+    /**
+     * Check if we're allowed to modify event / case / contact relationships'
+     */
+    get entityCanModify(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].modify(this.authUser);
+    }
+
+    /**
+     * Check if we're allowed to delete event / case / contact relationships'
+     */
+    get entityCanDelete(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].delete(this.authUser);
     }
 }
