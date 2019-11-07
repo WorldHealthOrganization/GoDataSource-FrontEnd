@@ -40,7 +40,8 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             link: string,
             can: {
                 [type: string]: {
-                    modify: (UserModel) => boolean
+                    modify: (UserModel) => boolean,
+                    reverse: (UserModel) => boolean
                 }
             }
         }
@@ -50,10 +51,12 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             link: '/cases',
             can: {
                 contacts: {
-                    modify: CaseModel.canModifyRelationshipContacts
+                    modify: CaseModel.canModifyRelationshipContacts,
+                    reverse: CaseModel.canReverseRelationship
                 },
                 exposures: {
-                    modify: CaseModel.canModifyRelationshipExposures
+                    modify: CaseModel.canModifyRelationshipExposures,
+                    reverse: CaseModel.canReverseRelationship
                 }
             }
         },
@@ -62,10 +65,12 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             link: '/contacts',
             can: {
                 contacts: {
-                    modify: ContactModel.canModifyRelationshipContacts
+                    modify: ContactModel.canModifyRelationshipContacts,
+                    reverse: ContactModel.canReverseRelationship
                 },
                 exposures: {
-                    modify: ContactModel.canModifyRelationshipExposures
+                    modify: ContactModel.canModifyRelationshipExposures,
+                    reverse: ContactModel.canReverseRelationship
                 }
             }
         },
@@ -74,10 +79,12 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             link: '/events',
             can: {
                 contacts: {
-                    modify: EventModel.canModifyRelationshipContacts
+                    modify: EventModel.canModifyRelationshipContacts,
+                    reverse: EventModel.canReverseRelationship
                 },
                 exposures: {
-                    modify: EventModel.canModifyRelationshipExposures
+                    modify: EventModel.canModifyRelationshipExposures,
+                    reverse: EventModel.canReverseRelationship
                 }
             }
         }
@@ -313,9 +320,16 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     }
 
     /**
-     * Check if we're allowed to modify event / case / contact relationships'
+     * Check if we're allowed to modify event / case / contact relationships
      */
     get entityCanModify(): boolean {
         return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].modify(this.authUser);
+    }
+
+    /**
+     * Check if we're allowed to reverse relationships persons
+     */
+    get entityCanReverse(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].reverse(this.authUser);
     }
 }

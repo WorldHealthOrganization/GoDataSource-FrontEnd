@@ -24,7 +24,7 @@
             fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
 
             <button
-                *ngIf="canReverseRelation"
+                *ngIf="canReverseRelation && RelationshipModel.canReverse(authUser) && entityCanReverse"
                 (click)="reverseExistingRelationship()"
                 [matTooltip]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_REVERSE_RELATIONSHIP_TOOLTIP' | translate"
                 mat-raised-button type="button">
@@ -32,6 +32,7 @@
             </button>
 
             <a
+                *ngIf="RelationshipModel.canModify(authUser) && entityCanModify"
                 mat-raised-button
                 color="accent"
                 (click)="onModifyRelationship()">
@@ -39,6 +40,7 @@
             </a>
 
             <a
+                *ngIf="RelationshipModel.canDelete(authUser) && entityCanDelete"
                 mat-raised-button
                 color="warn"
                 (click)="onDeleteRelationship()">
@@ -46,7 +48,9 @@
             </a>
         </div>
 
-        <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
+        <div
+            *ngIf="RelationshipModel.canView(authUser) && entityCanView"
+            fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
             <a
                 [href]="relationshipLink"
                 target="_blank"

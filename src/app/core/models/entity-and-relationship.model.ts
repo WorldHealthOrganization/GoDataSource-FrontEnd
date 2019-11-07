@@ -38,6 +38,7 @@ export class RelationshipModel extends BaseModel implements IPermissionModel {
     static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.RELATIONSHIP_CREATE) : false; }
     static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.RELATIONSHIP_MODIFY) : false; }
     static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.RELATIONSHIP_DELETE) : false; }
+    static canReverse(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.RELATIONSHIP_REVERSE) : false; }
 
     /**
      * Constructor
@@ -72,6 +73,7 @@ export class RelationshipModel extends BaseModel implements IPermissionModel {
     canCreate(user: UserModel): boolean { return RelationshipModel.canCreate(user); }
     canModify(user: UserModel): boolean { return RelationshipModel.canModify(user); }
     canDelete(user: UserModel): boolean { return RelationshipModel.canDelete(user); }
+    canReverse(user: UserModel): boolean { return RelationshipModel.canReverse(user); }
 
     /**
      * Get the related entity

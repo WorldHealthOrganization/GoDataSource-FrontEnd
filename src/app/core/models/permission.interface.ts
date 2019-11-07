@@ -119,5 +119,15 @@ export interface IPermissionModel {
      */
     canDeleteRelationshipExposures?(user: UserModel): boolean;
 
+    /**
+     * Can we reverse a relationship target & source ?
+     */
+    canReverse?(user: UserModel): boolean;
+
+    /**
+     * Can we reverse a relationship target & source ?
+     */
+    canReverseRelationship?(user: UserModel): boolean;
+
     // END of Related Models
 }

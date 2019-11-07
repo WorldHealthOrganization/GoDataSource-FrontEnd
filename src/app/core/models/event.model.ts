@@ -46,6 +46,7 @@ export class EventModel extends BaseModel implements IPermissionModel {
     static canCreateRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_CREATE_RELATIONSHIP_EXPOSURES) : false; }
     static canModifyRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_MODIFY_RELATIONSHIP_EXPOSURES) : false; }
     static canDeleteRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_DELETE_RELATIONSHIP_EXPOSURES) : false; }
+    static canReverseRelationship(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_REVERSE_RELATIONSHIP) : false; }
 
     /**
      * Constructor
@@ -100,6 +101,7 @@ export class EventModel extends BaseModel implements IPermissionModel {
     canCreateRelationshipExposures(user: UserModel): boolean { return EventModel.canCreateRelationshipExposures(user); }
     canModifyRelationshipExposures(user: UserModel): boolean { return EventModel.canModifyRelationshipExposures(user); }
     canDeleteRelationshipExposures(user: UserModel): boolean { return EventModel.canDeleteRelationshipExposures(user); }
+    canReverseRelationship(user: UserModel): boolean { return EventModel.canReverseRelationship(user); }
 
     get firstName(): string {
         return this.name;

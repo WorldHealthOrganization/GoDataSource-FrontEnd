@@ -100,7 +100,7 @@
 
             <ng-container *ngIf="!viewOnly">
 
-                <ng-container *ngIf="canReverseRelation" >
+                <ng-container *ngIf="canReverseRelation && RelationshipModel.canReverse(authUser) && entityCanReverse">
                     <button
                         (click)="reverseExistingRelationship()"
                         [matTooltip]="'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_REVERSE_RELATIONSHIP_TOOLTIP' | translate"

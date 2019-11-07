@@ -96,6 +96,7 @@ export class ContactModel extends BaseModel implements IPermissionModel {
     static canCreateRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_CREATE_RELATIONSHIP_EXPOSURES) : false; }
     static canModifyRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_MODIFY_RELATIONSHIP_EXPOSURES) : false; }
     static canDeleteRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_DELETE_RELATIONSHIP_EXPOSURES) : false; }
+    static canReverseRelationship(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CONTACT_REVERSE_RELATIONSHIP) : false; }
 
     /**
      * Constructor
@@ -175,6 +176,7 @@ export class ContactModel extends BaseModel implements IPermissionModel {
     canCreateRelationshipExposures(user: UserModel): boolean { return ContactModel.canCreateRelationshipExposures(user); }
     canModifyRelationshipExposures(user: UserModel): boolean { return ContactModel.canModifyRelationshipExposures(user); }
     canDeleteRelationshipExposures(user: UserModel): boolean { return ContactModel.canDeleteRelationshipExposures(user); }
+    canReverseRelationship(user: UserModel): boolean { return ContactModel.canReverseRelationship(user); }
 
     /**
      * Contact Name
