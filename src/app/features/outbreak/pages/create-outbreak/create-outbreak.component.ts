@@ -16,7 +16,7 @@ import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -174,6 +174,20 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                         this.snackbarService.showApiError(err);
                         loadingDialog.close();
                         return throwError(err);
+                    }),
+
+                    // handle create outbreak from outbreak template language tokens refresh
+                    switchMap((createdOutbreak) => {
+                        // update language tokens to get the translation of submitted questions and answers
+                        return this.i18nService.loadUserLanguage()
+                            .pipe(
+                                catchError((err) => {
+                                    this.snackbarService.showApiError(err);
+                                    loadingDialog.close();
+                                    return throwError(err);
+                                }),
+                                map(() => createdOutbreak)
+                            );
                     })
                 )
                 .subscribe((newOutbreak) => {
