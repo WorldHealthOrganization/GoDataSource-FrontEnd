@@ -53,6 +53,11 @@ export interface IPermissionModel {
      */
     canBulkRestore?(user: UserModel): boolean;
 
+    /**
+     * Has export permission ?
+     */
+    canExport?(user: UserModel): boolean;
+
     // END of Model specific
 
 
@@ -128,6 +133,16 @@ export interface IPermissionModel {
      * Can we reverse a relationship target & source ?
      */
     canReverseRelationship?(user: UserModel): boolean;
+
+    /**
+     * Can see the list of persons ( events... ) without relationships
+     */
+    canListPersonsWithoutRelationships?(user: UserModel): boolean;
+
+    /**
+     * Has relationship export permission ( events, cases, contacts...) ?
+     */
+    canExportRelationships?(user: UserModel): boolean;
 
     // END of Related Models
 }

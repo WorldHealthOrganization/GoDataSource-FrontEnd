@@ -21,6 +21,8 @@ export enum PERMISSION {
     EVENT_MODIFY_RELATIONSHIP_EXPOSURES = 'event_modify_relationship_exposures',
     EVENT_DELETE_RELATIONSHIP_EXPOSURES = 'event_delete_relationship_exposures',
     EVENT_REVERSE_RELATIONSHIP = 'event_reverse_relationship',
+    EVENT_WITHOUT_RELATIONSHIPS = 'event_without_relationships',
+    EVENT_EXPORT_RELATIONSHIPS = 'event_export_relationships',
 WRITE_EVENT = EVENT_MODIFY,
 
     // contacts
@@ -77,6 +79,7 @@ WRITE_CASE = 'write_case',
     RELATIONSHIP_MODIFY = 'relationship_modify',
     RELATIONSHIP_DELETE = 'relationship_delete',
     RELATIONSHIP_REVERSE = 'relationship_reverse',
+    RELATIONSHIP_EXPORT = 'relationship_export',
 
 
 

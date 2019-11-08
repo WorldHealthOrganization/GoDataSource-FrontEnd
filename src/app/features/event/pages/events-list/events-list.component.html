@@ -12,7 +12,10 @@
                 </ng-container>
 
                 <button
-                    *ngIf="!appliedListFilter"
+                    *ngIf="!appliedListFilter && (
+                        (EventModel.canList(authUser) && EventModel.canListPersonsWithoutRelationships(authUser)) ||
+                        (RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser))
+                    )"
                     mat-raised-button
                     color="accent"
                     [matMenuTriggerFor]="quickActionsMenu">
@@ -21,6 +24,7 @@
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <button
+                        *ngIf="EventModel.canList(authUser) && EventModel.canListPersonsWithoutRelationships(authUser)"
                         mat-menu-item
                         [routerLink]="['/events']"
                         [queryParams]="{ applyListFilter: Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS }">
@@ -28,6 +32,7 @@
                     </button>
 
                     <button
+                        *ngIf="RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser)"
                         mat-menu-item
                         (click)="exportFilteredEventsRelationships()">
                         {{ 'LNG_PAGE_LIST_EVENTS_ACTION_EXPORT_EVENTS_RELATIONSHIPS' | translate }}
