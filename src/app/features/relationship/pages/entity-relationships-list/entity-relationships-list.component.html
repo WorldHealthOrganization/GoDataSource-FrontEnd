@@ -99,6 +99,7 @@
                                 <mat-divider></mat-divider>
 
                                 <button
+                                    *ngIf="RelationshipModel.canShare(authUser) && entityCanShare"
                                     [disabled]="checkedRecords.length < 1"
                                     mat-menu-item
                                     (click)="shareSelectedRelationships()">

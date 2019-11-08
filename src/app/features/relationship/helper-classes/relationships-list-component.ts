@@ -26,7 +26,8 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     view: (UserModel) => boolean,
                     create: (UserModel) => boolean,
                     modify: (UserModel) => boolean,
-                    delete: (UserModel) => boolean
+                    delete: (UserModel) => boolean,
+                    share: (UserModel) => boolean
                 }
             }
         }
@@ -39,13 +40,15 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     view: CaseModel.canViewRelationshipContacts,
                     create: CaseModel.canCreateRelationshipContacts,
                     modify: CaseModel.canModifyRelationshipContacts,
-                    delete: CaseModel.canDeleteRelationshipContacts
+                    delete: CaseModel.canDeleteRelationshipContacts,
+                    share: CaseModel.canShareRelationship
                 },
                 exposures: {
                     view: CaseModel.canViewRelationshipExposures,
                     create: CaseModel.canCreateRelationshipExposures,
                     modify: CaseModel.canModifyRelationshipExposures,
-                    delete: CaseModel.canDeleteRelationshipExposures
+                    delete: CaseModel.canDeleteRelationshipExposures,
+                    share: CaseModel.canShareRelationship
                 }
             }
         },
@@ -57,13 +60,15 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     view: ContactModel.canViewRelationshipContacts,
                     create: ContactModel.canCreateRelationshipContacts,
                     modify: ContactModel.canModifyRelationshipContacts,
-                    delete: ContactModel.canDeleteRelationshipContacts
+                    delete: ContactModel.canDeleteRelationshipContacts,
+                    share: ContactModel.canShareRelationship
                 },
                 exposures: {
                     view: ContactModel.canViewRelationshipExposures,
                     create: ContactModel.canCreateRelationshipExposures,
                     modify: ContactModel.canModifyRelationshipExposures,
-                    delete: ContactModel.canDeleteRelationshipExposures
+                    delete: ContactModel.canDeleteRelationshipExposures,
+                    share: ContactModel.canShareRelationship
                 }
             }
         },
@@ -75,13 +80,15 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     view: EventModel.canViewRelationshipContacts,
                     create: EventModel.canCreateRelationshipContacts,
                     modify: EventModel.canModifyRelationshipContacts,
-                    delete: EventModel.canDeleteRelationshipContacts
+                    delete: EventModel.canDeleteRelationshipContacts,
+                    share: EventModel.canShareRelationship
                 },
                 exposures: {
                     view: EventModel.canViewRelationshipExposures,
                     create: EventModel.canCreateRelationshipExposures,
                     modify: EventModel.canModifyRelationshipExposures,
-                    delete: EventModel.canDeleteRelationshipExposures
+                    delete: EventModel.canDeleteRelationshipExposures,
+                    share: EventModel.canShareRelationship
                 }
             }
         }
@@ -241,5 +248,12 @@ export abstract class RelationshipsListComponent extends ListComponent implement
      */
     get entityCanDelete(): boolean {
         return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].delete(this.authUser);
+    }
+
+    /**
+     * Check if we're allowed to share event / case / contact relationships'
+     */
+    get entityCanShare(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].share(this.authUser);
     }
 }

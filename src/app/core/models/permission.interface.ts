@@ -144,5 +144,15 @@ export interface IPermissionModel {
      */
     canExportRelationships?(user: UserModel): boolean;
 
+    /**
+     * Can we share relationships ?
+     */
+    canShare?(user: UserModel): boolean;
+
+    /**
+     * Can we share relationships from a person ( case, contact, event ) ?
+     */
+    canShareRelationship?(user: UserModel): boolean;
+
     // END of Related Models
 }
