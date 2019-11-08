@@ -107,7 +107,7 @@
                                 </button>
 
                                 <button
-                                    *ngIf="relationshipType === RelationshipType.CONTACT && (hasCaseWriteAccess() || hasContactWriteAccess())"
+                                    *ngIf="entityCanChangeSource"
                                     mat-menu-item
                                     [disabled]="checkedRecords.length === 0"
                                     (click)="changeSourceForSelectedRelationships()">

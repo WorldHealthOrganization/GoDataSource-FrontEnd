@@ -27,7 +27,8 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     create: (UserModel) => boolean,
                     modify: (UserModel) => boolean,
                     delete: (UserModel) => boolean,
-                    share: (UserModel) => boolean
+                    share: (UserModel) => boolean,
+                    changeSource: (UserModel) => boolean
                 }
             }
         }
@@ -41,14 +42,16 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     create: CaseModel.canCreateRelationshipContacts,
                     modify: CaseModel.canModifyRelationshipContacts,
                     delete: CaseModel.canDeleteRelationshipContacts,
-                    share: CaseModel.canShareRelationship
+                    share: CaseModel.canShareRelationship,
+                    changeSource: CaseModel.canChangeSource
                 },
                 exposures: {
                     view: CaseModel.canViewRelationshipExposures,
                     create: CaseModel.canCreateRelationshipExposures,
                     modify: CaseModel.canModifyRelationshipExposures,
                     delete: CaseModel.canDeleteRelationshipExposures,
-                    share: CaseModel.canShareRelationship
+                    share: CaseModel.canShareRelationship,
+                    changeSource: () => false
                 }
             }
         },
@@ -61,14 +64,16 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     create: ContactModel.canCreateRelationshipContacts,
                     modify: ContactModel.canModifyRelationshipContacts,
                     delete: ContactModel.canDeleteRelationshipContacts,
-                    share: ContactModel.canShareRelationship
+                    share: ContactModel.canShareRelationship,
+                    changeSource: ContactModel.canChangeSource
                 },
                 exposures: {
                     view: ContactModel.canViewRelationshipExposures,
                     create: ContactModel.canCreateRelationshipExposures,
                     modify: ContactModel.canModifyRelationshipExposures,
                     delete: ContactModel.canDeleteRelationshipExposures,
-                    share: ContactModel.canShareRelationship
+                    share: ContactModel.canShareRelationship,
+                    changeSource: () => false
                 }
             }
         },
@@ -81,14 +86,16 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     create: EventModel.canCreateRelationshipContacts,
                     modify: EventModel.canModifyRelationshipContacts,
                     delete: EventModel.canDeleteRelationshipContacts,
-                    share: EventModel.canShareRelationship
+                    share: EventModel.canShareRelationship,
+                    changeSource: EventModel.canChangeSource
                 },
                 exposures: {
                     view: EventModel.canViewRelationshipExposures,
                     create: EventModel.canCreateRelationshipExposures,
                     modify: EventModel.canModifyRelationshipExposures,
                     delete: EventModel.canDeleteRelationshipExposures,
-                    share: EventModel.canShareRelationship
+                    share: EventModel.canShareRelationship,
+                    changeSource: () => false
                 }
             }
         }
@@ -255,5 +262,12 @@ export abstract class RelationshipsListComponent extends ListComponent implement
      */
     get entityCanShare(): boolean {
         return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].share(this.authUser);
+    }
+
+    /**
+     * Check if we're allowed to change person source of a relationship
+     */
+    get entityCanChangeSource(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].changeSource(this.authUser);
     }
 }

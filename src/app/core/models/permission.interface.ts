@@ -154,5 +154,10 @@ export interface IPermissionModel {
      */
     canShareRelationship?(user: UserModel): boolean;
 
+    /**
+     * Can we change source person of a relationship ?
+     */
+    canChangeSource?(user: UserModel): boolean;
+
     // END of Related Models
 }

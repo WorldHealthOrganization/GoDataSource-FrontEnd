@@ -24,6 +24,7 @@ export enum PERMISSION {
     EVENT_WITHOUT_RELATIONSHIPS = 'event_without_relationships',
     EVENT_EXPORT_RELATIONSHIPS = 'event_export_relationships',
     EVENT_SHARE_RELATIONSHIPS = 'event_share_relationships',
+    EVENT_CHANGE_SOURCE_RELATIONSHIP = 'event_change_source_relationships',
 WRITE_EVENT = EVENT_MODIFY,
 
     // contacts
@@ -50,6 +51,7 @@ WRITE_CONTACT = 'write_contact',
     CONTACT_DELETE_RELATIONSHIP_EXPOSURES = '...',
     CONTACT_REVERSE_RELATIONSHIP = '...',
     CONTACT_SHARE_RELATIONSHIPS = '...',
+    CONTACT_CHANGE_SOURCE_RELATIONSHIP = '...',
 
     // case
 READ_CASE = 'read_case',
@@ -74,6 +76,7 @@ WRITE_CASE = 'write_case',
     CASE_DELETE_RELATIONSHIP_EXPOSURES = '...',
     CASE_REVERSE_RELATIONSHIP = '...',
     CASE_SHARE_RELATIONSHIPS = '...',
+    CASE_CHANGE_SOURCE_RELATIONSHIP = '...',
 
     // relationships
     RELATIONSHIP_LIST = 'relationship_list',
