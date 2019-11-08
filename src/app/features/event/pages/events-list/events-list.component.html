@@ -114,13 +114,16 @@
                                 {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
                             </button>
 
-                            <mat-divider></mat-divider>
+                            <ng-container
+                                *ngIf="RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser)">
+                                <mat-divider></mat-divider>
 
-                            <button
-                                mat-menu-item
-                                (click)="exportSelectedEventsRelationship()">
-                                {{ 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS_RELATIONSHIPS' | translate }}
-                            </button>
+                                <button
+                                    mat-menu-item
+                                    (click)="exportSelectedEventsRelationship()">
+                                    {{ 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS_RELATIONSHIPS' | translate }}
+                                </button>
+                            </ng-container>
                         </mat-menu>
                     </div>
                     <div class="column-filter">
