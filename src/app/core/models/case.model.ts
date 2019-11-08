@@ -113,6 +113,8 @@ export class CaseModel extends BaseModel implements IPermissionModel {
     static canReverseRelationship(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_REVERSE_RELATIONSHIP) : false; }
     static canShareRelationship(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_SHARE_RELATIONSHIPS) : false; }
     static canChangeSource(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_CHANGE_SOURCE_RELATIONSHIP) : false; }
+    static canBulkDeleteRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_BULK_DELETE_RELATIONSHIP_CONTACTS) : false; }
+    static canBulkDeleteRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_BULK_DELETE_RELATIONSHIP_EXPOSURES) : false; }
 
     /**
      * Constructor
@@ -213,6 +215,8 @@ export class CaseModel extends BaseModel implements IPermissionModel {
     canReverseRelationship(user: UserModel): boolean { return CaseModel.canReverseRelationship(user); }
     canShareRelationship(user: UserModel): boolean { return CaseModel.canShareRelationship(user); }
     canChangeSource(user: UserModel): boolean { return CaseModel.canChangeSource(user); }
+    canBulkDeleteRelationshipContacts(user: UserModel): boolean { return CaseModel.canBulkDeleteRelationshipContacts(user); }
+    canBulkDeleteRelationshipExposures(user: UserModel): boolean { return CaseModel.canBulkDeleteRelationshipExposures(user); }
 
     /**
      * Case Name

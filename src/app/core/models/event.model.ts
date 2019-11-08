@@ -51,6 +51,8 @@ export class EventModel extends BaseModel implements IPermissionModel {
     static canExportRelationships(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_EXPORT_RELATIONSHIPS) : false; }
     static canShareRelationship(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_SHARE_RELATIONSHIPS) : false; }
     static canChangeSource(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_CHANGE_SOURCE_RELATIONSHIP) : false; }
+    static canBulkDeleteRelationshipContacts(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_BULK_DELETE_RELATIONSHIP_CONTACTS) : false; }
+    static canBulkDeleteRelationshipExposures(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.EVENT_BULK_DELETE_RELATIONSHIP_EXPOSURES) : false; }
 
     /**
      * Constructor
@@ -110,6 +112,8 @@ export class EventModel extends BaseModel implements IPermissionModel {
     canExportRelationships(user: UserModel): boolean { return EventModel.canExportRelationships(user); }
     canShareRelationship(user: UserModel): boolean { return EventModel.canShareRelationship(user); }
     canChangeSource(user: UserModel): boolean { return EventModel.canChangeSource(user); }
+    canBulkDeleteRelationshipContacts(user: UserModel): boolean { return EventModel.canBulkDeleteRelationshipContacts(user); }
+    canBulkDeleteRelationshipExposures(user: UserModel): boolean { return EventModel.canBulkDeleteRelationshipExposures(user); }
 
     get firstName(): string {
         return this.name;

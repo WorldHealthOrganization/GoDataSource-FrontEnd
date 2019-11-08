@@ -159,5 +159,15 @@ export interface IPermissionModel {
      */
     canChangeSource?(user: UserModel): boolean;
 
+    /**
+     * Can bulk delete relationships exposures from events / cases & contacts
+     */
+    canBulkDeleteRelationshipExposures?(user: UserModel): boolean;
+
+    /**
+     * Can bulk delete relationships contacts from events / cases & contacts
+     */
+    canBulkDeleteRelationshipContacts?(user: UserModel): boolean;
+
     // END of Related Models
 }

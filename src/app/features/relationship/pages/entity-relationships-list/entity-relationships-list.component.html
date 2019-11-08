@@ -95,7 +95,9 @@
                                 {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
                             </button>
 
-                            <ng-container *ngIf="hasCaseWriteAccess() || hasContactWriteAccess()">
+                            <ng-container *ngIf="(RelationshipModel.canShare(authUser) && entityCanShare) ||
+                                entityCanChangeSource || (RelationshipModel.canBulkDelete(authUser) && entityCanBulkDelete)">
+
                                 <mat-divider></mat-divider>
 
                                 <button
@@ -114,14 +116,17 @@
                                     {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE' | translate }}
                                 </button>
 
-                                <mat-divider></mat-divider>
+                                <ng-container
+                                    *ngIf="RelationshipModel.canBulkDelete(authUser) && entityCanBulkDelete">
+                                    <mat-divider></mat-divider>
 
-                                <button
-                                    [disabled]="checkedRecords.length < 1"
-                                    mat-menu-item
-                                    (click)="deleteSelectedRelationships()">
-                                    {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS' | translate }}
-                                </button>
+                                    <button
+                                        [disabled]="checkedRecords.length < 1"
+                                        mat-menu-item
+                                        (click)="deleteSelectedRelationships()">
+                                        {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS' | translate }}
+                                    </button>
+                                </ng-container>
                             </ng-container>
                         </mat-menu>
                     </div>

@@ -28,7 +28,8 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     modify: (UserModel) => boolean,
                     delete: (UserModel) => boolean,
                     share: (UserModel) => boolean,
-                    changeSource: (UserModel) => boolean
+                    changeSource: (UserModel) => boolean,
+                    bulkDelete: (UserModel) => boolean
                 }
             }
         }
@@ -43,7 +44,8 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     modify: CaseModel.canModifyRelationshipContacts,
                     delete: CaseModel.canDeleteRelationshipContacts,
                     share: CaseModel.canShareRelationship,
-                    changeSource: CaseModel.canChangeSource
+                    changeSource: CaseModel.canChangeSource,
+                    bulkDelete: CaseModel.canBulkDeleteRelationshipContacts
                 },
                 exposures: {
                     view: CaseModel.canViewRelationshipExposures,
@@ -51,7 +53,8 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     modify: CaseModel.canModifyRelationshipExposures,
                     delete: CaseModel.canDeleteRelationshipExposures,
                     share: CaseModel.canShareRelationship,
-                    changeSource: () => false
+                    changeSource: () => false,
+                    bulkDelete: CaseModel.canBulkDeleteRelationshipExposures
                 }
             }
         },
@@ -65,7 +68,8 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     modify: ContactModel.canModifyRelationshipContacts,
                     delete: ContactModel.canDeleteRelationshipContacts,
                     share: ContactModel.canShareRelationship,
-                    changeSource: ContactModel.canChangeSource
+                    changeSource: ContactModel.canChangeSource,
+                    bulkDelete: ContactModel.canBulkDeleteRelationshipContacts
                 },
                 exposures: {
                     view: ContactModel.canViewRelationshipExposures,
@@ -73,7 +77,8 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     modify: ContactModel.canModifyRelationshipExposures,
                     delete: ContactModel.canDeleteRelationshipExposures,
                     share: ContactModel.canShareRelationship,
-                    changeSource: () => false
+                    changeSource: () => false,
+                    bulkDelete: ContactModel.canBulkDeleteRelationshipExposures
                 }
             }
         },
@@ -87,7 +92,8 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     modify: EventModel.canModifyRelationshipContacts,
                     delete: EventModel.canDeleteRelationshipContacts,
                     share: EventModel.canShareRelationship,
-                    changeSource: EventModel.canChangeSource
+                    changeSource: EventModel.canChangeSource,
+                    bulkDelete: EventModel.canBulkDeleteRelationshipContacts
                 },
                 exposures: {
                     view: EventModel.canViewRelationshipExposures,
@@ -95,7 +101,8 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     modify: EventModel.canModifyRelationshipExposures,
                     delete: EventModel.canDeleteRelationshipExposures,
                     share: EventModel.canShareRelationship,
-                    changeSource: () => false
+                    changeSource: () => false,
+                    bulkDelete: EventModel.canBulkDeleteRelationshipExposures
                 }
             }
         }
@@ -269,5 +276,12 @@ export abstract class RelationshipsListComponent extends ListComponent implement
      */
     get entityCanChangeSource(): boolean {
         return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].changeSource(this.authUser);
+    }
+
+    /**
+     * Check if we're allowed to bulk delete relationships
+     */
+    get entityCanBulkDelete(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].bulkDelete(this.authUser);
     }
 }

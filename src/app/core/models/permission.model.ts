@@ -25,6 +25,8 @@ export enum PERMISSION {
     EVENT_EXPORT_RELATIONSHIPS = 'event_export_relationships',
     EVENT_SHARE_RELATIONSHIPS = 'event_share_relationships',
     EVENT_CHANGE_SOURCE_RELATIONSHIP = 'event_change_source_relationships',
+    EVENT_BULK_DELETE_RELATIONSHIP_CONTACTS = 'event_bulk_delete_relationships_contacts',
+    EVENT_BULK_DELETE_RELATIONSHIP_EXPOSURES = 'event_bulk_delete_relationships_exposures',
 WRITE_EVENT = EVENT_MODIFY,
 
     // contacts
@@ -52,6 +54,8 @@ WRITE_CONTACT = 'write_contact',
     CONTACT_REVERSE_RELATIONSHIP = '...',
     CONTACT_SHARE_RELATIONSHIPS = '...',
     CONTACT_CHANGE_SOURCE_RELATIONSHIP = '...',
+    CONTACT_BULK_DELETE_RELATIONSHIP_CONTACTS = '...',
+    CONTACT_BULK_DELETE_RELATIONSHIP_EXPOSURES = '...',
 
     // case
 READ_CASE = 'read_case',
@@ -77,6 +81,8 @@ WRITE_CASE = 'write_case',
     CASE_REVERSE_RELATIONSHIP = '...',
     CASE_SHARE_RELATIONSHIPS = '...',
     CASE_CHANGE_SOURCE_RELATIONSHIP = '...',
+    CASE_BULK_DELETE_RELATIONSHIP_CONTACTS = '...',
+    CASE_BULK_DELETE_RELATIONSHIP_EXPOSURES = '...',
 
     // relationships
     RELATIONSHIP_LIST = 'relationship_list',
@@ -87,6 +93,7 @@ WRITE_CASE = 'write_case',
     RELATIONSHIP_REVERSE = 'relationship_reverse',
     RELATIONSHIP_EXPORT = 'relationship_export',
     RELATIONSHIP_SHARE = 'relationship_share',
+    RELATIONSHIP_BULK_DELETE = 'relationship_bulk_delete',
 
 
 
