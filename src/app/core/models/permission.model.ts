@@ -95,6 +95,9 @@ WRITE_CASE = 'write_case',
     RELATIONSHIP_SHARE = 'relationship_share',
     RELATIONSHIP_BULK_DELETE = 'relationship_bulk_delete',
 
+    // no restrictions permissions
+    SYSTEM_VERSION_VIEW = 'view_system_version',
+
 
 
     // system config
@@ -132,14 +135,22 @@ WRITE_CASE = 'write_case',
     APPROVE_HELP = 'approve_help'
 }
 
-export class PermissionModel {
+export interface IPermissionChildModel {
     id: PERMISSION;
     label: string;
     description: string;
+}
+
+export class PermissionModel {
+    groupAllId: string;
+    groupLabel: string;
+    groupDescription: string;
+    permissions: IPermissionChildModel[] = [];
 
     constructor(data = null) {
-        this.id = _.get(data, 'id');
-        this.label = _.get(data, 'label');
-        this.description = _.get(data, 'description');
+        this.groupAllId = _.get(data, 'groupAllId');
+        this.groupLabel = _.get(data, 'groupLabel');
+        this.groupDescription = _.get(data, 'groupDescription');
+        this.permissions = _.get(data, 'permissions');
     }
 }

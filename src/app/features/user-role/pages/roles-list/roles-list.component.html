@@ -123,19 +123,25 @@
                         </mat-menu>
                     </div>
                     <div class="column-filter">
-                        <app-form-select
+                        <app-form-select-groups
                             name="rolesFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="availablePermissions$ | async"
-                            multiple="true"
-                            (optionChanged)="filterBySelectField('permissionIds', $event, 'id')"
-                            optionLabelKey="label"
-                            optionValueKey="id"
+                            [groups]="availablePermissions$ | async"
+                            groupLabelKey="groupLabel"
+                            groupValueKey="groupAllId"
+                            groupOptionsKey="permissions"
+                            groupOptionLabelKey="label"
+                            groupOptionValueKey="id"
+                            groupAllLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL"
+                            groupAllTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL_DESCRIPTION"
+                            groupNoneLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE"
+                            groupNoneTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE_DESCRIPTION"
+                            groupPartialLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL"
+                            groupPartialTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL_DESCRIPTION"
                             app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
+                            (optionChanged)="filterBySelectField('permissionIds', $event, null)">
+                        </app-form-select-groups>
                     </div>
                 </div>
             </mat-header-cell>

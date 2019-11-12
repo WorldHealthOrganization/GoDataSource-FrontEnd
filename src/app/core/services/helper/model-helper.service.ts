@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UserModel } from '../../models/user.model';
 import { UserRoleModel } from '../../models/user-role.model';
-import { PERMISSION, PermissionModel } from '../../models/permission.model';
+import { IPermissionChildModel, PERMISSION, PermissionModel } from '../../models/permission.model';
 import * as _ from 'lodash';
 import { TeamModel } from '../../models/team.model';
 import { LocationModel } from '../../models/location.model';
@@ -97,8 +97,29 @@ export class ModelHelperService {
 
                 if (availablePermissions) {
                     // set role's permissions
-                    userRole.permissions = _.filter(availablePermissions, (permission: PermissionModel) => {
-                        return _.indexOf(userRole.permissionIds, permission.id) >= 0;
+                    const mappedPermissions: {
+                        [id: string]: IPermissionChildModel
+                    } = {};
+                    (availablePermissions || []).forEach((groupData: PermissionModel) => {
+                        // add group key
+                        mappedPermissions[groupData.groupAllId] = {
+                            id: groupData.groupAllId as any,
+                            label: groupData.groupLabel,
+                            description: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL_DESCRIPTION'
+                        };
+
+                        // add group child permissions
+                        (groupData.permissions || []).forEach((permission) => {
+                            mappedPermissions[permission.id] = permission;
+                        });
+                    });
+
+                    // map permissions for easy access
+                    userRole.permissions = [];
+                    (userRole.permissionIds || []).forEach((permissionId: string) => {
+                        if (mappedPermissions[permissionId]) {
+                            userRole.permissions.push(mappedPermissions[permissionId]);
+                        }
                     });
                 }
 

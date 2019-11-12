@@ -29,18 +29,27 @@
                             tooltip="LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
                         </app-form-textarea>
 
-                        <app-form-select
+                        <app-form-select-groups
                             name="permissionIds"
                             [(ngModel)]="newUserRole.permissionIds"
                             [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate"
                             tooltip="LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS_DESCRIPTION"
                             required="true"
-                            [options]="availablePermissions$ | async"
-                            optionLabelKey="label"
-                            optionValueKey="id"
-                            optionTooltipKey="description"
-                            multiple="true">
-                        </app-form-select>
+                            [groups]="availablePermissions$ | async"
+                            groupLabelKey="groupLabel"
+                            groupTooltipKey="groupDescription"
+                            groupValueKey="groupAllId"
+                            groupOptionsKey="permissions"
+                            groupOptionLabelKey="label"
+                            groupOptionValueKey="id"
+                            groupOptionTooltipKey="description"
+                            groupAllLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL"
+                            groupAllTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL_DESCRIPTION"
+                            groupNoneLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE"
+                            groupNoneTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE_DESCRIPTION"
+                            groupPartialLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL"
+                            groupPartialTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL_DESCRIPTION">
+                        </app-form-select-groups>
                     </mat-card>
 
                     <div class="stepper-navigation-buttons">
