@@ -83,6 +83,11 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
         this.savedImportMappingsList$ = this.savedImportMappingService
             .getImportMappingsList(this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback();
+                    return throwError(err);
+                }),
                 tap(this.checkEmptyList.bind(this)),
                 tap(() => {
                     finishCallback();

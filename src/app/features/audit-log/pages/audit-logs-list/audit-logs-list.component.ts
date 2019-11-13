@@ -13,8 +13,9 @@ import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/help
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { share, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-audit-logs-list',
@@ -156,6 +157,11 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
         this.auditLogsList$ = this.auditLogDataService
             .getAuditLogsList(this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback();
+                    return throwError(err);
+                }),
                 tap(this.checkEmptyList.bind(this)),
                 tap(() => {
                     finishCallback();

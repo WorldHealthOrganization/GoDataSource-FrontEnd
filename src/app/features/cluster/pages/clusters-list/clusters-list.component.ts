@@ -156,8 +156,14 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
      */
     refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
-            this.clustersList$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id, this.queryBuilder)
+            this.clustersList$ = this.clusterDataService
+                .getClusterList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap(() => {
                         finishCallback();

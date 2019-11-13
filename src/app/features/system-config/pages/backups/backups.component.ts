@@ -207,8 +207,14 @@ export class BackupsComponent extends ListComponent implements OnInit {
      * Refresh list
      */
     refreshList(finishCallback: () => void) {
-        this.backupsList$ = this.systemBackupDataService.getBackupList(this.queryBuilder)
+        this.backupsList$ = this.systemBackupDataService
+            .getBackupList(this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback();
+                    return throwError(err);
+                }),
                 tap(this.checkEmptyList.bind(this)),
                 tap(() => {
                     finishCallback();

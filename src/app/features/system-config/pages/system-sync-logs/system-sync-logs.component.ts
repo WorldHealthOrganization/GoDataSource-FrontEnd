@@ -206,6 +206,11 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
         this.syncLogsList$ = this.systemSyncLogDataService
             .getSyncLogList(this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback();
+                    return throwError(err);
+                }),
                 map((syncLogs: SystemSyncLogModel[]) => {
                     return _.map(syncLogs, (log: SystemSyncLogModel) => {
                         // add list of outbreaks

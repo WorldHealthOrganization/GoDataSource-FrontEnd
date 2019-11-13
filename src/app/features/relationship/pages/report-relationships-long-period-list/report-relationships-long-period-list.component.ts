@@ -10,12 +10,13 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { ReportDifferenceOnsetRelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-report-relationships-long-period',
@@ -197,6 +198,11 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
             this.relationshipList$ = this.relationshipDataService
                 .getLongPeriodBetweenDateOfOnset(this.selectedOutbreak.id)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap(() => {
                         finishCallback();

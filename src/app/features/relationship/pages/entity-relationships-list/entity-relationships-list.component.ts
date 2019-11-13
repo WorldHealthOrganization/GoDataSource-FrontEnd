@@ -321,13 +321,19 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             // request data
             if (this.relationshipType === RelationshipType.EXPOSURE) {
                 // retrieve the list of exposures
-                this.relationshipsList$ = this.relationshipDataService.getEntityExposures(
-                    this.selectedOutbreak.id,
-                    this.entityType,
-                    this.entityId,
-                    this.queryBuilder
-                )
+                this.relationshipsList$ = this.relationshipDataService
+                    .getEntityExposures(
+                        this.selectedOutbreak.id,
+                        this.entityType,
+                        this.entityId,
+                        this.queryBuilder
+                    )
                     .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            finishCallback();
+                            return throwError(err);
+                        }),
                         tap(this.checkEmptyList.bind(this)),
                         tap((entities: EntityModel[]) => {
                             // map models

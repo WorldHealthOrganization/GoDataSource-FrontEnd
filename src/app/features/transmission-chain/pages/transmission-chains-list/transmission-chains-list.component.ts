@@ -15,9 +15,10 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { Subscription } from 'rxjs/internal/Subscription';
 import * as _ from 'lodash';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-transmission-chains-list',
@@ -238,6 +239,11 @@ export class TransmissionChainsListComponent extends ListComponent implements On
 
             this.transmissionChains$ = this.transmissionChains$
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap(() => {
                         finishCallback();

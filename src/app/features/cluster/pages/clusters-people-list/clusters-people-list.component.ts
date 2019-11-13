@@ -16,11 +16,12 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Constants } from '../../../../core/models/constants';
-import { share, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { HoverRowAction } from '../../../../shared/components';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -153,8 +154,14 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      */
     refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
-            this.clusterPeopleList$ = this.clusterDataService.getClusterPeople(this.selectedOutbreak.id, this.cluster.id, this.queryBuilder)
+            this.clusterPeopleList$ = this.clusterDataService
+                .getClusterPeople(this.selectedOutbreak.id, this.cluster.id, this.queryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap(() => {
                         finishCallback();

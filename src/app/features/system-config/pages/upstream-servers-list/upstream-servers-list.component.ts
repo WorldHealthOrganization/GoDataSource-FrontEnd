@@ -197,6 +197,13 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
         this.upstreamServerListAll = [];
         this.systemSettingsDataService
             .getSystemSettings()
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback();
+                    return throwError(err);
+                })
+            )
             .subscribe((settings: SystemSettingsModel) => {
                 this.settings = settings;
                 this.upstreamServerListAll = _.get(this.settings, 'upstreamServers');

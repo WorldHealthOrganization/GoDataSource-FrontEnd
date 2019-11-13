@@ -6,7 +6,7 @@ import { ListComponent } from '../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { ListFilterDataService } from '../../../core/services/data/list-filter.data.service';
 import { ActivatedRoute } from '@angular/router';
-import { tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { HelpDataService } from '../../../core/services/data/help.data.service';
 import * as _ from 'lodash';
 import { HelpCategoryModel } from '../../../core/models/help-category.model';
@@ -14,6 +14,7 @@ import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { ViewHelpDetailsData, ViewHelpDetailsDialogComponent } from '../view-help-details-dialog/view-help-details-dialog.component';
 import { HoverRowAction } from '../hover-row-actions/hover-row-actions.component';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 export class ViewHelpData {
     helpItemsIds: string[];
@@ -129,6 +130,11 @@ export class ViewHelpDialogComponent extends ListComponent {
         // check for empty list
         this.helpItemsList$ = this.helpItemsList$
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback();
+                    return throwError(err);
+                }),
                 tap(this.checkEmptyList.bind(this)),
                 tap(() => {
                     finishCallback();

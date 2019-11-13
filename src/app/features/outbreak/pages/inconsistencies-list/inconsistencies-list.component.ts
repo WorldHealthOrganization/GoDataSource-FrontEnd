@@ -19,8 +19,9 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { share, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { HoverRowAction } from '../../../../shared/components';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-inconsistencies-list',
@@ -137,8 +138,14 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
      */
     refreshList(finishCallback: () => void) {
         if (this.outbreak) {
-            this.entitiesList$ = this.outbreakDataService.getPeopleInconsistencies(this.outbreak.id, this.queryBuilder)
+            this.entitiesList$ = this.outbreakDataService
+                .getPeopleInconsistencies(this.outbreak.id, this.queryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap(() => {
                         finishCallback();

@@ -22,12 +22,13 @@ import { FollowUpPage } from '../../typings/follow-up-page';
 import { RangeFollowUpsModel } from '../../../../core/models/range-follow-ups.model';
 import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { Observable } from 'rxjs';
-import { share } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { AddressType } from '../../../../core/models/address.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -256,6 +257,13 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             let maxDate: Moment;
             this.followUpsDataService
                 .getRangeFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    })
+                )
                 .subscribe((rangeData: RangeFollowUpsModel[]) => {
                     this.followUpsGroupedByContact = _.map(rangeData, (data: RangeFollowUpsModel) => {
                         // determine follow-up questionnaire alertness

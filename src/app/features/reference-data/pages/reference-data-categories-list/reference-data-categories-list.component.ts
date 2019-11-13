@@ -12,8 +12,9 @@ import { HoverRowAction, LoadingDialogModel } from '../../../../shared/component
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-reference-data-categories-list',
@@ -82,6 +83,11 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
         this.referenceData$ = this.referenceDataDataService
             .getReferenceData()
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback();
+                    return throwError(err);
+                }),
                 tap(() => {
                     finishCallback();
                 })

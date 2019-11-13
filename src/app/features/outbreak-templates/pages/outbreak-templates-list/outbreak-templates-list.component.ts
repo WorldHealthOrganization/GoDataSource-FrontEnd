@@ -198,6 +198,11 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
         this.outbreakTemplatesList$ = this.outbreakTemplateDataService
             .getOutbreakTemplatesList(this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback();
+                    return throwError(err);
+                }),
                 tap(this.checkEmptyList.bind(this)),
                 tap(() => {
                     finishCallback();

@@ -804,6 +804,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             this.casesList$ = this.caseDataService
                 .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
                     map((cases: CaseModel[]) => {
                         // refresh badges list with applied filter
                         this.getCasesGroupedByClassification();

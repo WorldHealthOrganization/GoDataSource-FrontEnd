@@ -180,6 +180,11 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
             this.categoryEntries$ = this.referenceDataDataService
                 .getReferenceDataByCategory(this.categoryId)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
                     map((category: ReferenceDataCategoryModel) => {
                         return category.entries;
                     }),

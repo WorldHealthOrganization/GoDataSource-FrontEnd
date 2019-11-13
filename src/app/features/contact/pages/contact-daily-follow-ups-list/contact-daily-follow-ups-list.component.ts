@@ -895,6 +895,11 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             this.followUpsList$ = this.followUpsDataService
                 .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
                     map((followUps: FollowUpModel[]) => {
                         return FollowUpModel.determineAlertness(
                             this.selectedOutbreak.contactFollowUpTemplate,

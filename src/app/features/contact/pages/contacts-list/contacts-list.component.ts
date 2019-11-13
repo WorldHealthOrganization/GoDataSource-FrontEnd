@@ -747,8 +747,14 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             this.queryBuilder.include('locations', true);
 
             // retrieve the list of Contacts
-            this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder)
+            this.contactsList$ = this.contactDataService
+                .getContactsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap(() => {
                         finishCallback();

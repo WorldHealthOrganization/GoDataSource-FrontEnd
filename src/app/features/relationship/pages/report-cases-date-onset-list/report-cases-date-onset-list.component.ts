@@ -12,11 +12,12 @@ import { ReportCasesWithOnsetModel } from '../../../../core/models/report-cases-
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-report-cases-date-onset-list',
@@ -199,8 +200,14 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
     refreshList(finishCallback: () => void) {
         if (this.selectedOutbreak) {
             // retrieve the list
-            this.casesWithOnsetList$ = this.relationshipDataService.getCasesWithDateOnsetBeforePrimaryCase(this.selectedOutbreak.id)
+            this.casesWithOnsetList$ = this.relationshipDataService
+                .getCasesWithDateOnsetBeforePrimaryCase(this.selectedOutbreak.id)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap(() => {
                         finishCallback();

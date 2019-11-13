@@ -15,8 +15,9 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { FormControl, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { share, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-duplicate-records-list',
@@ -104,9 +105,16 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             this.duplicatesList = null;
             this.outbreakDataService
                 .getPeoplePossibleDuplicates(this.selectedOutbreak.id, this.queryBuilder)
-                .pipe(tap((duplicatesList) => {
-                    this.checkEmptyList(duplicatesList.groups);
-                }))
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
+                    tap((duplicatesList) => {
+                        this.checkEmptyList(duplicatesList.groups);
+                    })
+                )
                 .subscribe((duplicatesList) => {
                     this.duplicatesList = duplicatesList;
 

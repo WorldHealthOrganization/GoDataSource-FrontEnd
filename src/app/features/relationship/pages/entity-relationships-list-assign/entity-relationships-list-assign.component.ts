@@ -17,11 +17,12 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { map, share, tap } from 'rxjs/operators';
+import { catchError, map, share, tap } from 'rxjs/operators';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { UserSettings } from '../../../../core/models/user.model';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-entity-relationships-list-assign',
@@ -273,6 +274,11 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
                     this.queryBuilder
                 )
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap(() => {
                         finishCallback();

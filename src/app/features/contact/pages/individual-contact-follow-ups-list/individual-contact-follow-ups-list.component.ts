@@ -22,11 +22,12 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { map, share, tap } from 'rxjs/operators';
+import { catchError, map, share, tap } from 'rxjs/operators';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { DialogField, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { FollowUpPage } from '../../typings/follow-up-page';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-individual-contact-follow-ups-list',
@@ -497,6 +498,11 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             this.followUpsList$ = this.followUpsDataService
                 .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
                     map((followUps: FollowUpModel[]) => {
                         return FollowUpModel.determineAlertness(
                             this.selectedOutbreak.contactFollowUpTemplate,

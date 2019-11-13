@@ -199,6 +199,11 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                     qb
                 )
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap(() => {
                         finishCallback();

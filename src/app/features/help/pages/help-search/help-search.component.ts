@@ -11,11 +11,12 @@ import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import * as _ from 'lodash';
-import { tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { HoverRowAction } from '../../../../shared/components';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-help-search',
@@ -110,6 +111,11 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
 
         this.helpItemsList$ = this.helpItemsList$
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback();
+                    return throwError(err);
+                }),
                 tap(this.checkEmptyList.bind(this)),
                 tap(() => {
                     finishCallback();

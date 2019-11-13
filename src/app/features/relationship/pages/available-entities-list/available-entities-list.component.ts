@@ -18,10 +18,11 @@ import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { map, share, tap } from 'rxjs/operators';
+import { catchError, map, share, tap } from 'rxjs/operators';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { AddressType } from '../../../../core/models/address.model';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -183,6 +184,11 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
                     this.queryBuilder
                 )
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap(() => {
                         finishCallback();

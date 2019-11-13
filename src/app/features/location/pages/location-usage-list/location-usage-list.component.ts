@@ -15,6 +15,8 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { Constants } from '../../../../core/models/constants';
 import { HoverRowAction } from '../../../../shared/components';
 import { EventModel } from '../../../../core/models/event.model';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-location-usage-list',
@@ -115,6 +117,13 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
             // retrieve outbreaks
             this.outbreakDataService
                 .getOutbreaksList()
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    })
+                )
                 .subscribe((outbreaks: OutbreakModel[]) => {
                     // map outbreaks to id / model
                     const outbreaksMapped: {
@@ -130,6 +139,13 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
                     // retrieve usages of a location
                     this.locationDataService
                         .getLocationUsage(this.locationId)
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                finishCallback();
+                                return throwError(err);
+                            })
+                        )
                         .subscribe((locationUsage: LocationUsageModel) => {
                             // remove keys if we don't have rights
                             // #TODO - not sure if this is how it should be...

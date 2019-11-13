@@ -195,6 +195,11 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
         this.devicesList$ = this.deviceDataService
             .getDevices(this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback();
+                    return throwError(err);
+                }),
                 tap(() => {
                     finishCallback();
                 })

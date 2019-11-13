@@ -131,8 +131,14 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
      */
     refreshList(finishCallback: () => void) {
         // retrieve the list of Teams
-        this.teamsList$ = this.teamDataService.getTeamsList(this.queryBuilder)
+        this.teamsList$ = this.teamDataService
+            .getTeamsList(this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback();
+                    return throwError(err);
+                }),
                 tap(this.checkEmptyList.bind(this)),
                 tap(() => {
                     finishCallback();

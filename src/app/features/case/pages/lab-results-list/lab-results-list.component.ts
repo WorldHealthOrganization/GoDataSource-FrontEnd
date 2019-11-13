@@ -385,8 +385,14 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
             this.queryBuilder.include('updatedByUser', true);
 
             // retrieve the list of lab results
-            this.labResultsList$ = this.labResultDataService.getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder)
+            this.labResultsList$ = this.labResultDataService
+                .getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap(() => {
                         finishCallback();

@@ -14,6 +14,8 @@ import { FormDateRangeSliderData } from '../../../../shared/xt-forms/components/
 import { Subscription } from 'rxjs';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { TeamModel } from '../../../../core/models/team.model';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 interface ITeamMap {
     id: string;
@@ -176,6 +178,13 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                 // retrieve the list of Follow Ups
                 this.followUpsDataService
                     .getFollowUpsPerDayTeam(this.selectedOutbreak.id, this.queryBuilder)
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            finishCallback();
+                            return throwError(err);
+                        })
+                    )
                     .subscribe((metricTeamsFollowups: TeamFollowupsPerDayModel) => {
                         // set headers
                         this.dates = dates;

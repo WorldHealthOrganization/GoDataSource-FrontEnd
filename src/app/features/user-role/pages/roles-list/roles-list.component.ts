@@ -109,8 +109,14 @@ export class RolesListComponent extends ListComponent implements OnInit {
      */
     refreshList(finishCallback: () => void) {
         // get the list of existing roles
-        this.rolesList$ = this.userRoleDataService.getRolesList(this.queryBuilder)
+        this.rolesList$ = this.userRoleDataService
+            .getRolesList(this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback();
+                    return throwError(err);
+                }),
                 tap(this.checkEmptyList.bind(this)),
                 tap(() => {
                     finishCallback();
