@@ -937,6 +937,10 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             this.followUpsListCount$ = this.followUpsDataService
                 .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
                     share()
                 );
         }

@@ -362,7 +362,15 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.outbreaksListCount$ = this.outbreakDataService.getOutbreaksCount(countQueryBuilder).pipe(share());
+        this.outbreaksListCount$ = this.outbreakDataService
+            .getOutbreaksCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**

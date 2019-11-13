@@ -390,20 +390,36 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
 
             if (this.relationshipType === RelationshipType.EXPOSURE) {
                 // count the exposures
-                this.relationshipsListCount$ = this.relationshipDataService.getEntityExposuresCount(
-                    this.selectedOutbreak.id,
-                    this.entityType,
-                    this.entityId,
-                    countQueryBuilder
-                ).pipe(share());
+                this.relationshipsListCount$ = this.relationshipDataService
+                    .getEntityExposuresCount(
+                        this.selectedOutbreak.id,
+                        this.entityType,
+                        this.entityId,
+                        countQueryBuilder
+                    )
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            return throwError(err);
+                        }),
+                        share()
+                    );
             } else {
                 // count the contacts
-                this.relationshipsListCount$ = this.relationshipDataService.getEntityContactsCount(
-                    this.selectedOutbreak.id,
-                    this.entityType,
-                    this.entityId,
-                    countQueryBuilder
-                ).pipe(share());
+                this.relationshipsListCount$ = this.relationshipDataService
+                    .getEntityContactsCount(
+                        this.selectedOutbreak.id,
+                        this.entityType,
+                        this.entityId,
+                        countQueryBuilder
+                    )
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            return throwError(err);
+                        }),
+                        share()
+                    );
             }
         }
     }

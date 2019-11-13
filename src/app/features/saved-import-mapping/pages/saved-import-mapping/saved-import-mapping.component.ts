@@ -102,7 +102,15 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.savedImportMappingsListCount$ = this.savedImportMappingService.getImportMappingsListCount(countQueryBuilder).pipe(share());
+        this.savedImportMappingsListCount$ = this.savedImportMappingService
+            .getImportMappingsListCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**

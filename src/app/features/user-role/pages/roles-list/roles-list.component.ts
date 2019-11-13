@@ -132,7 +132,15 @@ export class RolesListComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.rolesListCount$ = this.userRoleDataService.getRolesCount(countQueryBuilder).pipe(share());
+        this.rolesListCount$ = this.userRoleDataService
+            .getRolesCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     deleteRole(userRole: UserRoleModel) {

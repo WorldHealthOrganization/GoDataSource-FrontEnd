@@ -229,7 +229,15 @@ export class BackupsComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.backupsListCount$ = this.systemBackupDataService.getBackupListCount(countQueryBuilder).pipe(share());
+        this.backupsListCount$ = this.systemBackupDataService
+            .getBackupListCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**

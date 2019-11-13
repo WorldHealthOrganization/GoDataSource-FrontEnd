@@ -218,7 +218,15 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.outbreakTemplatesListCount$ = this.outbreakTemplateDataService.getOutbreakTemplatesCount(countQueryBuilder).pipe(share());
+        this.outbreakTemplatesListCount$ = this.outbreakTemplateDataService
+            .getOutbreakTemplatesCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**

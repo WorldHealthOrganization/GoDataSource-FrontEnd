@@ -177,7 +177,15 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.auditLogsListCount$ = this.auditLogDataService.getAuditLogsCount(countQueryBuilder).pipe(share());
+        this.auditLogsListCount$ = this.auditLogDataService
+            .getAuditLogsCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**

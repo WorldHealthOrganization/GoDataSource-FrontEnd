@@ -544,6 +544,10 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             this.followUpsListCount$ = this.followUpsDataService
                 .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
                     share()
                 );
         }

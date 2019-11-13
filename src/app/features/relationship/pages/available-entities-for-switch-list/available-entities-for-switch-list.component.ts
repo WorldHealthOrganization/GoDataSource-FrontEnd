@@ -244,7 +244,13 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                     this.entityId,
                     qb
                 )
-                .pipe(share());
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
+                    share()
+                );
         }
     }
 

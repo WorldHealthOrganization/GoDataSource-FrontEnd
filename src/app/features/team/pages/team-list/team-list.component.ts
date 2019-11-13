@@ -154,7 +154,15 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.teamsListCount$ = this.teamDataService.getTeamsCount(countQueryBuilder).pipe(share());
+        this.teamsListCount$ = this.teamDataService
+            .getTeamsCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**

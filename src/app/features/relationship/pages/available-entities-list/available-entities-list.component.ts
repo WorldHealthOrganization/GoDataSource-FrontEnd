@@ -219,7 +219,13 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
                     this.entityId,
                     this.queryBuilder
                 )
-                .pipe(share());
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
+                    share()
+                );
         }
     }
 

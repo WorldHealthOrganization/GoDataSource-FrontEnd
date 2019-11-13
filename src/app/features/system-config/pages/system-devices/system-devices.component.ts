@@ -214,7 +214,15 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.devicesListCount$ = this.deviceDataService.getDevicesCount(countQueryBuilder).pipe(share());
+        this.devicesListCount$ = this.deviceDataService
+            .getDevicesCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**

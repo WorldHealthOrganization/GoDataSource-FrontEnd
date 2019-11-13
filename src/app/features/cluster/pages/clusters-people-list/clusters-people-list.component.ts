@@ -180,7 +180,15 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.clusterPeopleListCount$ = this.clusterDataService.getClusterPeopleCount(this.selectedOutbreak.id, this.cluster.id, countQueryBuilder).pipe(share());
+        this.clusterPeopleListCount$ = this.clusterDataService
+            .getClusterPeopleCount(this.selectedOutbreak.id, this.cluster.id, countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**

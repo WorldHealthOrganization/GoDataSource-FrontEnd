@@ -15,7 +15,7 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import * as _ from 'lodash';
 
@@ -177,7 +177,15 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.helpCategoriesListCount$ = this.helpDataService.getHelpCategoryCount(countQueryBuilder);
+        this.helpCategoriesListCount$ = this.helpDataService
+            .getHelpCategoryCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**

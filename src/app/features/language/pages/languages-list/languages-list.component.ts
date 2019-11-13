@@ -12,7 +12,7 @@ import { LanguageModel } from '../../../../core/models/language.model';
 import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { TopnavComponent } from '../../../../shared/components/topnav/topnav.component';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -175,7 +175,15 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.languagesListCount$ = this.languageDataService.getLanguagesCount(countQueryBuilder);
+        this.languagesListCount$ = this.languageDataService
+            .getLanguagesCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**
