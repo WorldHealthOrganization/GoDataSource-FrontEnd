@@ -1,10 +1,10 @@
-import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -15,22 +15,19 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
-import { SheetCellType } from '../../../../core/models/sheet/sheet-cell-type';
+import { DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, LocationSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
 import * as Handsontable from 'handsontable';
 import { Constants } from '../../../../core/models/constants';
-import { BulkContactsService } from '../../../../core/services/helper/bulk-contacts.service';
-import { SheetCellValidator } from '../../../../core/models/sheet/sheet-cell-validator';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { NgModel } from '@angular/forms';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
-import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { HotTableWrapperComponent } from '../../../../shared/components/hot-table-wrapper/hot-table-wrapper.component';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -38,8 +35,11 @@ import { moment } from '../../../../core/helperClasses/x-moment';
     templateUrl: './bulk-create-contacts.component.html',
     styleUrls: ['./bulk-create-contacts.component.less']
 })
-export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements OnInit {
+export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [];
+
+    @ViewChild('inputForMakingFormDirty') inputForMakingFormDirty;
+    @ViewChild('hotTableWrapper') hotTableWrapper: HotTableWrapperComponent;
 
     // selected outbreak
     selectedOutbreak: OutbreakModel;
@@ -47,31 +47,24 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     relatedEntityType: EntityType;
     relatedEntityId: string;
 
-    // options for dropdown cells
+    // contact options
     genderList$: Observable<LabelValuePair[]>;
     occupationsList$: Observable<LabelValuePair[]>;
-    addressTypesList$: Observable<LabelValuePair[]>;
     riskLevelsList$: Observable<LabelValuePair[]>;
     documentTypesList$: Observable<LabelValuePair[]>;
+
+    // relationship options
     certaintyLevelOptions$: Observable<LabelValuePair[]>;
     exposureTypeOptions$: Observable<LabelValuePair[]>;
     exposureFrequencyOptions$: Observable<LabelValuePair[]>;
     exposureDurationOptions$: Observable<LabelValuePair[]>;
     socialRelationshipOptions$: Observable<LabelValuePair[]>;
-    locationsListOptions$: Observable<LabelValuePair[]> = of([]);
 
     relatedEntityData: CaseModel | EventModel;
 
-    ContactModel = ContactModel;
-
     // sheet widget configuration
-    sheetWidth = 500;
     sheetContextMenu = {};
     sheetColumns: any[] = [];
-
-    // provide constants to template
-    Constants = Constants;
-    SheetCellType = SheetCellType;
 
     // error messages
     errorMessages: {
@@ -87,11 +80,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         mask: string
     };
 
-    afterChangeCallback: (
-        sheetCore: Handsontable,
-        changes: any[],
-        source: string
-    ) => void;
+    // subscribers
+    outbreakSubscriber: Subscription;
 
     constructor(
         private router: Router,
@@ -102,20 +92,16 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
         private i18nService: I18nService,
-        private bulkContactsService: BulkContactsService,
         private dialogService: DialogService
     ) {
         super();
     }
 
     ngOnInit() {
-        this.setSheetWidth();
-
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION).pipe(share());
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).pipe(share());
-        this.addressTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.ADDRESS_TYPE).pipe(share());
         this.documentTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DOCUMENT_TYPE).pipe(share());
         this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL).pipe(share());
         this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE).pipe(share());
@@ -124,9 +110,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).pipe(share());
 
         // configure Sheet widget
-        setTimeout(() => {
-            this.configureSheetWidget();
-        });
+        this.configureSheetWidget();
 
         // retrieve query params
         this.route.queryParams
@@ -145,7 +129,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             });
 
         // get selected outbreak
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreak()
             .pipe(
                 catchError((err) => {
@@ -168,18 +152,12 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             });
     }
 
-    /**
-     * Set the locations list options as label value pair based on what locations are selected
-     */
-    publishLocationsAtLabelValue(locations: LocationAutoItem[]) {
-        this.locationsListOptions$ = of<LabelValuePair[]>(
-            _.map(locations, (location: LocationAutoItem) => {
-                return new LabelValuePair(location.label, location.id);
-            })
-        );
-
-        // configure Sheet widget
-        this.configureSheetWidget();
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
@@ -200,15 +178,6 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
             new BreadcrumbItemModel('LNG_PAGE_BULK_ADD_CONTACTS_TITLE', '.', true)
         ]);
-    }
-
-    /**
-     * Update sheet width based on browser width
-     * Note: It's a hack, but there's no other fix for now, since handsontable is working with pixels only
-     */
-    @HostListener('window:resize')
-    private setSheetWidth() {
-        this.sheetWidth = window.innerWidth - 220;
     }
 
     /**
@@ -291,24 +260,11 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_REASON')
                 .setProperty('contact.riskReason'),
 
-            // Document(s)
-            new DropdownSheetColumn()
-                .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE')
-                .setProperty('contact.documents[0].type')
-                .setOptions(this.documentTypesList$, this.i18nService),
-            new TextSheetColumn()
-                .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER')
-                .setProperty('contact.documents[0].number'),
-
-            // Address(es)
-            new DropdownSheetColumn()
-                .setTitle('LNG_ADDRESS_FIELD_LABEL_TYPE')
-                .setProperty('contact.addresses[0].typeId')
-                .setOptions(this.addressTypesList$, this.i18nService),
-            new DropdownSheetColumn()
+            // Contact Address(es)
+            new LocationSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
                 .setProperty('contact.addresses[0].locationId')
-                .setOptions(this.locationsListOptions$, this.i18nService),
+                .setUseOutbreakLocations(true),
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
                 .setProperty('contact.addresses[0].city'),
@@ -321,6 +277,15 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             new TextSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER')
                 .setProperty('contact.addresses[0].phoneNumber'),
+
+            // Contact Document(s)
+            new DropdownSheetColumn()
+                .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE')
+                .setProperty('contact.documents[0].type')
+                .setOptions(this.documentTypesList$, this.i18nService),
+            new TextSheetColumn()
+                .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER')
+                .setProperty('contact.documents[0].number'),
 
             // Relationship properties
             new DateSheetColumn(
@@ -375,98 +340,16 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     }
 
     /**
-     * 'Handsontable' hook before running validation on a cell
-     */
-    beforeValidateSheet(sheetCore: Handsontable, value: string, row: number, column: number) {
-        // determine if row is empty
-        const columnValues: any[] = sheetCore.getDataAtRow(row);
-        columnValues[column] = value;
-
-        // isEmptyRow doesn't work since values is changed after beforeValidateSheet
-        if (_.isEmpty(_.filter(columnValues, (v) => v !== null && v !== ''))) {
-            // mark this cell as being on an empty row, so we skip validation for it
-            return SheetCellValidator.EMPTY_ROW_CELL_VALUE;
-        } else {
-            return value;
-        }
-    }
-
-    /**
-     * After removing row
-     */
-    afterRemoveRow(sheetCore: Handsontable, row: number) {
-        // determine if row is empty
-        const countedRows: number = sheetCore.countRows();
-        while (row < countedRows) {
-            // validate row
-            if (_.isEmpty(_.filter(sheetCore.getDataAtRow(row), (v) => v !== null && v !== ''))) {
-                _.each(
-                    sheetCore.getCellMetaAtRow(row),
-                    (column: {
-                        valid?: boolean
-                    }) => {
-                        if (column.valid === false) {
-                            column.valid = true;
-                        }
-                    }
-                );
-            }
-
-            // check next row
-            row++;
-        }
-    }
-
-    /**
      * After changes
      */
-    afterChange(
-        inputForMakingFormDirty: NgModel
-    ): (
-        sheetCore: Handsontable,
-        changes: any[],
-        source: string
-    ) => void {
-        // return cached function
-        if (this.afterChangeCallback) {
-            return this.afterChangeCallback;
+    afterBecameDirty() {
+        // no input to make dirty ?
+        if (!this.inputForMakingFormDirty) {
+            return;
         }
 
-        // create functions
-        this.afterChangeCallback = (
-            sheetCore: Handsontable,
-            changes: any[],
-            source: string
-        ) => {
-            if (source === 'edit') {
-                // remove validations
-                const row: number = changes[0][0];
-                if (_.isEmpty(_.filter(sheetCore.getDataAtRow(row), (v) => v !== null && v !== ''))) {
-                    // remove validations
-                    _.each(
-                        sheetCore.getCellMetaAtRow(row),
-                        (column: {
-                            valid?: boolean
-                        }) => {
-                            if (column.valid === false) {
-                                column.valid = true;
-                            }
-                        }
-                    );
-
-                    // refresh
-                    sheetCore.render();
-                }
-
-                // make form dirty
-                if (!sheetCore.isEmptyRow(row)) {
-                    inputForMakingFormDirty.control.markAsDirty();
-                }
-            }
-        };
-
-        // return newly created function
-        return this.afterChangeCallback;
+        // make form dirty
+        this.inputForMakingFormDirty.control.markAsDirty();
     }
 
     /**
@@ -536,21 +419,23 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
     /**
      * Create new Contacts
-     * @param {any} sheetTable
      */
-    addContacts(sheetTable: any) {
-        const sheetCore: Handsontable = sheetTable.hotInstance;
+    addContacts() {
+        // make sure we have the component used to validate & retrieve data
+        if (!this.hotTableWrapper) {
+            return;
+        }
 
         // validate sheet
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.errorMessages = [];
-        this.bulkContactsService
-            .validateTable(sheetCore)
+        this.hotTableWrapper
+            .validateTable()
             .subscribe((response) => {
                 // we can't continue if we have errors
                 if (!response.isValid) {
                     // map error messages if any?
-                    this.errorMessages = this.bulkContactsService.getErrors(
+                    this.errorMessages = this.hotTableWrapper.getErrors(
                         response,
                         'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_ERROR_MSG'
                     );
@@ -560,10 +445,13 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                     this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_INVALID_FIELDS');
                 } else {
                     // collect data from table
-                    this.bulkContactsService.getData(sheetCore, this.sheetColumns)
-                        .subscribe((data) => {
+                    this.hotTableWrapper.getData()
+                        .subscribe((dataResponse: {
+                            data: any[],
+                            sheetCore: Handsontable
+                        }) => {
                             // no data to save ?
-                            if (_.isEmpty(data)) {
+                            if (_.isEmpty(dataResponse.data)) {
                                 // show error
                                 loadingDialog.close();
                                 this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_NO_DATA');
@@ -574,7 +462,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                                         this.selectedOutbreak.id,
                                         this.relatedEntityType,
                                         this.relatedEntityId,
-                                        data
+                                        dataResponse.data
                                     )
                                     .pipe(
                                         catchError((err) => {
@@ -583,7 +471,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
                                             // mark success records
                                             this.errorMessages = [];
-                                            if (sheetCore) {
+                                            if (dataResponse.sheetCore) {
                                                 // display partial success message
                                                 if (!_.isEmpty(_.get(err, 'details.success'))) {
                                                     this.errorMessages.push({
@@ -598,7 +486,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                                                     // remove record that was added
                                                     if (_.isNumber(successRecord.recordNo)) {
                                                         // remove row
-                                                        sheetCore.alter(
+                                                        dataResponse.sheetCore.alter(
                                                             'remove_row',
                                                             successRecord.recordNo,
                                                             1

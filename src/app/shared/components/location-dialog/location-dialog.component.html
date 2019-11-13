@@ -1,0 +1,48 @@
+<div
+    class="dialog-main app-theme"
+    fxLayout="column"
+>
+    <div
+        *ngIf="data?.message"
+        class="dialog-main-msg">
+        {{ data.message | translate }}
+    </div>
+
+    <form #form="ngForm" fxLayout="column">
+        <div fxLayout="column" fxLayoutGap="10px">
+            <div
+                fxLayout="row">
+                <app-form-location-dropdown
+                    name="locationSelected"
+                    [ngModel]="data?.locationId"
+                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"
+                    tooltip="LNG_ADDRESS_FIELD_LABEL_LOCATION_DESCRIPTION"
+                    [required]="data?.required"
+                    [useOutbreakLocations]="data?.useOutbreakLocations"
+                    [fixedDropPanel]="true"
+                    (itemChanged)="locationChanged($event)"
+                    (locationsLoaded)="locationsLoaded($event)">
+                </app-form-location-dropdown>
+            </div>
+
+            <div
+                fxLayout="row" fxLayoutAlign="end">
+                <button
+                    mat-button
+                    type="button"
+                    class="dialog-button"
+                    (click)="closeDialog(DialogAnswerButton.Cancel)">
+                    {{ 'LNG_COMMON_BUTTON_CANCEL' | translate | uppercase }}
+                </button>
+                <button
+                    mat-button
+                    type="button"
+                    class="dialog-button"
+                    [disabled]="form.invalid"
+                    (click)="closeDialog(DialogAnswerButton.Yes)">
+                    {{ 'LNG_COMMON_BUTTON_UPDATE' | translate }}
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

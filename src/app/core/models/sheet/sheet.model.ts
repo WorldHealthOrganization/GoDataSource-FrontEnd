@@ -165,3 +165,20 @@ export class DropdownSheetColumn extends AbstractSheetColumn {
         return this;
     }
 }
+
+/**
+ * Location Button cell
+ */
+export class LocationSheetColumn extends AbstractSheetColumn {
+    // outbreak locations ?
+    useOutbreakLocations: boolean = false;
+
+    constructor() {
+        super(SheetCellType.LOCATION);
+    }
+
+    setUseOutbreakLocations(useOutbreakLocations: boolean) {
+        this.useOutbreakLocations = useOutbreakLocations;
+        return this;
+    }
+}

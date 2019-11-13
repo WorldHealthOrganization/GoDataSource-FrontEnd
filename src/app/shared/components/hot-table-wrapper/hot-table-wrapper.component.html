@@ -1,0 +1,64 @@
+<hot-table
+    #sheetTable
+    [colHeaders]="true"
+    [data]="data"
+    [rowHeaders]="true"
+    [manualColumnResize]="true"
+    preventOverflow="horizontal"
+    [width]="sheetWidth"
+    [height]="520"
+    [contextMenu]="sheetContextMenu"
+    [colWidths]="150"
+    [startRows]="startRows"
+    [minSpareRows]="minSpareRows"
+    [renderAllRows]="true"
+    [beforeValidate]="beforeValidateSheet"
+    [afterRemoveRow]="afterRemoveRow"
+    [afterChange]="afterChangeTrigger()">
+
+    <ng-container *ngFor="let column of sheetColumns">
+        <!-- Text column -->
+        <hot-column
+            *ngIf="column.type === SheetCellType.TEXT"
+            [title]="(column.title | translate) + (column.required ? ' *' : '')"
+            [validator]="column.validationFunc">
+        </hot-column>
+
+        <!-- Numeric column -->
+        <hot-column
+            *ngIf="column.type === SheetCellType.NUMERIC"
+            [title]="(column.title | translate) + (column.required ? ' *' : '')"
+            type="numeric"
+            [validator]="column.validationFunc">
+        </hot-column>
+
+        <!-- Date column -->
+        <hot-column
+            *ngIf="column.type === SheetCellType.DATE"
+            [title]="(column.title | translate) + (column.required ? ' *' : '')"
+            type="date"
+            [dateFormat]="Constants.DEFAULT_DATE_DISPLAY_FORMAT"
+            [correctFormat]="true"
+            [validator]="column.validationFunc">
+        </hot-column>
+
+        <!-- Dropdown column -->
+        <hot-column
+            *ngIf="column.type === SheetCellType.DROPDOWN"
+            [title]="(column.title | translate) + (column.required ? ' *' : '')"
+            type="dropdown"
+            [trimDropdown]="false"
+            [source]="column.optionLabels$ | async"
+            [validator]="column.validationFunc">
+        </hot-column>
+
+        <!-- Location button column -->
+        <hot-column
+            *ngIf="column.type === SheetCellType.LOCATION"
+            [title]="(column.title | translate) + (column.required ? ' *' : '')"
+            [renderer]="locationRenderer()"
+            [editor]="locationEditor()"
+            [validator]="column.validationFunc">
+        </hot-column>
+    </ng-container>
+</hot-table>
