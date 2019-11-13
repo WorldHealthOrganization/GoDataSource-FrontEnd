@@ -7,7 +7,8 @@ import { PasswordChangeModel } from '../../models/password-change.model';
 import { RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/request-query-builder';
 import { SecurityQuestionModel } from '../../models/securityQuestion.model';
 import * as _ from 'lodash';
-import { mergeMap } from 'rxjs/operators';
+import { map, mergeMap, switchMap } from 'rxjs/operators';
+import { PermissionModel } from '../../models/permission.model';
 
 @Injectable()
 export class UserDataService {
@@ -15,8 +16,7 @@ export class UserDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve the list of Users
@@ -84,10 +84,30 @@ export class UserDataService {
 
         const filter = qb.buildQuery();
 
-        return this.modelHelper.mapObservableToModel(
-            this.http.get(`users/${userId}?filter=${filter}`),
-            UserModel
-        );
+        return this.modelHelper
+            .mapObservableListToModel(
+                this.http.get(`roles/available-permissions`),
+                PermissionModel
+            )
+            .pipe(
+                switchMap((availablePermissions: PermissionModel[]) => {
+                    return this.modelHelper.mapObservableToModel(
+                        this.http
+                            .get(`users/${userId}?filter=${filter}`)
+                            .pipe(
+                                map((userData) => {
+                                    return userData ?
+                                        {
+                                            ...userData,
+                                            availablePermissions: availablePermissions
+                                        } :
+                                        userData;
+                                })
+                            ),
+                        UserModel
+                    );
+                })
+            );
     }
 
     /**
@@ -106,10 +126,30 @@ export class UserDataService {
      * @returns {Observable<UserModel>}
      */
     modifyUser(userId: string, data: any): Observable<UserModel> {
-        return this.modelHelper.mapObservableToModel(
-            this.http.patch(`users/${userId}`, data),
-            UserModel
-        );
+        return this.modelHelper
+            .mapObservableListToModel(
+                this.http.get(`roles/available-permissions`),
+                PermissionModel
+            )
+            .pipe(
+                switchMap((availablePermissions: PermissionModel[]) => {
+                    return this.modelHelper.mapObservableToModel(
+                        this.http
+                            .patch(`users/${userId}`, data)
+                            .pipe(
+                                map((userData) => {
+                                    return userData ?
+                                        {
+                                            ...userData,
+                                            availablePermissions: availablePermissions
+                                        } :
+                                        userData;
+                                })
+                            ),
+                        UserModel
+                    );
+                })
+            );
     }
 
     /**

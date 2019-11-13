@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { UserRoleModel } from './user-role.model';
-import { PERMISSION } from './permission.model';
+import { PERMISSION, PermissionModel } from './permission.model';
 import { SecurityQuestionModel } from './securityQuestion.model';
 import { UserSettingsDashboardModel } from './user-settings-dashboard.model';
 
@@ -81,6 +81,8 @@ export class UserModel {
     securityQuestions: SecurityQuestionModel[] = [];
     settings: { [key: string]: any } = {};
 
+    availablePermissions: PermissionModel[];
+
     constructor(data = null) {
         this.id = _.get(data, 'id');
         this.firstName = _.get(data, 'firstName');
@@ -93,6 +95,7 @@ export class UserModel {
         this.languageId = _.get(data, 'languageId');
         this.roleIds = _.get(data, 'roleIds', []);
         this.securityQuestions = _.get(data, 'securityQuestions', [new SecurityQuestionModel(), new SecurityQuestionModel()]);
+        this.availablePermissions = _.get(data, 'availablePermissions');
 
         // initialize all settings
         this.initializeSettings(data);

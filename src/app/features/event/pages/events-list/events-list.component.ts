@@ -378,8 +378,14 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             this.queryBuilder.include('updatedByUser', true);
 
             // retrieve the list of Events
-            this.eventsList$ = this.eventDataService.getEventsList(this.selectedOutbreak.id, this.queryBuilder)
+            this.eventsList$ = this.eventDataService
+                .getEventsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback();
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap(() => {
                         finishCallback();
