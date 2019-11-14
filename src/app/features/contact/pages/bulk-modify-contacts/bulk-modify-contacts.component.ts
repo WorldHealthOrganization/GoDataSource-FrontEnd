@@ -1,35 +1,29 @@
-import { Component, HostListener, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable, of } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { AbstractSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
-import { SheetCellType } from '../../../../core/models/sheet/sheet-cell-type';
-import * as Handsontable from 'handsontable';
-import { Constants } from '../../../../core/models/constants';
-import { SheetCellValidator } from '../../../../core/models/sheet/sheet-cell-validator';
+import { AbstractSheetColumn, LocationSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { NgModel } from '@angular/forms';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { BulkContactsService } from '../../../../core/services/helper/bulk-contacts.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
-import { LocationModel } from '../../../../core/models/location.model';
-import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { map, switchMap } from 'rxjs/internal/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { HotTableWrapperComponent } from '../../../../shared/components/hot-table-wrapper/hot-table-wrapper.component';
+import { Constants } from '../../../../core/models/constants';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { SheetCellType } from '../../../../core/models/sheet/sheet-cell-type';
+import * as Handsontable from 'handsontable';
 
 @Component({
     selector: 'app-bulk-modify-contacts',
@@ -37,31 +31,27 @@ import { moment } from '../../../../core/helperClasses/x-moment';
     templateUrl: './bulk-modify-contacts.component.html',
     styleUrls: ['./bulk-modify-contacts.component.less']
 })
-export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements OnInit {
+export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
         new BreadcrumbItemModel('LNG_PAGE_BULK_MODIFY_CONTACTS_TITLE', '.', true)
     ];
 
+    @ViewChild('inputForMakingFormDirty') inputForMakingFormDirty;
+    @ViewChild('hotTableWrapper') hotTableWrapper: HotTableWrapperComponent;
+
     // selected outbreak
     selectedOutbreak: OutbreakModel;
-    existingLocations: LabelValuePair[];
 
     // options for dropdown cells
     genderList$: Observable<LabelValuePair[]>;
     occupationsList$: Observable<LabelValuePair[]>;
     riskLevelsList$: Observable<LabelValuePair[]>;
     finalFollowUpStatus$: Observable<LabelValuePair[]>;
-    locationsListOptions$: Observable<LabelValuePair[]> = of([]);
 
     // sheet widget configuration
-    sheetWidth = 500;
     sheetContextMenu = {};
-    sheetColumns: any[] = [];
-
-    // provide constants to template
-    Constants = Constants;
-    SheetCellType = SheetCellType;
+    sheetColumns: AbstractSheetColumn[] = [];
 
     // error messages
     errorMessages: {
@@ -72,19 +62,14 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         }
     }[] = [];
 
-    afterChangeCallback: (
-        sheetCore: Handsontable,
-        changes: any[],
-        source: string
-    ) => void;
-
     data: any[][] = [];
     extraContactData: {
         id: string,
         addresses: AddressModel[]
     }[];
 
-    @ViewChild('sheetTable') sheetTable;
+    // subscribers
+    outbreakSubscriber: Subscription;
 
     constructor(
         private router: Router,
@@ -94,17 +79,12 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
         private i18nService: I18nService,
-        private dialogService: DialogService,
-        private bulkContactsService: BulkContactsService,
-        private locationDataService: LocationDataService
+        private dialogService: DialogService
     ) {
         super();
     }
 
     ngOnInit() {
-        // set spreadsheet width
-        this.setSheetWidth();
-
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION).pipe(share());
@@ -112,12 +92,10 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
 
         // init table columns
-        setTimeout(() => {
-            this.configureSheetWidget();
-        });
+        this.configureSheetWidget();
 
         // get selected outbreak
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreak()
             .pipe(
                 catchError((err) => {
@@ -134,79 +112,19 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 this.route.queryParams
                     .subscribe((params: { contactIds }) => {
                         // retrieve contacts information
-                        this.retrieveContacts(params.contactIds ? JSON.parse(params.contactIds) : []);
+                        setTimeout(() => {
+                            this.retrieveContacts(params.contactIds ? JSON.parse(params.contactIds) : []);
+                        });
                     });
             });
     }
 
-    /**
-     * Update sheet width based on browser width
-     * Note: It's a hack, but there's no other fix for now, since handsontable is working with pixels only
-     */
-    @HostListener('window:resize')
-    private setSheetWidth() {
-        this.sheetWidth = window.innerWidth - 220;
-    }
-
-    /**
-     * Emit all locations (the initial ones and the selected ones)
-     * @returns {Observable<LabelValuePair[]>}
-     */
-    get allLocationsListOptions(): Observable<LabelValuePair[]> {
-        return new Observable((observer) => {
-            this.locationsListOptions$.subscribe((selectedLocations) => {
-                if (this.existingLocations) {
-                    const allLocations = this.existingLocations.concat(selectedLocations);
-                    observer.next(_.uniqWith(allLocations, _.isEqual));
-                } else {
-                    observer.next(selectedLocations);
-                }
-                observer.complete();
-           });
-        });
-    }
-
-    /**
-     * Set the locations list options as label value pair based on what locations are selected by the user
-     */
-    publishLocationsAtLabelValue(locations: LocationAutoItem[]) {
-        this.locationsListOptions$ = of<LabelValuePair[]>(
-            _.map(locations, (location: LocationAutoItem) => {
-                return new LabelValuePair(location.label, location.id);
-            })
-        );
-
-        // configure Sheet widget
-        this.configureSheetWidget();
-    }
-
-    /**
-     * Return existing locations to publish them in the location drop-down
-     * @param {ContactModel[]} contactModels
-     */
-    getExistingLocationsAsLabelValueKey(contactModels: ContactModel[]): Observable<LocationModel[]> {
-        // get location ids
-        const locationIds = [];
-        _.map(contactModels, (contact: ContactModel) => {
-            const currentAddress: AddressModel = AddressModel.getCurrentAddress(contact.addresses);
-            if (
-                currentAddress &&
-                currentAddress.locationId
-            ) {
-                locationIds.push(currentAddress.locationId);
-            }
-        });
-
-        // retrieve locations for displaying them in template
-        const qb = new RequestQueryBuilder();
-        qb.filter.where({
-            id: {
-                inq: locationIds
-            }
-        });
-
-        // get existing locations info and return them
-        return this.locationDataService.getLocationsList(qb);
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
@@ -239,26 +157,11 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         );
 
         // retrieve contacts
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.contactDataService
             .getContactsList(this.selectedOutbreak.id, qb)
-            .pipe(switchMap((contactModels) => {
-                    // retrieve the existing locations
-                    return this.getExistingLocationsAsLabelValueKey(contactModels)
-                        .pipe(
-                            catchError((err) => {
-                                this.snackbarService.showApiError(err);
-                                return throwError(err);
-                            }),
-                            map((locationsData) => {
-                                this.existingLocations = _.map(locationsData, (location: LocationModel) => {
-                                        return new LabelValuePair(location.name, location.id);
-                                    });
-                                return contactModels;
-                            })
-                        );
-                })
-            )
             .pipe(catchError((err) => {
+                loadingDialog.close();
                 this.snackbarService.showApiError(err);
                 return throwError(err);
             }))
@@ -290,8 +193,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                                 break;
                             case 'addresses.locationId':
                                 addressModel = AddressModel.getCurrentAddress(contact.addresses);
-                                value = addressModel ? _.find(this.existingLocations, { value: addressModel.locationId }) : null;
-                                value = value ? value.label : null;
+                                value = addressModel ? addressModel.locationId : null;
                                 break;
                             case 'addresses.addressLine1':
                                 addressModel = AddressModel.getCurrentAddress(contact.addresses);
@@ -331,8 +233,8 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                     return contactData;
                 });
 
-                // init table columns
-                this.configureSheetWidget();
+                // hide loading
+                loadingDialog.close();
             });
     }
 
@@ -354,22 +256,6 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
                 .setProperty('gender')
                 .setOptions(this.genderList$, this.i18nService),
-            new DropdownSheetColumn()
-                .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
-                .setProperty('addresses.locationId')
-                .setOptions(this.allLocationsListOptions, this.i18nService),
-            new TextSheetColumn()
-                .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
-                .setProperty('addresses.city'),
-            new TextSheetColumn()
-                .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
-                .setProperty('addresses.addressLine1'),
-            new TextSheetColumn()
-                .setTitle('LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE')
-                .setProperty('addresses.postalCode'),
-            new TextSheetColumn()
-                .setTitle('LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER')
-                .setProperty('addresses.phoneNumber'),
             new DateSheetColumn(
                 null,
                 moment())
@@ -394,16 +280,40 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH')
                 .setProperty('dob'),
             new DropdownSheetColumn()
-                .setTitle('LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS')
-                .setProperty('followUp.status')
-                .setOptions(this.finalFollowUpStatus$, this.i18nService),
-            new DropdownSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL')
                 .setProperty('riskLevel')
                 .setOptions(this.riskLevelsList$, this.i18nService),
             new TextSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_REASON')
                 .setProperty('riskReason'),
+
+            // Contact Address(es)
+            new LocationSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
+                .setProperty('addresses.locationId')
+                .setUseOutbreakLocations(true),
+            new TextSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
+                .setProperty('addresses.city'),
+            new TextSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
+                .setProperty('addresses.addressLine1'),
+            new TextSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE')
+                .setProperty('addresses.postalCode'),
+            new TextSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER')
+                .setProperty('addresses.phoneNumber'),
+
+            // Contact Document(s)
+            // Can't edit since they are multiple
+            // or we could implement something custom..like location to edit a list of items
+
+            // only field available for update contact
+            new DropdownSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS')
+                .setProperty('followUp.status')
+                .setOptions(this.finalFollowUpStatus$, this.i18nService)
         ];
 
         // configure the context menu
@@ -420,93 +330,37 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     }
 
     /**
-     * 'Handsontable' hook before running validation on a cell
-     */
-    beforeValidateSheet(
-        sheetCore: Handsontable,
-        value: string, row: number,
-        column: number
-    ) {
-        // determine if row is empty
-        const columnValues: any[] = sheetCore.getDataAtRow(row);
-        columnValues[column] = value;
-
-        // isEmptyRow doesn't work since values is changed after beforeValidateSheet
-        if (_.isEmpty(_.filter(columnValues, (v) => v !== null && v !== ''))) {
-            // mark this cell as being on an empty row, so we skip validation for it
-            return SheetCellValidator.EMPTY_ROW_CELL_VALUE;
-        } else {
-            return value;
-        }
-    }
-
-    /**
      * After changes
      */
-    afterChange(
-        inputForMakingFormDirty: NgModel
-    ): (
-        sheetCore: Handsontable,
-        changes: any[],
-        source: string
-    ) => void {
-        // return cached function
-        if (this.afterChangeCallback) {
-            return this.afterChangeCallback;
+    afterBecameDirty() {
+        // no input to make dirty ?
+        if (!this.inputForMakingFormDirty) {
+            return;
         }
 
-        // create functions
-        this.afterChangeCallback = (
-            sheetCore: Handsontable,
-            changes: any[],
-            source: string
-        ) => {
-            if (source === 'edit') {
-                // remove validations
-                const row: number = changes[0][0];
-                if (_.isEmpty(_.filter(sheetCore.getDataAtRow(row), (v) => v !== null && v !== ''))) {
-                    // remove validations
-                    _.each(
-                        sheetCore.getCellMetaAtRow(row),
-                        (column: {
-                            valid?: boolean
-                        }) => {
-                            if (column.valid === false) {
-                                column.valid = true;
-                            }
-                        }
-                    );
-
-                    // refresh
-                    sheetCore.render();
-                }
-
-                // make form dirty
-                if (!sheetCore.isEmptyRow(row)) {
-                    inputForMakingFormDirty.control.markAsDirty();
-                }
-            }
-        };
-
-        // return newly created function
-        return this.afterChangeCallback;
+        // make form dirty
+        this.inputForMakingFormDirty.control.markAsDirty();
     }
 
     /**
      * Modify Contacts
-     * @param {any} sheetTable
      */
     modifyContacts() {
+        // make sure we have the component used to validate & retrieve data
+        if (!this.hotTableWrapper) {
+            return;
+        }
+
         // validate sheet
-        const sheetCore: Handsontable = this.sheetTable.hotInstance;
         const loadingDialog = this.dialogService.showLoadingDialog();
-        this.bulkContactsService
-            .validateTable(sheetCore)
+        this.errorMessages = [];
+        this.hotTableWrapper
+            .validateTable()
             .subscribe((response) => {
                 // we can't continue if we have errors
                 if (!response.isValid) {
                     // map error messages if any?
-                    this.errorMessages = this.bulkContactsService.getErrors(
+                    this.errorMessages = this.hotTableWrapper.getErrors(
                         response,
                         'LNG_PAGE_BULK_MODIFY_CONTACTS_LABEL_ERROR_MSG'
                     );
@@ -516,10 +370,13 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                     this.snackbarService.showError('LNG_PAGE_BULK_MODIFY_CONTACTS_WARNING_INVALID_FIELDS');
                 } else {
                     // collect data from table
-                    this.bulkContactsService.getData(sheetCore, this.sheetColumns)
-                        .subscribe((data) => {
+                    this.hotTableWrapper.getData()
+                        .subscribe((dataResponse: {
+                            data: any[],
+                            sheetCore: Handsontable
+                        }) => {
                             // add id
-                            (data || []).forEach((contactData, index: number) => {
+                            (dataResponse.data || []).forEach((contactData, index: number) => {
                                 // set data
                                 contactData.id = this.extraContactData[index].id;
 
@@ -580,6 +437,11 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
 
                                     // replace with correct data
                                     contactData.addresses = this.extraContactData[index].addresses;
+                                } else {
+                                    // We should delete current address in this case
+                                    // but for now this isn't a good idea since we need to take in consideration that contact could have multiple addresses, and at least one should be current address
+                                    // so either we delete all addresses, or show error that user can't remove current location since it has other locations as well..
+                                    // #TBD
                                 }
                             });
 
@@ -587,7 +449,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                             this.contactDataService
                                 .bulkModifyContacts(
                                     this.selectedOutbreak.id,
-                                    data
+                                    dataResponse.data
                                 )
                                 .pipe(
                                     catchError((err) => {
