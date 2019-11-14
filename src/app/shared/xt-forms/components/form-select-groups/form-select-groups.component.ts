@@ -1,10 +1,10 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, HostBinding, Output, EventEmitter } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, HostBinding, Output, EventEmitter, ViewChild, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { ElementBase } from '../../core/index';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
-import { MatOptionSelectionChange } from '@angular/material';
+import { MatOptionSelectionChange, MatSelect } from '@angular/material';
 import { PERMISSION } from '../../../../core/models/permission.model';
 
 @Component({
@@ -18,10 +18,12 @@ import { PERMISSION } from '../../../../core/models/permission.model';
         multi: true
     }]
 })
-export class FormSelectGroupsComponent extends ElementBase<string[]> {
+export class FormSelectGroupsComponent extends ElementBase<string[]> implements OnInit {
     static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
+
+    @ViewChild('selectGroup', { read: MatSelect }) matSelect: MatSelect;
 
     @Input() placeholder: string;
     @Input() required: boolean = false;
@@ -184,6 +186,30 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> {
             // language changed
             this.valueChangedTrigger();
         });
+    }
+
+    /**
+     * Component initialized
+     */
+    ngOnInit(): void {
+        // hack for select scroll bug
+        this.hackSelectForScrollBug();
+    }
+
+    /**
+     * Fixes mat-select scroll option into view not working properly when option height is changes
+     */
+    hackSelectForScrollBug() {
+        // check if we have the component needed for fix
+        if (!this.matSelect) {
+            setTimeout(() => {
+                this.hackSelectForScrollBug();
+            }, 100);
+            return;
+        }
+
+        // // overwrite scroll into view
+        this.matSelect['_scrollActiveOptionIntoView'] = () => {};
     }
 
     /**
