@@ -144,7 +144,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
         // initialize pagination
         this.initPaginator();
 
-        // retrieve backups
+        // retrieve data
         this.needsRefreshList(true);
     }
 

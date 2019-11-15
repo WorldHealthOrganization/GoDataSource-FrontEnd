@@ -28,6 +28,11 @@
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
 
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="categoryEntriesCount?.count">
+</app-total-number-of-records>
+
 <mat-card class="page-section page-content">
 
     <!-- Hover question effects / actions -->
@@ -36,7 +41,7 @@
         [active]="!refreshingList"
     ></app-hover-row-actions>
 
-    <mat-table #table [dataSource]="categoryEntries$ | async">
+    <mat-table #table [dataSource]="categoryEntries">
 
         <!-- Label -->
         <ng-container matColumnDef="label">
@@ -239,5 +244,12 @@
             </div>
         </div>
     </div>
+
+    <mat-paginator
+        [length]="categoryEntriesCount?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
 
 </mat-card>

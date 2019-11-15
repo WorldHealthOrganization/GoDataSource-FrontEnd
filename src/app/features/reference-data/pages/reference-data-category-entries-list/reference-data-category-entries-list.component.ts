@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -12,7 +11,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs';
@@ -30,7 +29,9 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
         new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
     ];
 
-    categoryEntries$: Observable<ReferenceDataEntryModel[]>;
+    categoryEntriesCount: { count: number };
+    categoryEntries: ReferenceDataEntryModel[];
+    categoryEntriesAll: ReferenceDataEntryModel[];
     categoryId: ReferenceDataCategory;
 
     authUser: UserModel;
@@ -101,6 +102,10 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
             .subscribe((params: { categoryId }) => {
                 this.categoryId = params.categoryId;
 
+                // initialize pagination
+                this.initPaginator();
+
+                // retrieve data
                 this.needsRefreshList(true);
 
                 // retrieve Reference Data Category info
@@ -177,7 +182,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
 
     refreshList(finishCallback: () => void) {
         if (this.categoryId) {
-            this.categoryEntries$ = this.referenceDataDataService
+            this.referenceDataDataService
                 .getReferenceDataByCategory(this.categoryId)
                 .pipe(
                     catchError((err) => {
@@ -187,15 +192,43 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                     }),
                     map((category: ReferenceDataCategoryModel) => {
                         return category.entries;
-                    }),
-                    tap(this.checkEmptyList.bind(this)),
-                    tap(() => {
-                        finishCallback();
                     })
-                );
+                )
+                .subscribe((entries) => {
+                    // retrieve all entries
+                    this.categoryEntriesAll = entries ? entries : [];
+
+                    // display only items from this page
+                    if (this.queryBuilder.paginator) {
+                        this.categoryEntries = this.categoryEntriesAll.slice(
+                            this.queryBuilder.paginator.skip,
+                            this.queryBuilder.paginator.skip + this.queryBuilder.paginator.limit
+                        );
+                    }
+
+                    // refresh the total count
+                    this.refreshListCount();
+
+                    // flag if list is empty
+                    this.checkEmptyList(this.categoryEntries);
+
+                    // finished
+                    finishCallback();
+                });
         } else {
             finishCallback();
         }
+    }
+
+    /**
+     * Get total number of items
+     */
+    refreshListCount() {
+        this.categoryEntriesCount = {
+            count: this.categoryEntriesAll ?
+                this.categoryEntriesAll.length :
+                0
+        };
     }
 
     deleteEntry(entry: ReferenceDataEntryModel) {
