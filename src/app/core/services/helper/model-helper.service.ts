@@ -68,9 +68,6 @@ export class ModelHelperService {
         switch (modelClass) {
             // custom instantiation routine for User model
             case UserModel:
-                // retrieve available permissions
-                const availableGroupPermissions: PermissionModel[] = data ? data.availablePermissions : null;
-
                 // create the User instance
                 const user = new UserModel(data);
 
@@ -90,12 +87,12 @@ export class ModelHelperService {
                 user.permissionIds = _.uniq(permissionIdsFromRoles);
 
                 // go through all permissions and add child permissions
-                if (availableGroupPermissions) {
+                if (user.availablePermissions) {
                     // map group permissions for easy access
                     const availableGroupPermissionsMap: {
                         [allId: string]: PermissionModel
                     } = {};
-                    availableGroupPermissions.forEach((groupPermission: PermissionModel) => {
+                    user.availablePermissions.forEach((groupPermission: PermissionModel) => {
                         availableGroupPermissionsMap[groupPermission.groupAllId] = groupPermission;
                     });
 

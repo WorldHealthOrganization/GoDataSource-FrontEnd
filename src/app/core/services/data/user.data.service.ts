@@ -75,7 +75,6 @@ export class UserDataService {
         userId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<UserModel> {
-
         const qb = new RequestQueryBuilder();
         // include roles and permissions in response
         qb.include('roles', true);
@@ -83,31 +82,10 @@ export class UserDataService {
         qb.merge(queryBuilder);
 
         const filter = qb.buildQuery();
-
-        return this.modelHelper
-            .mapObservableListToModel(
-                this.http.get(`roles/available-permissions`),
-                PermissionModel
-            )
-            .pipe(
-                switchMap((availablePermissions: PermissionModel[]) => {
-                    return this.modelHelper.mapObservableToModel(
-                        this.http
-                            .get(`users/${userId}?filter=${filter}`)
-                            .pipe(
-                                map((userData) => {
-                                    return userData ?
-                                        {
-                                            ...userData,
-                                            availablePermissions: availablePermissions
-                                        } :
-                                        userData;
-                                })
-                            ),
-                        UserModel
-                    );
-                })
-            );
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`users/${userId}?filter=${filter}`),
+            UserModel
+        );
     }
 
     /**
@@ -126,30 +104,10 @@ export class UserDataService {
      * @returns {Observable<UserModel>}
      */
     modifyUser(userId: string, data: any): Observable<UserModel> {
-        return this.modelHelper
-            .mapObservableListToModel(
-                this.http.get(`roles/available-permissions`),
-                PermissionModel
-            )
-            .pipe(
-                switchMap((availablePermissions: PermissionModel[]) => {
-                    return this.modelHelper.mapObservableToModel(
-                        this.http
-                            .patch(`users/${userId}`, data)
-                            .pipe(
-                                map((userData) => {
-                                    return userData ?
-                                        {
-                                            ...userData,
-                                            availablePermissions: availablePermissions
-                                        } :
-                                        userData;
-                                })
-                            ),
-                        UserModel
-                    );
-                })
-            );
+        return this.modelHelper.mapObservableToModel(
+            this.http.patch(`users/${userId}`, data),
+            UserModel
+        );
     }
 
     /**
