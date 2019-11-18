@@ -514,8 +514,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // initialization
         const qb = new RequestQueryBuilder();
 
-        // date
+        // date filters
         if (this.globalFilterDate) {
+            // pdf report
+            qb.filter.flag(
+                'dateOfFollowUp',
+                this.globalFilterDate.startOf('day').format()
+            );
+
+            // same as list view
             qb.filter.byDateRange(
                 'dateOfReporting', {
                     endDate: this.globalFilterDate.endOf('day').format()
