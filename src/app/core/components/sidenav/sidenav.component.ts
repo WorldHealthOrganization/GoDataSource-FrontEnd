@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { AuthDataService } from '../../services/data/auth.data.service';
-import { UserModel } from '../../models/user.model';
+import { PermissionExpressionModel, UserModel } from '../../models/user.model';
 import { PERMISSION } from '../../models/permission.model';
 import * as _ from 'lodash';
 import { ChildNavItem, NavItem } from './nav-item.class';
@@ -205,7 +205,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
             'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL',
             'event',
             [
-                PERMISSION.READ_OUTBREAK,
+                PERMISSION.OUTBREAK_VIEW,
                 PERMISSION.EVENT_LIST
             ],
             [],
@@ -216,8 +216,18 @@ export class SidenavComponent implements OnInit, OnDestroy {
             'duplicated-records',
             'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
             'fileCopy',
-            // there is a custom logic for this item's permissions (see method 'shouldDisplayItem')
-            [],
+            new PermissionExpressionModel({
+                and: [
+                    PERMISSION.OUTBREAK_VIEW,
+                    new PermissionExpressionModel({
+                        or: [
+                            PERMISSION.CASE_LIST,
+                            PERMISSION.EVENT_LIST,
+                            PERMISSION.CONTACT_LIST
+                        ]
+                    })
+                ]
+            }),
             [],
             '/duplicated-records',
             () => this.hasOutbreak.apply(this) // provide context to keep this functionality
@@ -440,32 +450,27 @@ export class SidenavComponent implements OnInit, OnDestroy {
             return false;
         }
 
-        // check permissions
-        switch (item.id) {
-            case 'duplicated-records':
-                return (
-                    this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK) && (
-                        this.authUser.hasPermissions(PERMISSION.READ_CASE) ||
-                        this.authUser.hasPermissions(PERMISSION.READ_CONTACT) ||
-                        this.authUser.hasPermissions(PERMISSION.EVENT_LIST)
-                    )
-                );
-
-            default:
-                // check if it is an item with a Submenu list
-                if (
-                    item instanceof NavItem &&
-                    (item as NavItem).children &&
-                    item.children.length > 0) {
-                    // check if there is any visible Child Item
-                    return _.filter(item.children, (childItem) => {
-                        return childItem.isVisible &&
-                            this.authUser.hasPermissions(...childItem.permissions);
-                    }).length > 0;
-                }
-
-                return this.authUser.hasPermissions(...item.permissions);
+        // check if this an expandable menu
+        if (
+            item instanceof NavItem &&
+            (item as NavItem).children &&
+            item.children.length > 0
+        ) {
+            // check if there is at least one visible child
+            return !!_.find(item.children, (childItem) => {
+                return childItem.isVisible &&
+                    (
+                        _.isArray(childItem.permissions) ?
+                            this.authUser.hasPermissions(...childItem.permissions) :
+                            this.authUser.hasPermissions(...[childItem.permissions])
+                    );
+            });
         }
+
+        // check parent permissions
+        return _.isArray(item.permissions) ?
+            this.authUser.hasPermissions(...item.permissions) :
+            this.authUser.hasPermissions(...[item.permissions]);
     }
 
     /**

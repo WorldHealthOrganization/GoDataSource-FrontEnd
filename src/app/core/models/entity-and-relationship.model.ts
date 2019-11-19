@@ -14,6 +14,7 @@ import { RelationshipPersonModel } from './relationship-person.model';
 import { IPermissionModel } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
+import { OutbreakModel } from './outbreak.model';
 
 export class RelationshipModel extends BaseModel implements IPermissionModel {
     id: string;
@@ -33,15 +34,15 @@ export class RelationshipModel extends BaseModel implements IPermissionModel {
     /**
      * Static Permissions
      */
-    static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.RELATIONSHIP_VIEW) : false; }
-    static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.RELATIONSHIP_LIST) : false; }
-    static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.RELATIONSHIP_CREATE) : false; }
-    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.RELATIONSHIP_MODIFY) : false; }
-    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.RELATIONSHIP_DELETE) : false; }
-    static canReverse(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.RELATIONSHIP_REVERSE) : false; }
-    static canExport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.RELATIONSHIP_EXPORT) : false; }
-    static canShare(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.RELATIONSHIP_SHARE) : false; }
-    static canBulkDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.RELATIONSHIP_BULK_DELETE) : false; }
+    static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_VIEW) : false); }
+    static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_LIST) : false); }
+    static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_CREATE) : false); }
+    static canModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_MODIFY) : false); }
+    static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_DELETE) : false); }
+    static canReverse(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_REVERSE) : false); }
+    static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_EXPORT) : false); }
+    static canShare(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_SHARE) : false); }
+    static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_BULK_DELETE) : false); }
 
     /**
      * Constructor
