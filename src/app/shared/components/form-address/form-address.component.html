@@ -251,7 +251,7 @@
                             [label]="'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES' | translate"
                             tooltip="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES_DESCRIPTION"
                             [disabled]="disabled"
-                            (input)="onChange()">
+                            (optionChanged)="onChange()">
                         </app-form-slide-toggle>
                         <div
                             *ngIf="displayCopyField"
