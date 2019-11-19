@@ -70,16 +70,26 @@ const routes: Routes = [
     // Entity Exposure Relationships
     {
         path: ':entityType/:entityId/exposures',
+        canActivate: [AuthGuard],
         data: {
-            relationshipType: RelationshipType.EXPOSURE
+            relationshipType: RelationshipType.EXPOSURE,
+            permissions: [
+                PERMISSION.READ_OUTBREAK,
+                PERMISSION.RELATIONSHIP_LIST
+            ]
         },
-        children: relationshipTypeChildrenRoutes
+        children: relationshipTypeChildrenRoutes,
     },
     // Entity Contact Relationships
     {
         path: ':entityType/:entityId/contacts',
+        canActivate: [AuthGuard],
         data: {
-            relationshipType: RelationshipType.CONTACT
+            relationshipType: RelationshipType.CONTACT,
+            permissions: [
+                PERMISSION.READ_OUTBREAK,
+                PERMISSION.RELATIONSHIP_LIST
+            ]
         },
         children: relationshipTypeChildrenRoutes
     },
@@ -90,6 +100,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
+                PERMISSION.READ_OUTBREAK,
                 PERMISSION.READ_CASE,
                 PERMISSION.READ_REPORT
             ]
@@ -102,6 +113,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
+                PERMISSION.READ_OUTBREAK,
                 PERMISSION.READ_REPORT
             ]
         }

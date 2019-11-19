@@ -1,5 +1,5 @@
 import { ModuleWithProviders } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './core/services/guards/auth-guard.service';
 import { PERMISSION } from './core/models/permission.model';
 import { AuthenticatedComponent } from './core/components/authenticated/authenticated.component';
@@ -7,6 +7,7 @@ import { LanguageResolver } from './core/services/resolvers/language.resolver';
 import { ModulePath } from './core/enums/module-path.enum';
 import { PasswordChangeGuard } from './core/services/guards/password-change-guard.service';
 import { RedirectComponent } from './core/components/redirect/redirect.component';
+import { PermissionExpressionModel } from './core/models/user.model';
 
 const routes: Routes = [
     // Authentication Module routes
@@ -125,7 +126,14 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [PERMISSION.READ_OUTBREAK]
+                    permissions: new PermissionExpressionModel({
+                        or: [
+                            PERMISSION.OUTBREAK_LIST,
+                            PERMISSION.OUTBREAK_VIEW,
+                            PERMISSION.OUTBREAK_CREATE,
+                            PERMISSION.OUTBREAK_MODIFY
+                        ]
+                    })
                 }
             },
             // Outbreak Templates Module routes
@@ -179,10 +187,19 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [
-                        PERMISSION.READ_OUTBREAK,
-                        PERMISSION.EVENT_LIST
-                    ]
+                    permissions: new PermissionExpressionModel({
+                        and: [
+                            PERMISSION.OUTBREAK_VIEW,
+                            new PermissionExpressionModel({
+                                or: [
+                                    PERMISSION.EVENT_LIST,
+                                    PERMISSION.EVENT_VIEW,
+                                    PERMISSION.EVENT_CREATE,
+                                    PERMISSION.EVENT_MODIFY
+                                ]
+                            })
+                        ]
+                    })
                 }
             },
             // Duplicate records routes
@@ -218,7 +235,22 @@ const routes: Routes = [
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
-                ]
+                ],
+                data: {
+                    permissions: new PermissionExpressionModel({
+                        and: [
+                            PERMISSION.OUTBREAK_VIEW,
+                            new PermissionExpressionModel({
+                                or: [
+                                    PERMISSION.RELATIONSHIP_LIST,
+                                    PERMISSION.RELATIONSHIP_VIEW,
+                                    PERMISSION.RELATIONSHIP_CREATE,
+                                    PERMISSION.RELATIONSHIP_MODIFY
+                                ]
+                            })
+                        ]
+                    })
+                }
             },
             // Reference Data Module routes
             {
@@ -357,7 +389,7 @@ const routes: Routes = [
     {
         // for unknown routes, redirect to home page
         path: '**',
-        redirectTo: '/'
+        redirectTo: '/dashboard'
     }
 
 ];

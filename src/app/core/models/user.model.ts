@@ -51,6 +51,79 @@ abstract class UserSettingsHandlers {
     static SHARE_RELATIONSHIPS = [];
 }
 
+export interface IPermissionExpressionAnd {
+    and: (PERMISSION | PermissionExpressionModel)[];
+}
+
+export interface IPermissionExpressionOr {
+    or: (PERMISSION | PermissionExpressionModel)[];
+}
+
+export class PermissionExpressionModel {
+    /**
+     * Constructor
+     */
+    constructor(
+        public permission: PERMISSION |
+            IPermissionExpressionAnd |
+            IPermissionExpressionOr
+    ) {}
+
+    /**
+     * Check if an user passes required permissions from this model
+     * @param authUser
+     */
+    allowed(authUser: UserModel): boolean {
+        // check recursively if we have access
+        if (typeof this.permission === 'object') {
+            // and / or conditions
+            if ((this.permission as any).and !== undefined) {
+                // go through and see if all conditions match
+                const permission: IPermissionExpressionAnd = this.permission as IPermissionExpressionAnd;
+                for (const condition of permission.and) {
+                    // if complex expression then we need to check further
+                    if (condition instanceof PermissionExpressionModel) {
+                        if (!condition.allowed(authUser)) {
+                            return false;
+                        }
+
+                        // check if user has this permission
+                    } else if (!authUser.permissionIdsMapped[condition]) {
+                        return false;
+                    }
+                }
+
+                // all match
+                return true;
+            } else if ((this.permission as any).or !== undefined) {
+                // go through and see if at least one condition matches
+                const permission: IPermissionExpressionOr = this.permission as IPermissionExpressionOr;
+                for (const condition of permission.or) {
+                    // if complex expression then we need to check further
+                    if (condition instanceof PermissionExpressionModel) {
+                        if (condition.allowed(authUser)) {
+                            return true;
+                        }
+
+                    // check if user has this permission
+                    } else if (authUser.permissionIdsMapped[condition]) {
+                        return true;
+                    }
+                }
+
+                // no match ?
+                return false;
+            }
+
+            // invalid object
+            return false;
+        }
+
+        // simple permission
+        return !!authUser.permissionIdsMapped[this.permission];
+    }
+}
+
 export class UserModel {
     id: string;
     firstName: string;
@@ -101,10 +174,18 @@ export class UserModel {
         this.initializeSettings(data);
     }
 
-    hasPermissions(...permissionIds: PERMISSION[]): boolean {
+    hasPermissions(...permissionIds: (PERMISSION | PermissionExpressionModel)[]): boolean {
         // check if all permissions are in our list allowed permissions
         for (const permission of permissionIds) {
-            if (!this.permissionIdsMapped[permission]) {
+            if (
+                (
+                    permission instanceof PermissionExpressionModel &&
+                    !permission.allowed(this)
+                ) || (
+                    !(permission instanceof PermissionExpressionModel) &&
+                    !this.permissionIdsMapped[permission as PERMISSION]
+                )
+            ) {
                 return false;
             }
         }

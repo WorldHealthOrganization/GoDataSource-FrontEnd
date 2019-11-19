@@ -12,7 +12,13 @@ const routes: Routes = [
     // Outbreaks list
     {
         path: '',
-        component: fromPages.OutbreakListComponent
+        component: fromPages.OutbreakListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.OUTBREAK_LIST
+            ]
+        }
     },
     // Create Outbreak
     {
@@ -20,7 +26,11 @@ const routes: Routes = [
         component: fromPages.CreateOutbreakComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_OUTBREAK]
+            permissions: [
+                // list for checking if there is another outbreak with the same name
+                PERMISSION.OUTBREAK_LIST,
+                PERMISSION.OUTBREAK_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -35,7 +45,9 @@ const routes: Routes = [
         },
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_OUTBREAK],
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW
+            ],
             action: ViewModifyComponentAction.VIEW
         }
     },
@@ -48,7 +60,12 @@ const routes: Routes = [
         },
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_OUTBREAK],
+            permissions: [
+                // list for checking if there is another outbreak with the same name
+                PERMISSION.OUTBREAK_LIST,
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.OUTBREAK_MODIFY
+            ],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [

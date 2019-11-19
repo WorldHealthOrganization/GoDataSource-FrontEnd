@@ -1,6 +1,15 @@
 import * as _ from 'lodash';
 
 export enum PERMISSION {
+    // outbreaks
+    OUTBREAK_LIST = 'outbreak_list',
+    OUTBREAK_VIEW = 'outbreak_view',
+    OUTBREAK_CREATE = 'outbreak_create',
+    OUTBREAK_MODIFY = 'outbreak_modify',
+    OUTBREAK_DELETE = 'outbreak_delete',
+READ_OUTBREAK = 'read_outbreak',
+WRITE_OUTBREAK = 'write_outbreak',
+
     // events
     EVENT_LIST = 'event_list',
     EVENT_VIEW = 'event_view',
@@ -114,10 +123,6 @@ WRITE_CASE = 'write_case',
     // roles
     READ_ROLE = 'read_role',
     WRITE_ROLE = 'write_role',
-
-    // outbreaks
-    READ_OUTBREAK = 'read_outbreak',
-    WRITE_OUTBREAK = 'write_outbreak',
 
     // teams
     READ_TEAM = 'read_team',

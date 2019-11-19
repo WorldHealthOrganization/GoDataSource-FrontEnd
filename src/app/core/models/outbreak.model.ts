@@ -3,8 +3,11 @@ import { QuestionModel } from './question.model';
 import { LocationModel } from './location.model';
 import { MapServerModel } from './map-server.model';
 import { BaseModel } from './base.model';
+import { IPermissionModel } from './permission.interface';
+import { UserModel } from './user.model';
+import { PERMISSION } from './permission.model';
 
-export class OutbreakModel extends BaseModel {
+export class OutbreakModel extends BaseModel implements IPermissionModel {
     id: string;
     name: string;
     description: string;
@@ -39,6 +42,18 @@ export class OutbreakModel extends BaseModel {
     // no need to save this one in the database
     details: string;
 
+    /**
+     * Static Permissions
+     */
+    static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_VIEW) : false; }
+    static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_LIST) : false; }
+    static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_CREATE) : false; }
+    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY) : false; }
+    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_DELETE) : false; }
+
+    /**
+     * Constructor
+     */
     constructor(data = null) {
         super(data);
 
@@ -88,4 +103,13 @@ export class OutbreakModel extends BaseModel {
                 return new MapServerModel(lData);
             });
     }
+
+    /**
+     * Permissions
+     */
+    canView(user: UserModel): boolean { return OutbreakModel.canView(user); }
+    canList(user: UserModel): boolean { return OutbreakModel.canList(user); }
+    canCreate(user: UserModel): boolean { return OutbreakModel.canCreate(user); }
+    canModify(user: UserModel): boolean { return OutbreakModel.canModify(user); }
+    canDelete(user: UserModel): boolean { return OutbreakModel.canDelete(user); }
 }
