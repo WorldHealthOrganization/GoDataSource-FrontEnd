@@ -14,7 +14,7 @@ const routes: Routes = [
         component: fromPages.EventsListComponent,
         data: {
             permissions: [
-                PERMISSION.READ_OUTBREAK,
+                PERMISSION.OUTBREAK_VIEW,
                 PERMISSION.EVENT_LIST
             ]
         }
@@ -26,7 +26,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.READ_OUTBREAK,
+                PERMISSION.OUTBREAK_VIEW,
                 PERMISSION.EVENT_CREATE
             ]
         },
@@ -41,7 +41,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.READ_OUTBREAK,
+                PERMISSION.OUTBREAK_VIEW,
                 PERMISSION.EVENT_VIEW
             ],
             action: ViewModifyComponentAction.VIEW
@@ -54,7 +54,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.READ_OUTBREAK,
+                PERMISSION.OUTBREAK_VIEW,
                 PERMISSION.EVENT_MODIFY
             ],
             action: ViewModifyComponentAction.MODIFY
