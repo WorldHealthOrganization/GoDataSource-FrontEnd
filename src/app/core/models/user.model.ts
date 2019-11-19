@@ -52,14 +52,14 @@ abstract class UserSettingsHandlers {
 }
 
 export interface IPermissionExpressionAnd {
-    and: (PERMISSION | PermissionExpressionModel)[];
+    and: (PERMISSION | PermissionExpression)[];
 }
 
 export interface IPermissionExpressionOr {
-    or: (PERMISSION | PermissionExpressionModel)[];
+    or: (PERMISSION | PermissionExpression)[];
 }
 
-export class PermissionExpressionModel {
+export class PermissionExpression {
     /**
      * Constructor
      */
@@ -82,7 +82,7 @@ export class PermissionExpressionModel {
                 const permission: IPermissionExpressionAnd = this.permission as IPermissionExpressionAnd;
                 for (const condition of permission.and) {
                     // if complex expression then we need to check further
-                    if (condition instanceof PermissionExpressionModel) {
+                    if (condition instanceof PermissionExpression) {
                         if (!condition.allowed(authUser)) {
                             return false;
                         }
@@ -100,7 +100,7 @@ export class PermissionExpressionModel {
                 const permission: IPermissionExpressionOr = this.permission as IPermissionExpressionOr;
                 for (const condition of permission.or) {
                     // if complex expression then we need to check further
-                    if (condition instanceof PermissionExpressionModel) {
+                    if (condition instanceof PermissionExpression) {
                         if (condition.allowed(authUser)) {
                             return true;
                         }
@@ -174,15 +174,15 @@ export class UserModel {
         this.initializeSettings(data);
     }
 
-    hasPermissions(...permissionIds: (PERMISSION | PermissionExpressionModel)[]): boolean {
+    hasPermissions(...permissionIds: (PERMISSION | PermissionExpression)[]): boolean {
         // check if all permissions are in our list allowed permissions
         for (const permission of permissionIds) {
             if (
                 (
-                    permission instanceof PermissionExpressionModel &&
+                    permission instanceof PermissionExpression &&
                     !permission.allowed(this)
                 ) || (
-                    !(permission instanceof PermissionExpressionModel) &&
+                    !(permission instanceof PermissionExpression) &&
                     !this.permissionIdsMapped[permission as PERMISSION]
                 )
             ) {

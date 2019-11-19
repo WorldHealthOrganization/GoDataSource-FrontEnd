@@ -56,6 +56,7 @@ const routes: Routes = [
         data: {
             permissions: [
                 PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.EVENT_VIEW,
                 PERMISSION.EVENT_MODIFY
             ],
             action: ViewModifyComponentAction.MODIFY

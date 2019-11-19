@@ -7,7 +7,7 @@ import { LanguageResolver } from './core/services/resolvers/language.resolver';
 import { ModulePath } from './core/enums/module-path.enum';
 import { PasswordChangeGuard } from './core/services/guards/password-change-guard.service';
 import { RedirectComponent } from './core/components/redirect/redirect.component';
-import { PermissionExpressionModel } from './core/models/user.model';
+import { PermissionExpression } from './core/models/user.model';
 
 const routes: Routes = [
     // Authentication Module routes
@@ -126,7 +126,7 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: new PermissionExpressionModel({
+                    permissions: new PermissionExpression({
                         or: [
                             PERMISSION.OUTBREAK_LIST,
                             PERMISSION.OUTBREAK_VIEW,
@@ -187,10 +187,10 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: new PermissionExpressionModel({
+                    permissions: new PermissionExpression({
                         and: [
                             PERMISSION.OUTBREAK_VIEW,
-                            new PermissionExpressionModel({
+                            new PermissionExpression({
                                 or: [
                                     PERMISSION.EVENT_LIST,
                                     PERMISSION.EVENT_VIEW,
@@ -237,10 +237,10 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: new PermissionExpressionModel({
+                    permissions: new PermissionExpression({
                         and: [
                             PERMISSION.OUTBREAK_VIEW,
-                            new PermissionExpressionModel({
+                            new PermissionExpression({
                                 or: [
                                     PERMISSION.RELATIONSHIP_LIST,
                                     PERMISSION.RELATIONSHIP_VIEW,

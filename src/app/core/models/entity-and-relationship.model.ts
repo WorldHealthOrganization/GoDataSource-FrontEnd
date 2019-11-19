@@ -37,7 +37,7 @@ export class RelationshipModel extends BaseModel implements IPermissionModel {
     static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_VIEW) : false); }
     static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_LIST) : false); }
     static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_CREATE) : false); }
-    static canModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_MODIFY) : false); }
+    static canModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_VIEW, PERMISSION.RELATIONSHIP_MODIFY) : false); }
     static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_DELETE) : false); }
     static canReverse(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_REVERSE) : false); }
     static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_EXPORT) : false); }

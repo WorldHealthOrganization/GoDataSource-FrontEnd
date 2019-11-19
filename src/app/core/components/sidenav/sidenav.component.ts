@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { AuthDataService } from '../../services/data/auth.data.service';
-import { PermissionExpressionModel, UserModel } from '../../models/user.model';
+import { PermissionExpression, UserModel } from '../../models/user.model';
 import { PERMISSION } from '../../models/permission.model';
 import * as _ from 'lodash';
 import { ChildNavItem, NavItem } from './nav-item.class';
@@ -216,10 +216,10 @@ export class SidenavComponent implements OnInit, OnDestroy {
             'duplicated-records',
             'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
             'fileCopy',
-            new PermissionExpressionModel({
+            new PermissionExpression({
                 and: [
                     PERMISSION.OUTBREAK_VIEW,
-                    new PermissionExpressionModel({
+                    new PermissionExpression({
                         or: [
                             PERMISSION.CASE_LIST,
                             PERMISSION.EVENT_LIST,
