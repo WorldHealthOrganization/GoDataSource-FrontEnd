@@ -48,11 +48,12 @@ export class UserRoleModel {
                     tooltip: tooltipToken ?
                         i18nService.instant(tooltipToken) :
                         '',
-                    requirements: i18nService.instant(
-                        'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_MESSAGE', {
-                            labels: extraRequiredPermMessage
-                        }
-                    )
+                    requirements: extraRequiredPermMessage ?
+                        i18nService.instant(
+                            'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_MESSAGE', {
+                                labels: extraRequiredPermMessage
+                            }
+                        ) : ''
                 }
             );
         }
