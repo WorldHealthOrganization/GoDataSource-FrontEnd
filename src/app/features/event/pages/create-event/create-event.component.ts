@@ -15,6 +15,9 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-create-event',
@@ -23,11 +26,7 @@ import { Moment, moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./create-event.component.less']
 })
 export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit {
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
-        new BreadcrumbItemModel('LNG_PAGE_CREATE_EVENT_TITLE', '.', true)
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // selected outbreak ID
     outbreakId: string;
@@ -36,18 +35,29 @@ export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit
 
     serverToday: Moment = moment();
 
+    // authenticated user details
+    authUser: UserModel;
+
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private eventDataService: EventDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private authDataService: AuthDataService,
+        private redirectService: RedirectService
     ) {
         super();
     }
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // get selected outbreak
         this.outbreakDataService
             .getSelectedOutbreak()
@@ -57,6 +67,25 @@ export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit
 
         // pre-set the initial address as "current address"
         this.eventData.address.typeId = AddressType.CURRENT_ADDRESS;
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (EventModel.canList(this.authUser)) {
+            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'));
+        }
+
+        // create breadcrumb
+        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_EVENT_TITLE', '.', true));
     }
 
     /**
@@ -88,9 +117,18 @@ export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit
                     // hide dialog
                     loadingDialog.close();
 
-                    // navigate to listing page
+                    // navigate to proper page
                     this.disableDirtyConfirm();
-                    this.router.navigate([`/events/${newEvent.id}/modify`]);
+                    if (EventModel.canModify(this.authUser)) {
+                        this.router.navigate([`/events/${newEvent.id}/modify`]);
+                    } else if (EventModel.canView(this.authUser)) {
+                        this.router.navigate([`/events/${newEvent.id}/view`]);
+                    } else if (EventModel.canList(this.authUser)) {
+                        this.router.navigate([`/events`]);
+                    } else {
+                        // fallback to current page since we already know that we have access to this page
+                        this.redirectService.to([`/events/create`]);
+                    }
                 });
         }
     }

@@ -12,6 +12,7 @@ const routes: Routes = [
     {
         path: '',
         component: fromPages.EventsListComponent,
+        canActivate: [AuthGuard],
         data: {
             permissions: [
                 PERMISSION.OUTBREAK_VIEW,

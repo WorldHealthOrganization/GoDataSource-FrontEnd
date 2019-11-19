@@ -74,7 +74,7 @@ const routes: Routes = [
         data: {
             relationshipType: RelationshipType.EXPOSURE,
             permissions: [
-                PERMISSION.READ_OUTBREAK,
+                PERMISSION.OUTBREAK_VIEW,
                 PERMISSION.RELATIONSHIP_LIST
             ]
         },
@@ -87,7 +87,7 @@ const routes: Routes = [
         data: {
             relationshipType: RelationshipType.CONTACT,
             permissions: [
-                PERMISSION.READ_OUTBREAK,
+                PERMISSION.OUTBREAK_VIEW,
                 PERMISSION.RELATIONSHIP_LIST
             ]
         },

@@ -76,7 +76,7 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
                             .getEvent(selectedOutbreak.id, this.eventId, true)
                             .subscribe(eventDataReturned => {
                                 this.eventData = new EventModel(eventDataReturned);
-                                this.createBreadcrumbs();
+                                this.initializeBreadcrumbs();
                             });
                     });
             });
@@ -116,7 +116,7 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE');
 
                 // update breadcrumb
-                this.createBreadcrumbs();
+                this.initializeBreadcrumbs();
 
                 // hide dialog
                 loadingDialog.close();
@@ -124,18 +124,24 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
     }
 
     /**
-     * Create breadcrumbs
+     * Initialize breadcrumbs
      */
-    createBreadcrumbs() {
-        this.breadcrumbs = [
-            new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
-            new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_EVENT_TITLE' : 'LNG_PAGE_MODIFY_EVENT_TITLE',
-                '.',
-                true,
-                {},
-                this.eventData
-            )
-        ];
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (EventModel.canList(this.authUser)) {
+            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'));
+        }
+
+        // view / modify breadcrumb
+        this.breadcrumbs.push(new BreadcrumbItemModel(
+            this.viewOnly ? 'LNG_PAGE_VIEW_EVENT_TITLE' : 'LNG_PAGE_MODIFY_EVENT_TITLE',
+            '.',
+            true,
+            {},
+            this.eventData
+        ));
     }
 }
