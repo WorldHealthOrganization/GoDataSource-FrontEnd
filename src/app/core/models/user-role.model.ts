@@ -1,7 +1,8 @@
 import * as _ from 'lodash';
 import { IPermissionChildModel, PERMISSION, PermissionModel } from './permission.model';
 import { I18nService } from '../services/helper/i18n.service';
-import { ISelectGroupMap, ISelectGroupOptionMap } from '../../shared/xt-forms/components/form-select-groups/form-select-groups.component';
+import { ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../shared/xt-forms/components/form-select-groups/form-select-groups.component';
+import { DomSanitizer } from '@angular/platform-browser';
 
 export class UserRoleModel {
     id: string | null;
@@ -13,13 +14,19 @@ export class UserRoleModel {
     /**
      * Add required permissions to token
      */
-    public static groupOptionFormatTooltipMethod(
+    public static groupOptionFormatMethod(
+        sanitized: DomSanitizer,
         i18nService: I18nService,
         groupsMap: ISelectGroupMap<PermissionModel>,
         optionsMap: ISelectGroupOptionMap<IPermissionChildModel>,
-        option: IPermissionChildModel,
-        tooltipToken: string
-    ): string {
+        option: IPermissionChildModel
+    ): ISelectGroupOptionFormatResponse {
+        // define response
+        const response: ISelectGroupOptionFormatResponse = {
+            label: '',
+            tooltip: ''
+        };
+
         // do we need to include permission requirements
         if (
             option.requires &&
@@ -42,11 +49,28 @@ export class UserRoleModel {
                 extraRequiredPermMessage = requiredPermissionTranslations.join(', ');
             }
 
-            // construct the final message
-            return i18nService.instant(
+            // label
+            response.label = sanitized.bypassSecurityTrustHtml(
+                i18nService.instant(
+                    'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_LABEL_MESSAGE', {
+                        label: option.label ?
+                            i18nService.instant(option.label) :
+                            '',
+                        requirements: extraRequiredPermMessage ?
+                            i18nService.instant(
+                                'LNG_ROLE_AVAILABLE_PERMISSIONS_LABEL_REQUIRE_MESSAGE', {
+                                    labels: extraRequiredPermMessage
+                                }
+                            ) : ''
+                    }
+                )
+            );
+
+            // tooltip
+            response.tooltip = i18nService.instant(
                 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_TOOLTIP_MESSAGE', {
-                    tooltip: tooltipToken ?
-                        i18nService.instant(tooltipToken) :
+                    tooltip: option.description ?
+                        i18nService.instant(option.description) :
                         '',
                     requirements: extraRequiredPermMessage ?
                         i18nService.instant(
@@ -56,12 +80,20 @@ export class UserRoleModel {
                         ) : ''
                 }
             );
+        } else {
+            // label
+            response.label = option.label ?
+                i18nService.instant(option.label) :
+                '';
+
+            // tooltip
+            response.tooltip = option.description ?
+                i18nService.instant(option.description) :
+                '';
         }
 
         // nothing else to include
-        return tooltipToken ?
-            i18nService.instant(tooltipToken) :
-            '';
+        return response;
     }
 
     /**

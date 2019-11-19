@@ -13,8 +13,9 @@ import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { ISelectGroupMap, ISelectGroupOptionMap } from '../../../../shared/xt-forms/components/form-select-groups/form-select-groups.component';
+import { ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../../shared/xt-forms/components/form-select-groups/form-select-groups.component';
 import { IPermissionChildModel, PermissionModel } from '../../../../core/models/permission.model';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
     selector: 'app-create-role',
@@ -77,19 +78,19 @@ export class CreateRoleComponent extends ConfirmOnFormChanges {
     /**
      * Add required permissions to token
      */
-    groupOptionFormatTooltipMethod(
+    groupOptionFormatMethod(
+        sanitized: DomSanitizer,
         i18nService: I18nService,
         groupsMap: ISelectGroupMap<PermissionModel>,
         optionsMap: ISelectGroupOptionMap<IPermissionChildModel>,
-        option: IPermissionChildModel,
-        tooltipToken: string
-    ): string {
-        return UserRoleModel.groupOptionFormatTooltipMethod(
+        option: IPermissionChildModel
+    ): ISelectGroupOptionFormatResponse {
+        return UserRoleModel.groupOptionFormatMethod(
+            sanitized,
             i18nService,
             groupsMap,
             optionsMap,
-            option,
-            tooltipToken
+            option
         );
     }
 }

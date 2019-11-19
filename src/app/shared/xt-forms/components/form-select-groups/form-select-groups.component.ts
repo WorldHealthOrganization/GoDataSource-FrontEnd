@@ -6,6 +6,7 @@ import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
 import { MatOptionSelectionChange, MatSelect } from '@angular/material';
 import { PERMISSION } from '../../../../core/models/permission.model';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 export interface ISelectGroupMap<T> {
     [groupValueKey: string]: T;
@@ -16,6 +17,11 @@ export interface ISelectGroupOptionMap<T> {
         groupValue: string,
         option: T
     };
+}
+
+export interface ISelectGroupOptionFormatResponse {
+    label: SafeHtml;
+    tooltip: string;
 }
 
 @Component({
@@ -135,7 +141,7 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
             }
 
             // translate tooltips
-            this.initializeGroupTooltips();
+            this.initializeGroupLabelsAndTooltips();
 
             // render options
             this.valueChangedTrigger();
@@ -183,15 +189,22 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
     } = {};
 
     /**
-     * Used to format group options tokens ( add extra information )
+     * Label translations
      */
-    @Input() groupOptionFormatTooltipMethod: (
+    labelTranslations: {
+        [groupOptionLabelKey: string]: SafeHtml
+    } = {};
+
+    /**
+     * Used to format group options labels / tooltips.. ( add extra information )
+     */
+    @Input() groupOptionFormatMethod: (
+        sanitized: DomSanitizer,
         i18nService: I18nService,
         groupsMap: ISelectGroupMap<any>,
         optionsMap: ISelectGroupOptionMap<any>,
-        option: any,
-        tooltipToken: string
-    ) => string;
+        option: any
+    ) => ISelectGroupOptionFormatResponse;
 
     /**
      * Constructor
@@ -200,7 +213,8 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        protected i18nService: I18nService
+        protected i18nService: I18nService,
+        protected sanitized: DomSanitizer
     ) {
         super(controlContainer, validators, asyncValidators);
 
@@ -210,7 +224,7 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
             this.tooltip = this._tooltipToken;
 
             // translate tooltips
-            this.initializeGroupTooltips();
+            this.initializeGroupLabelsAndTooltips();
 
             // language changed
             this.valueChangedTrigger();
@@ -244,15 +258,18 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
     /**
      * Translate tooltips - optimization so we don't trigger translation multiple times because of the binding system
      */
-    initializeGroupTooltips() {
+    initializeGroupLabelsAndTooltips() {
         // reset value
         this.tooltipTranslations = {};
+        this.labelTranslations = {};
 
         // continue only if we have groups
         if (
             !this.groups ||
-            !this.groupOptionsKey ||
-            !this.groupOptionTooltipKey
+            !this.groupOptionsKey || (
+                !this.groupOptionLabelKey &&
+                !this.groupOptionTooltipKey
+            )
         ) {
             return;
         }
@@ -261,15 +278,29 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
         this.groups.forEach((group) => {
             // translate group options
             (group[this.groupOptionsKey] || []).forEach((option) => {
-                this.tooltipTranslations[option[this.groupOptionTooltipKey]] = this.groupOptionFormatTooltipMethod ?
-                    this.groupOptionFormatTooltipMethod(
+                // format tooltips and labels ?
+                if (this.groupOptionFormatMethod) {
+                    // determine label & tooltip
+                    const formatResponse = this.groupOptionFormatMethod(
+                        this.sanitized,
                         this.i18nService,
                         this.groupsMap,
                         this.optionsMap,
-                        option,
-                        option[this.groupOptionTooltipKey]
-                    ) :
-                    this.i18nService.instant(option[this.groupOptionTooltipKey]);
+                        option
+                    );
+
+                    // label
+                    this.labelTranslations[option[this.groupOptionLabelKey]] = formatResponse.label ? formatResponse.label : '';
+
+                    // tooltip
+                    this.tooltipTranslations[option[this.groupOptionTooltipKey]] = formatResponse.tooltip ? formatResponse.tooltip : '';
+                } else {
+                    // label
+                    this.labelTranslations[option[this.groupOptionLabelKey]] = this.i18nService.instant(option[this.groupOptionLabelKey]);
+
+                    // tooltip
+                    this.tooltipTranslations[option[this.groupOptionTooltipKey]] = this.i18nService.instant(option[this.groupOptionTooltipKey]);
+                }
             });
         });
     }
