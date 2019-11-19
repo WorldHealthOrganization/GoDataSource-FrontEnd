@@ -144,6 +144,7 @@ export interface IPermissionChildModel {
     id: PERMISSION;
     label: string;
     description: string;
+    requires?: PERMISSION[];
 }
 
 export class PermissionModel {

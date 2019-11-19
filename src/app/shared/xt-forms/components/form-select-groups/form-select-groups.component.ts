@@ -7,6 +7,17 @@ import * as _ from 'lodash';
 import { MatOptionSelectionChange, MatSelect } from '@angular/material';
 import { PERMISSION } from '../../../../core/models/permission.model';
 
+export interface ISelectGroupMap<T> {
+    [groupValueKey: string]: T;
+}
+
+export interface ISelectGroupOptionMap<T> {
+    [optionValue: string]: {
+        groupValue: string,
+        option: T
+    };
+}
+
 @Component({
     selector: 'app-form-select-groups',
     encapsulation: ViewEncapsulation.None,
@@ -63,15 +74,8 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
     partialPermissions: {
         [partielKey: string]: string
     } = {};
-    groupsMap: {
-        [groupValueKey: string]: any
-    } = {};
-    optionsMap: {
-        [optionValue: string]: {
-            groupValue: string,
-            option: any
-        }
-    } = {};
+    groupsMap: ISelectGroupMap<any> = {};
+    optionsMap: ISelectGroupOptionMap<any> = {};
     expandedGroups: {
         [groupId: string]: boolean
     } = {};
@@ -130,6 +134,9 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
                 });
             }
 
+            // translate tooltips
+            this.initializeGroupTooltips();
+
             // render options
             this.valueChangedTrigger();
         });
@@ -169,6 +176,24 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
     @Output() optionChanged = new EventEmitter<any>();
 
     /**
+     * Tooltip translations
+     */
+    tooltipTranslations: {
+        [groupOptionValueKey: string]: string
+    } = {};
+
+    /**
+     * Used to format group options tokens ( add extra information )
+     */
+    @Input() groupOptionFormatTooltipMethod: (
+        i18nService: I18nService,
+        groupsMap: ISelectGroupMap<any>,
+        optionsMap: ISelectGroupOptionMap<any>,
+        option: any,
+        tooltipToken: string
+    ) => string;
+
+    /**
      * Constructor
      */
     constructor(
@@ -181,7 +206,11 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
 
         // on language change..we need to translate again the token
         this.i18nService.languageChangedEvent.subscribe(() => {
+            // trigger update
             this.tooltip = this._tooltipToken;
+
+            // translate tooltips
+            this.initializeGroupTooltips();
 
             // language changed
             this.valueChangedTrigger();
@@ -210,6 +239,39 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
 
         // // overwrite scroll into view
         this.matSelect['_scrollActiveOptionIntoView'] = () => {};
+    }
+
+    /**
+     * Translate tooltips - optimization so we don't trigger translation multiple times because of the binding system
+     */
+    initializeGroupTooltips() {
+        // reset value
+        this.tooltipTranslations = {};
+
+        // continue only if we have groups
+        if (
+            !this.groups ||
+            !this.groupOptionsKey ||
+            !this.groupOptionTooltipKey
+        ) {
+            return;
+        }
+
+        // go through groups & translate options
+        this.groups.forEach((group) => {
+            // translate group options
+            (group[this.groupOptionsKey] || []).forEach((option) => {
+                this.tooltipTranslations[option[this.groupOptionTooltipKey]] = this.groupOptionFormatTooltipMethod ?
+                    this.groupOptionFormatTooltipMethod(
+                        this.i18nService,
+                        this.groupsMap,
+                        this.optionsMap,
+                        option,
+                        option[this.groupOptionTooltipKey]
+                    ) :
+                    this.i18nService.instant(option[this.groupOptionTooltipKey]);
+            });
+        });
     }
 
     /**

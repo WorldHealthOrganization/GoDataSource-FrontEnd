@@ -50,6 +50,7 @@
                                 required="true"
                                 [disabled]="viewOnly"
                                 [groups]="availablePermissions$ | async"
+                                [groupOptionFormatTooltipMethod]="groupOptionFormatTooltipMethod"
                                 groupLabelKey="groupLabel"
                                 groupTooltipKey="groupDescription"
                                 groupValueKey="groupAllId"

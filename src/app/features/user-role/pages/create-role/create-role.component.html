@@ -36,6 +36,7 @@
                             tooltip="LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS_DESCRIPTION"
                             required="true"
                             [groups]="availablePermissions$ | async"
+                            [groupOptionFormatTooltipMethod]="groupOptionFormatTooltipMethod"
                             groupLabelKey="groupLabel"
                             groupTooltipKey="groupDescription"
                             groupValueKey="groupAllId"

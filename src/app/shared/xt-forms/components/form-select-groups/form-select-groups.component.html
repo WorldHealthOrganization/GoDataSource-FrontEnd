@@ -80,7 +80,7 @@
                     <mat-option
                         *ngFor="let option of group[groupOptionsKey]"
                         [value]="option[groupOptionValueKey]"
-                        [matTooltip]="option[groupOptionTooltipKey] | translate">
+                        [matTooltip]="tooltipTranslations[option[groupOptionTooltipKey]]">
                         {{ option[groupOptionLabelKey] | translate }}
                     </mat-option>
                 </ng-container>

@@ -9,12 +9,14 @@ import { Observable } from 'rxjs';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
-import { PERMISSION } from '../../../../core/models/permission.model';
+import { IPermissionChildModel, PERMISSION, PermissionModel } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ISelectGroupMap, ISelectGroupOptionMap } from '../../../../shared/xt-forms/components/form-select-groups/form-select-groups.component';
 
 @Component({
     selector: 'app-modify-role',
@@ -30,7 +32,7 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
     authUser: UserModel;
     userRoleId: string;
     userRole: UserRoleModel = new UserRoleModel();
-    availablePermissions$: Observable<any[]>;
+    availablePermissions$: Observable<PermissionModel[]>;
 
     constructor(
         private router: Router,
@@ -107,5 +109,24 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
      */
     hasUserRoleWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_ROLE);
+    }
+
+    /**
+     * Add required permissions to token
+     */
+    groupOptionFormatTooltipMethod(
+        i18nService: I18nService,
+        groupsMap: ISelectGroupMap<PermissionModel>,
+        optionsMap: ISelectGroupOptionMap<IPermissionChildModel>,
+        option: IPermissionChildModel,
+        tooltipToken: string
+    ): string {
+        return UserRoleModel.groupOptionFormatTooltipMethod(
+            i18nService,
+            groupsMap,
+            optionsMap,
+            option,
+            tooltipToken
+        );
     }
 }
