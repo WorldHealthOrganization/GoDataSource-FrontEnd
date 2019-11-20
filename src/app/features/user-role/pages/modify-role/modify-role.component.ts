@@ -30,6 +30,9 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
         new BreadcrumbItemModel('LNG_PAGE_LIST_USER_ROLES_TITLE', '/user-roles'),
     ];
 
+    // constants
+    PermissionModel = PermissionModel;
+
     authUser: UserModel;
     userRoleId: string;
     userRole: UserRoleModel = new UserRoleModel();

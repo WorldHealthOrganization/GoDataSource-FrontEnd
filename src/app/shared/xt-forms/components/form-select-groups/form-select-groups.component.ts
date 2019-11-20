@@ -5,13 +5,18 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
 import { MatOptionSelectionChange, MatSelect } from '@angular/material';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
+/**
+ * Used to map groups for easy access to a group by using its unique key
+ */
 export interface ISelectGroupMap<T> {
     [groupValueKey: string]: T;
 }
 
+/**
+ * Used to map group child options for easy access to a options and its parent group by using its unique key
+ */
 export interface ISelectGroupOptionMap<T> {
     [optionValue: string]: {
         groupValue: string,
@@ -19,6 +24,9 @@ export interface ISelectGroupOptionMap<T> {
     };
 }
 
+/**
+ * Used to format child option labels & tooltips
+ */
 export interface ISelectGroupOptionFormatResponse {
     label: SafeHtml;
     tooltip: string;
@@ -36,21 +44,38 @@ export interface ISelectGroupOptionFormatResponse {
     }]
 })
 export class FormSelectGroupsComponent extends ElementBase<string[]> implements OnInit {
+    // identifier
     static identifier: number = 0;
 
+    // unique component id
+    public identifier = `form-select-groups-${FormSelectGroupsComponent.identifier++}`;
+
+    // form element
     @HostBinding('class.form-element-host') isFormElement = true;
 
+    // handler to mat select
     @ViewChild('selectGroup', { read: MatSelect }) matSelect: MatSelect;
 
+    // input data
     @Input() placeholder: string;
     @Input() required: boolean = false;
     @Input() disabled: boolean = false;
     @Input() name: string;
+    @Input() groupLabelKey: string;
+    @Input() groupValueKey: string;
+    @Input() groupTooltipKey: string;
+    @Input() groupOptionsKey: string;
+    @Input() groupOptionLabelKey: string;
+    @Input() groupOptionValueKey: string;
+    @Input() groupOptionTooltipKey: string;
+    @Input() groupNoneLabel: string;
+    @Input() groupNoneTooltip: string;
+    @Input() groupPartialLabel: string;
+    @Input() groupPartialTooltip: string;
+    @Input() groupAllLabel: string;
+    @Input() groupAllTooltip: string;
 
-    // constants
-    PERMISSION = PERMISSION;
-
-    // data
+    // internal data used to map custom group options
     groupKeys: {
         partial: {
             [groupValueKey: string]: string
@@ -77,14 +102,23 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
         }
     };
 
-    partialPermissions: {
+    // partial option - child options that were selected - label
+    partialOptions: {
         [partielKey: string]: string
     } = {};
+
+    // mapped group list for easy access to a group using group unique key
     groupsMap: ISelectGroupMap<any> = {};
+
+    // mapped group option list for easy access to a option or its parent group using option unique key
     optionsMap: ISelectGroupOptionMap<any> = {};
+
+    // list of expanded groups - display child options instead of group options ( none, partial, all )
     expandedGroups: {
         [groupId: string]: boolean
     } = {};
+
+    // group data - select options
     private _groups: any[];
     @Input() set groups(groups: any[]) {
         // set groups
@@ -92,53 +126,8 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
 
         // wait for binding to take place
         setTimeout(() => {
-            // reset expanded groups
-            this.expandedGroups = {};
-
-            // map group options to groups
-            // option id should be unique on all groups and not only under parent group
-            // due to optimization right not it ISN'T NEEDED to run this logic after groupOptionsKey / groupValueKey / groupOptionValueKey / this.value changes
-            this.optionsMap = {};
-            this.groupsMap = {};
-            this.partialPermissions = {};
-            this.groupKeys = {
-                partial: {},
-                none: {},
-                map: {
-                    partial: {},
-                    none: {}
-                }
-            };
-            if (
-                this.groups &&
-                this.groupOptionsKey &&
-                this.groupValueKey &&
-                this.groupOptionValueKey
-            ) {
-                this.groups.forEach((group) => {
-                    // map group
-                    this.groupsMap[group[this.groupValueKey]] = group;
-
-                    // set partial key
-                    const partialValue: string = uuid();
-                    this.groupKeys.partial[group[this.groupValueKey]] = partialValue;
-                    this.groupKeys.map.partial[partialValue] = group[this.groupValueKey];
-
-                    // set none key
-                    const noneValue: string = uuid();
-                    this.groupKeys.none[group[this.groupValueKey]] = noneValue;
-                    this.groupKeys.map.none[noneValue] = group[this.groupValueKey];
-
-                    // map options
-                    (group[this.groupOptionsKey] || []).forEach((option) => {
-                        // map option
-                        this.optionsMap[option[this.groupOptionValueKey]] = {
-                            groupValue: group[this.groupValueKey],
-                            option: option
-                        };
-                    });
-                });
-            }
+            // initialize groups
+            this.initializeGroups();
 
             // translate tooltips
             this.initializeGroupLabelsAndTooltips();
@@ -150,21 +139,8 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
     get groups(): any[] {
         return this._groups;
     }
-    @Input() groupLabelKey: string;
-    @Input() groupValueKey: string;
-    @Input() groupTooltipKey: string;
-    @Input() groupOptionsKey: string;
-    @Input() groupOptionLabelKey: string;
-    @Input() groupOptionValueKey: string;
-    @Input() groupOptionTooltipKey: string;
 
-    @Input() groupNoneLabel: string;
-    @Input() groupNoneTooltip: string;
-    @Input() groupPartialLabel: string;
-    @Input() groupPartialTooltip: string;
-    @Input() groupAllLabel: string;
-    @Input() groupAllTooltip: string;
-
+    // select tooltip language handler
     private _tooltipToken: string;
     private _tooltip: string;
     @Input() set tooltip(tooltip: string) {
@@ -175,29 +151,23 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
         return this._tooltip;
     }
 
-    public identifier = `form-select-groups-${FormSelectGroupsComponent.identifier++}`;
-
+    // what we see when mat select is collapsed - selected value
     selectTriggerText: string = '';
 
+    // event triggered when value changes ( called after popup closes )
     @Output() optionChanged = new EventEmitter<any>();
 
-    /**
-     * Tooltip translations
-     */
-    tooltipTranslations: {
-        [groupOptionValueKey: string]: string
-    } = {};
-
-    /**
-     * Label translations
-     */
+    // group child option label translations - optimization
     labelTranslations: {
         [groupOptionLabelKey: string]: SafeHtml
     } = {};
 
-    /**
-     * Used to format group options labels / tooltips.. ( add extra information )
-     */
+    // group child option tooltip translations - optimization
+    tooltipTranslations: {
+        [groupOptionValueKey: string]: string
+    } = {};
+
+    // used to format group options labels / tooltips.. ( add extra information )
     @Input() groupOptionFormatMethod: (
         sanitized: DomSanitizer,
         i18nService: I18nService,
@@ -205,6 +175,19 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
         optionsMap: ISelectGroupOptionMap<any>,
         option: any
     ) => ISelectGroupOptionFormatResponse;
+
+    // list of items should be displayed as default values
+    private _defaultValues: any[] = [];
+    public get defaultValues(): any[] {
+        return this._defaultValues;
+    }
+    @Input() public set defaultValues(defaultValues: any[]) {
+        // set default values
+        this._defaultValues = defaultValues;
+
+        // add default values if necessary
+        this.initializeDefaultValues(this.value);
+    }
 
     /**
      * Constructor
@@ -256,6 +239,59 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
     }
 
     /**
+     * Initialize Groups
+     */
+    initializeGroups() {
+        // reset expanded groups
+        this.expandedGroups = {};
+
+        // map group options to groups
+        // option id should be unique on all groups and not only under parent group
+        // due to optimization right not it ISN'T NEEDED to run this logic after groupOptionsKey / groupValueKey / groupOptionValueKey / this.value changes
+        this.optionsMap = {};
+        this.groupsMap = {};
+        this.partialOptions = {};
+        this.groupKeys = {
+            partial: {},
+            none: {},
+            map: {
+                partial: {},
+                none: {}
+            }
+        };
+        if (
+            this.groups &&
+            this.groupOptionsKey &&
+            this.groupValueKey &&
+            this.groupOptionValueKey
+        ) {
+            this.groups.forEach((group) => {
+                // map group
+                this.groupsMap[group[this.groupValueKey]] = group;
+
+                // set partial key
+                const partialValue: string = uuid();
+                this.groupKeys.partial[group[this.groupValueKey]] = partialValue;
+                this.groupKeys.map.partial[partialValue] = group[this.groupValueKey];
+
+                // set none key
+                const noneValue: string = uuid();
+                this.groupKeys.none[group[this.groupValueKey]] = noneValue;
+                this.groupKeys.map.none[noneValue] = group[this.groupValueKey];
+
+                // map options
+                (group[this.groupOptionsKey] || []).forEach((option) => {
+                    // map option
+                    this.optionsMap[option[this.groupOptionValueKey]] = {
+                        groupValue: group[this.groupValueKey],
+                        option: option
+                    };
+                });
+            });
+        }
+    }
+
+    /**
      * Translate tooltips - optimization so we don't trigger translation multiple times because of the binding system
      */
     initializeGroupLabelsAndTooltips() {
@@ -290,16 +326,24 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
                     );
 
                     // label
-                    this.labelTranslations[option[this.groupOptionLabelKey]] = formatResponse.label ? formatResponse.label : '';
+                    if (this.groupOptionLabelKey) {
+                        this.labelTranslations[option[this.groupOptionLabelKey]] = formatResponse.label ? formatResponse.label : '';
+                    }
 
                     // tooltip
-                    this.tooltipTranslations[option[this.groupOptionTooltipKey]] = formatResponse.tooltip ? formatResponse.tooltip : '';
+                    if (this.groupOptionTooltipKey) {
+                        this.tooltipTranslations[option[this.groupOptionTooltipKey]] = formatResponse.tooltip ? formatResponse.tooltip : '';
+                    }
                 } else {
                     // label
-                    this.labelTranslations[option[this.groupOptionLabelKey]] = this.i18nService.instant(option[this.groupOptionLabelKey]);
+                    if (this.groupOptionLabelKey) {
+                        this.labelTranslations[option[this.groupOptionLabelKey]] = this.i18nService.instant(option[this.groupOptionLabelKey]);
+                    }
 
                     // tooltip
-                    this.tooltipTranslations[option[this.groupOptionTooltipKey]] = this.i18nService.instant(option[this.groupOptionTooltipKey]);
+                    if (this.groupOptionTooltipKey) {
+                        this.tooltipTranslations[option[this.groupOptionTooltipKey]] = this.i18nService.instant(option[this.groupOptionTooltipKey]);
+                    }
                 }
             });
         });
@@ -496,9 +540,9 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
         dontCallSelectGroup?: boolean
     ) {
         // reset all partial keys
-        this.partialPermissions = {};
+        this.partialOptions = {};
         _.each(this.groupKeys.map.partial, (groupValueKey: string, partialValue: string) => {
-            this.partialPermissions[partialValue] = '';
+            this.partialOptions[partialValue] = '';
         });
 
         // check partial check
@@ -514,9 +558,9 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
                         this.optionsMap[selectedValue] &&
                         this.optionsMap[selectedValue].groupValue === groupValueKey
                     ) {
-                        // add name to the list of permissions
-                        this.partialPermissions[value] = this.partialPermissions[value] +
-                            (this.partialPermissions[value] ? ', ' : ' - ') +
+                        // add name to the list of selected child options
+                        this.partialOptions[value] = this.partialOptions[value] +
+                            (this.partialOptions[value] ? ', ' : ' - ') +
                             this.i18nService.instant(this.optionsMap[selectedValue].option[this.groupOptionLabelKey]);
 
                         // already added to the list ?
@@ -558,11 +602,7 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
             this.valueChangedTrigger();
 
             // emit change event
-            this.optionChanged.emit(
-                (this.value || []).filter(
-                    (permissionId: string) => ([PERMISSION.SYSTEM_VERSION_VIEW] as string[]).indexOf(permissionId) < 0
-                )
-            );
+            this.optionChanged.emit(this.value);
         }
     }
 
@@ -670,14 +710,33 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
     }
 
     /**
+     * Initialize default values
+     */
+    initializeDefaultValues(value: string[]) {
+        if (
+            value &&
+            this.groupOptionValueKey
+        ) {
+            (this.defaultValues || []).forEach((defaultValue) => {
+                if (
+                    defaultValue[this.groupOptionValueKey] &&
+                    value.indexOf(defaultValue[this.groupOptionValueKey]) < 0
+                ) {
+                    value.push(defaultValue[this.groupOptionValueKey]);
+                }
+            });
+        }
+    }
+
+    /**
      * All users should have access to view system version
      */
     writeValue(value: string[]) {
         // add system version view ?
         value = value ? value : [];
-        if (value && value.indexOf(PERMISSION.SYSTEM_VERSION_VIEW) < 0) {
-            value.push(PERMISSION.SYSTEM_VERSION_VIEW);
-        }
+
+        // add default values if necessary
+        this.initializeDefaultValues(value);
 
         // send data further to parent
         super.writeValue(value);

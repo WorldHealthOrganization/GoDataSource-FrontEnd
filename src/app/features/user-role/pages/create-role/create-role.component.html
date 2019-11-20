@@ -37,6 +37,7 @@
                             required="true"
                             [groups]="availablePermissions$ | async"
                             [groupOptionFormatMethod]="groupOptionFormatMethod"
+                            [defaultValues]="PermissionModel.HIDDEN_PERMISSIONS"
                             groupLabelKey="groupLabel"
                             groupTooltipKey="groupDescription"
                             groupValueKey="groupAllId"

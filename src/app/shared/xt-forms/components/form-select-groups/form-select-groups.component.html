@@ -22,10 +22,11 @@
 
             <!-- Needed to actually select partial records when nothing selectable is visible -->
             <mat-option
-                [value]="PERMISSION.SYSTEM_VERSION_VIEW"
+                *ngFor="let defaultValue of defaultValues"
+                [value]="defaultValue[groupOptionValueKey]"
                 disabled="true"
-                [matTooltip]="'LNG_ROLE_AVAILABLE_PERMISSIONS_VIEW_SYSTEM_VERSION_DESCRIPTION' | translate">
-                {{ 'LNG_ROLE_AVAILABLE_PERMISSIONS_VIEW_SYSTEM_VERSION' | translate }}
+                [matTooltip]="defaultValue[groupOptionTooltipKey] | translate">
+                {{ defaultValue[groupOptionLabelKey] | translate }}
             </mat-option>
 
             <!-- Render select panel -->
@@ -62,7 +63,7 @@
                         [matTooltip]="groupPartialTooltip | translate"
                         (onSelectionChange)="uncheckOthers($event)"
                         (click)="clickedGroup($event, group, 'select-group-option-partial')">
-                        {{ groupPartialLabel | translate:{ permissions: partialPermissions[groupKeys.partial[group[groupValueKey]]] } }}
+                        {{ groupPartialLabel | translate:{ partialLabels: partialOptions[groupKeys.partial[group[groupValueKey]]] } }}
                     </mat-option>
                     <mat-option
                         class="select-group-option"
@@ -80,8 +81,11 @@
                     <mat-option
                         *ngFor="let option of group[groupOptionsKey]"
                         [value]="option[groupOptionValueKey]"
-                        [matTooltip]="tooltipTranslations[option[groupOptionTooltipKey]]"
-                        [innerHTML]="labelTranslations[option[groupOptionLabelKey]]">
+                        [matTooltip]="tooltipTranslations[option[groupOptionTooltipKey]]">
+                        <div
+                            fxLayout="row"
+                            [innerHTML]="labelTranslations[option[groupOptionLabelKey]]">
+                        </div>
                     </mat-option>
                 </ng-container>
             </mat-optgroup>

@@ -24,11 +24,13 @@ import { DomSanitizer } from '@angular/platform-browser';
     styleUrls: ['./create-role.component.less']
 })
 export class CreateRoleComponent extends ConfirmOnFormChanges {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_USER_ROLES_TITLE', '..'),
         new BreadcrumbItemModel('LNG_PAGE_CREATE_USER_ROLE_TITLE', '.', true)
     ];
+
+    // constants
+    PermissionModel = PermissionModel;
 
     newUserRole: UserRoleModel = new UserRoleModel();
     availablePermissions$: Observable<any[]>;

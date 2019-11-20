@@ -148,11 +148,24 @@ export interface IPermissionChildModel {
 }
 
 export class PermissionModel {
+    // list of permissions that can be excluded from save
+    static HIDDEN_PERMISSIONS: IPermissionChildModel[] = [
+        {
+            id: PERMISSION.SYSTEM_VERSION_VIEW,
+            label: 'LNG_ROLE_AVAILABLE_PERMISSIONS_VIEW_SYSTEM_VERSION',
+            description: 'LNG_ROLE_AVAILABLE_PERMISSIONS_VIEW_SYSTEM_VERSION_DESCRIPTION'
+        }
+    ];
+
+    // data
     groupAllId: string;
     groupLabel: string;
     groupDescription: string;
     permissions: IPermissionChildModel[] = [];
 
+    /**
+     * Constructor
+     */
     constructor(data = null) {
         this.groupAllId = _.get(data, 'groupAllId');
         this.groupLabel = _.get(data, 'groupLabel');
