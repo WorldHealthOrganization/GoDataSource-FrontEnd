@@ -189,6 +189,9 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
         this.initializeDefaultValues(this.value);
     }
 
+    // valueChanged method triggered
+    valueChangedTriggered: boolean = false;
+
     /**
      * Constructor
      */
@@ -244,6 +247,9 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
     initializeGroups() {
         // reset expanded groups
         this.expandedGroups = {};
+
+        // reset value changed triggered
+        this.valueChangedTriggered = false;
 
         // map group options to groups
         // option id should be unique on all groups and not only under parent group
@@ -574,6 +580,10 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
 
         // select missing keys if needed
         if (!dontCallSelectGroup) {
+            // announce that value changes was triggered
+            this.valueChangedTriggered = true;
+
+            // determine group keys
             setTimeout(() => {
                 this.selectGroupKeys();
             });
@@ -602,7 +612,15 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
             this.valueChangedTrigger();
 
             // emit change event
-            this.optionChanged.emit(this.value);
+            if (this.valueChangedTriggered) {
+                // reset change trigger
+                this.valueChangedTriggered = false;
+
+                // emit event after binding is done
+                setTimeout(() => {
+                    this.optionChanged.emit(this.value);
+                });
+            }
         }
     }
 
@@ -740,6 +758,9 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
 
         // send data further to parent
         super.writeValue(value);
+
+        // reset value changed triggered
+        this.valueChangedTriggered = false;
 
         // render options
         this.valueChangedTrigger();
