@@ -1,6 +1,6 @@
 import { DomSanitizer } from '@angular/platform-browser';
 import { I18nService } from '../services/helper/i18n.service';
-import { IGroupOptionEventData, ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../shared/xt-forms/components/form-select-groups/form-select-groups.component';
+import { GroupEventDataAction, IGroupEventData, IGroupOptionEventData, ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../shared/xt-forms/components/form-select-groups/form-select-groups.component';
 import { IPermissionChildModel, PERMISSION, PermissionModel } from '../models/permission.model';
 import { DialogService } from '../services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration } from '../../shared/components';
@@ -338,6 +338,21 @@ export class UserRoleHelper {
                 determineRequiredBy(selectedOption.id),
                 [selectedOption.id]
             );
+        }
+    }
+
+    /**
+     * Group checked other option ( all / none / partial )
+     */
+    public static groupSelectionChanged(
+        data: IGroupEventData
+    ) {
+        // we're interested only if we jump from all or partial to none since from none to partial isn't possible
+        //    and partial is handled in groupOptionCheckStateChanged method
+        // jumping from none or partial to all ...doesn't matter since we get full access
+        if (data.action === GroupEventDataAction.None) {
+            // #TODO
+            console.log(data);
         }
     }
 }

@@ -103,8 +103,9 @@ export class CreateRoleComponent extends ConfirmOnFormChanges {
      * Group checked other option ( all / none / partial )
      */
     groupSelectionChanged(data: IGroupEventData) {
-        // #TODO
-        console.log(data);
+        UserRoleHelper.groupSelectionChanged(
+            data
+        );
     }
 
     /**
