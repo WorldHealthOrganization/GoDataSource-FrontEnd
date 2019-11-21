@@ -81,7 +81,8 @@
                     <mat-option
                         *ngFor="let option of group[groupOptionsKey]"
                         [value]="option[groupOptionValueKey]"
-                        [matTooltip]="tooltipTranslations[option[groupOptionTooltipKey]]">
+                        [matTooltip]="tooltipTranslations[option[groupOptionTooltipKey]]"
+                        (onSelectionChange)="checkedChildOption($event)">
                         <div
                             fxLayout="row"
                             [innerHTML]="labelTranslations[option[groupOptionLabelKey]]">

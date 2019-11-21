@@ -6,7 +6,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
+import { PERMISSION, PermissionModel } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -27,6 +27,9 @@ export class RolesListComponent extends ListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Roles', '.', true)
     ];
+
+    // constants
+    PermissionModel = PermissionModel;
 
     // authenticated user
     authUser: UserModel;

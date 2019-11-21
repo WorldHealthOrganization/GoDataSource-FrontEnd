@@ -52,6 +52,7 @@
                                 [groups]="availablePermissions$ | async"
                                 [groupOptionFormatMethod]="groupOptionFormatMethod"
                                 [defaultValues]="PermissionModel.HIDDEN_PERMISSIONS"
+                                removeDefaultOptionOnOptionChanged="true"
                                 groupLabelKey="groupLabel"
                                 groupTooltipKey="groupDescription"
                                 groupValueKey="groupAllId"
@@ -64,7 +65,9 @@
                                 groupNoneLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE"
                                 groupNoneTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE_DESCRIPTION"
                                 groupPartialLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL"
-                                groupPartialTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL_DESCRIPTION">
+                                groupPartialTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL_DESCRIPTION"
+                                (groupSelectionChanged)="groupSelectionChanged($event)"
+                                (groupOptionCheckStateChanged)="groupOptionCheckStateChanged($event)">
                             </app-form-select-groups>
                         </div>
                     </div>
