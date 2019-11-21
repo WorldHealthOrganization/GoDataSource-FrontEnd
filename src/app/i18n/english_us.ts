@@ -20,7 +20,11 @@ export const EnglishUsLang = {
         'LNG_FORM_HOT_TABLE_WRAPPER_LOADING_LOCATIONS_TITLE': 'Loading locations',
         'LNG_FORM_HOT_TABLE_WRAPPER_CHANGE_LOCATION_DIALOG_TITLE': 'Change location',
 
-
+        /**
+         * uiCaseFields
+         */
+        'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS': 'Number of contacts',
+        'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES': 'Number of exposures',
 
         /**
          * REMOVE the tokens from below

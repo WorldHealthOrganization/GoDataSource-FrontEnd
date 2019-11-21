@@ -35,6 +35,7 @@ import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AddressType } from '../../../../core/models/address.model';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 
 @Component({
     selector: 'app-cases-list',
@@ -406,7 +407,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         private i18nService: I18nService,
         private genericDataService: GenericDataService,
         private clusterDataService: ClusterDataService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
+        private relationshipDataService: RelationshipDataService
     ) {
         super(
             snackbarService,
@@ -586,6 +588,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 field: 'updatedAt',
                 label: 'LNG_CASE_FIELD_LABEL_UPDATED_AT',
                 visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'numberOfContacts',
+                label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS'
+            }),
+            new VisibleColumnModel({
+                field: 'numberOfExposures',
+                label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES'
             })
         ];
     }
@@ -1302,5 +1312,46 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
         // refresh list
         this.needsRefreshList();
+    }
+
+    /**
+     * Display relationships popup
+     */
+    displayRelationships(entityType: EntityType,
+                         entityId: string,
+                         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) {
+        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+        this.relationshipDataService
+            .getEntityContacts(
+                this.selectedOutbreak.id,
+                entityType,
+                entityId,
+                queryBuilder
+            )
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    // hide loading
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
+            .subscribe((relationships) => {
+                console.log(relationships);
+                // hide loading
+                loadingDialog.close();
+                // this.dialogService.showCustomDialog(
+                //     ViewCotEdgeDialogComponent,
+                //     {
+                //         ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+                //         ...{
+                //             data: {
+                //                 relationship: relationships
+                //             }
+                //         }
+                //     }
+                // );
+            });
+
     }
 }
