@@ -94,6 +94,156 @@ export class UserRoleHelper {
     }
 
     /**
+     * Display popup with required permissions
+     */
+    private static displayRequiredByPopup(
+        sanitized: DomSanitizer,
+        i18nService: I18nService,
+        dialogService: DialogService,
+        data: {
+            readonly optionsMap: ISelectGroupOptionMap<any>,
+            readonly groupsMap: ISelectGroupMap<any>,
+            value: string[],
+            addValues(...values: string[]): string[]
+        },
+        requiredByList: string[],
+        selectBackIds: string[],
+        doAfterPopupCloses?: () => void,
+        thirdButton?: {
+            label: string,
+            action: () => void,
+            requiredPermissions: string[]
+        }
+    ) {
+        // display confirm popup if we are sure we wan't to uncheck this option
+        if (
+            !requiredByList ||
+            requiredByList.length < 1
+        ) {
+            return;
+        }
+
+        // labels
+        const requiredByLabel: string = i18nService.instant('LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRED_BY_PERMISSIONS_LABEL');
+        const requiredLabel: string = i18nService.instant('LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRED_PERMISSIONS_LABEL');
+
+        // determine missing permission labels
+        let labels: string[] = requiredByList.map((permission): string => {
+            return `<div>${data.optionsMap[permission] ?
+                i18nService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) : (
+                    data.groupsMap[permission] ?
+                        i18nService.instant((data.groupsMap[permission] as PermissionModel).groupLabel) :
+                        permission
+                )}</div>`;
+        });
+
+        // add required permissions ?
+        if (
+            thirdButton &&
+            thirdButton.requiredPermissions &&
+            thirdButton.requiredPermissions.length > 0
+        ) {
+            labels = [
+                `<div style="font-weight: bold;">${requiredByLabel}</div>`,
+                ...labels,
+                `<br /><div style="font-weight: bold;">${requiredLabel}</div>`,
+                ...thirdButton.requiredPermissions.map((permission): string => {
+                    return `<div>${data.optionsMap[permission] ?
+                        i18nService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) :
+                        permission
+                    }</div>`;
+                })
+            ];
+        }
+
+        // configure dialog
+        const dialogConfiguration = new DialogConfiguration({
+            message: 'LNG_ROLE_AVAILABLE_PERMISSIONS_UNCHECK_CONFIRM_POPUP_MESSAGE',
+            additionalInfo: sanitized.bypassSecurityTrustHtml(labels.join('')),
+            yesLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_UNCHECK_CONFIRM_POPUP_YES_LABEL',
+            cancelLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_UNCHECK_CONFIRM_POPUP_NO_LABEL'
+        });
+
+        // handle third button
+        if (thirdButton) {
+            dialogConfiguration.addDefaultButtons = true;
+            dialogConfiguration.buttons = [
+                new DialogButton({
+                    label: thirdButton.label,
+                    clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                        dialogHandler.close(new DialogAnswer(DialogAnswerButton.Extra_1));
+                    }
+                })
+            ];
+        }
+
+        // display confirm dialog - should we check back the unchecked option ?
+        dialogService
+            .showConfirm(dialogConfiguration)
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    data.value = data.addValues(...selectBackIds);
+                } else if (answer.button === DialogAnswerButton.Extra_1) {
+                    thirdButton.action();
+                }
+
+                // finished
+                if (doAfterPopupCloses) {
+                    doAfterPopupCloses();
+                }
+            });
+    }
+
+    /**
+     * Determine what permissions depend on a specific permission
+     */
+    private static determineRequiredBy(
+        data: {
+            readonly optionsMap: ISelectGroupOptionMap<any>,
+            readonly groupsMap: ISelectGroupMap<any>,
+            value: string[]
+        },
+        selectedOptionId: string
+    ): string[] {
+        // check child options
+        const requiredList: string[] = [];
+        data.value.forEach((checkedOption: string) => {
+            // child / group options
+            if (data.optionsMap[checkedOption]) {
+                // child option
+                const option: IPermissionChildModel = data.optionsMap[checkedOption].option;
+                if (
+                    option &&
+                    option.requires &&
+                    option.requires.length > 0 &&
+                    option.requires.indexOf(selectedOptionId as any) > -1
+                ) {
+                    requiredList.push(option.id);
+                }
+            } else if (data.groupsMap[checkedOption]) {
+                // group option
+                const group: PermissionModel = data.groupsMap[checkedOption];
+                _.each(group.permissions, (permission: IPermissionChildModel) => {
+                    if (
+                        permission.requires &&
+                        permission.requires.length > 0 &&
+                        permission.requires.indexOf(selectedOptionId as any) > -1
+                    ) {
+                        // add group to list of items that requires this option
+                        requiredList.push(checkedOption);
+
+                        // stop for each
+                        return false;
+                    }
+                });
+            }
+        });
+
+        // finished
+        return requiredList;
+    }
+
+    /**
      * Group child option check state changed
      */
     public static groupOptionCheckStateChanged(
@@ -107,136 +257,6 @@ export class UserRoleHelper {
         if (!selectedOption) {
             return;
         }
-
-        // determine what permissions depend on a specific permission
-        const determineRequiredBy = (selectedOptionId: string): string[] => {
-            // check child options
-            const requiredList: string[] = [];
-            data.value.forEach((checkedOption: string) => {
-                // child / group options
-                if (data.optionsMap[checkedOption]) {
-                    // child option
-                    const option: IPermissionChildModel = data.optionsMap[checkedOption].option;
-                    if (
-                        option &&
-                        option.requires &&
-                        option.requires.length > 0 &&
-                        option.requires.indexOf(selectedOptionId as any) > -1
-                    ) {
-                        requiredList.push(option.id);
-                    }
-                } else if (data.groupsMap[checkedOption]) {
-                    // group option
-                    const group: PermissionModel = data.groupsMap[checkedOption];
-                    _.each(group.permissions, (permission: IPermissionChildModel) => {
-                        if (
-                            permission.requires &&
-                            permission.requires.length > 0 &&
-                            permission.requires.indexOf(selectedOptionId as any) > -1
-                        ) {
-                            // add group to list of items that requires this option
-                            requiredList.push(checkedOption);
-
-                            // stop for each
-                            return false;
-                        }
-                    });
-                }
-            });
-
-            // finished
-            return requiredList;
-        };
-
-        // display required by popup only if we need to
-        const displayRequiredByPopup = (
-            requiredByList: string[],
-            selectBackIds: string[],
-            doAfterPopupCloses?: () => void,
-            thirdButton?: {
-                label: string,
-                action: () => void,
-                requiredPermissions: string[]
-            }
-        ) => {
-            // display confirm popup if we are sure we wan't to uncheck this option
-            if (
-                !requiredByList ||
-                requiredByList.length < 1
-            ) {
-                return;
-            }
-
-            // labels
-            const requiredByLabel: string = i18nService.instant('LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRED_BY_PERMISSIONS_LABEL');
-            const requiredLabel: string = i18nService.instant('LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRED_PERMISSIONS_LABEL');
-
-            // determine missing permission labels
-            let labels: string[] = requiredByList.map((permission): string => {
-                return `<div>${data.optionsMap[permission] ?
-                    i18nService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) : (
-                        data.groupsMap[permission] ?
-                            i18nService.instant((data.groupsMap[permission] as PermissionModel).groupLabel) :
-                            permission
-                    )}</div>`;
-            });
-
-            // add required permissions ?
-            if (
-                thirdButton &&
-                thirdButton.requiredPermissions &&
-                thirdButton.requiredPermissions.length > 0
-            ) {
-                labels = [
-                    `<div style="font-weight: bold;">${requiredByLabel}</div>`,
-                    ...labels,
-                    `<br /><div style="font-weight: bold;">${requiredLabel}</div>`,
-                    ...thirdButton.requiredPermissions.map((permission): string => {
-                        return `<div>${data.optionsMap[permission] ?
-                            i18nService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) :
-                            permission
-                        }</div>`;
-                    })
-                ];
-            }
-
-            // configure dialog
-            const dialogConfiguration = new DialogConfiguration({
-                message: 'LNG_ROLE_AVAILABLE_PERMISSIONS_UNCHECK_CONFIRM_POPUP_MESSAGE',
-                additionalInfo: sanitized.bypassSecurityTrustHtml(labels.join('')),
-                yesLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_UNCHECK_CONFIRM_POPUP_YES_LABEL',
-                cancelLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_UNCHECK_CONFIRM_POPUP_NO_LABEL'
-            });
-
-            // handle third button
-            if (thirdButton) {
-                dialogConfiguration.addDefaultButtons = true;
-                dialogConfiguration.buttons = [
-                    new DialogButton({
-                        label: thirdButton.label,
-                        clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-                            dialogHandler.close(new DialogAnswer(DialogAnswerButton.Extra_1));
-                        }
-                    })
-                ];
-            }
-
-            // display confirm dialog - should we check back the unchecked option ?
-            dialogService
-                .showConfirm(dialogConfiguration)
-                .subscribe((answer: DialogAnswer) => {
-                    if (answer.button === DialogAnswerButton.Yes) {
-                        data.value = data.addValues(...selectBackIds);
-                    } else if (answer.button === DialogAnswerButton.Extra_1) {
-                        thirdButton.action();
-                    }
-
-                    // finished
-                    if (doAfterPopupCloses) {
-                        doAfterPopupCloses();
-                    }
-                });
-        };
 
         // if we check this one, then we need to make sure we have all required permission checked as well
         if (data.checked) {
@@ -295,7 +315,10 @@ export class UserRoleHelper {
                         // don't take in account the checked one
                         if (groupPermission.id !== selectedOption.id) {
                             // retrieve list of required by
-                            const requiredBy: string[] = determineRequiredBy(groupPermission.id);
+                            const requiredBy: string[] = UserRoleHelper.determineRequiredBy(
+                                data,
+                                groupPermission.id
+                            );
 
                             // did we find any dependable permissions ?
                             if (requiredBy.length > 0) {
@@ -313,7 +336,11 @@ export class UserRoleHelper {
                     });
 
                     // display dependable options
-                    displayRequiredByPopup(
+                    UserRoleHelper.displayRequiredByPopup(
+                        sanitized,
+                        i18nService,
+                        dialogService,
+                        data,
                         selectedOptionRequiredByList,
                         [group.groupAllId],
                         () => {
@@ -334,8 +361,15 @@ export class UserRoleHelper {
             }
         } else if (data.value) {
             // option unchecked - need to see if thi isn't required by other permissions
-            displayRequiredByPopup(
-                determineRequiredBy(selectedOption.id),
+            UserRoleHelper.displayRequiredByPopup(
+                sanitized,
+                i18nService,
+                dialogService,
+                data,
+                UserRoleHelper.determineRequiredBy(
+                    data,
+                    selectedOption.id
+                ),
                 [selectedOption.id]
             );
         }
@@ -345,14 +379,93 @@ export class UserRoleHelper {
      * Group checked other option ( all / none / partial )
      */
     public static groupSelectionChanged(
-        data: IGroupEventData
+        data: IGroupEventData,
+        sanitized: DomSanitizer,
+        i18nService: I18nService,
+        dialogService: DialogService
     ) {
         // we're interested only if we jump from all or partial to none since from none to partial isn't possible
         //    and partial is handled in groupOptionCheckStateChanged method
         // jumping from none or partial to all ...doesn't matter since we get full access
         if (data.action === GroupEventDataAction.None) {
-            // #TODO
-            console.log(data);
+            // get data
+            const group: PermissionModel = data.group;
+
+            // determine partial / all permissions that were removed
+            const uncheckedPermissionIds: string[] = [];
+            const allUncheckedPermissionIds: string[] = [];
+            (data.previousValue || []).forEach((permissionId: string) => {
+                // check if it is an all permission
+                if (permissionId === group.groupAllId) {
+                    // add it the list of check to check back
+                    uncheckedPermissionIds.push(permissionId);
+
+                    // add unique values - not really needed since previousValue should contain only unique values
+                    (group.permissions || []).forEach((groupChildPermission) => {
+                        if (allUncheckedPermissionIds.indexOf(groupChildPermission.id) === -1) {
+                            allUncheckedPermissionIds.push(groupChildPermission.id);
+                        }
+                    });
+                } else if (
+                    data.optionsMap[permissionId] &&
+                    data.optionsMap[permissionId].groupValue === group.groupAllId
+                ) {
+                    // add unique values - not really needed since previousValue should contain only unique values
+                    if (allUncheckedPermissionIds.indexOf(permissionId) === -1) {
+                        // add it the list of check to check back
+                        uncheckedPermissionIds.push(permissionId);
+
+                        // add it to the list of checks needed
+                        allUncheckedPermissionIds.push(permissionId);
+                    }
+                }
+            });
+
+            // do we have changed permissions ?
+            if (allUncheckedPermissionIds.length > 0) {
+                // determine required by permissions
+                const requiredByPermissions: string[] = [];
+                const requiredPermissions: string[] = [];
+                allUncheckedPermissionIds.forEach((permissionId: string) => {
+                    // required by
+                    const tempRequiredBY = UserRoleHelper.determineRequiredBy(
+                        data,
+                        permissionId
+                    );
+
+                    // add to list only permissions that are actually required
+                    if (tempRequiredBY.length > 0) {
+                        requiredPermissions.push(permissionId);
+                    }
+
+                    // add unique values to required by list
+                    (tempRequiredBY || []).forEach((requiredByPermissionId: string) => {
+                        if (requiredByPermissions.indexOf(requiredByPermissionId) === -1) {
+                            requiredByPermissions.push(requiredByPermissionId);
+                        }
+                    });
+                });
+
+                // do we need to display revert back popup ?
+                if (requiredByPermissions.length > 0) {
+                    UserRoleHelper.displayRequiredByPopup(
+                        sanitized,
+                        i18nService,
+                        dialogService,
+                        data,
+                        requiredByPermissions,
+                        uncheckedPermissionIds,
+                        undefined,
+                        _.isEqual(uncheckedPermissionIds, requiredPermissions) ? undefined : {
+                            label: 'LNG_ROLE_AVAILABLE_PERMISSIONS_UNCHECK_CONFIRM_POPUP_YES_ONLY_REQUIRED_LABEL',
+                            requiredPermissions: requiredPermissions,
+                            action: () => {
+                                data.value = data.addValues(...requiredPermissions);
+                            }
+                        }
+                    );
+                }
+            }
         }
     }
 }

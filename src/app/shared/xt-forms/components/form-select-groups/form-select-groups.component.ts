@@ -20,22 +20,28 @@ export enum GroupEventDataAction {
  * Used for event input data
  */
 export interface IGroupEventData {
-    group: any;
-    action: GroupEventDataAction;
+    readonly group: any;
+    readonly action: GroupEventDataAction;
+
+    value: string[];
+    readonly groupsMap: ISelectGroupMap<any>;
+    readonly optionsMap: ISelectGroupOptionMap<any>;
+    readonly previousValue: string[];
+    addValues(...values: string[]): string[];
 }
 
 /**
  * Used for event input data
  */
 export interface IGroupOptionEventData {
-    group: any;
-    option: any;
-    checked: boolean;
+    readonly group: any;
+    readonly option: any;
+    readonly checked: boolean;
 
-    allWasSelected: boolean;
-    groupsMap: ISelectGroupMap<any>;
-    optionsMap: ISelectGroupOptionMap<any>;
     value: string[];
+    readonly groupsMap: ISelectGroupMap<any>;
+    readonly optionsMap: ISelectGroupOptionMap<any>;
+    readonly allWasSelected: boolean;
     addValues(...values: string[]): string[];
 }
 
@@ -714,11 +720,101 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
     }
 
     /**
+     * Add values
+     */
+    private internalAddValues(...values: string[]): string[] {
+        // add values and rerender list
+        // make sure we don't add duplicates
+        this.value = this.value || [];
+        let valueChanged: boolean = false;
+        const groupIds: string[] = [];
+        (values || []).forEach((value: string) => {
+            // did we already add it to the group ?
+            if (this.value.indexOf(value) < 0) {
+                // add to the list
+                this.value.push(value);
+
+                // if this is a group option, then we need to do some cleanup - remove partial options
+                if (
+                    this.groupsMap &&
+                    this.groupOptionValueKey &&
+                    this.groupOptionsKey &&
+                    this.groupsMap[value]
+                ) {
+                    groupIds.push(value);
+                }
+
+                // tell system that we need to update select options
+                valueChanged = true;
+            }
+        });
+
+        // update only if we have to
+        if (valueChanged) {
+            // check to see if one of these options was a group option
+            if (
+                this.value &&
+                groupIds.length > 0
+            ) {
+                groupIds.forEach((groupValueKey: string) => {
+                    // remove partial options
+                    const groupOptions: any[] = this.groupsMap[groupValueKey][this.groupOptionsKey];
+                    (groupOptions || []).forEach((groupOption: any) => {
+                        const groupOptionId: string = groupOption[this.groupOptionValueKey];
+                        let groupOptionIndex: number;
+                        if (
+                            groupOptionId &&
+                            (groupOptionIndex = this.value.indexOf(groupOptionId)) !== -1
+                        ) {
+                            // remove group child option since we checked group all option
+                            this.value.splice(groupOptionIndex, 1);
+                        }
+                    });
+
+                    // remove partial key if necessary
+                    const partialKeyIndex: number = this.value.indexOf(this.groupKeys.partial[groupValueKey]);
+                    if (partialKeyIndex !== -1) {
+                        this.value.splice(partialKeyIndex, 1);
+                    }
+
+                    // remove none key if necessary - this shouldn't be possible..but...
+                    const noneKeyIndex: number = this.value.indexOf(this.groupKeys.none[groupValueKey]);
+                    if (noneKeyIndex !== -1) {
+                        this.value.splice(noneKeyIndex, 1);
+                    }
+
+                    // collapse group
+                    if (this.expandedGroups[groupValueKey]) {
+                        this.expandedGroups[groupValueKey] = false;
+                    }
+                });
+            }
+
+            // update values with partial ones / group all
+            this.value = [...this.value];
+            this.valueChanged(this.value);
+
+            // force partial refresh keys
+            // fix for when jumping from 'None' to 'Partial' group checkbox
+            setTimeout(() => {
+                this.refreshPartialKeys(this.value);
+            });
+        }
+
+        // finished
+        return [...this.value];
+    }
+
+    /**
      * Uncheck other checkboxes ( all / partial / none )
      */
     uncheckOthers(changed: MatOptionSelectionChange) {
         // wait for data bind
         if (changed.isUserInput) {
+            // keep reference to previous value
+            const previousValue: string[] = this.value ? [...this.value] : [];
+
+            // wait for data to bind
             setTimeout(() => {
                 // handle group option checked & unchecked
                 if (
@@ -838,7 +934,14 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
                     ) {
                         this.groupSelectionChanged.emit({
                             action,
-                            group
+                            group,
+                            value: [...this.value],
+                            previousValue: previousValue,
+                            groupsMap: this.groupsMap,
+                            optionsMap: this.optionsMap,
+                            addValues: (...values: string[]): string[] => {
+                                return this.internalAddValues(...values);
+                            }
                         });
                     }
                 }
@@ -882,86 +985,7 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
                                 optionsMap: this.optionsMap,
                                 value: [...this.value],
                                 addValues: (...values: string[]): string[] => {
-                                    // add values and rerender list
-                                    // make sure we don't add duplicates
-                                    this.value = this.value || [];
-                                    let valueChanged: boolean = false;
-                                    const groupIds: string[] = [];
-                                    (values || []).forEach((value: string) => {
-                                        // did we already add it to the group ?
-                                        if (this.value.indexOf(value) < 0) {
-                                            // add to the list
-                                            this.value.push(value);
-
-                                            // if this is a group option, then we need to do some cleanup - remove partial options
-                                            if (
-                                                this.groupsMap &&
-                                                this.groupOptionValueKey &&
-                                                this.groupOptionsKey &&
-                                                this.groupsMap[value]
-                                            ) {
-                                                groupIds.push(value);
-                                            }
-
-                                            // tell system that we need to update select options
-                                            valueChanged = true;
-                                        }
-                                    });
-
-                                    // update only if we have to
-                                    if (valueChanged) {
-                                        // check to see if one of these options was a group option
-                                        if (
-                                            this.value &&
-                                            groupIds.length > 0
-                                        ) {
-                                            groupIds.forEach((groupValueKey: string) => {
-                                                // remove partial options
-                                                const groupOptions: any[] = this.groupsMap[groupValueKey][this.groupOptionsKey];
-                                                (groupOptions || []).forEach((groupOption: any) => {
-                                                    const groupOptionId: string = groupOption[this.groupOptionValueKey];
-                                                    let groupOptionIndex: number;
-                                                    if (
-                                                        groupOptionId &&
-                                                        (groupOptionIndex = this.value.indexOf(groupOptionId)) !== -1
-                                                    ) {
-                                                        // remove group child option since we checked group all option
-                                                        this.value.splice(groupOptionIndex, 1);
-                                                    }
-                                                });
-
-                                                // remove partial key if necessary
-                                                const partialKeyIndex: number = this.value.indexOf(this.groupKeys.partial[groupValueKey]);
-                                                if (partialKeyIndex !== -1) {
-                                                    this.value.splice(partialKeyIndex, 1);
-                                                }
-
-                                                // remove none key if necessary - this shouldn't be possible..but...
-                                                const noneKeyIndex: number = this.value.indexOf(this.groupKeys.none[groupValueKey]);
-                                                if (noneKeyIndex !== -1) {
-                                                    this.value.splice(noneKeyIndex, 1);
-                                                }
-
-                                                // collapse group
-                                                if (this.expandedGroups[groupValueKey]) {
-                                                    this.expandedGroups[groupValueKey] = false;
-                                                }
-                                            });
-                                        }
-
-                                        // update values with partial ones / group all
-                                        this.value = [...this.value];
-                                        this.valueChanged(this.value);
-
-                                        // force partial refresh keys
-                                        // fix for when jumping from 'None' to 'Partial' group checkbox
-                                        setTimeout(() => {
-                                            this.refreshPartialKeys(this.value);
-                                        });
-                                    }
-
-                                    // finished
-                                    return [...this.value];
+                                    return this.internalAddValues(...values);
                                 }
                             });
                         }

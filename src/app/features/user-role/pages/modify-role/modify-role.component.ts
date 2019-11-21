@@ -142,7 +142,10 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
      */
     groupSelectionChanged(data: IGroupEventData) {
         UserRoleHelper.groupSelectionChanged(
-            data
+            data,
+            this.sanitized,
+            this.i18nService,
+            this.dialogService
         );
     }
 

@@ -104,7 +104,10 @@ export class CreateRoleComponent extends ConfirmOnFormChanges {
      */
     groupSelectionChanged(data: IGroupEventData) {
         UserRoleHelper.groupSelectionChanged(
-            data
+            data,
+            this.sanitized,
+            this.i18nService,
+            this.dialogService
         );
     }
 
