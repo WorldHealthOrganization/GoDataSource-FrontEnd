@@ -10,7 +10,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, DialogField, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import {DialogAnswerButton, DialogField, HoverRowAction, HoverRowActionType, LoadingDialogModel, ViewEntityRelationshipsComponent} from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
@@ -1340,17 +1340,17 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 console.log(relationships);
                 // hide loading
                 loadingDialog.close();
-                // this.dialogService.showCustomDialog(
-                //     ViewCotEdgeDialogComponent,
-                //     {
-                //         ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
-                //         ...{
-                //             data: {
-                //                 relationship: relationships
-                //             }
-                //         }
-                //     }
-                // );
+                this.dialogService.showCustomDialog(
+                    ViewEntityRelationshipsComponent,
+                    {
+                        ...ViewEntityRelationshipsComponent.DEFAULT_CONFIG,
+                        ...{
+                            data: {
+                                relationship: relationships
+                            }
+                        }
+                    }
+                );
             });
 
     }

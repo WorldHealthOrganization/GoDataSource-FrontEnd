@@ -301,6 +301,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                         );
                     });
                 } else {
+                    console.log(`asdfg`);
                     // show node information
                     this.dialogService.showCustomDialog(
                         ViewCotNodeDialogComponent,

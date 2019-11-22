@@ -1,0 +1,26 @@
+<div fxLayout="column" fxLayoutGap="10px">
+    <!-- Title -->
+    <div class="dialog-title">
+        {{ 'TEST' | translate }}
+    </div>
+
+<!--    &lt;!&ndash; Specific model fields &ndash;&gt;-->
+<!--    <div *ngFor="let info of relationshipInfo" class="label-value">-->
+<!--        <span>{{info.label | translate}}</span>-->
+<!--        <span>{{info.value | translate}}</span>asdasdasd-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Link to resource &ndash;&gt;-->
+<!--    <a *ngIf="getResourceViewPageLink()" [href]="getResourceViewPageLink()" target="_blank">-->
+<!--        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE' | translate}}-->
+<!--    </a>-->
+
+    <div fxLayout="row" fxLayoutAlign="end">
+        <button
+            mat-button
+            (click)="closeDialog()"
+            type="button">
+            {{ 'LNG_COMMON_BUTTON_CANCEL' | translate | uppercase }}
+        </button>
+    </div>
+</div>

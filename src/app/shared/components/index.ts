@@ -51,6 +51,7 @@ import { FormNgxWigComponent } from './form-ngx-wig/form-ngx-wig.component';
 import { FormVaccinesListComponent } from './form-vaccines-list/form-vaccines-list.component';
 import { HotTableWrapperComponent } from './hot-table-wrapper/hot-table-wrapper.component';
 import { LocationDialogComponent } from './location-dialog/location-dialog.component';
+import { ViewEntityRelationshipsComponent } from './view-entity-relationships/view-entity-relationships.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -65,6 +66,7 @@ export * from './view-help-details-dialog/view-help-details-dialog.component';
 export * from './form-modify-questionnaire/form-modify-questionnaire.component';
 export * from './hover-row-actions/hover-row-actions.component';
 export * from './location-dialog/location-dialog.component';
+export * from './view-entity-relationships/view-entity-relationships.component';
 
 // export the list of all components
 export const components: any[] = [
@@ -125,6 +127,7 @@ export const components: any[] = [
     ViewHelpDialogComponent,
     ViewHelpDetailsDialogComponent,
     LocationDialogComponent,
+    ViewEntityRelationshipsComponent,
 
     // general
     ExportButtonComponent,
