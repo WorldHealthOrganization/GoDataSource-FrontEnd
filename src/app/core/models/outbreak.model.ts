@@ -3,11 +3,14 @@ import { QuestionModel } from './question.model';
 import { LocationModel } from './location.model';
 import { MapServerModel } from './map-server.model';
 import { BaseModel } from './base.model';
-import { IPermissionModel } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
+import { IPermissionBasic } from './permission.interface';
 
-export class OutbreakModel extends BaseModel implements IPermissionModel {
+export class OutbreakModel
+    extends BaseModel
+    implements
+        IPermissionBasic {
     id: string;
     name: string;
     description: string;

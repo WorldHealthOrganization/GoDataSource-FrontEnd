@@ -11,12 +11,18 @@ import { Constants } from './constants';
 import { moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { RelationshipPersonModel } from './relationship-person.model';
-import { IPermissionModel } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
+import { IPermissionBasic, IPermissionBasicBulk, IPermissionExportable, IPermissionRelationship } from './permission.interface';
 
-export class RelationshipModel extends BaseModel implements IPermissionModel {
+export class RelationshipModel
+    extends BaseModel
+    implements
+        IPermissionBasic,
+        IPermissionRelationship,
+        IPermissionExportable,
+        IPermissionBasicBulk {
     id: string;
     persons: RelationshipPersonModel[];
     contactDate: string;
@@ -42,7 +48,10 @@ export class RelationshipModel extends BaseModel implements IPermissionModel {
     static canReverse(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_REVERSE) : false); }
     static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_EXPORT) : false); }
     static canShare(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_SHARE) : false); }
+    static canBulkCreate(user: UserModel): boolean { return false; }
+    static canBulkModify(user: UserModel): boolean { return false; }
     static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_BULK_DELETE) : false); }
+    static canBulkRestore(user: UserModel): boolean { return false; }
 
     /**
      * Constructor
@@ -80,7 +89,10 @@ export class RelationshipModel extends BaseModel implements IPermissionModel {
     canReverse(user: UserModel): boolean { return RelationshipModel.canReverse(user); }
     canExport(user: UserModel): boolean { return RelationshipModel.canExport(user); }
     canShare(user: UserModel): boolean { return RelationshipModel.canShare(user); }
+    canBulkCreate(user: UserModel): boolean { return RelationshipModel.canBulkCreate(user); }
+    canBulkModify(user: UserModel): boolean { return RelationshipModel.canBulkModify(user); }
     canBulkDelete(user: UserModel): boolean { return RelationshipModel.canBulkDelete(user); }
+    canBulkRestore(user: UserModel): boolean { return RelationshipModel.canBulkRestore(user); }
 
     /**
      * Get the related entity

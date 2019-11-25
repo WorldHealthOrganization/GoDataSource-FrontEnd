@@ -6,10 +6,17 @@ import { EntityMatchedRelationshipModel } from './entity-matched-relationship.mo
 import { BaseModel } from './base.model';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
-import { IPermissionModel } from './permission.interface';
 import { OutbreakModel } from './outbreak.model';
+import { IPermissionBasic, IPermissionRelatedContact, IPermissionRelatedContactBulk, IPermissionRelatedRelationship, IPermissionRestorable } from './permission.interface';
 
-export class EventModel extends BaseModel implements IPermissionModel {
+export class EventModel
+    extends BaseModel
+    implements
+        IPermissionBasic,
+        IPermissionRelatedRelationship,
+        IPermissionRestorable,
+        IPermissionRelatedContact,
+        IPermissionRelatedContactBulk {
     id: string;
     name: string;
     date: string;
