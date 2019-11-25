@@ -63,6 +63,42 @@ export interface IPermissionExportable {
     canExport(user: UserModel): boolean;
 }
 
+export interface IPermissionCloneable {
+    /**
+     * Has permission to create a clone
+     */
+    canClone(user: UserModel): boolean;
+}
+
+export interface IPermissionQuestionnaire {
+    /**
+     * Has permission to modify case questionnaire
+     */
+    canModifyCaseQuestionnaire(user: UserModel): boolean;
+
+    /**
+     * Has permission to modify contact follow-up questionnaire
+     */
+    canModifyContactFollowUpQuestionnaire(user: UserModel): boolean;
+
+    /**
+     * Has permission to modify case lab result questionnaire
+     */
+    canModifyCaseLabResultQuestionnaire(user: UserModel): boolean;
+}
+
+export interface IPermissionOutbreak {
+    /**
+     * Has permission to make the selected outbreak active for the current user
+     */
+    canMakeOutbreakActive(user: UserModel): boolean;
+
+    /**
+     * Has permission to see inconsistencies in key dates
+     */
+    canSeeInconsistencies(user: UserModel): boolean;
+}
+
 export interface IPermissionRelatedContact {
     /**
      * Has permission that allows user to create a related contact ?

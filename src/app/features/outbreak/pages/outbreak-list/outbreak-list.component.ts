@@ -10,7 +10,6 @@ import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import * as _ from 'lodash';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
@@ -33,13 +32,13 @@ import { throwError } from 'rxjs';
     styleUrls: ['./outbreak-list.component.less']
 })
 export class OutbreakListComponent extends ListComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '.', true)
     ];
 
     // import constants into template
     Constants = Constants;
+    OutbreakModel = OutbreakModel;
 
     // list of existing outbreaks
     outbreaksList$: Observable<OutbreakModel[]>;
@@ -76,7 +75,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                 this.router.navigate(['/outbreaks', item.id, 'view']);
             },
             visible: (item: OutbreakModel): boolean => {
-                return !item.deleted;
+                return !item.deleted &&
+                    OutbreakModel.canView(this.authUser);
             }
         }),
 
@@ -89,7 +89,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
             },
             visible: (item: OutbreakModel): boolean => {
                 return !item.deleted &&
-                    this.hasOutbreakWriteAccess();
+                    OutbreakModel.canModify(this.authUser);
             }
         }),
 
@@ -103,7 +103,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
             visible: (item: OutbreakModel): boolean => {
                 return !item.deleted &&
                     this.authUser &&
-                    item.id !== this.authUser.activeOutbreakId;
+                    item.id !== this.authUser.activeOutbreakId &&
+                    OutbreakModel.canMakeOutbreakActive(this.authUser);
             }
         }),
 
@@ -120,7 +121,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                     },
                     visible: (item: OutbreakModel): boolean => {
                         return !item.deleted &&
-                            this.hasOutbreakWriteAccess();
+                            OutbreakModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -131,7 +132,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                     visible: (item: OutbreakModel): boolean => {
                         // visible only if at least one of the previous...
                         return !item.deleted &&
-                            this.hasOutbreakWriteAccess();
+                            OutbreakModel.canDelete(this.authUser);
                     }
                 }),
 
@@ -142,7 +143,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                         this.router.navigate(['/outbreaks', item.id, 'inconsistencies']);
                     },
                     visible: (item: OutbreakModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted &&
+                            OutbreakModel.canSeeInconsistencies(this.authUser);
                     }
                 }),
 
@@ -154,7 +156,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                     },
                     visible: (item: OutbreakModel): boolean => {
                         return !item.deleted &&
-                            this.hasOutbreakWriteAccess();
+                            OutbreakModel.canModifyCaseQuestionnaire(this.authUser);
                     }
                 }),
 
@@ -166,7 +168,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                     },
                     visible: (item: OutbreakModel): boolean => {
                         return !item.deleted &&
-                            this.hasOutbreakWriteAccess();
+                            OutbreakModel.canModifyContactFollowUpQuestionnaire(this.authUser);
                     }
                 }),
 
@@ -178,7 +180,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                     },
                     visible: (item: OutbreakModel): boolean => {
                         return !item.deleted &&
-                            this.hasOutbreakWriteAccess();
+                            OutbreakModel.canModifyCaseLabResultQuestionnaire(this.authUser);
                     }
                 }),
 
@@ -187,7 +189,12 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                     type: HoverRowActionType.DIVIDER,
                     visible: (item: OutbreakModel): boolean => {
                         // visible only if at least one of the previous...
-                        return !item.deleted;
+                        return !item.deleted && (
+                            OutbreakModel.canSeeInconsistencies(this.authUser) ||
+                            OutbreakModel.canModifyCaseQuestionnaire(this.authUser) ||
+                            OutbreakModel.canModifyContactFollowUpQuestionnaire(this.authUser) ||
+                            OutbreakModel.canModifyCaseLabResultQuestionnaire(this.authUser)
+                        );
                     }
                 }),
 
@@ -199,7 +206,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                     },
                     visible: (item: OutbreakModel): boolean => {
                         return !item.deleted &&
-                            this.hasOutbreakWriteAccess();
+                            OutbreakModel.canClone(this.authUser);
                     }
                 }),
 
@@ -211,7 +218,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                     },
                     visible: (item: OutbreakModel): boolean => {
                         return item.deleted &&
-                            this.hasOutbreakWriteAccess();
+                            OutbreakModel.canRestore(this.authUser);
                     },
                     class: 'mat-menu-item-restore'
                 })
@@ -501,14 +508,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         }
         // refresh list
         this.needsRefreshList(true);
-    }
-
-    /**
-     * Check if we have write access to outbreaks
-     * @returns {boolean}
-     */
-    hasOutbreakWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
     }
 
     /**

@@ -7,6 +7,13 @@ export enum PERMISSION {
     OUTBREAK_CREATE = 'outbreak_create',
     OUTBREAK_MODIFY = 'outbreak_modify',
     OUTBREAK_DELETE = 'outbreak_delete',
+    OUTBREAK_RESTORE = 'outbreak_restore',
+    OUTBREAK_MAKE_ACTIVE = 'outbreak_make_active',
+    OUTBREAK_SEE_INCONSISTENCIES = 'outbreak_see_inconsistencies',
+    OUTBREAK_MODIFY_CASE_QUESTIONNAIRE = 'outbreak_modify_case_questionnaire',
+    OUTBREAK_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE = 'outbreak_modify_contact_follow_up_questionnaire',
+    OUTBREAK_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE = 'outbreak_modify_case_lab_result_questionnaire',
+    OUTBREAK_CREATE_CLONE = 'outbreak_create_clone',
 READ_OUTBREAK = 'read_outbreak',
 WRITE_OUTBREAK = 'write_outbreak',
 

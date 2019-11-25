@@ -37,7 +37,6 @@ import { RelationshipModel } from '../../../../core/models/entity-and-relationsh
     styleUrls: ['./events-list.component.less']
 })
 export class EventsListComponent extends ListComponent implements OnInit, OnDestroy {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '.', true)
     ];
