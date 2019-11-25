@@ -1287,7 +1287,6 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      * @param items
      */
     private displayChoseFromGroupDialog(items: (WorldMapPath | WorldMapMarker)[]) {
-        console.log(items);
         // only one item in the list, then we need to display it
         if (items.length < 2) {
             const item: WorldMapPath | WorldMapMarker = items[0];
@@ -1373,7 +1372,6 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                 }));
             });
         }
-        console.log('test1');
         // display dialog to choose item from list
         this.dialogService
             .showInput(new DialogConfiguration({

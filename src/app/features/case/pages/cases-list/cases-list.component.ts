@@ -19,7 +19,10 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import {
+    DialogAnswer, DialogButton, DialogComponent, DialogConfiguration,
+    DialogFieldType
+} from '../../../../shared/components/dialog/dialog.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import * as _ from 'lodash';
@@ -28,7 +31,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
-import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { throwError } from 'rxjs';
@@ -36,6 +39,11 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AddressType } from '../../../../core/models/address.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { EventModel } from '../../../../core/models/event.model';
+import { MatDialogRef } from '@angular/material';
+import { ViewCotEdgeDialogComponent } from '../../../../shared/components/view-cot-edge-dialog/view-cot-edge-dialog.component';
+import { ViewCotNodeDialogComponent } from '../../../../shared/components/view-cot-node-dialog/view-cot-node-dialog.component';
 
 @Component({
     selector: 'app-cases-list',
@@ -1315,11 +1323,17 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     }
 
     /**
-     * Display relationships popup
+     * Display contacts popup
      */
-    displayRelationships(entityType: EntityType,
-                         entityId: string,
-                         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) {
+    displayContacts(
+        contactsNumber: number,
+        entityType: EntityType,
+        entityId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) {
+        // if we do not have contacts return
+        if (contactsNumber < 1) {
+            return;
+        }
         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
         this.relationshipDataService
             .getEntityContacts(
@@ -1336,22 +1350,162 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     return throwError(err);
                 })
             )
-            .subscribe((relationships) => {
-                console.log(relationships);
+            .subscribe((relationshipsData: EntityModel[]) => {
                 // hide loading
                 loadingDialog.close();
-                this.dialogService.showCustomDialog(
-                    ViewEntityRelationshipsComponent,
-                    {
-                        ...ViewEntityRelationshipsComponent.DEFAULT_CONFIG,
-                        ...{
-                            data: {
-                                relationship: relationships
-                            }
-                        }
-                    }
-                );
+
+                // display popup
+                this.displayEntitiesAndRelationships(relationshipsData);
+
             });
 
+    }
+
+    /**
+     * Display exposures popup
+     */
+    displayExposures(
+        exposureNumber: number,
+        entityType: EntityType,
+        entityId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) {
+        // if we do not have any exposure return
+        if (exposureNumber < 1) {
+            return;
+        }
+        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+
+        this.relationshipDataService
+            .getEntityExposures(
+                this.selectedOutbreak.id,
+                entityType,
+                entityId,
+                queryBuilder
+            )
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    // hide loading
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
+            .subscribe((relationshipsData: EntityModel[]) => {
+                // hide loading
+                loadingDialog.close();
+
+                // display popup
+                this.displayEntitiesAndRelationships(relationshipsData);
+            });
+    }
+
+    /**
+     * Display dialog with entities and related relationships
+     * @param {EntityModel[]} relationshipsData
+     */
+    displayEntitiesAndRelationships(relationshipsData: EntityModel[]) {
+        // split relationships data into entities and relationships
+        const entities = [];
+        const relationships: RelationshipModel[] = [];
+
+        // add models
+        relationshipsData.forEach((relationshipData) => {
+            entities.push(relationshipData.model);
+        });
+        // add relationships
+        relationshipsData.forEach((relationshipData) => {
+            relationships.push(relationshipData.relationship);
+        });
+
+        // list of entities and relationships
+        const fieldList: DialogField[] = [];
+
+        // add section title if we have entities
+        if (!_.isEmpty(entities)) {
+            fieldList.push(new DialogField({
+                name: '_',
+                fieldType: DialogFieldType.SECTION_TITLE,
+                placeholder: 'LNG_PAGE_CASES_LIST_DIALOG_ENTITY_SECTION_TITLE'
+            }));
+        }
+
+        // add entities to the list
+        entities.forEach((itemModel: CaseModel | ContactModel | EventModel) => {
+            fieldList.push(new DialogField({
+                name: '',
+                fieldType: DialogFieldType.ACTION,
+                placeholder: itemModel.name,
+                actionData: itemModel,
+                actionCallback: (item) => {
+                    // show entity information
+                    this.dialogService.showCustomDialog(
+                        ViewCotNodeDialogComponent,
+                        {
+                            ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
+                            ...{
+                                data: {
+                                    entity: item
+                                }
+                            }
+                        }
+                    );
+                }
+            }));
+        });
+
+        // add section title if we have relationships
+        if (!_.isEmpty(relationships)) {
+            fieldList.push(new DialogField({
+                name: '_',
+                fieldType: DialogFieldType.SECTION_TITLE,
+                placeholder: 'LNG_PAGE_CASES_LIST_DIALOG_ENTITY_RELATIONSHIPS_TITLE'
+            }));
+        }
+
+        console.log(relationships);
+        // add relationships to the list
+        relationships.forEach((relationshipModel: RelationshipModel) => {
+            // get the relationship label
+            console.log(relationshipModel);
+            fieldList.push(new DialogField({
+                name: '',
+                fieldType: DialogFieldType.ACTION,
+                placeholder: 'relationshipModel.socialRelationshipDetail',
+                actionData: relationshipModel,
+                actionCallback: (item: RelationshipModel) => {
+                    // show entity information
+                    this.dialogService.showCustomDialog(
+                        ViewCotEdgeDialogComponent,
+                        {
+                            ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+                            ...{
+                                data: {
+                                    relationship: item
+                                }
+                            }
+                        }
+                    );
+                }
+            }));
+        });
+
+        // display dialog if filed list is not empty
+        if (!_.isEmpty(fieldList)) {
+            // display dialog to choose item from list
+            this.dialogService
+                .showInput(new DialogConfiguration({
+                    message: 'LNG_PAGE_WORLD_MAP_GROUP_DIALOG_TITLE',
+                    buttons: [
+                        new DialogButton({
+                            label: 'LNG_COMMON_BUTTON_CLOSE',
+                            clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                                dialogHandler.close();
+                            }
+                        })
+                    ],
+                    fieldsList: fieldList
+                }))
+                .subscribe();
+        }
     }
 }

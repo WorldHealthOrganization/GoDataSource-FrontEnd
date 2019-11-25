@@ -361,6 +361,44 @@
             </mat-cell>
         </ng-container>
 
+        <!--Number of Contacts-->
+        <ng-container matColumnDef="numberOfContacts">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_EVENTS_FIELD_LABEL_NUMBER_OF_CONTACTS' | translate }}
+                    </div>
+                    <div class="column-filter">
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                (click)="displayContacts(item.numberOfContacts, item.type, item.id)"
+                class="relationship-number">
+                {{ item.numberOfContacts }}
+            </mat-cell>
+        </ng-container>
+
+        <!--Number of Exposures-->
+        <ng-container matColumnDef="numberOfExposures">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_EVENTS_FIELD_LABEL_NUMBER_OF_EXPOSURES' | translate}}
+                    </div>
+                    <div class="column-filter">
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                (click)="displayExposures(item.numberOfExposures, item.type, item.id)"
+                class="relationship-number">
+                {{ item.numberOfExposures }}
+            </mat-cell>
+        </ng-container>
+
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
         <mat-row
             *matRowDef="let item; columns: visibleTableColumns"

@@ -1,10 +1,13 @@
 import { Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
-import {EntityModel, RelationshipModel} from '../../../core/models/entity-and-relationship.model';
-import {CaseModel} from '../../../core/models/case.model';
-import {ContactModel} from '../../../core/models/contact.model';
-import {EventModel} from '../../../core/models/event.model';
+import { EntityModel, RelationshipModel} from '../../../core/models/entity-and-relationship.model';
+
+export class ViewEntityRelationshipData {
+    constructor(
+        public relationships: EntityModel[]
+    ) {}
+}
 
 @Component({
     selector: 'app-view-entity-relationships',
@@ -13,6 +16,8 @@ import {EventModel} from '../../../core/models/event.model';
     styleUrls: ['./view-entity-relationships.component.less']
 })
 export class ViewEntityRelationshipsComponent implements OnInit {
+
+
 
     // default settings for this type of dialog
     static DEFAULT_CONFIG = {
@@ -26,14 +31,14 @@ export class ViewEntityRelationshipsComponent implements OnInit {
         panelClass: 'view-entity-relationship'
     };
 
-    entities: CaseModel[] | ContactModel[] | EventModel[];
+    entity = [];
     entitiesRelationships: RelationshipModel[];
     constructor(
         public dialogRef: MatDialogRef<ViewEntityRelationshipsComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: EntityModel[],
+        @Inject(MAT_DIALOG_DATA) public data: ViewEntityRelationshipData,
 
     ) {
-        console.log(this.data);
+
     }
 
     ngOnInit() {

@@ -21,10 +21,29 @@ export const EnglishUsLang = {
         'LNG_FORM_HOT_TABLE_WRAPPER_CHANGE_LOCATION_DIALOG_TITLE': 'Change location',
 
         /**
+         * uiCasesListPage
+         */
+        'LNG_PAGE_CASES_LIST_DIALOG_ENTITY_SECTION_TITLE': 'Entities',
+        'LNG_PAGE_CASES_LIST_DIALOG_ENTITY_RELATIONSHIPS_TITLE': 'Relationships',
+
+        /**
          * uiCaseFields
          */
         'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS': 'Number of contacts',
         'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES': 'Number of exposures',
+
+        /**
+         * uiContactListPage
+         */
+        'LNG_CONTACTS_FIELD_LABEL_NUMBER_OF_CONTACTS': 'Number of contacts',
+        'LNG_CONTACTS_FIELD_LABEL_NUMBER_OF_EXPOSURES': 'Number of exposures',
+
+        /**
+         * uiEventsListPage
+         */
+        'LNG_EVENTS_FIELD_LABEL_NUMBER_OF_CONTACTS': 'Number of contacts',
+        'LNG_EVENTS_FIELD_LABEL_NUMBER_OF_EXPOSURES': 'Number of exposures',
+
 
         /**
          * REMOVE the tokens from below

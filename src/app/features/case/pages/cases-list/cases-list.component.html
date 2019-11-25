@@ -659,7 +659,7 @@
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
-                (click)="displayRelationships(item.type, item.id)"
+                (click)="displayContacts(item.numberOfContacts, item.type, item.id)"
                 class="relationship-number">
                 {{ item.numberOfContacts }}
             </mat-cell>
@@ -676,7 +676,10 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                (click)="displayExposures(item.numberOfExposures, item.type, item.id)"
+                class="relationship-number">
                 {{ item.numberOfExposures }}
             </mat-cell>
         </ng-container>

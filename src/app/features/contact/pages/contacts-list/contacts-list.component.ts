@@ -19,7 +19,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ActivatedRoute, Router } from '@angular/router';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import { DialogAnswer, DialogButton, DialogComponent } from '../../../../shared/components/dialog/dialog.component';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { RequestQueryBuilder, RequestRelationBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -36,6 +36,13 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { Subscription } from 'rxjs/internal/Subscription';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { AddressType } from '../../../../core/models/address.model';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { CaseModel } from '../../../../core/models/case.model';
+import { EventModel } from '../../../../core/models/event.model';
+import { ViewCotNodeDialogComponent } from '../../../../shared/components/view-cot-node-dialog/view-cot-node-dialog.component';
+import { ViewCotEdgeDialogComponent } from '../../../../shared/components/view-cot-edge-dialog/view-cot-edge-dialog.component';
+import { MatDialogRef } from '@angular/material';
 
 @Component({
     selector: 'app-contacts-list',
@@ -342,7 +349,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
+        private relationshipDataService: RelationshipDataService
     ) {
         super(
             snackbarService,
@@ -535,6 +543,16 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             new VisibleColumnModel({
                 field: 'updatedAt',
                 label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_AT',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'numberOfContacts',
+                label: 'LNG_CONTACTS_FIELD_LABEL_NUMBER_OF_CONTACTS',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'numberOfExposures',
+                label: 'LNG_CONTACTS_FIELD_LABEL_NUMBER_OF_EXPOSURES',
                 visible: false
             })
         ];
@@ -745,6 +763,10 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
             // retrieve location list
             this.queryBuilder.include('locations', true);
+
+            this.queryBuilder.filter.flag(
+                'countRelations',
+                true);
 
             // retrieve the list of Contacts
             this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder)
@@ -1307,5 +1329,192 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     }
                 });
         });
+    }
+
+    /**
+     * Display contacts popup
+     */
+    displayContacts(
+        contactsNumber: number,
+        entityType: EntityType,
+        entityId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) {
+        // if we do not have contacts return
+        if (contactsNumber < 1) {
+            return;
+        }
+        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+        this.relationshipDataService
+            .getEntityContacts(
+                this.selectedOutbreak.id,
+                entityType,
+                entityId,
+                queryBuilder
+            )
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    // hide loading
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
+            .subscribe((relationshipsData: EntityModel[]) => {
+                // hide loading
+                loadingDialog.close();
+
+                // display popup
+                this.displayEntitiesAndRelationships(relationshipsData);
+
+            });
+
+    }
+
+    /**
+     * Display exposures popup
+     */
+    displayExposures(
+        exposureNumber: number,
+        entityType: EntityType,
+        entityId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) {
+        // if we do not have any exposure return
+        if (exposureNumber < 1) {
+            return;
+        }
+        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+
+        this.relationshipDataService
+            .getEntityExposures(
+                this.selectedOutbreak.id,
+                entityType,
+                entityId,
+                queryBuilder
+            )
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showError(err.message);
+                    // hide loading
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
+            .subscribe((relationshipsData: EntityModel[]) => {
+                // hide loading
+                loadingDialog.close();
+
+                // display popup
+                this.displayEntitiesAndRelationships(relationshipsData);
+            });
+    }
+
+    /**
+     * Display dialog with entities and related relationships
+     * @param {EntityModel[]} relationshipsData
+     */
+    displayEntitiesAndRelationships(relationshipsData: EntityModel[]) {
+        // split relationships data into entities and relationships
+        const entities = [];
+        const relationships: RelationshipModel[] = [];
+
+        // add models
+        relationshipsData.forEach((relationshipData) => {
+            entities.push(relationshipData.model);
+        });
+        // add relationships
+        relationshipsData.forEach((relationshipData) => {
+            relationships.push(relationshipData.relationship);
+        });
+
+        // list of entities and relationships
+        const fieldList: DialogField[] = [];
+
+        // add section title if we have entities
+        if (!_.isEmpty(entities)) {
+            fieldList.push(new DialogField({
+                name: '_',
+                fieldType: DialogFieldType.SECTION_TITLE,
+                placeholder: 'LNG_PAGE_CASES_LIST_DIALOG_ENTITY_SECTION_TITLE'
+            }));
+        }
+
+        // add entities to the list
+        entities.forEach((itemModel: CaseModel | ContactModel | EventModel) => {
+            fieldList.push(new DialogField({
+                name: '',
+                fieldType: DialogFieldType.ACTION,
+                placeholder: itemModel.name,
+                actionData: itemModel,
+                actionCallback: (item) => {
+                    // show entity information
+                    this.dialogService.showCustomDialog(
+                        ViewCotNodeDialogComponent,
+                        {
+                            ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
+                            ...{
+                                data: {
+                                    entity: item
+                                }
+                            }
+                        }
+                    );
+                }
+            }));
+        });
+
+        // add section title if we have relationships
+        if (!_.isEmpty(relationships)) {
+            fieldList.push(new DialogField({
+                name: '_',
+                fieldType: DialogFieldType.SECTION_TITLE,
+                placeholder: 'LNG_PAGE_CASES_LIST_DIALOG_ENTITY_RELATIONSHIPS_TITLE'
+            }));
+        }
+
+        console.log(relationships);
+        // add relationships to the list
+        relationships.forEach((relationshipModel: RelationshipModel) => {
+            // get the relationship label
+            console.log(relationshipModel);
+            fieldList.push(new DialogField({
+                name: '',
+                fieldType: DialogFieldType.ACTION,
+                placeholder: 'relationshipModel.socialRelationshipDetail',
+                actionData: relationshipModel,
+                actionCallback: (item: RelationshipModel) => {
+                    // show entity information
+                    this.dialogService.showCustomDialog(
+                        ViewCotEdgeDialogComponent,
+                        {
+                            ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+                            ...{
+                                data: {
+                                    relationship: item
+                                }
+                            }
+                        }
+                    );
+                }
+            }));
+        });
+
+        // display dialog if filed list is not empty
+        if (!_.isEmpty(fieldList)) {
+            // display dialog to choose item from list
+            this.dialogService
+                .showInput(new DialogConfiguration({
+                    message: 'LNG_PAGE_WORLD_MAP_GROUP_DIALOG_TITLE',
+                    buttons: [
+                        new DialogButton({
+                            label: 'LNG_COMMON_BUTTON_CLOSE',
+                            clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                                dialogHandler.close();
+                            }
+                        })
+                    ],
+                    fieldsList: fieldList
+                }))
+                .subscribe();
+        }
     }
 }
