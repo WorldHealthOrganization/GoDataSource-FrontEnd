@@ -906,13 +906,16 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
                                 this.generateNewAnswer(curParentDate)
                             );
 
-                            // create file uploader
-                            if (!_.isArray(this.uploadersData[question.variable])) {
-                                this.uploadersData[question.variable] = [];
-                            }
+                            // generate file uploader only if necessary
+                            if (question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value) {
+                                // create file uploader
+                                if (!_.isArray(this.uploadersData[question.variable])) {
+                                    this.uploadersData[question.variable] = [];
+                                }
 
-                            // add file upload ?
-                            this.initializeUploader();
+                                // add file upload ?
+                                this.initializeUploader();
+                            }
 
                             // recursive isn't needed since we generate a new answer that is empty
                             // NOTHING
