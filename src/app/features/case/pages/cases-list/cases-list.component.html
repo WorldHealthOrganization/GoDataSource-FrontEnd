@@ -659,7 +659,7 @@
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
-                (click)="displayContacts(item.numberOfContacts, item.type, item.id)"
+                (click)="displayContacts(item, item.numberOfContacts, item.type, item.id)"
                 class="relationship-number">
                 {{ item.numberOfContacts }}
             </mat-cell>
@@ -678,7 +678,7 @@
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
-                (click)="displayExposures(item.numberOfExposures, item.type, item.id)"
+                (click)="displayExposures(item, item.numberOfExposures, item.type, item.id)"
                 class="relationship-number">
                 {{ item.numberOfExposures }}
             </mat-cell>

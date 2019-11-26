@@ -31,7 +31,10 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
-import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import {
+    EntityModel, RelationshipForDialogModel,
+    RelationshipModel
+} from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { throwError } from 'rxjs';
@@ -1326,6 +1329,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * Display contacts popup
      */
     displayContacts(
+        entity: CaseModel,
         contactsNumber: number,
         entityType: EntityType,
         entityId: string,
@@ -1355,7 +1359,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 loadingDialog.close();
 
                 // display popup
-                this.displayEntitiesAndRelationships(relationshipsData);
+                this.displayEntitiesAndRelationships(entity, relationshipsData);
 
             });
 
@@ -1365,6 +1369,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * Display exposures popup
      */
     displayExposures(
+        entity: CaseModel,
         exposureNumber: number,
         entityType: EntityType,
         entityId: string,
@@ -1395,18 +1400,20 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 loadingDialog.close();
 
                 // display popup
-                this.displayEntitiesAndRelationships(relationshipsData);
+                this.displayEntitiesAndRelationships(entity, relationshipsData);
             });
     }
 
     /**
      * Display dialog with entities and related relationships
      * @param {EntityModel[]} relationshipsData
+     * @param {string} entityId
+     * @param {string} entityName
      */
-    displayEntitiesAndRelationships(relationshipsData: EntityModel[]) {
+    displayEntitiesAndRelationships(entity: CaseModel, relationshipsData: EntityModel[]) {
         // split relationships data into entities and relationships
         const entities = [];
-        const relationships: RelationshipModel[] = [];
+        const relationships: RelationshipForDialogModel[] = [];
 
         // add models
         relationshipsData.forEach((relationshipData) => {
@@ -1414,7 +1421,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         });
         // add relationships
         relationshipsData.forEach((relationshipData) => {
-            relationships.push(relationshipData.relationship);
+            // create object to pass to the dialog
+            relationships.push({
+                entityType: relationshipData.model.type,
+                relatedEntity: relationshipData.model,
+                relationshipData: relationshipData.relationship});
         });
 
         // list of entities and relationships
@@ -1462,16 +1473,30 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             }));
         }
 
-        console.log(relationships);
+        // console.log(relationships);
+
         // add relationships to the list
-        relationships.forEach((relationshipModel: RelationshipModel) => {
+        relationships.forEach((relationshipModel: RelationshipForDialogModel) => {
+            // construct relationship label for dialog
+            let relationshipLabel: string = '';
+            if (relationshipModel.entityType === EntityType.CASE) {
+                relationshipLabel = `${entity.name} - ${relationshipModel.relatedEntity.name}`;
+            }
+
+            if (relationshipModel.entityType === EntityType.CONTACT) {
+                relationshipLabel = ` ${relationshipModel.relatedEntity.name} - ${entity.name}`;
+            }
+
+            relationshipModel.relationshipData.people = [
+            ];
+
             // get the relationship label
-            console.log(relationshipModel);
+            console.log('relModel', relationshipModel);
             fieldList.push(new DialogField({
                 name: '',
                 fieldType: DialogFieldType.ACTION,
-                placeholder: 'relationshipModel.socialRelationshipDetail',
-                actionData: relationshipModel,
+                placeholder: relationshipLabel,
+                actionData: relationshipModel.relationshipData,
                 actionCallback: (item: RelationshipModel) => {
                     // show entity information
                     this.dialogService.showCustomDialog(
@@ -1480,7 +1505,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
                             ...{
                                 data: {
-                                    relationship: item
+                                    relationship: relationshipModel.relationshipData
                                 }
                             }
                         }
