@@ -270,7 +270,9 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
             )
             .subscribe((followUpData) => {
                 // update model
+                const contact = this.followUpData.contact;
                 this.followUpData = followUpData;
+                this.followUpData.contact = contact;
 
                 // mark form as pristine
                 form.form.markAsPristine();
