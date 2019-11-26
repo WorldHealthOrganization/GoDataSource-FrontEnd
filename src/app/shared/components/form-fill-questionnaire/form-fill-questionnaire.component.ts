@@ -311,7 +311,14 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
             (this.parentDate as Moment).format() :
             (this.parentDate as string);
         const setDates = (question: QuestionModel, childIndex: number) => {
-            const answer: IAnswerData = this.value[question.variable][childIndex];
+            // make sure our question / sub question is visible
+            const questionData: IAnswerData[] = this.value[question.variable];
+            if (!questionData) {
+                return;
+            }
+
+            // retrieve our answer
+            const answer: IAnswerData = questionData[childIndex];
 
             // set child date
             answer.date = childDate;
