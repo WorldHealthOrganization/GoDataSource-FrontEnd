@@ -1359,7 +1359,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 loadingDialog.close();
 
                 // display popup
-                this.displayEntitiesAndRelationships(entity, relationshipsData);
+                this.displayEntitiesAndRelationships('fromContacts', entity, relationshipsData);
 
             });
 
@@ -1400,17 +1400,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 loadingDialog.close();
 
                 // display popup
-                this.displayEntitiesAndRelationships(entity, relationshipsData);
+                this.displayEntitiesAndRelationships('fromExposures', entity, relationshipsData);
             });
     }
 
     /**
      * Display dialog with entities and related relationships
-     * @param {EntityModel[]} relationshipsData
-     * @param {string} entityId
-     * @param {string} entityName
      */
-    displayEntitiesAndRelationships(entity: CaseModel, relationshipsData: EntityModel[]) {
+    displayEntitiesAndRelationships(from: string, entity: CaseModel, relationshipsData: EntityModel[]) {
         // split relationships data into entities and relationships
         const entities = [];
         const relationships: RelationshipForDialogModel[] = [];
@@ -1428,98 +1425,99 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 relationshipData: relationshipData.relationship});
         });
 
-        // list of entities and relationships
-        const fieldList: DialogField[] = [];
+        // create  list of entities and relationships
+        const fieldsList: DialogField[] = [];
 
-        // add section title if we have entities
         if (!_.isEmpty(entities)) {
-            fieldList.push(new DialogField({
+            // add section title if we have entities
+            fieldsList.push(new DialogField({
                 name: '_',
                 fieldType: DialogFieldType.SECTION_TITLE,
-                placeholder: 'LNG_PAGE_CASES_LIST_DIALOG_ENTITY_SECTION_TITLE'
+                placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_SECTION_TITLE'
             }));
-        }
 
-        // add entities to the list
-        entities.forEach((itemModel: CaseModel | ContactModel | EventModel) => {
-            fieldList.push(new DialogField({
-                name: '',
-                fieldType: DialogFieldType.ACTION,
-                placeholder: itemModel.name,
-                actionData: itemModel,
-                actionCallback: (item) => {
-                    // show entity information
-                    this.dialogService.showCustomDialog(
-                        ViewCotNodeDialogComponent,
-                        {
-                            ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
-                            ...{
-                                data: {
-                                    entity: item
+            // add entities to the list
+            entities.forEach((itemModel: CaseModel | ContactModel | EventModel) => {
+                fieldsList.push(new DialogField({
+                    name: '',
+                    fieldType: DialogFieldType.ACTION,
+                    placeholder: itemModel.name,
+                    actionData: itemModel,
+                    actionCallback: (item) => {
+                        // show entity information
+                        this.dialogService.showCustomDialog(
+                            ViewCotNodeDialogComponent,
+                            {
+                                ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
+                                ...{
+                                    data: {
+                                        entity: item
+                                    }
                                 }
                             }
-                        }
-                    );
-                }
-            }));
-        });
+                        );
+                    }
+                }));
+            });
+        }
 
-        // add section title if we have relationships
         if (!_.isEmpty(relationships)) {
-            fieldList.push(new DialogField({
+            // add section title if we have relationships
+            fieldsList.push(new DialogField({
                 name: '_',
                 fieldType: DialogFieldType.SECTION_TITLE,
-                placeholder: 'LNG_PAGE_CASES_LIST_DIALOG_ENTITY_RELATIONSHIPS_TITLE'
+                placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_RELATIONSHIPS_TITLE'
             }));
-        }
 
-        // console.log(relationships);
+            // add relationships to the list
+            relationships.forEach((relationshipModel: RelationshipForDialogModel) => {
+                // construct relationship label for dialog
+                let relationshipLabel: string = '';
+                if (from === 'fromContacts') {
+                    relationshipLabel = `${entity.name} - ${relationshipModel.relatedEntity.name}`;
+                }
 
-        // add relationships to the list
-        relationships.forEach((relationshipModel: RelationshipForDialogModel) => {
-            // construct relationship label for dialog
-            let relationshipLabel: string = '';
-            if (relationshipModel.entityType === EntityType.CASE) {
-                relationshipLabel = `${entity.name} - ${relationshipModel.relatedEntity.name}`;
-            }
+                if (from === 'fromExposures') {
+                    relationshipLabel = ` ${relationshipModel.relatedEntity.name} - ${entity.name}`;
+                }
 
-            if (relationshipModel.entityType === EntityType.CONTACT) {
-                relationshipLabel = ` ${relationshipModel.relatedEntity.name} - ${entity.name}`;
-            }
+                // add related entities into relationship people to display relationship dialog
+                relationshipModel.relationshipData.people = [
+                    new EntityModel(entity),
+                    new EntityModel(relationshipModel.relatedEntity)
+                ];
 
-            relationshipModel.relationshipData.people = [
-            ];
-
-            // get the relationship label
-            console.log('relModel', relationshipModel);
-            fieldList.push(new DialogField({
-                name: '',
-                fieldType: DialogFieldType.ACTION,
-                placeholder: relationshipLabel,
-                actionData: relationshipModel.relationshipData,
-                actionCallback: (item: RelationshipModel) => {
-                    // show entity information
-                    this.dialogService.showCustomDialog(
-                        ViewCotEdgeDialogComponent,
-                        {
-                            ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
-                            ...{
-                                data: {
-                                    relationship: relationshipModel.relationshipData
+                // add relationships to the list
+                fieldsList.push(new DialogField({
+                    name: '',
+                    fieldType: DialogFieldType.ACTION,
+                    placeholder: relationshipLabel,
+                    actionData: relationshipModel.relationshipData,
+                    actionCallback: (item: RelationshipModel) => {
+                        console.log(item);
+                        // show entity information
+                        this.dialogService.showCustomDialog(
+                            ViewCotEdgeDialogComponent,
+                            {
+                                ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+                                ...{
+                                    data: {
+                                        relationship: item
+                                    }
                                 }
                             }
-                        }
-                    );
-                }
-            }));
-        });
+                        );
+                    }
+                }));
+            });
+        }
 
         // display dialog if filed list is not empty
-        if (!_.isEmpty(fieldList)) {
+        if (!_.isEmpty(fieldsList)) {
             // display dialog to choose item from list
             this.dialogService
                 .showInput(new DialogConfiguration({
-                    message: 'LNG_PAGE_WORLD_MAP_GROUP_DIALOG_TITLE',
+                    message: 'LNG_PAGE_LIST_CASES_GROUP_DIALOG_TITLE',
                     buttons: [
                         new DialogButton({
                             label: 'LNG_COMMON_BUTTON_CLOSE',
@@ -1528,7 +1526,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             }
                         })
                     ],
-                    fieldsList: fieldList
+                    fieldsList: fieldsList
                 }))
                 .subscribe();
         }

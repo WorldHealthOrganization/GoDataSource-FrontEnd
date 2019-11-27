@@ -23,8 +23,9 @@ export const EnglishUsLang = {
         /**
          * uiCasesListPage
          */
-        'LNG_PAGE_CASES_LIST_DIALOG_ENTITY_SECTION_TITLE': 'Entities',
-        'LNG_PAGE_CASES_LIST_DIALOG_ENTITY_RELATIONSHIPS_TITLE': 'Relationships',
+        'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_SECTION_TITLE': 'Entities',
+        'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_RELATIONSHIPS_TITLE': 'Relationships',
+        'LNG_PAGE_LIST_CASES_GROUP_DIALOG_TITLE': 'Grouped items',
 
         /**
          * uiCaseFields
