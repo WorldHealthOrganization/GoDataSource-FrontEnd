@@ -62,7 +62,7 @@ import * as fromSharedPipes from './pipes';
         fromSharedComponents.ViewCotEdgeDialogComponent,
         fromSharedComponents.ViewHelpDialogComponent,
         fromSharedComponents.ViewHelpDetailsDialogComponent,
-        fromSharedComponents.LocationDialogComponent,
+        fromSharedComponents.LocationDialogComponent
     ]
 })
 export class SharedModule {

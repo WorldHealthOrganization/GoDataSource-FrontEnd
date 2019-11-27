@@ -508,7 +508,5 @@ export class RelationshipDataService {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.post(`/outbreaks/${outbreakId}/relationships/bulk-change-source`, {sourceId: sourceId, where: JSON.parse(whereFilter)});
     }
-
-
 }
 

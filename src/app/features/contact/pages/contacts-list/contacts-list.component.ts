@@ -1338,11 +1338,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      * Display contacts popup
      */
     displayContacts(
-        entity: CaseModel,
+        entity: ContactModel,
         contactsNumber: number,
         entityType: EntityType,
         entityId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) {
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder())
+    {
         // if we do not have contacts return
         if (contactsNumber < 1) {
             return;
@@ -1378,11 +1379,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      * Display exposures popup
      */
     displayExposures(
-        entity: CaseModel,
+        entity: ContactModel,
         exposureNumber: number,
         entityType: EntityType,
         entityId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) {
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder())
+    {
         // if we do not have any exposure return
         if (exposureNumber < 1) {
             return;
@@ -1416,7 +1418,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     /**
      * Display dialog with entities and related relationships
      */
-    displayEntitiesAndRelationships(from: string, entity: CaseModel, relationshipsData: EntityModel[]) {
+    displayEntitiesAndRelationships(from: string, entity: ContactModel, relationshipsData: EntityModel[]) {
         // split relationships data into entities and relationships
         const entities = [];
         const relationships: RelationshipForDialogModel[] = [];
@@ -1429,7 +1431,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         relationshipsData.forEach((relationshipData) => {
             // create object to pass to the dialog
             relationships.push({
-                entityType: relationshipData.model.type,
                 relatedEntity: relationshipData.model,
                 relationshipData: relationshipData.relationship});
         });

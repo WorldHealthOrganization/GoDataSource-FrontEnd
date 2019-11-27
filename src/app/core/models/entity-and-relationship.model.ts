@@ -82,7 +82,6 @@ export class ReportDifferenceOnsetRelationshipModel extends RelationshipModel {
 
 
 export class RelationshipForDialogModel {
-    entityType: EntityType;
     relatedEntity: CaseModel | ContactModel | EventModel;
     relationshipData: RelationshipModel;
 }

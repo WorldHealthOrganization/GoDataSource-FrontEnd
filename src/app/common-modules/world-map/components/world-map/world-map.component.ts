@@ -1372,6 +1372,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                 }));
             });
         }
+
         // display dialog to choose item from list
         this.dialogService
             .showInput(new DialogConfiguration({

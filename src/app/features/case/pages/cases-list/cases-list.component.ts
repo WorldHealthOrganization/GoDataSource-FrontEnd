@@ -1333,7 +1333,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         contactsNumber: number,
         entityType: EntityType,
         entityId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) {
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder())
+    {
         // if we do not have contacts return
         if (contactsNumber < 1) {
             return;
@@ -1373,7 +1374,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         exposureNumber: number,
         entityType: EntityType,
         entityId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) {
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder())
+    {
         // if we do not have any exposure return
         if (exposureNumber < 1) {
             return;
@@ -1420,7 +1422,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         relationshipsData.forEach((relationshipData) => {
             // create object to pass to the dialog
             relationships.push({
-                entityType: relationshipData.model.type,
                 relatedEntity: relationshipData.model,
                 relationshipData: relationshipData.relationship});
         });
@@ -1494,7 +1495,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     placeholder: relationshipLabel,
                     actionData: relationshipModel.relationshipData,
                     actionCallback: (item: RelationshipModel) => {
-                        console.log(item);
                         // show entity information
                         this.dialogService.showCustomDialog(
                             ViewCotEdgeDialogComponent,
