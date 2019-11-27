@@ -18,7 +18,7 @@ export class EventModel extends BaseModel {
     outbreakId: string;
 
     numberOfContacts: number;
-    numberOFExposures: number;
+    numberOfExposures: number;
 
     inconsistencies: InconsistencyModel[];
     relationship: any;
@@ -38,7 +38,7 @@ export class EventModel extends BaseModel {
         this.outbreakId = _.get(data, 'outbreakId');
 
         this.numberOfContacts = _.get(data, 'numberOfContacts');
-        this.numberOFExposures = _.get(data, 'numberOFExposures');
+        this.numberOfExposures = _.get(data, 'numberOfExposures');
 
         // we need the object to use the custom getter that constructs the address from all fields
         const location = _.get(data, 'location');

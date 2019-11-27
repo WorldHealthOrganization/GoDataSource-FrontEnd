@@ -366,7 +366,7 @@
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
-                        {{ 'LNG_EVENTS_FIELD_LABEL_NUMBER_OF_CONTACTS' | translate }}
+                        {{ 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS' | translate }}
                     </div>
                     <div class="column-filter">
                     </div>
@@ -374,7 +374,7 @@
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
-                (click)="displayContacts(item.numberOfContacts, item.type, item.id)"
+                (click)="displayContacts(item, item.numberOfContacts, item.type, item.id)"
                 class="relationship-number">
                 {{ item.numberOfContacts }}
             </mat-cell>
@@ -385,7 +385,7 @@
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
-                        {{ 'LNG_EVENTS_FIELD_LABEL_NUMBER_OF_EXPOSURES' | translate}}
+                        {{ 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES' | translate}}
                     </div>
                     <div class="column-filter">
                     </div>
@@ -393,7 +393,7 @@
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
-                (click)="displayExposures(item.numberOfExposures, item.type, item.id)"
+                (click)="displayExposures(item, item.numberOfExposures, item.type, item.id)"
                 class="relationship-number">
                 {{ item.numberOfExposures }}
             </mat-cell>

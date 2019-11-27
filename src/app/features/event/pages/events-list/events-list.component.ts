@@ -34,7 +34,10 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { Subscription } from 'rxjs/internal/Subscription';
 import { MatDialogRef } from '@angular/material';
 import { ViewCotEdgeDialogComponent } from '../../../../shared/components/view-cot-edge-dialog/view-cot-edge-dialog.component';
-import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import {
+    EntityModel, RelationshipForDialogModel,
+    RelationshipModel
+} from '../../../../core/models/entity-and-relationship.model';
 import { ViewCotNodeDialogComponent } from '../../../../shared/components/view-cot-node-dialog/view-cot-node-dialog.component';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -362,12 +365,12 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             }),
             new VisibleColumnModel({
                 field: 'numberOfContacts',
-                label: 'LNG_EVENTS_FIELD_LABEL_NUMBER_OF_CONTACTS',
+                label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
                 visible: false
             }),
             new VisibleColumnModel({
                 field: 'numberOfExposures',
-                label: 'LNG_EVENTS_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+                label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
                 visible: false
             })
         ];
@@ -604,6 +607,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
      * Display contacts popup
      */
     displayContacts(
+        entity: CaseModel,
         contactsNumber: number,
         entityType: EntityType,
         entityId: string,
@@ -633,7 +637,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 loadingDialog.close();
 
                 // display popup
-                this.displayEntitiesAndRelationships(relationshipsData);
+                this.displayEntitiesAndRelationships('fromContacts', entity, relationshipsData);
 
             });
 
@@ -643,6 +647,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
      * Display exposures popup
      */
     displayExposures(
+        entity: CaseModel,
         exposureNumber: number,
         entityType: EntityType,
         entityId: string,
@@ -673,18 +678,17 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 loadingDialog.close();
 
                 // display popup
-                this.displayEntitiesAndRelationships(relationshipsData);
+                this.displayEntitiesAndRelationships('fromExposures', entity, relationshipsData);
             });
     }
 
     /**
      * Display dialog with entities and related relationships
-     * @param {EntityModel[]} relationshipsData
      */
-    displayEntitiesAndRelationships(relationshipsData: EntityModel[]) {
+    displayEntitiesAndRelationships(from: string, entity: CaseModel, relationshipsData: EntityModel[]) {
         // split relationships data into entities and relationships
         const entities = [];
-        const relationships: RelationshipModel[] = [];
+        const relationships: RelationshipForDialogModel[] = [];
 
         // add models
         relationshipsData.forEach((relationshipData) => {
@@ -692,87 +696,106 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         });
         // add relationships
         relationshipsData.forEach((relationshipData) => {
-            relationships.push(relationshipData.relationship);
+            // create object to pass to the dialog
+            relationships.push({
+                entityType: relationshipData.model.type,
+                relatedEntity: relationshipData.model,
+                relationshipData: relationshipData.relationship});
         });
 
-        // list of entities and relationships
-        const fieldList: DialogField[] = [];
+        // create  list of entities and relationships
+        const fieldsList: DialogField[] = [];
 
-        // add section title if we have entities
         if (!_.isEmpty(entities)) {
-            fieldList.push(new DialogField({
+            // add section title if we have entities
+            fieldsList.push(new DialogField({
                 name: '_',
                 fieldType: DialogFieldType.SECTION_TITLE,
-                placeholder: 'LNG_PAGE_CASES_LIST_DIALOG_ENTITY_SECTION_TITLE'
+                placeholder: 'LNG_PAGE_LIST_EVENTS_DIALOG_ENTITY_SECTION_TITLE'
             }));
-        }
 
-        // add entities to the list
-        entities.forEach((itemModel: CaseModel | ContactModel | EventModel) => {
-            fieldList.push(new DialogField({
-                name: '',
-                fieldType: DialogFieldType.ACTION,
-                placeholder: itemModel.name,
-                actionData: itemModel,
-                actionCallback: (item) => {
-                    // show entity information
-                    this.dialogService.showCustomDialog(
-                        ViewCotNodeDialogComponent,
-                        {
-                            ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
-                            ...{
-                                data: {
-                                    entity: item
+            // add entities to the list
+            entities.forEach((itemModel: CaseModel | ContactModel | EventModel) => {
+                fieldsList.push(new DialogField({
+                    name: '',
+                    fieldType: DialogFieldType.ACTION,
+                    placeholder: itemModel.name,
+                    actionData: itemModel,
+                    actionCallback: (item) => {
+                        // show entity information
+                        this.dialogService.showCustomDialog(
+                            ViewCotNodeDialogComponent,
+                            {
+                                ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
+                                ...{
+                                    data: {
+                                        entity: item
+                                    }
                                 }
                             }
-                        }
-                    );
-                }
-            }));
-        });
+                        );
+                    }
+                }));
+            });
+        }
 
-        // add section title if we have relationships
         if (!_.isEmpty(relationships)) {
-            fieldList.push(new DialogField({
+            // add section title if we have relationships
+            fieldsList.push(new DialogField({
                 name: '_',
                 fieldType: DialogFieldType.SECTION_TITLE,
-                placeholder: 'LNG_PAGE_CASES_LIST_DIALOG_ENTITY_RELATIONSHIPS_TITLE'
+                placeholder: 'LNG_PAGE_LIST_EVENTS_DIALOG_ENTITY_RELATIONSHIPS_TITLE'
             }));
-        }
 
-        console.log(relationships);
-        // add relationships to the list
-        relationships.forEach((relationshipModel: RelationshipModel) => {
-            // get the relationship label
-            console.log(relationshipModel);
-            fieldList.push(new DialogField({
-                name: '',
-                fieldType: DialogFieldType.ACTION,
-                placeholder: 'relationshipModel.socialRelationshipDetail',
-                actionData: relationshipModel,
-                actionCallback: (item: RelationshipModel) => {
-                    // show entity information
-                    this.dialogService.showCustomDialog(
-                        ViewCotEdgeDialogComponent,
-                        {
-                            ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
-                            ...{
-                                data: {
-                                    relationship: item
+            // add relationships to the list
+            relationships.forEach((relationshipModel: RelationshipForDialogModel) => {
+                // construct relationship label for dialog
+                let relationshipLabel: string = '';
+                if (from === 'fromContacts') {
+                    relationshipLabel = `${entity.name} - ${relationshipModel.relatedEntity.name}`;
+                }
+
+                if (from === 'fromExposures') {
+                    relationshipLabel = ` ${relationshipModel.relatedEntity.name} - ${entity.name}`;
+                }
+
+                // add related entities into relationship people to display relationship dialog
+                relationshipModel.relationshipData.people = [
+                    new EntityModel(entity),
+                    new EntityModel(relationshipModel.relatedEntity)
+                ];
+
+                // add relationships to the list
+                fieldsList.push(new DialogField({
+                    name: '',
+                    fieldType: DialogFieldType.ACTION,
+                    placeholder: relationshipLabel,
+                    actionData: relationshipModel.relationshipData,
+                    actionCallback: (item: RelationshipModel) => {
+                        console.log(item);
+                        // show entity information
+                        this.dialogService.showCustomDialog(
+                            ViewCotEdgeDialogComponent,
+                            {
+                                ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+                                ...{
+                                    data: {
+                                        relationship: item
+                                    }
                                 }
                             }
-                        }
-                    );
-                }
-            }));
-        });
+                        );
+                    }
+                }));
+            });
+        }
 
         // display dialog if filed list is not empty
-        if (!_.isEmpty(fieldList)) {
+        if (!_.isEmpty(fieldsList)) {
             // display dialog to choose item from list
             this.dialogService
                 .showInput(new DialogConfiguration({
-                    message: 'LNG_PAGE_WORLD_MAP_GROUP_DIALOG_TITLE',
+                    message: 'LNG_PAGE_LIST_EVENTS_GROUP_DIALOG_TITLE',
                     buttons: [
                         new DialogButton({
                             label: 'LNG_COMMON_BUTTON_CLOSE',
@@ -781,7 +804,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                             }
                         })
                     ],
-                    fieldsList: fieldList
+                    fieldsList: fieldsList
                 }))
                 .subscribe();
         }
