@@ -1342,8 +1342,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         contactsNumber: number,
         entityType: EntityType,
         entityId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder())
-    {
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) {
         // if we do not have contacts return
         if (contactsNumber < 1) {
             return;
@@ -1383,8 +1382,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         exposureNumber: number,
         entityType: EntityType,
         entityId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder())
-    {
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) {
         // if we do not have any exposure return
         if (exposureNumber < 1) {
             return;
