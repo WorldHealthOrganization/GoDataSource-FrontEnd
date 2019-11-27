@@ -192,6 +192,13 @@ export class FollowUpsDataService {
         return this.http.delete(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups/${followUpId}`);
     }
 
+    deleteSelectedFollowUps(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+        const filter = queryBuilder.buildQuery();
+        return this.http.delete(`outbreaks/${outbreakId}/follow-ups/bulk?filter=${filter}`);
+    }
+
     /**
      * Restore an existing Follow-up of an Outbreak
      * @param {string} outbreakId

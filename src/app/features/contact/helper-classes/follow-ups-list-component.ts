@@ -184,6 +184,47 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
     }
 
     /**
+     * Delete selected follow-ups
+     */
+    deleteSelectedFollowUps() {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('DELETE FOLLOWUPS')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // delete selected follow-ups
+                }
+            });
+
+
+
+
+
+        // // get list of selected follow-ups ids
+        // const selectedRecords: false |  string[] = this.validateCheckedRecords();
+        // if (!selectedRecords) {
+        //     return;
+        // }
+        //
+        // // const qb = new RequestQueryBuilder();
+        // //
+        // // this.followUpsDataService.deleteSelectedFollowUps('1234', qb)
+        // //     .pipe(
+        // //         catchError((err) => {
+        // //             this.snackbarService.showApiError(err.);
+        // //             return throwError(err);
+        // //         })
+        // //     )
+        // //     .subscribe(() => {
+        // //         this.snackbarService.showSuccess('TOKEN');
+        // //
+        // //         // reload data
+        // //         this.needsRefreshList(true);
+        // //     });
+        //
+        // console.log(selectedRecords);
+    }
+
+    /**
      * Restore specific follow-up
      * @param {FollowUpModel} followUp
      */

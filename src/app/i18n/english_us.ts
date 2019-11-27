@@ -20,7 +20,10 @@ export const EnglishUsLang = {
         'LNG_FORM_HOT_TABLE_WRAPPER_LOADING_LOCATIONS_TITLE': 'Loading locations',
         'LNG_FORM_HOT_TABLE_WRAPPER_CHANGE_LOCATION_DIALOG_TITLE': 'Change location',
 
-
+        /**
+         * uiFollowUpsListPage
+         */
+        'LNG_PAGE_LIST_FOLLOW_UOS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS': 'Delete selected follow-ups'
 
         /**
          * REMOVE the tokens from below
