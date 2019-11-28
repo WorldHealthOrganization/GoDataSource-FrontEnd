@@ -42,9 +42,6 @@ export class CaseDataService {
     ): Observable<CaseModel[]> {
         const qb: RequestQueryBuilder = new RequestQueryBuilder();
         qb.include(`dateRangeLocations`, true);
-        qb.filter.flag(
-            'countRelations',
-            true);
         qb.merge(queryBuilder);
         const filter = qb.buildQuery();
         return this.modelHelper.mapObservableListToModel(

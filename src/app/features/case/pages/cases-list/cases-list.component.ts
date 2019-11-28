@@ -31,10 +31,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
-import {
-    EntityModel, RelationshipForDialogModel,
-    RelationshipModel
-} from '../../../../core/models/entity-and-relationship.model';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { throwError } from 'rxjs';
@@ -47,6 +44,7 @@ import { EventModel } from '../../../../core/models/event.model';
 import { MatDialogRef } from '@angular/material';
 import { ViewCotEdgeDialogComponent } from '../../../../shared/components/view-cot-edge-dialog/view-cot-edge-dialog.component';
 import { ViewCotNodeDialogComponent } from '../../../../shared/components/view-cot-node-dialog/view-cot-node-dialog.component';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 
 @Component({
     selector: 'app-cases-list',
@@ -419,7 +417,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         private genericDataService: GenericDataService,
         private clusterDataService: ClusterDataService,
         private userDataService: UserDataService,
-        private relationshipDataService: RelationshipDataService
+        private relationshipDataService: RelationshipDataService,
+        private entityHelperService: EntityHelperService
     ) {
         super(
             snackbarService,
@@ -820,6 +819,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
             // retrieve location list
             this.queryBuilder.include('locations', true);
+
+            this.queryBuilder.filter.flag(
+                'countRelations',
+                true);
 
             // retrieve the list of Cases
             this.casesList$ = this.caseDataService
@@ -1328,27 +1331,22 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     /**
      * Display contacts popup
      */
-    displayContacts(
-        entity: CaseModel,
-        contactsNumber: number,
-        entityType: EntityType,
-        entityId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) {
+    displayContacts(entity: CaseModel) {
         // if we do not have contacts return
-        if (contactsNumber < 1) {
+        if (entity.numberOfContacts < 1) {
             return;
         }
+        // display loading
         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
         this.relationshipDataService
             .getEntityContacts(
                 this.selectedOutbreak.id,
-                entityType,
-                entityId,
-                queryBuilder
+                entity.type,
+                entity.id,
             )
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     // hide loading
                     loadingDialog.close();
                     return throwError(err);
@@ -1359,23 +1357,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 loadingDialog.close();
 
                 // display popup
-                this.displayEntitiesAndRelationships('fromContacts', entity, relationshipsData);
-
+                this.entityHelperService.displayEntitiesAndRelationships('fromContacts', entity, relationshipsData);
             });
-
     }
 
     /**
      * Display exposures popup
      */
-    displayExposures(
-        entity: CaseModel,
-        exposureNumber: number,
-        entityType: EntityType,
-        entityId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) {
+    displayExposures(entity: CaseModel) {
         // if we do not have any exposure return
-        if (exposureNumber < 1) {
+        if (entity.numberOfExposures < 1) {
             return;
         }
         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
@@ -1383,13 +1374,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         this.relationshipDataService
             .getEntityExposures(
                 this.selectedOutbreak.id,
-                entityType,
-                entityId,
-                queryBuilder
+                entity.type,
+                entity.id
             )
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     // hide loading
                     loadingDialog.close();
                     return throwError(err);
@@ -1400,133 +1390,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 loadingDialog.close();
 
                 // display popup
-                this.displayEntitiesAndRelationships('fromExposures', entity, relationshipsData);
+                this.entityHelperService.displayEntitiesAndRelationships('fromExposures', entity, relationshipsData);
             });
-    }
-
-    /**
-     * Display dialog with entities and related relationships
-     */
-    displayEntitiesAndRelationships(from: string, entity: CaseModel, relationshipsData: EntityModel[]) {
-        // split relationships data into entities and relationships
-        const entities = [];
-        const relationships: RelationshipForDialogModel[] = [];
-
-        // add models
-        relationshipsData.forEach((relationshipData) => {
-            entities.push(relationshipData.model);
-        });
-        // add relationships
-        relationshipsData.forEach((relationshipData) => {
-            // create object to pass to the dialog
-            relationships.push({
-                relatedEntity: relationshipData.model,
-                relationshipData: relationshipData.relationship});
-        });
-
-        // create  list of entities and relationships
-        const fieldsList: DialogField[] = [];
-
-        if (!_.isEmpty(entities)) {
-            // add section title if we have entities
-            fieldsList.push(new DialogField({
-                name: '_',
-                fieldType: DialogFieldType.SECTION_TITLE,
-                placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_SECTION_TITLE'
-            }));
-
-            // add entities to the list
-            entities.forEach((itemModel: CaseModel | ContactModel | EventModel) => {
-                fieldsList.push(new DialogField({
-                    name: '',
-                    fieldType: DialogFieldType.ACTION,
-                    placeholder: itemModel.name,
-                    actionData: itemModel,
-                    actionCallback: (item) => {
-                        // show entity information
-                        this.dialogService.showCustomDialog(
-                            ViewCotNodeDialogComponent,
-                            {
-                                ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
-                                ...{
-                                    data: {
-                                        entity: item
-                                    }
-                                }
-                            }
-                        );
-                    }
-                }));
-            });
-        }
-
-        if (!_.isEmpty(relationships)) {
-            // add section title if we have relationships
-            fieldsList.push(new DialogField({
-                name: '_',
-                fieldType: DialogFieldType.SECTION_TITLE,
-                placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_RELATIONSHIPS_TITLE'
-            }));
-
-            // add relationships to the list
-            relationships.forEach((relationshipModel: RelationshipForDialogModel) => {
-                // construct relationship label for dialog
-                let relationshipLabel: string = '';
-                if (from === 'fromContacts') {
-                    relationshipLabel = `${entity.name} - ${relationshipModel.relatedEntity.name}`;
-                }
-
-                if (from === 'fromExposures') {
-                    relationshipLabel = ` ${relationshipModel.relatedEntity.name} - ${entity.name}`;
-                }
-
-                // add related entities into relationship people to display relationship dialog
-                relationshipModel.relationshipData.people = [
-                    new EntityModel(entity),
-                    new EntityModel(relationshipModel.relatedEntity)
-                ];
-
-                // add relationships to the list
-                fieldsList.push(new DialogField({
-                    name: '',
-                    fieldType: DialogFieldType.ACTION,
-                    placeholder: relationshipLabel,
-                    actionData: relationshipModel.relationshipData,
-                    actionCallback: (item: RelationshipModel) => {
-                        // show entity information
-                        this.dialogService.showCustomDialog(
-                            ViewCotEdgeDialogComponent,
-                            {
-                                ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
-                                ...{
-                                    data: {
-                                        relationship: item
-                                    }
-                                }
-                            }
-                        );
-                    }
-                }));
-            });
-        }
-
-        // display dialog if filed list is not empty
-        if (!_.isEmpty(fieldsList)) {
-            // display dialog to choose item from list
-            this.dialogService
-                .showInput(new DialogConfiguration({
-                    message: 'LNG_PAGE_LIST_CASES_GROUP_DIALOG_TITLE',
-                    buttons: [
-                        new DialogButton({
-                            label: 'LNG_COMMON_BUTTON_CLOSE',
-                            clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-                                dialogHandler.close();
-                            }
-                        })
-                    ],
-                    fieldsList: fieldsList
-                }))
-                .subscribe();
-        }
     }
 }

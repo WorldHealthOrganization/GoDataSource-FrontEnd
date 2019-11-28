@@ -654,12 +654,20 @@
                         {{ 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS' | translate }}
                     </div>
                     <div class="column-filter">
+                        <app-form-input
+                            name="numberOfContactsFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('numberOfContacts', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
                     </div>
                 </div>
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
-                (click)="displayContacts(item, item.numberOfContacts, item.type, item.id)"
+                (click)="displayContacts(item)"
                 class="relationship-number">
                 {{ item.numberOfContacts }}
             </mat-cell>
@@ -673,12 +681,20 @@
                         {{ 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES' | translate}}
                     </div>
                     <div class="column-filter">
+                        <app-form-input
+                            name="caseNumberOfExposures"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('numberOfExposures', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
                     </div>
                 </div>
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
-                (click)="displayExposures(item, item.numberOfExposures, item.type, item.id)"
+                (click)="displayExposures(item)"
                 class="relationship-number">
                 {{ item.numberOfExposures }}
             </mat-cell>

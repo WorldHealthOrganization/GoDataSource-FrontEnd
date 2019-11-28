@@ -34,10 +34,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { Subscription } from 'rxjs/internal/Subscription';
 import { MatDialogRef } from '@angular/material';
 import { ViewCotEdgeDialogComponent } from '../../../../shared/components/view-cot-edge-dialog/view-cot-edge-dialog.component';
-import {
-    EntityModel, RelationshipForDialogModel,
-    RelationshipModel
-} from '../../../../core/models/entity-and-relationship.model';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { ViewCotNodeDialogComponent } from '../../../../shared/components/view-cot-node-dialog/view-cot-node-dialog.component';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -612,34 +609,34 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         entityType: EntityType,
         entityId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) {
-        // if we do not have contacts return
-        if (contactsNumber < 1) {
-            return;
-        }
-        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
-        this.relationshipDataService
-            .getEntityContacts(
-                this.selectedOutbreak.id,
-                entityType,
-                entityId,
-                queryBuilder
-            )
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showError(err.message);
-                    // hide loading
-                    loadingDialog.close();
-                    return throwError(err);
-                })
-            )
-            .subscribe((relationshipsData: EntityModel[]) => {
-                // hide loading
-                loadingDialog.close();
-
-                // display popup
-                this.displayEntitiesAndRelationships('fromContacts', entity, relationshipsData);
-
-            });
+        // // if we do not have contacts return
+        // if (contactsNumber < 1) {
+        //     return;
+        // }
+        // const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+        // this.relationshipDataService
+        //     .getEntityContacts(
+        //         this.selectedOutbreak.id,
+        //         entityType,
+        //         entityId,
+        //         queryBuilder
+        //     )
+        //     .pipe(
+        //         catchError((err) => {
+        //             this.snackbarService.showError(err.message);
+        //             // hide loading
+        //             loadingDialog.close();
+        //             return throwError(err);
+        //         })
+        //     )
+        //     .subscribe((relationshipsData: EntityModel[]) => {
+        //         // hide loading
+        //         loadingDialog.close();
+        //
+        //         // display popup
+        //         this.displayEntitiesAndRelationships('fromContacts', entity, relationshipsData);
+        //
+        //     });
 
     }
 
@@ -652,159 +649,159 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         entityType: EntityType,
         entityId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) {
-        // if we do not have any exposure return
-        if (exposureNumber < 1) {
-            return;
-        }
-        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
-
-        this.relationshipDataService
-            .getEntityExposures(
-                this.selectedOutbreak.id,
-                entityType,
-                entityId,
-                queryBuilder
-            )
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showError(err.message);
-                    // hide loading
-                    loadingDialog.close();
-                    return throwError(err);
-                })
-            )
-            .subscribe((relationshipsData: EntityModel[]) => {
-                // hide loading
-                loadingDialog.close();
-
-                // display popup
-                this.displayEntitiesAndRelationships('fromExposures', entity, relationshipsData);
-            });
+        // // if we do not have any exposure return
+        // if (exposureNumber < 1) {
+        //     return;
+        // }
+        // const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+        //
+        // this.relationshipDataService
+        //     .getEntityExposures(
+        //         this.selectedOutbreak.id,
+        //         entityType,
+        //         entityId,
+        //         queryBuilder
+        //     )
+        //     .pipe(
+        //         catchError((err) => {
+        //             this.snackbarService.showError(err.message);
+        //             // hide loading
+        //             loadingDialog.close();
+        //             return throwError(err);
+        //         })
+        //     )
+        //     .subscribe((relationshipsData: EntityModel[]) => {
+        //         // hide loading
+        //         loadingDialog.close();
+        //
+        //         // display popup
+        //         this.displayEntitiesAndRelationships('fromExposures', entity, relationshipsData);
+        //     });
     }
 
-    /**
-     * Display dialog with entities and related relationships
-     */
-    displayEntitiesAndRelationships(from: string, entity: EventModel, relationshipsData: EntityModel[]) {
-        // split relationships data into entities and relationships
-        const entities = [];
-        const relationships: RelationshipForDialogModel[] = [];
-
-        // add models
-        relationshipsData.forEach((relationshipData) => {
-            entities.push(relationshipData.model);
-        });
-        // add relationships
-        relationshipsData.forEach((relationshipData) => {
-            // create object to pass to the dialog
-            relationships.push({
-                relatedEntity: relationshipData.model,
-                relationshipData: relationshipData.relationship});
-        });
-
-        // create  list of entities and relationships
-        const fieldsList: DialogField[] = [];
-
-        if (!_.isEmpty(entities)) {
-            // add section title if we have entities
-            fieldsList.push(new DialogField({
-                name: '_',
-                fieldType: DialogFieldType.SECTION_TITLE,
-                placeholder: 'LNG_PAGE_LIST_EVENTS_DIALOG_ENTITY_SECTION_TITLE'
-            }));
-
-            // add entities to the list
-            entities.forEach((itemModel: CaseModel | ContactModel | EventModel) => {
-                fieldsList.push(new DialogField({
-                    name: '',
-                    fieldType: DialogFieldType.ACTION,
-                    placeholder: itemModel.name,
-                    actionData: itemModel,
-                    actionCallback: (item) => {
-                        // show entity information
-                        this.dialogService.showCustomDialog(
-                            ViewCotNodeDialogComponent,
-                            {
-                                ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
-                                ...{
-                                    data: {
-                                        entity: item
-                                    }
-                                }
-                            }
-                        );
-                    }
-                }));
-            });
-        }
-
-        if (!_.isEmpty(relationships)) {
-            // add section title if we have relationships
-            fieldsList.push(new DialogField({
-                name: '_',
-                fieldType: DialogFieldType.SECTION_TITLE,
-                placeholder: 'LNG_PAGE_LIST_EVENTS_DIALOG_ENTITY_RELATIONSHIPS_TITLE'
-            }));
-
-            // add relationships to the list
-            relationships.forEach((relationshipModel: RelationshipForDialogModel) => {
-                // construct relationship label for dialog
-                let relationshipLabel: string = '';
-                if (from === 'fromContacts') {
-                    relationshipLabel = `${entity.name} - ${relationshipModel.relatedEntity.name}`;
-                }
-
-                if (from === 'fromExposures') {
-                    relationshipLabel = ` ${relationshipModel.relatedEntity.name} - ${entity.name}`;
-                }
-
-                // add related entities into relationship people to display relationship dialog
-                relationshipModel.relationshipData.people = [
-                    new EntityModel(entity),
-                    new EntityModel(relationshipModel.relatedEntity)
-                ];
-
-                // add relationships to the list
-                fieldsList.push(new DialogField({
-                    name: '',
-                    fieldType: DialogFieldType.ACTION,
-                    placeholder: relationshipLabel,
-                    actionData: relationshipModel.relationshipData,
-                    actionCallback: (item: RelationshipModel) => {
-                        // show entity information
-                        this.dialogService.showCustomDialog(
-                            ViewCotEdgeDialogComponent,
-                            {
-                                ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
-                                ...{
-                                    data: {
-                                        relationship: item
-                                    }
-                                }
-                            }
-                        );
-                    }
-                }));
-            });
-        }
-
-        // display dialog if filed list is not empty
-        if (!_.isEmpty(fieldsList)) {
-            // display dialog to choose item from list
-            this.dialogService
-                .showInput(new DialogConfiguration({
-                    message: 'LNG_PAGE_LIST_EVENTS_GROUP_DIALOG_TITLE',
-                    buttons: [
-                        new DialogButton({
-                            label: 'LNG_COMMON_BUTTON_CLOSE',
-                            clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-                                dialogHandler.close();
-                            }
-                        })
-                    ],
-                    fieldsList: fieldsList
-                }))
-                .subscribe();
-        }
-    }
+    // /**
+    //  * Display dialog with entities and related relationships
+    //  */
+    // displayEntitiesAndRelationships(from: string, entity: EventModel, relationshipsData: EntityModel[]) {
+    //     // split relationships data into entities and relationships
+    //     const entities = [];
+    //     const relationships: RelationshipForDialogModel[] = [];
+    //
+    //     // add models
+    //     relationshipsData.forEach((relationshipData) => {
+    //         entities.push(relationshipData.model);
+    //     });
+    //     // add relationships
+    //     relationshipsData.forEach((relationshipData) => {
+    //         // create object to pass to the dialog
+    //         relationships.push({
+    //             relatedEntity: relationshipData.model,
+    //             relationshipData: relationshipData.relationship});
+    //     });
+    //
+    //     // create  list of entities and relationships
+    //     const fieldsList: DialogField[] = [];
+    //
+    //     if (!_.isEmpty(entities)) {
+    //         // add section title if we have entities
+    //         fieldsList.push(new DialogField({
+    //             name: '_',
+    //             fieldType: DialogFieldType.SECTION_TITLE,
+    //             placeholder: 'LNG_PAGE_LIST_EVENTS_DIALOG_ENTITY_SECTION_TITLE'
+    //         }));
+    //
+    //         // add entities to the list
+    //         entities.forEach((itemModel: CaseModel | ContactModel | EventModel) => {
+    //             fieldsList.push(new DialogField({
+    //                 name: '',
+    //                 fieldType: DialogFieldType.ACTION,
+    //                 placeholder: itemModel.name,
+    //                 actionData: itemModel,
+    //                 actionCallback: (item) => {
+    //                     // show entity information
+    //                     this.dialogService.showCustomDialog(
+    //                         ViewCotNodeDialogComponent,
+    //                         {
+    //                             ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
+    //                             ...{
+    //                                 data: {
+    //                                     entity: item
+    //                                 }
+    //                             }
+    //                         }
+    //                     );
+    //                 }
+    //             }));
+    //         });
+    //     }
+    //
+    //     if (!_.isEmpty(relationships)) {
+    //         // add section title if we have relationships
+    //         fieldsList.push(new DialogField({
+    //             name: '_',
+    //             fieldType: DialogFieldType.SECTION_TITLE,
+    //             placeholder: 'LNG_PAGE_LIST_EVENTS_DIALOG_ENTITY_RELATIONSHIPS_TITLE'
+    //         }));
+    //
+    //         // add relationships to the list
+    //         relationships.forEach((relationshipModel: RelationshipForDialogModel) => {
+    //             // construct relationship label for dialog
+    //             let relationshipLabel: string = '';
+    //             if (from === 'fromContacts') {
+    //                 relationshipLabel = `${entity.name} - ${relationshipModel.relatedEntity.name}`;
+    //             }
+    //
+    //             if (from === 'fromExposures') {
+    //                 relationshipLabel = ` ${relationshipModel.relatedEntity.name} - ${entity.name}`;
+    //             }
+    //
+    //             // add related entities into relationship people to display relationship dialog
+    //             relationshipModel.relationshipData.people = [
+    //                 new EntityModel(entity),
+    //                 new EntityModel(relationshipModel.relatedEntity)
+    //             ];
+    //
+    //             // add relationships to the list
+    //             fieldsList.push(new DialogField({
+    //                 name: '',
+    //                 fieldType: DialogFieldType.ACTION,
+    //                 placeholder: relationshipLabel,
+    //                 actionData: relationshipModel.relationshipData,
+    //                 actionCallback: (item: RelationshipModel) => {
+    //                     // show entity information
+    //                     this.dialogService.showCustomDialog(
+    //                         ViewCotEdgeDialogComponent,
+    //                         {
+    //                             ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+    //                             ...{
+    //                                 data: {
+    //                                     relationship: item
+    //                                 }
+    //                             }
+    //                         }
+    //                     );
+    //                 }
+    //             }));
+    //         });
+    //     }
+    //
+    //     // display dialog if filed list is not empty
+    //     if (!_.isEmpty(fieldsList)) {
+    //         // display dialog to choose item from list
+    //         this.dialogService
+    //             .showInput(new DialogConfiguration({
+    //                 message: 'LNG_PAGE_LIST_EVENTS_GROUP_DIALOG_TITLE',
+    //                 buttons: [
+    //                     new DialogButton({
+    //                         label: 'LNG_COMMON_BUTTON_CLOSE',
+    //                         clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+    //                             dialogHandler.close();
+    //                         }
+    //                     })
+    //                 ],
+    //                 fieldsList: fieldsList
+    //             }))
+    //             .subscribe();
+    //     }
+    // }
 }
