@@ -84,17 +84,25 @@ export class ContactModel
     }
 
     /**
-     * Static Permissions
+     * Static Permissions - IPermissionBasic
      */
     static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_VIEW) : false); }
     static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_LIST) : false); }
     static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_CREATE) : false); }
     static canModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_VIEW, PERMISSION.CONTACT_MODIFY) : false); }
     static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_DELETE) : false); }
+
+    /**
+     * Static Permissions - IPermissionBasicBulk
+     */
     static canBulkCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_BULK_CREATE) : false); }
     static canBulkModify(user: UserModel): boolean { return false; }
     static canBulkDelete(user: UserModel): boolean { return false; }
     static canBulkRestore(user: UserModel): boolean { return false; }
+
+    /**
+     * Static Permissions - IPermissionRelatedRelationship
+     */
     static canListRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_LIST_RELATIONSHIP_CONTACTS) : false); }
     static canViewRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_VIEW_RELATIONSHIP_CONTACTS) : false); }
     static canCreateRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_CREATE_RELATIONSHIP_CONTACTS) : false); }
@@ -173,17 +181,25 @@ export class ContactModel
     }
 
     /**
-     * Permissions
+     * Permissions - IPermissionBasic
      */
     canView(user: UserModel): boolean { return ContactModel.canView(user); }
     canList(user: UserModel): boolean { return ContactModel.canList(user); }
     canCreate(user: UserModel): boolean { return ContactModel.canCreate(user); }
     canModify(user: UserModel): boolean { return ContactModel.canModify(user); }
     canDelete(user: UserModel): boolean { return ContactModel.canDelete(user); }
+
+    /**
+     * Permissions - IPermissionBasicBulk
+     */
     canBulkCreate(user: UserModel): boolean { return ContactModel.canBulkCreate(user); }
     canBulkModify(user: UserModel): boolean { return ContactModel.canBulkModify(user); }
     canBulkDelete(user: UserModel): boolean { return ContactModel.canBulkDelete(user); }
     canBulkRestore(user: UserModel): boolean { return ContactModel.canBulkRestore(user); }
+
+    /**
+     * Permissions - IPermissionRelatedRelationship
+     */
     canListRelationshipContacts(user: UserModel): boolean { return ContactModel.canListRelationshipContacts(user); }
     canViewRelationshipContacts(user: UserModel): boolean { return ContactModel.canViewRelationshipContacts(user); }
     canCreateRelationshipContacts(user: UserModel): boolean { return ContactModel.canCreateRelationshipContacts(user); }

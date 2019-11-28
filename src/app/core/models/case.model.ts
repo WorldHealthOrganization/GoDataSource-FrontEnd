@@ -98,13 +98,17 @@ export class CaseModel
     }
 
     /**
-     * Static Permissions
+     * Static Permissions - IPermissionBasic
      */
     static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_VIEW) : false); }
     static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LIST) : false); }
     static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_CREATE) : false); }
     static canModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_VIEW, PERMISSION.CASE_MODIFY) : false); }
     static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_DELETE) : false); }
+
+    /**
+     * Static Permissions - IPermissionRelatedRelationship
+     */
     static canListRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LIST_RELATIONSHIP_CONTACTS) : false); }
     static canViewRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_VIEW_RELATIONSHIP_CONTACTS) : false); }
     static canCreateRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_CREATE_RELATIONSHIP_CONTACTS) : false); }
@@ -202,13 +206,17 @@ export class CaseModel
     }
 
     /**
-     * Permissions
+     * Permissions - IPermissionBasic
      */
     canView(user: UserModel): boolean { return CaseModel.canView(user); }
     canList(user: UserModel): boolean { return CaseModel.canList(user); }
     canCreate(user: UserModel): boolean { return CaseModel.canCreate(user); }
     canModify(user: UserModel): boolean { return CaseModel.canModify(user); }
     canDelete(user: UserModel): boolean { return CaseModel.canDelete(user); }
+
+    /**
+     * Permissions - IPermissionRelatedRelationship
+     */
     canListRelationshipContacts(user: UserModel): boolean { return CaseModel.canListRelationshipContacts(user); }
     canViewRelationshipContacts(user: UserModel): boolean { return CaseModel.canViewRelationshipContacts(user); }
     canCreateRelationshipContacts(user: UserModel): boolean { return CaseModel.canCreateRelationshipContacts(user); }

@@ -38,16 +38,28 @@ export class RelationshipModel
     people: EntityModel[];
 
     /**
-     * Static Permissions
+     * Static Permissions - IPermissionBasic
      */
     static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_VIEW) : false); }
     static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_LIST) : false); }
     static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_CREATE) : false); }
     static canModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_VIEW, PERMISSION.RELATIONSHIP_MODIFY) : false); }
     static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_DELETE) : false); }
+
+    /**
+     * Static Permissions - IPermissionRelationship
+     */
     static canReverse(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_REVERSE) : false); }
-    static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_EXPORT) : false); }
     static canShare(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_SHARE) : false); }
+
+    /**
+     * Static Permissions - IPermissionExportable
+     */
+    static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_EXPORT) : false); }
+
+    /**
+     * Static Permissions - IPermissionBasicBulk
+     */
     static canBulkCreate(user: UserModel): boolean { return false; }
     static canBulkModify(user: UserModel): boolean { return false; }
     static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_BULK_DELETE) : false); }
@@ -79,16 +91,28 @@ export class RelationshipModel
     }
 
     /**
-     * Permissions
+     * Permissions - IPermissionBasic
      */
     canView(user: UserModel): boolean { return RelationshipModel.canView(user); }
     canList(user: UserModel): boolean { return RelationshipModel.canList(user); }
     canCreate(user: UserModel): boolean { return RelationshipModel.canCreate(user); }
     canModify(user: UserModel): boolean { return RelationshipModel.canModify(user); }
     canDelete(user: UserModel): boolean { return RelationshipModel.canDelete(user); }
+
+    /**
+     * Permissions - IPermissionRelationship
+     */
     canReverse(user: UserModel): boolean { return RelationshipModel.canReverse(user); }
-    canExport(user: UserModel): boolean { return RelationshipModel.canExport(user); }
     canShare(user: UserModel): boolean { return RelationshipModel.canShare(user); }
+
+    /**
+     * Permissions - IPermissionExportable
+     */
+    canExport(user: UserModel): boolean { return RelationshipModel.canExport(user); }
+
+    /**
+     * Permissions - IPermissionBasicBulk
+     */
     canBulkCreate(user: UserModel): boolean { return RelationshipModel.canBulkCreate(user); }
     canBulkModify(user: UserModel): boolean { return RelationshipModel.canBulkModify(user); }
     canBulkDelete(user: UserModel): boolean { return RelationshipModel.canBulkDelete(user); }
