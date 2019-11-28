@@ -192,11 +192,32 @@ export class FollowUpsDataService {
         return this.http.delete(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups/${followUpId}`);
     }
 
-    deleteSelectedFollowUps(
+    /**
+     * Delete multiple follow-ups
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    deleteBulkFollowUps(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
         const filter = queryBuilder.buildQuery();
-        return this.http.delete(`outbreaks/${outbreakId}/follow-ups/bulk?filter=${filter}`);
+        return this.http.delete(
+            `outbreaks/${outbreakId}/follow-ups/bulk?filter=${filter}`);
+    }
+
+    /**
+     * Restore multiple follow-ups
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    restoreBulkFollowUps(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+        const filter = queryBuilder.buildQuery();
+        return this.http.post(
+            `outbreaks/${outbreakId}/follow-ups/bulk/restore?filter=${filter}`, {});
     }
 
     /**

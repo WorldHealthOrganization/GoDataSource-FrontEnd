@@ -23,7 +23,16 @@ export const EnglishUsLang = {
         /**
          * uiFollowUpsListPage
          */
-        'LNG_PAGE_LIST_FOLLOW_UOS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS': 'Delete selected follow-ups'
+        'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS': 'Delete selected follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS': 'Restore selected follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups deletes',
+        'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups restored',
+
+        /**
+         * uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_FOLLOW_UPS': 'Are you sure you want to delete selected follow-ups?',
+        'LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_FOLLOW_UPS': 'Are you sure you want to restore selected follow-ups?',
 
         /**
          * REMOVE the tokens from below
