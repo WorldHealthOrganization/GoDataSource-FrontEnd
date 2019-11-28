@@ -131,7 +131,8 @@ const routes: Routes = [
                             PERMISSION.OUTBREAK_LIST,
                             PERMISSION.OUTBREAK_VIEW,
                             PERMISSION.OUTBREAK_CREATE,
-                            PERMISSION.OUTBREAK_MODIFY
+                            PERMISSION.OUTBREAK_MODIFY,
+                            PERMISSION.OUTBREAK_SEE_INCONSISTENCIES
                         ]
                     })
                 }

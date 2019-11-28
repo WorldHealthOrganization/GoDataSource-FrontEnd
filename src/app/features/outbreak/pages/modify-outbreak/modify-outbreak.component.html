@@ -285,7 +285,7 @@
     <!-- outbreak form actions -->
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
-        <button *ngIf="viewOnly && hasOutbreakWriteAccess()"
+        <button *ngIf="viewOnly && OutbreakModel.canModify(authUser)"
                 mat-raised-button
                 type="button"
                 color="accent"
@@ -298,16 +298,21 @@
                 color="accent">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
-            <button type="button"
-                    [routerLink]="['/outbreaks']"
-                    mat-raised-button>
+            <button
+                *ngIf="OutbreakModel.canList(authUser)"
+                type="button"
+                [routerLink]="['/outbreaks']"
+                mat-raised-button>
                 {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
             </button>
         </ng-container>
 
-        <div class="page-tabs-navbar-placeholder"></div>
+        <div
+            *ngIf="(viewOnly && OutbreakModel.canModify(authUser)) || (!viewOnly && OutbreakModel.canList(authUser))"
+            class="page-tabs-navbar-placeholder"></div>
 
         <button
+            *ngIf="OutbreakModel.canModifyCaseQuestionnaire(authUser)"
             mat-raised-button
             type="button"
             [routerLink]="['/outbreaks', outbreakId, 'case-questionnaire']">
@@ -315,6 +320,7 @@
         </button>
 
         <button
+            *ngIf="OutbreakModel.canModifyContactFollowUpQuestionnaire(authUser)"
             mat-raised-button
             type="button"
             [routerLink]="['/outbreaks', outbreakId, 'contact-follow-up-questionnaire']">
@@ -322,6 +328,7 @@
         </button>
 
         <button
+            *ngIf="OutbreakModel.canModifyCaseLabResultQuestionnaire(authUser)"
             mat-raised-button
             type="button"
             [routerLink]="['/outbreaks', outbreakId, 'case-lab-results-questionnaire']">

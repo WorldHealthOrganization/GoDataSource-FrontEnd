@@ -12,7 +12,6 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -28,7 +27,10 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./modify-outbreak.component.less']
 })
 export class ModifyOutbreakComponent extends ViewModifyComponent implements OnInit {
+    // constants
+    OutbreakModel = OutbreakModel;
 
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
     // authenticated user
     authUser: UserModel;
@@ -82,7 +84,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         this.outbreakId = this.outbreak.id;
 
         // update breadcrumbs
-        this.createBreadcrumbs();
+        this.initializeBreadcrumbs();
 
         this.outbreakNameValidator$ = new Observable((observer) => {
             this.outbreakDataService.checkOutbreakNameUniquenessValidity(this.outbreak.name, this.outbreakId)
@@ -91,6 +93,32 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
                     observer.complete();
                 });
         });
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (OutbreakModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks')
+            );
+        }
+
+        // view / modify breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY',
+                '.',
+                true,
+                {},
+                this.outbreak
+            )
+        );
     }
 
     /**
@@ -140,36 +168,11 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
                 // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
 
-                // update breadcrumb
-                this.createBreadcrumbs();
+                // update breadcrumbs
+                this.initializeBreadcrumbs();
 
                 // hide dialog
                 loadingDialog.close();
             });
-    }
-
-    /**
-     * Check if we have write access to outbreaks
-     * @returns {boolean}
-     */
-    hasOutbreakWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
-    }
-
-    /**
-     * Create breadcrumbs
-     */
-    createBreadcrumbs() {
-        this.breadcrumbs = [];
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks'),
-            new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY',
-                '.',
-                true,
-                {},
-                this.outbreak
-            )
-        );
     }
 }

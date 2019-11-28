@@ -79,7 +79,11 @@ const routes: Routes = [
         component: fromPages.OutbreakQuestionnaireComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_OUTBREAK],
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.OUTBREAK_MODIFY,
+                PERMISSION.OUTBREAK_MODIFY_CASE_QUESTIONNAIRE
+            ],
             questionnaire: OutbreakQestionnaireTypeEnum.CASE
         },
         canDeactivate: [
@@ -93,7 +97,11 @@ const routes: Routes = [
         component: fromPages.OutbreakQuestionnaireComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_OUTBREAK],
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.OUTBREAK_MODIFY,
+                PERMISSION.OUTBREAK_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE
+            ],
             questionnaire: OutbreakQestionnaireTypeEnum.FOLLOW_UP
         },
         canDeactivate: [
@@ -107,7 +115,11 @@ const routes: Routes = [
         component: fromPages.OutbreakQuestionnaireComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_OUTBREAK],
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.OUTBREAK_MODIFY,
+                PERMISSION.OUTBREAK_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE
+            ],
             questionnaire: OutbreakQestionnaireTypeEnum.CASE_LAB_RESULT
         },
         canDeactivate: [
@@ -121,7 +133,9 @@ const routes: Routes = [
         component: fromPages.InconsistenciesListComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_OUTBREAK]
+            permissions: [
+                PERMISSION.OUTBREAK_SEE_INCONSISTENCIES
+            ]
         }
     }
 ];

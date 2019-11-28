@@ -141,7 +141,7 @@
         <ng-container
             *app-selected-outbreak-is-active
         >
-            <button *ngIf="EventModel.canModify(authUser) && viewOnly"
+            <button *ngIf="viewOnly && EventModel.canModify(authUser)"
                     mat-raised-button type="button" color="accent"
                     [routerLink]="['/events', eventId, 'modify']">
                 {{'LNG_COMMON_BUTTON_EDIT'| translate}}
@@ -161,7 +161,9 @@
                 </button>
             </ng-container>
 
-            <div class="page-tabs-navbar-placeholder"></div>
+            <div
+                *ngIf="(viewOnly && EventModel.canModify(authUser)) || (!viewOnly && EventModel.canList(authUser))"
+                class="page-tabs-navbar-placeholder"></div>
 
             <ng-container *ngIf="EventModel.canCreateContact(authUser) && ContactModel.canCreate(authUser)">
                 <button
@@ -177,14 +179,14 @@
         </ng-container>
 
         <button
-            *ngIf="EventModel.canListRelationshipContacts(authUser) && RelationshipModel.canList(this.authUser)"
+            *ngIf="EventModel.canListRelationshipContacts(authUser) && RelationshipModel.canList(authUser)"
             mat-raised-button
             type="button"
             [routerLink]="['/relationships', EntityType.EVENT, eventId, 'contacts']">
             {{ 'LNG_COMMON_BUTTON_EXPOSURES_FROM' | translate }}
         </button>
         <button
-            *ngIf="EventModel.canListRelationshipExposures(authUser) && RelationshipModel.canList(this.authUser)"
+            *ngIf="EventModel.canListRelationshipExposures(authUser) && RelationshipModel.canList(authUser)"
             mat-raised-button
             type="button"
             [routerLink]="['/relationships', EntityType.EVENT, eventId, 'exposures']">
