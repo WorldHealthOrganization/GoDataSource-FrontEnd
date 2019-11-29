@@ -19,10 +19,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
-import {
-    DialogAnswer, DialogButton, DialogComponent, DialogConfiguration,
-    DialogFieldType
-} from '../../../../shared/components/dialog/dialog.component';
+import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import * as _ from 'lodash';
@@ -31,7 +28,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
-import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { throwError } from 'rxjs';
@@ -39,11 +36,6 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AddressType } from '../../../../core/models/address.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { ContactModel } from '../../../../core/models/contact.model';
-import { EventModel } from '../../../../core/models/event.model';
-import { MatDialogRef } from '@angular/material';
-import { ViewCotEdgeDialogComponent } from '../../../../shared/components/view-cot-edge-dialog/view-cot-edge-dialog.component';
-import { ViewCotNodeDialogComponent } from '../../../../shared/components/view-cot-node-dialog/view-cot-node-dialog.component';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 
 @Component({
@@ -575,6 +567,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 visible: false
             }),
             new VisibleColumnModel({
+                field: 'numberOfContacts',
+                label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS'
+            }),
+            new VisibleColumnModel({
+                field: 'numberOfExposures',
+                label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES'
+            }),
+            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_CASE_FIELD_LABEL_DELETED',
                 visible: false
@@ -598,14 +598,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 field: 'updatedAt',
                 label: 'LNG_CASE_FIELD_LABEL_UPDATED_AT',
                 visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'numberOfContacts',
-                label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS'
-            }),
-            new VisibleColumnModel({
-                field: 'numberOfExposures',
-                label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES'
             })
         ];
     }
@@ -820,9 +812,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             // retrieve location list
             this.queryBuilder.include('locations', true);
 
+            // retrieve number of contacts & exposures for each record
             this.queryBuilder.filter.flag(
                 'countRelations',
-                true);
+                true
+            );
 
             // retrieve the list of Cases
             this.casesList$ = this.caseDataService
@@ -1336,7 +1330,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         if (entity.numberOfContacts < 1) {
             return;
         }
-        this.entityHelperService.displayContacts(this.selectedOutbreak.id, entity);
+
+        // display dialog
+        this.entityHelperService.displayContacts(
+            this.selectedOutbreak.id,
+            entity
+        );
     }
 
     /**
@@ -1348,6 +1347,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             return;
         }
 
-        this.entityHelperService.displayExposures(this.selectedOutbreak.id, entity);
+        // display dialog
+        this.entityHelperService.displayExposures(
+            this.selectedOutbreak.id,
+            entity
+        );
     }
 }

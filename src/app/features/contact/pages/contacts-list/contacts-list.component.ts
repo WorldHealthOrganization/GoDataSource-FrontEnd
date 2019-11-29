@@ -19,7 +19,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ActivatedRoute, Router } from '@angular/router';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
-import { DialogAnswer, DialogButton, DialogComponent } from '../../../../shared/components/dialog/dialog.component';
+import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { RequestQueryBuilder, RequestRelationBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -36,7 +36,6 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { Subscription } from 'rxjs/internal/Subscription';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { AddressType } from '../../../../core/models/address.model';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 
 @Component({
@@ -517,6 +516,16 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE'
             }),
             new VisibleColumnModel({
+                field: 'numberOfContacts',
+                label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'numberOfExposures',
+                label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+                visible: false
+            }),
+            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_CONTACT_FIELD_LABEL_DELETED'
             }),
@@ -538,16 +547,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             new VisibleColumnModel({
                 field: 'updatedAt',
                 label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_AT',
-                visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'numberOfContacts',
-                label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
-                visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'numberOfExposures',
-                label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
                 visible: false
             })
         ];
@@ -759,9 +758,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             // retrieve location list
             this.queryBuilder.include('locations', true);
 
+            // retrieve number of contacts & exposures for each record
             this.queryBuilder.filter.flag(
                 'countRelations',
-                true);
+                true
+            );
 
             // retrieve the list of Contacts
             this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder)
@@ -1334,7 +1335,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         if (entity.numberOfContacts < 1) {
             return;
         }
-        this.entityHelperService.displayContacts(this.selectedOutbreak.id, entity);
+
+        // display dialog
+        this.entityHelperService.displayContacts(
+            this.selectedOutbreak.id,
+            entity
+        );
     }
 
     /**
@@ -1346,6 +1352,10 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             return;
         }
 
-        this.entityHelperService.displayExposures(this.selectedOutbreak.id, entity);
+        // display dialog
+        this.entityHelperService.displayExposures(
+            this.selectedOutbreak.id,
+            entity
+        );
     }
 }

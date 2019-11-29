@@ -328,6 +328,16 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 visible: false
             }),
             new VisibleColumnModel({
+                field: 'numberOfContacts',
+                label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'numberOfExposures',
+                label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+                visible: false
+            }),
+            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_EVENT_FIELD_LABEL_DELETED'
             }),
@@ -350,16 +360,6 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 field: 'updatedAt',
                 label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT',
                 visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'numberOfContacts',
-                label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
-                visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'numberOfExposures',
-                label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-                visible: false
             })
         ];
     }
@@ -373,9 +373,11 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
 
+            // retrieve number of contacts & exposures for each record
             this.queryBuilder.filter.flag(
                 'countRelations',
-                true);
+                true
+            );
 
             // retrieve the list of Events
             this.eventsList$ = this.eventDataService.getEventsList(this.selectedOutbreak.id, this.queryBuilder)
@@ -599,7 +601,12 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         if (entity.numberOfContacts < 1) {
             return;
         }
-        this.entityHelperService.displayContacts(this.selectedOutbreak.id, entity);
+
+        // display dialog
+        this.entityHelperService.displayContacts(
+            this.selectedOutbreak.id,
+            entity
+        );
     }
 
     /**
@@ -611,6 +618,10 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             return;
         }
 
-        this.entityHelperService.displayExposures(this.selectedOutbreak.id, entity);
+        // display dialog
+        this.entityHelperService.displayExposures(
+            this.selectedOutbreak.id,
+            entity
+        );
     }
 }

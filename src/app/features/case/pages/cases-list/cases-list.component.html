@@ -495,6 +495,46 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Number of Contacts -->
+        <ng-container matColumnDef="numberOfContacts">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                (click)="displayContacts(item)"
+                class="mat-table-number-column">
+                {{ item.numberOfContacts }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Number of Exposures -->
+        <ng-container matColumnDef="numberOfExposures">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                (click)="displayExposures(item)"
+                class="mat-table-number-column">
+                {{ item.numberOfExposures }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Deleted -->
         <ng-container matColumnDef="deleted">
             <mat-header-cell *matHeaderCellDef>
@@ -643,44 +683,6 @@
             </mat-header-cell>
             <mat-cell class="has-date-range-filter" *matCellDef="let item">
                 {{ item.updatedAt | dateTimeDefault }}
-            </mat-cell>
-        </ng-container>
-
-        <!--Number of Contacts-->
-        <ng-container matColumnDef="numberOfContacts">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">
-                        {{ 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS' | translate }}
-                    </div>
-                    <div class="column-filter">
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell
-                *matCellDef="let item"
-                (click)="displayContacts(item)"
-                class="relationship-number">
-                {{ item.numberOfContacts }}
-            </mat-cell>
-        </ng-container>
-
-        <!--Number of Exposures-->
-        <ng-container matColumnDef="numberOfExposures">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">
-                        {{ 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES' | translate}}
-                    </div>
-                    <div class="column-filter">
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell
-                *matCellDef="let item"
-                (click)="displayExposures(item)"
-                class="relationship-number">
-                {{ item.numberOfExposures }}
             </mat-cell>
         </ng-container>
 

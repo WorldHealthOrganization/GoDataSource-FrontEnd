@@ -25,20 +25,24 @@ export enum SentFromColumn {
 
 @Injectable()
 export class EntityHelperService {
-
+    /**
+     * Constructor
+     */
     constructor(
         private dialogService: DialogService,
         private relationshipDataService: RelationshipDataService,
-        private snackbarService: SnackbarService) {
-
-    }
+        private snackbarService: SnackbarService
+    ) {}
 
     /**
      * Display contacts
      * @param {string} selectedOutbreakId
      * @param {CaseModel | ContactModel | EventModel} entity
      */
-    displayContacts(selectedOutbreakId: string, entity: CaseModel | ContactModel | EventModel) {
+    displayContacts(
+        selectedOutbreakId: string,
+        entity: CaseModel | ContactModel | EventModel
+    ) {
         // display loading
         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
         this.relationshipDataService
@@ -49,7 +53,9 @@ export class EntityHelperService {
             )
             .pipe(
                 catchError((err) => {
+                    // show error
                     this.snackbarService.showApiError(err);
+
                     // hide loading
                     loadingDialog.close();
                     return throwError(err);
@@ -65,22 +71,27 @@ export class EntityHelperService {
     }
 
     /**
-     * Displa exposures
-     * @param {string} selectedOtbreakId
+     * Display exposures
+     * @param {string} selectedOutbreakId
      * @param {CaseModel | ContactModel | EventModel} entity
      */
-    displayExposures(selectedOtbreakId: string, entity: CaseModel | ContactModel | EventModel) {
+    displayExposures(
+        selectedOutbreakId: string,
+        entity: CaseModel | ContactModel | EventModel
+    ) {
+        // display loading
         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
-
         this.relationshipDataService
             .getEntityExposures(
-                selectedOtbreakId,
+                selectedOutbreakId,
                 entity.type,
                 entity.id
             )
             .pipe(
                 catchError((err) => {
+                    // show error
                     this.snackbarService.showApiError(err);
+
                     // hide loading
                     loadingDialog.close();
                     return throwError(err);
@@ -98,25 +109,32 @@ export class EntityHelperService {
     /**
      * Display dialog with entities and related relationships
      */
-    displayEntitiesAndRelationships(from: SentFromColumn, entity: CaseModel | ContactModel | EventModel, relationshipsData: EntityModel[]) {
+    displayEntitiesAndRelationships(
+        from: SentFromColumn,
+        entity: CaseModel | ContactModel | EventModel,
+        relationshipsData: EntityModel[]
+    ) {
         if (!_.isEmpty(relationshipsData)) {
             // split relationships data into entities and relationships
             // entities collection
-            const entities = [];
-            // add section title for entities
-            entities.push(new DialogField({
-                name: '_',
-                fieldType: DialogFieldType.SECTION_TITLE,
-                placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_SECTION_TITLE'
-            }));
+            const entities: DialogField[] = [
+                // add section title for entities
+                new DialogField({
+                    name: '_',
+                    fieldType: DialogFieldType.SECTION_TITLE,
+                    placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_SECTION_TITLE'
+                })
+            ];
+
             // relationships collection
-            const relationships = [];
-            // add section title for relationships
-            relationships.push(new DialogField({
-                name: '_',
-                fieldType: DialogFieldType.SECTION_TITLE,
-                placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_RELATIONSHIPS_TITLE'
-            }));
+            const relationships: DialogField[] = [
+                // add section title for relationships
+                new DialogField({
+                    name: '_',
+                    fieldType: DialogFieldType.SECTION_TITLE,
+                    placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_RELATIONSHIPS_TITLE'
+                })
+            ];
 
             // add entities and relationships
             relationshipsData.forEach((relationshipData) => {
@@ -144,12 +162,13 @@ export class EntityHelperService {
 
                 // construct relationship label for dialog
                 let relationshipLabel: string = '';
-                if (from === 'fromContacts') {
-                    relationshipLabel = `${entity.name} - ${relationshipData.model.name}`;
-                }
-
-                if (from === 'fromExposures') {
-                    relationshipLabel = ` ${relationshipData.model.name} - ${entity.name}`;
+                switch (from) {
+                    case SentFromColumn.CONTACTS:
+                        relationshipLabel = `${entity.name} - ${relationshipData.model.name}`;
+                        break;
+                    case SentFromColumn.EXPOSURES:
+                        relationshipLabel = `${entity.name} - ${relationshipData.model.name}`;
+                        break;
                 }
 
                 // add related entities into relationship people to display relationship dialog
@@ -179,13 +198,14 @@ export class EntityHelperService {
                         );
                     }
                 }));
-            // });
         });
 
         // display dialog to choose item from list
         this.dialogService
             .showInput(new DialogConfiguration({
-                message: from === 'fromContacts' ? 'LNG_DIALOG_GENERAL_DIALOG_TITLE_GROUP_CONTACTS_DIALOG_TITLE' : 'LNG_DIALOG_GENERAL_DIALOG_TITLE_GROUP_EXPOSURES_DIALOG_TITLE',
+                message: from === 'fromContacts' ?
+                    'LNG_DIALOG_GENERAL_DIALOG_TITLE_GROUP_CONTACTS_DIALOG_TITLE' :
+                    'LNG_DIALOG_GENERAL_DIALOG_TITLE_GROUP_EXPOSURES_DIALOG_TITLE',
                 buttons: [
                     new DialogButton({
                         label: 'LNG_COMMON_BUTTON_CLOSE',
