@@ -1336,29 +1336,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         if (entity.numberOfContacts < 1) {
             return;
         }
-        // display loading
-        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
-        this.relationshipDataService
-            .getEntityContacts(
-                this.selectedOutbreak.id,
-                entity.type,
-                entity.id,
-            )
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    // hide loading
-                    loadingDialog.close();
-                    return throwError(err);
-                })
-            )
-            .subscribe((relationshipsData: EntityModel[]) => {
-                // hide loading
-                loadingDialog.close();
-
-                // display popup
-                this.entityHelperService.displayEntitiesAndRelationships('fromContacts', entity, relationshipsData);
-            });
+        this.entityHelperService.displayContacts(this.selectedOutbreak.id, entity);
     }
 
     /**
@@ -1369,28 +1347,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         if (entity.numberOfExposures < 1) {
             return;
         }
-        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
 
-        this.relationshipDataService
-            .getEntityExposures(
-                this.selectedOutbreak.id,
-                entity.type,
-                entity.id
-            )
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    // hide loading
-                    loadingDialog.close();
-                    return throwError(err);
-                })
-            )
-            .subscribe((relationshipsData: EntityModel[]) => {
-                // hide loading
-                loadingDialog.close();
-
-                // display popup
-                this.entityHelperService.displayEntitiesAndRelationships('fromExposures', entity, relationshipsData);
-            });
+        this.entityHelperService.displayExposures(this.selectedOutbreak.id, entity);
     }
 }
