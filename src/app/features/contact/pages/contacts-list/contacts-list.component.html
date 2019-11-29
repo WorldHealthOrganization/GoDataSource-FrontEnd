@@ -558,6 +558,46 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Number of Contacts -->
+        <ng-container matColumnDef="numberOfContacts">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                (click)="displayContacts(item)"
+                class="mat-table-number-column">
+                {{ item.numberOfContacts }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Number of Exposures -->
+        <ng-container matColumnDef="numberOfExposures">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell
+                *matCellDef="let item"
+                (click)="displayExposures(item)"
+                class="mat-table-number-column">
+                {{ item.numberOfExposures }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Created By -->
         <ng-container matColumnDef="createdBy">
             <mat-header-cell *matHeaderCellDef>

@@ -36,6 +36,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { Subscription } from 'rxjs/internal/Subscription';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { AddressType } from '../../../../core/models/address.model';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 
 @Component({
     selector: 'app-contacts-list',
@@ -342,7 +343,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
+        private entityHelperService: EntityHelperService
     ) {
         super(
             snackbarService,
@@ -512,6 +514,16 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             new VisibleColumnModel({
                 field: 'wasCase',
                 label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE'
+            }),
+            new VisibleColumnModel({
+                field: 'numberOfContacts',
+                label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'numberOfExposures',
+                label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'deleted',
@@ -745,6 +757,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
             // retrieve location list
             this.queryBuilder.include('locations', true);
+
+            // retrieve number of contacts & exposures for each record
+            this.queryBuilder.filter.flag(
+                'countRelations',
+                true
+            );
 
             // retrieve the list of Contacts
             this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder)
@@ -1307,5 +1325,37 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     }
                 });
         });
+    }
+
+    /**
+     * Display contacts popup
+     */
+    displayContacts(entity: ContactModel) {
+        // if we do not have contacts return
+        if (entity.numberOfContacts < 1) {
+            return;
+        }
+
+        // display dialog
+        this.entityHelperService.displayContacts(
+            this.selectedOutbreak.id,
+            entity
+        );
+    }
+
+    /**
+     * Display exposures popup
+     */
+    displayExposures(entity: ContactModel) {
+        // if we do not have any exposure return
+        if (entity.numberOfExposures < 1) {
+            return;
+        }
+
+        // display dialog
+        this.entityHelperService.displayExposures(
+            this.selectedOutbreak.id,
+            entity
+        );
     }
 }

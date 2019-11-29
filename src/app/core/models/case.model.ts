@@ -46,6 +46,9 @@ export class CaseModel extends BaseModel {
     dateBecomeContact: string;
     wasContact: boolean;
 
+    numberOfContacts: number;
+    numberOfExposures: number;
+
     visualId: string;
 
     relationships: {
@@ -131,6 +134,9 @@ export class CaseModel extends BaseModel {
         this.relationships = _.get(data, 'relationships', []);
         this.dateBecomeContact = _.get(data, 'dateBecomeContact');
         this.wasContact = _.get(data, 'wasContact');
+
+        this.numberOfContacts = _.get(data, 'numberOfContacts');
+        this.numberOfExposures = _.get(data, 'numberOfExposures');
 
         this.inconsistencies = _.get(data, 'inconsistencies', []);
         _.each(this.inconsistencies, (inconsistency, index) => {

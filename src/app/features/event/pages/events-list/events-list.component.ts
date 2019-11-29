@@ -29,6 +29,7 @@ import { RequestFilter } from '../../../../core/helperClasses/request-query-buil
 import { throwError } from 'rxjs';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 
 @Component({
     selector: 'app-events-list',
@@ -251,7 +252,8 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         private route: ActivatedRoute,
         private genericDataService: GenericDataService,
         private i18nService: I18nService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
+        private entityHelperService: EntityHelperService
     ) {
         super(
             snackbarService,
@@ -326,6 +328,16 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 visible: false
             }),
             new VisibleColumnModel({
+                field: 'numberOfContacts',
+                label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'numberOfExposures',
+                label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+                visible: false
+            }),
+            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_EVENT_FIELD_LABEL_DELETED'
             }),
@@ -360,6 +372,12 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
+
+            // retrieve number of contacts & exposures for each record
+            this.queryBuilder.filter.flag(
+                'countRelations',
+                true
+            );
 
             // retrieve the list of Events
             this.eventsList$ = this.eventDataService.getEventsList(this.selectedOutbreak.id, this.queryBuilder)
@@ -573,5 +591,37 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             this.loadingDialog.close();
             this.loadingDialog = null;
         }
+    }
+
+    /**
+     * Display contacts popup
+     */
+    displayContacts(entity: EventModel) {
+        // if we do not have contacts return
+        if (entity.numberOfContacts < 1) {
+            return;
+        }
+
+        // display dialog
+        this.entityHelperService.displayContacts(
+            this.selectedOutbreak.id,
+            entity
+        );
+    }
+
+    /**
+     * Display exposures popup
+     */
+    displayExposures(entity: EventModel) {
+        // if we do not have any exposure return
+        if (entity.numberOfExposures < 1) {
+            return;
+        }
+
+        // display dialog
+        this.entityHelperService.displayExposures(
+            this.selectedOutbreak.id,
+            entity
+        );
     }
 }
