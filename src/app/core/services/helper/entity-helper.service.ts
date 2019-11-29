@@ -18,6 +18,11 @@ import { SnackbarService } from './snackbar.service';
 import { throwError } from 'rxjs/index';
 import { catchError } from 'rxjs/internal/operators';
 
+export enum SentFromColumn {
+    CONTACTS = 'fromContacts',
+    EXPOSURES = 'fromExposures'
+}
+
 @Injectable()
 export class EntityHelperService {
 
@@ -55,7 +60,7 @@ export class EntityHelperService {
                 loadingDialog.close();
 
                 // display popup
-                this.displayEntitiesAndRelationships('fromContacts', entity, relationshipsData);
+                this.displayEntitiesAndRelationships(SentFromColumn.CONTACTS, entity, relationshipsData);
             });
     }
 
@@ -86,14 +91,14 @@ export class EntityHelperService {
                 loadingDialog.close();
 
                 // display popup
-                this.displayEntitiesAndRelationships('fromExposures', entity, relationshipsData);
+                this.displayEntitiesAndRelationships(SentFromColumn.EXPOSURES, entity, relationshipsData);
             });
     }
 
     /**
      * Display dialog with entities and related relationships
      */
-    displayEntitiesAndRelationships(from: string, entity: CaseModel | ContactModel | EventModel, relationshipsData: EntityModel[]) {
+    displayEntitiesAndRelationships(from: SentFromColumn, entity: CaseModel | ContactModel | EventModel, relationshipsData: EntityModel[]) {
         if (!_.isEmpty(relationshipsData)) {
             // split relationships data into entities and relationships
             // entities collection
