@@ -217,10 +217,13 @@ export class FollowUpsDataService {
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<FollowUpModel[]> {
         const filter = queryBuilder.buildQuery();
-        return this.http.post(
-            `outbreaks/${outbreakId}/follow-ups/bulk/restore?filter=${filter}`,
-            {}
-            );
+        return this.modelHelper.mapObservableListToModel(
+            this.http.post(
+                        `outbreaks/${outbreakId}/follow-ups/bulk/restore?filter=${filter}`,
+                        {}
+            ),
+            FollowUpModel
+        );
     }
 
     /**

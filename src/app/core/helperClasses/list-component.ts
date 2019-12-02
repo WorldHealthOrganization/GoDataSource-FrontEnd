@@ -128,6 +128,13 @@ export abstract class ListComponent implements OnDestroy {
         individualCheck: {}
     };
 
+    private recordsToBeDeleted: {
+        entryId: string,
+        deleted: boolean,
+    }[] = [];
+    public hasSelectedOnlyDeletedRecords: boolean = false;
+    public hasSelectedOnlyNotDeletedRecords: boolean = false;
+
     /**
      * All checkbox selected
      * @param value
@@ -1644,7 +1651,13 @@ export abstract class ListComponent implements OnDestroy {
     /**
      * Individual Checkbox
      */
-    checkedRecord(id: string, checked: boolean, singleRecord?: boolean) {
+    checkedRecord(id: string, checked: boolean, singleRecord?: boolean, deletedRecord?: boolean) {
+        this.recordsToBeDeleted.push({
+            entryId: id,
+            deleted: deletedRecord
+        });
+
+        console.log(this.recordsToBeDeleted);
         // set value
         this.checkboxModels.individualCheck[id] = checked ? true : false;
 
@@ -1689,6 +1702,10 @@ export abstract class ListComponent implements OnDestroy {
             }
         );
         return ids;
+    }
+
+    get hasDeletedRecordsSelected() {
+        return true;
     }
 
     /**
