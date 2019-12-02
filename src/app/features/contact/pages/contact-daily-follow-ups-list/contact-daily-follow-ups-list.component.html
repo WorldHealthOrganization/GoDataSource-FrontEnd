@@ -192,6 +192,7 @@
                             <button
                                 *ngIf="checkedRecords.length > 0 && hasFollowUpsWriteAccess()"
                                 mat-menu-item
+                                [matTooltip]="'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS_DESCRIPTION' | translate"
                                 (click)="deleteSelectedFollowUps()">
                                 {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS' | translate }}
                             </button>

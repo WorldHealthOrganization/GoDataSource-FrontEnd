@@ -192,21 +192,21 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
         if (!selectedRecords) {
             return;
         }
-        // construct filter
-        const qb = new RequestQueryBuilder();
-
-        qb.filter.
-        where({
-            id: {
-                inq: selectedRecords
-            }
-        });
-
 
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_FOLLOW_UPS')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
+                    // construct filter
+                    const qb = new RequestQueryBuilder();
+
+                    qb.filter.
+                    where({
+                        id: {
+                            inq: selectedRecords
+                        }
+                    });
+
                     // display loading
                     const loadingDialog = this.dialogService.showLoadingDialog();
                     this.followUpsDataService
@@ -241,20 +241,20 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
         if (!selectedRecords) {
             return;
         }
-        // construct filter
-        const qb = new RequestQueryBuilder();
-
-        qb.filter.
-        where({
-            id: {
-                inq: selectedRecords
-            }
-        });
 
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_FOLLOW_UPS')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
+                    // construct filter
+                    const qb = new RequestQueryBuilder();
+
+                    qb.filter.
+                    where({
+                        id: {
+                            inq: selectedRecords
+                        }
+                    });
                     // display loading
                     const loadingDialog = this.dialogService.showLoadingDialog();
                     this.followUpsDataService
