@@ -170,7 +170,7 @@
                             </button>
 
                             <button
-                                *ngIf="checkedRecords.length > 0 && hasFollowUpsWriteAccess()"
+                                [disabled]="!hasSelectedOnlyNotDeletedRecords && hasFollowUpsWriteAccess()"
                                 mat-menu-item
                                 [matTooltip]="'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS_DESCRIPTION' | translate"
                                 (click)="deleteSelectedFollowUps()">
@@ -178,7 +178,7 @@
                             </button>
 
                             <button
-                                *ngIf="checkedRecords.length > 0 && hasFollowUpsWriteAccess()"
+                                [disabled]="!hasSelectedOnlyDeletedRecords && hasFollowUpsWriteAccess()"
                                 mat-menu-item
                                 [matTooltip]="'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS_DESCRIPTION' | translate"
                                 (click)="restoreSelectedFollowUps()">
@@ -197,7 +197,7 @@
                     [name]="'listCheckedIndividual[' + item.id + ']'"
                     class="table-checkbox"
                     ngModel
-                    (optionChanged)="checkedRecord(item.id, $event)"
+                    (optionChanged)="checkedRecord(item.id, $event, false, item.deleted)"
                     (afterInitialize)="checkedRecord(item.id, false)">
                 </app-form-checkbox>
             </mat-cell>

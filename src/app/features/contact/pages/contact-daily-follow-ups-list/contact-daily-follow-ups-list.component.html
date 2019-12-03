@@ -190,7 +190,7 @@
                             </button>
 
                             <button
-                                [disabled]="!hasSelectedOnlyNotDeletedRecords && !hasFollowUpsWriteAccess()"
+                                [disabled]="!hasSelectedOnlyNotDeletedRecords && hasFollowUpsWriteAccess()"
                                 mat-menu-item
                                 [matTooltip]="'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS_DESCRIPTION' | translate"
                                 (click)="deleteSelectedFollowUps()">
@@ -198,8 +198,9 @@
                             </button>
 
                             <button
-                                [disabled]="!hasSelectedOnlyDeletedRecords && !hasFollowUpsWriteAccess()"
+                                [disabled]="!hasSelectedOnlyDeletedRecords && hasFollowUpsWriteAccess()"
                                 mat-menu-item
+                                [matTooltip]="'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS_DESCRIPTION' | translate"
                                 (click)="restoreSelectedFollowUps()">
                                 {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS' | translate}}
                             </button>

@@ -128,12 +128,16 @@ export abstract class ListComponent implements OnDestroy {
         individualCheck: {}
     };
 
-    private recordsToBeDeleted: {
-        entryId: string,
-        deleted: boolean,
-    }[] = [];
-    public hasSelectedOnlyDeletedRecords: boolean = false;
-    public hasSelectedOnlyNotDeletedRecords: boolean = false;
+    /**
+     * Collection of entries to be verified
+     * @type {{deletedItems: {}}}
+     */
+    private recordsToBeVerified = {
+        deletedItems: {},
+    };
+
+    public hasSelectedOnlyDeletedRecords: boolean = true;
+    public hasSelectedOnlyNotDeletedRecords: boolean = true;
 
     /**
      * All checkbox selected
@@ -1651,13 +1655,7 @@ export abstract class ListComponent implements OnDestroy {
     /**
      * Individual Checkbox
      */
-    checkedRecord(id: string, checked: boolean, singleRecord?: boolean, deletedRecord?: boolean) {
-        this.recordsToBeDeleted.push({
-            entryId: id,
-            deleted: deletedRecord
-        });
-
-        console.log(this.recordsToBeDeleted);
+    checkedRecord(id: string, checked: boolean, singleRecord?: boolean, deleted?: boolean) {
         // set value
         this.checkboxModels.individualCheck[id] = checked ? true : false;
 
@@ -1669,6 +1667,30 @@ export abstract class ListComponent implements OnDestroy {
                 return false;
             }
         });
+
+        // if the record is checked add it to the array for verification
+        if (checked === true) {
+            this.recordsToBeVerified.deletedItems[id] = deleted;
+        }
+        // if the record is unchecked remove it from the array for verification
+        if (checked === false) {
+            delete this.recordsToBeVerified.deletedItems[id];
+        }
+
+        // check if we have selected only deleted records and set the flag
+        this.hasSelectedOnlyDeletedRecords = Object
+            .keys(this.recordsToBeVerified.deletedItems)
+            .every((key) => {
+                return this.recordsToBeVerified.deletedItems[key] === true;
+        });
+
+        // check if we have selected only NOT delete records and set the flag
+        this.hasSelectedOnlyNotDeletedRecords = Object
+            .keys(this.recordsToBeVerified.deletedItems)
+            .every((key) => {
+                return this.recordsToBeVerified.deletedItems[key] === false;
+            });
+
         // getting all the object keys
         const objKeys = Object.keys((this.checkboxModels.individualCheck));
         if (singleRecord && objKeys.length > 1) {
@@ -1702,10 +1724,6 @@ export abstract class ListComponent implements OnDestroy {
             }
         );
         return ids;
-    }
-
-    get hasDeletedRecordsSelected() {
-        return true;
     }
 
     /**
