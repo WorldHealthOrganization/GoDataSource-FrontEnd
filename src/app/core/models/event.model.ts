@@ -17,6 +17,9 @@ export class EventModel extends BaseModel {
     isDateOfReportingApproximate: boolean;
     outbreakId: string;
 
+    numberOfContacts: number;
+    numberOfExposures: number;
+
     inconsistencies: InconsistencyModel[];
     relationship: any;
 
@@ -33,6 +36,9 @@ export class EventModel extends BaseModel {
         this.dateOfReporting = _.get(data, 'dateOfReporting');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.outbreakId = _.get(data, 'outbreakId');
+
+        this.numberOfContacts = _.get(data, 'numberOfContacts');
+        this.numberOfExposures = _.get(data, 'numberOfExposures');
 
         // we need the object to use the custom getter that constructs the address from all fields
         const location = _.get(data, 'location');
