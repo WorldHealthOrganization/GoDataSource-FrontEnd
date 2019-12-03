@@ -26,6 +26,8 @@ export const EnglishUsLang = {
          */
         'LNG_DIALOG_GENERAL_DIALOG_TITLE_GROUP_CONTACTS_DIALOG_TITLE': 'Contacts',
         'LNG_DIALOG_GENERAL_DIALOG_TITLE_GROUP_EXPOSURES_DIALOG_TITLE': 'Exposures',
+        'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_CONTACTS': 'Full list of contacts',
+        'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_EXPOSURES': 'Full list of exposures',
 
         /**
          * uiCaseFields
