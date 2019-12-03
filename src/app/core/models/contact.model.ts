@@ -45,6 +45,9 @@ export class ContactModel
     wasCase: boolean;
     visualId: string;
 
+    numberOfContacts: number;
+    numberOfExposures: number;
+
     followUp: {
         originalStartDate: string,
         startDate: string,
@@ -148,6 +151,9 @@ export class ContactModel
                 return new AddressModel(addressData, locationsList);
             }
         );
+
+        this.numberOfContacts = _.get(data, 'numberOfContacts');
+        this.numberOfExposures = _.get(data, 'numberOfExposures');
 
         // vaccines received
         const vaccinesReceived = _.get(data, 'vaccinesReceived');

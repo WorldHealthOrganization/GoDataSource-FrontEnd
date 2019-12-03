@@ -35,6 +35,8 @@ import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AddressType } from '../../../../core/models/address.model';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 
 @Component({
     selector: 'app-cases-list',
@@ -406,7 +408,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         private i18nService: I18nService,
         private genericDataService: GenericDataService,
         private clusterDataService: ClusterDataService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
+        private relationshipDataService: RelationshipDataService,
+        private entityHelperService: EntityHelperService
     ) {
         super(
             snackbarService,
@@ -561,6 +565,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 field: 'wasContact',
                 label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
                 visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'numberOfContacts',
+                label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS'
+            }),
+            new VisibleColumnModel({
+                field: 'numberOfExposures',
+                label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES'
             }),
             new VisibleColumnModel({
                 field: 'deleted',
@@ -799,6 +811,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
             // retrieve location list
             this.queryBuilder.include('locations', true);
+
+            // retrieve number of contacts & exposures for each record
+            this.queryBuilder.filter.flag(
+                'countRelations',
+                true
+            );
 
             // retrieve the list of Cases
             this.casesList$ = this.caseDataService
@@ -1315,5 +1333,37 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
         // refresh list
         this.needsRefreshList();
+    }
+
+    /**
+     * Display contacts popup
+     */
+    displayContacts(entity: CaseModel) {
+        // if we do not have contacts return
+        if (entity.numberOfContacts < 1) {
+            return;
+        }
+
+        // display dialog
+        this.entityHelperService.displayContacts(
+            this.selectedOutbreak.id,
+            entity
+        );
+    }
+
+    /**
+     * Display exposures popup
+     */
+    displayExposures(entity: CaseModel) {
+        // if we do not have any exposure return
+        if (entity.numberOfExposures < 1) {
+            return;
+        }
+
+        // display dialog
+        this.entityHelperService.displayExposures(
+            this.selectedOutbreak.id,
+            entity
+        );
     }
 }
