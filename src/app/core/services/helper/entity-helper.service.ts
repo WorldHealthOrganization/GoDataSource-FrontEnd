@@ -17,6 +17,8 @@ import { RelationshipDataService } from '../data/relationship.data.service';
 import { SnackbarService } from './snackbar.service';
 import { throwError } from 'rxjs/index';
 import { catchError } from 'rxjs/internal/operators';
+import { AuthDataService } from '../data/auth.data.service';
+import { UserModel } from '../../models/user.model';
 
 export enum SentFromColumn {
     CONTACTS = 'fromContacts',
@@ -31,7 +33,8 @@ export class EntityHelperService {
     constructor(
         private dialogService: DialogService,
         private relationshipDataService: RelationshipDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private authDataService: AuthDataService
     ) {}
 
     /**
@@ -66,7 +69,11 @@ export class EntityHelperService {
                 loadingDialog.close();
 
                 // display popup
-                this.displayEntitiesAndRelationships(SentFromColumn.CONTACTS, entity, relationshipsData);
+                this.displayEntitiesAndRelationships(
+                    SentFromColumn.CONTACTS,
+                    entity,
+                    relationshipsData
+                );
             });
     }
 
@@ -102,7 +109,11 @@ export class EntityHelperService {
                 loadingDialog.close();
 
                 // display popup
-                this.displayEntitiesAndRelationships(SentFromColumn.EXPOSURES, entity, relationshipsData);
+                this.displayEntitiesAndRelationships(
+                    SentFromColumn.EXPOSURES,
+                    entity,
+                    relationshipsData
+                );
             });
     }
 
@@ -137,6 +148,7 @@ export class EntityHelperService {
             ];
 
             // add entities and relationships
+            const authUser: UserModel = this.authDataService.getAuthenticatedUser();
             relationshipsData.forEach((relationshipData) => {
                 // add entities to the list
                 entities.push(new DialogField({
@@ -144,7 +156,7 @@ export class EntityHelperService {
                     fieldType: DialogFieldType.ACTION,
                     placeholder: relationshipData.model.name,
                     actionData: relationshipData.model,
-                    actionCallback: (item) => {
+                    actionCallback: relationshipData.model.canView(authUser) ? ((item) => {
                         // show entity information
                         this.dialogService.showCustomDialog(
                             ViewCotNodeDialogComponent,
@@ -157,7 +169,7 @@ export class EntityHelperService {
                                 }
                             }
                         );
-                    }
+                    }) : null
                 }));
 
                 // construct relationship label for dialog
@@ -183,7 +195,7 @@ export class EntityHelperService {
                     fieldType: DialogFieldType.ACTION,
                     placeholder: relationshipLabel,
                     actionData: relationshipData.relationship,
-                    actionCallback: (item) => {
+                    actionCallback: relationshipData.relationship.canView(authUser) ? ((item) => {
                         // show entity information
                         this.dialogService.showCustomDialog(
                             ViewCotEdgeDialogComponent,
@@ -196,7 +208,7 @@ export class EntityHelperService {
                                 }
                             }
                         );
-                    }
+                    }) : null
                 }));
         });
 

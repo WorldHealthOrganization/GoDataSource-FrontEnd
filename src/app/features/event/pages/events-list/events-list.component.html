@@ -256,7 +256,7 @@
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
-                (click)="displayContacts(item)"
+                (click)="EventModel.canListRelationshipContacts(authUser) ? displayContacts(item) : ''"
                 class="mat-table-number-column">
                 {{ item.numberOfContacts }}
             </mat-cell>
@@ -276,7 +276,7 @@
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
-                (click)="displayExposures(item)"
+                (click)="EventModel.canListRelationshipExposures(authUser) ? displayExposures(item) : ''"
                 class="mat-table-number-column">
                 {{ item.numberOfExposures }}
             </mat-cell>
