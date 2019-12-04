@@ -824,7 +824,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
-                        finishCallback();
+                        finishCallback([]);
                         return throwError(err);
                     }),
                     map((cases: CaseModel[]) => {

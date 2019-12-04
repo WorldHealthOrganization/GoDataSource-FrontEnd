@@ -208,7 +208,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
-                    finishCallback();
+                    finishCallback([]);
                     return throwError(err);
                 }),
                 map((syncLogs: SystemSyncLogModel[]) => {

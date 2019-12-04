@@ -146,7 +146,7 @@ export class ManageIconsListComponent extends ListComponent implements OnInit {
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
-                    finishCallback();
+                    finishCallback([]);
                     return throwError(err);
                 }),
                 tap(this.checkEmptyList.bind(this)),

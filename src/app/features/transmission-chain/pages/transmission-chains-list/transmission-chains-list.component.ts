@@ -241,7 +241,7 @@ export class TransmissionChainsListComponent extends ListComponent implements On
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
-                        finishCallback();
+                        finishCallback([]);
                         return throwError(err);
                     }),
                     tap(this.checkEmptyList.bind(this)),

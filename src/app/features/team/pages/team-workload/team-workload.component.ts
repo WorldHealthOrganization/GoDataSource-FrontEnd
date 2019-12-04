@@ -181,7 +181,7 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                     .pipe(
                         catchError((err) => {
                             this.snackbarService.showApiError(err);
-                            finishCallback();
+                            finishCallback([]);
                             return throwError(err);
                         })
                     )

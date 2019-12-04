@@ -108,7 +108,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
-                        finishCallback();
+                        finishCallback([]);
                         return throwError(err);
                     }),
                     tap((duplicatesList) => {

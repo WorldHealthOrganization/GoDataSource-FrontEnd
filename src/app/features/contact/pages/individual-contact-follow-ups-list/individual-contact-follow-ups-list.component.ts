@@ -500,7 +500,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
-                        finishCallback();
+                        finishCallback([]);
                         return throwError(err);
                     }),
                     map((followUps: FollowUpModel[]) => {

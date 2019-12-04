@@ -260,7 +260,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
-                        finishCallback();
+                        finishCallback([]);
                         return throwError(err);
                     })
                 )

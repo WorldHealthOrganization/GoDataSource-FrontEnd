@@ -194,7 +194,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
-                    finishCallback();
+                    finishCallback([]);
                     return throwError(err);
                 })
             )

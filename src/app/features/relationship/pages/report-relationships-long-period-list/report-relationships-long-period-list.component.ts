@@ -200,7 +200,7 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
-                        finishCallback();
+                        finishCallback([]);
                         return throwError(err);
                     }),
                     tap(this.checkEmptyList.bind(this)),
