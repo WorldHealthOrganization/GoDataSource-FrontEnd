@@ -85,7 +85,7 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
-                    finishCallback();
+                    finishCallback([]);
                     return throwError(err);
                 }),
                 tap((data: any[]) => {
