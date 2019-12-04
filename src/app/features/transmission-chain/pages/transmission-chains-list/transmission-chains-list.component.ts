@@ -216,7 +216,7 @@ export class TransmissionChainsListComponent extends ListComponent implements On
     /**
      * Re(load) the Transmission Chains list, based on the applied filter, sort criterias
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (
             this.selectedOutbreak &&
             this.selectedOutbreak.id
@@ -239,12 +239,12 @@ export class TransmissionChainsListComponent extends ListComponent implements On
             this.transmissionChains$ = this.transmissionChains$
                 .pipe(
                     tap(this.checkEmptyList.bind(this)),
-                    tap(() => {
-                        finishCallback();
+                    tap((data: any[]) => {
+                        finishCallback(data);
                     })
                 );
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

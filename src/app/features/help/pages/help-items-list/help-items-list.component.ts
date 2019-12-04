@@ -187,13 +187,13 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the items list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         // retrieve the list of items
         this.helpItemsList$ = this.helpDataService.getHelpItemsCategoryList(this.categoryId, this.queryBuilder)
             .pipe(
                 tap(this.checkEmptyList.bind(this)),
-                tap(() => {
-                    finishCallback();
+                tap((data: any[]) => {
+                    finishCallback(data);
                 })
             );
     }

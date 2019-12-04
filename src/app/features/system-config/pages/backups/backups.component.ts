@@ -206,12 +206,13 @@ export class BackupsComponent extends ListComponent implements OnInit {
     /**
      * Refresh list
      */
-    refreshList(finishCallback: () => void) {
-        this.backupsList$ = this.systemBackupDataService.getBackupList(this.queryBuilder)
+    refreshList(finishCallback: (records: any[]) => void) {
+        this.backupsList$ = this.systemBackupDataService
+            .getBackupList(this.queryBuilder)
             .pipe(
                 tap(this.checkEmptyList.bind(this)),
-                tap(() => {
-                    finishCallback();
+                tap((data: any[]) => {
+                    finishCallback(data);
                 })
             );
     }

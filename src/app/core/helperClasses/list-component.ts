@@ -56,7 +56,7 @@ export abstract class ListComponent implements OnDestroy {
     /**
      * Individual checkboxes selects
      */
-    @ViewChildren('listCheckedIndividual') protected listCheckedIndividualInputs: QueryList<FormCheckboxComponent >;
+    @ViewChildren('listCheckedIndividual') protected listCheckedIndividualInputs: QueryList<FormCheckboxComponent>;
 
     /**
      * List table columns
@@ -119,25 +119,68 @@ export abstract class ListComponent implements OnDestroy {
     // flag set to true if the list is empty
     public isEmptyList: boolean;
 
-    /**
-     * Models for the checkbox functionality
-     * @type {boolean}
-     */
-    private checkboxModels = {
+    // Models for the checkbox functionality
+    private checkboxModels: {
+        multiCheck: boolean,
+        keyPath: string,
+        records: any[],
+        checkAll: boolean,
+        checkedOnlyDeletedRecords: boolean,
+        checkedOnlyNotDeletedRecords: boolean,
+        checkedRecords: {
+            [id: string]: boolean
+        }
+    } = {
+        multiCheck: true,
+        keyPath: null,
+        records: [],
         checkAll: false,
-        individualCheck: {}
+        checkedOnlyDeletedRecords: false,
+        checkedOnlyNotDeletedRecords: false,
+        checkedRecords: {}
     };
 
     /**
-     * Collection of entries to be verified
-     * @type {{deletedItems: {}}}
+     * Checked only deleted records ?
      */
-    private recordsToBeVerified = {
-        deletedItems: {},
-    };
+    get checkedOnlyDeletedRecords(): boolean {
+        return this.checkboxModels.checkedOnlyDeletedRecords;
+    }
 
-    public hasSelectedOnlyDeletedRecords: boolean = true;
-    public hasSelectedOnlyNotDeletedRecords: boolean = true;
+    /**
+     * Checked only not deleted records ?
+     */
+    get checkedOnlyNotDeletedRecords(): boolean {
+        return this.checkboxModels.checkedOnlyNotDeletedRecords;
+    }
+
+    /**
+     * Set checkbox behaviour ( key path - id used to identify a record )
+     */
+    set checkedKeyPath(keyPath: string) {
+        this.checkboxModels.keyPath = keyPath;
+    }
+
+    /**
+     * Get checkbox behaviour ( key path - id used to identify a record )
+     */
+    get checkedKeyPath(): string {
+        return this.checkboxModels.keyPath;
+    }
+
+    /**
+     * Set checkbox behaviour ( can or can't select multiple checkboxes at the same time )
+     */
+    set checkedIsMultiSelect(multiCheck: boolean) {
+        this.checkboxModels.multiCheck = multiCheck;
+    }
+
+    /**
+     * Get checkbox behaviour ( can or can't select multiple checkboxes at the same time )
+     */
+    get checkedIsMultiSelect(): boolean {
+        return this.checkboxModels.multiCheck;
+    }
 
     /**
      * All checkbox selected
@@ -148,8 +191,11 @@ export abstract class ListComponent implements OnDestroy {
         this.checkboxModels.checkAll = value;
 
         // check/un-check all individual checkboxes
-        for (const id in this.checkboxModels.individualCheck) {
-            this.checkboxModels.individualCheck[id] = this.checkboxModels.checkAll;
+        this.checkboxModels.checkedRecords = {};
+        if (this.checkboxModels.checkAll) {
+            this.checkboxModels.records.forEach((record: any) => {
+                this.checkboxModels.checkedRecords[this.getCheckRecordKey(record)] = true;
+            });
         }
 
         // go through all html checkboxes and update their value - this is faster than using binding which slows down a lot the page
@@ -160,7 +206,7 @@ export abstract class ListComponent implements OnDestroy {
             this.listCheckedIndividualInputs.forEach((checkbox: FormCheckboxComponent) => {
                 // retrieve id
                 const id = checkbox.name.substring(checkbox.name.lastIndexOf('[') + 1, checkbox.name.lastIndexOf(']'));
-                checkbox.value = !!this.checkboxModels.individualCheck[id];
+                checkbox.value = !!this.checkboxModels.checkedRecords[id];
             });
         }
     }
@@ -174,8 +220,16 @@ export abstract class ListComponent implements OnDestroy {
     private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
         // refresh list
         this.refreshingList = true;
-        this.refreshList(() => {
+        this.refreshList((records: any[]) => {
+            // wait for binding
             setTimeout(() => {
+                // reset checked items
+                this.resetCheckboxData();
+
+                // set items that can be checked
+                this.checkboxModels.records = records || [];
+
+                // finished refreshing list
                 this.refreshingList = false;
             });
         });
@@ -208,7 +262,7 @@ export abstract class ListComponent implements OnDestroy {
     /**
      * Refresh list
      */
-    public abstract refreshList(finishCallback: () => void);
+    public abstract refreshList(finishCallback: (records: any[]) => void);
 
     /**
      * Refresh items count
@@ -233,12 +287,31 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
+     * Reset checkbox data
+     */
+    private resetCheckboxData() {
+        this.checkboxModels.records = [];
+        this.checkboxModels.checkAll = false;
+        this.checkboxModels.checkedOnlyDeletedRecords = false;
+        this.checkboxModels.checkedOnlyNotDeletedRecords = false;
+        this.checkboxModels.checkedRecords = {};
+    }
+
+    /**
+     * Retrieve record key used by list component checkboxes
+     */
+    private getCheckRecordKey(record: any): string {
+        return this.checkedKeyPath ?
+            _.get(record, this.checkedKeyPath) :
+            record.id;
+    }
+
+    /**
      * Tell list that we need to refresh list
      */
     public needsRefreshList(instant: boolean = false, resetPagination: boolean = true) {
         // reset checked items
-        this.checkboxModels.checkAll = false;
-        this.checkboxModels.individualCheck = {};
+        this.resetCheckboxData();
 
         // do we need to reset pagination (aka go to the first page) ?
         if (
@@ -1655,57 +1728,52 @@ export abstract class ListComponent implements OnDestroy {
     /**
      * Individual Checkbox
      */
-    checkedRecord(id: string, checked: boolean, singleRecord?: boolean, deleted?: boolean) {
+    checkedRecord(item: any, checked: boolean) {
         // set value
-        this.checkboxModels.individualCheck[id] = checked ? true : false;
+        const id: string = this.getCheckRecordKey(item);
+        if (checked) {
+            this.checkboxModels.checkedRecords[id] = true;
+        } else {
+            delete this.checkboxModels.checkedRecords[id];
+        }
 
         // reset check all
         let checkedAll: boolean = true;
-        _.each(this.checkboxModels.individualCheck, (check: boolean) => {
-            if (!check) {
+        this.checkboxModels.checkedOnlyDeletedRecords = true;
+        this.checkboxModels.checkedOnlyNotDeletedRecords = true;
+        this.checkboxModels.records.forEach((record: any) => {
+            // uncheck checked all ?
+            const idRecord: string = this.getCheckRecordKey(record);
+            if (!this.checkboxModels.checkedRecords[idRecord]) {
                 checkedAll = false;
-                return false;
+            }
+
+            // all records are deleted ?
+            if (!record.deleted) {
+                this.checkboxModels.checkedOnlyDeletedRecords = false;
+            }
+
+            // all records aren't deleted ?
+            if (record.deleted) {
+                this.checkboxModels.checkedOnlyNotDeletedRecords = false;
+            }
+
+            // single select? - uncheck others
+            if (
+                !this.checkedIsMultiSelect &&
+                this.checkboxModels.checkedRecords[idRecord] &&
+                idRecord !== id
+            ) {
+                // update the view
+                delete this.checkboxModels.checkedRecords[idRecord];
+                this.listCheckedIndividualInputs.forEach((checkbox: FormCheckboxComponent) => {
+                    if (checkbox.name === 'listCheckedIndividual[' + idRecord + ']') {
+                        checkbox.value = false;
+                    }
+                });
             }
         });
 
-        // if the record is checked add it to the array for verification
-        if (checked === true) {
-            this.recordsToBeVerified.deletedItems[id] = deleted;
-        }
-        // if the record is unchecked remove it from the array for verification
-        if (checked === false) {
-            delete this.recordsToBeVerified.deletedItems[id];
-        }
-
-        // check if we have selected only deleted records and set the flag
-        this.hasSelectedOnlyDeletedRecords = Object
-            .keys(this.recordsToBeVerified.deletedItems)
-            .every((key) => {
-                return this.recordsToBeVerified.deletedItems[key] === true;
-        });
-
-        // check if we have selected only NOT delete records and set the flag
-        this.hasSelectedOnlyNotDeletedRecords = Object
-            .keys(this.recordsToBeVerified.deletedItems)
-            .every((key) => {
-                return this.recordsToBeVerified.deletedItems[key] === false;
-            });
-
-        // getting all the object keys
-        const objKeys = Object.keys((this.checkboxModels.individualCheck));
-        if (singleRecord && objKeys.length > 1) {
-            _.forEach(objKeys, (key) => {
-                if (key !== id) {
-                    this.checkboxModels.individualCheck[key] = false;
-                    // update the view
-                    this.listCheckedIndividualInputs.forEach((checkbox: FormCheckboxComponent) => {
-                        if (checkbox.name === 'listCheckedIndividual[' + key + ']') {
-                            checkbox.value = false;
-                        }
-                    });
-                }
-            });
-        }
         // set check all value
         this.checkboxModels.checkAll = checkedAll;
     }
@@ -1714,16 +1782,7 @@ export abstract class ListComponent implements OnDestroy {
      * Retrieve list of checked records ( an array of IDs )
      */
     get checkedRecords(): string[] {
-        const ids: string[] = [];
-        _.each(
-            this.checkboxModels.individualCheck,
-            (checked: boolean, id: string) => {
-                if (checked) {
-                    ids.push(id);
-                }
-            }
-        );
-        return ids;
+        return Object.keys(this.checkboxModels.checkedRecords || {});
     }
 
     /**

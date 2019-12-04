@@ -378,7 +378,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
     /**
      * Re(load) the Lab Results list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (this.selectedOutbreak) {
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
@@ -388,12 +388,12 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
             this.labResultsList$ = this.labResultDataService.getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
                     tap(this.checkEmptyList.bind(this)),
-                    tap(() => {
-                        finishCallback();
+                    tap((data: any[]) => {
+                        finishCallback(data);
                     })
                 );
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

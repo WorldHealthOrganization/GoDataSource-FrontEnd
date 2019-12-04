@@ -191,12 +191,12 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
     /**
      * Refresh list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         this.devicesList$ = this.deviceDataService
             .getDevices(this.queryBuilder)
             .pipe(
-                tap(() => {
-                    finishCallback();
+                tap((data: any[]) => {
+                    finishCallback(data);
                 })
             );
     }

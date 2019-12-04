@@ -140,13 +140,13 @@ export class ManageIconsListComponent extends ListComponent implements OnInit {
     /**
      * Retrieve Icons
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         this.iconsList$ = this.iconDataService
             .getIconsList(this.queryBuilder)
             .pipe(
                 tap(this.checkEmptyList.bind(this)),
-                tap(() => {
-                    finishCallback();
+                tap((data: any[]) => {
+                    finishCallback(data);
                 })
             );
     }
