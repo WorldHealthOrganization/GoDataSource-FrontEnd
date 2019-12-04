@@ -150,7 +150,7 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the Languages list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         // retrieve the list of Languages
         this.languagesList$ = this.languageDataService
             .getLanguagesList(this.queryBuilder)
@@ -161,8 +161,8 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
                     return throwError(err);
                 }),
                 tap(this.checkEmptyList.bind(this)),
-                tap(() => {
-                    finishCallback();
+                tap((data: any[]) => {
+                    finishCallback(data);
                 })
             );
     }

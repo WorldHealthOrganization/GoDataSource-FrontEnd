@@ -800,7 +800,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     /**
      * Re(load) the Cases list, based on the applied filter, sort criterias
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (this.selectedOutbreak) {
             // classification conditions - not really necessary since refreshListCount is always called before this one
             this.addClassificationConditions();
@@ -837,12 +837,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         );
                     }),
                     tap(this.checkEmptyList.bind(this)),
-                    tap(() => {
-                        finishCallback();
+                    tap((data: any[]) => {
+                        finishCallback(data);
                     })
                 );
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

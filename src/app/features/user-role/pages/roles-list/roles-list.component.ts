@@ -110,7 +110,7 @@ export class RolesListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the User Roles list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         // get the list of existing roles
         this.rolesList$ = this.userRoleDataService
             .getRolesList(this.queryBuilder)
@@ -121,8 +121,8 @@ export class RolesListComponent extends ListComponent implements OnInit {
                     return throwError(err);
                 }),
                 tap(this.checkEmptyList.bind(this)),
-                tap(() => {
-                    finishCallback();
+                tap((data: any[]) => {
+                    finishCallback(data);
                 })
             );
     }

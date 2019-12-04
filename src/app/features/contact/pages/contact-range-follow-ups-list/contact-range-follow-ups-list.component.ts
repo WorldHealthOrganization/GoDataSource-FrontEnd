@@ -232,7 +232,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     /**
      * Refresh list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (this.selectedOutbreak) {
             // order by name
             this.queryBuilder.sort.clear();
@@ -320,13 +320,13 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                     }
 
                     // finished
-                    finishCallback();
+                    finishCallback(rangeData);
 
                     // display data
                     this.displayLoading = false;
                 });
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

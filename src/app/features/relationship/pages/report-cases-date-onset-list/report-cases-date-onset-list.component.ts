@@ -197,7 +197,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
     /**
      * Re(load) the Cases list, based on the applied filter, sort criterias
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (this.selectedOutbreak) {
             // retrieve the list
             this.casesWithOnsetList$ = this.relationshipDataService
@@ -209,12 +209,12 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
                         return throwError(err);
                     }),
                     tap(this.checkEmptyList.bind(this)),
-                    tap(() => {
-                        finishCallback();
+                    tap((data: any[]) => {
+                        finishCallback(data);
                     })
                 );
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

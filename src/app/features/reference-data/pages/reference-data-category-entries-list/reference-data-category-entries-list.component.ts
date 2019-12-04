@@ -180,14 +180,14 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
         ];
     }
 
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (this.categoryId) {
             this.referenceDataDataService
                 .getReferenceDataByCategory(this.categoryId)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
-                        finishCallback();
+                        finishCallback([]);
                         return throwError(err);
                     }),
                     map((category: ReferenceDataCategoryModel) => {
@@ -213,10 +213,10 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                     this.checkEmptyList(this.categoryEntries);
 
                     // finished
-                    finishCallback();
+                    finishCallback(entries);
                 });
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

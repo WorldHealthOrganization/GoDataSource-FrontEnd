@@ -877,7 +877,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     /**
      * Refresh list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (this.selectedOutbreak) {
             // refresh badges
             this.getFollowUpsGroupedByTeams();
@@ -907,12 +907,12 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                         );
                     }),
                     tap(this.checkEmptyList.bind(this)),
-                    tap(() => {
-                        finishCallback();
+                    tap((data: any[]) => {
+                        finishCallback(data);
                     })
                 );
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

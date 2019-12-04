@@ -193,6 +193,40 @@ export class FollowUpsDataService {
     }
 
     /**
+     * Delete multiple follow-ups
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    deleteBulkFollowUps(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const filter = queryBuilder.buildQuery();
+        return this.http.delete(`outbreaks/${outbreakId}/follow-ups/bulk?filter=${filter}`);
+    }
+
+    /**
+     * Restore multiple follow-ups
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    restoreBulkFollowUps(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<FollowUpModel[]> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableListToModel(
+            this.http.post(
+                `outbreaks/${outbreakId}/follow-ups/bulk/restore?filter=${filter}`,
+                {}
+            ),
+            FollowUpModel
+        );
+    }
+
+    /**
      * Restore an existing Follow-up of an Outbreak
      * @param {string} outbreakId
      * @param {string} contactId

@@ -382,7 +382,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     /**
      * Re(load) the Events list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (this.selectedOutbreak) {
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
@@ -404,12 +404,12 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                         return throwError(err);
                     }),
                     tap(this.checkEmptyList.bind(this)),
-                    tap(() => {
-                        finishCallback();
+                    tap((data: any[]) => {
+                        finishCallback(data);
                     })
                 );
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

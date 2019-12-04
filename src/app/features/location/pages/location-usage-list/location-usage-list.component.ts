@@ -112,7 +112,7 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
     /**
      * Re(load) the list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (this.locationId) {
             // retrieve outbreaks
             this.outbreakDataService
@@ -182,11 +182,11 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
                             this.checkEmptyList(this.usageDetailsList);
 
                             // finished
-                            finishCallback();
+                            finishCallback(this.usageDetailsList);
                         });
                 });
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

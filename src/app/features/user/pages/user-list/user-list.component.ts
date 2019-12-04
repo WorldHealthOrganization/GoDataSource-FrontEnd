@@ -125,7 +125,7 @@ export class UserListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the Users list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         // get the list of existing users
         this.usersList$ = this.userDataService
             .getUsersList(this.queryBuilder)
@@ -136,8 +136,8 @@ export class UserListComponent extends ListComponent implements OnInit {
                     return throwError(err);
                 }),
                 tap(this.checkEmptyList.bind(this)),
-                tap(() => {
-                    finishCallback();
+                tap((data: any[]) => {
+                    finishCallback(data);
                 })
             );
     }

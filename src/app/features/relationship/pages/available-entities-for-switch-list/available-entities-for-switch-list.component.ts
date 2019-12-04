@@ -33,7 +33,6 @@ import { AddressType } from '../../../../core/models/address.model';
     styleUrls: ['./available-entities-for-switch-list.component.less']
 })
 export class AvailableEntitiesForSwitchListComponent extends RelationshipsListComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
@@ -69,10 +68,14 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService
     ) {
+        // parent
         super(
             snackbarService, router, route,
             authDataService, outbreakDataService, entityDataService
         );
+
+        // disable multi select for current list component
+        this.checkedIsMultiSelect = false;
     }
 
     ngOnInit() {
@@ -170,7 +173,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     /**
      * Re(load) the available Entities list, based on the applied filter, sort criterias
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (
             this.entityType &&
             this.entityId &&
@@ -205,12 +208,12 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                         return throwError(err);
                     }),
                     tap(this.checkEmptyList.bind(this)),
-                    tap(() => {
-                        finishCallback();
+                    tap((data: any[]) => {
+                        finishCallback(data);
                     })
                 );
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

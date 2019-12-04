@@ -138,10 +138,14 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         private clusterDataService: ClusterDataService,
         private userDataService: UserDataService
     ) {
+        // parent
         super(
             snackbarService, router, route,
             authDataService, outbreakDataService, entityDataService
         );
+
+        // set checkbox key ( id ) path for current list component
+        this.checkedKeyPath = 'relationship.id';
     }
 
     ngOnInit() {
@@ -311,7 +315,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     /**
      * Re(load) the Relationships list, based on the applied filter, sort criterias
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (
             this.relationshipType &&
             this.entityType &&
@@ -343,7 +347,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                             });
 
                             // finished
-                            finishCallback();
+                            finishCallback(entities);
                         })
                     );
             } else {
@@ -364,12 +368,12 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                             });
 
                             // finished
-                            finishCallback();
+                            finishCallback(entities);
                         })
                     );
             }
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

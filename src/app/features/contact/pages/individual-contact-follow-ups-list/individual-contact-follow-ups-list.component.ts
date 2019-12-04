@@ -470,7 +470,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
     /**
      * Refresh list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (
             this.selectedOutbreak &&
             this.contactId
@@ -510,12 +510,12 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                         );
                     }),
                     tap(this.checkEmptyList.bind(this)),
-                    tap(() => {
-                        finishCallback();
+                    tap((data: any[]) => {
+                        finishCallback(data);
                     })
                 );
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

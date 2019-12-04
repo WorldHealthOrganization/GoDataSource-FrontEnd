@@ -79,7 +79,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
     /**
      * Re(load) the Clusters list, based on the applied filter, sort criterias
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         this.savedImportMappingsList$ = this.savedImportMappingService
             .getImportMappingsList(this.queryBuilder)
             .pipe(
@@ -89,8 +89,8 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
                     return throwError(err);
                 }),
                 tap(this.checkEmptyList.bind(this)),
-                tap(() => {
-                    finishCallback();
+                tap((data: any[]) => {
+                    finishCallback(data);
                 })
             );
     }

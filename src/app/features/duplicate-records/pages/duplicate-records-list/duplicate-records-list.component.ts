@@ -99,7 +99,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
     /**
      * Re(load) the list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (this.selectedOutbreak) {
             // retrieve the list
             this.duplicatesList = null;
@@ -119,10 +119,10 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
                     this.duplicatesList = duplicatesList;
 
                     // finished
-                    finishCallback();
+                    finishCallback([]);
                 });
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

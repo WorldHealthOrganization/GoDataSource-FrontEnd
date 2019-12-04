@@ -148,7 +148,7 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
     /**
      * Refresh list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (
             this.selectedOutbreak &&
             !_.isEmpty(this.teamsData)
@@ -193,17 +193,17 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                         this.formatData(metricTeamsFollowups);
 
                         // finished
-                        finishCallback();
+                        finishCallback([]);
                     });
             } else {
                 // hide loading
                 this.displayLoading = false;
 
                 // finished
-                finishCallback();
+                finishCallback([]);
             }
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

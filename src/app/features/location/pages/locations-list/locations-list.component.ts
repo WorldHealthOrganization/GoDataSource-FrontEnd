@@ -246,7 +246,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the list of Locations
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         // retrieve created user & modified user information
         this.queryBuilder.include('createdByUser', true);
         this.queryBuilder.include('updatedByUser', true);
@@ -261,8 +261,8 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                     return throwError(err);
                 }),
                 tap(this.checkEmptyList.bind(this)),
-                tap(() => {
-                    finishCallback();
+                tap((data: any[]) => {
+                    finishCallback(data);
                 })
             );
     }

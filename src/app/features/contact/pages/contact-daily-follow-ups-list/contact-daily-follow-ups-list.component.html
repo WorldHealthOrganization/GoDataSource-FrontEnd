@@ -166,28 +166,51 @@
                                 (click)="checkAllRecords()">
                                 {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}
                             </button>
-                            <button
-                                *ngIf="checkedRecords.length > 0"
-                                mat-menu-item
-                                (click)="uncheckAllRecords()">
-                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
-                            </button>
 
-                            <mat-divider></mat-divider>
+                            <ng-container
+                                *ngIf="checkedRecords.length > 0">
+                                <button
+                                    mat-menu-item
+                                    (click)="uncheckAllRecords()">
+                                    {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
+                                </button>
 
-                            <button
-                                *ngIf="hasFollowUpsWriteAccess()"
-                                mat-menu-item
-                                (click)="modifySelectedFollowUps(table)">
-                                {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS' | translate }}
-                            </button>
+                                <mat-divider></mat-divider>
 
-                            <button
-                                *ngIf="exportFollowUpsUrl"
-                                mat-menu-item
-                                (click)="exportSelectedFollowUps()">
-                                {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS' | translate }}
-                            </button>
+                                <button
+                                    *ngIf="hasFollowUpsWriteAccess()"
+                                    mat-menu-item
+                                    (click)="modifySelectedFollowUps(table)">
+                                    {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS' | translate }}
+                                </button>
+
+                                <button
+                                    *ngIf="exportFollowUpsUrl"
+                                    mat-menu-item
+                                    (click)="exportSelectedFollowUps()">
+                                    {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS' | translate }}
+                                </button>
+
+                                <button
+                                    [disabled]="!checkedOnlyNotDeletedRecords || !hasFollowUpsWriteAccess()"
+                                    mat-menu-item
+                                    (click)="deleteSelectedFollowUps()">
+                                    <div
+                                        [matTooltip]="'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS_DESCRIPTION' | translate">
+                                        {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS' | translate }}
+                                    </div>
+                                </button>
+
+                                <button
+                                    [disabled]="!checkedOnlyDeletedRecords || !hasFollowUpsWriteAccess()"
+                                    mat-menu-item
+                                    (click)="restoreSelectedFollowUps()">
+                                    <div
+                                        [matTooltip]="'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS_DESCRIPTION' | translate">
+                                        {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS' | translate}}
+                                    </div>
+                                </button>
+                            </ng-container>
                         </mat-menu>
                     </div>
                     <div class="column-filter">
@@ -201,8 +224,7 @@
                     [name]="'listCheckedIndividual[' + item.id + ']'"
                     class="table-checkbox"
                     ngModel
-                    (optionChanged)="checkedRecord(item.id, $event)"
-                    (afterInitialize)="checkedRecord(item.id, false)">
+                    (optionChanged)="checkedRecord(item, $event)">
                 </app-form-checkbox>
             </mat-cell>
         </ng-container>

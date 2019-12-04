@@ -746,7 +746,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     /**
      * Re(load) the Contacts list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (this.selectedOutbreak) {
             // refresh list of contacts grouped by risk level
             this.getContactsGroupedByRiskLevel();
@@ -774,12 +774,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         return throwError(err);
                     }),
                     tap(this.checkEmptyList.bind(this)),
-                    tap(() => {
-                        finishCallback();
+                    tap((data: any[]) => {
+                        finishCallback(data);
                     })
                 );
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

@@ -152,7 +152,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     /**
      * Re(load) the Cluster people list, based on the applied filter, sort criterias
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (this.selectedOutbreak) {
             this.clusterPeopleList$ = this.clusterDataService
                 .getClusterPeople(this.selectedOutbreak.id, this.cluster.id, this.queryBuilder)
@@ -163,12 +163,12 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
                         return throwError(err);
                     }),
                     tap(this.checkEmptyList.bind(this)),
-                    tap(() => {
-                        finishCallback();
+                    tap((data: any[]) => {
+                        finishCallback(data);
                     })
                 );
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

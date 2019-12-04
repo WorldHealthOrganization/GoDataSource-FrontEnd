@@ -129,7 +129,7 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
     /**
      * Re(load) the list of Teams
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         // retrieve the list of Teams
         this.teamsList$ = this.teamDataService
             .getTeamsList(this.queryBuilder)
@@ -140,8 +140,8 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
                     return throwError(err);
                 }),
                 tap(this.checkEmptyList.bind(this)),
-                tap(() => {
-                    finishCallback();
+                tap((data: any[]) => {
+                    finishCallback(data);
                 })
             );
     }

@@ -166,7 +166,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     /**
      * Re(load) the available Entities list, based on the applied filter, sort criterias
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (
             this.entityType &&
             this.entityId &&
@@ -190,12 +190,12 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
                         return throwError(err);
                     }),
                     tap(this.checkEmptyList.bind(this)),
-                    tap(() => {
-                        finishCallback();
+                    tap((data: any[]) => {
+                        finishCallback(data);
                     })
                 );
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

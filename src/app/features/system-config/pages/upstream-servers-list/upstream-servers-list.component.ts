@@ -192,7 +192,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
     /**
      * Refresh list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         this.upstreamServerList = [];
         this.upstreamServerListAll = [];
         this.systemSettingsDataService
@@ -224,7 +224,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
                 this.checkEmptyList(this.upstreamServerList);
 
                 // finished
-                finishCallback();
+                finishCallback(this.upstreamServerList);
             });
     }
 

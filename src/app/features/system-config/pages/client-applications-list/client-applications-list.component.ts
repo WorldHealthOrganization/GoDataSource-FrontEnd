@@ -179,7 +179,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
     /**
      * Refresh list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         this.clientApplicationsServerList = [];
         this.clientApplicationsServerListAll = [];
 
@@ -240,7 +240,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                 this.checkEmptyList(this.clientApplicationsServerList);
 
                 // finished
-                finishCallback();
+                finishCallback(this.clientApplicationsServerList);
             });
     }
 
