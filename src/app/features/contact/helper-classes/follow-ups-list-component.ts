@@ -194,7 +194,8 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
         }
 
         // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_FOLLOW_UPS')
+        this.dialogService
+            .showConfirm('LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_FOLLOW_UPS')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // construct filter
@@ -243,7 +244,8 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
         }
 
         // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_FOLLOW_UPS')
+        this.dialogService
+            .showConfirm('LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_FOLLOW_UPS')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // construct filter

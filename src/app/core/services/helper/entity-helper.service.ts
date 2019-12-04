@@ -125,10 +125,11 @@ export class EntityHelperService {
                     routerLink: [
                         from === SentFromColumn.CONTACTS ?
                             `/relationships/${entity.type}/${entity.id}/contacts` :
-                            `/relationships/${entity.type}/${entity.id}/exposures` ],
+                            `/relationships/${entity.type}/${entity.id}/exposures`
+                    ],
                     placeholder: from === SentFromColumn.CONTACTS ?
-                                    'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_CONTACTS' :
-                                    'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_EXPOSURES',
+                        'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_CONTACTS' :
+                        'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_EXPOSURES',
                     linkTarget: '_blank'
                 }),
                 // add section title for entities

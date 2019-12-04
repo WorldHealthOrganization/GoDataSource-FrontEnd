@@ -219,8 +219,8 @@ export class FollowUpsDataService {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.post(
-                        `outbreaks/${outbreakId}/follow-ups/bulk/restore?filter=${filter}`,
-                        {}
+                `outbreaks/${outbreakId}/follow-ups/bulk/restore?filter=${filter}`,
+                {}
             ),
             FollowUpModel
         );
