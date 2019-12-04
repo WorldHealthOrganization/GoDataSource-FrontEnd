@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
-import { EntityModel } from '../../models/entity-and-relationship.model';
+import { EntityModel, RelationshipModel } from '../../models/entity-and-relationship.model';
 import {
     DialogButton, DialogComponent, DialogConfiguration, DialogField,
     DialogFieldType
@@ -128,28 +128,41 @@ export class EntityHelperService {
         if (!_.isEmpty(relationshipsData)) {
             // split relationships data into entities and relationships
             // entities collection
-            const entities: DialogField[] = [
-                // add link to full resource
-                new DialogField({
-                    name: 'link',
-                    fieldType: DialogFieldType.LINK,
-                    routerLink: [
-                        from === SentFromColumn.CONTACTS ?
-                            `/relationships/${entity.type}/${entity.id}/contacts` :
-                            `/relationships/${entity.type}/${entity.id}/exposures`
-                    ],
-                    placeholder: from === SentFromColumn.CONTACTS ?
-                        'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_CONTACTS' :
-                        'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_EXPOSURES',
-                    linkTarget: '_blank'
-                }),
-                // add section title for entities
-                new DialogField({
-                    name: '_',
-                    fieldType: DialogFieldType.SECTION_TITLE,
-                    placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_SECTION_TITLE'
-                })
-            ];
+            const entities: DialogField[] = [];
+
+            // add links to list relationship page only if we're alloed to view that page
+            const authUser: UserModel = this.authDataService.getAuthenticatedUser();
+            if (
+                RelationshipModel.canList(authUser) && (
+                    from === SentFromColumn.CONTACTS ?
+                        entity.canListRelationshipContacts(authUser) :
+                        entity.canListRelationshipExposures(authUser)
+                )
+            ) {
+                entities.push(
+                    // add link to full resource
+                    new DialogField({
+                        name: 'link',
+                        fieldType: DialogFieldType.LINK,
+                        routerLink: [
+                            from === SentFromColumn.CONTACTS ?
+                                `/relationships/${entity.type}/${entity.id}/contacts` :
+                                `/relationships/${entity.type}/${entity.id}/exposures`
+                        ],
+                        placeholder: from === SentFromColumn.CONTACTS ?
+                            'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_CONTACTS' :
+                            'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_EXPOSURES',
+                        linkTarget: '_blank'
+                    }),
+
+                    // add section title for entities
+                    new DialogField({
+                        name: '_',
+                        fieldType: DialogFieldType.SECTION_TITLE,
+                        placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_SECTION_TITLE'
+                    })
+                );
+            }
 
             // relationships collection
             const relationships: DialogField[] = [
@@ -162,7 +175,6 @@ export class EntityHelperService {
             ];
 
             // add entities and relationships
-            const authUser: UserModel = this.authDataService.getAuthenticatedUser();
             relationshipsData.forEach((relationshipData) => {
                 // add entities to the list
                 entities.push(new DialogField({
