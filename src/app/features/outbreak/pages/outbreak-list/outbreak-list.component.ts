@@ -535,22 +535,26 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         };
 
         // get the outbreak to clone
-        this.outbreakDataService.getOutbreak(outbreakModel.id)
+        this.outbreakDataService
+            .getOutbreak(outbreakModel.id)
             .subscribe((outbreak: OutbreakModel) => {
                 // create the clone of the parent outbreak
-                this.dialogService.showInput(
-                    new DialogConfiguration({
-                        message: 'LNG_DIALOG_CONFIRM_CLONE_OUTBREAK',
-                        yesLabel: 'LNG_COMMON_BUTTON_CLONE',
-                        required: true,
-                        fieldsList: [new DialogField({
-                            name: 'clonedOutbreakName',
-                            placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_NAME',
+                this.dialogService
+                    .showInput(
+                        new DialogConfiguration({
+                            message: 'LNG_DIALOG_CONFIRM_CLONE_OUTBREAK',
+                            yesLabel: 'LNG_COMMON_BUTTON_CLONE',
                             required: true,
-                            type: 'text',
-                            value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME', {name: outbreak.name})
-                        })],
-                    }), true)
+                            fieldsList: [new DialogField({
+                                name: 'clonedOutbreakName',
+                                placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_NAME',
+                                required: true,
+                                type: 'text',
+                                value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME', {name: outbreak.name})
+                            })],
+                        }),
+                        true
+                    )
                     .subscribe((answer) => {
                         if (answer.button === DialogAnswerButton.Yes) {
                             // delete the id from the parent outbreak
@@ -576,7 +580,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
 
                             // show loading
                             const loadingDialog = this.dialogService.showLoadingDialog();
-                            this.outbreakDataService.createOutbreak(outbreak)
+                            this.outbreakDataService
+                                .createOutbreak(outbreak)
                                 .pipe(
                                     catchError((err) => {
                                         this.snackbarService.showApiError(err);
@@ -603,7 +608,16 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                                     loadingDialog.close();
 
                                     // navigate to modify page of the new outbreak
-                                    this.router.navigate([`/outbreaks/${clonedOutbreak.id}/modify`]);
+                                    if (OutbreakModel.canModify(this.authUser)) {
+                                        this.router.navigate([`/outbreaks/${clonedOutbreak.id}/modify`]);
+                                    } else if (OutbreakModel.canView(this.authUser)) {
+                                        this.router.navigate([`/outbreaks/${clonedOutbreak.id}/view`]);
+                                    } else if (OutbreakModel.canList(this.authUser)) {
+                                        this.router.navigate([`/outbreaks`]);
+                                    } else {
+                                        // fallback to current page since we already know that we have access to this page
+                                        // Don't redirect :)
+                                    }
                                 });
                         }
                     });
