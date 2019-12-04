@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, Subject } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { OutbreakModel } from '../../models/outbreak.model';
-import { UserRoleModel } from '../../models/user-role.model';
 import { StorageKey, StorageService } from '../helper/storage.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { AuthDataService } from './auth.data.service';
@@ -91,7 +90,6 @@ export class OutbreakDataService {
     /**
      * Create a new Outbreak
      * @param { OutbreakModel } outbreak
-     * @returns {Observable<UserRoleModel[]>}
      */
     createOutbreak(outbreak: OutbreakModel): Observable<any> {
         return this.http.post('outbreaks', outbreak)

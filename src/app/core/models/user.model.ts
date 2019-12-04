@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
-import { UserRoleModel } from './user-role.model';
-import { PERMISSION, PermissionModel } from './permission.model';
+import { IPermissionChildModel, PERMISSION, PermissionModel } from './permission.model';
 import { SecurityQuestionModel } from './securityQuestion.model';
 import { UserSettingsDashboardModel } from './user-settings-dashboard.model';
 
@@ -23,7 +22,8 @@ export enum UserSettings {
     SYNC_CLIENT_APPLICATIONS_FIELDS = 'syncClientApplicationsFields',
     SYNC_LOGS_FIELDS = 'syncLogsFields',
     REF_DATA_CAT_ENTRIES_FIELDS = 'refDataCatEntriesFields',
-    SHARE_RELATIONSHIPS = 'shareRelationships'
+    SHARE_RELATIONSHIPS = 'shareRelationships',
+    USER_ROLE_FIELDS = 'userRoleFields'
 }
 
 /**
@@ -49,6 +49,7 @@ abstract class UserSettingsHandlers {
     static SYNC_LOGS_FIELDS = [];
     static REF_DATA_CAT_ENTRIES_FIELDS = [];
     static SHARE_RELATIONSHIPS = [];
+    static USER_ROLE_FIELDS = [];
 }
 
 export interface IPermissionExpressionAnd {
@@ -121,6 +122,31 @@ export class PermissionExpression {
 
         // simple permission
         return !!authUser.permissionIdsMapped[this.permission];
+    }
+}
+
+export class UserRoleModel {
+    id: string | null;
+    name: string | null;
+    permissionIds: PERMISSION[];
+    description: string | null;
+    permissions: IPermissionChildModel[];
+
+    users: UserModel[];
+
+    /**
+     * Constructor
+     */
+    constructor(data = null) {
+        this.id = _.get(data, 'id');
+        this.name = _.get(data, 'name');
+        this.permissionIds = _.get(data, 'permissionIds', []);
+        this.description = _.get(data, 'description');
+
+        this.users = _.get(data, 'users', [])
+            .map((userData) => {
+                return new UserModel(userData);
+            });
     }
 }
 

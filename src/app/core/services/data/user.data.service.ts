@@ -7,8 +7,7 @@ import { PasswordChangeModel } from '../../models/password-change.model';
 import { RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/request-query-builder';
 import { SecurityQuestionModel } from '../../models/securityQuestion.model';
 import * as _ from 'lodash';
-import { map, mergeMap, switchMap } from 'rxjs/operators';
-import { PermissionModel } from '../../models/permission.model';
+import { mergeMap } from 'rxjs/operators';
 
 @Injectable()
 export class UserDataService {
@@ -23,15 +22,12 @@ export class UserDataService {
      * @returns {Observable<UserModel[]>}
      */
     getUsersList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<UserModel[]> {
-
-        const qb = new RequestQueryBuilder();
         // include roles and permissions in response
+        const qb = new RequestQueryBuilder();
         qb.include('roles', true);
-
         qb.merge(queryBuilder);
 
         const filter = qb.buildQuery();
-
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`users?filter=${filter}`),
             UserModel

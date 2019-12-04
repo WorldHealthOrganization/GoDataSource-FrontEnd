@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { UserRoleModel } from '../../models/user-role.model';
 import { IPermissionChildModel, PermissionModel } from '../../models/permission.model';
 import { Observable, of } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
@@ -9,6 +8,7 @@ import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { map, share, switchMap, tap } from 'rxjs/operators';
 import { I18nService } from '../helper/i18n.service';
+import { UserRoleModel } from '../../models/user.model';
 
 @Injectable()
 export class UserRoleDataService {
@@ -48,7 +48,9 @@ export class UserRoleDataService {
      * Retrieve the list of User Roles
      * @returns {Observable<UserRoleModel[]>}
      */
-    getRolesList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<UserRoleModel[]> {
+    getRolesList(
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<UserRoleModel[]> {
         // get roles list from cache
         const rolesList = this.cacheService.get(CacheKey.AUTH_ROLES);
         if (queryBuilder.isEmpty() && rolesList) {

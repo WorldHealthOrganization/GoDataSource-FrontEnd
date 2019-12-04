@@ -2,7 +2,6 @@ import { Component, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Observable } from 'rxjs';
@@ -17,6 +16,7 @@ import { IGroupEventData, IGroupOptionEventData, ISelectGroupMap, ISelectGroupOp
 import { IPermissionChildModel, PermissionModel } from '../../../../core/models/permission.model';
 import { DomSanitizer } from '@angular/platform-browser';
 import { UserRoleHelper } from '../../../../core/helperClasses/user-role.helper';
+import { UserRoleModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-create-role',

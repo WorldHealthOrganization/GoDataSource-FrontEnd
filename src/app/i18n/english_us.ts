@@ -81,6 +81,12 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_FOLLOW_UPS': 'Are you sure you want to delete selected follow-ups?',
         'LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_FOLLOW_UPS': 'Are you sure you want to restore selected follow-ups?',
 
+        /**
+         * uiUserRoleFields
+         */
+        'LNG_USER_ROLE_FIELD_LABEL_USERS': 'Users',
+
+
 
         /**
          * REMOVE the tokens from below

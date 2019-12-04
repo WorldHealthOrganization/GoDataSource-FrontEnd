@@ -1,9 +1,8 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
-import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserRoleModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { PERMISSION, PermissionModel } from '../../../../core/models/permission.model';
@@ -15,6 +14,8 @@ import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-roles-list',
@@ -23,13 +24,16 @@ import * as _ from 'lodash';
     styleUrls: ['./roles-list.component.less']
 })
 export class RolesListComponent extends ListComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Roles', '.', true)
     ];
 
     // constants
     PermissionModel = PermissionModel;
+    UserSettings = UserSettings;
+
+    // user list
+    userList$: Observable<UserModel[]>;
 
     // authenticated user
     authUser: UserModel;
@@ -83,12 +87,16 @@ export class RolesListComponent extends ListComponent implements OnInit {
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private userRoleDataService: UserRoleDataService,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private userDataService: UserDataService
     ) {
         super(
             snackbarService
@@ -98,19 +106,58 @@ export class RolesListComponent extends ListComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get data
         this.availablePermissions$ = this.userRoleDataService.getAvailablePermissions().pipe(share());
+        this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
         // initialize pagination
         this.initPaginator();
         // ...and re-load the list when the Selected Outbreak is changed
         this.needsRefreshList(true);
+
+        // initialize Side Table Columns
+        this.initializeSideTableColumns();
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'name',
+                label: 'LNG_USER_ROLE_FIELD_LABEL_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'description',
+                label: 'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION'
+            }),
+            new VisibleColumnModel({
+                field: 'users',
+                label: 'LNG_USER_ROLE_FIELD_LABEL_USERS'
+            }),
+            new VisibleColumnModel({
+                field: 'permissions',
+                label: 'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS'
+            })
+        ];
     }
 
     /**
      * Re(load) the User Roles list
      */
     refreshList(finishCallback: (records: any[]) => void) {
+        // make sure we include user information
+        this.queryBuilder.filter.flag(
+            'includeUsers',
+            true
+        );
+
         // get the list of existing roles
         this.rolesList$ = this.userRoleDataService
             .getRolesList(this.queryBuilder)
@@ -176,17 +223,5 @@ export class RolesListComponent extends ListComponent implements OnInit {
      */
     hasUserRoletWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_ROLE);
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'name',
-            'description',
-            'permissions'
-        ];
     }
 }

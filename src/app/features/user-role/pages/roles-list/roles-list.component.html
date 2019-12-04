@@ -18,6 +18,13 @@
     [value]="(rolesListCount$ | async)?.count">
 </app-total-number-of-records>
 
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.USER_ROLE_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">
@@ -44,12 +51,13 @@
     ></app-hover-row-actions>
 
     <mat-table #table [dataSource]="rolesList$ | async" matSort (matSortChange)="sortBy($event)">
-
         <!-- Name -->
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header class="column-header">{{'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate}}</div>
+                    <div mat-sort-header class="column-header">
+                        {{ 'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-input
                             name="nameFilter"
@@ -72,7 +80,9 @@
         <ng-container matColumnDef="description">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div class="column-header">{{'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate}}</div>
+                    <div class="column-header">
+                        {{ 'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-input
                             name="descriptionFilter"
@@ -91,12 +101,103 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Users -->
+        <ng-container matColumnDef="users">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div class="column-header">
+                        <span>
+                            {{ 'LNG_USER_ROLE_FIELD_LABEL_USERS' | translate }}
+                        </span>
+
+                        <button
+                            type="button"
+                            mat-icon-button
+                            class="column-actions-button"
+                            [disableRipple]="true"
+                            [matMenuTriggerFor]="columnActions"
+                            color="accent"
+                        >
+                            <span class="xt-icon">arrowDropdownCircle</span>
+                        </button>
+
+                        <mat-menu #columnActions="matMenu">
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('users', true)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL' | translate }}
+                            </button>
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('users', false)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL' | translate }}
+                            </button>
+                        </mat-menu>
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="userListFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="userList$ | async"
+                            (optionChanged)="filterBySelectField('users._id', $event, 'id')"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            [multiple]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <ng-container *ngIf="!isCellExpanded('users', item.id)">
+                    <app-number-of-items-label
+                        [value]="item.users?.length"
+                    ></app-number-of-items-label>
+
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('users', item.id, true)"
+                    >
+                        {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND' | translate }}
+                    </button>
+                </ng-container>
+
+                <div
+                    *ngIf="isCellExpanded('users', item.id)"
+                    fxLayout="column" fxLayoutAlign="start start">
+                    <mat-chip-list fxLayout="row wrap">
+                        <mat-chip
+                            *ngFor="let user of item.users"
+                            [matTooltip]="user.name"
+                        >
+                            {{ user.name }}
+                        </mat-chip>
+                    </mat-chip-list>
+
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('users', item.id, false)"
+                    >
+                        {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate }}
+                    </button>
+                </div>
+            </mat-cell>
+        </ng-container>
+
         <!-- Permissions -->
         <ng-container matColumnDef="permissions">
             <mat-header-cell *matHeaderCellDef fxFlex>
                 <div class="table-header-cell" fxLayout="column">
                     <div class="column-header" fxLayout="row">
-                        <span>{{'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate}}</span>
+                        <span>
+                            {{ 'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate }}
+                        </span>
 
                         <button
                             type="button"
@@ -185,9 +286,9 @@
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
         <mat-row
-            *matRowDef="let item; columns: getTableColumns()"
+            *matRowDef="let item; columns: visibleTableColumns"
             app-hover-row-actions
             [hoverRowActionsComponent]="hoverRow"
             [hoverRowActions]="recordActions"

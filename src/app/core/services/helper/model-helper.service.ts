@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { UserModel } from '../../models/user.model';
-import { UserRoleModel } from '../../models/user-role.model';
+import { UserModel, UserRoleModel } from '../../models/user.model';
 import { IPermissionChildModel, PERMISSION, PermissionModel } from '../../models/permission.model';
 import * as _ from 'lodash';
 import { TeamModel } from '../../models/team.model';
