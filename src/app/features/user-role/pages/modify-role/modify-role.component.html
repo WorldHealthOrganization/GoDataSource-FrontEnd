@@ -72,6 +72,17 @@
                         </div>
                     </div>
                 </mat-card>
+
+                <!-- Affected users -->
+                <div class="section-title">
+                    {{ 'LNG_PAGE_MODIFY_USER_ROLES_AFFECTED_USERS_TITLE' | translate }}
+                </div>
+                <mat-card class="page-section">
+                    <div
+                        *ngFor="let user of userRole.users">
+                        {{ user.name }}
+                    </div>
+                </mat-card>
             </mat-tab>
         </mat-tab-group>
     </div>

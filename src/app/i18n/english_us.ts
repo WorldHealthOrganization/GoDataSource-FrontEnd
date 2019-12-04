@@ -86,6 +86,11 @@ export const EnglishUsLang = {
          */
         'LNG_USER_ROLE_FIELD_LABEL_USERS': 'Users',
 
+        /**
+         * uiModifyUserRolePage
+         */
+        'LNG_PAGE_MODIFY_USER_ROLES_AFFECTED_USERS_TITLE': 'Affected Users',
+
 
 
         /**
