@@ -135,17 +135,18 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
     /**
      * Re(load) list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (this.outbreak) {
-            this.entitiesList$ = this.outbreakDataService.getPeopleInconsistencies(this.outbreak.id, this.queryBuilder)
+            this.entitiesList$ = this.outbreakDataService
+                .getPeopleInconsistencies(this.outbreak.id, this.queryBuilder)
                 .pipe(
                     tap(this.checkEmptyList.bind(this)),
-                    tap(() => {
-                        finishCallback();
+                    tap((data: any[]) => {
+                        finishCallback(data);
                     })
                 );
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

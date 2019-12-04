@@ -184,6 +184,105 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
     }
 
     /**
+     * Delete selected follow-ups
+     */
+    deleteSelectedFollowUps() {
+        // get list of selected follow-ups ids
+        const selectedRecords: false |  string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // show confirm dialog to confirm the action
+        this.dialogService
+            .showConfirm('LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_FOLLOW_UPS')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // construct filter
+                    const qb = new RequestQueryBuilder();
+
+                    qb.filter.
+                    where({
+                        id: {
+                            inq: selectedRecords
+                        }
+                    });
+
+                    // display loading
+                    const loadingDialog = this.dialogService.showLoadingDialog();
+                    this.followUpsDataService
+                        .deleteBulkFollowUps(this.selectedOutbreak.id, qb)
+                        .pipe(
+                            catchError((err) => {
+                                // hide dialog
+                                loadingDialog.close();
+
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe(() => {
+                            // hide dialog
+                            loadingDialog.close();
+
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
+
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+
+    /**
+     * Restore selected follow-ups
+     */
+    restoreSelectedFollowUps() {
+        // get list of selected follow-ups ids
+        const selectedRecords: false |  string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // show confirm dialog to confirm the action
+        this.dialogService
+            .showConfirm('LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_FOLLOW_UPS')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // construct filter
+                    const qb = new RequestQueryBuilder();
+
+                    qb.filter.
+                    where({
+                        id: {
+                            inq: selectedRecords
+                        }
+                    });
+                    // display loading
+                    const loadingDialog = this.dialogService.showLoadingDialog();
+                    this.followUpsDataService
+                        .restoreBulkFollowUps(this.selectedOutbreak.id, qb)
+                        .pipe(
+                            catchError((err) => {
+                                // hide dialog
+                                loadingDialog.close();
+
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe(() => {
+                            // hide dialog
+                            loadingDialog.close();
+
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
+
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+
+    /**
      * Restore specific follow-up
      * @param {FollowUpModel} followUp
      */

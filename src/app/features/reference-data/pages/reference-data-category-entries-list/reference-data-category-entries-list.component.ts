@@ -175,7 +175,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
         ];
     }
 
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (this.categoryId) {
             this.categoryEntries$ = this.referenceDataDataService
                 .getReferenceDataByCategory(this.categoryId)
@@ -184,12 +184,12 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                         return category.entries;
                     }),
                     tap(this.checkEmptyList.bind(this)),
-                    tap(() => {
-                        finishCallback();
+                    tap((data: any[]) => {
+                        finishCallback(data);
                     })
                 );
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

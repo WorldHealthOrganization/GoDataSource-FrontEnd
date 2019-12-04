@@ -77,13 +77,13 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
     /**
      * Re(load) the Reference Data Categories list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         // load reference data
         this.referenceData$ = this.referenceDataDataService
             .getReferenceData()
             .pipe(
-                tap(() => {
-                    finishCallback();
+                tap((data: any[]) => {
+                    finishCallback(data);
                 })
             );
     }

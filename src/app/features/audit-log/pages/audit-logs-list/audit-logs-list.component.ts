@@ -143,7 +143,7 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the list, based on the applied filter, sort criterias
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         // include user details
         this.queryBuilder.include('user', true);
 
@@ -157,8 +157,8 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
             .getAuditLogsList(this.queryBuilder)
             .pipe(
                 tap(this.checkEmptyList.bind(this)),
-                tap(() => {
-                    finishCallback();
+                tap((data: any[]) => {
+                    finishCallback(data);
                 })
             );
     }

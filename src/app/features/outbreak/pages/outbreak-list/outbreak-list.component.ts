@@ -333,7 +333,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the Outbreaks list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         // retrieve created user & modified user information
         this.queryBuilder.include('createdByUser', true);
         this.queryBuilder.include('updatedByUser', true);
@@ -343,8 +343,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
             .getOutbreaksList(this.queryBuilder)
             .pipe(
                 tap(this.checkEmptyList.bind(this)),
-                tap(() => {
-                    finishCallback();
+                tap((data: any[]) => {
+                    finishCallback(data);
                 })
             );
     }

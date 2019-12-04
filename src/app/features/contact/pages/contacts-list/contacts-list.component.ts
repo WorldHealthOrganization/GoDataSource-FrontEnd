@@ -746,7 +746,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     /**
      * Re(load) the Contacts list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (this.selectedOutbreak) {
             // refresh list of contacts grouped by risk level
             this.getContactsGroupedByRiskLevel();
@@ -765,15 +765,16 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             );
 
             // retrieve the list of Contacts
-            this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder)
+            this.contactsList$ = this.contactDataService
+                .getContactsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
                     tap(this.checkEmptyList.bind(this)),
-                    tap(() => {
-                        finishCallback();
+                    tap((data: any[]) => {
+                        finishCallback(data);
                     })
                 );
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

@@ -19,7 +19,7 @@ export class OutbreakTemplateDataService {
      * Retrieve the list of Outbreak Templates
      * @returns {Observable<OutbreakTemplateModel[]>}
      */
-    getOutbreakTemplatesList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<OutbreakTemplateModel> {
+    getOutbreakTemplatesList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<OutbreakTemplateModel[]> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`templates?filter=${filter}`),

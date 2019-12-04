@@ -201,7 +201,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
     /**
      * Refresh list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         // sync logs
         this.syncLogsList$ = this.systemSyncLogDataService
             .getSyncLogList(this.queryBuilder)
@@ -225,8 +225,8 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                     });
                 }),
                 tap(this.checkEmptyList.bind(this)),
-                tap(() => {
-                    finishCallback();
+                tap((data: any[]) => {
+                    finishCallback(data);
                 })
             );
     }

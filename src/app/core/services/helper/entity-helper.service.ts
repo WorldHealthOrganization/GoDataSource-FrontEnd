@@ -118,6 +118,20 @@ export class EntityHelperService {
             // split relationships data into entities and relationships
             // entities collection
             const entities: DialogField[] = [
+                // add link to full resource
+                new DialogField({
+                    name: 'link',
+                    fieldType: DialogFieldType.LINK,
+                    routerLink: [
+                        from === SentFromColumn.CONTACTS ?
+                            `/relationships/${entity.type}/${entity.id}/contacts` :
+                            `/relationships/${entity.type}/${entity.id}/exposures`
+                    ],
+                    placeholder: from === SentFromColumn.CONTACTS ?
+                        'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_CONTACTS' :
+                        'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_EXPOSURES',
+                    linkTarget: '_blank'
+                }),
                 // add section title for entities
                 new DialogField({
                     name: '_',

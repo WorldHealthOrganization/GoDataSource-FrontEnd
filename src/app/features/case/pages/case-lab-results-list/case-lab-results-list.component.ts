@@ -386,7 +386,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     /**
      * Re(load) the Case lab results list, based on the applied filter, sort criterias
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         if (
             this.selectedOutbreak &&
             this.caseId
@@ -399,12 +399,12 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
             this.labResultsList$ = this.labResultDataService.getCaseLabResults(this.selectedOutbreak.id, this.caseId, this.queryBuilder)
                 .pipe(
                     tap(this.checkEmptyList.bind(this)),
-                    tap(() => {
-                        finishCallback();
+                    tap((data: any[]) => {
+                        finishCallback(data);
                     })
                 );
         } else {
-            finishCallback();
+            finishCallback([]);
         }
     }
 

@@ -103,7 +103,7 @@ export class ViewHelpDialogComponent extends ListComponent {
     /**
      * Re(load) the items list
      */
-    refreshList(finishCallback: () => void) {
+    refreshList(finishCallback: (records: any[]) => void) {
         // make sure we retrieve only approved help items
         this.queryBuilder.filter.where({
             approved: true
@@ -130,8 +130,8 @@ export class ViewHelpDialogComponent extends ListComponent {
         this.helpItemsList$ = this.helpItemsList$
             .pipe(
                 tap(this.checkEmptyList.bind(this)),
-                tap(() => {
-                    finishCallback();
+                tap((data: any[]) => {
+                    finishCallback(data);
                 })
             );
     }

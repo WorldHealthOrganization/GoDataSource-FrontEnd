@@ -81,12 +81,13 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
     /**
      * Re(load) the Saved filters list, based on the applied filter, sort criterias
      */
-    refreshList(finishCallback: () => void) {
-        this.savedFiltersList$ = this.savedFiltersService.getSavedFiltersList(this.queryBuilder)
+    refreshList(finishCallback: (records: any[]) => void) {
+        this.savedFiltersList$ = this.savedFiltersService
+            .getSavedFiltersList(this.queryBuilder)
             .pipe(
                 tap(this.checkEmptyList.bind(this)),
-                tap(() => {
-                    finishCallback();
+                tap((data: any[]) => {
+                    finishCallback(data);
                 })
             );
     }
