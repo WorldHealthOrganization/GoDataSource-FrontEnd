@@ -191,10 +191,23 @@ export abstract class ListComponent implements OnDestroy {
         this.checkboxModels.checkAll = value;
 
         // check/un-check all individual checkboxes
+        this.checkboxModels.checkedOnlyNotDeletedRecords = this.checkboxModels.checkAll;
+        this.checkboxModels.checkedOnlyDeletedRecords = this.checkboxModels.checkAll;
         this.checkboxModels.checkedRecords = {};
         if (this.checkboxModels.checkAll) {
             this.checkboxModels.records.forEach((record: any) => {
+                // check record
                 this.checkboxModels.checkedRecords[this.getCheckRecordKey(record)] = true;
+
+                // all records are deleted ?
+                if (!record.deleted) {
+                    this.checkboxModels.checkedOnlyDeletedRecords = false;
+                }
+
+                // all records aren't deleted ?
+                if (record.deleted) {
+                    this.checkboxModels.checkedOnlyNotDeletedRecords = false;
+                }
             });
         }
 
@@ -1748,29 +1761,31 @@ export abstract class ListComponent implements OnDestroy {
                 checkedAll = false;
             }
 
-            // all records are deleted ?
-            if (!record.deleted) {
-                this.checkboxModels.checkedOnlyDeletedRecords = false;
-            }
+            // check only checked records
+            if (this.checkboxModels.checkedRecords[idRecord]) {
+                // all records are deleted ?
+                if (!record.deleted) {
+                    this.checkboxModels.checkedOnlyDeletedRecords = false;
+                }
 
-            // all records aren't deleted ?
-            if (record.deleted) {
-                this.checkboxModels.checkedOnlyNotDeletedRecords = false;
-            }
+                // all records aren't deleted ?
+                if (record.deleted) {
+                    this.checkboxModels.checkedOnlyNotDeletedRecords = false;
+                }
 
-            // single select? - uncheck others
-            if (
-                !this.checkedIsMultiSelect &&
-                this.checkboxModels.checkedRecords[idRecord] &&
-                idRecord !== id
-            ) {
-                // update the view
-                delete this.checkboxModels.checkedRecords[idRecord];
-                this.listCheckedIndividualInputs.forEach((checkbox: FormCheckboxComponent) => {
-                    if (checkbox.name === 'listCheckedIndividual[' + idRecord + ']') {
-                        checkbox.value = false;
-                    }
-                });
+                // single select? - uncheck others
+                if (
+                    !this.checkedIsMultiSelect &&
+                    idRecord !== id
+                ) {
+                    // update the view
+                    delete this.checkboxModels.checkedRecords[idRecord];
+                    this.listCheckedIndividualInputs.forEach((checkbox: FormCheckboxComponent) => {
+                        if (checkbox.name === 'listCheckedIndividual[' + idRecord + ']') {
+                            checkbox.value = false;
+                        }
+                    });
+                }
             }
         });
 
