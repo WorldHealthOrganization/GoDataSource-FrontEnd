@@ -1,3 +1,4 @@
+// tslint:disable:no-use-before-declare
 import * as _ from 'lodash';
 import { IPermissionChildModel, PERMISSION, PermissionModel } from './permission.model';
 import { SecurityQuestionModel } from './securityQuestion.model';
