@@ -391,6 +391,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * @returns {IterableIterator<any>}
      */
     onNodeTap(entity: GraphNodeModel) {
+        console.log(entity);
         this.nodeTapped.emit(entity);
     }
 
@@ -400,6 +401,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * @returns {IterableIterator<any>}
      */
     onEdgeTap(relationship: GraphEdgeModel) {
+        console.log(relationship);
         this.edgeTapped.emit(relationship);
     }
 

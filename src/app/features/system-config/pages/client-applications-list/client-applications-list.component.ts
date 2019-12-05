@@ -267,6 +267,8 @@ export class ClientApplicationsListComponent extends ListComponent implements On
      * @param item
      */
     deleteClientApplication(clientApplication: SystemClientApplicationModel) {
+        console.log(`ssss`);
+        console.log(clientApplication);
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CLIENT_APPLICATION', clientApplication)
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
