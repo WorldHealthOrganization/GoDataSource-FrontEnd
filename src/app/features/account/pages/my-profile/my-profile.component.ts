@@ -17,7 +17,6 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
     styleUrls: ['./my-profile.component.less']
 })
 export class MyProfileComponent extends ViewModifyComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_MY_PROFILE_TITLE'),
     ];

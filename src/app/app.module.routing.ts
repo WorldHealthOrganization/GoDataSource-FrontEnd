@@ -34,7 +34,12 @@ const routes: Routes = [
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
-                ]
+                ],
+                data: {
+                    permissions: [
+                        PERMISSION.USER_MODIFY_OWN_ACCOUNT
+                    ]
+                }
             },
             // User Module routes
             {
@@ -46,6 +51,10 @@ const routes: Routes = [
                 ],
                 data: {
                     permissions: [PERMISSION.READ_USER_ACCOUNT]
+                    // permissions: new PermissionExpression({
+                    //     or: [
+                    //     ]
+                    // })
                 }
             },
             // User Role Module routes

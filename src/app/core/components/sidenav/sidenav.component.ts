@@ -41,19 +41,25 @@ export class SidenavComponent implements OnInit, OnDestroy {
             new ChildNavItem(
                 'my-profile',
                 'LNG_LAYOUT_MENU_ITEM_MY_PROFILE_LABEL',
-                [],
+                [
+                    PERMISSION.USER_MODIFY_OWN_ACCOUNT
+                ],
                 '/account/my-profile'
             ),
             new ChildNavItem(
                 'change-password',
                 'LNG_LAYOUT_MENU_ITEM_CHANGE_PASSWORD_LABEL',
-                [],
+                [
+                    PERMISSION.USER_MODIFY_OWN_ACCOUNT
+                ],
                 '/account/change-password'
             ),
             new ChildNavItem(
                 'security-questions',
                 'LNG_LAYOUT_MENU_ITEM_SET_SECURITY_QUESTION_LABEL',
-                [],
+                [
+                    PERMISSION.USER_MODIFY_OWN_ACCOUNT
+                ],
                 '/account/set-security-questions'
             ),
             new ChildNavItem(

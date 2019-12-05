@@ -70,6 +70,13 @@ export interface IPermissionCloneable {
     canClone(user: UserModel): boolean;
 }
 
+export interface IPermissionUser {
+    /**
+     * Has permission to modify his account
+     */
+    canModifyOwnAccount(user: UserModel): boolean;
+}
+
 export interface IPermissionQuestionnaire {
     /**
      * Has permission to modify case questionnaire

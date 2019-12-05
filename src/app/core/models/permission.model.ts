@@ -1,6 +1,16 @@
 import * as _ from 'lodash';
 
 export enum PERMISSION {
+    // users
+    USER_LIST = 'user_list',
+    USER_VIEW = 'user_view',
+    USER_CREATE = 'user_create',
+    USER_MODIFY = 'user_modify',
+    USER_DELETE = 'user_delete',
+    USER_MODIFY_OWN_ACCOUNT = 'user_modify_own_account',
+READ_USER_ACCOUNT = 'read_user_account',
+WRITE_USER_ACCOUNT = 'write_user_account',
+
     // outbreaks
     OUTBREAK_LIST = 'outbreak_list',
     OUTBREAK_VIEW = 'outbreak_view',
@@ -125,10 +135,6 @@ WRITE_CASE = 'write_case',
 
     // reference data
     WRITE_REFERENCE_DATA = 'write_reference_data',
-
-    // users
-    READ_USER_ACCOUNT = 'read_user_account',
-    WRITE_USER_ACCOUNT = 'write_user_account',
 
     // roles
     READ_ROLE = 'read_role',

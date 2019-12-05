@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import { IPermissionChildModel, PERMISSION, PermissionModel } from './permission.model';
 import { SecurityQuestionModel } from './securityQuestion.model';
 import { UserSettingsDashboardModel } from './user-settings-dashboard.model';
+import { IPermissionBasic, IPermissionUser } from './permission.interface';
 
 export enum UserSettings {
     AUDIT_LOG_FIELDS = 'auditLogFields',
@@ -151,7 +152,10 @@ export class UserRoleModel {
     }
 }
 
-export class UserModel {
+export class UserModel
+    implements
+        IPermissionBasic,
+        IPermissionUser {
     id: string;
     firstName: string;
     lastName: string;
@@ -183,6 +187,23 @@ export class UserModel {
 
     availablePermissions: PermissionModel[];
 
+    /**
+     * Static Permissions - IPermissionBasic
+     */
+    static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_VIEW) : false; }
+    static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_LIST) : false; }
+    static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_CREATE) : false; }
+    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_MODIFY) : false; }
+    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_DELETE) : false; }
+
+    /**
+     * Static Permissions - IPermissionUser
+     */
+    static canModifyOwnAccount(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_MODIFY_OWN_ACCOUNT) : false; }
+
+    /**
+     * Constructor
+     */
     constructor(data = null) {
         this.id = _.get(data, 'id');
         this.firstName = _.get(data, 'firstName');
@@ -201,6 +222,23 @@ export class UserModel {
         this.initializeSettings(data);
     }
 
+    /**
+     * Permissions - IPermissionBasic
+     */
+    canView(user: UserModel): boolean { return UserModel.canView(user); }
+    canList(user: UserModel): boolean { return UserModel.canList(user); }
+    canCreate(user: UserModel): boolean { return UserModel.canCreate(user); }
+    canModify(user: UserModel): boolean { return UserModel.canModify(user); }
+    canDelete(user: UserModel): boolean { return UserModel.canDelete(user); }
+
+    /**
+     * Permissions - IPermissionUser
+     */
+    canModifyOwnAccount(user: UserModel): boolean { return UserModel.canModifyOwnAccount(user); }
+
+    /**
+     * Check if user has specific permissions
+     */
     hasPermissions(...permissionIds: (PERMISSION | PermissionExpression)[]): boolean {
         // check if all permissions are in our list allowed permissions
         for (const permission of permissionIds) {
