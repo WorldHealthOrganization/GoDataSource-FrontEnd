@@ -53,7 +53,14 @@
                             groupPartialLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL"
                             groupPartialTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL_DESCRIPTION"
                             (groupSelectionChanged)="groupSelectionChanged($event)"
-                            (groupOptionCheckStateChanged)="groupOptionCheckStateChanged($event)">
+                            (groupOptionCheckStateChanged)="groupOptionCheckStateChanged($event)"
+                            app-group-option-requirements-validator
+                            [appGroupRequiredOptions]="availablePermissions$ | async"
+                            appGroupKey="groupAllId"
+                            appGroupOptionsKey="permissions"
+                            appGroupOptionsValueKey="id"
+                            appGroupOptionsLabelKey="label"
+                            appGroupOptionsRequirementsKey="requires">
                         </app-form-select-groups>
                     </mat-card>
 
