@@ -247,7 +247,9 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 {{ item.lastName }}
             </mat-cell>
         </ng-container>
@@ -270,7 +272,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 {{ item.firstName }}
             </mat-cell>
         </ng-container>
@@ -293,7 +297,9 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 {{ item.visualId }}
             </mat-cell>
         </ng-container>
@@ -318,7 +324,9 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 {{ item.mainAddress?.location?.name }}
             </mat-cell>
         </ng-container>
@@ -342,7 +350,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 <app-age-label [age]="item.age"></app-age-label>
             </mat-cell>
         </ng-container>
@@ -368,7 +378,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 {{ item.gender | translate }}
             </mat-cell>
         </ng-container>
@@ -390,7 +402,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 <ng-container *ngFor="let phoneNumber of item.phoneNumbers">
                     {{phoneNumber}}<br/>
                 </ng-container>
@@ -419,7 +433,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.RISK_LEVEL"
                     [value]="item.riskLevel">
@@ -444,7 +460,10 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                class="has-date-range-filter"
+                [style.color]="getRiskColor(item)">
                 {{ item.dateOfLastContact | dateDefault }}
             </mat-cell>
         </ng-container>
@@ -466,7 +485,10 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                class="has-date-range-filter"
+                [style.color]="getRiskColor(item)">
                 {{ item.followUp?.endDate | dateDefault }}
             </mat-cell>
         </ng-container>
@@ -494,7 +516,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS"
                     [value]="item.followUp?.status">
@@ -522,7 +546,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 <app-yes-no-label
                     [value]="item.deleted">
                 </app-yes-no-label>
@@ -550,7 +576,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 <app-yes-no-label
                     [value]="item.wasCase">
                 </app-yes-no-label>
@@ -572,6 +600,7 @@
             <mat-cell
                 *matCellDef="let item"
                 (click)="displayContacts(item)"
+                [style.color]="getRiskColor(item)"
                 class="mat-table-number-column">
                 {{ item.numberOfContacts }}
             </mat-cell>
@@ -591,6 +620,7 @@
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
+                [style.color]="getRiskColor(item)"
                 (click)="displayExposures(item)"
                 class="mat-table-number-column">
                 {{ item.numberOfExposures }}
@@ -621,7 +651,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 {{ item.createdByUser?.name }}
             </mat-cell>
         </ng-container>
@@ -643,7 +675,10 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                class="has-date-range-filter"
+                [style.color]="getRiskColor(item)">
                 {{ item.createdAt | dateTimeDefault }}
             </mat-cell>
         </ng-container>
@@ -672,7 +707,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 {{ item.updatedByUser?.name }}
             </mat-cell>
         </ng-container>
@@ -694,7 +731,10 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                class="has-date-range-filter"
+                [style.color]="getRiskColor(item)">
                 {{ item.updatedAt | dateTimeDefault }}
             </mat-cell>
         </ng-container>

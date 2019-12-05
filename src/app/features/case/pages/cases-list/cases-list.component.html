@@ -508,6 +508,7 @@
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
+                [style.color]="getCaseClassificationColor(item)"
                 (click)="displayContacts(item)"
                 class="mat-table-number-column">
                 {{ item.numberOfContacts }}
@@ -528,6 +529,7 @@
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
+                [style.color]="getCaseClassificationColor(item)"
                 (click)="displayExposures(item)"
                 class="mat-table-number-column">
                 {{ item.numberOfExposures }}
@@ -607,7 +609,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getCaseClassificationColor(item)">
                 {{ item.createdByUser?.name }}
             </mat-cell>
         </ng-container>
@@ -629,7 +633,10 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                class="has-date-range-filter"
+                [style.color]="getCaseClassificationColor(item)">
                 {{ item.createdAt | dateTimeDefault }}
             </mat-cell>
         </ng-container>
@@ -658,7 +665,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getCaseClassificationColor(item)">
                 {{ item.updatedByUser?.name }}
             </mat-cell>
         </ng-container>
@@ -680,7 +689,10 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                class="has-date-range-filter"
+                [style.color]="getCaseClassificationColor(item)">
                 {{ item.updatedAt | dateTimeDefault }}
             </mat-cell>
         </ng-container>
