@@ -90,6 +90,12 @@ export const EnglishUsLang = {
          * uiModifyUserRolePage
          */
         'LNG_PAGE_MODIFY_USER_ROLES_AFFECTED_USERS_TITLE': 'Affected Users',
+        'LNG_PAGE_MODIFY_USER_ROLES_AFFECTED_USERS_NONE_LABEL': 'None',
+
+        /**
+         * uiFormInputValidationErrors
+         */
+        'LNG_FORM_VALIDATION_ERROR_MISSING_REQUIRED_OPTIONS': 'Missing options: {{options}}'
 
 
 

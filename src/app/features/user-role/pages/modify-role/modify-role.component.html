@@ -67,7 +67,14 @@
                                 groupPartialLabel="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL"
                                 groupPartialTooltip="LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL_DESCRIPTION"
                                 (groupSelectionChanged)="groupSelectionChanged($event)"
-                                (groupOptionCheckStateChanged)="groupOptionCheckStateChanged($event)">
+                                (groupOptionCheckStateChanged)="groupOptionCheckStateChanged($event)"
+                                app-group-option-requirements-validator
+                                [appGroupRequiredOptions]="availablePermissions$ | async"
+                                appGroupKey="groupAllId"
+                                appGroupOptionsKey="permissions"
+                                appGroupOptionsValueKey="id"
+                                appGroupOptionsLabelKey="label"
+                                appGroupOptionsRequirementsKey="requires">
                             </app-form-select-groups>
                         </div>
                     </div>
@@ -78,10 +85,17 @@
                     {{ 'LNG_PAGE_MODIFY_USER_ROLES_AFFECTED_USERS_TITLE' | translate }}
                 </div>
                 <mat-card class="page-section">
-                    <div
-                        *ngFor="let user of userRole.users">
-                        {{ user.name }}
-                    </div>
+                    <ng-container
+                        *ngIf="userRole.users?.length > 0">
+                        <div
+                            *ngFor="let user of userRole.users">
+                            {{ user.name }}
+                        </div>
+                    </ng-container>
+                    <ng-container
+                        *ngIf="!userRole.users || userRole.users.length < 1">
+                        {{ 'LNG_PAGE_MODIFY_USER_ROLES_AFFECTED_USERS_NONE_LABEL' | translate }}
+                    </ng-container>
                 </mat-card>
             </mat-tab>
         </mat-tab-group>

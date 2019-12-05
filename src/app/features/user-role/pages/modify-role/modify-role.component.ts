@@ -6,13 +6,12 @@ import { UserRoleDataService } from '../../../../core/services/data/user-role.da
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Observable } from 'rxjs';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import * as _ from 'lodash';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { IPermissionChildModel, PERMISSION, PermissionModel } from '../../../../core/models/permission.model';
 import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { catchError } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { IGroupEventData, IGroupOptionEventData, ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../../shared/xt-forms/components/form-select-groups/form-select-groups.component';
@@ -63,7 +62,9 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
         });
 
         // get the list of permissions to populate the dropdown in UI
-        this.availablePermissions$ = this.userRoleDataService.getAvailablePermissions();
+        this.availablePermissions$ = this.userRoleDataService
+            .getAvailablePermissions()
+            .pipe(share());
     }
 
     ngOnInit() {
@@ -78,36 +79,36 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
     }
 
     modifyRole(form: NgForm) {
-
+        // get dirty fields & validate form
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
-
-        if (form.valid && !_.isEmpty(dirtyFields)) {
-
-            // modify the role
-            const loadingDialog = this.dialogService.showLoadingDialog();
-            this.userRoleDataService
-                .modifyRole(this.userRoleId, dirtyFields)
-                .pipe(
-                    catchError((err) => {
-                        this.snackbarService.showApiError(err);
-                        loadingDialog.close();
-                        return throwError(err);
-                    })
-                )
-                .subscribe((modifiedRole: UserRoleModel) => {
-                    // update model
-                    this.userRole = modifiedRole;
-
-                    // mark form as pristine
-                    form.form.markAsPristine();
-
-                    // display message
-                    this.snackbarService.showSuccess('LNG_PAGE_MODIFY_USER_ROLES_ACTION_MODIFY_USER_ROLES_SUCCESS_MESSAGE');
-
-                    // hide dialog
-                    loadingDialog.close();
-                });
+        if (!this.formHelper.validateForm(form)) {
+            return;
         }
+
+        // modify the role
+        const loadingDialog = this.dialogService.showLoadingDialog();
+        this.userRoleDataService
+            .modifyRole(this.userRoleId, dirtyFields)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    loadingDialog.close();
+                    return throwError(err);
+                })
+            )
+            .subscribe((modifiedRole: UserRoleModel) => {
+                // update model
+                this.userRole = modifiedRole;
+
+                // mark form as pristine
+                form.form.markAsPristine();
+
+                // display message
+                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_USER_ROLES_ACTION_MODIFY_USER_ROLES_SUCCESS_MESSAGE');
+
+                // hide dialog
+                loadingDialog.close();
+            });
     }
     /**
      * Check if we have write access to users
