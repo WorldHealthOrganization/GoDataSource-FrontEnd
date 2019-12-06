@@ -123,6 +123,39 @@
                     </div>
                 </mat-card>
 
+                <!-- Flag contact section -->
+                <div class="section-title">
+                    {{ 'LNG_PAGE_CREATE_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE' | translate }}
+                </div>
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                fxFlex
+                                name="riskLevel"
+                                [(ngModel)]="contactData.riskLevel"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL' | translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
+                                [options]="riskLevelsList$ | async">
+                            </app-form-select>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
+                        <div fxLayout="row">
+                            <app-form-textarea
+                                name="riskReason"
+                                [(ngModel)]="contactData.riskReason"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_RISK_REASON' | translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION">
+                            </app-form-textarea>
+                        </div>
+                    </div>
+                </mat-card>
+
                 <div class="section-title">{{'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS' | translate}}</div>
 
                 <!--Vaccines received section-->
