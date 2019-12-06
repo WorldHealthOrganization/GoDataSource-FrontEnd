@@ -46,7 +46,7 @@ export const EnglishUsLang = {
          */
         'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS': 'Number of contacts',
         'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES': 'Number of exposures',
-        'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL_TITLE': 'Flag this contact with a risk level for additional attention',
+        'LNG_PAGE_CREATE_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE': 'Flag this contact with a risk level for additional attention',
 
         /**
          * uiContactsListPage
