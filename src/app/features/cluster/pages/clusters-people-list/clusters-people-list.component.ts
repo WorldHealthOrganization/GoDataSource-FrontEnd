@@ -9,7 +9,6 @@ import { Observable } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -31,9 +30,8 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 })
 export class ClustersPeopleListComponent extends ListComponent implements OnInit {
     // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters'),
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
+
     // authenticated user
     authUser: UserModel;
     // selected Outbreak
@@ -73,7 +71,8 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
                 this.router.navigateByUrl(this.getItemRouterLink(item, 'view'));
             },
             visible: (item: CaseModel | ContactModel | EventModel): boolean => {
-                return !item.deleted;
+                return !item.deleted &&
+                    item.canView(this.authUser);
             }
         }),
 
@@ -89,11 +88,14 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    this.getAccessPermissions(item);
+                    item.canModify(this.authUser);
             }
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -108,6 +110,9 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -140,14 +145,8 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
                             .subscribe((clusterData: ClusterModel) => {
                                 this.cluster = clusterData;
 
-                                // pushing the new breadcrumbs
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        clusterData.name,
-                                        `/clusters/${clusterData.id}/view`
-                                    ),
-                                    new BreadcrumbItemModel('LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE', '.', true)
-                                );
+                                // initialize breadcrumbs
+                                this.initializeBreadcrumbs();
 
                                 // initialize pagination
                                 this.initPaginator();
@@ -157,6 +156,36 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
                     }
                 });
         });
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (ClusterModel.canList(this.authUser)) {
+            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters'));
+        }
+
+        // cluster breadcrumb
+        if (
+            this.cluster &&
+            ClusterModel.canView(this.authUser)
+        ) {
+            this.breadcrumbs.push(new BreadcrumbItemModel(
+                this.cluster.name,
+                `/clusters/${this.cluster.id}/view`
+            ));
+        }
+
+        // people breadcrumb
+        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE', '.', true));
     }
 
     /**
@@ -203,9 +232,6 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
 
     /**
      * Get the link to redirect to view page depending on item type and action
-     * @param {Object} item
-     * @param {string} action
-     * @returns {string}
      */
     getItemRouterLink (item, action: string): string {
         switch (item.type) {
@@ -216,46 +242,6 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
             case EntityType.EVENT:
                 return `/events/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
         }
-    }
-
-    /**
-     * Get the permission for different type of item
-     * @param {Object} item
-     * @returns {boolean}
-     */
-    getAccessPermissions(item) {
-        switch (item.type) {
-            case EntityType.CASE:
-                return this.hasCaseWriteAccess();
-            case EntityType.CONTACT:
-                return this.hasContactWriteAccess();
-            case EntityType.EVENT:
-                return this.hasEventWriteAccess();
-        }
-    }
-
-    /**
-     * Check if we have access to write cluster's cases
-     * @returns {boolean}
-     */
-    hasCaseWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-    }
-
-    /**
-     * Check if we have access to write cluster's contacts
-     * @returns {boolean}
-     */
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-    }
-
-    /**
-     * Check if we have access to write cluster's event
-     * @returns {boolean}
-     */
-    hasEventWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
     }
 
     /**

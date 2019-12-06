@@ -50,6 +50,9 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
 
     outbreakNameValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
+    /**
+     * Constructor
+     */
     constructor(
         private outbreakDataService: OutbreakDataService,
         protected route: ActivatedRoute,
@@ -65,6 +68,9 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);

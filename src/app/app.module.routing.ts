@@ -251,7 +251,15 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [PERMISSION.READ_OUTBREAK]
+                    permissions: new PermissionExpression({
+                        or: [
+                            PERMISSION.CLUSTER_LIST,
+                            PERMISSION.CLUSTER_VIEW,
+                            PERMISSION.CLUSTER_CREATE,
+                            PERMISSION.CLUSTER_MODIFY,
+                            PERMISSION.CLUSTER_LIST_PEOPLE
+                        ]
+                    })
                 }
             },
             // Relationship Module routes

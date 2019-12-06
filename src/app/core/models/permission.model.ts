@@ -36,6 +36,14 @@ WRITE_OUTBREAK = 'write_outbreak',
     OUTBREAK_TEMPLATE_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE = 'outbreak_template_modify_case_lab_result_questionnaire',
     OUTBREAK_TEMPLATE_GENERATE_OUTBREAK = 'outbreak_template_generate_outbreak',
 
+    // clusters
+    CLUSTER_LIST = 'cluster_list',
+    CLUSTER_VIEW = 'cluster_view',
+    CLUSTER_CREATE = 'cluster_create',
+    CLUSTER_MODIFY = 'cluster_modify',
+    CLUSTER_DELETE = 'cluster_delete',
+    CLUSTER_LIST_PEOPLE = 'cluster_list_people',
+
     // events
     EVENT_LIST = 'event_list',
     EVENT_VIEW = 'event_view',

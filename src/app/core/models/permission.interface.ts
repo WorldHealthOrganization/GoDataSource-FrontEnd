@@ -141,6 +141,16 @@ export interface IPermissionOutbreakTemplate {
 }
 
 /**
+ * Cluster
+ */
+export interface IPermissionCluster {
+    /**
+     * Has permission to list people under a cluster
+     */
+    canListPeople(user: UserModel): boolean;
+}
+
+/**
  * Contact
  */
 export interface IPermissionRelatedContact {

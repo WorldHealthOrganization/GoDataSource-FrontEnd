@@ -4,6 +4,9 @@ import { UserModel } from '../models/user.model';
 import { Router } from '@angular/router';
 import { RedirectService } from '../services/helper/redirect.service';
 
+/**
+ * Add methods specific to create component & extends ConfirmOnFormChanges functionality
+ */
 export abstract class CreateConfirmOnChanges
     extends ConfirmOnFormChanges {
 

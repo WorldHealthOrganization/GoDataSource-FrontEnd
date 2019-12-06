@@ -53,6 +53,9 @@ export class CreateOutbreakComponent
 
     serverToday: Moment = moment();
 
+    /**
+     * Constructor
+     */
     constructor(
         private outbreakDataService: OutbreakDataService,
         private router: Router,
@@ -69,6 +72,9 @@ export class CreateOutbreakComponent
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -176,6 +182,9 @@ export class CreateOutbreakComponent
         return (o1 ? o1.id : undefined) === (o2 ? o2.id : undefined);
     }
 
+    /**
+     * Create new outbreak
+     */
     createOutbreak(stepForms: NgForm[]) {
         // get forms fields
         let dirtyFields: any = this.formHelper.mergeFields(stepForms);

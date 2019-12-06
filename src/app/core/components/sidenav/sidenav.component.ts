@@ -246,7 +246,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
             'clusters',
             'LNG_LAYOUT_MENU_ITEM_CLUSTERS_LABEL',
             'groupWork',
-            [PERMISSION.READ_OUTBREAK],
+            [
+                PERMISSION.CLUSTER_LIST
+            ],
             [],
             '/clusters',
             () => this.hasOutbreak.apply(this) // provide context to keep this functionality
