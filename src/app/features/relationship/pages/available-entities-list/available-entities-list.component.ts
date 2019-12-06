@@ -55,6 +55,20 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     ReferenceDataCategory = ReferenceDataCategory;
     EntityType = EntityType;
 
+    fixedTableColumns: string[] = [
+        'checkbox',
+        'hasDuplicate',
+        'lastName',
+        'firstName',
+        'visualId',
+        'age',
+        'gender',
+        'riskLevel',
+        'classification',
+        'place',
+        'address'
+    ];
+
     constructor(
         protected snackbarService: SnackbarService,
         protected router: Router,
@@ -339,28 +353,6 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     getPersonTypeColor(personType: string) {
         const personTypeData = _.get(this.personTypesListMap, personType);
         return _.get(personTypeData, 'colorCode', '');
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        const columns = [
-            'checkbox',
-            'hasDuplicate',
-            'lastName',
-            'firstName',
-            'visualId',
-            'age',
-            'gender',
-            'riskLevel',
-            'classification',
-            'place',
-            'address'
-        ];
-
-        return columns;
     }
 
     selectEntities(form: NgForm) {

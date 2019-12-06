@@ -54,6 +54,16 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     ReferenceDataCategory = ReferenceDataCategory;
     Constants = Constants;
 
+    fixedTableColumns: string[] = [
+        'lastName',
+        'firstName',
+        'age',
+        'gender',
+        'riskLevel',
+        'place',
+        'address'
+    ];
+
     recordActions: HoverRowAction[] = [
         // View Person
         new HoverRowAction({
@@ -189,22 +199,6 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
                 }),
                 share()
             );
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'lastName',
-            'firstName',
-            'age',
-            'gender',
-            'riskLevel',
-            'place',
-            'address'
-        ];
     }
 
     /**

@@ -48,6 +48,12 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
     // selected outbreak - needed to check assignment at delete team
     selectedOutbreak: OutbreakModel;
 
+    fixedTableColumns: string[] = [
+        'name',
+        'users',
+        'locations'
+    ];
+
     recordActions: HoverRowAction[] = [
         // View Team
         new HoverRowAction({
@@ -163,19 +169,6 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
                 }),
                 share()
             );
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        // default columns that we should display
-        return [
-            'name',
-            'users',
-            'locations'
-        ];
     }
 
     /**

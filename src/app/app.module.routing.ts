@@ -50,11 +50,14 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [PERMISSION.READ_USER_ACCOUNT]
-                    // permissions: new PermissionExpression({
-                    //     or: [
-                    //     ]
-                    // })
+                    permissions: new PermissionExpression({
+                        or: [
+                            PERMISSION.USER_LIST,
+                            PERMISSION.USER_CREATE,
+                            PERMISSION.USER_VIEW,
+                            PERMISSION.USER_MODIFY
+                        ]
+                    })
                 }
             },
             // User Role Module routes

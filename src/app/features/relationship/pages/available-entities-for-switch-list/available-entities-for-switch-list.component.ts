@@ -57,6 +57,15 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     ReferenceDataCategory = ReferenceDataCategory;
     EntityType = EntityType;
 
+    fixedTableColumns: string[] = [
+        'radio',
+        'lastName',
+        'firstName',
+        'visualId',
+        'gender',
+        'place'
+    ];
+
     constructor(
         protected snackbarService: SnackbarService,
         protected router: Router,
@@ -298,23 +307,6 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     getPersonTypeColor(personType: string) {
         const personTypeData = _.get(this.personTypesListMap, personType);
         return _.get(personTypeData, 'colorCode', '');
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        const columns = [
-            'radio',
-            'lastName',
-            'firstName',
-            'visualId',
-            'gender',
-            'place'
-        ];
-
-        return columns;
     }
 
     /**

@@ -366,8 +366,8 @@
                 </ng-container>
 
 
-                <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-                <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+                <mat-header-row *matHeaderRowDef="fixedTableColumns"></mat-header-row>
+                <mat-row *matRowDef="let item; columns: fixedTableColumns"></mat-row>
             </mat-table>
 
             <div

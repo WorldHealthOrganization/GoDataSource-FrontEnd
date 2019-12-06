@@ -64,6 +64,15 @@ export class BackupsComponent extends ListComponent implements OnInit {
     mappedCollections: LabelValuePair[];
     mappedExportTypes: LabelValuePair[];
 
+    fixedTableColumns: string[] = [
+        'location',
+        'modules',
+        'date',
+        'status',
+        'error',
+        'user'
+    ];
+
     recordActions: HoverRowAction[] = [
         // View Backup Path
         new HoverRowAction({
@@ -238,21 +247,6 @@ export class BackupsComponent extends ListComponent implements OnInit {
                 }),
                 share()
             );
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'location',
-            'modules',
-            'date',
-            'status',
-            'error',
-            'user'
-        ];
     }
 
     /**

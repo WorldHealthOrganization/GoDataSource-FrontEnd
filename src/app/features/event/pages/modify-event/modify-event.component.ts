@@ -76,6 +76,8 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
                             .getEvent(selectedOutbreak.id, this.eventId, true)
                             .subscribe(eventDataReturned => {
                                 this.eventData = new EventModel(eventDataReturned);
+
+                                // update breadcrumbs
                                 this.initializeBreadcrumbs();
                             });
                     });
@@ -137,7 +139,9 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
 
         // view / modify breadcrumb
         this.breadcrumbs.push(new BreadcrumbItemModel(
-            this.viewOnly ? 'LNG_PAGE_VIEW_EVENT_TITLE' : 'LNG_PAGE_MODIFY_EVENT_TITLE',
+            this.viewOnly ?
+                'LNG_PAGE_VIEW_EVENT_TITLE' :
+                'LNG_PAGE_MODIFY_EVENT_TITLE',
             '.',
             true,
             {},

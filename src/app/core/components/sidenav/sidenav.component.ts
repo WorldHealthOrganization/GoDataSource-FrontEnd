@@ -332,7 +332,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 new ChildNavItem(
                     'users',
                     'LNG_LAYOUT_MENU_ITEM_USERS_LABEL',
-                    [PERMISSION.READ_USER_ACCOUNT],
+                    [
+                        PERMISSION.USER_LIST
+                    ],
                     '/users'
                 ),
                 new ChildNavItem(

@@ -35,6 +35,11 @@ export class ManageIconsListComponent extends ListComponent implements OnInit {
      */
     iconsList$: Observable<IconModel[]>;
 
+    fixedTableColumns: string[] = [
+        'name',
+        'icon'
+    ];
+
     recordActions: HoverRowAction[] = [
         // Other actions
         new HoverRowAction({
@@ -154,16 +159,6 @@ export class ManageIconsListComponent extends ListComponent implements OnInit {
                     finishCallback(data);
                 })
             );
-    }
-
-    /**
-     * Table columns
-     */
-    getTableColumns(): string[] {
-        return [
-            'name',
-            'icon'
-        ];
     }
 
     /**

@@ -30,6 +30,12 @@ export const EnglishUsLang = {
         'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_EXPOSURES': 'Full list of exposures',
 
         /**
+         * uiModifyUserPage
+         */
+        'LNG_PAGE_MODIFY_USER_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_VIEW_USER_TITLE': 'View {{name}}',
+
+        /**
          * uiCaseFields
          */
         'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS': 'Number of contacts',

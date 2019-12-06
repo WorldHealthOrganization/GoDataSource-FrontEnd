@@ -38,6 +38,11 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
 
     loadingDialog: LoadingDialogModel;
 
+    fixedTableColumns: string[] = [
+        'categoryName',
+        'entries'
+    ];
+
     recordActions: HoverRowAction[] = [
         // View Items
         new HoverRowAction({
@@ -92,17 +97,6 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
                     finishCallback(data);
                 })
             );
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'categoryName',
-            'entries'
-        ];
     }
 
     /**

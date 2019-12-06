@@ -41,6 +41,11 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
     clustersList$: Observable<ClusterModel[]>;
     clustersListCount$: Observable<any>;
 
+    fixedTableColumns: string[] = [
+        'name',
+        'description'
+    ];
+
     recordActions: HoverRowAction[] = [
         // View Cluster
         new HoverRowAction({
@@ -217,17 +222,6 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
      */
     hasContactReadAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'name',
-            'description'
-        ];
     }
 
     /**

@@ -4,7 +4,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -25,13 +24,15 @@ import { Router } from '@angular/router';
     styleUrls: ['./user-list.component.less']
 })
 export class UserListComponent extends ListComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '.', true)
     ];
 
     // authenticated user
     authUser: UserModel;
+
+    // constants
+    UserModel = UserModel;
 
     // list of existing users
     usersList$: Observable<UserModel[]>;
@@ -41,6 +42,14 @@ export class UserListComponent extends ListComponent implements OnInit {
     outbreaksListMap: any = {};
     outbreaksList$: Observable<OutbreakModel[]>;
 
+    fixedTableColumns: string[] = [
+        'lastName',
+        'firstName',
+        'email',
+        'role',
+        'availableOutbreaks'
+    ];
+
     recordActions: HoverRowAction[] = [
         // View User
         new HoverRowAction({
@@ -48,6 +57,10 @@ export class UserListComponent extends ListComponent implements OnInit {
             iconTooltip: 'LNG_PAGE_LIST_USERS_ACTION_VIEW_USER',
             click: (item: UserModel) => {
                 this.router.navigate(['/users', item.id, 'view']);
+            },
+            visible: (item: UserModel): boolean => {
+                return item.id !== this.authUser.id &&
+                    UserModel.canView(this.authUser);
             }
         }),
 
@@ -60,7 +73,7 @@ export class UserListComponent extends ListComponent implements OnInit {
             },
             visible: (item: UserModel): boolean => {
                 return item.id !== this.authUser.id &&
-                    this.hasUserWriteAccess();
+                    UserModel.canModify(this.authUser);
             }
         }),
 
@@ -77,7 +90,7 @@ export class UserListComponent extends ListComponent implements OnInit {
                     },
                     visible: (item: UserModel): boolean => {
                         return item.id !== this.authUser.id &&
-                            this.hasUserWriteAccess();
+                            UserModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -85,6 +98,9 @@ export class UserListComponent extends ListComponent implements OnInit {
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private userDataService: UserDataService,
@@ -99,10 +115,12 @@ export class UserListComponent extends ListComponent implements OnInit {
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
-
         this.rolesList$ = this.userRoleDataService.getRolesList();
 
         this.outbreakDataService
@@ -158,28 +176,6 @@ export class UserListComponent extends ListComponent implements OnInit {
                 }),
                 share()
             );
-    }
-
-    /**
-     * Check if we have write access to users
-     * @returns {boolean}
-     */
-    hasUserWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_USER_ACCOUNT);
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'lastName',
-            'firstName',
-            'email',
-            'role',
-            'availableOutbreaks'
-        ];
     }
 
     deleteUser(user: UserModel) {

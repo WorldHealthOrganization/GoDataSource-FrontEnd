@@ -36,6 +36,12 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
     savedFiltersList$: Observable<SavedFilterModel[]>;
     savedFiltersListCount$: Observable<any>;
 
+    fixedTableColumns: string[] = [
+        'name',
+        'public',
+        'filter-keys'
+    ];
+
     recordActions: HoverRowAction[] = [
         // Other actions
         new HoverRowAction({
@@ -113,18 +119,6 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
                 }),
                 share()
             );
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'name',
-            'public',
-            'filter-keys'
-        ];
     }
 
     /**

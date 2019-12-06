@@ -35,6 +35,12 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
     savedImportMappingsList$: Observable<SavedImportMappingModel[]>;
     savedImportMappingsListCount$: Observable<any>;
 
+    fixedTableColumns: string[] = [
+        'name',
+        'isPublic',
+        'mappingKey'
+    ];
+
     recordActions: HoverRowAction[] = [
         // Other actions
         new HoverRowAction({
@@ -111,18 +117,6 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
                 }),
                 share()
             );
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'name',
-            'isPublic',
-            'mappingKey'
-        ];
     }
 
     /**

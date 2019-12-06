@@ -55,6 +55,11 @@ export class ViewHelpDialogComponent extends ListComponent {
     helpItemsList$: Observable<HelpItemModel[]>;
     helpCategoriesList$: Observable<HelpCategoryModel[]>;
 
+    fixedTableColumns: string[] = [
+        'title',
+        'categoryId'
+    ];
+
     recordActions: HoverRowAction[] = [
         // View Case
         new HoverRowAction({
@@ -89,16 +94,6 @@ export class ViewHelpDialogComponent extends ListComponent {
 
         // ...and re-load the list
         this.needsRefreshList(true);
-    }
-
-    /**
-     * Table columns
-     */
-    getTableColumns(): string[] {
-        return [
-            'title',
-            'categoryId'
-        ];
     }
 
     /**

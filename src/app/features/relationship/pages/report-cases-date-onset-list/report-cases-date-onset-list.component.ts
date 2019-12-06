@@ -47,6 +47,17 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
     ReferenceDataCategory = ReferenceDataCategory;
     EntityType = EntityType;
 
+    fixedTableColumns: string[] = [
+        'primaryCase.firstName',
+        'primaryCase.lastName',
+        'primaryCase.dateOfOnset',
+        'primaryCase.classification',
+        'secondaryCase.firstName',
+        'secondaryCase.lastName',
+        'secondaryCase.dateOfOnset',
+        'secondaryCase.classification'
+    ];
+
     recordActions: HoverRowAction[] = [
         // Other actions
         new HoverRowAction({
@@ -224,22 +235,5 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
      */
     hasCaseWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'primaryCase.firstName',
-            'primaryCase.lastName',
-            'primaryCase.dateOfOnset',
-            'primaryCase.classification',
-            'secondaryCase.firstName',
-            'secondaryCase.lastName',
-            'secondaryCase.dateOfOnset',
-            'secondaryCase.classification'
-        ];
     }
 }

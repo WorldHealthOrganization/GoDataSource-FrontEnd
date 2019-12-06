@@ -47,6 +47,12 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
 
+    fixedTableColumns: string[] = [
+        'lastName',
+        'firstName',
+        'inconsistencies'
+    ];
+
     recordActions: HoverRowAction[] = [
         // View Item
         new HoverRowAction({
@@ -209,17 +215,6 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
     getPersonTypeColor(personType: string) {
         const personTypeData = _.get(this.personTypesListMap, personType);
         return _.get(personTypeData, 'colorCode', '');
-    }
-
-    /**
-     * Table columns
-     */
-    getTableColumns(): string[] {
-        return [
-            'lastName',
-            'firstName',
-            'inconsistencies'
-        ];
     }
 
     /**

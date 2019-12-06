@@ -42,6 +42,16 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
     // list of long periods in the dates of onset between cases in the chain of transmission i.e. indicate where an intermediate contact may have been missed
     relationshipList$: Observable<ReportDifferenceOnsetRelationshipModel[]>;
 
+    fixedTableColumns: string[] = [
+        'people[0].firstName',
+        'people[0].lastName',
+        'people[0].dateOfOnset',
+        'people[1].firstName',
+        'people[1].lastName',
+        'people[1].dateOfOnset',
+        'differenceBetweenDatesOfOnset'
+    ];
+
     recordActions: HoverRowAction[] = [
         // Other actions
         new HoverRowAction({
@@ -219,21 +229,5 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
      */
     hasCaseWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'people[0].firstName',
-            'people[0].lastName',
-            'people[0].dateOfOnset',
-            'people[1].firstName',
-            'people[1].lastName',
-            'people[1].dateOfOnset',
-            'differenceBetweenDatesOfOnset'
-        ];
     }
 }

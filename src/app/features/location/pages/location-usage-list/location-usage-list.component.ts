@@ -39,6 +39,12 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
         total: number
     };
 
+    fixedTableColumns: string[] = [
+        'type',
+        'name',
+        'outbreakName'
+    ];
+
     recordActions: HoverRowAction[] = [
         // View Item
         new HoverRowAction({
@@ -214,17 +220,5 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
 
         // something went wrong, if this part was reached
         return false;
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'type',
-            'name',
-            'outbreakName'
-        ];
     }
 }

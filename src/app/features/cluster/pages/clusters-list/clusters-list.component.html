@@ -92,9 +92,9 @@
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+        <mat-header-row *matHeaderRowDef="fixedTableColumns"></mat-header-row>
         <mat-row
-            *matRowDef="let item; columns: getTableColumns()"
+            *matRowDef="let item; columns: fixedTableColumns"
             app-hover-row-actions
             [hoverRowActionsComponent]="hoverRow"
             [hoverRowActions]="recordActions"
