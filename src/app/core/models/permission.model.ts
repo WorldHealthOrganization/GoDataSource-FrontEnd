@@ -8,8 +8,6 @@ export enum PERMISSION {
     USER_MODIFY = 'user_modify',
     USER_DELETE = 'user_delete',
     USER_MODIFY_OWN_ACCOUNT = 'user_modify_own_account',
-READ_USER_ACCOUNT = 'read_user_account',
-WRITE_USER_ACCOUNT = 'write_user_account',
 
     // outbreaks
     OUTBREAK_LIST = 'outbreak_list',
