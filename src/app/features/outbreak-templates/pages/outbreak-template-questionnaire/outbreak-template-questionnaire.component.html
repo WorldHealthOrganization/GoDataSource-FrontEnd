@@ -8,7 +8,7 @@
     <app-form-modify-questionnaire
         #questionnaire
         [parent]="outbreakTemplate"
-        (initBreadcrumbs)="createBreadcrumbs($event)"
+        (initBreadcrumbs)="initializeBreadcrumbs($event)"
         (updateQuestionnaire)="updateQuestionnaire($event)">
     </app-form-modify-questionnaire>
 </mat-card>

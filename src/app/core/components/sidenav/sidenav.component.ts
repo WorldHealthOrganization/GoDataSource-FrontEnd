@@ -114,13 +114,17 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 new ChildNavItem(
                     'outbreaks',
                     'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL',
-                    [PERMISSION.OUTBREAK_LIST],
+                    [
+                        PERMISSION.OUTBREAK_LIST
+                    ],
                     '/outbreaks'
                 ),
                 new ChildNavItem(
                     'outbreak-templates',
                     'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL',
-                    [PERMISSION.READ_SYS_CONFIG],
+                    [
+                        PERMISSION.OUTBREAK_TEMPLATE_LIST
+                    ],
                     '/outbreak-templates'
                 )
             ]

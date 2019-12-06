@@ -9,7 +9,6 @@ import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -17,6 +16,7 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 
 @Component({
     selector: 'app-create-user',
@@ -24,7 +24,9 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
     templateUrl: './create-user.component.html',
     styleUrls: ['./create-user.component.less']
 })
-export class CreateUserComponent extends ConfirmOnFormChanges implements OnInit {
+export class CreateUserComponent
+    extends CreateConfirmOnChanges
+    implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // constants
@@ -118,17 +120,15 @@ export class CreateUserComponent extends ConfirmOnFormChanges implements OnInit 
                     loadingDialog.close();
 
                     // navigate to proper page
-                    this.disableDirtyConfirm();
-                    if (UserModel.canModify(this.authUser)) {
-                        this.router.navigate([`/users/${newUser.id}/modify`]);
-                    } else if (UserModel.canView(this.authUser)) {
-                        this.router.navigate([`/users/${newUser.id}/view`]);
-                    } else if (UserModel.canList(this.authUser)) {
-                        this.router.navigate([`/users`]);
-                    } else {
-                        // fallback to current page since we already know that we have access to this page
-                        this.redirectService.to([`/users/create`]);
-                    }
+                    // method handles disableDirtyConfirm too...
+                    this.redirectToProperPageAfterCreate(
+                        this.router,
+                        this.redirectService,
+                        this.authUser,
+                        UserModel,
+                        'users',
+                        newUser.id
+                    );
                 });
         }
     }

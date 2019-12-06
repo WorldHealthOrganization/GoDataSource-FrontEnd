@@ -25,6 +25,17 @@ export enum PERMISSION {
 READ_OUTBREAK = 'read_outbreak',
 WRITE_OUTBREAK = 'write_outbreak',
 
+    // outbreak templates
+    OUTBREAK_TEMPLATE_LIST = 'outbreak_template_list',
+    OUTBREAK_TEMPLATE_VIEW = 'outbreak_template_view',
+    OUTBREAK_TEMPLATE_CREATE = 'outbreak_template_create',
+    OUTBREAK_TEMPLATE_MODIFY = 'outbreak_template_modify',
+    OUTBREAK_TEMPLATE_DELETE = 'outbreak_template_delete',
+    OUTBREAK_TEMPLATE_MODIFY_CASE_QUESTIONNAIRE = 'outbreak_template_modify_case_questionnaire',
+    OUTBREAK_TEMPLATE_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE = 'outbreak_template_modify_contact_follow_up_questionnaire',
+    OUTBREAK_TEMPLATE_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE = 'outbreak_template_modify_case_lab_result_questionnaire',
+    OUTBREAK_TEMPLATE_GENERATE_OUTBREAK = 'outbreak_template_generate_outbreak',
+
     // events
     EVENT_LIST = 'event_list',
     EVENT_VIEW = 'event_view',

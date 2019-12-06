@@ -1,5 +1,8 @@
 import { UserModel } from './user.model';
 
+/**
+ * Basic
+ */
 export interface IPermissionBasic {
     /**
      * Has view permission ?
@@ -27,6 +30,9 @@ export interface IPermissionBasic {
     canDelete(user: UserModel): boolean;
 }
 
+/**
+ * Basic Bulk
+ */
 export interface IPermissionBasicBulk {
     /**
      * Has bulk create permission ?
@@ -49,6 +55,9 @@ export interface IPermissionBasicBulk {
     canBulkRestore(user: UserModel): boolean;
 }
 
+/**
+ * Restore
+ */
 export interface IPermissionRestorable {
     /**
      * Has restore permission ?
@@ -56,6 +65,9 @@ export interface IPermissionRestorable {
     canRestore(user: UserModel): boolean;
 }
 
+/**
+ * Export
+ */
 export interface IPermissionExportable {
     /**
      * Has export permission ?
@@ -63,6 +75,9 @@ export interface IPermissionExportable {
     canExport(user: UserModel): boolean;
 }
 
+/**
+ * Clone
+ */
 export interface IPermissionCloneable {
     /**
      * Has permission to create a clone
@@ -70,6 +85,9 @@ export interface IPermissionCloneable {
     canClone(user: UserModel): boolean;
 }
 
+/**
+ * User
+ */
 export interface IPermissionUser {
     /**
      * Has permission to modify his account
@@ -77,6 +95,9 @@ export interface IPermissionUser {
     canModifyOwnAccount(user: UserModel): boolean;
 }
 
+/**
+ * Questionnaire
+ */
 export interface IPermissionQuestionnaire {
     /**
      * Has permission to modify case questionnaire
@@ -94,6 +115,9 @@ export interface IPermissionQuestionnaire {
     canModifyCaseLabResultQuestionnaire(user: UserModel): boolean;
 }
 
+/**
+ * Outbreak
+ */
 export interface IPermissionOutbreak {
     /**
      * Has permission to make the selected outbreak active for the current user
@@ -106,6 +130,19 @@ export interface IPermissionOutbreak {
     canSeeInconsistencies(user: UserModel): boolean;
 }
 
+/**
+ * Outbreak Template
+ */
+export interface IPermissionOutbreakTemplate {
+    /**
+     * Has permission to generate an outbreak from an outbreak template
+     */
+    canGenerateOutbreak(user: UserModel): boolean;
+}
+
+/**
+ * Contact
+ */
 export interface IPermissionRelatedContact {
     /**
      * Has permission that allows user to create a related contact ?
@@ -113,6 +150,9 @@ export interface IPermissionRelatedContact {
     canCreateContact(user: UserModel): boolean;
 }
 
+/**
+ * Contact Bulk
+ */
 export interface IPermissionRelatedContactBulk {
     /**
      * Has permission that allows user to create multiple contacts at the same time ?
@@ -120,6 +160,9 @@ export interface IPermissionRelatedContactBulk {
     canBulkCreateContact(user: UserModel): boolean;
 }
 
+/**
+ * Relationship
+ */
 export interface IPermissionRelationship {
     /**
      * Can we reverse a relationship target & source ?
@@ -132,6 +175,9 @@ export interface IPermissionRelationship {
     canShare(user: UserModel): boolean;
 }
 
+/**
+ * Case / Contact / Event - Relationship
+ */
 export interface IPermissionRelatedRelationship {
     /**
      * Can we list relationship contacts ?

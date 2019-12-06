@@ -27,11 +27,12 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./modify-outbreak.component.less']
 })
 export class ModifyOutbreakComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
+
     // constants
     OutbreakModel = OutbreakModel;
 
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
     // authenticated user
     authUser: UserModel;
     // id of the outbreak to modify

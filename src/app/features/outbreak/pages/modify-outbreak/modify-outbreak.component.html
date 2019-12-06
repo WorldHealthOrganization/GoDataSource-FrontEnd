@@ -308,7 +308,7 @@
         </ng-container>
 
         <div
-            *ngIf="(viewOnly && OutbreakModel.canModify(authUser)) || (!viewOnly && OutbreakModel.canList(authUser))"
+            *ngIf="(viewOnly && OutbreakModel.canModify(authUser)) || !viewOnly"
             class="page-tabs-navbar-placeholder"></div>
 
         <button

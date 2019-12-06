@@ -9,7 +9,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import * as _ from 'lodash';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { AddressType } from '../../../../core/models/address.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
@@ -18,6 +17,7 @@ import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 
 @Component({
     selector: 'app-create-event',
@@ -25,7 +25,9 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
     templateUrl: './create-event.component.html',
     styleUrls: ['./create-event.component.less']
 })
-export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit {
+export class CreateEventComponent
+    extends CreateConfirmOnChanges
+    implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // selected outbreak ID
@@ -118,17 +120,15 @@ export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit
                     loadingDialog.close();
 
                     // navigate to proper page
-                    this.disableDirtyConfirm();
-                    if (EventModel.canModify(this.authUser)) {
-                        this.router.navigate([`/events/${newEvent.id}/modify`]);
-                    } else if (EventModel.canView(this.authUser)) {
-                        this.router.navigate([`/events/${newEvent.id}/view`]);
-                    } else if (EventModel.canList(this.authUser)) {
-                        this.router.navigate([`/events`]);
-                    } else {
-                        // fallback to current page since we already know that we have access to this page
-                        this.redirectService.to([`/events/create`]);
-                    }
+                    // method handles disableDirtyConfirm too...
+                    this.redirectToProperPageAfterCreate(
+                        this.router,
+                        this.redirectService,
+                        this.authUser,
+                        EventModel,
+                        'events',
+                        newEvent.id
+                    );
                 });
         }
     }

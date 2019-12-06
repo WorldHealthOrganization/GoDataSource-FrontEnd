@@ -93,7 +93,7 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
             );
         }
 
-        // add modify breadcrumb only if we have permission
+        // add view breadcrumb only if we have permission
         if (OutbreakModel.canView(this.authUser)) {
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(

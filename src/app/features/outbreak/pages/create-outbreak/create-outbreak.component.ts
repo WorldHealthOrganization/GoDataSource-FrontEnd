@@ -10,7 +10,6 @@ import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
@@ -24,6 +23,7 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 
 @Component({
     selector: 'app-create-outbreak',
@@ -31,12 +31,14 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
     templateUrl: './create-outbreak.component.html',
     styleUrls: ['./create-outbreak.component.less']
 })
-export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnInit {
-    // authenticated user details
-    authUser: UserModel;
-
+export class CreateOutbreakComponent
+    extends CreateConfirmOnChanges
+    implements OnInit {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // authenticated user details
+    authUser: UserModel;
 
     // lists used in dropdowns
     diseasesList$: Observable<LabelValuePair[]>;
@@ -224,17 +226,15 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                     loadingDialog.close();
 
                     // navigate to proper page
-                    this.disableDirtyConfirm();
-                    if (OutbreakModel.canModify(this.authUser)) {
-                        this.router.navigate([`/outbreaks/${newOutbreak.id}/modify`]);
-                    } else if (OutbreakModel.canView(this.authUser)) {
-                        this.router.navigate([`/outbreaks/${newOutbreak.id}/view`]);
-                    } else if (OutbreakModel.canList(this.authUser)) {
-                        this.router.navigate([`/outbreaks`]);
-                    } else {
-                        // fallback to current page since we already know that we have access to this page
-                        this.redirectService.to([`/outbreaks/create`]);
-                    }
+                    // method handles disableDirtyConfirm too...
+                    this.redirectToProperPageAfterCreate(
+                        this.router,
+                        this.redirectService,
+                        this.authUser,
+                        OutbreakModel,
+                        'outbreaks',
+                        newOutbreak.id
+                    );
                 });
         }
     }

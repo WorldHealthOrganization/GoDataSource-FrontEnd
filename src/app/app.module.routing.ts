@@ -144,7 +144,10 @@ const routes: Routes = [
                             PERMISSION.OUTBREAK_VIEW,
                             PERMISSION.OUTBREAK_CREATE,
                             PERMISSION.OUTBREAK_MODIFY,
-                            PERMISSION.OUTBREAK_SEE_INCONSISTENCIES
+                            PERMISSION.OUTBREAK_SEE_INCONSISTENCIES,
+                            PERMISSION.OUTBREAK_MODIFY_CASE_QUESTIONNAIRE,
+                            PERMISSION.OUTBREAK_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE,
+                            PERMISSION.OUTBREAK_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE
                         ]
                     })
                 }
@@ -158,7 +161,17 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                    permissions: new PermissionExpression({
+                        or: [
+                            PERMISSION.OUTBREAK_TEMPLATE_LIST,
+                            PERMISSION.OUTBREAK_TEMPLATE_VIEW,
+                            PERMISSION.OUTBREAK_TEMPLATE_CREATE,
+                            PERMISSION.OUTBREAK_TEMPLATE_MODIFY,
+                            PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_QUESTIONNAIRE,
+                            PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE,
+                            PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE
+                        ]
+                    })
                 }
             },
             // Contacts Module routes
