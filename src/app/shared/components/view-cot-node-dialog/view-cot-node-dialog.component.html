@@ -17,7 +17,7 @@
 
     <!-- Link to person chain -->
     <a
-        *ngIf="entity.type !== EntityType.CONTACT"
+        *ngIf="entity.type !== EntityType.CONTACT && displayPersonChainOfTransmissionLink"
         [href]="getPersonChainLink()"
         target="_blank"
     >

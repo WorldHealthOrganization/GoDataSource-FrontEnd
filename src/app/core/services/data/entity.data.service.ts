@@ -34,7 +34,7 @@ export class EntityDataService {
             modifyMethod: 'modifyContact',
         },
         [EntityType.EVENT]: {
-            dataService: this.evenDataService,
+            dataService: this.eventDataService,
             getMethod: 'getEvent',
             deleteMethod: 'deleteEvent',
             modifyMethod: 'modifyEvent',
@@ -45,7 +45,7 @@ export class EntityDataService {
         private http: HttpClient,
         private caseDataService: CaseDataService,
         private contactDataService: ContactDataService,
-        private evenDataService: EventDataService,
+        private eventDataService: EventDataService,
         private i18nService: I18nService
     ) {
     }
@@ -312,6 +312,31 @@ export class EntityDataService {
         }
 
         return lightObject;
+    }
+
+    /**
+     * Check if entity have relationships
+     * @param {string} outbreakId
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @returns {Observable<any>}
+     */
+    checkRelationshipsCount(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string, )
+    : Observable<any> {
+        switch (entityType) {
+            case EntityType.EVENT:
+                return this.eventDataService.getEventRelationshipsCount(outbreakId, entityId);
+                break;
+            case EntityType.CASE:
+                return this.caseDataService.getCaseRelationshipsCount(outbreakId, entityId);
+                break;
+            case EntityType.CONTACT:
+                return this.contactDataService.getContactRelationshipsCount(outbreakId, entityId);
+                break;
+        }
     }
 
 }
