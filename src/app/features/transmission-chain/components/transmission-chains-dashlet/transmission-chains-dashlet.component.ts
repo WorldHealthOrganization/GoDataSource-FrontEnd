@@ -392,6 +392,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      */
     onNodeTap(entity: GraphNodeModel) {
         console.log(entity);
+        console.log(entity);
         this.nodeTapped.emit(entity);
     }
 
