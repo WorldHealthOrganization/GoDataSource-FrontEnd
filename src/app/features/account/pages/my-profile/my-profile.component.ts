@@ -30,6 +30,9 @@ export class MyProfileComponent extends ViewModifyComponent implements OnInit {
     rolesList$: Observable<UserRoleModel[]>;
     outbreaksList$: Observable<OutbreakModel[]>;
 
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private userRoleDataService: UserRoleDataService,
@@ -40,6 +43,9 @@ export class MyProfileComponent extends ViewModifyComponent implements OnInit {
         super(route);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
         // retrieve the User instance

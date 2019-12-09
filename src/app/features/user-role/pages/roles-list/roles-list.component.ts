@@ -5,7 +5,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { UserModel, UserRoleModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { PERMISSION, PermissionModel } from '../../../../core/models/permission.model';
+import { PermissionModel } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -31,6 +31,7 @@ export class RolesListComponent extends ListComponent implements OnInit {
     // constants
     PermissionModel = PermissionModel;
     UserSettings = UserSettings;
+    UserRoleModel = UserRoleModel;
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -50,6 +51,9 @@ export class RolesListComponent extends ListComponent implements OnInit {
             iconTooltip: 'LNG_PAGE_LIST_USER_ROLES_ACTION_VIEW_ROLE',
             click: (item: UserRoleModel) => {
                 this.router.navigate(['/user-roles', item.id, 'view']);
+            },
+            visible: (item: UserRoleModel): boolean => {
+                return UserRoleModel.canView(this.authUser);
             }
         }),
 
@@ -61,8 +65,8 @@ export class RolesListComponent extends ListComponent implements OnInit {
                 this.router.navigate(['/user-roles', item.id, 'modify']);
             },
             visible: (item: UserRoleModel): boolean => {
-                return this.hasUserRoletWriteAccess() &&
-                    !this.authUser.hasRole(item.id);
+                return !this.authUser.hasRole(item.id) &&
+                    UserRoleModel.canModify(this.authUser);
             }
         }),
 
@@ -78,8 +82,8 @@ export class RolesListComponent extends ListComponent implements OnInit {
                         this.deleteRole(item);
                     },
                     visible: (item: UserRoleModel): boolean => {
-                        return this.hasUserRoletWriteAccess() &&
-                            !this.authUser.hasRole(item.id);
+                        return !this.authUser.hasRole(item.id) &&
+                            UserRoleModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -193,6 +197,9 @@ export class RolesListComponent extends ListComponent implements OnInit {
             );
     }
 
+    /**
+     * Delete role
+     */
     deleteRole(userRole: UserRoleModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_USER_ROLE', userRole)
@@ -215,13 +222,5 @@ export class RolesListComponent extends ListComponent implements OnInit {
                         });
                 }
             });
-    }
-
-    /**
-     * Check if we have write access to user roles
-     * @returns {boolean}
-     */
-    hasUserRoletWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_ROLE);
     }
 }

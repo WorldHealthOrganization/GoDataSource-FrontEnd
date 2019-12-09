@@ -4,7 +4,7 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button *ngIf="hasUserRoletWriteAccess()" mat-raised-button color="accent"
+                <button *ngIf="UserRoleModel.canCreate(authUser)" mat-raised-button color="accent"
                         [routerLink]="'./create'">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>

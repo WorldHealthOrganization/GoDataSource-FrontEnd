@@ -69,7 +69,14 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [PERMISSION.READ_ROLE]
+                    permissions: new PermissionExpression({
+                        or: [
+                            PERMISSION.USER_ROLE_LIST,
+                            PERMISSION.USER_ROLE_CREATE,
+                            PERMISSION.USER_ROLE_VIEW,
+                            PERMISSION.USER_ROLE_MODIFY
+                        ]
+                    })
                 }
             },
             // Saved Filters

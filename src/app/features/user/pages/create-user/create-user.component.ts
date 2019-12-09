@@ -27,6 +27,7 @@ import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-co
 export class CreateUserComponent
     extends CreateConfirmOnChanges
     implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // constants
@@ -66,6 +67,7 @@ export class CreateUserComponent
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
 
         // initialize breadcrumbs

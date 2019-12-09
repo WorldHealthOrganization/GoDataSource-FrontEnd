@@ -7,7 +7,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { Observable } from 'rxjs';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
-import { IPermissionChildModel, PERMISSION, PermissionModel } from '../../../../core/models/permission.model';
+import { IPermissionChildModel, PermissionModel } from '../../../../core/models/permission.model';
 import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -25,18 +25,20 @@ import { UserRoleHelper } from '../../../../core/helperClasses/user-role.helper'
     styleUrls: ['./modify-role.component.less']
 })
 export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_USER_ROLES_TITLE', '/user-roles'),
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // constants
     PermissionModel = PermissionModel;
+    UserRoleModel = UserRoleModel;
 
     authUser: UserModel;
     userRoleId: string;
     userRole: UserRoleModel = new UserRoleModel();
     availablePermissions$: Observable<PermissionModel[]>;
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         protected route: ActivatedRoute,
@@ -49,6 +51,15 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
         private sanitized: DomSanitizer
     ) {
         super(route);
+    }
+
+    /**
+     * Component initialization
+     */
+    ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.route.params.subscribe((params: {roleId}) => {
             // get the ID of the Role being modified
             this.userRoleId = params.roleId;
@@ -65,19 +76,40 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
         this.availablePermissions$ = this.userRoleDataService
             .getAvailablePermissions()
             .pipe(share());
+
+        // update breadcrumbs
+        this.initializeBreadcrumbs();
     }
 
-    ngOnInit() {
-        this.authUser = this.authDataService.getAuthenticatedUser();
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (UserRoleModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_USER_ROLES_TITLE', '/user-roles')
+            );
+        }
+
+        // view / modify breadcrumb
         this.breadcrumbs.push(
             new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_USER_ROLES_TITLE' : 'LNG_PAGE_MODIFY_USER_ROLES_TITLE',
+                this.viewOnly ?
+                    'LNG_PAGE_VIEW_USER_ROLES_TITLE' :
+                    'LNG_PAGE_MODIFY_USER_ROLES_TITLE',
                 '.',
                 true
             )
         );
     }
 
+    /**
+     * Modify Role
+     */
     modifyRole(form: NgForm) {
         // get dirty fields & validate form
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
@@ -109,13 +141,6 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
                 // hide dialog
                 loadingDialog.close();
             });
-    }
-    /**
-     * Check if we have write access to users
-     * @returns {boolean}
-     */
-    hasUserRoleWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_ROLE);
     }
 
     /**

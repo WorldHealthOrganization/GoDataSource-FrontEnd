@@ -12,6 +12,13 @@ export enum PERMISSION {
     USER_DELETE = 'user_delete',
     USER_MODIFY_OWN_ACCOUNT = 'user_modify_own_account',
 
+    // roles
+    USER_ROLE_LIST = 'user_role_list',
+    USER_ROLE_VIEW = 'user_role_view',
+    USER_ROLE_CREATE = 'user_role_create',
+    USER_ROLE_MODIFY = 'user_role_modify',
+    USER_ROLE_DELETE = 'user_role_delete',
+
     // locations
     LOCATION_LIST = 'location_list',
     LOCATION_VIEW = 'location_view',
@@ -161,6 +168,8 @@ WRITE_CASE = 'write_case',
     FOLLOW_UP_CREATE = 'follow_up_create',
     FOLLOW_UP_MODIFY = 'follow_up_modify',
     FOLLOW_UP_DELETE = 'follow_up_delete',
+READ_FOLLOWUP = 'read_followup',
+WRITE_FOLLOWUP = 'write_followup',
 
 
 
@@ -171,20 +180,12 @@ WRITE_CASE = 'write_case',
     // reference data
     WRITE_REFERENCE_DATA = 'write_reference_data',
 
-    // roles
-    READ_ROLE = 'read_role',
-    WRITE_ROLE = 'write_role',
-
     // teams
     READ_TEAM = 'read_team',
     WRITE_TEAM = 'write_team',
 
     // reports
     READ_REPORT = 'read_report',
-
-    // followups
-    READ_FOLLOWUP = 'read_followup',
-    WRITE_FOLLOWUP = 'write_followup',
 
     // help
     WRITE_HELP = 'write_help',

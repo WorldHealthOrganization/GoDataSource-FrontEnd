@@ -85,6 +85,34 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
     }
 
     /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (UserModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users')
+            );
+        }
+
+        // view / modify breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                this.viewOnly ?
+                    'LNG_PAGE_VIEW_USER_TITLE' :
+                    'LNG_PAGE_MODIFY_USER_TITLE',
+                null,
+                true,
+                {},
+                this.user
+            )
+        );
+    }
+
+    /**
      * Modify user
      */
     modifyUser(form: NgForm) {
@@ -149,33 +177,5 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
                         });
                 });
         }
-    }
-
-    /**
-     * Initialize breadcrumbs
-     */
-    initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
-
-        // add list breadcrumb only if we have permission
-        if (UserModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users')
-            );
-        }
-
-        // view / modify breadcrumb
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel(
-                this.viewOnly ?
-                    'LNG_PAGE_VIEW_USER_TITLE' :
-                    'LNG_PAGE_MODIFY_USER_TITLE',
-                null,
-                true,
-                {},
-                this.user
-            )
-        );
     }
 }

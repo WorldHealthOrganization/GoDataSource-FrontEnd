@@ -127,7 +127,9 @@ export class PermissionExpression {
     }
 }
 
-export class UserRoleModel {
+export class UserRoleModel
+    implements
+        IPermissionBasic {
     id: string | null;
     name: string | null;
     permissionIds: PERMISSION[];
@@ -135,6 +137,15 @@ export class UserRoleModel {
     permissions: IPermissionChildModel[];
 
     users: UserModel[];
+
+    /**
+     * Static Permissions - IPermissionBasic
+     */
+    static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_VIEW) : false; }
+    static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_LIST) : false; }
+    static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_CREATE) : false; }
+    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_VIEW, PERMISSION.USER_ROLE_MODIFY) : false; }
+    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_DELETE) : false; }
 
     /**
      * Constructor
@@ -150,6 +161,15 @@ export class UserRoleModel {
                 return new UserModel(userData);
             });
     }
+
+    /**
+     * Permissions - IPermissionBasic
+     */
+    canView(user: UserModel): boolean { return UserRoleModel.canView(user); }
+    canList(user: UserModel): boolean { return UserRoleModel.canList(user); }
+    canCreate(user: UserModel): boolean { return UserRoleModel.canCreate(user); }
+    canModify(user: UserModel): boolean { return UserRoleModel.canModify(user); }
+    canDelete(user: UserModel): boolean { return UserRoleModel.canDelete(user); }
 }
 
 export class UserModel
@@ -193,7 +213,7 @@ export class UserModel
     static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_VIEW) : false; }
     static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_LIST) : false; }
     static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_CREATE) : false; }
-    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_MODIFY) : false; }
+    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_VIEW, PERMISSION.USER_MODIFY) : false; }
     static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_DELETE) : false; }
 
     /**

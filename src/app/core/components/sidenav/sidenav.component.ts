@@ -348,7 +348,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 new ChildNavItem(
                     'roles',
                     'LNG_LAYOUT_MENU_ITEM_ROLES_LABEL',
-                    [PERMISSION.READ_ROLE],
+                    [
+                        PERMISSION.USER_ROLE_LIST
+                    ],
                     '/user-roles'
                 ),
                 new ChildNavItem(

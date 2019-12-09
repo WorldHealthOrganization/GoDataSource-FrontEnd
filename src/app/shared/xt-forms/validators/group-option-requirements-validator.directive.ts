@@ -14,6 +14,10 @@ import { I18nService } from '../../../core/services/helper/i18n.service';
     ]
 })
 export class GroupOptionRequirementsValidator implements Validator {
+    // default values
+    @Input() defaultValues: any[] = [];
+    @Input() requiredWithoutDefaultValues: boolean = false;
+
     // Group key
     private _appGroupKey: string;
     @Input() set appGroupKey(appGroupKey: string) {
@@ -175,12 +179,35 @@ export class GroupOptionRequirementsValidator implements Validator {
     ): {
         [key: string]: any
     } {
-        // we don't handle required validator
-        if (
-            _.isEmpty(control.value) ||
-            _.isEmpty(this._requirementsMap)
-        ) {
+        // we need requirement data to validate
+        if (_.isEmpty(this._requirementsMap)) {
             return null;
+        }
+
+        // empty is handled by default required validator
+        if ( _.isEmpty(control.value)) {
+            return null;
+        }
+
+        // handle custom required validator
+        if (
+            this.requiredWithoutDefaultValues &&
+            this.defaultValues &&
+            this.defaultValues.length > 0
+        ) {
+            // remove default values
+            const realValue: any[] = control.value.filter((itemKey: string) => {
+                return !this.defaultValues.find((defaultItem: any) => {
+                    return defaultItem[this.appGroupOptionsValueKey] === itemKey;
+                });
+            });
+
+            // no values selected ?
+            if (realValue.length < 1) {
+                return {
+                    required: true
+                };
+            }
         }
 
         // map values for easy access
