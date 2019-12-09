@@ -304,7 +304,15 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                    permissions: new PermissionExpression({
+                        or: [
+                            PERMISSION.LOCATION_LIST,
+                            PERMISSION.LOCATION_CREATE,
+                            PERMISSION.LOCATION_VIEW,
+                            PERMISSION.LOCATION_MODIFY,
+                            PERMISSION.LOCATION_USAGE
+                        ]
+                    })
                 }
             },
             // Teams Module routes
@@ -365,7 +373,15 @@ const routes: Routes = [
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
-                ]
+                ],
+                data: {
+                    permissions: new PermissionExpression({
+                        or: [
+                            PERMISSION.LOCATION_IMPORT
+                            // ...case / contact / lab results / language / ref data
+                        ]
+                    })
+                }
             },
             // System settings Module routes
             {

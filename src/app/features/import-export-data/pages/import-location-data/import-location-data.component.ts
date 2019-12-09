@@ -5,6 +5,9 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { Constants } from '../../../../core/models/constants';
 import { ImportDataExtension } from '../../components/import-data/model';
+import { LocationModel } from '../../../../core/models/location.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-import-case-data',
@@ -13,19 +16,11 @@ import { ImportDataExtension } from '../../components/import-data/model';
     styleUrls: ['./import-location-data.component.less']
 })
 export class ImportLocationDataComponent {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_LOCATIONS_TITLE',
-            '/locations'
-        ),
-        new BreadcrumbItemModel(
-            'LNG_PAGE_IMPORT_LOCATION_DATA_TITLE',
-            '',
-            true
-        )
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     Constants = Constants;
+
+    authUser: UserModel;
 
     allowedExtensions: string[] = [
         ImportDataExtension.CSV,
@@ -47,9 +42,43 @@ export class ImportLocationDataComponent {
      */
     constructor(
         private cacheService: CacheService,
-        private router: Router
-    ) {}
+        private router: Router,
+        private authDataService: AuthDataService
+    ) {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
 
+        // update breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (LocationModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_LOCATIONS_TITLE', '/locations')
+            );
+        }
+
+        // import breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                'LNG_PAGE_IMPORT_LOCATION_DATA_TITLE',
+                '.',
+                true
+            )
+        );
+    }
+
+    /**
+     * Finished import
+     */
     finished() {
         this.cacheService.remove(CacheKey.LOCATIONS);
         this.router.navigate(['/locations']);

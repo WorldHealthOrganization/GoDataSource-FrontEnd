@@ -5,8 +5,14 @@ import { DateDefaultPipe } from '../../shared/pipes/date-default-pipe/date-defau
 import { IAnswerData, QuestionModel } from './question.model';
 import { BaseModel } from './base.model';
 import { FillLocationModel } from './fill-location.model';
+import { IPermissionBasic } from './permission.interface';
+import { UserModel } from './user.model';
+import { PERMISSION } from './permission.model';
 
-export class FollowUpModel extends BaseModel {
+export class FollowUpModel
+    extends BaseModel
+    implements
+        IPermissionBasic {
     id: string;
     date: string;
     address: AddressModel;
@@ -25,6 +31,18 @@ export class FollowUpModel extends BaseModel {
 
     fillLocation: FillLocationModel;
 
+    /**
+     * Static Permissions - IPermissionBasic
+     */
+    static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_VIEW) : false; }
+    static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_LIST) : false; }
+    static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_CREATE) : false; }
+    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_VIEW, PERMISSION.FOLLOW_UP_MODIFY) : false; }
+    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_DELETE) : false; }
+
+    /**
+     * Constructor
+     */
     constructor(
         data = null,
         includeContact: boolean = true
@@ -53,6 +71,15 @@ export class FollowUpModel extends BaseModel {
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
     }
+
+    /**
+     * Permissions - IPermissionBasic
+     */
+    canView(user: UserModel): boolean { return FollowUpModel.canView(user); }
+    canList(user: UserModel): boolean { return FollowUpModel.canList(user); }
+    canCreate(user: UserModel): boolean { return FollowUpModel.canCreate(user); }
+    canModify(user: UserModel): boolean { return FollowUpModel.canModify(user); }
+    canDelete(user: UserModel): boolean { return FollowUpModel.canDelete(user); }
 
     /**
      * Determine alertness

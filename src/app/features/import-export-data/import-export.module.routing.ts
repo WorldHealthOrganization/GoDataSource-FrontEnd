@@ -12,7 +12,9 @@ const routes: Routes = [
         component: fromPages.ImportLocationDataComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG]
+            permissions: [
+                PERMISSION.LOCATION_IMPORT
+            ]
         }
     },
     // Import hierarchical locations
@@ -21,7 +23,9 @@ const routes: Routes = [
         component: fromPages.ImportHierarchicalLocationsComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG]
+            permissions: [
+                PERMISSION.LOCATION_IMPORT
+            ]
         }
     },
 

@@ -325,7 +325,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
             'locations',
             'LNG_LAYOUT_MENU_ITEM_LOCATIONS_LABEL',
             'location',
-            [PERMISSION.READ_SYS_CONFIG],
+            [
+                PERMISSION.LOCATION_LIST
+            ],
             [],
             '/locations'
         ),

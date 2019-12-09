@@ -1,6 +1,9 @@
 import * as _ from 'lodash';
 
 export enum PERMISSION {
+    // no restrictions permissions
+    SYSTEM_VERSION_VIEW = 'view_system_version',
+
     // users
     USER_LIST = 'user_list',
     USER_VIEW = 'user_view',
@@ -8,6 +11,17 @@ export enum PERMISSION {
     USER_MODIFY = 'user_modify',
     USER_DELETE = 'user_delete',
     USER_MODIFY_OWN_ACCOUNT = 'user_modify_own_account',
+
+    // locations
+    LOCATION_LIST = 'location_list',
+    LOCATION_VIEW = 'location_view',
+    LOCATION_CREATE = 'location_create',
+    LOCATION_MODIFY = 'location_modify',
+    LOCATION_DELETE = 'location_delete',
+    LOCATION_EXPORT = 'location_export',
+    LOCATION_IMPORT = 'location_import',
+    LOCATION_USAGE = 'location_usage',
+    LOCATION_PROPAGATE_GEO_TO_PERSONS = 'location_propagate_geo_to_persons',
 
     // outbreaks
     OUTBREAK_LIST = 'outbreak_list',
@@ -141,8 +155,12 @@ WRITE_CASE = 'write_case',
     RELATIONSHIP_SHARE = 'relationship_share',
     RELATIONSHIP_BULK_DELETE = 'relationship_bulk_delete',
 
-    // no restrictions permissions
-    SYSTEM_VERSION_VIEW = 'view_system_version',
+    // follow-ups
+    FOLLOW_UP_LIST = 'follow_up_list',
+    FOLLOW_UP_VIEW = 'follow_up_view',
+    FOLLOW_UP_CREATE = 'follow_up_create',
+    FOLLOW_UP_MODIFY = 'follow_up_modify',
+    FOLLOW_UP_DELETE = 'follow_up_delete',
 
 
 

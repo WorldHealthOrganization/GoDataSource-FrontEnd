@@ -3,6 +3,9 @@ import { CacheKey, CacheService } from '../../../../core/services/helper/cache.s
 import { Router } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ImportDataExtension } from '../../components/import-data/model';
+import { LocationModel } from '../../../../core/models/location.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-import-hierarchical-locations',
@@ -11,18 +14,9 @@ import { ImportDataExtension } from '../../components/import-data/model';
     styleUrls: ['./import-hierarchical-locations.component.less']
 })
 export class ImportHierarchicalLocationsComponent {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_LOCATIONS_TITLE',
-            '/locations'
-        ),
-        new BreadcrumbItemModel(
-            'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE',
-            '',
-            true
-        )
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
+    authUser: UserModel;
 
     allowedExtensions: string[] = [
         ImportDataExtension.XML,
@@ -33,14 +27,46 @@ export class ImportHierarchicalLocationsComponent {
 
     /**
      * Constructor
-     * @param router
-     * @param route
      */
     constructor(
         private cacheService: CacheService,
-        private router: Router
-    ) {}
+        private router: Router,
+        private authDataService: AuthDataService
+    ) {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
 
+        // update breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (LocationModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_LOCATIONS_TITLE', '/locations')
+            );
+        }
+
+        // import breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE',
+                '.',
+                true
+            )
+        );
+    }
+
+    /**
+     * Finished import
+     */
     finished() {
         this.cacheService.remove(CacheKey.LOCATIONS);
         this.router.navigate(['/locations']);

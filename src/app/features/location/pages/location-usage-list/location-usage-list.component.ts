@@ -1,12 +1,11 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { LocationUsageModel, UsageDetails, UsageDetailsItem, UsageDetailsItemType } from '../../../../core/models/location-usage.model';
+import { LocationUsageModel, UsageDetails, UsageDetailsItem } from '../../../../core/models/location-usage.model';
 import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -17,6 +16,9 @@ import { HoverRowAction } from '../../../../shared/components';
 import { EventModel } from '../../../../core/models/event.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
     selector: 'app-location-usage-list',
@@ -25,13 +27,14 @@ import { throwError } from 'rxjs/internal/observable/throwError';
     styleUrls: ['./location-usage-list.component.less']
 })
 export class LocationUsageListComponent extends ListComponent implements OnInit {
-
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
 
     locationId: string;
+    locationData: LocationModel;
 
     usageDetailsList: UsageDetailsItem[];
     usageDetailsListMore: {
@@ -52,6 +55,10 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
             iconTooltip: 'LNG_PAGE_ACTION_VIEW',
             click: (item: UsageDetailsItem) => {
                 this.router.navigateByUrl(item.viewUrl);
+            },
+            visible: (item: UsageDetailsItem): boolean => {
+                return item.typePermissions &&
+                    item.typePermissions.canView(this.authUser);
             }
         }),
 
@@ -63,11 +70,15 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
                 this.router.navigateByUrl(item.modifyUrl);
             },
             visible: (item: UsageDetailsItem): boolean => {
-                return this.hasWriteAccess(item);
+                return item.typePermissions &&
+                    item.typePermissions.canModify(this.authUser);
             }
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         protected snackbarService: SnackbarService,
@@ -81,6 +92,9 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -92,27 +106,42 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
             this.locationDataService
                 .getLocation(this.locationId)
                 .subscribe((location: LocationModel) => {
-                    // add breadcrumb
-                    this.breadcrumbs = [
-                        new BreadcrumbItemModel(
-                            'LNG_PAGE_LIST_LOCATIONS_TITLE',
-                            '/locations'
-                        )
-                    ];
-                    this.breadcrumbs.push(
-                        new BreadcrumbItemModel(
-                            'LNG_PAGE_LIST_USAGE_LOCATIONS_TITLE',
-                            '.',
-                            true,
-                            {},
-                            location
-                        )
-                    );
+                    // location data
+                    this.locationData = location;
+
+                    // update breadcrumbs
+                    this.initializeBreadcrumbs();
 
                     // get usage list
                     this.needsRefreshList(true);
                 });
         });
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (LocationModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_LOCATIONS_TITLE', '/locations')
+            );
+        }
+
+        // usage breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_USAGE_LOCATIONS_TITLE',
+                '.',
+                true,
+                {},
+                this.locationData
+            )
+        );
     }
 
     /**
@@ -157,7 +186,7 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
                             // #TODO - not sure if this is how it should be...
 
                             // follow-ups
-                            if (!this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP)) {
+                            if (!FollowUpModel.canList(this.authUser)) {
                                 locationUsage.followUp = [];
                             }
 
@@ -167,12 +196,12 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
                             }
 
                             // contacts
-                            if (!this.authUser.hasPermissions(PERMISSION.READ_CONTACT)) {
+                            if (!ContactModel.canList(this.authUser)) {
                                 locationUsage.contact = [];
                             }
 
                             // cases
-                            if (!this.authUser.hasPermissions(PERMISSION.READ_CASE)) {
+                            if (!CaseModel.canList(this.authUser)) {
                                 locationUsage.case = [];
                             }
 
@@ -194,31 +223,5 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
         } else {
             finishCallback([]);
         }
-    }
-
-    /**
-     * Check if we have write permissions for this item
-     * @param item
-     */
-    hasWriteAccess(item: UsageDetailsItem): boolean {
-        // check outbreak
-        if (this.authUser.activeOutbreakId !== item.outbreakId) {
-            return false;
-        }
-
-        // check permissions accordingly to type
-        switch (item.type) {
-            case UsageDetailsItemType.CASE:
-                return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-            case UsageDetailsItemType.CONTACT:
-                return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-            case UsageDetailsItemType.EVENT:
-                return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
-            case UsageDetailsItemType.FOLLOW_UP:
-                return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
-        }
-
-        // something went wrong, if this part was reached
-        return false;
     }
 }

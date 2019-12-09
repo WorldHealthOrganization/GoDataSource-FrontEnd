@@ -76,6 +76,16 @@ export interface IPermissionExportable {
 }
 
 /**
+ * Import
+ */
+export interface IPermissionImportable {
+    /**
+     * Has import permission ?
+     */
+    canImport(user: UserModel): boolean;
+}
+
+/**
  * Clone
  */
 export interface IPermissionCloneable {
@@ -93,6 +103,21 @@ export interface IPermissionUser {
      * Has permission to modify his account
      */
     canModifyOwnAccount(user: UserModel): boolean;
+}
+
+/**
+ * Location
+ */
+export interface IPermissionLocation {
+    /**
+     * Has permission to see location usage
+     */
+    canListUsage(user: UserModel): boolean;
+
+    /**
+     * Has permission to propagate latitude and longitude to persons that use this location and have the same previous lat and lng as the location
+     */
+    canPropagateGeoToPersons(user: UserModel): boolean;
 }
 
 /**

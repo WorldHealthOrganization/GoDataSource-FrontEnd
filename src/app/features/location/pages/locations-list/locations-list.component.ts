@@ -8,7 +8,6 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
@@ -43,6 +42,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
 
     // constants
     ExportDataExtension = ExportDataExtension;
+    LocationModel = LocationModel;
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -76,6 +76,9 @@ export class LocationsListComponent extends ListComponent implements OnInit {
             iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_VIEW_LOCATION',
             click: (item: LocationModel) => {
                 this.router.navigate(['/locations', item.id, 'view']);
+            },
+            visible: (): boolean => {
+                return LocationModel.canView(this.authUser);
             }
         }),
 
@@ -87,7 +90,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                 this.router.navigate(['/locations', item.id, 'modify']);
             },
             visible: (): boolean => {
-                return this.hasLocationWriteAccess();
+                return LocationModel.canModify(this.authUser);
             }
         }),
 
@@ -112,7 +115,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                         this.deleteLocation(item);
                     },
                     visible: (): boolean => {
-                        return this.hasLocationWriteAccess();
+                        return LocationModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -122,7 +125,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                     type: HoverRowActionType.DIVIDER,
                     visible: (): boolean => {
                         // visible only if at least one of the previous...
-                        return this.hasLocationWriteAccess();
+                        return LocationModel.canDelete(this.authUser);
                     }
                 }),
 
@@ -131,12 +134,18 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                     menuOptionLabel: 'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE',
                     click: (item: LocationModel) => {
                         this.router.navigate(['/locations', item.id, 'usage']);
+                    },
+                    visible: (): boolean => {
+                        return LocationModel.canListUsage(this.authUser);
                     }
                 })
             ]
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private authDataService: AuthDataService,
         private locationDataService: LocationDataService,
@@ -154,6 +163,9 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // add page title
         this.hierarchicalLocationsDataExportFileName = `${this.i18nService.instant('LNG_PAGE_LIST_LOCATIONS_TITLE')} - ${this.hierarchicalLocationsDataExportFileName}`;
@@ -332,14 +344,6 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                         });
                 }
             });
-    }
-
-    /**
-     * Check if we have write access to locations
-     * @returns {boolean}
-     */
-    hasLocationWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
     }
 
     /**
