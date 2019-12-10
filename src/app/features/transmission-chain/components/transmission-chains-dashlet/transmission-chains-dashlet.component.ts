@@ -45,6 +45,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     @Output() nodeTapped = new EventEmitter<GraphNodeModel>();
     @Output() edgeTapped = new EventEmitter<GraphEdgeModel>();
     @Output() changeEditMode = new EventEmitter<boolean>();
+    @Output() sendFilterOption = new EventEmitter<boolean>();
 
     selectedOutbreak: OutbreakModel;
     chainElements: TransmissionChainModel[];
@@ -393,6 +394,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     onNodeTap(entity: GraphNodeModel) {
         console.log(entity);
         this.nodeTapped.emit(entity);
+        this.sendFilterOption.emit(this.filters.showContacts ? this.filters.showContacts : false);
     }
 
     /**

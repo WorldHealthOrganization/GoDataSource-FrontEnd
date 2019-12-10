@@ -69,6 +69,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     // type of the selected person . event
     selectedEntityType: EntityType = null;
 
+    showContactsFilter: boolean = true;
+
     // nodes selected from graph
     selectedNodes: SelectedNodes = new SelectedNodes();
     // selected relationship
@@ -273,6 +275,14 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         }
     }
 
+    /**
+     * Set the flag to display link for person COT
+     * @param {boolean} showContacts
+     */
+    setFilterOption(showContacts: boolean) {
+        this.showContactsFilter = showContacts;
+    }
+
     onNodeTap(entity: GraphNodeModel) {
         // retrieve entity info
         const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
@@ -308,7 +318,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                             ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
                             ...{
                                 data: {
-                                    entity: entityData
+                                    entity: entityData,
+                                    showContactsFilter: this.showContactsFilter
                                 }
                             }
                         }
