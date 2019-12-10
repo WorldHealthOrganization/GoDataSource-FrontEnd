@@ -13,8 +13,8 @@ import { ImportDataExtension } from '../../components/import-data/model';
 export class ImportSyncPackageComponent {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
-            'LNG_BACKUP_MODULE_LABEL_SYSTEM_CONFIGURATION',
-            '/system-config/backups'
+            'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_TITLE',
+            '/system-config/sync-logs'
         ),
         new BreadcrumbItemModel(
             'LNG_PAGE_IMPORT_SYNC_PACKAGE_TITLE',

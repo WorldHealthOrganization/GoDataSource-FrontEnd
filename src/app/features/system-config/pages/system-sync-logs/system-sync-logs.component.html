@@ -19,13 +19,29 @@
                             (click)="configureSyncSettings()">
                             {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_BUTTON' | translate }}
                         </button>
+
                         <!-- Delete sync logs -->
                         <button
                             mat-menu-item
                             (click)="deleteServerSyncLogs()">
                             {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_LOGS_BUTTON' | translate }}
                         </button>
+
+                        <!-- Import Sync Package -->
+                        <button
+                            *ngIf="hasSysConfigWriteAccess()"
+                            mat-menu-item
+                            [routerLink]="['/import-export-data', 'sync-package', 'import']">
+                            {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_IMPORT_SYNC_PACKAGE_BUTTON' | translate }}
+                        </button>
                     </ng-container>
+
+                    <!-- Export Sync Package -->
+                    <button
+                        mat-menu-item
+                        (click)="exportSyncPackage()">
+                        {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_EXPORT_SYNC_PACKAGE_BUTTON' | translate }}
+                    </button>
                 </mat-menu>
             </div>
         </div>

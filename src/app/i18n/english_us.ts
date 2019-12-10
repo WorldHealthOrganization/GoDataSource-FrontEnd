@@ -100,6 +100,13 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_USER_ROLES_AFFECTED_USERS_NONE_LABEL': 'None',
 
         /**
+         * uiSyncLogsListPage
+         */
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_IMPORT_SYNC_PACKAGE_BUTTON': 'Import sync package',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_EXPORT_SYNC_PACKAGE_BUTTON': 'Export sync package',
+
+
+        /**
          * uiFormInputValidationErrors
          */
         'LNG_FORM_VALIDATION_ERROR_MISSING_REQUIRED_OPTIONS': 'Missing options: {{options}}'
@@ -118,5 +125,7 @@ export const EnglishUsLang = {
         // LNG_PAGE_BULK_ADD_CONTACTS_LABEL_LOCATIONS_DESCRIPTION
         // LNG_PAGE_BULK_ADD_CONTACTS_TAB_ADD_CONTACTS
         // LNG_PAGE_LIST_FILTER_CASES_OUTSIDE_THE_TRANSMISSION_CHAINS
+        // LNG_PAGE_SYSTEM_BACKUPS_IMPORT_SYNC_PACKAGE_BUTTON
+        // LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE_BUTTON
     }
 };
