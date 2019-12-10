@@ -220,6 +220,7 @@ export class UserModel
      * Static Permissions - IPermissionUser
      */
     static canModifyOwnAccount(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_MODIFY_OWN_ACCOUNT) : false; }
+    static canListForFilters(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_LIST_FOR_FILTERS) : false; }
 
     /**
      * Constructor
@@ -255,6 +256,7 @@ export class UserModel
      * Permissions - IPermissionUser
      */
     canModifyOwnAccount(user: UserModel): boolean { return UserModel.canModifyOwnAccount(user); }
+    canListForFilters(user: UserModel): boolean { return UserModel.canListForFilters(user); }
 
     /**
      * Check if user has specific permissions

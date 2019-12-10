@@ -20,6 +20,7 @@ export enum PERMISSION {
     USER_MODIFY = 'user_modify',
     USER_DELETE = 'user_delete',
     USER_MODIFY_OWN_ACCOUNT = 'user_modify_own_account',
+    USER_LIST_FOR_FILTERS = 'user_list_for_filters',
 
     // roles
     USER_ROLE_LIST = 'user_role_list',
