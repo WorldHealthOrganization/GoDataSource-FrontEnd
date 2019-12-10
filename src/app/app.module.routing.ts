@@ -384,8 +384,9 @@ const routes: Routes = [
                 data: {
                     permissions: new PermissionExpression({
                         or: [
-                            PERMISSION.LOCATION_IMPORT
-                            // ...case / contact / lab results / language / ref data
+                            PERMISSION.LOCATION_IMPORT,
+                            PERMISSION.LANGUAGE_IMPORT_TOKENS
+                            // ...case / contact / lab results / ref data
                         ]
                     })
                 }
@@ -423,7 +424,14 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                    permissions: new PermissionExpression({
+                        or: [
+                            PERMISSION.LANGUAGE_LIST,
+                            PERMISSION.LANGUAGE_CREATE,
+                            PERMISSION.LANGUAGE_VIEW,
+                            PERMISSION.LANGUAGE_MODIFY
+                        ]
+                    })
                 }
             },
             // Help Module routes

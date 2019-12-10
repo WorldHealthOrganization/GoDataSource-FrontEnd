@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -24,10 +23,12 @@ import * as _ from 'lodash';
     styleUrls: ['./languages-list.component.less']
 })
 export class LanguagesListComponent extends ListComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '.', true)
     ];
+
+    // constants
+    LanguageModel = LanguageModel;
 
     // authenticated user
     authUser: UserModel;
@@ -47,6 +48,9 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
             iconTooltip: 'LNG_PAGE_LIST_LANGUAGES_ACTION_VIEW_LANGUAGE',
             click: (item: LanguageModel) => {
                 this.router.navigate(['/languages', item.id, 'view']);
+            },
+            visible: (item: LanguageModel): boolean => {
+                return LanguageModel.canView(this.authUser);
             }
         }),
 
@@ -59,7 +63,7 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
             },
             visible: (item: LanguageModel): boolean => {
                 return !item.readOnly &&
-                    this.hasSysConfigWriteAccess();
+                    LanguageModel.canModify(this.authUser);
             }
         }),
 
@@ -76,7 +80,7 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
                     },
                     visible: (item: LanguageModel): boolean => {
                         return !item.readOnly &&
-                            this.hasSysConfigWriteAccess();
+                            LanguageModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -87,7 +91,7 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
                     visible: (item: LanguageModel): boolean => {
                         // visible only if at least one of the previous...
                         return !item.readOnly &&
-                            this.hasSysConfigWriteAccess();
+                            LanguageModel.canDelete(this.authUser);
                     }
                 }),
 
@@ -96,6 +100,9 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
                     menuOptionLabel: 'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS',
                     click: (item: LanguageModel) => {
                         this.downloadLanguage(item);
+                    },
+                    visible: (item: LanguageModel): boolean => {
+                        return LanguageModel.canExportTokens(this.authUser);
                     }
                 }),
 
@@ -106,7 +113,7 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
                         this.router.navigate(['/import-export-data', 'language-data', item.id, 'import-tokens']);
                     },
                     visible: (): boolean => {
-                        return this.hasSysConfigWriteAccess();
+                        return LanguageModel.canImportTokens(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -114,6 +121,9 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private languageDataService: LanguageDataService,
@@ -127,6 +137,9 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -184,14 +197,6 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
                 }),
                 share()
             );
-    }
-
-    /**
-     * Check if we have write access
-     * @returns {boolean}
-     */
-    hasSysConfigWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
     }
 
     /**

@@ -4,6 +4,15 @@ export enum PERMISSION {
     // no restrictions permissions
     SYSTEM_VERSION_VIEW = 'view_system_version',
 
+    // languages
+    LANGUAGE_LIST = 'language_list',
+    LANGUAGE_VIEW = 'language_view',
+    LANGUAGE_CREATE = 'language_create',
+    LANGUAGE_MODIFY = 'language_modify',
+    LANGUAGE_DELETE = 'language_delete',
+    LANGUAGE_EXPORT_TOKENS = 'language_export_tokens',
+    LANGUAGE_IMPORT_TOKENS = 'language_import_tokens',
+
     // users
     USER_LIST = 'user_list',
     USER_VIEW = 'user_view',

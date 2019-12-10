@@ -96,6 +96,21 @@ export interface IPermissionCloneable {
 }
 
 /**
+ * Language
+ */
+export interface IPermissionLanguage {
+    /**
+     * Has permission to export language tokens
+     */
+    canExportTokens(user: UserModel): boolean;
+
+    /**
+     * Has permission to import language tokens
+     */
+    canImportTokens(user: UserModel): boolean;
+}
+
+/**
  * User
  */
 export interface IPermissionUser {

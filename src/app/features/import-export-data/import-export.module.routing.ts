@@ -35,7 +35,9 @@ const routes: Routes = [
         component: fromPages.ImportLanguageTokensComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG]
+            permissions: [
+                PERMISSION.LANGUAGE_IMPORT_TOKENS
+            ]
         }
     },
 

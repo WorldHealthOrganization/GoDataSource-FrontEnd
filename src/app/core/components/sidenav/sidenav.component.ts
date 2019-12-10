@@ -356,7 +356,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 new ChildNavItem(
                     'languages',
                     'LNG_LAYOUT_MENU_ITEM_LANGUAGES',
-                    [PERMISSION.READ_SYS_CONFIG],
+                    [
+                        PERMISSION.LANGUAGE_LIST
+                    ],
                     '/languages'
                 ),
                 new ChildNavItem(
