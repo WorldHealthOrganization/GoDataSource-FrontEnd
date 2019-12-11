@@ -433,6 +433,9 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                 ]
             })).subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
+                    // display loading
+                    const loadingDialog = this.dialogService.showLoadingDialog();
+
                     // construct query
                     const qb = new RequestQueryBuilder();
                     qb.filter.byEquality(
@@ -446,6 +449,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
+                                loadingDialog.close();
                                 return throwError(err);
                             })
                         )
@@ -455,6 +459,9 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
 
                             // refresh
                             this.needsRefreshList(true);
+
+                            // hide loading
+                            loadingDialog.close();
                         });
                 }
             });

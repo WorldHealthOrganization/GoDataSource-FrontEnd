@@ -384,9 +384,7 @@ export class UserRoleHelper {
         i18nService: I18nService,
         dialogService: DialogService
     ) {
-        // we're interested only if we jump from all or partial to none since from none to partial isn't possible
-        //    and partial is handled in groupOptionCheckStateChanged method
-        // jumping from none or partial to all ...doesn't matter since we get full access
+        // check if we don't have permissions that require permissions that we wan't to disable by changing to None
         if (data.action === GroupEventDataAction.None) {
             // get data
             const group: PermissionModel = data.group;
@@ -465,6 +463,59 @@ export class UserRoleHelper {
                         }
                     );
                 }
+            }
+        } else if (data.action === GroupEventDataAction.All) {
+            // we need to determine required permissions under all options
+            const group: PermissionModel = data.group;
+            const missingPermissions: {
+                [key: string]: boolean
+            } = {};
+            (group.permissions || []).forEach((groupChildPermission) => {
+                // does this permission require other permissions ?
+                if (
+                    groupChildPermission.requires &&
+                    groupChildPermission.requires.length > 0
+                ) {
+                    // check if we have each required permissions
+                    groupChildPermission.requires.forEach((reqPermission: string) => {
+                        // check if we have each required permissions
+                        // & make sure it isn't from the same group since the entire group is checked ( all )
+                        if (
+                            data.value.indexOf(reqPermission) === -1 &&
+                            data.optionsMap[reqPermission].groupValue !== group.groupAllId
+                        ) {
+                            missingPermissions[reqPermission] = true;
+                        }
+                    });
+                }
+            });
+
+            // do we have missing permissions
+            const missingPermissionsArray: string[] = Object.keys(missingPermissions);
+            if (
+                missingPermissionsArray &&
+                missingPermissionsArray.length > 0
+            ) {
+                // determine missing permission labels
+                const labels: string[] = missingPermissionsArray.map((permission): string => {
+                    return `<div>${data.optionsMap[permission] ?
+                        i18nService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) :
+                        permission}</div>`;
+                });
+
+                // display confirm dialog - should we add missing required permissions ?
+                dialogService
+                    .showConfirm(new DialogConfiguration({
+                        message: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_MESSAGE',
+                        additionalInfo: labels.join(''),
+                        yesLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_YES_LABEL',
+                        cancelLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_NO_LABEL'
+                    }))
+                    .subscribe((answer: DialogAnswer) => {
+                        if (answer.button === DialogAnswerButton.Yes) {
+                            data.addValues(...missingPermissionsArray);
+                        }
+                    });
             }
         }
     }
