@@ -280,37 +280,30 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                             })
                         )
                         .subscribe((settings: SystemSettingsModel) => {
-                            // remove client application
-                            const cleanClientApplication: SystemClientApplicationModel = _.cloneDeep(clientApplication);
-                            delete cleanClientApplication.outbreaks;
-                            const upIndex: number = _.findIndex(settings.clientApplications, cleanClientApplication);
-                            if (upIndex > -1) {
-                                // remove server
-                                settings.clientApplications.splice(upIndex, 1);
-
-                                // save upstream servers
-                                this.systemSettingsDataService
-                                    .modifySystemSettings({
-                                        clientApplications: settings.clientApplications
+                            // filter client applications and remove client application
+                            const filteredClientApplications =
+                                settings.clientApplications
+                                    .filter((clientApp: SystemClientApplicationModel) => {
+                                        return clientApp.id !== clientApplication.id;
+                                });
+                            // save upstream servers
+                            this.systemSettingsDataService
+                                .modifySystemSettings({
+                                    clientApplications: filteredClientApplications
+                                })
+                                .pipe(
+                                    catchError((err) => {
+                                        this.snackbarService.showApiError(err);
+                                        return throwError(err);
                                     })
-                                    .pipe(
-                                        catchError((err) => {
-                                            this.snackbarService.showApiError(err);
-                                            return throwError(err);
-                                        })
-                                    )
-                                    .subscribe(() => {
-                                        // display success message
-                                        this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
+                                )
+                                .subscribe(() => {
+                                    // display success message
+                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
 
-                                        // refresh
-                                        this.needsRefreshList(true);
-                                    });
-                            } else {
-                                // not found ?
-                                // IGNORE...
-                                this.needsRefreshList(true);
-                            }
+                                    // refresh
+                                    this.needsRefreshList(true);
+                                });
                         });
                 }
             });
@@ -334,35 +327,29 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                 })
             )
             .subscribe((settings: SystemSettingsModel) => {
-                // client application
-                const cleanClientApplication: SystemClientApplicationModel = _.cloneDeep(clientApplication);
-                cleanClientApplication.active = !clientApplication.active;
-                delete cleanClientApplication.outbreaks;
-                const clientApplicationItem: SystemClientApplicationModel = _.find(settings.clientApplications, cleanClientApplication) as SystemClientApplicationModel;
-                if (clientApplicationItem) {
-                    // set flag
-                    clientApplicationItem.active = clientApplication.active;
-
-                    // save client applications
-                    this.systemSettingsDataService
-                        .modifySystemSettings({
-                            clientApplications: settings.clientApplications
+                // map client applications and modify client application status
+                const modifiedClientApplications =
+                    _.map(settings.clientApplications, (clientApp: SystemClientApplicationModel) => {
+                        if (clientApp.id === clientApplication.id) {
+                            clientApp.active = !clientApplication.active;
+                        }
+                        return clientApp;
+                });
+                // save client applications
+                this.systemSettingsDataService
+                    .modifySystemSettings({
+                        clientApplications: modifiedClientApplications
+                    })
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            return throwError(err);
                         })
-                        .pipe(
-                            catchError((err) => {
-                                this.snackbarService.showApiError(err);
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe(() => {
-                            // display success message
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE');
-                        });
-                } else {
-                    // not found ?
-                    // IGNORE...
-                    this.needsRefreshList(true);
-                }
+                    )
+                    .subscribe(() => {
+                        // display success message
+                        this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE');
+                    });
             });
     }
 
