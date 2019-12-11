@@ -9,6 +9,7 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { map, share, switchMap, tap } from 'rxjs/operators';
 import { I18nService } from '../helper/i18n.service';
 import { UserRoleModel } from '../../models/user.model';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class UserRoleDataService {
@@ -97,11 +98,11 @@ export class UserRoleDataService {
 
     /**
      * Return total number of user roles
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getRolesCount(
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`roles/count?where=${whereFilter}`);
     }

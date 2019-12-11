@@ -34,6 +34,7 @@ import { FollowUpPage } from '../../typings/follow-up-page';
 import { throwError } from 'rxjs';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -54,7 +55,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
 
     // follow ups list
     followUpsList$: Observable<FollowUpModel[]>;
-    followUpsListCount$: Observable<any>;
+    followUpsListCount$: Observable<IBasicCount>;
 
     // Daily follow ups grouped by teams
     countedFollowUpsGroupedByTeams$: Observable<any>;

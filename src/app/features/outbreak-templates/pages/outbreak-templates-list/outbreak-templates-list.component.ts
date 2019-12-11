@@ -17,6 +17,7 @@ import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-outbreak-templates-list',
@@ -33,7 +34,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
     OutbreakTemplateModel = OutbreakTemplateModel;
 
     outbreakTemplatesList$: Observable<OutbreakTemplateModel[]>;
-    outbreakTemplatesListCount$: Observable<any>;
+    outbreakTemplatesListCount$: Observable<IBasicCount>;
 
     diseasesList$: Observable<any[]>;
 

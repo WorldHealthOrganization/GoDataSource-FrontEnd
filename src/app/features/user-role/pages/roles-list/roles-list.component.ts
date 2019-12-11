@@ -16,6 +16,7 @@ import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-roles-list',
@@ -40,7 +41,7 @@ export class RolesListComponent extends ListComponent implements OnInit {
     authUser: UserModel;
     // list of existing roles
     rolesList$: Observable<UserRoleModel[]>;
-    rolesListCount$: Observable<any>;
+    rolesListCount$: Observable<IBasicCount>;
     // list of permission
     availablePermissions$: Observable<any>;
 

@@ -20,6 +20,7 @@ import { catchError, share, tap } from 'rxjs/operators';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-backups',
@@ -44,7 +45,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
 
     // backups list
     backupsList$: Observable<BackupModel[]>;
-    backupsListCount$: Observable<any>;
+    backupsListCount$: Observable<IBasicCount>;
     usersList$: Observable<UserModel[]>;
 
     // module list

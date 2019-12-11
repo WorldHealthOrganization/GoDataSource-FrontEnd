@@ -28,6 +28,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -43,7 +44,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     relationshipsListRecordsMap: {
         [idRelationship: string]: EntityModel
     } = {};
-    relationshipsListCount$: Observable<any>;
+    relationshipsListCount$: Observable<IBasicCount>;
 
     outbreakSubscriber: Subscription;
 

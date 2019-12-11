@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { EventModel } from '../../models/event.model';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class EventDataService {
@@ -37,12 +38,12 @@ export class EventDataService {
      * Return total number of events
      * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getEventsCount(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
 
         const filter = queryBuilder.buildQuery();
 

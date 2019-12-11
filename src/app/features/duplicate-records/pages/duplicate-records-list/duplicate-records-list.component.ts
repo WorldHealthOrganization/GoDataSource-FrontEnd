@@ -18,6 +18,7 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { catchError, share, tap } from 'rxjs/operators';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-duplicate-records-list',
@@ -45,7 +46,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
 
     // duplicates
     duplicatesList: PeoplePossibleDuplicateModel;
-    duplicatesListCount$: Observable<any>;
+    duplicatesListCount$: Observable<IBasicCount>;
 
     /**
      * Visible table columns

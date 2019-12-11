@@ -30,6 +30,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-events-list',
@@ -52,7 +53,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
 
     // list of existing events
     eventsList$: Observable<EventModel[]>;
-    eventsListCount$: Observable<any>;
+    eventsListCount$: Observable<IBasicCount>;
     yesNoOptionsList$: Observable<any>;
 
     // events outbreak

@@ -16,6 +16,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-reference-data-category-entries-list',
@@ -29,7 +30,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
         new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
     ];
 
-    categoryEntriesCount: { count: number };
+    categoryEntriesCount: IBasicCount;
     categoryEntries: ReferenceDataEntryModel[];
     categoryEntriesAll: ReferenceDataEntryModel[];
     categoryId: ReferenceDataCategory;

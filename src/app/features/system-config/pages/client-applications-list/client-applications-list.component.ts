@@ -22,6 +22,7 @@ import { throwError, of, forkJoin } from 'rxjs';
 import { Router } from '@angular/router';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-client-applications-list',
@@ -42,7 +43,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
 
     // client applications servers
     clientApplicationsServerList: SystemClientApplicationModel[] = [];
-    clientApplicationsServerListCount: { count: number };
+    clientApplicationsServerListCount: IBasicCount;
     clientApplicationsServerListAll: SystemClientApplicationModel[] = [];
 
     // settings

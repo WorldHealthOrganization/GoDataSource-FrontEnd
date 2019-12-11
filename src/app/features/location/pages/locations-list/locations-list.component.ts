@@ -24,6 +24,7 @@ import { RequestFilter } from '../../../../core/helperClasses/request-query-buil
 import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-locations-list',
@@ -52,7 +53,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
 
     // list of existing locations
     locationsList$: Observable<LocationModel[]>;
-    locationsListCount$: Observable<any>;
+    locationsListCount$: Observable<IBasicCount>;
 
     yesNoOptionsList$: Observable<any[]>;
 

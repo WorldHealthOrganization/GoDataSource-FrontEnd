@@ -16,6 +16,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { catchError, share, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-audit-logs-list',
@@ -30,7 +31,7 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
 
     // list of existing audit logs
     auditLogsList$: Observable<AuditLogModel[]>;
-    auditLogsListCount$: Observable<any>;
+    auditLogsListCount$: Observable<IBasicCount>;
 
     // options
     usersList$: Observable<any>;

@@ -15,6 +15,7 @@ import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-languages-list',
@@ -35,7 +36,7 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
 
     // list of existing languages
     languagesList$: Observable<LanguageModel[]>;
-    languagesListCount$: Observable<any>;
+    languagesListCount$: Observable<IBasicCount>;
 
     @ViewChild('topNav') topNav: TopnavComponent;
 

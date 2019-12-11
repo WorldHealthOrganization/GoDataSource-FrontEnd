@@ -26,6 +26,7 @@ import { HoverRowAction, HoverRowActionType } from '../../../../shared/component
 import { Router } from '@angular/router';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-lab-results',
@@ -41,7 +42,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
     // lab results list
     labResultsList$: Observable<any>;
     // lab results count
-    labResultsListCount$: Observable<any>;
+    labResultsListCount$: Observable<IBasicCount>;
 
     labNamesList$: Observable<any[]>;
     sampleTypesList$: Observable<any[]>;

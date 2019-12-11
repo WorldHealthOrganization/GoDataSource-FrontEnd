@@ -23,6 +23,7 @@ import { RelationshipType } from '../../../../core/enums/relationship-type.enum'
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { UserSettings } from '../../../../core/models/user.model';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-entity-relationships-list-assign',
@@ -35,7 +36,7 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
 
     // entities list relationships
     entitiesList$: Observable<(CaseModel | ContactModel | EventModel)[]>;
-    entitiesListCount$: Observable<any>;
+    entitiesListCount$: Observable<IBasicCount>;
 
     // available side filters
     availableSideFilters: FilterModel[];

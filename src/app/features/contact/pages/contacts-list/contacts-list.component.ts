@@ -37,6 +37,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { AddressType } from '../../../../core/models/address.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-contacts-list',
@@ -57,7 +58,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
     // list of existing contacts
     contactsList$: Observable<ContactModel[]>;
-    contactsListCount$: Observable<any>;
+    contactsListCount$: Observable<IBasicCount>;
 
     outbreakSubscriber: Subscription;
 

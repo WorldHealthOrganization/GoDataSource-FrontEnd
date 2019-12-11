@@ -14,6 +14,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { Constants } from '../../../../core/models/constants';
 import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-saved-import-mapping',
@@ -33,7 +34,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
     });
 
     savedImportMappingsList$: Observable<SavedImportMappingModel[]>;
-    savedImportMappingsListCount$: Observable<any>;
+    savedImportMappingsListCount$: Observable<IBasicCount>;
 
     fixedTableColumns: string[] = [
         'name',

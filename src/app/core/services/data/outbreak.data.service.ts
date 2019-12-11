@@ -17,6 +17,7 @@ import { PeoplePossibleDuplicateModel } from '../../models/people-possible-dupli
 import { EntityType } from '../../models/entity-type';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import { catchError, map, mergeMap, takeUntil, tap } from 'rxjs/operators';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class OutbreakDataService {
@@ -52,7 +53,7 @@ export class OutbreakDataService {
      * Retrieve the number of Outbreaks
      * @param {RequestQueryBuilder} queryBuilder
      */
-    getOutbreaksCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+    getOutbreaksCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`outbreaks/count?where=${whereFilter}`);
     }
@@ -372,12 +373,12 @@ export class OutbreakDataService {
      * Return total number of case / contacts & events possible duplicates
      * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getPeoplePossibleDuplicatesCount(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`outbreaks/${outbreakId}/people/possible-duplicates/count?where=${whereFilter}`);
     }

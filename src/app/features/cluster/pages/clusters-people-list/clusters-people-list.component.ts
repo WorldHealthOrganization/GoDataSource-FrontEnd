@@ -21,6 +21,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -40,7 +41,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     cluster: ClusterModel;
     // cluster people list
     clusterPeopleList$: Observable<any>;
-    clusterPeopleListCount$: Observable<any>;
+    clusterPeopleListCount$: Observable<IBasicCount>;
 
     // reference data
     genderList$: Observable<any[]>;

@@ -18,6 +18,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import * as _ from 'lodash';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-help-categories-list',
@@ -36,7 +37,7 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
 
     // list of categories
     helpCategoriesList$: Observable<HelpCategoryModel[]>;
-    helpCategoriesListCount$: Observable<any>;
+    helpCategoriesListCount$: Observable<IBasicCount>;
 
     // provide constants to template
     Constants = Constants;

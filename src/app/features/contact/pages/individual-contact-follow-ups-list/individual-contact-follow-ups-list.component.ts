@@ -28,6 +28,7 @@ import { DialogField, HoverRowAction, HoverRowActionType } from '../../../../sha
 import { FollowUpPage } from '../../typings/follow-up-page';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-individual-contact-follow-ups-list',
@@ -48,7 +49,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
 
     // follow ups list
     followUpsList$: Observable<FollowUpModel[]>;
-    followUpsListCount$: Observable<any>;
+    followUpsListCount$: Observable<IBasicCount>;
 
     // dropdowns values
     yesNoOptionsList$: Observable<any[]>;

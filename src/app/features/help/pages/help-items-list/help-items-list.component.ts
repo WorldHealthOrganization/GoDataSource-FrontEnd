@@ -20,6 +20,7 @@ import { catchError, share, tap } from 'rxjs/operators';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { throwError } from 'rxjs';
 import * as _ from 'lodash';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-help-items-list',
@@ -39,7 +40,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
     selectedCategory: HelpCategoryModel;
 
     helpItemsList$: Observable<HelpItemModel[]>;
-    helpItemsListCount$: Observable<any>;
+    helpItemsListCount$: Observable<IBasicCount>;
 
     // provide constants to template
     Constants = Constants;

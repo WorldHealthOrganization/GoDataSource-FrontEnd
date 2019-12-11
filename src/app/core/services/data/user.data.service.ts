@@ -8,6 +8,7 @@ import { RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/r
 import { SecurityQuestionModel } from '../../models/securityQuestion.model';
 import * as _ from 'lodash';
 import { mergeMap } from 'rxjs/operators';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class UserDataService {
@@ -50,11 +51,11 @@ export class UserDataService {
     /**
      * Return total number of users
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getUsersCount(
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
 
         const whereFilter = queryBuilder.filter.generateCondition(true);
 

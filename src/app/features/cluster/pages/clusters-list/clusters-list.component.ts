@@ -17,6 +17,7 @@ import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-clusters-list',
@@ -40,7 +41,7 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
     selectedOutbreak: OutbreakModel;
     // list of existing clusters
     clustersList$: Observable<ClusterModel[]>;
-    clustersListCount$: Observable<any>;
+    clustersListCount$: Observable<IBasicCount>;
 
     fixedTableColumns: string[] = [
         'name',

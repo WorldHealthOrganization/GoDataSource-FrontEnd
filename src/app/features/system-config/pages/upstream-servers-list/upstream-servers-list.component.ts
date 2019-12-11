@@ -21,6 +21,7 @@ import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-upstream-servers-list',
@@ -41,7 +42,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
 
     // upstream servers
     upstreamServerList: SystemUpstreamServerModel[] = [];
-    upstreamServerListCount: { count: number };
+    upstreamServerListCount: IBasicCount;
     upstreamServerListAll: SystemUpstreamServerModel[] = [];
 
     // sync in progress ?

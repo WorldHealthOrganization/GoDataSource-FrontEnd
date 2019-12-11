@@ -23,6 +23,7 @@ import { RelationshipsListComponent } from '../../helper-classes/relationships-l
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { AddressType } from '../../../../core/models/address.model';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -35,7 +36,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
 
     // entities list relationships
     entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
-    entitiesListCount$: Observable<any>;
+    entitiesListCount$: Observable<IBasicCount>;
 
     // available side filters
     availableSideFilters: FilterModel[];

@@ -28,6 +28,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -54,7 +55,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
 
     // list of existing case lab results
     labResultsList$: Observable<LabResultModel[]>;
-    labResultsListCount$: Observable<any>;
+    labResultsListCount$: Observable<IBasicCount>;
 
     labTestResultsList$: Observable<any[]>;
     testTypesList$: Observable<any[]>;

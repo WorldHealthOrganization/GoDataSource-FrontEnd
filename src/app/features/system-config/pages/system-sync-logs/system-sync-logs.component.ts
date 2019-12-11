@@ -25,6 +25,7 @@ import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-system-sync-logs-list',
@@ -53,7 +54,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
 
     // sync logs
     syncLogsList$: Observable<SystemSyncLogModel[]>;
-    syncLogsListCount$: Observable<any>;
+    syncLogsListCount$: Observable<IBasicCount>;
     syncLogsStatusList$: Observable<any>;
 
     // upstream servers

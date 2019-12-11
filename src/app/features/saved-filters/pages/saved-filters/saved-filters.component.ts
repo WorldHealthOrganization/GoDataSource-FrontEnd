@@ -14,6 +14,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-saved-filters',
@@ -34,7 +35,7 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
     });
 
     savedFiltersList$: Observable<SavedFilterModel[]>;
-    savedFiltersListCount$: Observable<any>;
+    savedFiltersListCount$: Observable<IBasicCount>;
 
     fixedTableColumns: string[] = [
         'name',

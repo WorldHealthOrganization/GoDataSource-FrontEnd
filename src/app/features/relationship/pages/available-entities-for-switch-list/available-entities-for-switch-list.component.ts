@@ -26,6 +26,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { AddressType } from '../../../../core/models/address.model';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-available-entities-for-switch-list',
@@ -36,7 +37,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
-    entitiesListCount$: Observable<any>;
+    entitiesListCount$: Observable<IBasicCount>;
     entityType: EntityType;
 
     // available side filters

@@ -16,6 +16,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-user-list',
@@ -36,7 +37,7 @@ export class UserListComponent extends ListComponent implements OnInit {
 
     // list of existing users
     usersList$: Observable<UserModel[]>;
-    usersListCount$: Observable<any>;
+    usersListCount$: Observable<IBasicCount>;
 
     rolesList$: Observable<UserRoleModel[]>;
     outbreaksListMap: any = {};

@@ -16,6 +16,7 @@ import { throwError } from 'rxjs';
 import { catchError, share, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-system-devices-list',
@@ -35,7 +36,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
     authUser: UserModel;
 
     devicesList$: Observable<DeviceModel[]>;
-    devicesListCount$: Observable<any>;
+    devicesListCount$: Observable<IBasicCount>;
 
     // constants
     UserSettings = UserSettings;

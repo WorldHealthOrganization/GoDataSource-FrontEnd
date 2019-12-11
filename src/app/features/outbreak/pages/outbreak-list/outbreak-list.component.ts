@@ -24,6 +24,7 @@ import { TopnavComponent } from '../../../../shared/components/topnav/topnav.com
 import { catchError, map, share, switchMap, tap } from 'rxjs/operators';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import { throwError } from 'rxjs';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -42,7 +43,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
 
     // list of existing outbreaks
     outbreaksList$: Observable<OutbreakModel[]>;
-    outbreaksListCount$: Observable<any>;
+    outbreaksListCount$: Observable<IBasicCount>;
 
     // list of options from the Active dropdown
     activeOptionsList$: Observable<any[]>;

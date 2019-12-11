@@ -29,6 +29,7 @@ import { AddressType } from '../../../../core/models/address.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -74,7 +75,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     } = {};
 
     // used for pagination
-    followUpsGroupedByContactCount$: Observable<any>;
+    followUpsGroupedByContactCount$: Observable<IBasicCount>;
     teamsList$: Observable<TeamModel[]>;
 
     // loading flag - display spinner instead of table

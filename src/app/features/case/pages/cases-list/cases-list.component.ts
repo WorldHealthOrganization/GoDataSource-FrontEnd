@@ -37,6 +37,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { AddressType } from '../../../../core/models/address.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-cases-list',
@@ -55,7 +56,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     selectedOutbreak: OutbreakModel;
     // list of existing cases
     casesList$: Observable<CaseModel[]>;
-    casesListCount$: Observable<any>;
+    casesListCount$: Observable<IBasicCount>;
 
     // user list
     userList$: Observable<UserModel[]>;
