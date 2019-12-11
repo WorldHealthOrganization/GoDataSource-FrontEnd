@@ -324,7 +324,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             )
             .subscribe((settings: SystemSettingsModel) => {
                 // map client applications and modify client application status
-                const modifiedClientApplications =_.map(settings.clientApplications, (clientApp: SystemClientApplicationModel) => {
+                const modifiedClientApplications = _.map(settings.clientApplications, (clientApp: SystemClientApplicationModel) => {
                     if (clientApp.id === clientApplication.id) {
                         clientApp.active = !clientApplication.active;
                     }
