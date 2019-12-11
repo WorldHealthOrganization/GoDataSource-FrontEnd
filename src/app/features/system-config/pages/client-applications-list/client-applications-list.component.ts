@@ -281,11 +281,10 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                         )
                         .subscribe((settings: SystemSettingsModel) => {
                             // filter client applications and remove client application
-                            const filteredClientApplications =
-                                settings.clientApplications
-                                    .filter((clientApp: SystemClientApplicationModel) => {
-                                        return clientApp.id !== clientApplication.id;
-                                });
+                            const filteredClientApplications = settings.clientApplications.filter((clientApp: SystemClientApplicationModel) => {
+                                return clientApp.id !== clientApplication.id;
+                            });
+
                             // save upstream servers
                             this.systemSettingsDataService
                                 .modifySystemSettings({
@@ -328,13 +327,13 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             )
             .subscribe((settings: SystemSettingsModel) => {
                 // map client applications and modify client application status
-                const modifiedClientApplications =
-                    _.map(settings.clientApplications, (clientApp: SystemClientApplicationModel) => {
-                        if (clientApp.id === clientApplication.id) {
-                            clientApp.active = !clientApplication.active;
-                        }
-                        return clientApp;
+                const modifiedClientApplications =_.map(settings.clientApplications, (clientApp: SystemClientApplicationModel) => {
+                    if (clientApp.id === clientApplication.id) {
+                        clientApp.active = !clientApplication.active;
+                    }
+                    return clientApp;
                 });
+
                 // save client applications
                 this.systemSettingsDataService
                     .modifySystemSettings({
