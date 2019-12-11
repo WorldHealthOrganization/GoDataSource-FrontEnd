@@ -29,6 +29,14 @@ export enum PERMISSION {
     USER_ROLE_MODIFY = 'user_role_modify',
     USER_ROLE_DELETE = 'user_role_delete',
 
+    // backups
+    BACKUP_LIST = 'backup_list',
+    BACKUP_VIEW = 'backup_view',
+    BACKUP_CREATE = 'backup_create',
+    BACKUP_DELETE = 'backup_delete',
+    BACKUP_AUTOMATIC_SETTINGS = 'backup_automatic_settings',
+    BACKUP_RESTORE = 'backup_restore',
+
     // locations
     LOCATION_LIST = 'location_list',
     LOCATION_VIEW = 'location_view',

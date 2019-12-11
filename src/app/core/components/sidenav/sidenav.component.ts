@@ -415,7 +415,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 new ChildNavItem(
                     'backups',
                     'LNG_LAYOUT_MENU_ITEM_BACKUPS_LABEL',
-                    [PERMISSION.READ_SYS_CONFIG],
+                    [
+                        PERMISSION.BACKUP_LIST
+                    ],
                     '/system-config/backups'
                 )
             ]

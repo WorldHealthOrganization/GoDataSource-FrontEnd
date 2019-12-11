@@ -111,6 +111,21 @@ export interface IPermissionLanguage {
 }
 
 /**
+ * Location
+ */
+export interface IPermissionLocation {
+    /**
+     * Has permission to see location usage
+     */
+    canListUsage(user: UserModel): boolean;
+
+    /**
+     * Has permission to propagate latitude and longitude to persons that use this location and have the same previous lat and lng as the location
+     */
+    canPropagateGeoToPersons(user: UserModel): boolean;
+}
+
+/**
  * User
  */
 export interface IPermissionUser {
@@ -126,18 +141,13 @@ export interface IPermissionUser {
 }
 
 /**
- * Location
+ * Backup
  */
-export interface IPermissionLocation {
+export interface IPermissionBackup {
     /**
-     * Has permission to see location usage
+     * Has permission to set automatic backup settings
      */
-    canListUsage(user: UserModel): boolean;
-
-    /**
-     * Has permission to propagate latitude and longitude to persons that use this location and have the same previous lat and lng as the location
-     */
-    canPropagateGeoToPersons(user: UserModel): boolean;
+    canSetAutomaticBackupSettings(user: UserModel): boolean;
 }
 
 /**

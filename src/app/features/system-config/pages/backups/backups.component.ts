@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -29,12 +28,13 @@ import { Router } from '@angular/router';
     styleUrls: ['./backups.component.less']
 })
 export class BackupsComponent extends ListComponent implements OnInit {
-    /**
-     * Breadcrumbs
-     */
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_SYSTEM_BACKUPS_TITLE', '.', true)
     ];
+
+    // constants
+    BackupModel = BackupModel;
 
     // authenticated user
     authUser: UserModel;
@@ -72,6 +72,10 @@ export class BackupsComponent extends ListComponent implements OnInit {
             iconTooltip: 'LNG_PAGE_SYSTEM_BACKUPS_ACTION_VIEW_BACKUP_PATH',
             click: (item: BackupModel) => {
                 this.showBackupData(item);
+            },
+            visible: (item: BackupModel): boolean => {
+                return item.status !== Constants.SYSTEM_BACKUP_STATUS.PENDING.value &&
+                    BackupModel.canView(this.authUser);
             }
         }),
 
@@ -83,7 +87,8 @@ export class BackupsComponent extends ListComponent implements OnInit {
                 this.restoreBackup(item);
             },
             visible: (item: BackupModel): boolean => {
-                return item.status === Constants.SYSTEM_BACKUP_STATUS.SUCCESS.value;
+                return item.status === Constants.SYSTEM_BACKUP_STATUS.SUCCESS.value &&
+                    BackupModel.canRestore(this.authUser);
             }
         }),
 
@@ -98,8 +103,9 @@ export class BackupsComponent extends ListComponent implements OnInit {
                     click: (item: BackupModel) => {
                         this.deleteBackup(item);
                     },
-                    visible: (): boolean => {
-                        return this.hasSysConfigWriteAccess();
+                    visible: (item: BackupModel): boolean => {
+                        return item.status !== Constants.SYSTEM_BACKUP_STATUS.PENDING.value &&
+                            BackupModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -164,14 +170,6 @@ export class BackupsComponent extends ListComponent implements OnInit {
             .subscribe((settings: SystemSettingsModel) => {
                 this.settings = settings;
             });
-    }
-
-    /**
-     * Check if we have write access to cases
-     * @returns {boolean}
-     */
-    hasSysConfigWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
     }
 
     /**

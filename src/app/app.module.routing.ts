@@ -400,7 +400,12 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                    permissions: new PermissionExpression({
+                        or: [
+                            PERMISSION.BACKUP_LIST
+                            // ... Upstream Servers / Client Applications / System Devices / Sync
+                        ]
+                    })
                 }
             },
             // Audit Logs Module routes

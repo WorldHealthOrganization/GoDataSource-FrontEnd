@@ -6,6 +6,7 @@
             <div class="topnav-actions">
                 <ng-container *ngIf="!waitForBackupIdToBeReady && !loading">
                     <button
+                        *ngIf="settings && (BackupModel.canSetAutomaticBackupSettings(authUser) || BackupModel.canCreate(authUser))"
                         mat-raised-button
                         color="accent"
                         [matMenuTriggerFor]="quickActionsMenu">
@@ -13,9 +14,10 @@
                     </button>
 
                     <mat-menu #quickActionsMenu="matMenu">
-                        <ng-container *ngIf="hasSysConfigWriteAccess() && settings">
+                        <ng-container *ngIf="settings">
                             <!-- Modify settings -->
                             <button
+                                *ngIf="BackupModel.canSetAutomaticBackupSettings(authUser)"
                                 mat-menu-item
                                 (click)="configureAutomaticBackupSettings()">
                                 {{ 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_BUTTON' | translate }}
@@ -23,6 +25,7 @@
 
                             <!-- Create backup -->
                             <button
+                                *ngIf="BackupModel.canCreate(authUser)"
                                 mat-menu-item
                                 (click)="backupData()">
                                 {{ 'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_BUTTON' | translate }}
@@ -37,6 +40,7 @@
 
 <!--Total number of records from the list-->
 <app-total-number-of-records
+    *ngIf="!loading"
     [value]="(backupsListCount$ | async)?.count">
 </app-total-number-of-records>
 
@@ -262,6 +266,7 @@
     </div>
 
     <mat-paginator
+        *ngIf="!loading"
         [length]="(backupsListCount$ | async)?.count"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"

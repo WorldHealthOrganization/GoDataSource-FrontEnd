@@ -10,8 +10,15 @@ const routes: Routes = [
     // Backups
     {
         path: 'backups',
-        component: fromPages.BackupsComponent
+        component: fromPages.BackupsComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.BACKUP_LIST
+            ]
+        }
     },
+
     // Upstream Servers
     {
         path: 'upstream-servers',
@@ -26,6 +33,7 @@ const routes: Routes = [
             }
         ]
     },
+
     // Client Applications
     {
         path: 'client-applications',
@@ -40,6 +48,7 @@ const routes: Routes = [
             }
         ]
     },
+
     // System Devices
     {
         path: 'devices',
@@ -78,6 +87,7 @@ const routes: Routes = [
             }
         ]
     },
+
     // Sync
     {
         path: 'sync-logs',
