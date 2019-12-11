@@ -313,9 +313,6 @@ export class ClientApplicationsListComponent extends ListComponent implements On
      * @param upstreamServer
      */
     toggleActiveFlag(clientApplication: SystemClientApplicationModel) {
-        // toggle flag
-        clientApplication.active = !clientApplication.active;
-
         // save
         this.systemSettingsDataService
             .getSystemSettings()
