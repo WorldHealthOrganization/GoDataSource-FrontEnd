@@ -385,7 +385,8 @@ const routes: Routes = [
                     permissions: new PermissionExpression({
                         or: [
                             PERMISSION.LOCATION_IMPORT,
-                            PERMISSION.LANGUAGE_IMPORT_TOKENS
+                            PERMISSION.LANGUAGE_IMPORT_TOKENS,
+                            PERMISSION.SYNC_IMPORT_PACKAGE
                             // ...case / contact / lab results / ref data
                         ]
                     })
@@ -402,8 +403,9 @@ const routes: Routes = [
                 data: {
                     permissions: new PermissionExpression({
                         or: [
-                            PERMISSION.BACKUP_LIST
-                            // ... Upstream Servers / Client Applications / System Devices / Sync
+                            PERMISSION.BACKUP_LIST,
+                            PERMISSION.SYNC_LOG_LIST
+                            // ... Upstream Servers / Client Applications / System Devices
                         ]
                     })
                 }

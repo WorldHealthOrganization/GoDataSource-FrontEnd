@@ -37,6 +37,15 @@ export enum PERMISSION {
     BACKUP_AUTOMATIC_SETTINGS = 'backup_automatic_settings',
     BACKUP_RESTORE = 'backup_restore',
 
+    // sync logs
+    SYNC_LOG_LIST = 'sync_log_list',
+    SYNC_LOG_VIEW = 'sync_log_view',
+    SYNC_LOG_DELETE = 'sync_log_delete',
+    SYNC_LOG_BULK_DELETE = 'sync_log_bulk_delete',
+    SYNC_SETTINGS = 'sync_settings',
+    SYNC_EXPORT_PACKAGE = 'sync_export_package',
+    SYNC_IMPORT_PACKAGE = 'sync_import_package',
+
     // locations
     LOCATION_LIST = 'location_list',
     LOCATION_VIEW = 'location_view',

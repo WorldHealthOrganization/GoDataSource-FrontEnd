@@ -4,7 +4,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { SystemSyncLogDataService } from '../../../../core/services/data/system-sync-log.data.service';
@@ -40,6 +39,9 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_TITLE', '.', true)
     ];
+
+    // constants
+    SystemSyncLogModel = SystemSyncLogModel;
 
     // authenticated user
     authUser: UserModel;
@@ -79,7 +81,8 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                 this.viewError(item);
             },
             visible: (item: SystemSyncLogModel): boolean => {
-                return !_.isEmpty(item.error);
+                return !_.isEmpty(item.error) &&
+                    SystemSyncLogModel.canView(this.authUser);
             }
         }),
 
@@ -95,7 +98,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                         this.deleteSyncLog(item);
                     },
                     visible: (): boolean => {
-                        return this.hasSysConfigWriteAccess();
+                        return SystemSyncLogModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -286,14 +289,6 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
     }
 
     /**
-     * Check if we have write access to sys settings
-     * @returns {boolean}
-     */
-    hasSysConfigWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
-    }
-
-    /**
      * Configure sync settings
      */
     configureSyncSettings() {
@@ -373,20 +368,48 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
      * @param systemSyncLogModel
      */
     viewError(systemSyncLogModel: SystemSyncLogModel) {
-        this.dialogService
-            .showConfirm(new DialogConfiguration({
-                message: systemSyncLogModel.error,
-                addDefaultButtons: false,
-                buttons: [
-                    new DialogButton({
-                        label: 'LNG_COMMON_BUTTON_CLOSE',
-                        clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-                            dialogHandler.close();
-                        }
-                    })
-                ]
-            }))
-            .subscribe();
+        // if not string, then there is no point in continuing
+        if (
+            !systemSyncLogModel.error ||
+            !_.isString(systemSyncLogModel.error)
+        ) {
+            return;
+        }
+
+        // fix api issue
+        let error: string = systemSyncLogModel.error.trim();
+        let errJson: any;
+        const detailsString: string = '"details":{';
+        const detailsIndex: number = error.indexOf(detailsString);
+        if (detailsIndex > -1) {
+            // split error object & details object
+            const detailsText: string = error.substr(detailsIndex, error.length - (detailsIndex + 2));
+            const detailsObjectText: string = detailsText.substr(detailsString.length - 1);
+            error = error.substr(0, detailsIndex - 1) + '}'
+
+            // convert to json
+            errJson = JSON.parse(error);
+            errJson.details = JSON.parse(detailsObjectText);
+        }
+
+        // display data
+        if (errJson) {
+            this.dialogService
+                .showConfirm(new DialogConfiguration({
+                    message: 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ERROR_DETAILS_TITLE',
+                    additionalInfo: `<code><pre>${JSON.stringify(errJson, null, 1)}</pre></code>`,
+                    addDefaultButtons: false,
+                    buttons: [
+                        new DialogButton({
+                            label: 'LNG_COMMON_BUTTON_CLOSE',
+                            clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                                dialogHandler.close();
+                            }
+                        })
+                    ]
+                }))
+                .subscribe();
+        }
     }
 
     /**

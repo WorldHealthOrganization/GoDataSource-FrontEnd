@@ -104,6 +104,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_IMPORT_SYNC_PACKAGE_BUTTON': 'Import sync package',
         'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_EXPORT_SYNC_PACKAGE_BUTTON': 'Export sync package',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ERROR_DETAILS_TITLE': 'Error details',
 
 
         /**

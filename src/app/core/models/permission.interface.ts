@@ -151,6 +151,26 @@ export interface IPermissionBackup {
 }
 
 /**
+ * Sync log
+ */
+export interface IPermissionSyncLog {
+    /**
+     * Has permission to set sync settings
+     */
+    canSetSettings(user: UserModel): boolean;
+
+    /**
+     * Has permission to export sync package
+     */
+    canExportPackage(user: UserModel): boolean;
+
+    /**
+     * Has permission to import sync package
+     */
+    canImportPackage(user: UserModel): boolean;
+}
+
+/**
  * Questionnaire
  */
 export interface IPermissionQuestionnaire {

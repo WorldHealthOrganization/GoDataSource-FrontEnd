@@ -91,7 +91,13 @@ const routes: Routes = [
     // Sync
     {
         path: 'sync-logs',
-        component: fromPages.SystemSyncLogsComponent
+        component: fromPages.SystemSyncLogsComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.SYNC_LOG_LIST
+            ]
+        }
     }
 ];
 

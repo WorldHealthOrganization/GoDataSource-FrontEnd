@@ -87,7 +87,9 @@ const routes: Routes = [
         component: fromPages.ImportSyncPackageComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG]
+            permissions: [
+                PERMISSION.SYNC_IMPORT_PACKAGE
+            ]
         }
     }
 ];

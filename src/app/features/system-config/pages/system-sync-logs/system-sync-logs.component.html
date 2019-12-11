@@ -5,6 +5,10 @@
 
             <div class="topnav-actions">
                 <button
+                    *ngIf="SystemSyncLogModel.canSetSettings(authUser) ||
+                        SystemSyncLogModel.canBulkDelete(authUser) ||
+                        SystemSyncLogModel.canImportPackage(authUser) ||
+                        SystemSyncLogModel.canExportPackage(authUser)"
                     mat-raised-button
                     color="accent"
                     [matMenuTriggerFor]="quickActionsMenu">
@@ -12,32 +16,33 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
-                    <ng-container *ngIf="hasSysConfigWriteAccess()">
-                        <!-- Sync general settings -->
-                        <button
-                            mat-menu-item
-                            (click)="configureSyncSettings()">
-                            {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_BUTTON' | translate }}
-                        </button>
+                    <!-- Sync general settings -->
+                    <button
+                        *ngIf="SystemSyncLogModel.canSetSettings(authUser)"
+                        mat-menu-item
+                        (click)="configureSyncSettings()">
+                        {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_BUTTON' | translate }}
+                    </button>
 
-                        <!-- Delete sync logs -->
-                        <button
-                            mat-menu-item
-                            (click)="deleteServerSyncLogs()">
-                            {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_LOGS_BUTTON' | translate }}
-                        </button>
+                    <!-- Delete sync logs -->
+                    <button
+                        *ngIf="SystemSyncLogModel.canBulkDelete(authUser)"
+                        mat-menu-item
+                        (click)="deleteServerSyncLogs()">
+                        {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_LOGS_BUTTON' | translate }}
+                    </button>
 
-                        <!-- Import Sync Package -->
-                        <button
-                            *ngIf="hasSysConfigWriteAccess()"
-                            mat-menu-item
-                            [routerLink]="['/import-export-data', 'sync-package', 'import']">
-                            {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_IMPORT_SYNC_PACKAGE_BUTTON' | translate }}
-                        </button>
-                    </ng-container>
+                    <!-- Import Sync Package -->
+                    <button
+                        *ngIf="SystemSyncLogModel.canImportPackage(authUser)"
+                        mat-menu-item
+                        [routerLink]="['/import-export-data', 'sync-package', 'import']">
+                        {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_IMPORT_SYNC_PACKAGE_BUTTON' | translate }}
+                    </button>
 
                     <!-- Export Sync Package -->
                     <button
+                        *ngIf="SystemSyncLogModel.canExportPackage(authUser)"
                         mat-menu-item
                         (click)="exportSyncPackage()">
                         {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_EXPORT_SYNC_PACKAGE_BUTTON' | translate }}

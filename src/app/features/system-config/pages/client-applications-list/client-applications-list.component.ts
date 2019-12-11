@@ -68,8 +68,13 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             icon: 'visibilityOf',
             iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE',
             click: (item: SystemClientApplicationModel, handler: HoverRowActionsDirective) => {
-                this.toggleActiveFlag(item);
-                handler.redraw();
+                this.toggleActiveFlag(
+                    item,
+                    false,
+                    () => {
+                        handler.redraw();
+                    }
+                );
             },
             visible: (item: SystemClientApplicationModel): boolean => {
                 return this.hasSysConfigWriteAccess() &&
@@ -82,8 +87,13 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE',
             click: (item: SystemClientApplicationModel, handler: HoverRowActionsDirective) => {
-                this.toggleActiveFlag(item);
-                handler.redraw();
+                this.toggleActiveFlag(
+                    item,
+                    true,
+                    () => {
+                        handler.redraw();
+                    }
+                );
             },
             visible: (item: SystemClientApplicationModel): boolean => {
                 return this.hasSysConfigWriteAccess() &&
@@ -310,9 +320,12 @@ export class ClientApplicationsListComponent extends ListComponent implements On
 
     /**
      * Toggle active flag
-     * @param upstreamServer
      */
-    toggleActiveFlag(clientApplication: SystemClientApplicationModel) {
+    toggleActiveFlag(
+        clientApplication: SystemClientApplicationModel,
+        newValue: boolean,
+        finishCallback: () => void
+    ) {
         // save
         this.systemSettingsDataService
             .getSystemSettings()
@@ -324,28 +337,36 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             )
             .subscribe((settings: SystemSettingsModel) => {
                 // map client applications and modify client application status
-                const modifiedClientApplications = _.map(settings.clientApplications, (clientApp: SystemClientApplicationModel) => {
-                    if (clientApp.id === clientApplication.id) {
-                        clientApp.active = !clientApplication.active;
-                    }
-                    return clientApp;
+                const childClientApplication: SystemClientApplicationModel = _.find(settings.clientApplications, (clientApp: SystemClientApplicationModel) => {
+                    return clientApp.id === clientApplication.id;
                 });
+                if (childClientApplication) {
+                    // update data
+                    childClientApplication.active = newValue;
 
-                // save client applications
-                this.systemSettingsDataService
-                    .modifySystemSettings({
-                        clientApplications: modifiedClientApplications
-                    })
-                    .pipe(
-                        catchError((err) => {
-                            this.snackbarService.showApiError(err);
-                            return throwError(err);
+                    // save client applications
+                    this.systemSettingsDataService
+                        .modifySystemSettings({
+                            clientApplications: settings.clientApplications
                         })
-                    )
-                    .subscribe(() => {
-                        // display success message
-                        this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE');
-                    });
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe(() => {
+                            // display success message
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE');
+
+                            // finished
+                            clientApplication.active = newValue;
+                            finishCallback();
+                        });
+                } else {
+                    // no client application found - must refresh page
+                    this.needsRefreshList(true);
+                }
             });
     }
 

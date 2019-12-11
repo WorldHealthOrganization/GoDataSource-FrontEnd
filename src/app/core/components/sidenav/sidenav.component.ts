@@ -409,7 +409,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 new ChildNavItem(
                     'sync',
                     'LNG_LAYOUT_MENU_ITEM_SYNC_LABEL',
-                    [PERMISSION.READ_SYS_CONFIG],
+                    [
+                        PERMISSION.SYNC_LOG_LIST
+                    ],
                     '/system-config/sync-logs'
                 ),
                 new ChildNavItem(
