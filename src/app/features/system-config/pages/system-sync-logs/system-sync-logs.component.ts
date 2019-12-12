@@ -386,7 +386,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
             // split error object & details object
             const detailsText: string = error.substr(detailsIndex, error.length - (detailsIndex + 2));
             const detailsObjectText: string = detailsText.substr(detailsString.length - 1);
-            error = error.substr(0, detailsIndex - 1) + '}'
+            error = error.substr(0, detailsIndex - 1) + '}';
 
             // convert to json
             errJson = JSON.parse(error);

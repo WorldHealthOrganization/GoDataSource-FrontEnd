@@ -32,56 +32,6 @@ export class FollowUpModel
     fillLocation: FillLocationModel;
 
     /**
-     * Static Permissions - IPermissionBasic
-     */
-    static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_VIEW) : false; }
-    static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_LIST) : false; }
-    static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_CREATE) : false; }
-    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_VIEW, PERMISSION.FOLLOW_UP_MODIFY) : false; }
-    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_DELETE) : false; }
-
-    /**
-     * Constructor
-     */
-    constructor(
-        data = null,
-        includeContact: boolean = true
-    ) {
-        super(data);
-
-        this.id = _.get(data, 'id');
-        this.date = _.get(data, 'date');
-        this.personId = _.get(data, 'personId');
-        this.targeted = _.get(data, 'targeted', true);
-        this.statusId = _.get(data, 'statusId');
-        this.outbreakId = _.get(data, 'outbreakId');
-
-        this.address = new AddressModel(_.get(data, 'address'));
-
-        this.fillLocation = _.get(data, 'fillLocation');
-        this.fillLocation = _.isEmpty(this.fillLocation) ? undefined : new FillLocationModel(this.fillLocation);
-
-        if (includeContact) {
-            this.contact = _.get(data, 'contact', {});
-            this.contact = new ContactModel(this.contact);
-        }
-
-        this.teamId = _.get(data, 'teamId');
-        this.index = _.get(data, 'index');
-
-        this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
-    }
-
-    /**
-     * Permissions - IPermissionBasic
-     */
-    canView(user: UserModel): boolean { return FollowUpModel.canView(user); }
-    canList(user: UserModel): boolean { return FollowUpModel.canList(user); }
-    canCreate(user: UserModel): boolean { return FollowUpModel.canCreate(user); }
-    canModify(user: UserModel): boolean { return FollowUpModel.canModify(user); }
-    canDelete(user: UserModel): boolean { return FollowUpModel.canDelete(user); }
-
-    /**
      * Determine alertness
      */
     static determineAlertness(
@@ -149,6 +99,56 @@ export class FollowUpModel
             return followUpData;
         });
     }
+
+    /**
+     * Static Permissions - IPermissionBasic
+     */
+    static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_VIEW) : false; }
+    static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_LIST) : false; }
+    static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_CREATE) : false; }
+    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_VIEW, PERMISSION.FOLLOW_UP_MODIFY) : false; }
+    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_DELETE) : false; }
+
+    /**
+     * Constructor
+     */
+    constructor(
+        data = null,
+        includeContact: boolean = true
+    ) {
+        super(data);
+
+        this.id = _.get(data, 'id');
+        this.date = _.get(data, 'date');
+        this.personId = _.get(data, 'personId');
+        this.targeted = _.get(data, 'targeted', true);
+        this.statusId = _.get(data, 'statusId');
+        this.outbreakId = _.get(data, 'outbreakId');
+
+        this.address = new AddressModel(_.get(data, 'address'));
+
+        this.fillLocation = _.get(data, 'fillLocation');
+        this.fillLocation = _.isEmpty(this.fillLocation) ? undefined : new FillLocationModel(this.fillLocation);
+
+        if (includeContact) {
+            this.contact = _.get(data, 'contact', {});
+            this.contact = new ContactModel(this.contact);
+        }
+
+        this.teamId = _.get(data, 'teamId');
+        this.index = _.get(data, 'index');
+
+        this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
+    }
+
+    /**
+     * Permissions - IPermissionBasic
+     */
+    canView(user: UserModel): boolean { return FollowUpModel.canView(user); }
+    canList(user: UserModel): boolean { return FollowUpModel.canList(user); }
+    canCreate(user: UserModel): boolean { return FollowUpModel.canCreate(user); }
+    canModify(user: UserModel): boolean { return FollowUpModel.canModify(user); }
+    canDelete(user: UserModel): boolean { return FollowUpModel.canDelete(user); }
 
     /**
      * Get date formatted
