@@ -244,6 +244,100 @@ export class UserRoleHelper {
     }
 
     /**
+     * Determine all required permissions ( recursive )
+     */
+    private static determineMissingPermissions(
+        data: {
+            readonly optionsMap: ISelectGroupOptionMap<any>,
+            value: string[]
+        },
+        option: IPermissionChildModel,
+        checkedPermission: {
+            [permission: string]: boolean
+        },
+        missingPermissions: string[]
+    ) {
+        (option.requires || []).forEach((req: string) => {
+            // there is no point in checking again when this permission was checked already
+            if (checkedPermission[req]) {
+                return;
+            }
+
+            // mark as checked
+            checkedPermission[req] = true;
+
+            // do we need to add this one to missing permissions ?
+            if (
+                !data.value || (
+                    data.value.indexOf(req) === -1 && (
+                        !data.optionsMap[req] ||
+                        data.value.indexOf(data.optionsMap[req].groupValue) === -1
+                    )
+                )
+            ) {
+                // add it the list of missing missingPermissions
+                missingPermissions.push(req);
+
+                // check children permissions
+                if (data.optionsMap[req]) {
+                    const requireOption: IPermissionChildModel = data.optionsMap[req].option;
+                    if (
+                        requireOption.requires &&
+                        requireOption.requires.length > 0
+                    ) {
+                        UserRoleHelper.determineMissingPermissions(
+                            data,
+                            requireOption,
+                            checkedPermission,
+                            missingPermissions
+                        );
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Display requires popup
+     */
+    private static displayRequiresPopup(
+        data: {
+            readonly optionsMap: ISelectGroupOptionMap<any>,
+            addValues(...values: string[]): string[]
+        },
+        missingPermissions: string[],
+        i18nService: I18nService,
+        dialogService: DialogService
+    ) {
+        // do we need to request user if he want to enable missing permissions ?
+        if (
+            missingPermissions &&
+            missingPermissions.length > 0
+        ) {
+            // determine missing permission labels
+            const labels: string[] = missingPermissions.map((permission): string => {
+                return `<div>${data.optionsMap[permission] ?
+                    i18nService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) :
+                    permission}</div>`;
+            });
+
+            // display confirm dialog - should we add missing required permissions ?
+            dialogService
+                .showConfirm(new DialogConfiguration({
+                    message: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_MESSAGE',
+                    additionalInfo: labels.join(''),
+                    yesLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_YES_LABEL',
+                    cancelLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_NO_LABEL'
+                }))
+                .subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        data.addValues(...missingPermissions);
+                    }
+                });
+        }
+    }
+
+    /**
      * Group child option check state changed
      */
     public static groupOptionCheckStateChanged(
@@ -264,42 +358,25 @@ export class UserRoleHelper {
             const checkSelectionMissingPermissions = () => {
                 // check if we need to add permissions
                 if (selectedOption.requires) {
-                    // determine missing permissions
-                    const missingPermissions: string[] = (selectedOption.requires || []).filter((req: string): boolean => {
-                        return !data.value || (
-                            data.value.indexOf(req) === -1 && (
-                                !data.optionsMap[req] ||
-                                data.value.indexOf(data.optionsMap[req].groupValue) === -1
-                            )
-                        );
-                    });
+                    // method to recursively determine missing permissions
+                    const checkedPermission: {
+                        [permission: string]: boolean
+                    } = {};
+                    const missingPermissions: string[] = [];
+                    UserRoleHelper.determineMissingPermissions(
+                        data,
+                        selectedOption,
+                        checkedPermission,
+                        missingPermissions
+                    );
 
                     // do we need to request user if he want to enable missing permissions ?
-                    if (
-                        missingPermissions &&
-                        missingPermissions.length > 0
-                    ) {
-                        // determine missing permission labels
-                        const labels: string[] = missingPermissions.map((permission): string => {
-                            return `<div>${data.optionsMap[permission] ?
-                                i18nService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) :
-                                permission}</div>`;
-                        });
-
-                        // display confirm dialog - should we add missing required permissions ?
+                    this.displayRequiresPopup(
+                        data,
+                        missingPermissions,
+                        i18nService,
                         dialogService
-                            .showConfirm(new DialogConfiguration({
-                                message: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_MESSAGE',
-                                additionalInfo: labels.join(''),
-                                yesLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_YES_LABEL',
-                                cancelLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_NO_LABEL'
-                            }))
-                            .subscribe((answer: DialogAnswer) => {
-                                if (answer.button === DialogAnswerButton.Yes) {
-                                    data.addValues(...missingPermissions);
-                                }
-                            });
-                    }
+                    );
                 }
             };
 
@@ -467,56 +544,28 @@ export class UserRoleHelper {
         } else if (data.action === GroupEventDataAction.All) {
             // we need to determine required permissions under all options
             const group: PermissionModel = data.group;
-            const missingPermissions: {
-                [key: string]: boolean
+
+            // method to recursively determine missing permissions
+            const checkedPermission: {
+                [permission: string]: boolean
             } = {};
-            (group.permissions || []).forEach((groupChildPermission) => {
-                // does this permission require other permissions ?
-                if (
-                    groupChildPermission.requires &&
-                    groupChildPermission.requires.length > 0
-                ) {
-                    // check if we have each required permissions
-                    groupChildPermission.requires.forEach((reqPermission: string) => {
-                        // check if we have each required permissions
-                        // & make sure it isn't from the same group since the entire group is checked ( all )
-                        if (
-                            data.value.indexOf(reqPermission) === -1 &&
-                            data.optionsMap[reqPermission].groupValue !== group.groupAllId
-                        ) {
-                            missingPermissions[reqPermission] = true;
-                        }
-                    });
-                }
+            const missingPermissions: string[] = [];
+            (group.permissions || []).forEach((groupChildPermission: IPermissionChildModel) => {
+                UserRoleHelper.determineMissingPermissions(
+                    data,
+                    groupChildPermission,
+                    checkedPermission,
+                    missingPermissions
+                );
             });
 
             // do we have missing permissions
-            const missingPermissionsArray: string[] = Object.keys(missingPermissions);
-            if (
-                missingPermissionsArray &&
-                missingPermissionsArray.length > 0
-            ) {
-                // determine missing permission labels
-                const labels: string[] = missingPermissionsArray.map((permission): string => {
-                    return `<div>${data.optionsMap[permission] ?
-                        i18nService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) :
-                        permission}</div>`;
-                });
-
-                // display confirm dialog - should we add missing required permissions ?
+            this.displayRequiresPopup(
+                data,
+                missingPermissions,
+                i18nService,
                 dialogService
-                    .showConfirm(new DialogConfiguration({
-                        message: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_MESSAGE',
-                        additionalInfo: labels.join(''),
-                        yesLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_YES_LABEL',
-                        cancelLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_NO_LABEL'
-                    }))
-                    .subscribe((answer: DialogAnswer) => {
-                        if (answer.button === DialogAnswerButton.Yes) {
-                            data.addValues(...missingPermissionsArray);
-                        }
-                    });
-            }
+            );
         }
     }
 }
