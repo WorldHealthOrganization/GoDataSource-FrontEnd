@@ -171,6 +171,21 @@ export interface IPermissionSyncLog {
 }
 
 /**
+ * Device
+ */
+export interface IPermissionDevice {
+    /**
+     * Has permission to see device history
+     */
+    canListHistory(user: UserModel): boolean;
+
+    /**
+     * Has permission to wipe device application
+     */
+    canWipe(user: UserModel): boolean;
+}
+
+/**
  * Questionnaire
  */
 export interface IPermissionQuestionnaire {

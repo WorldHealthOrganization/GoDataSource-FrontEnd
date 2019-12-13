@@ -404,8 +404,12 @@ const routes: Routes = [
                     permissions: new PermissionExpression({
                         or: [
                             PERMISSION.BACKUP_LIST,
-                            PERMISSION.SYNC_LOG_LIST
-                            // ... Upstream Servers / Client Applications / System Devices
+                            PERMISSION.SYNC_LOG_LIST,
+                            PERMISSION.DEVICE_LIST,
+                            PERMISSION.DEVICE_VIEW,
+                            PERMISSION.DEVICE_MODIFY,
+                            PERMISSION.DEVICE_LIST_HISTORY
+                            // ... Upstream Servers / Client Applications
                         ]
                     })
                 }

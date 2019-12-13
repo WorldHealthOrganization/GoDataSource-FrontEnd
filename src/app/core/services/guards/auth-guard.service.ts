@@ -66,19 +66,20 @@ export class AuthGuard implements CanActivate {
             this.router.navigate(['/auth/login']);
             return false;
         } else {
+            // sign out in case we're signed in
             return new Observable<boolean>((observer) => {
-                // sign out in case we're signed in
                 this.authDataService
                     .logout()
                     .pipe(
                         catchError(() => {
                             this.router.navigate(['/auth/login']);
+                            observer.next(false);
                             return of(false);
                         })
                     )
                     .subscribe(() => {
                         this.router.navigate(['/auth/login']);
-                        return false;
+                        observer.next(false);
                     });
             });
         }

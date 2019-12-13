@@ -403,7 +403,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 new ChildNavItem(
                     'devices',
                     'LNG_LAYOUT_MENU_ITEM_DEVICES_LABEL',
-                    [PERMISSION.READ_SYS_CONFIG],
+                    [
+                        PERMISSION.DEVICE_LIST
+                    ],
                     '/system-config/devices'
                 ),
                 new ChildNavItem(

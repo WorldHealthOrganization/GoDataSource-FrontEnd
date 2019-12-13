@@ -57,6 +57,14 @@ export enum PERMISSION {
     LOCATION_USAGE = 'location_usage',
     LOCATION_PROPAGATE_GEO_TO_PERSONS = 'location_propagate_geo_to_persons',
 
+    // devices
+    DEVICE_LIST = 'device_list',
+    DEVICE_VIEW = 'device_view',
+    DEVICE_MODIFY = 'device_modify',
+    DEVICE_DELETE = 'device_delete',
+    DEVICE_LIST_HISTORY = 'device_list_history',
+    DEVICE_WIPE = 'device_wipe',
+
     // outbreaks
     OUTBREAK_LIST = 'outbreak_list',
     OUTBREAK_VIEW = 'outbreak_view',

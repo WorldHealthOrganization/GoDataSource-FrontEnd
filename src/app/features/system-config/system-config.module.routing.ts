@@ -55,14 +55,22 @@ const routes: Routes = [
         children: [
             {
                 path: '',
-                component: fromPages.SystemDevicesComponent
+                component: fromPages.SystemDevicesComponent,
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [
+                        PERMISSION.DEVICE_LIST
+                    ]
+                }
             },
             {
                 path: ':deviceId/view',
                 component: fromPages.ModifySystemDeviceComponent,
                 canActivate: [AuthGuard],
                 data: {
-                    permissions: [PERMISSION.READ_SYS_CONFIG],
+                    permissions: [
+                        PERMISSION.DEVICE_VIEW
+                    ],
                     action: ViewModifyComponentAction.VIEW
                 }
             },
@@ -71,7 +79,9 @@ const routes: Routes = [
                 component: fromPages.ModifySystemDeviceComponent,
                 canActivate: [AuthGuard],
                 data: {
-                    permissions: [PERMISSION.WRITE_SYS_CONFIG],
+                    permissions: [
+                        PERMISSION.DEVICE_MODIFY
+                    ],
                     action: ViewModifyComponentAction.MODIFY
                 },
                 canDeactivate: [
@@ -81,6 +91,12 @@ const routes: Routes = [
             {
                 path: ':deviceId/history',
                 component: fromPages.ViewHistorySystemDeviceComponent,
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [
+                        PERMISSION.DEVICE_LIST_HISTORY
+                    ]
+                },
                 canDeactivate: [
                     PageChangeConfirmationGuard
                 ]
