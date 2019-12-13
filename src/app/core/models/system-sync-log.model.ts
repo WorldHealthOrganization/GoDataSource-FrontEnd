@@ -44,6 +44,7 @@ export class SystemSyncLogModel
     static canSetSettings(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.SYNC_SETTINGS) : false; }
     static canExportPackage(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.SYNC_EXPORT_PACKAGE) : false; }
     static canImportPackage(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.SYNC_IMPORT_PACKAGE) : false; }
+    static canSynchronize(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.SYNC_SYNCHRONIZE) : false; }
 
     /**
      * Constructor
@@ -83,4 +84,5 @@ export class SystemSyncLogModel
     canSetSettings(user: UserModel): boolean { return SystemSyncLogModel.canSetSettings(user); }
     canExportPackage(user: UserModel): boolean { return SystemSyncLogModel.canExportPackage(user); }
     canImportPackage(user: UserModel): boolean { return SystemSyncLogModel.canImportPackage(user); }
+    canSynchronize(user: UserModel): boolean { return SystemSyncLogModel.canSynchronize(user); }
 }

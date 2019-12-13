@@ -408,8 +408,10 @@ const routes: Routes = [
                             PERMISSION.DEVICE_LIST,
                             PERMISSION.DEVICE_VIEW,
                             PERMISSION.DEVICE_MODIFY,
-                            PERMISSION.DEVICE_LIST_HISTORY
-                            // ... Upstream Servers / Client Applications
+                            PERMISSION.DEVICE_LIST_HISTORY,
+                            PERMISSION.UPSTREAM_SERVER_LIST,
+                            PERMISSION.UPSTREAM_SERVER_CREATE
+                            // Client Applications
                         ]
                     })
                 }

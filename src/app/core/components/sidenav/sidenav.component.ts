@@ -391,7 +391,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 new ChildNavItem(
                     'upstream-servers',
                     'LNG_LAYOUT_MENU_ITEM_UPSTREAM_SERVERS_LABEL',
-                    [PERMISSION.READ_SYS_CONFIG],
+                    [
+                        PERMISSION.UPSTREAM_SERVER_LIST
+                    ],
                     '/system-config/upstream-servers'
                 ),
                 new ChildNavItem(
@@ -428,6 +430,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
         ),
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -437,6 +442,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
         this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // retrieve list of outbreaks
         if (this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK)) {

@@ -25,11 +25,23 @@ const routes: Routes = [
         children: [
             {
                 path: '',
-                component: fromPages.UpstreamServersListComponent
+                component: fromPages.UpstreamServersListComponent,
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [
+                        PERMISSION.UPSTREAM_SERVER_LIST
+                    ]
+                }
             },
             {
                 path: 'create',
-                component: fromPages.CreateUpstreamServerComponent
+                component: fromPages.CreateUpstreamServerComponent,
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [
+                        PERMISSION.UPSTREAM_SERVER_CREATE
+                    ]
+                }
             }
         ]
     },

@@ -160,6 +160,11 @@ export interface IPermissionSyncLog {
     canSetSettings(user: UserModel): boolean;
 
     /**
+     * Has permission to sync two GoData instances
+     */
+    canSynchronize(user: UserModel): boolean;
+
+    /**
      * Has permission to export sync package
      */
     canExportPackage(user: UserModel): boolean;
@@ -168,6 +173,26 @@ export interface IPermissionSyncLog {
      * Has permission to import sync package
      */
     canImportPackage(user: UserModel): boolean;
+}
+
+/**
+ * Upstream Server
+ */
+export interface IPermissionUpstreamServer {
+    /**
+     * Has permission to sync two GoData instances
+     */
+    canSync(user: UserModel): boolean;
+
+    /**
+     * Has permission to enable sync
+     */
+    canEnableSync(user: UserModel): boolean;
+
+    /**
+     * Has permission to disable sync
+     */
+    canDisableSync(user: UserModel): boolean;
 }
 
 /**

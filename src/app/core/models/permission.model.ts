@@ -45,6 +45,15 @@ export enum PERMISSION {
     SYNC_SETTINGS = 'sync_settings',
     SYNC_EXPORT_PACKAGE = 'sync_export_package',
     SYNC_IMPORT_PACKAGE = 'sync_import_package',
+    SYNC_SYNCHRONIZE = 'sync_synchronize',
+
+    // upstream servers
+    UPSTREAM_SERVER_LIST = 'upstream_server_list',
+    UPSTREAM_SERVER_CREATE = 'upstream_server_create',
+    UPSTREAM_SERVER_DELETE = 'upstream_server_delete',
+    UPSTREAM_SERVER_SYNC = 'upstream_server_sync',
+    UPSTREAM_SERVER_ENABLE_SYNC = 'upstream_server_enable_sync',
+    UPSTREAM_SERVER_DISABLE_SYNC = 'upstream_server_disable_sync',
 
     // locations
     LOCATION_LIST = 'location_list',
