@@ -66,7 +66,7 @@ export class CreateClientApplicationComponent extends ConfirmOnFormChanges imple
 
         // retrieve outbreaks
         if (OutbreakModel.canList(this.authUser)) {
-            this.outbreaksOptionsList$ = this.outbreakDataService.getOutbreaksList();
+            this.outbreaksOptionsList$ = this.outbreakDataService.getOutbreaksListReduced();
         }
 
         // initialize breadcrumbs

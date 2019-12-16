@@ -68,7 +68,7 @@ export class CreateUserComponent
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
+        this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
 
         // initialize breadcrumbs
         this.initializeBreadcrumbs();

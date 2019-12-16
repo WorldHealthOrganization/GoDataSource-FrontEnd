@@ -196,7 +196,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
         this.clientApplicationsServerListAll = [];
 
         const outbreaksList$: Observable<OutbreakModel[]> = OutbreakModel.canList(this.authUser) ?
-            this.outbreakDataService.getOutbreaksList() :
+            this.outbreakDataService.getOutbreaksListReduced() :
             of([]);
 
         forkJoin(

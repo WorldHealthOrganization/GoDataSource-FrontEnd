@@ -125,14 +125,14 @@ export class UserListComponent extends ListComponent implements OnInit {
         this.rolesList$ = this.userRoleDataService.getRolesList();
 
         this.outbreakDataService
-            .getOutbreaksList()
+            .getOutbreaksListReduced()
             .subscribe( (outbreaks) => {
               _.forEach(outbreaks, (outbreak, key) => {
                     this.outbreaksListMap[outbreak.id] = outbreak;
                 });
         });
 
-        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
+        this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
 
         // initialize pagination
         this.initPaginator();

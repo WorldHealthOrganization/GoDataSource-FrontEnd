@@ -57,7 +57,7 @@ export class MyProfileComponent extends ViewModifyComponent implements OnInit {
 
         // get the list of roles to populate the dropdown in UI
         this.rolesList$ = this.userRoleDataService.getRolesList();
-        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
+        this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
     }
 
 }

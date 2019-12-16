@@ -151,7 +151,7 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
         if (this.locationId) {
             // retrieve outbreaks
             this.outbreakDataService
-                .getOutbreaksList()
+                .getOutbreaksListReduced()
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);

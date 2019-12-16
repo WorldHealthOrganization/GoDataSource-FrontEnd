@@ -158,9 +158,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.initializeDashlets();
 
         // get Outbreaks list to check if there are any in the system
-        this.outbreakDataService.getOutbreaksList()
-            .subscribe((outbreaksList) => {
-                this.noOutbreaksInSystem = outbreaksList.length === 0;
+        this.outbreakDataService
+            .getOutbreaksCount()
+            .subscribe((outbreaksCount) => {
+                this.noOutbreaksInSystem = !outbreaksCount.count;
             });
 
         this.outbreakSubscriber = this.outbreakDataService

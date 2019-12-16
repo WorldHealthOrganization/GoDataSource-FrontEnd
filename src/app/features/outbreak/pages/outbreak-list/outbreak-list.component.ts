@@ -346,6 +346,22 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         this.queryBuilder.include('createdByUser', true);
         this.queryBuilder.include('updatedByUser', true);
 
+        // filter out questionnaire data
+        const outbreakObj: OutbreakModel = new OutbreakModel();
+        const removeFields: {
+            [propName: string]: boolean
+        } = {
+            caseInvestigationTemplate: true,
+            contactFollowUpTemplate: true,
+            labResultsTemplate: true
+        };
+        const fields: string[] = Object.getOwnPropertyNames(outbreakObj).filter((propName: string) => {
+            return !removeFields[propName];
+        });
+
+        // retrieve only specific fields
+        this.queryBuilder.fields(...fields);
+
         // retrieve the list of Outbreaks
         this.outbreaksList$ = this.outbreakDataService
             .getOutbreaksList(this.queryBuilder)

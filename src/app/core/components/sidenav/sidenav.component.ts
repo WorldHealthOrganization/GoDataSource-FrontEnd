@@ -448,13 +448,15 @@ export class SidenavComponent implements OnInit, OnDestroy {
      */
     ngOnInit() {
         // retrieve list of outbreaks
-        if (this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK)) {
-            this.outbreakDataService.getOutbreaksList().subscribe((outbreaks) => {
-                // no outbreak ?
-                if (outbreaks.length < 1) {
-                    this.snackbarService.showNotice('LNG_GENERIC_WARNING_NO_OUTBREAKS');
-                }
-            });
+        if (OutbreakModel.canView(this.authUser)) {
+            this.outbreakDataService
+                .getOutbreaksCount()
+                .subscribe((outbreaksCount) => {
+                    // no outbreak ?
+                    if (!outbreaksCount.count) {
+                        this.snackbarService.showNotice('LNG_GENERIC_WARNING_NO_OUTBREAKS');
+                    }
+                });
         }
 
         // subscribe to the selected outbreak stream

@@ -168,7 +168,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
 
         // retrieve outbreaks information
         this.outbreakDataService
-            .getOutbreaksList()
+            .getOutbreaksListReduced()
             .subscribe((outbreaks: OutbreakModel[]) => {
                 // set outbreaks
                 this.outbreaks = outbreaks;

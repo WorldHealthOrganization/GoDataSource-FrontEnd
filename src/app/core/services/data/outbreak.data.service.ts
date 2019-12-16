@@ -39,10 +39,31 @@ export class OutbreakDataService {
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<OutbreakModel[]>}
      */
-    getOutbreaksList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<OutbreakModel[]> {
-
+    getOutbreaksList(
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<OutbreakModel[]> {
         const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks?filter=${filter}`),
+            OutbreakModel
+        );
+    }
 
+    /**
+     * Retrieve the list of Outbreaks
+     * @returns {Observable<OutbreakModel[]>}
+     */
+    getOutbreaksListReduced(): Observable<OutbreakModel[]> {
+        // retrieve only necessary fields
+        const qb: RequestQueryBuilder = new RequestQueryBuilder();
+        qb.fields(
+            'id',
+            'name',
+            'description'
+        );
+
+        // filter
+        const filter = qb.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks?filter=${filter}`),
             OutbreakModel

@@ -4,14 +4,14 @@ import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { Observable, Subscription } from 'rxjs';
 import { UserModel } from '../../../core/models/user.model';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../core/models/permission.model';
 import { LanguageDataService } from '../../../core/services/data/language.data.service';
 import { LanguageModel } from '../../../core/models/language.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { DialogService } from '../../../core/services/helper/dialog.service';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-topnav',
@@ -20,8 +20,10 @@ import { DialogService } from '../../../core/services/helper/dialog.service';
     styleUrls: ['./topnav.component.less']
 })
 export class TopnavComponent implements OnInit, OnDestroy {
-
     @Input() activeOutbreakEditable: boolean = true;
+
+    // constants
+    OutbreakModel = OutbreakModel;
 
     // authenticated user
     authUser: UserModel;
@@ -38,6 +40,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
 
     getSelectedOutbreakSubject: Subscription;
 
+    /**
+     * Constructor
+     */
     constructor(
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
@@ -53,6 +58,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
         this.refreshLanguageList();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // subscribe to the selected outbreak stream
         this.getSelectedOutbreakSubject = this.outbreakDataService
@@ -68,6 +76,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         if (this.getSelectedOutbreakSubject) {
             this.getSelectedOutbreakSubject.unsubscribe();
@@ -91,34 +102,36 @@ export class TopnavComponent implements OnInit, OnDestroy {
      */
     refreshOutbreaksList() {
         // get the authenticated user
+        // we need to reload data - since component isn't re-rendered
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // outbreak data
-        if (this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK)) {
-            this.outbreakDataService
-                .getOutbreaksList()
-                .pipe(
-                    map((outbreaksList) => {
-                        return _.map(outbreaksList, (outbreak: OutbreakModel) => {
-                            // add outbreak details
-                            outbreak.details = outbreak.name + (_.isEmpty(outbreak.description) ? '' : `: ${outbreak.description}`);
-
-                            // do we need to update name of the outbreak ?
-                            if (outbreak.id === this.authUser.activeOutbreakId) {
-                                outbreak.name = this.i18nService.instant('LNG_LAYOUT_ACTIVE_OUTBREAK_LABEL', outbreak);
-                            }
-
-                            // finished
-                            return outbreak;
-                        });
-                    })
-                )
-                .subscribe((outbreaksList) => {
-                    this.outbreaksList = outbreaksList;
-                });
-        } else {
-            this.outbreaksList = [];
+        // we don't have access to outbreaks ?
+        if (!OutbreakModel.canView(this.authUser)) {
+            return;
         }
+
+        // outbreak data
+        this.outbreakDataService
+            .getOutbreaksListReduced()
+            .pipe(
+                map((outbreaksList) => {
+                    return _.map(outbreaksList, (outbreak: OutbreakModel) => {
+                        // add outbreak details
+                        outbreak.details = outbreak.name + (_.isEmpty(outbreak.description) ? '' : `: ${outbreak.description}`);
+
+                        // do we need to update name of the outbreak ?
+                        if (outbreak.id === this.authUser.activeOutbreakId) {
+                            outbreak.name = this.i18nService.instant('LNG_LAYOUT_ACTIVE_OUTBREAK_LABEL', outbreak);
+                        }
+
+                        // finished
+                        return outbreak;
+                    });
+                })
+            )
+            .subscribe((outbreaksList) => {
+                this.outbreaksList = outbreaksList;
+            });
     }
 
     /**
@@ -126,10 +139,38 @@ export class TopnavComponent implements OnInit, OnDestroy {
      * @param {OutbreakModel} outbreak
      */
     selectOutbreak(outbreak: OutbreakModel) {
-        this.selectedOutbreak = outbreak;
+        if (
+            !outbreak ||
+            !outbreak.id
+        ) {
+            // set selected outbreak
+            this.selectedOutbreak = outbreak;
 
-        // cache the selected Outbreak
-        this.outbreakDataService.setSelectedOutbreak(this.selectedOutbreak);
+            // cache the selected Outbreak
+            this.outbreakDataService.setSelectedOutbreak(this.selectedOutbreak);
+        } else {
+            // retrieve outbreak data since we have only truncated data here
+            const loadingDialog = this.dialogService.showLoadingDialog();
+            this.outbreakDataService
+                .getOutbreak(outbreak.id)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        loadingDialog.close();
+                        return throwError(err);
+                    })
+                )
+                .subscribe((outbreakData) => {
+                    // set selected outbreak
+                    this.selectedOutbreak = outbreakData;
+
+                    // hide loading dialog
+                    loadingDialog.close();
+
+                    // cache the selected Outbreak
+                    this.outbreakDataService.setSelectedOutbreak(this.selectedOutbreak);
+                });
+        }
     }
 
     /**
@@ -150,13 +191,4 @@ export class TopnavComponent implements OnInit, OnDestroy {
                 this.snackbarService.showSuccess('LNG_LAYOUT_ACTION_CHANGE_LANGUAGE_SUCCESS_MESSAGE');
             });
     }
-
-    /**
-     * Display the Selected Outbreak dropdown only for users that have the right access
-     */
-    showSelectedOutbreakDropdown() {
-        return this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK) &&
-            this.selectedOutbreak && this.selectedOutbreak.id;
-    }
-
 }
