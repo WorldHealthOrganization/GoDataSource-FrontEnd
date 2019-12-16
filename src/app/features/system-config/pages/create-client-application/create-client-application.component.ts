@@ -17,9 +17,9 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { Constants } from '../../../../core/models/constants';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-create-client-application',
@@ -29,25 +29,21 @@ import { throwError } from 'rxjs';
 })
 export class CreateClientApplicationComponent extends ConfirmOnFormChanges implements OnInit {
     // breadcrumb header
-    public breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_TITLE',
-            '/system-config/client-applications'
-        ),
-        new BreadcrumbItemModel(
-            'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_TITLE',
-            '.',
-            true
-        )
-    ];
+    public breadcrumbs: BreadcrumbItemModel[] = [];
 
     clientApplicationData: SystemClientApplicationModel = new SystemClientApplicationModel();
 
     outbreaksOptionsList$: Observable<OutbreakModel[]>;
 
+    // constants
+    OutbreakModel = OutbreakModel;
+
     // authenticated user
     authUser: UserModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         private authDataService: AuthDataService,
         private router: Router,
@@ -55,19 +51,42 @@ export class CreateClientApplicationComponent extends ConfirmOnFormChanges imple
         private formHelper: FormHelperService,
         private systemSettingsDataService: SystemSettingsDataService,
         private outbreakDataService: OutbreakDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private redirectService: RedirectService
     ) {
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // retrieve outbreaks
-        if (this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK)) {
+        if (OutbreakModel.canList(this.authUser)) {
             this.outbreaksOptionsList$ = this.outbreakDataService.getOutbreaksList();
         }
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (SystemClientApplicationModel.canList(this.authUser)) {
+            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_TITLE', '/system-config/client-applications'));
+        }
+
+        // create breadcrumb
+        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_TITLE', '.', true));
     }
 
     /**
@@ -118,15 +137,16 @@ export class CreateClientApplicationComponent extends ConfirmOnFormChanges imple
 
                             // navigate to listing page
                             this.disableDirtyConfirm();
-                            this.router.navigate(['/system-config/client-applications']);
+                            if (SystemClientApplicationModel.canList(this.authUser)) {
+                                this.router.navigate(['/system-config/client-applications']);
+                            } else {
+                                // fallback to current page since we already know that we have access to this page
+                                this.redirectService.to([`/system-config/client-applications/create`]);
+                            }
                         });
 
                 });
         }
-    }
-
-    hasOutbreakReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK);
     }
 
     /**

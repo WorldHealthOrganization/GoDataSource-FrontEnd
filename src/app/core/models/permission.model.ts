@@ -55,6 +55,14 @@ export enum PERMISSION {
     UPSTREAM_SERVER_ENABLE_SYNC = 'upstream_server_enable_sync',
     UPSTREAM_SERVER_DISABLE_SYNC = 'upstream_server_disable_sync',
 
+    // client applications
+    CLIENT_APPLICATION_LIST = 'client_application_list',
+    CLIENT_APPLICATION_CREATE = 'client_application_create',
+    CLIENT_APPLICATION_DELETE = 'client_application_delete',
+    CLIENT_APPLICATION_DOWNLOAD_CONF_FILE = 'client_application_download_conf_file',
+    CLIENT_APPLICATION_ENABLE = 'client_application_enable',
+    CLIENT_APPLICATION_DISABLE = 'client_application_disable',
+
     // locations
     LOCATION_LIST = 'location_list',
     LOCATION_VIEW = 'location_view',

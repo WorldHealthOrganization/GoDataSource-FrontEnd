@@ -410,8 +410,9 @@ const routes: Routes = [
                             PERMISSION.DEVICE_MODIFY,
                             PERMISSION.DEVICE_LIST_HISTORY,
                             PERMISSION.UPSTREAM_SERVER_LIST,
-                            PERMISSION.UPSTREAM_SERVER_CREATE
-                            // Client Applications
+                            PERMISSION.UPSTREAM_SERVER_CREATE,
+                            PERMISSION.CLIENT_APPLICATION_LIST,
+                            PERMISSION.CLIENT_APPLICATION_CREATE
                         ]
                     })
                 }

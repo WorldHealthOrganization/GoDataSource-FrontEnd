@@ -399,7 +399,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 new ChildNavItem(
                     'client-applications',
                     'LNG_LAYOUT_MENU_ITEM_CLIENT_APPLICATIONS_LABEL',
-                    [PERMISSION.READ_SYS_CONFIG],
+                    [
+                        PERMISSION.CLIENT_APPLICATION_LIST
+                    ],
                     '/system-config/client-applications'
                 ),
                 new ChildNavItem(

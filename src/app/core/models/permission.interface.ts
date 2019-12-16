@@ -196,6 +196,26 @@ export interface IPermissionUpstreamServer {
 }
 
 /**
+ * Client Application
+ */
+export interface IPermissionClientApplication {
+    /**
+     * Has permission to download config file
+     */
+    canDownloadConfFile(user: UserModel): boolean;
+
+    /**
+     * Has permission to enable client application
+     */
+    canEnable(user: UserModel): boolean;
+
+    /**
+     * Has permission to disable client application
+     */
+    canDisable(user: UserModel): boolean;
+}
+
+/**
  * Device
  */
 export interface IPermissionDevice {

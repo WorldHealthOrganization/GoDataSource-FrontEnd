@@ -6,7 +6,6 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { DialogAnswer, DialogAnswerButton, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
@@ -31,9 +30,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     styleUrls: ['./client-applications-list.component.less']
 })
 export class ClientApplicationsListComponent extends ListComponent implements OnInit {
-    /**
-     * Breadcrumbs
-     */
+    // Breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_TITLE', '.', true)
     ];
@@ -51,6 +48,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
 
     // constants
     UserSettings = UserSettings;
+    SystemClientApplicationModel = SystemClientApplicationModel;
 
     loadingDialog: LoadingDialogModel;
 
@@ -61,6 +59,9 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE',
             click: (item: SystemClientApplicationModel) => {
                 this.downloadConfFile(item);
+            },
+            visible: (item: SystemClientApplicationModel): boolean => {
+                return SystemClientApplicationModel.canDownloadConfFile(this.authUser);
             }
         }),
 
@@ -78,8 +79,8 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                 );
             },
             visible: (item: SystemClientApplicationModel): boolean => {
-                return this.hasSysConfigWriteAccess() &&
-                    item.active;
+                return item.active &&
+                    SystemClientApplicationModel.canDisable(this.authUser);
             }
         }),
 
@@ -97,8 +98,8 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                 );
             },
             visible: (item: SystemClientApplicationModel): boolean => {
-                return this.hasSysConfigWriteAccess() &&
-                    !item.active;
+                return !item.active &&
+                    SystemClientApplicationModel.canEnable(this.authUser);
             }
         }),
 
@@ -114,7 +115,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                         this.deleteClientApplication(item);
                     },
                     visible: (): boolean => {
-                        return this.hasSysConfigWriteAccess();
+                        return SystemClientApplicationModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -177,7 +178,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
         ];
 
         // outbreaks
-        if (this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK)) {
+        if (OutbreakModel.canList(this.authUser)) {
             this.tableColumns.push(
                 new VisibleColumnModel({
                     field: 'outbreaks',
@@ -194,7 +195,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
         this.clientApplicationsServerList = [];
         this.clientApplicationsServerListAll = [];
 
-        const outbreaksList$: Observable<OutbreakModel[]> = this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK) ?
+        const outbreaksList$: Observable<OutbreakModel[]> = OutbreakModel.canList(this.authUser) ?
             this.outbreakDataService.getOutbreaksList() :
             of([]);
 
@@ -264,14 +265,6 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                 this.clientApplicationsServerListAll.length :
                 0
         };
-    }
-
-    /**
-     * Check if we have write access to sys settings
-     * @returns {boolean}
-     */
-    hasSysConfigWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
     }
 
     /**

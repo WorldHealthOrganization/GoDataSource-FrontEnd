@@ -52,11 +52,23 @@ const routes: Routes = [
         children: [
             {
                 path: '',
-                component: fromPages.ClientApplicationsListComponent
+                component: fromPages.ClientApplicationsListComponent,
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [
+                        PERMISSION.CLIENT_APPLICATION_LIST
+                    ]
+                }
             },
             {
                 path: 'create',
-                component: fromPages.CreateClientApplicationComponent
+                component: fromPages.CreateClientApplicationComponent,
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [
+                        PERMISSION.CLIENT_APPLICATION_CREATE
+                    ]
+                }
             }
         ]
     },
