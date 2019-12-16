@@ -379,7 +379,6 @@ export class SidenavComponent implements OnInit, OnDestroy {
                     [PERMISSION.WRITE_HELP],
                     '/help/categories'
                 )
-                // TODO Insert auditLogs here when needed
             ]
         ),
         new NavItem(
