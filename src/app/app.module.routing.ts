@@ -331,7 +331,15 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [PERMISSION.READ_TEAM]
+                    permissions: new PermissionExpression({
+                        or: [
+                            PERMISSION.TEAM_LIST,
+                            PERMISSION.TEAM_CREATE,
+                            PERMISSION.TEAM_VIEW,
+                            PERMISSION.TEAM_MODIFY,
+                            PERMISSION.TEAM_LIST_WORKLOAD
+                        ]
+                    })
                 }
             },
             // Dashboard Module routes

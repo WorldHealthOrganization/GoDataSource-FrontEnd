@@ -112,6 +112,16 @@ WRITE_OUTBREAK = 'write_outbreak',
     OUTBREAK_TEMPLATE_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE = 'outbreak_template_modify_case_lab_result_questionnaire',
     OUTBREAK_TEMPLATE_GENERATE_OUTBREAK = 'outbreak_template_generate_outbreak',
 
+    // teams
+    TEAM_LIST = 'team_list',
+    TEAM_VIEW = 'team_view',
+    TEAM_CREATE = 'team_create',
+    TEAM_MODIFY = 'team_modify',
+    TEAM_DELETE = 'team_delete',
+    TEAM_LIST_WORKLOAD = 'team_list_workload',
+READ_TEAM = 'read_team',
+WRITE_TEAM = 'write_team',
+
     // clusters
     CLUSTER_LIST = 'cluster_list',
     CLUSTER_VIEW = 'cluster_view',
@@ -234,10 +244,6 @@ WRITE_FOLLOWUP = 'write_followup',
 
     // reference data
     WRITE_REFERENCE_DATA = 'write_reference_data',
-
-    // teams
-    READ_TEAM = 'read_team',
-    WRITE_TEAM = 'write_team',
 
     // reports
     READ_REPORT = 'read_report',

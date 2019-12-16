@@ -276,6 +276,16 @@ export interface IPermissionOutbreakTemplate {
 }
 
 /**
+ * Team
+ */
+export interface IPermissionTeam {
+    /**
+     * Has permission to list teams workload
+     */
+    canListWorkload(user: UserModel): boolean;
+}
+
+/**
  * Cluster
  */
 export interface IPermissionCluster {

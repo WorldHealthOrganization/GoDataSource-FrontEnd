@@ -372,7 +372,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 new ChildNavItem(
                     'teams',
                     'LNG_LAYOUT_MENU_ITEM_TEAMS_ASSIGNMENTS_LABEL',
-                    [PERMISSION.READ_TEAM],
+                    [
+                        PERMISSION.TEAM_LIST
+                    ],
                     '/teams'
                 ),
                 new ChildNavItem(
