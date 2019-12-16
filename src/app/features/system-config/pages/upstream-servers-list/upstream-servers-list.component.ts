@@ -386,7 +386,8 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
         };
 
         // start sync ?
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SYNC_CONFIRMATION', upstreamServer)
+        this.dialogService
+            .showConfirm('LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SYNC_CONFIRMATION', upstreamServer)
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // start sync
