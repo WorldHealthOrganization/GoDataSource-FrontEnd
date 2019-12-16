@@ -426,7 +426,9 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                    permissions: [
+                        PERMISSION.AUDIT_LOG_LIST
+                    ]
                 }
             },
             // Language Module routes

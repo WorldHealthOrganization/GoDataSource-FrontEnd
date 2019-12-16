@@ -4,6 +4,9 @@ export enum PERMISSION {
     // no restrictions permissions
     SYSTEM_VERSION_VIEW = 'view_system_version',
 
+    // audit logs
+    AUDIT_LOG_LIST = 'audit_log_list',
+
     // languages
     LANGUAGE_LIST = 'language_list',
     LANGUAGE_VIEW = 'language_view',

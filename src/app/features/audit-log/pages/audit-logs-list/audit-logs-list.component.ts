@@ -50,6 +50,9 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
     // constants
     UserSettings = UserSettings;
 
+    /**
+     * Constructor
+     */
     constructor(
         private dialogService: DialogService,
         private auditLogDataService: AuditLogDataService,
@@ -62,6 +65,9 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // set default filter rules
         this.initializeHeaderFilters();

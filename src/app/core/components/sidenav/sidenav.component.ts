@@ -364,7 +364,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 new ChildNavItem(
                     'audit-log',
                     'LNG_LAYOUT_MENU_ITEM_AUDIT_LOG_LABEL',
-                    [PERMISSION.READ_SYS_CONFIG],
+                    [
+                        PERMISSION.AUDIT_LOG_LIST
+                    ],
                     '/audit-log'
                 ),
                 new ChildNavItem(
