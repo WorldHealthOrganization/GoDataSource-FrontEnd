@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -29,10 +28,8 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     styleUrls: ['./help-items-list.component.less']
 })
 export class HelpItemsListComponent extends ListComponent implements OnInit {
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories', false)
-    ];
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
@@ -44,6 +41,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
 
     // provide constants to template
     Constants = Constants;
+    HelpItemModel = HelpItemModel;
 
     recordActions: HoverRowAction[] = [
         // View Help Item
@@ -52,6 +50,9 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
             iconTooltip: 'LNG_PAGE_LIST_HELP_ITEMS_ACTION_VIEW_ITEM',
             click: (item: HelpItemModel) => {
                 this.router.navigate(['/help', 'categories', item.categoryId, 'items', item.id, 'view']);
+            },
+            visible: (): boolean => {
+                return HelpItemModel.canView(this.authUser);
             }
         }),
 
@@ -63,7 +64,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
                 this.router.navigate(['/help', 'categories', item.categoryId, 'items', item.id, 'modify']);
             },
             visible: (): boolean => {
-                return this.hasHelpWriteAccess();
+                return HelpItemModel.canModify(this.authUser);
             }
         }),
 
@@ -75,8 +76,8 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
                 this.approveHelpItem(item);
             },
             visible: (item: HelpItemModel): boolean => {
-                return this.hasHelpWriteAccess() &&
-                    !item.approved;
+                return !item.approved &&
+                    HelpItemModel.canApproveCategoryItems(this.authUser);
             }
         }),
 
@@ -92,7 +93,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
                         this.deleteHelpItem(item);
                     },
                     visible: (): boolean => {
-                        return this.hasHelpWriteAccess();
+                        return HelpItemModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -100,6 +101,9 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private helpDataService: HelpDataService,
@@ -115,6 +119,9 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -125,35 +132,62 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
                 this.helpDataService
                     .getHelpCategory(this.categoryId)
                     .subscribe((category) => {
+                        // set data
                         this.selectedCategory = category;
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                this.selectedCategory.name,
-                                `/help/categories/${this.categoryId}/view`,
-                                false,
-                                {},
-                                {}
-                            )
-                        );
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                'LNG_PAGE_LIST_HELP_ITEMS_TITLE',
-                                '.',
-                                true,
-                                {},
-                                {}
-                            )
-                        );
+
+                        // update breadcrumbs
+                        this.initializeBreadcrumbs();
 
                         // initialize pagination
                         this.initPaginator();
                         // ...and re-load the list
                         this.needsRefreshList(true);
+
                         // initialize Side Table Columns
                         this.initializeSideTableColumns();
                     });
 
             });
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (HelpCategoryModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories')
+            );
+        }
+
+        // view category breadcrumb
+        if (
+            HelpCategoryModel.canView(this.authUser) &&
+            this.selectedCategory
+        ) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    this.selectedCategory.name,
+                    `/help/categories/${this.categoryId}/view`,
+                    false,
+                    {},
+                    this.selectedCategory
+                )
+            );
+        }
+
+        // children list breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_HELP_ITEMS_TITLE',
+                '.',
+                true
+            )
+        );
     }
 
     /**
@@ -225,22 +259,6 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
                 }),
                 share()
             );
-    }
-
-    /**
-     * Check if we have write access to help
-     * @returns {boolean}
-     */
-    hasHelpWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_HELP);
-    }
-
-    /**
-     * Check if we have write access to help
-     * @returns {boolean}
-     */
-    hasHelpApproveAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.APPROVE_HELP);
     }
 
     /**

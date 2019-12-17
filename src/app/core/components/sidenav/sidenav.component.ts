@@ -309,7 +309,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
             'help',
             'LNG_LAYOUT_MENU_ITEM_HELP',
             'help',
-            [],
+            [
+                // NO permissions required, only to be authenticated
+            ],
             [],
             '/help'
         ),
@@ -380,7 +382,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 new ChildNavItem(
                     'help-admin',
                     'LNG_LAYOUT_MENU_ITEM_HELP_ADMIN',
-                    [PERMISSION.WRITE_HELP],
+                    [
+                        PERMISSION.HELP_CATEGORY_LIST
+                    ],
                     '/help/categories'
                 )
             ]

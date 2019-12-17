@@ -16,6 +16,21 @@ export enum PERMISSION {
     LANGUAGE_EXPORT_TOKENS = 'language_export_tokens',
     LANGUAGE_IMPORT_TOKENS = 'language_import_tokens',
 
+    // help
+    HELP_CATEGORY_LIST = 'help_list_category',
+    HELP_CATEGORY_VIEW = 'help_view_category',
+    HELP_CATEGORY_CREATE = 'help_create_category',
+    HELP_CATEGORY_MODIFY = 'help_modify_category',
+    HELP_CATEGORY_DELETE = 'help_delete_category',
+    HELP_CATEGORY_ITEM_LIST = 'help_list_category_item',
+    HELP_CATEGORY_ITEM_VIEW = 'help_view_category_item',
+    HELP_CATEGORY_ITEM_CREATE = 'help_create_category_item',
+    HELP_CATEGORY_ITEM_MODIFY = 'help_modify_category_item',
+    HELP_CATEGORY_ITEM_DELETE = 'help_delete_category_item',
+    HELP_CATEGORY_ITEM_APPROVE = 'help_approve_category_item',
+WRITE_HELP = 'write_help',
+APPROVE_HELP = 'approve_help',
+
     // users
     USER_LIST = 'user_list',
     USER_VIEW = 'user_view',
@@ -246,11 +261,7 @@ WRITE_FOLLOWUP = 'write_followup',
     WRITE_REFERENCE_DATA = 'write_reference_data',
 
     // reports
-    READ_REPORT = 'read_report',
-
-    // help
-    WRITE_HELP = 'write_help',
-    APPROVE_HELP = 'approve_help'
+    READ_REPORT = 'read_report'
 }
 
 export interface IPermissionChildModel {

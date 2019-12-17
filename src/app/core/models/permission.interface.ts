@@ -111,6 +111,16 @@ export interface IPermissionLanguage {
 }
 
 /**
+ * Help
+ */
+export interface IPermissionHelp {
+    /**
+     * Has permission to approve category items
+     */
+    canApproveCategoryItems(user: UserModel): boolean;
+}
+
+/**
  * Location
  */
 export interface IPermissionLocation {

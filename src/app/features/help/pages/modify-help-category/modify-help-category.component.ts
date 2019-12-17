@@ -6,7 +6,6 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
@@ -14,6 +13,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
+import { HelpItemModel } from '../../../../core/models/help-item.model';
 
 @Component({
     selector: 'app-modify-help-category',
@@ -22,7 +22,12 @@ import { catchError, map, switchMap } from 'rxjs/operators';
     styleUrls: ['./modify-help-category.component.less']
 })
 export class ModifyHelpCategoryComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // constants
+    HelpCategoryModel = HelpCategoryModel;
+    HelpItemModel = HelpItemModel;
 
     helpCategoryData: HelpCategoryModel = new HelpCategoryModel();
     categoryId: string;
@@ -30,6 +35,9 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
     // authenticated user
     authUser: UserModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private helpDataService: HelpDataService,
@@ -43,6 +51,9 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
         super(route);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -55,30 +66,42 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
                     .getHelpCategory(this.categoryId)
                     .subscribe((helpCategoryData) => {
                         this.helpCategoryData = helpCategoryData;
-                        this.createBreadcrumbs();
+
+                        // update breadcrumbs
+                        this.initializeBreadcrumbs();
                     });
             });
     }
 
     /**
-     * Create breadcrumbs
+     * Initialize breadcrumbs
      */
-    createBreadcrumbs() {
-        this.breadcrumbs = [
-            new BreadcrumbItemModel(
-                'LNG_PAGE_LIST_HELP_CATEGORIES_TITLE',
-                '/help/categories'
-            ),
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (HelpCategoryModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories')
+            );
+        }
+
+        // view / modify breadcrumb
+        this.breadcrumbs.push(
             new BreadcrumbItemModel(
                 this.viewOnly ? 'LNG_PAGE_VIEW_HELP_CATEGORY_TITLE' : 'LNG_PAGE_MODIFY_HELP_CATEGORY_TITLE',
                 '.',
                 true,
                 {},
-                {}
+                this.helpCategoryData
             )
-        ];
+        );
     }
 
+    /**
+     * Modify Help category
+     */
     modifyHelpCategory(form: NgForm) {
         const dirtyFields: any = this.formHelper.getFields(form);
 
@@ -119,19 +142,11 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
                 // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_HELP_CATEGORY_ACTION_MODIFY_HELP_CATEGORY_SUCCESS_MESSAGE');
 
-                // update breadcrumb
-                this.createBreadcrumbs();
+                // update breadcrumbs
+                this.initializeBreadcrumbs();
 
                 // hide dialog
                 loadingDialog.close();
             });
-    }
-
-    /**
-     * Check if we have write access to help
-     * @returns {boolean}
-     */
-    hasHelpWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_HELP);
     }
 }

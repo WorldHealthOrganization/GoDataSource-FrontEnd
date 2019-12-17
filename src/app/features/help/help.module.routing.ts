@@ -11,12 +11,16 @@ const routes: Routes = [
     // Help view / search
     {
         path: '',
-        component: fromPages.HelpSearchComponent
+        component: fromPages.HelpSearchComponent,
+        canActivate: [AuthGuard]
+        // NO permissions required, only to be authenticated
     },
     // Help view single item
     {
         path: 'categories/:categoryId/items/:itemId/view-global',
-        component: fromPages.ViewHelpComponent
+        component: fromPages.ViewHelpComponent,
+        canActivate: [AuthGuard]
+        // NO permissions required, only to be authenticated
     },
     // Help categories list
     {
@@ -24,7 +28,9 @@ const routes: Routes = [
         component: fromPages.HelpCategoriesListComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_HELP],
+            permissions: [
+                PERMISSION.HELP_CATEGORY_LIST
+            ],
         }
     },
     // Create Help Category
@@ -33,7 +39,9 @@ const routes: Routes = [
         component: fromPages.CreateHelpCategoryComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_HELP]
+            permissions: [
+                PERMISSION.HELP_CATEGORY_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -45,7 +53,9 @@ const routes: Routes = [
         component: fromPages.ModifyHelpCategoryComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_HELP],
+            permissions: [
+                PERMISSION.HELP_CATEGORY_VIEW
+            ],
             action: ViewModifyComponentAction.VIEW
         }
     },
@@ -55,7 +65,9 @@ const routes: Routes = [
         component: fromPages.ModifyHelpCategoryComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_HELP],
+            permissions: [
+                PERMISSION.HELP_CATEGORY_MODIFY
+            ],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [
@@ -68,7 +80,9 @@ const routes: Routes = [
         component: fromPages.HelpItemsListComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_HELP]
+            permissions: [
+                PERMISSION.HELP_CATEGORY_ITEM_LIST
+            ]
         }
     },
     // Create Help Item
@@ -77,7 +91,9 @@ const routes: Routes = [
         component: fromPages.CreateHelpItemComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_HELP]
+            permissions: [
+                PERMISSION.HELP_CATEGORY_ITEM_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -89,7 +105,9 @@ const routes: Routes = [
         component: fromPages.ModifyHelpItemComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_HELP],
+            permissions: [
+                PERMISSION.HELP_CATEGORY_ITEM_VIEW
+            ],
             action: ViewModifyComponentAction.VIEW
         }
     },
@@ -99,7 +117,9 @@ const routes: Routes = [
         component: fromPages.ModifyHelpItemComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_HELP],
+            permissions: [
+                PERMISSION.HELP_CATEGORY_ITEM_MODIFY
+            ],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [

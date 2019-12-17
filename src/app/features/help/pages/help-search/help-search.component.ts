@@ -12,7 +12,6 @@ import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import * as _ from 'lodash';
 import { catchError, tap } from 'rxjs/operators';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { HoverRowAction } from '../../../../shared/components';
@@ -38,6 +37,7 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
 
     // provide constants to template
     Constants = Constants;
+    HelpCategoryModel = HelpCategoryModel;
 
     searchedTerm: string = '';
 
@@ -134,9 +134,4 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
         // refresh list
         this.needsRefreshList();
     }
-
-    hasHelpWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_HELP);
-    }
-
 }

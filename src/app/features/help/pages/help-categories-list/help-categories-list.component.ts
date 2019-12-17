@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -19,6 +18,7 @@ import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { HelpItemModel } from '../../../../core/models/help-item.model';
 
 @Component({
     selector: 'app-help-categories-list',
@@ -28,7 +28,6 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 })
 export class HelpCategoriesListComponent extends ListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_GLOBAL_HELP_TITLE', '/help'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '.', true)
     ];
 
@@ -41,6 +40,7 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
 
     // provide constants to template
     Constants = Constants;
+    HelpCategoryModel = HelpCategoryModel;
 
     recordActions: HoverRowAction[] = [
         // View Help Category
@@ -51,7 +51,8 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
                 this.router.navigate(['/help', 'categories', item.id, 'view']);
             },
             visible: (item: HelpCategoryModel): boolean => {
-                return !item.deleted;
+                return !item.deleted &&
+                    HelpCategoryModel.canView(this.authUser);
             }
         }),
 
@@ -64,7 +65,7 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
             },
             visible: (item: HelpCategoryModel): boolean => {
                 return !item.deleted &&
-                    this.hasHelpWriteAccess();
+                    HelpCategoryModel.canModify(this.authUser);
             }
         }),
 
@@ -76,7 +77,8 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
                 this.router.navigate(['/help', 'categories', item.id, 'items']);
             },
             visible: (item: HelpCategoryModel): boolean => {
-                return !item.deleted;
+                return !item.deleted &&
+                    HelpItemModel.canList(this.authUser);
             }
         }),
 
@@ -93,7 +95,7 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
                     },
                     visible: (item: HelpCategoryModel): boolean => {
                         return !item.deleted &&
-                            this.hasHelpWriteAccess();
+                            HelpCategoryModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -101,6 +103,9 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private helpDataService: HelpDataService,
@@ -115,6 +120,9 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -187,14 +195,6 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
                 }),
                 share()
             );
-    }
-
-    /**
-     * Check if we have write access to help
-     * @returns {boolean}
-     */
-    hasHelpWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_HELP);
     }
 
     /**

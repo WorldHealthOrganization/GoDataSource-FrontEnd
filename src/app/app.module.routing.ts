@@ -463,8 +463,10 @@ const routes: Routes = [
                 path: ModulePath.HelpModule,
                 loadChildren: './features/help/help.module#HelpModule',
                 canActivate: [
+                    AuthGuard,
                     PasswordChangeGuard
                 ]
+                // NO permissions required, only to be authenticated
             },
 
             // Redirect Module routes
