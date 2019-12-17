@@ -111,6 +111,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_EXPORT_SYNC_PACKAGE_BUTTON': 'Export sync package',
         'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ERROR_DETAILS_TITLE': 'Error details',
 
+        /**
+         * uiModifyReferenceDataEntryPage
+         */
+        'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_LABEL_NO_ICON': 'No icon',
 
         /**
          * uiFormInputValidationErrors
@@ -133,5 +137,6 @@ export const EnglishUsLang = {
         // LNG_PAGE_LIST_FILTER_CASES_OUTSIDE_THE_TRANSMISSION_CHAINS
         // LNG_PAGE_SYSTEM_BACKUPS_IMPORT_SYNC_PACKAGE_BUTTON
         // LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE_BUTTON
+        // LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_LABEL_NO_COLOR
     }
 };

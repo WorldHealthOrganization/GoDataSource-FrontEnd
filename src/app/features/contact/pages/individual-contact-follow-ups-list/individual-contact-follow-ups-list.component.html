@@ -365,12 +365,17 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
                 <app-form-slide-toggle
+                    *ngIf="hasFollowUpsWriteAccess()"
                     name="targeted"
                     [(ngModel)]="item.targeted"
                     [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
                     tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
                     (optionChanged)="setTargetedItem(item, $event)">
                 </app-form-slide-toggle>
+                <div
+                    *ngIf="!hasFollowUpsWriteAccess()">
+                    <app-yes-no-label [value]="item.targeted"></app-yes-no-label>
+                </div>
             </mat-cell>
         </ng-container>
 

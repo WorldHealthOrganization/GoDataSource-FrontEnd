@@ -7,7 +7,6 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -17,6 +16,7 @@ import * as _ from 'lodash';
 import { throwError } from 'rxjs';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { IconModel } from '../../../../core/models/icon.model';
 
 @Component({
     selector: 'app-reference-data-category-entries-list',
@@ -25,15 +25,19 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     styleUrls: ['./reference-data-category-entries-list.component.less']
 })
 export class ReferenceDataCategoryEntriesListComponent extends ListComponent implements OnInit {
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
-    ];
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     categoryEntriesCount: IBasicCount;
     categoryEntries: ReferenceDataEntryModel[];
     categoryEntriesAll: ReferenceDataEntryModel[];
     categoryId: ReferenceDataCategory;
+
+    category: ReferenceDataCategoryModel;
+
+    // constants
+    IconModel = IconModel;
+    ReferenceDataEntryModel = ReferenceDataEntryModel;
 
     authUser: UserModel;
 
@@ -46,6 +50,9 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
             iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_VIEW_ENTRY',
             click: (item: ReferenceDataEntryModel) => {
                 this.router.navigate(['/reference-data', item.categoryId, item.id, 'view']);
+            },
+            visible: (): boolean => {
+                return ReferenceDataEntryModel.canView(this.authUser);
             }
         }),
 
@@ -57,7 +64,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                 this.router.navigate(['/reference-data', item.categoryId, item.id, 'modify']);
             },
             visible: (): boolean => {
-                return this.hasReferenceDataWriteAccess();
+                return ReferenceDataEntryModel.canModify(this.authUser);
             }
         }),
 
@@ -73,8 +80,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                         this.deleteEntry(item);
                     },
                     visible: (item: ReferenceDataEntryModel): boolean => {
-                        return this.hasReferenceDataWriteAccess() &&
-                            !item.readonly;
+                        return !item.readonly &&
+                            ReferenceDataEntryModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -82,6 +89,9 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         protected route: ActivatedRoute,
@@ -94,6 +104,9 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
         super(snackbarService);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -113,15 +126,42 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                 this.referenceDataDataService
                     .getReferenceDataByCategory(params.categoryId)
                     .subscribe((category: ReferenceDataCategoryModel) => {
-                        // add new breadcrumb
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(category.name, '.', true)
-                        );
+                        // set data
+                        this.category = category;
+
+                        // update breadcrumbs
+                        this.initializeBreadcrumbs();
                     });
             });
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (ReferenceDataCategoryModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
+            );
+        }
+
+        // view / modify breadcrumb
+        if (this.category) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    this.category.name,
+                    '.',
+                    true
+                )
+            );
+        }
     }
 
     /**
@@ -182,6 +222,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
     }
 
     refreshList(finishCallback: (records: any[]) => void) {
+        this.categoryEntriesAll = [];
+        this.categoryEntries = [];
         if (this.categoryId) {
             this.referenceDataDataService
                 .getReferenceDataByCategory(this.categoryId)
@@ -232,6 +274,9 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
         };
     }
 
+    /**
+     * Delete ref data entry
+     */
     deleteEntry(entry: ReferenceDataEntryModel) {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_REFERENCE_DATA_ENTRY')
             .subscribe((answer: DialogAnswer) => {
@@ -257,14 +302,6 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                         });
                 }
             });
-    }
-
-    /**
-     * Check if we have access to modify reference data
-     * @returns {boolean}
-     */
-    hasReferenceDataWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
     }
 
     /**

@@ -47,7 +47,9 @@ const routes: Routes = [
         component: fromPages.ImportReferenceDataComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_REFERENCE_DATA]
+            permissions: [
+                PERMISSION.REFERENCE_DATA_IMPORT
+            ]
         }
     },
 

@@ -112,7 +112,7 @@
                                     [src]="entry.iconUrl" />
                                 <div
                                     *ngIf="!entry.iconId">
-                                    {{ 'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_LABEL_NO_COLOR' | translate }}
+                                    {{ 'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_LABEL_NO_ICON' | translate }}
                                 </div>
 
                                 <!-- Change -->
@@ -194,24 +194,27 @@
 
     <div class="form-actions">
         <button
-            *ngIf="!viewOnly"
-            mat-raised-button
-            color="accent">
-            {{'LNG_COMMON_BUTTON_SAVE' | translate}}
-        </button>
-        <button
-            *ngIf="viewOnly && hasReferenceDataWriteAccess() "
+            *ngIf="viewOnly && ReferenceDataEntryModel.canModify(authUser) "
             type="button"
             [routerLink]="'/reference-data/' + categoryId + '/' + entryId + '/modify'"
             mat-raised-button>
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
-        <button
-            type="button"
-            [routerLink]="'/reference-data/' + categoryId"
-            mat-raised-button>
-            {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
-        </button>
+
+        <ng-container *ngIf="!viewOnly">
+            <button
+                mat-raised-button
+                color="accent">
+                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+            </button>
+            <button
+                *ngIf="ReferenceDataEntryModel.canList(authUser)"
+                type="button"
+                [routerLink]="'/reference-data/' + categoryId"
+                mat-raised-button>
+                {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+            </button>
+        </ng-container>
     </div>
 
 </form>

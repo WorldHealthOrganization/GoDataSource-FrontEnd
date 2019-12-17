@@ -5,6 +5,7 @@
 
             <div class="topnav-actions">
                 <button
+                    *ngIf="IconModel.canCreate(authUser)"
                     mat-raised-button
                     color="accent"
                     [routerLink]="['/reference-data', 'manage-icons', 'add']"
@@ -15,6 +16,11 @@
         </div>
     </ng-container>
 </app-topnav>
+
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="(iconsListCount$ | async)?.count">
+</app-total-number-of-records>
 
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
@@ -102,6 +108,12 @@
         </div>
     </div>
 
+    <mat-paginator
+        [length]="(iconsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
 </mat-card>
 
 

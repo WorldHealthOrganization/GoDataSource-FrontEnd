@@ -31,6 +31,22 @@ export enum PERMISSION {
 WRITE_HELP = 'write_help',
 APPROVE_HELP = 'approve_help',
 
+    // reference data
+    REFERENCE_DATA_LIST = 'reference_data_list_category',
+    REFERENCE_DATA_EXPORT = 'reference_data_export',
+    REFERENCE_DATA_IMPORT = 'reference_data_import',
+    REFERENCE_DATA_CATEGORY_ITEM_LIST = 'reference_data_list_category_item',
+    REFERENCE_DATA_CATEGORY_ITEM_VIEW = 'reference_data_view_category_item',
+    REFERENCE_DATA_CATEGORY_ITEM_CREATE = 'reference_data_create_category_item',
+    REFERENCE_DATA_CATEGORY_ITEM_MODIFY = 'reference_data_modify_category_item',
+    REFERENCE_DATA_CATEGORY_ITEM_DELETE = 'reference_data_delete_category_item',
+WRITE_REFERENCE_DATA = 'write_reference_data',
+
+    // icon
+    ICON_LIST = 'icon_list',
+    ICON_CREATE = 'icon_create',
+    ICON_DELETE = 'icon_delete',
+
     // users
     USER_LIST = 'user_list',
     USER_VIEW = 'user_view',
@@ -256,9 +272,6 @@ WRITE_FOLLOWUP = 'write_followup',
     // system config
     READ_SYS_CONFIG = 'read_sys_config',
     WRITE_SYS_CONFIG = 'write_sys_config',
-
-    // reference data
-    WRITE_REFERENCE_DATA = 'write_reference_data',
 
     // reports
     READ_REPORT = 'read_report'

@@ -4,28 +4,34 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button mat-raised-button color="accent" [matMenuTriggerFor]="quickActionsMenu">
+                <button
+                    *ngIf="IconModel.canList(authUser) || ReferenceDataCategoryModel.canImport(authUser) || ReferenceDataCategoryModel.canExport(authUser)"
+                    mat-raised-button
+                    color="accent"
+                    [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
-                    <ng-container *ngIf="hasReferenceDataWriteAccess()">
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/reference-data', 'manage-icons', 'list']">
-                            {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_MANAGE_ICONS_BUTTON' | translate}}
-                        </button>
+                    <button
+                        *ngIf="IconModel.canList(authUser)"
+                        mat-menu-item
+                        [routerLink]="['/reference-data', 'manage-icons', 'list']">
+                        {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_MANAGE_ICONS_BUTTON' | translate}}
+                    </button>
 
-                        <mat-divider></mat-divider>
+                    <mat-divider
+                        *ngIf="IconModel.canList(authUser)"></mat-divider>
 
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/import-export-data', 'reference-data', 'import']">
-                            {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_IMPORT_BUTTON' | translate}}
-                        </button>
-                    </ng-container>
+                    <button
+                        *ngIf="ReferenceDataCategoryModel.canImport(authUser)"
+                        mat-menu-item
+                        [routerLink]="['/import-export-data', 'reference-data', 'import']">
+                        {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_IMPORT_BUTTON' | translate}}
+                    </button>
 
                     <app-export-button
+                        *ngIf="ReferenceDataCategoryModel.canExport(authUser)"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON' | translate"
                         [message]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE' | translate"

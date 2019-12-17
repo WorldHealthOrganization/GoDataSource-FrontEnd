@@ -3,9 +3,9 @@
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
-            <div *ngIf="hasReferenceDataWriteAccess()" class="topnav-actions">
+            <div class="topnav-actions">
                 <button
-                    *ngIf="hasReferenceDataWriteAccess()"
+                    *ngIf="IconModel.canList(authUser)"
                     mat-raised-button
                     color="accent"
                     [routerLink]="['/reference-data', 'manage-icons', 'list']"
@@ -13,7 +13,9 @@
                     {{'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_MANAGE_ICONS_BUTTON' | translate}}
                 </button>
 
-                <button mat-raised-button color="accent" [routerLink]="'./create'">
+                <button
+                    *ngIf="ReferenceDataEntryModel.canCreate(authUser)"
+                    mat-raised-button color="accent" [routerLink]="'./create'">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
             </div>
@@ -121,7 +123,7 @@
 
             <mat-cell *matCellDef="let item">
                 <app-form-input
-                    *ngIf="hasReferenceDataWriteAccess()"
+                    *ngIf="ReferenceDataEntryModel.canModify(authUser)"
                     name="order"
                     [ngModel]="item.order"
                     [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER' | translate"
@@ -130,7 +132,7 @@
                     (optionChanged)="changeRefEntryOrder(item, $event)">
                 </app-form-input>
                 <div
-                    *ngIf="!hasReferenceDataWriteAccess()">
+                    *ngIf="!ReferenceDataEntryModel.canModify(authUser)">
                     {{ item.order }}
                 </div>
             </mat-cell>

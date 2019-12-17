@@ -319,7 +319,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
             'reference-data',
             'LNG_LAYOUT_MENU_ITEM_REFERENCE_DATA_LABEL',
             'language',
-            [PERMISSION.WRITE_REFERENCE_DATA],
+            [
+                PERMISSION.REFERENCE_DATA_LIST
+            ],
             [],
             '/reference-data'
         ),

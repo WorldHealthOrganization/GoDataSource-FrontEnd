@@ -2,11 +2,10 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ReferenceDataCategoryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { HoverRowAction, LoadingDialogModel } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -15,6 +14,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { catchError, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { IconModel } from '../../../../core/models/icon.model';
 
 @Component({
     selector: 'app-reference-data-categories-list',
@@ -23,13 +23,17 @@ import { throwError } from 'rxjs/internal/observable/throwError';
     styleUrls: ['./reference-data-categories-list.component.less']
 })
 export class ReferenceDataCategoriesListComponent extends ListComponent implements OnInit {
-
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '..', true)
     ];
 
     // authenticated user
     authUser: UserModel;
+
+    // constants
+    ReferenceDataCategoryModel = ReferenceDataCategoryModel;
+    IconModel = IconModel;
 
     // list of entries grouped by category
     referenceData$: Observable<ReferenceDataCategoryModel[]>;
@@ -50,10 +54,16 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
             iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_ACTION_VIEW_CATEGORY',
             click: (item: ReferenceDataCategoryModel) => {
                 this.router.navigate(['/reference-data', item.id]);
+            },
+            visible: (item: ReferenceDataCategoryModel): boolean => {
+                return ReferenceDataEntryModel.canList(this.authUser);
             }
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private referenceDataDataService: ReferenceDataDataService,
@@ -63,6 +73,14 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
         protected snackbarService: SnackbarService
     ) {
         super(snackbarService);
+    }
+
+    /**
+     * Component initialized
+     */
+    ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.needsRefreshList(true);
 
@@ -70,14 +88,6 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
         this.referenceDataExporFileName = this.i18nService.instant('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE') +
             ' - ' +
             this.referenceDataExporFileName;
-    }
-
-    /**
-     * Component Initialized
-     */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     /**
@@ -97,14 +107,6 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
                     finishCallback(data);
                 })
             );
-    }
-
-    /**
-     * Check if we have write access to reference data
-     * @returns {boolean}
-     */
-    hasReferenceDataWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_REFERENCE_DATA);
     }
 
     /**

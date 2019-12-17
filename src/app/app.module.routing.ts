@@ -300,7 +300,20 @@ const routes: Routes = [
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
-                ]
+                ],
+                data: {
+                    permissions: new PermissionExpression({
+                        or: [
+                            PERMISSION.REFERENCE_DATA_LIST,
+                            PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_LIST,
+                            PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_CREATE,
+                            PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_VIEW,
+                            PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_MODIFY,
+                            PERMISSION.ICON_LIST,
+                            PERMISSION.ICON_CREATE
+                        ]
+                    })
+                }
             },
             // Locations Module routes
             {
@@ -394,8 +407,9 @@ const routes: Routes = [
                         or: [
                             PERMISSION.LOCATION_IMPORT,
                             PERMISSION.LANGUAGE_IMPORT_TOKENS,
-                            PERMISSION.SYNC_IMPORT_PACKAGE
-                            // ...case / contact / lab results / ref data
+                            PERMISSION.SYNC_IMPORT_PACKAGE,
+                            PERMISSION.REFERENCE_DATA_IMPORT
+                            // ...case / contact / lab results
                         ]
                     })
                 }

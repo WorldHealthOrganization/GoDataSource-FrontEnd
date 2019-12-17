@@ -56,9 +56,7 @@ export class UserDataService {
     getUsersCount(
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<IBasicCount> {
-
         const whereFilter = queryBuilder.filter.generateCondition(true);
-
         return this.http.get(`users/count?where=${whereFilter}`);
     }
 
