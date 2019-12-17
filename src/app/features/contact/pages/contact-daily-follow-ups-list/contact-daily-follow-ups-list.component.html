@@ -426,7 +426,8 @@
                     [options]="teamsListLoaded"
                     optionLabelKey="name"
                     optionValueKey="id"
-                    (optionChanged)="changeFollowUpTeam(item, $event)">
+                    (optionChanged)="changeFollowUpTeam(item, $event)"
+                    [disabled]="item.deleted">
                 </app-form-select>
                 <div
                     *ngIf="!hasFollowUpsWriteAccess()">
@@ -493,7 +494,8 @@
                     [(ngModel)]="item.targeted"
                     [label]="item.targeted ? ('LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate) : ('LNG_FOLLOW_UP_FIELD_LABEL_NOT_TARGETED' | translate)"
                     [tooltip]="item.targeted ? ('LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION' | translate ): ('LNG_FOLLOW_UP_FIELD_LABEL_NOT_TARGETED_DESCRIPTION' | translate)"
-                    (optionChanged)="setTargetedItem(item, $event)">
+                    (optionChanged)="setTargetedItem(item, $event)"
+                    [disabled]="item.deleted">
                 </app-form-slide-toggle>
                 <app-yes-no-label
                     *ngIf="!hasFollowUpsWriteAccess()"
