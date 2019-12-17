@@ -25,6 +25,7 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
     @Input() toTooltip: string;
 
     @Input() minDate: Moment;
+    @Input() maxDate: Moment;
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
