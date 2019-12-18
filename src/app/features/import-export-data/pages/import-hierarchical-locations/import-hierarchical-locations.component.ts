@@ -25,7 +25,6 @@ export class ImportHierarchicalLocationsComponent {
 
 
     allowedExtensions: string[] = [
-        ImportDataExtension.XML,
         ImportDataExtension.JSON
     ];
 
