@@ -18,6 +18,9 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-modify-user',
@@ -36,6 +39,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
     passwordConfirmModel: string;
     rolesList$: Observable<UserRoleModel[]>;
     outbreaksList$: Observable<OutbreakModel[]>;
+    institutionsList$: Observable<LabelValuePair[]>;
 
     constructor(
         private router: Router,
@@ -46,7 +50,8 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
         private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private formHelper: FormHelperService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private referenceDataService: ReferenceDataDataService
     ) {
         super(route);
     }
@@ -74,6 +79,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
         // get the list of roles to populate the dropdown in UI
         this.rolesList$ = this.userRoleDataService.getRolesList();
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
+        this.institutionsList$ = this.referenceDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
     }
 
     modifyUser(form: NgForm) {

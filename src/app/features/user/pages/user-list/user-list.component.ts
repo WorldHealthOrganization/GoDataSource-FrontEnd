@@ -18,6 +18,9 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 
 @Component({
     selector: 'app-user-list',
@@ -41,6 +44,7 @@ export class UserListComponent extends ListComponent implements OnInit {
     rolesList$: Observable<UserRoleModel[]>;
     outbreaksListMap: any = {};
     outbreaksList$: Observable<OutbreakModel[]>;
+    institutionsList$: Observable<LabelValuePair[]>;
 
     recordActions: HoverRowAction[] = [
         // View User
@@ -93,7 +97,8 @@ export class UserListComponent extends ListComponent implements OnInit {
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
         private outbreakDataService: OutbreakDataService,
-        private userRoleDataService: UserRoleDataService
+        private userRoleDataService: UserRoleDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(
             snackbarService
@@ -105,6 +110,8 @@ export class UserListComponent extends ListComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.rolesList$ = this.userRoleDataService.getRolesList();
+
+        this.institutionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
 
         this.outbreakDataService
             .getOutbreaksList()
@@ -165,6 +172,8 @@ export class UserListComponent extends ListComponent implements OnInit {
             'lastName',
             'firstName',
             'email',
+            'institutionName',
+            'telephoneNumbers',
             'role',
             'availableOutbreaks'
         ];

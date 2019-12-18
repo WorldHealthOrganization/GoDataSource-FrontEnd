@@ -18,6 +18,9 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-create-user',
@@ -39,6 +42,7 @@ export class CreateUserComponent extends ConfirmOnFormChanges implements OnInit 
     passwordConfirmModel: string;
     rolesList$: Observable<UserRoleModel[]>;
     outbreaksList$: Observable<OutbreakModel[]>;
+    institutionsList$: Observable<LabelValuePair[]>;
 
     constructor(
         private router: Router,
@@ -48,7 +52,8 @@ export class CreateUserComponent extends ConfirmOnFormChanges implements OnInit 
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private formHelper: FormHelperService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private referenceDataService: ReferenceDataDataService
     ) {
         super();
     }
@@ -59,6 +64,7 @@ export class CreateUserComponent extends ConfirmOnFormChanges implements OnInit 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
+        this.institutionsList$ = this.referenceDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
     }
 
     createNewUser(form: NgForm) {

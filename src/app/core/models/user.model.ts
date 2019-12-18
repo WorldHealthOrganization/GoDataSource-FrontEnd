@@ -66,6 +66,10 @@ export class UserModel {
     permissionIds: PERMISSION[] = [];
     securityQuestions: SecurityQuestionModel[] = [];
     settings: { [key: string]: any } = {};
+    institutionName: string;
+    telephoneNumbers: {
+        [key: string]: string
+    };
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -79,7 +83,8 @@ export class UserModel {
         this.languageId = _.get(data, 'languageId');
         this.roleIds = _.get(data, 'roleIds', []);
         this.securityQuestions = _.get(data, 'securityQuestions', [new SecurityQuestionModel(), new SecurityQuestionModel()]);
-
+        this.institutionName = _.get(data, 'institutionName');
+        this.telephoneNumbers = _.get(data, 'telephoneNumbers', {});
         // initialize all settings
         this.initializeSettings(data);
     }

@@ -110,6 +110,45 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Institution  -->
+        <ng-container matColumnDef="institutionName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_INSTITUTION_NAME' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="institutionFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="institutionsList$ | async"
+                            (optionChanged)="filterByTextField('institutionName', $event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.institutionName | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="telephoneNumbers">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_PHONE_NUMBERS' | translate}}</div>
+                    <div class="column-filter">
+                        <div> <!--Placeholder --> </div>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.telephoneNumbers['LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE'] | translate }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Role -->
         <ng-container matColumnDef="role">
             <mat-header-cell *matHeaderCellDef>

@@ -56,6 +56,26 @@
 
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-select
+                                name="institutionName"
+                                [(ngModel)]="newUser.institutionName"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_INSTITUTION_NAME' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_INSTITUTION_NAME_DESCRIPTION"
+                                [options]="institutionsList$ | async">
+                            </app-form-select>
+
+                            <app-form-input
+                                name="telephoneNumbers['LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE']"
+                                [(ngModel)]="newUser.telephoneNumbers['LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE']"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS_DESCRIPTION">
+                            </app-form-input>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
                                 *ngIf="hasOutbreakReadAccess()"
                                 name="outbreakIds"
                                 [(ngModel)]="newUser.outbreakIds"
