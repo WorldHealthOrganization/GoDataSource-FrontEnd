@@ -20,9 +20,7 @@
 
     <div fxLayout="column" fxLayoutGap="10px">
         <div
-            *ngIf="hasCaseWriteAccess() || hasContactWriteAccess()"
             fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
-
             <button
                 *ngIf="canReverseRelation && RelationshipModel.canReverse(authUser) && entityCanReverse"
                 (click)="reverseExistingRelationship()"

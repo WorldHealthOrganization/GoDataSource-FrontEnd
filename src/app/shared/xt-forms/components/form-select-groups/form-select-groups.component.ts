@@ -1033,4 +1033,33 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
         // render options
         this.valueChangedTrigger();
     }
+
+    /**
+     * Clear selected options
+     */
+    clearSelected(event: MouseEvent) {
+        // stop propagation
+        event.preventDefault();
+        event.stopPropagation();
+
+        // if already empty, then we don't need to clear it
+        if (
+            !this.value ||
+            this.value.length < 1
+        ) {
+            return;
+        }
+
+        // clear
+        this.value = [];
+
+        // add default values if necessary
+        this.initializeDefaultValues(this.value);
+
+        // value changed
+        this.valueChangedTriggered = true;
+
+        // render options
+        this.valueChangedTrigger();
+    }
 }

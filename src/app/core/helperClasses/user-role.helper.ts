@@ -40,6 +40,11 @@ export class UserRoleHelper {
                 }
             });
 
+            // sort list before we display it
+            requiredPermissionTranslations.sort((label1: string, label2: string) => {
+                return label1.toLowerCase().localeCompare(label2.toLowerCase());
+            });
+
             // do we have extra required permissions ?
             let extraRequiredPermMessage: string = '';
             if (requiredPermissionTranslations.length > 0) {
@@ -120,6 +125,12 @@ export class UserRoleHelper {
             !requiredByList ||
             requiredByList.length < 1
         ) {
+            // continue with the next step
+            if (doAfterPopupCloses) {
+                doAfterPopupCloses();
+            }
+
+            // finished - nothing to display
             return;
         }
 

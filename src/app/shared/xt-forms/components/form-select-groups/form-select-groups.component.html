@@ -15,9 +15,24 @@
             (valueChange)="valueChanged($event)"
             (openedChange)="openedChange($event)">
             <!-- Render display selected -->
-            <mat-select-trigger
-                class="select-group-group-selected">
-                {{ selectTriggerText }}
+            <mat-select-trigger>
+                <div
+                    fxLayout="row">
+                    <!-- selected values -->
+                    <div
+                        fxFlex
+                        class="select-group-group-selected">
+                        {{ selectTriggerText }}
+                    </div>
+
+                    <!-- Clear button -->
+                    <div
+                        fxFlex fxGrow="0">
+                        <span
+                            class="select-group-group-selected-clear"
+                            (click)="clearSelected($event)">x</span>
+                    </div>
+                </div>
             </mat-select-trigger>
 
             <!-- Needed to actually select partial records when nothing selectable is visible -->
@@ -97,8 +112,7 @@
             #tooltipCtrl="matTooltip"
             [matTooltip]="tooltip"
             class="xt-icon form-icon"
-            (click)="displayTooltip($event, tooltipCtrl)"
-        >
+            (click)="displayTooltip($event, tooltipCtrl)">
             help
         </span>
     </mat-form-field>

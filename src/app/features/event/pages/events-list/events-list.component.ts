@@ -45,6 +45,8 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
 
     // authenticated user
     authUser: UserModel;
+
+    // constants
     EventModel = EventModel;
     RelationshipModel = RelationshipModel;
 

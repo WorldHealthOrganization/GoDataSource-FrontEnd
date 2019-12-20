@@ -130,26 +130,16 @@ const routes: Routes = [
     // Entity Exposure Relationships
     {
         path: ':entityType/:entityId/exposures',
-        canActivate: [AuthGuard],
         data: {
-            relationshipType: RelationshipType.EXPOSURE,
-            permissions: [
-                PERMISSION.OUTBREAK_VIEW,
-                PERMISSION.RELATIONSHIP_LIST
-            ]
+            relationshipType: RelationshipType.EXPOSURE
         },
         children: relationshipTypeChildrenRoutes,
     },
     // Entity Contact Relationships
     {
         path: ':entityType/:entityId/contacts',
-        canActivate: [AuthGuard],
         data: {
-            relationshipType: RelationshipType.CONTACT,
-            permissions: [
-                PERMISSION.OUTBREAK_VIEW,
-                PERMISSION.RELATIONSHIP_LIST
-            ]
+            relationshipType: RelationshipType.CONTACT
         },
         children: relationshipTypeChildrenRoutes
     },

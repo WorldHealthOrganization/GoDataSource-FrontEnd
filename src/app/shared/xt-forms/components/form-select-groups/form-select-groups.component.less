@@ -6,6 +6,21 @@
         .select-group-group-selected {
             white-space: normal;
         }
+
+        .select-group-group-selected-clear {
+            display: inline-block;
+            width: 16px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: rgba(0,0,0,.54);
+            line-height: 1;
+
+            &:hover {
+                cursor: pointer;
+                color: rgba(0,0,0,.87);
+            }
+        }
     }
 }
 
@@ -43,15 +58,26 @@
             font-weight: bold;
         }
 
+        &.select-group-option-partial {
+            white-space: normal;
+        }
+
         &.mat-option-disabled {
             color: rgba(0,0,0,.87);
         }
 
         .select-group-option-info-right {
+            padding-left: 17px;
             color: #777;
             font-size: 12px;
             width: 100%;
             text-align: right;
+
+            .select-group-option-info-right-content {
+                display: inline-block;
+                text-align: left;
+                white-space: normal;
+            }
         }
     }
 }

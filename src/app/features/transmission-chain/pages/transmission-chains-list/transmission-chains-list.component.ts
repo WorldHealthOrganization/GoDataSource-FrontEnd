@@ -27,9 +27,8 @@ import { throwError } from 'rxjs/internal/observable/throwError';
     styleUrls: ['./transmission-chains-list.component.less']
 })
 export class TransmissionChainsListComponent extends ListComponent implements OnInit, OnDestroy {
-
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', '/transmission-chains'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE', null, true)
     ];
 
@@ -46,11 +45,25 @@ export class TransmissionChainsListComponent extends ListComponent implements On
 
     // provide constants to template
     Constants = Constants;
+    TransmissionChainModel = TransmissionChainModel;
 
     EntityType = EntityType;
 
     queryParamsData: any;
 
+    fixedTableColumns: string[] = [
+        'firstContactDate',
+        'rootCase',
+        'noCases',
+        'noAliveCases',
+        'numberOfContacts',
+        'duration',
+        'active'
+    ];
+
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private outbreakDataService: OutbreakDataService,
@@ -67,6 +80,9 @@ export class TransmissionChainsListComponent extends ListComponent implements On
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -92,6 +108,9 @@ export class TransmissionChainsListComponent extends ListComponent implements On
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -252,31 +271,5 @@ export class TransmissionChainsListComponent extends ListComponent implements On
         } else {
             finishCallback([]);
         }
-    }
-
-    hasCaseReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_CASE);
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        const columns = [
-            'firstContactDate',
-            'noCases',
-            'noAliveCases',
-            'numberOfContacts',
-            'duration',
-            'active'
-        ];
-
-        if (this.hasCaseReadAccess()) {
-            // include the Root Case column on the second position
-            columns.splice(1, 0, 'rootCase');
-        }
-
-        return columns;
     }
 }

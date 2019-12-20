@@ -31,6 +31,7 @@ import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/
     styleUrls: ['./modify-entity-relationship.component.less']
 })
 export class ModifyEntityRelationshipComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // Entities Map for specific data
@@ -38,10 +39,13 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
         [entityType: string]: {
             label: string,
             link: string,
+            canList: (UserModel) => boolean,
+            canView: (UserModel) => boolean,
             can: {
                 [type: string]: {
                     modify: (UserModel) => boolean,
-                    reverse: (UserModel) => boolean
+                    reverse: (UserModel) => boolean,
+                    list: (UserModel) => boolean
                 }
             }
         }
@@ -49,42 +53,54 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
         [EntityType.CASE]: {
             label: 'LNG_PAGE_LIST_CASES_TITLE',
             link: '/cases',
+            canList: CaseModel.canList,
+            canView: CaseModel.canView,
             can: {
                 contacts: {
                     modify: CaseModel.canModifyRelationshipContacts,
-                    reverse: CaseModel.canReverseRelationship
+                    reverse: CaseModel.canReverseRelationship,
+                    list: CaseModel.canListRelationshipContacts
                 },
                 exposures: {
                     modify: CaseModel.canModifyRelationshipExposures,
-                    reverse: CaseModel.canReverseRelationship
+                    reverse: CaseModel.canReverseRelationship,
+                    list: CaseModel.canListRelationshipExposures
                 }
             }
         },
         [EntityType.CONTACT]: {
             label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
             link: '/contacts',
+            canList: ContactModel.canList,
+            canView: ContactModel.canView,
             can: {
                 contacts: {
                     modify: ContactModel.canModifyRelationshipContacts,
-                    reverse: ContactModel.canReverseRelationship
+                    reverse: ContactModel.canReverseRelationship,
+                    list: ContactModel.canListRelationshipContacts
                 },
                 exposures: {
                     modify: ContactModel.canModifyRelationshipExposures,
-                    reverse: ContactModel.canReverseRelationship
+                    reverse: ContactModel.canReverseRelationship,
+                    list: ContactModel.canListRelationshipExposures
                 }
             }
         },
         [EntityType.EVENT]: {
             label: 'LNG_PAGE_LIST_EVENTS_TITLE',
             link: '/events',
+            canList: EventModel.canList,
+            canView: EventModel.canView,
             can: {
                 contacts: {
                     modify: EventModel.canModifyRelationshipContacts,
-                    reverse: EventModel.canReverseRelationship
+                    reverse: EventModel.canReverseRelationship,
+                    list: EventModel.canListRelationshipContacts
                 },
                 exposures: {
                     modify: EventModel.canModifyRelationshipExposures,
-                    reverse: EventModel.canReverseRelationship
+                    reverse: EventModel.canReverseRelationship,
+                    list: EventModel.canListRelationshipExposures
                 }
             }
         }
@@ -228,24 +244,41 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             // get related person
             const relatedPerson = _.get(this.relationship.relatedEntity(this.entityId), 'model', {});
 
-            this.breadcrumbs = [
-                new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-                new BreadcrumbItemModel(
+            // reset value
+            this.breadcrumbs = [];
+
+            // case / contact / event list page breadcrumb
+            if (this.entityMap[this.entityType].canList(this.authUser)) {
+                this.breadcrumbs.push(new BreadcrumbItemModel(
+                    this.entityMap[this.entityType].label,
+                    this.entityMap[this.entityType].link
+                ));
+            }
+
+            // case / contact / event view page breadcrumb
+            if (this.entityMap[this.entityType].canView(this.authUser)) {
+                this.breadcrumbs.push(new BreadcrumbItemModel(
                     this.entity.name,
                     `${this.entityMap[this.entityType].link}/${this.entityId}/view`
-                ),
-                new BreadcrumbItemModel(
+                ));
+            }
+
+            // exposure / contacts list page
+            if (this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].list(this.authUser)) {
+                this.breadcrumbs.push(new BreadcrumbItemModel(
                     relationshipsListPageTitle,
                     `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
-                ),
-                new BreadcrumbItemModel(
-                    this.viewOnly ? 'LNG_PAGE_VIEW_RELATIONSHIP_TITLE' : 'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE',
-                    null,
-                    true,
-                    {},
-                    relatedPerson
-                )
-            ];
+                ));
+            }
+
+            // page breadcrumb
+            this.breadcrumbs.push(new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_RELATIONSHIP_TITLE' : 'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE',
+                null,
+                true,
+                {},
+                relatedPerson
+            ));
         }
     }
 

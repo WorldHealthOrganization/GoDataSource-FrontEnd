@@ -429,3 +429,98 @@ export interface IPermissionRelatedRelationship {
      */
     canBulkDeleteRelationshipContacts(user: UserModel): boolean;
 }
+
+/**
+ * Chains Of Transmission - COT
+ */
+export interface IChainsOfTransmission {
+    /**
+     * Has permission to list cot records ?
+     */
+    canList(user: UserModel): boolean;
+
+    /**
+     * Has permission to export cot bar chart image ?
+     */
+    canExportBarChart(user: UserModel): boolean;
+
+    /**
+     * Has permission to export cot graphs image ( bubble network, hierarchical network ... ) ?
+     */
+    canExportGraphs(user: UserModel): boolean;
+
+    /**
+     * Has permission to export cot case count map image ?
+     */
+    canExportCaseCountMap(user: UserModel): boolean;
+
+    /**
+     * Has permission to see bar chart
+     */
+    canViewBarChart(user: UserModel): boolean;
+
+    /**
+     * Has permission to see count map
+     */
+    canViewCaseCountMap(user: UserModel): boolean;
+
+    /**
+     * Has permission to see geospatial map
+     */
+    canViewGeospatialMap(user: UserModel): boolean;
+
+    /**
+     * Has permission to see bubble network
+     */
+    canViewBubbleNetwork(user: UserModel): boolean;
+
+    /**
+     * Has permission to modify bubble network
+     */
+    canModifyBubbleNetwork(user: UserModel): boolean;
+
+    /**
+     * Has permission to see hierarchical network
+     */
+    canViewHierarchicalNetwork(user: UserModel): boolean;
+
+    /**
+     * Has permission to modify hierarchical network
+     */
+    canModifyHierarchicalNetwork(user: UserModel): boolean;
+
+    /**
+     * Has permission to see timeline network date of onset
+     */
+    canViewTimelineNetworkDateOfOnset(user: UserModel): boolean;
+
+    /**
+     * Has permission to modify timeline network date of onset
+     */
+    canModifyTimelineNetworkDateOfOnset(user: UserModel): boolean;
+
+    /**
+     * Has permission to see timeline network date of last contact
+     */
+    canViewTimelineNetworkDateOfLastContact(user: UserModel): boolean;
+
+    /**
+     * Has permission to modify timeline network date of last contact
+     */
+    canModifyTimelineNetworkDateOfLastContact(user: UserModel): boolean;
+
+    /**
+     * Has permission to see timeline network date of reporting
+     */
+    canViewTimelineNetworkDateOfReporting(user: UserModel): boolean;
+
+    /**
+     * Has permission to modify timeline network date of reporting
+     */
+    canModifyTimelineNetworkDateOfReporting(user: UserModel): boolean;
+
+    /**
+     * Can view any of the cot graphs ( bubble / hierarchical ... )
+     */
+    canViewAnyGraph(user: UserModel): boolean;
+}

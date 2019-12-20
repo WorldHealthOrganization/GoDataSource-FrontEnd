@@ -373,10 +373,18 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [
-                        PERMISSION.READ_OUTBREAK,
-                        PERMISSION.READ_REPORT
-                    ]
+                    permissions: new PermissionExpression({
+                        or: [
+                            PERMISSION.COT_VIEW_BUBBLE_NETWORK,
+                            PERMISSION.COT_VIEW_GEOSPATIAL_MAP,
+                            PERMISSION.COT_VIEW_HIERARCHICAL_NETWORK,
+                            PERMISSION.COT_VIEW_TIMELINE_NETWORK_DATE_OF_ONSET,
+                            PERMISSION.COT_VIEW_TIMELINE_NETWORK_DATE_OF_LAST_CONTACT,
+                            PERMISSION.COT_VIEW_TIMELINE_NETWORK_DATE_OF_REPORTING,
+                            PERMISSION.COT_LIST,
+                            PERMISSION.COT_VIEW_CASE_COUNT_MAP
+                        ]
+                    })
                 }
             },
             // D3 Graphs Module routes
@@ -389,8 +397,7 @@ const routes: Routes = [
                 ],
                 data: {
                     permissions: [
-                        PERMISSION.READ_OUTBREAK,
-                        PERMISSION.READ_REPORT
+                        PERMISSION.COT_VIEW_BAR_CHART
                     ]
                 }
             },

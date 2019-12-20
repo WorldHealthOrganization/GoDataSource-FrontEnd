@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { UserModel } from '../../../../core/models/user.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -84,6 +83,9 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
 
     canReverseRelation: boolean = true;
 
+    /**
+     * Constructor
+     */
     constructor(
         private authDataService: AuthDataService,
         private relationshipDataService: RelationshipDataService,
@@ -103,6 +105,9 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
         }
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
@@ -170,14 +175,6 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
 
     onReverseRelationshipPersons() {
         this.reverseRelationshipPersons.emit();
-    }
-
-    hasCaseWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-    }
-
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
     }
 
     /**

@@ -262,10 +262,16 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 new ChildNavItem(
                     'transmission-chains',
                     'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL',
-                    [
-                        PERMISSION.READ_OUTBREAK,
-                        PERMISSION.READ_REPORT
-                    ],
+                    new PermissionExpression({
+                        or: [
+                            PERMISSION.COT_VIEW_BUBBLE_NETWORK,
+                            PERMISSION.COT_VIEW_GEOSPATIAL_MAP,
+                            PERMISSION.COT_VIEW_HIERARCHICAL_NETWORK,
+                            PERMISSION.COT_VIEW_TIMELINE_NETWORK_DATE_OF_ONSET,
+                            PERMISSION.COT_VIEW_TIMELINE_NETWORK_DATE_OF_LAST_CONTACT,
+                            PERMISSION.COT_VIEW_TIMELINE_NETWORK_DATE_OF_REPORTING
+                        ]
+                    }),
                     '/transmission-chains',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 ),
@@ -273,8 +279,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
                     'transmission-chain-bars',
                     'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAIN_BARS_LABEL',
                     [
-                        PERMISSION.READ_OUTBREAK,
-                        PERMISSION.READ_REPORT
+                        PERMISSION.COT_VIEW_BAR_CHART
                     ],
                     '/graphs/transmission-chain-bars',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
@@ -283,8 +288,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
                     'transmission-chains-list',
                     'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LIST_LABEL',
                     [
-                        PERMISSION.READ_OUTBREAK,
-                        PERMISSION.READ_REPORT
+                        PERMISSION.COT_LIST
                     ],
                     '/transmission-chains/list',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
@@ -293,9 +297,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
                     'cases-count-map',
                     'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_COUNT_MAP_LABEL',
                     [
-                        PERMISSION.READ_OUTBREAK,
-                        PERMISSION.READ_REPORT,
-                        PERMISSION.READ_CASE
+                        PERMISSION.COT_VIEW_CASE_COUNT_MAP
                     ],
                     '/transmission-chains/case-count-map',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
