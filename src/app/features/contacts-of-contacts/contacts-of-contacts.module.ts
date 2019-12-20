@@ -12,7 +12,7 @@ import {routing} from './contacts-of-contacts.module.routing';
         SharedModule
     ],
     declarations: [
-        ...fromPages.pageComponents
+        ...fromPages.pageComponents,
     ],
     entryComponents: []
 })

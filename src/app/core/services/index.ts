@@ -48,6 +48,7 @@ import { SavedFiltersService } from './data/saved-filters.data.service';
 import { SavedImportMappingService } from './data/saved-import-mapping.data.service';
 import { RedirectService } from './helper/redirect.service';
 import { EntityHelperService } from './helper/entity-helper.service';
+import {ContactsOfContactsDataService} from './data/contacts-of-contacts.data.service';
 
 // export the list of services
 export const services: any[] = [
@@ -61,6 +62,7 @@ export const services: any[] = [
     OutbreakDataService,
     OutbreakTemplateDataService,
     ContactDataService,
+    ContactsOfContactsDataService,
     CaseDataService,
     EventDataService,
     GenericDataService,

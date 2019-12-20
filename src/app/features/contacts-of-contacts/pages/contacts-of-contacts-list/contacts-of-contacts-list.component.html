@@ -1,3 +1,91 @@
-<p>
-  contacts-of-contacts-list works!
-</p>
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <button
+                    *ngIf="!appliedListFilter"
+                    mat-raised-button
+                    color="accent"
+                    [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <ng-container
+                        *ngIf="hasContactWriteAccess()">
+                        <button
+                            mat-menu-item
+                            (click)="changeContactFinalFollowUpStatus()">
+                            {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS' | translate }}
+                        </button>
+
+                        <mat-divider></mat-divider>
+                    </ng-container>
+
+                    <app-export-button
+                        *ngIf="exportContactsUrl"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE' | translate"
+                        [url]="exportContactsUrl"
+                        [fileName]="contactsDataExportFileName"
+                        [allowedExportTypes]="allowedExportTypes"
+                        [displayEncrypt]="true"
+                        [displayAnonymize]="true"
+                        [anonymizeFields]="anonymizeFields"
+                        [queryBuilder]="queryBuilder"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
+                    </app-export-button>
+
+                    <button
+                        *ngIf="hasContactWriteAccess()"
+                        mat-menu-item
+                        [routerLink]="['/import-export-data', 'contact-data', 'import']">
+                        {{'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON' | translate}}
+                    </button>
+
+                    <mat-divider></mat-divider>
+
+                    <button
+                        mat-menu-item
+                        (click)="exportFilteredContactsRelationships()">
+                        {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_EXPORT_CONTACTS_RELATIONSHIPS' | translate }}
+                    </button>
+
+                    <mat-divider
+                        *ngIf="exportContactsDailyFollowUpListUrl || exportContactsDailyFollowUpsFormUrl"></mat-divider>
+
+                    <app-export-button
+                        *ngIf="exportContactsDailyFollowUpListUrl"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE' | translate"
+                        [url]="exportContactsDailyFollowUpListUrl"
+                        [fileName]="exportContactsDailyFollowUpListFileName"
+                        [fileType]="exportContactsDailyFollowUpListFileType"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()"
+                        [queryBuilder]="queryBuilder"
+                        [extraDialogFields]="exportContactsDailyFollowUpListDialogFields">
+                    </app-export-button>
+
+                    <app-export-button
+                        *ngIf="exportContactsDailyFollowUpsFormUrl"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE' | translate"
+                        [url]="exportContactsDailyFollowUpsFormUrl"
+                        [fileName]="exportContactsDailyFollowUpsFormFileName"
+                        [fileType]="exportContactsDailyFollowUpsFormFileType"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()"
+                        [queryBuilder]="queryBuilder">
+                    </app-export-button>
+                </mat-menu>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
