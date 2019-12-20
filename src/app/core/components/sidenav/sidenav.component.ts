@@ -177,6 +177,16 @@ export class SidenavComponent implements OnInit, OnDestroy {
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 ),
                 new ChildNavItem(
+                    'contacts-of-contacts',
+                    'LNG_LAYOUT_MENU_ITEM_CONTACTS_OF_CONTACTS_LABEL',
+                    [
+                        PERMISSION.READ_OUTBREAK,
+                        PERMISSION.READ_CONTACT
+                    ],
+                    '/contacts-of-contacts',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+                ),
+                new ChildNavItem(
                     'contact-follow-ups',
                     'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL',
                     [

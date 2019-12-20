@@ -155,6 +155,21 @@ const routes: Routes = [
                     ]
                 }
             },
+            // Contacts of contacts Module routes
+            {
+                path: ModulePath.ContactsOfContactsModule,
+                loadChildren: './features/contacts-of-contacts/contacts-of-contacts.module#ContactsOfContactsModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [
+                        PERMISSION.READ_OUTBREAK,
+                        PERMISSION.READ_CONTACT
+                    ]
+                }
+            },
             // Case Module routes
             {
                 path: ModulePath.CaseModule,

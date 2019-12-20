@@ -40,6 +40,10 @@ export enum PERMISSION {
     READ_CONTACT = 'read_contact',
     WRITE_CONTACT = 'write_contact',
 
+    // contacts of contacts
+    READ_CONTACTS_OF_CONTACTS = 'read_contacts_of_contacts',
+    WRITE_CONTACTS_OF_CONTACTS = 'write_contacts_of_contacts',
+
     // followups
     READ_FOLLOWUP = 'read_followup',
     WRITE_FOLLOWUP = 'write_followup',
