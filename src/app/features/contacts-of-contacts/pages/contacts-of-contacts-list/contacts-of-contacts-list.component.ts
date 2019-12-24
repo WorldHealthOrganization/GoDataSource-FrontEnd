@@ -37,13 +37,14 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { AddressType } from '../../../../core/models/address.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 
 @Component({
     selector: 'app-contacts-of-contacts-list',
     templateUrl: './contacts-of-contacts-list.component.html',
     styleUrls: ['./contacts-of-contacts-list.component.less']
 })
-export class ContactsOfContactsListComponent extends ListComponent implements OnInit {
+export class ContactsOfContactsListComponent extends ListComponent implements OnInit, OnDestroy {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE', '.', true)
@@ -142,7 +143,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         // View Contact
         new HoverRowAction({
             icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CONTACT',
+            iconTooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CONTACT',
             click: (item: ContactModel) => {
                 this.router.navigate(['/contacts', item.id, 'view']);
             },
@@ -154,7 +155,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         // Modify Contact
         new HoverRowAction({
             icon: 'settings',
-            iconTooltip: 'LNG_PAGE_LIST_CONTACTS_ACTION_MODIFY_CONTACT',
+            iconTooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_MODIFY_CONTACT',
             click: (item: ContactModel) => {
                 this.router.navigate(['/contacts', item.id, 'modify']);
             },
@@ -162,8 +163,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 return !item.deleted &&
                     this.authUser &&
                     this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    this.hasContactWriteAccess();
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id
+                    // &&
+                    // this.hasContactOfContactWriteAccess();
             }
         }),
 
@@ -174,7 +176,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             menuOptions: [
                 // Convert Contact to Case
                 new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE',
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_CONVERT_TO_CASE',
                     click: (item: ContactModel) => {
                         this.convertContactToCase(item);
                     },
@@ -183,7 +185,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess() &&
+                            // this.hasContactOfContactWriteAccess() &&
                             this.hasCaseWriteAccess();
                     },
                     class: 'mat-menu-item-delete'
@@ -191,7 +193,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
                 // Delete Contact
                 new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_CONTACT',
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_CONTACT',
                     click: (item: ContactModel) => {
                         this.deleteContact(item);
                     },
@@ -199,8 +201,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                         return !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id
+                            // &&
+                            // this.hasContactOfContactWriteAccess();
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -213,26 +216,28 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                         return !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id
+                            // &&
+                            // this.hasContactOfContactWriteAccess();
                     }
                 }),
 
-                // Add Follow-up to Contact
-                new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP',
-                    click: (item: ContactModel) => {
-                        this.router.navigate(['/contacts', item.id, 'follow-ups', 'create']);
-                    },
-                    visible: (item: ContactModel): boolean => {
-                        return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess() &&
-                            this.hasFollowUpWriteAccess();
-                    }
-                }),
+                // // Add Follow-up to Contact
+                // new HoverRowAction({
+                //     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP',
+                //     click: (item: ContactModel) => {
+                //         this.router.navigate(['/contacts', item.id, 'follow-ups', 'create']);
+                //     },
+                //     visible: (item: ContactModel): boolean => {
+                //         return !item.deleted &&
+                //             this.authUser &&
+                //             this.selectedOutbreak &&
+                //             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                //             this.hasContactOfContactWriteAccess()
+                //             // &&
+                //             // this.hasFollowUpWriteAccess();
+                //     }
+                // }),
 
                 // Divider
                 new HoverRowAction({
@@ -242,9 +247,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                         return !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess() &&
-                            this.hasFollowUpWriteAccess();
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id
+                            // &&
+                            // this.hasContactOfContactWriteAccess()
+                            // &&
+                            // this.hasFollowUpWriteAccess();
                     }
                 }),
 
@@ -268,31 +275,33 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                     }
                 }),
 
-                // See contact follow-us
-                new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_FOLLOW_UPS',
-                    click: (item: ContactModel) => {
-                        this.router.navigate(['/contacts', 'contact-related-follow-ups', item.id]);
-                    },
-                    visible: (item: ContactModel): boolean => {
-                        return !item.deleted &&
-                            this.hasContactFollowUpReadAccess();
-                    }
-                }),
+                // // See contact follow-us
+                // new HoverRowAction({
+                //     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_FOLLOW_UPS',
+                //     click: (item: ContactModel) => {
+                //         this.router.navigate(['/contacts', 'contact-related-follow-ups', item.id]);
+                //     },
+                //     visible: (item: ContactModel): boolean => {
+                //         return !item.deleted
+                //             // &&
+                //             // this.hasContactFollowUpReadAccess();
+                //     }
+                // }),
 
                 // Divider
                 new HoverRowAction({
                     type: HoverRowActionType.DIVIDER,
                     visible: (item: ContactModel): boolean => {
                         // visible only if at least one of the previous...
-                        return !item.deleted &&
-                            this.hasContactFollowUpReadAccess();
+                        return !item.deleted
+                            // &&
+                            // this.hasContactFollowUpReadAccess();
                     }
                 }),
 
                 // View Contact movement map
                 new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT',
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_MOVEMENT',
                     click: (item: ContactModel) => {
                         this.router.navigate(['/contacts', item.id, 'movement']);
                     },
@@ -303,7 +312,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
                 // View Contact chronology timeline
                 new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY',
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CHRONOLOGY',
                     click: (item: ContactModel) => {
                         this.router.navigate(['/contacts', item.id, 'chronology']);
                     },
@@ -314,7 +323,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
                 // Restore a deleted contact
                 new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_CONTACT',
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_CONTACT',
                     click: (item: ContactModel) => {
                         this.restoreContact(item);
                     },
@@ -322,8 +331,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                         return item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id
+                            // &&
+                            // this.hasContactWriteAccess();
                     },
                     class: 'mat-menu-item-restore'
                 })
@@ -333,7 +343,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
     constructor(
         private router: Router,
-        private contactDataService: ContactDataService,
+        private contactsOfContactsDataService: ContactsOfContactsDataService,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
@@ -435,8 +445,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                     this.initializeSideFilters();
                 }
 
-                // get contacts grouped by risk level
-                this.getContactsGroupedByRiskLevel();
+                // // get contacts grouped by risk level
+                // this.getContactsGroupedByRiskLevel();
 
                 // initialize pagination
                 this.initPaginator();
@@ -749,7 +759,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     refreshList(finishCallback: (records: any[]) => void) {
         if (this.selectedOutbreak) {
             // refresh list of contacts grouped by risk level
-            this.getContactsGroupedByRiskLevel();
+            // this.getContactsGroupedByRiskLevel();
 
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
@@ -765,8 +775,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             );
 
             // retrieve the list of Contacts
-            this.contactsOfContactsList$ = this.contactDataService
-                .getContactsList(this.selectedOutbreak.id, this.queryBuilder)
+            this.contactsOfContactsList$ = this.contactsOfContactsDataService
+                .getContactsOfContactsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
                     tap(this.checkEmptyList.bind(this)),
                     tap((data: any[]) => {
@@ -787,45 +797,45 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
-            this.contactsListCount$ = this.contactDataService.getContactsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
+            this.contactsListCount$ = this.contactsOfContactsDataService.getContactsOfContactsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }
 
-    /**
-     * Get contacts grouped by risk level
-     */
-    getContactsGroupedByRiskLevel() {
-        if (this.selectedOutbreak) {
-            this.countedContactsByRiskLevel$ = this.riskLevelRefData$
-                .pipe(
-                    mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
-                        return this.contactDataService
-                            .getContactsGroupedByRiskLevel(this.selectedOutbreak.id, this.queryBuilder)
-                            .pipe(
-                                map((data: RiskLevelGroupModel) => {
-                                    return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
-                                        const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId}) as ReferenceDataEntryModel;
-                                        return new CountedItemsListItem(
-                                            item.count,
-                                            itemId as any,
-                                            item.contactIDs,
-                                            refItem ?
-                                                refItem.getColorCode() :
-                                                Constants.DEFAULT_COLOR_REF_DATA
-                                        );
-                                    });
-                                })
-                            );
-                    })
-                );
-        }
-    }
+    // /**
+    //  * Get contacts grouped by risk level
+    //  */
+    // getContactsGroupedByRiskLevel() {
+    //     if (this.selectedOutbreak) {
+    //         this.countedContactsByRiskLevel$ = this.riskLevelRefData$
+    //             .pipe(
+    //                 mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
+    //                     return this.contactDataService
+    //                         .getContactsGroupedByRiskLevel(this.selectedOutbreak.id, this.queryBuilder)
+    //                         .pipe(
+    //                             map((data: RiskLevelGroupModel) => {
+    //                                 return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
+    //                                     const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId}) as ReferenceDataEntryModel;
+    //                                     return new CountedItemsListItem(
+    //                                         item.count,
+    //                                         itemId as any,
+    //                                         item.contactIDs,
+    //                                         refItem ?
+    //                                             refItem.getColorCode() :
+    //                                             Constants.DEFAULT_COLOR_REF_DATA
+    //                                     );
+    //                                 });
+    //                             })
+    //                         );
+    //                 })
+    //             );
+    //     }
+    // }
 
     /**
      * Check if we have write access to contacts
      * @returns {boolean}
      */
-    hasContactWriteAccess(): boolean {
+    hasContactOfContactWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
     }
 
@@ -837,21 +847,21 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
     }
 
-    /**
-     * Check if we have write access to follow-ups
-     * @returns {boolean}
-     */
-    hasFollowUpWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
-    }
+    // /**
+    //  * Check if we have write access to follow-ups
+    //  * @returns {boolean}
+    //  */
+    // hasFollowUpWriteAccess(): boolean {
+    //     return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
+    // }
 
-    /**
-     * Check if we have access view a contact follow-up
-     * @returns {boolean}
-     */
-    hasContactFollowUpReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP);
-    }
+    // /**
+    //  * Check if we have access view a contact follow-up
+    //  * @returns {boolean}
+    //  */
+    // hasContactFollowUpReadAccess(): boolean {
+    //     return this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP);
+    // }
 
     /**
      * Retrieve risk color accordingly to risk level
@@ -878,7 +888,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete contact
-                    this.contactDataService
+                    this.contactsOfContactsDataService
                         .deleteContact(this.selectedOutbreak.id, contact.id)
                         .pipe(
                             catchError((err) => {
@@ -901,7 +911,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_CONTACT', new ContactModel(contact))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
-                    this.contactDataService
+                    this.contactsOfContactsDataService
                         .restoreContact(this.selectedOutbreak.id, contact.id)
                         .pipe(
                             catchError((err) => {
@@ -926,7 +936,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE', contactModel)
             .subscribe((answer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
-                    this.contactDataService
+                    this.contactsOfContactsDataService
                         .convertContactToCase(this.selectedOutbreak.id, contactModel.id)
                         .pipe(
                             catchError((err) => {
@@ -1224,109 +1234,109 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         );
     }
 
-    /**
-     * Change Contact Followup status for all records matching this.queryBuilder
-     */
-    changeContactFinalFollowUpStatus() {
-        // to continue we need to make sure we have an outbreak selected
-        if (
-            !this.selectedOutbreak ||
-            !this.selectedOutbreak.id
-        ) {
-            return;
-        }
-
-        // construct query builder user to count & update contacts
-        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-        countQueryBuilder.paginator.clear();
-        countQueryBuilder.sort.clear();
-        countQueryBuilder.fields('id', 'followUp');
-
-        // display loading while determining how many records will be deleted
-        this.showLoadingDialog();
-
-        // make all requests in parallel
-        forkJoin(
-            // retrieve follow-up statuses
-            this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS),
-
-            // count contacts
-            this.contactDataService.getContactsList(this.selectedOutbreak.id, countQueryBuilder)
-        ).subscribe((
-            [statuses, records]: [LabelValuePair[], ContactModel[]]
-        ) => {
-            // hide loading
-            this.closeLoadingDialog();
-
-            // display change status dialog
-            this.dialogService
-                .showInput(
-                    new DialogConfiguration({
-                        message: 'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE',
-                        translateData: {
-                            count: records.length
-                        },
-                        yesLabel: 'LNG_COMMON_BUTTON_UPDATE',
-                        fieldsList: [
-                            new DialogField({
-                                name: 'followUp.status',
-                                placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
-                                description: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION',
-                                required: true,
-                                fieldType: DialogFieldType.SELECT,
-                                inputOptionsMultiple: false,
-                                inputOptionsClearable: false,
-                                inputOptions: statuses
-                            })
-                        ]
-                    })
-                )
-                .subscribe((answer: DialogAnswer) => {
-                    if (answer.button === DialogAnswerButton.Yes) {
-                        // update contacts
-                        const putRecordsData = records.map((contact: ContactModel) => ({
-                            id: contact.id,
-                            followUp: Object.assign(
-                                contact.followUp, {
-                                    status: answer.inputValue.value.followUp.status
-                                }
-                            )
-                        }));
-
-                        // display loading while determining how many records will be deleted
-                        this.showLoadingDialog();
-
-                        // update statuses
-                        this.contactDataService
-                            .bulkModifyContacts(
-                                this.selectedOutbreak.id,
-                                putRecordsData
-                            )
-                            .pipe(
-                                catchError((err) => {
-                                    this.closeLoadingDialog();
-                                    this.snackbarService.showApiError(err);
-                                    return throwError(err);
-                                })
-                            )
-                            .subscribe(() => {
-                                // success message
-                                this.snackbarService.showSuccess(
-                                    'LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE', {
-                                        count: records.length
-                                    }
-                                );
-
-                                // close dialog
-                                this.closeLoadingDialog();
-
-                                // refresh list
-                                this.needsRefreshList(true);
-                            });
-                    }
-                });
-        });
-    }
+    // /**
+    //  * Change Contact Followup status for all records matching this.queryBuilder
+    //  */
+    // changeContactFinalFollowUpStatus() {
+    //     // to continue we need to make sure we have an outbreak selected
+    //     if (
+    //         !this.selectedOutbreak ||
+    //         !this.selectedOutbreak.id
+    //     ) {
+    //         return;
+    //     }
+    //
+    //     // construct query builder user to count & update contacts
+    //     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    //     countQueryBuilder.paginator.clear();
+    //     countQueryBuilder.sort.clear();
+    //     countQueryBuilder.fields('id', 'followUp');
+    //
+    //     // display loading while determining how many records will be deleted
+    //     this.showLoadingDialog();
+    //
+    //     // make all requests in parallel
+    //     forkJoin(
+    //         // retrieve follow-up statuses
+    //         this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS),
+    //
+    //         // count contacts
+    //         this.contactDataService.getContactsList(this.selectedOutbreak.id, countQueryBuilder)
+    //     ).subscribe((
+    //         [statuses, records]: [LabelValuePair[], ContactModel[]]
+    //     ) => {
+    //         // hide loading
+    //         this.closeLoadingDialog();
+    //
+    //         // display change status dialog
+    //         this.dialogService
+    //             .showInput(
+    //                 new DialogConfiguration({
+    //                     message: 'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE',
+    //                     translateData: {
+    //                         count: records.length
+    //                     },
+    //                     yesLabel: 'LNG_COMMON_BUTTON_UPDATE',
+    //                     fieldsList: [
+    //                         new DialogField({
+    //                             name: 'followUp.status',
+    //                             placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
+    //                             description: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION',
+    //                             required: true,
+    //                             fieldType: DialogFieldType.SELECT,
+    //                             inputOptionsMultiple: false,
+    //                             inputOptionsClearable: false,
+    //                             inputOptions: statuses
+    //                         })
+    //                     ]
+    //                 })
+    //             )
+    //             .subscribe((answer: DialogAnswer) => {
+    //                 if (answer.button === DialogAnswerButton.Yes) {
+    //                     // update contacts
+    //                     const putRecordsData = records.map((contact: ContactModel) => ({
+    //                         id: contact.id,
+    //                         followUp: Object.assign(
+    //                             contact.followUp, {
+    //                                 status: answer.inputValue.value.followUp.status
+    //                             }
+    //                         )
+    //                     }));
+    //
+    //                     // display loading while determining how many records will be deleted
+    //                     this.showLoadingDialog();
+    //
+    //                     // update statuses
+    //                     this.contactDataService
+    //                         .bulkModifyContacts(
+    //                             this.selectedOutbreak.id,
+    //                             putRecordsData
+    //                         )
+    //                         .pipe(
+    //                             catchError((err) => {
+    //                                 this.closeLoadingDialog();
+    //                                 this.snackbarService.showApiError(err);
+    //                                 return throwError(err);
+    //                             })
+    //                         )
+    //                         .subscribe(() => {
+    //                             // success message
+    //                             this.snackbarService.showSuccess(
+    //                                 'LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE', {
+    //                                     count: records.length
+    //                                 }
+    //                             );
+    //
+    //                             // close dialog
+    //                             this.closeLoadingDialog();
+    //
+    //                             // refresh list
+    //                             this.needsRefreshList(true);
+    //                         });
+    //                 }
+    //             });
+    //     });
+    // }
 
     /**
      * Display contacts popup
