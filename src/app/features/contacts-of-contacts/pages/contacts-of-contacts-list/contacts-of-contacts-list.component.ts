@@ -479,39 +479,39 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             }),
             new VisibleColumnModel({
                 field: 'lastName',
-                label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME'
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME'
             }),
             new VisibleColumnModel({
                 field: 'firstName',
-                label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME'
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME'
             }),
             new VisibleColumnModel({
                 field: 'visualId',
-                label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID'
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID'
             }),
             new VisibleColumnModel({
                 field: 'location',
-                label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION'
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION'
             }),
             new VisibleColumnModel({
                 field: 'age',
-                label: 'LNG_CONTACT_FIELD_LABEL_AGE'
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE'
             }),
             new VisibleColumnModel({
                 field: 'gender',
-                label: 'LNG_CONTACT_FIELD_LABEL_GENDER'
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER'
             }),
             new VisibleColumnModel({
                 field: 'phoneNumber',
-                label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER'
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER'
             }),
             new VisibleColumnModel({
                 field: 'riskLevel',
-                label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL'
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL'
             }),
             new VisibleColumnModel({
                 field: 'dateOfLastContact',
-                label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
             }),
             // new VisibleColumnModel({
             //     field: 'followUp.endDate',
@@ -523,40 +523,40 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             // }),
             new VisibleColumnModel({
                 field: 'wasCase',
-                label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE'
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE'
             }),
             new VisibleColumnModel({
                 field: 'numberOfContacts',
-                label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
                 visible: false
             }),
             new VisibleColumnModel({
                 field: 'numberOfExposures',
-                label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
                 visible: false
             }),
             new VisibleColumnModel({
                 field: 'deleted',
-                label: 'LNG_CONTACT_FIELD_LABEL_DELETED'
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DELETED'
             }),
             new VisibleColumnModel({
                 field: 'createdBy',
-                label: 'LNG_CONTACT_FIELD_LABEL_CREATED_BY',
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_BY',
                 visible: false
             }),
             new VisibleColumnModel({
                 field: 'createdAt',
-                label: 'LNG_CONTACT_FIELD_LABEL_CREATED_AT',
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_AT',
                 visible: false
             }),
             new VisibleColumnModel({
                 field: 'updatedBy',
-                label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_BY',
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_BY',
                 visible: false
             }),
             new VisibleColumnModel({
                 field: 'updatedAt',
-                label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_AT',
+                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_AT',
                 visible: false
             })
         ];
@@ -581,125 +581,126 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             // Contact
             new FilterModel({
                 fieldName: 'firstName',
-                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+                fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
                 type: FilterType.TEXT,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'lastName',
-                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+                fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
                 type: FilterType.TEXT,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'occupation',
-                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+                fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
                 type: FilterType.MULTISELECT,
                 options$: occupationsList$,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'age',
-                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_AGE',
+                fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
                 type: FilterType.RANGE_AGE,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'dateOfReporting',
-                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+                fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
                 type: FilterType.RANGE_DATE,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'dob',
-                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+                fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
                 type: FilterType.RANGE_DATE,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'visualId',
-                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+                fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
                 type: FilterType.TEXT
             }),
             new FilterModel({
                 fieldName: 'addresses',
-                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
+                fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
                 type: FilterType.ADDRESS,
                 addressFieldIsArray: true
             }),
             new FilterModel({
                 fieldName: 'addresses',
-                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
+                fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER',
                 type: FilterType.ADDRESS_PHONE_NUMBER,
                 addressFieldIsArray: true
             }),
             new FilterModel({
-                fieldName: 'followUp.status',
-                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
-                type: FilterType.MULTISELECT,
-                options$: this.finalFollowUpStatus$,
-                sortable: true
-            }),
-            new FilterModel({
-                fieldName: 'followUp.endDate',
-                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE',
-                type: FilterType.RANGE_DATE,
-                sortable: true
-            }),
-            new FilterModel({
                 fieldName: 'dateOfLastContact',
-                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+                fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
                 type: FilterType.RANGE_DATE,
                 sortable: true
             })
+
+            // new FilterModel({
+            //     fieldName: 'followUp.status',
+            //     fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
+            //     type: FilterType.MULTISELECT,
+            //     options$: this.finalFollowUpStatus$,
+            //     sortable: true
+            // }),
+            // new FilterModel({
+            //     fieldName: 'followUp.endDate',
+            //     fieldLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE',
+            //     type: FilterType.RANGE_DATE,
+            //     sortable: true
+            // }),
         ];
 
         // Relation - Follow-up
-        if (this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP)) {
-            this.availableSideFilters = [
-                ...this.availableSideFilters,
-                ...[
-                    new FilterModel({
-                        fieldName: 'date',
-                        fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
-                        type: FilterType.RANGE_DATE,
-                        relationshipPath: ['followUps'],
-                        relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-                    }),
-                    new FilterModel({
-                        fieldName: 'index',
-                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
-                        type: FilterType.NUMBER,
-                        relationshipPath: ['followUps'],
-                        relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-                    }),
-                    new FilterModel({
-                        fieldName: 'targeted',
-                        fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
-                        type: FilterType.SELECT,
-                        options$: this.yesNoOptionsList$,
-                        relationshipPath: ['followUps'],
-                        relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-                    }),
-                    new FilterModel({
-                        fieldName: 'statusId',
-                        fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
-                        type: FilterType.SELECT,
-                        options$: dailyStatusTypeOptions$,
-                        relationshipPath: ['followUps'],
-                        relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-                    }),
-                    new FilterModel({
-                        fieldName: 'questionnaireAnswers',
-                        fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-                        type: FilterType.QUESTIONNAIRE_ANSWERS,
-                        questionnaireTemplate: this.selectedOutbreak.contactFollowUpTemplate,
-                        relationshipPath: ['followUps'],
-                        relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-                    })
-                ]
-            ];
-        }
+        // if (this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP)) {
+        //     this.availableSideFilters = [
+        //         ...this.availableSideFilters,
+        //         ...[
+        //             new FilterModel({
+        //                 fieldName: 'date',
+        //                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+        //                 type: FilterType.RANGE_DATE,
+        //                 relationshipPath: ['followUps'],
+        //                 relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        //             }),
+        //             new FilterModel({
+        //                 fieldName: 'index',
+        //                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
+        //                 type: FilterType.NUMBER,
+        //                 relationshipPath: ['followUps'],
+        //                 relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        //             }),
+        //             new FilterModel({
+        //                 fieldName: 'targeted',
+        //                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
+        //                 type: FilterType.SELECT,
+        //                 options$: this.yesNoOptionsList$,
+        //                 relationshipPath: ['followUps'],
+        //                 relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        //             }),
+        //             new FilterModel({
+        //                 fieldName: 'statusId',
+        //                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+        //                 type: FilterType.SELECT,
+        //                 options$: dailyStatusTypeOptions$,
+        //                 relationshipPath: ['followUps'],
+        //                 relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        //             }),
+        //             new FilterModel({
+        //                 fieldName: 'questionnaireAnswers',
+        //                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+        //                 type: FilterType.QUESTIONNAIRE_ANSWERS,
+        //                 questionnaireTemplate: this.selectedOutbreak.contactFollowUpTemplate,
+        //                 relationshipPath: ['followUps'],
+        //                 relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        //             })
+        //         ]
+        //     ];
+        // }
 
         // Relation - Cases
         if (this.authUser.hasPermissions(PERMISSION.READ_CASE)) {

@@ -82,6 +82,45 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_FOLLOW_UPS': 'Are you sure you want to delete selected follow-ups?',
         'LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_FOLLOW_UPS': 'Are you sure you want to restore selected follow-ups?',
 
+        /**
+         * uiGenericLayout
+         */
+        'LNG_LAYOUT_MENU_ITEM_CONTACTS_OF_CONTACTS_LABEL': 'Contacts of contacts',
+
+        /**
+         * uiContactFields
+         */
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME': 'Last name',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME': 'First name',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID': 'Visual Id',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION': 'Address',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE': 'Age',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER': 'Gender',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER': 'Phone number',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL': 'Risk level',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT': 'Date of last contact',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DELETED': 'Deleted',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE': 'Was case',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS': 'Number of contacts',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES': 'Number of exposures',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_BY': 'Created by',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_AT': 'Created at',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_BY': 'Updated by',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_AT': 'Updated at',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION': 'Occupation',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH': 'Date of birth',
+        'f': '',
+        'g': '',
+        'h': '',
+        'j': '',
+        'k': '',
+        'kk': '',
+
+        /**
+         * uiContactsListPage
+         */
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE': 'Contacts of contacts',
 
         /**
          * REMOVE the tokens from below
