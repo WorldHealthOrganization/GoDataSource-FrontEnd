@@ -174,23 +174,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             type: HoverRowActionType.MENU,
             icon: 'moreVertical',
             menuOptions: [
-                // Convert Contact to Case
-                new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_CONVERT_TO_CASE',
-                    click: (item: ContactModel) => {
-                        this.convertContactToCase(item);
-                    },
-                    visible: (item: ContactModel): boolean => {
-                        return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            // this.hasContactOfContactWriteAccess() &&
-                            this.hasCaseWriteAccess();
-                    },
-                    class: 'mat-menu-item-delete'
-                }),
-
                 // Delete Contact
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_CONTACT',
@@ -922,31 +905,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                         )
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
-                            // reload data
-                            this.needsRefreshList(true);
-                        });
-                }
-            });
-    }
-
-    /**
-     * Convert a case to a contact
-     * @param contactModel
-     */
-    convertContactToCase(contactModel: ContactModel) {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE', contactModel)
-            .subscribe((answer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    this.contactsOfContactsDataService
-                        .convertContactToCase(this.selectedOutbreak.id, contactModel.id)
-                        .pipe(
-                            catchError((err) => {
-                                this.snackbarService.showError(err.message);
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
                             // reload data
                             this.needsRefreshList(true);
                         });

@@ -53,6 +53,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_CONTACTS_DIALOG_ENTITY_SECTION_TITLE': 'Entities',
         'LNG_PAGE_LIST_CONTACTS_DIALOG_ENTITY_RELATIONSHIPS_TITLE': 'Relationships',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_CONTACT_OF_CONTACT': 'Add contact of contact',
 
         /**
          * uiEventFields
@@ -88,7 +89,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_OF_CONTACTS_LABEL': 'Contacts of contacts',
 
         /**
-         * uiContactFields
+         * uiContactsOfContactsFields
          */
         'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME': 'Last name',
         'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME': 'First name',
@@ -118,9 +119,15 @@ export const EnglishUsLang = {
         'kk': '',
 
         /**
-         * uiContactsListPage
+         * uiContactsOfContactsListPage
          */
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE': 'Contacts of contacts',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CONTACT': 'View contact',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_MODIFY_CONTACT': 'Modify contact',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_CONTACT': 'Delete contact',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_MOVEMENT': 'View movement',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CHRONOLOGY': 'View chronology',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_CONTACT': 'Restore contact',
 
         /**
          * REMOVE the tokens from below

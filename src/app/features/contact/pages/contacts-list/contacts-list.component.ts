@@ -218,6 +218,40 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     }
                 }),
 
+                // Add contact of contact
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_CONTACT_OF_CONTACT',
+                    click: (item: ContactModel) => {
+                        console.log(item);
+                        this.router.navigate(['/contacts-of-contacts', 'create'], {
+                            queryParams: {
+                                entityType: item.type,
+                                entityId: item.id
+                            }
+                        });
+                    },
+                    visible: (item: ContactModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasContactWriteAccess();
+                    }
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: ContactModel): boolean => {
+                        // visible only if at least one of the first two items is visible
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.hasContactWriteAccess();
+                    }
+                }),
+
                 // Add Follow-up to Contact
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP',

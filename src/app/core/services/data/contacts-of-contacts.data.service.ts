@@ -44,17 +44,33 @@ export class ContactsOfContactsDataService {
         return this.http.get(`outbreaks/${outbreakId}/contacts/filtered-count?filter=${filter}`);
     }
 
-    deleteContact(outbreakId: string, contactId: string) {
-        return of({});
+    /**
+     * Create contact of contact
+     * @param {string} outbreakId
+     * @param contactData
+     * @returns {Observable<any>}
+     */
+    createContactOfContact(outbreakId: string, contactData): Observable<any>{
+        return this.http.post(`outbreaks/${outbreakId}/contacts`, contactData);
     }
 
-    restoreContact(outbreakId: string, contactId: string) {
-        return of({});
-
+    /**
+     * Delete contact of contact
+     * @param {string} outbreakId
+     * @param {string} contactId
+     * @returns {Observable<{}>}
+     */
+    deleteContact(outbreakId: string, contactId: string): Observable<any> {
+        return this.http.delete(`outbreaks/${outbreakId}/contacts/${contactId}`);
     }
 
-    convertContactToCase(outbreakId: string, contactId: string) {
-        return of({});
-
+    /**
+     * Restore contact of contact
+     * @param {string} outbreakId
+     * @param {string} contactId
+     * @returns {Observable<{}>}
+     */
+    restoreContact(outbreakId: string, contactId: string): Observable<any> {
+        return this.http.post(`/outbreaks/${outbreakId}/contacts/${contactId}/restore`, {});
     }
 }

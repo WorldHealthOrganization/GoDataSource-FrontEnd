@@ -19,7 +19,7 @@ const routes: Routes = [
         component: fromPages.CreateContactOfContactComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CONTACTS_OF_CONTACTS]
+            permissions: [PERMISSION.WRITE_CONTACT]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
