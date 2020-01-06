@@ -5,7 +5,7 @@ import { EntityType } from './entity-type';
 import { Constants } from './constants';
 import { EventModel } from './event.model';
 import { moment } from '../helperClasses/x-moment';
-import { IChainsOfTransmission } from './permission.interface';
+import { IPermissionChainsOfTransmission } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 
@@ -17,7 +17,7 @@ export class TransmissionChainRelation {
 
 export class TransmissionChainModel
     implements
-        IChainsOfTransmission {
+        IPermissionChainsOfTransmission {
     // all Cases from Chain, mapped by Case ID
     casesMap: {}|{string: CaseModel} = {};
     // all events related to chain
@@ -43,7 +43,7 @@ export class TransmissionChainModel
     rootPerson: CaseModel | EventModel;
 
     /**
-     * Static Permissions - IChainsOfTransmission
+     * Static Permissions - IPermissionChainsOfTransmission
      */
     static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.COT_LIST) : false; }
     static canExportBarChart(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.COT_EXPORT_BAR_CHART) : false; }
@@ -129,7 +129,7 @@ export class TransmissionChainModel
     }
 
     /**
-     * Permissions - IChainsOfTransmission
+     * Permissions - IPermissionChainsOfTransmission
      */
     canList(user: UserModel): boolean { return TransmissionChainModel.canList(user); }
     canExportBarChart(user: UserModel): boolean { return TransmissionChainModel.canExportBarChart(user); }

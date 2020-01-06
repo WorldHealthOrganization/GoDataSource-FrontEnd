@@ -244,9 +244,14 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [
-                        PERMISSION.READ_OUTBREAK
-                    ]
+                    permissions: new PermissionExpression({
+                        or: [
+                            PERMISSION.DUPLICATE_LIST,
+                            PERMISSION.DUPLICATE_MERGE_CASES,
+                            PERMISSION.DUPLICATE_MERGE_CONTACTS,
+                            PERMISSION.DUPLICATE_MERGE_EVENTS
+                        ]
+                    })
                 }
             },
             // Cluster Module routes

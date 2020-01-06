@@ -433,7 +433,7 @@ export interface IPermissionRelatedRelationship {
 /**
  * Chains Of Transmission - COT
  */
-export interface IChainsOfTransmission {
+export interface IPermissionChainsOfTransmission {
     /**
      * Has permission to list cot records ?
      */
@@ -523,4 +523,29 @@ export interface IChainsOfTransmission {
      * Can view any of the cot graphs ( bubble / hierarchical ... )
      */
     canViewAnyGraph(user: UserModel): boolean;
+}
+
+/**
+ * Duplicates
+ */
+export interface IPermissionDuplicates {
+    /**
+     * Has permission to list duplicate records ?
+     */
+    canList(user: UserModel): boolean;
+
+    /**
+     * Has permission to merge duplicate case records ?
+     */
+    canMergeCases(user: UserModel): boolean;
+
+    /**
+     * Has permission to merge duplicate contact records ?
+     */
+    canMergeContacts(user: UserModel): boolean;
+
+    /**
+     * Has permission to merge duplicate event records ?
+     */
+    canMergeEvents(user: UserModel): boolean;
 }

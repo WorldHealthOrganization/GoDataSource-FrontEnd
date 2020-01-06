@@ -279,6 +279,12 @@ WRITE_FOLLOWUP = 'write_followup',
     COT_VIEW_TIMELINE_NETWORK_DATE_OF_REPORTING = 'cot_view_timeline_network_date_of_reporting',
     COT_MODIFY_TIMELINE_NETWORK_DATE_OF_REPORTING = 'cot_modify_timeline_network_date_of_reporting',
 
+    // duplicate
+    DUPLICATE_LIST = 'duplicate_list',
+    DUPLICATE_MERGE_CASES = 'duplicate_merge_cases',
+    DUPLICATE_MERGE_CONTACTS = 'duplicate_merge_contacts',
+    DUPLICATE_MERGE_EVENTS = 'duplicate_merge_events',
+
 
 
     // system config

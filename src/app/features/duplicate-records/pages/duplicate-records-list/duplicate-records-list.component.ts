@@ -8,10 +8,9 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
-import { PeoplePossibleDuplicateModel } from '../../../../core/models/people-possible-duplicate.model';
+import { PeoplePossibleDuplicateGroupModel, PeoplePossibleDuplicateModel } from '../../../../core/models/people-possible-duplicate.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { AddressModel } from '../../../../core/models/address.model';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { FormControl, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
@@ -27,6 +26,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     styleUrls: ['./duplicate-records-list.component.less']
 })
 export class DuplicateRecordsListComponent extends ListComponent implements OnInit, OnDestroy {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '.', true)
     ];
@@ -61,6 +61,9 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
         'address'
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private authDataService: AuthDataService,
@@ -72,6 +75,9 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -89,6 +95,9 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -230,17 +239,6 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             .map((id: string) => this.duplicatesList.peopleMap[id])
             .uniqBy('type')
             .map('type')
-            .filter((type: EntityType) => {
-                // check permissions
-                switch (type) {
-                    case EntityType.CASE:
-                        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-                    case EntityType.CONTACT:
-                        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-                    case EntityType.EVENT:
-                        return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
-                }
-            })
             .value();
 
         // we shouldn't be able to merge two types...
@@ -263,5 +261,22 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
                 }
             }
         );
+    }
+
+    /**
+     * Check if group has merge permission
+     */
+    hasMergePermission(group: PeoplePossibleDuplicateGroupModel): boolean {
+        switch (group.groupType) {
+            case EntityType.CASE:
+                return PeoplePossibleDuplicateModel.canMergeCases(this.authUser);
+            case EntityType.CONTACT:
+                return PeoplePossibleDuplicateModel.canMergeContacts(this.authUser);
+            case EntityType.EVENT:
+                return PeoplePossibleDuplicateModel.canMergeEvents(this.authUser);
+            default:
+                // not supported
+                return false;
+        }
     }
 }

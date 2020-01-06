@@ -226,18 +226,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
             'duplicated-records',
             'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
             'fileCopy',
-            new PermissionExpression({
-                and: [
-                    PERMISSION.OUTBREAK_VIEW,
-                    new PermissionExpression({
-                        or: [
-                            PERMISSION.CASE_LIST,
-                            PERMISSION.EVENT_LIST,
-                            PERMISSION.CONTACT_LIST
-                        ]
-                    })
-                ]
-            }),
+            [
+                PERMISSION.DUPLICATE_LIST
+            ],
             [],
             '/duplicated-records',
             () => this.hasOutbreak.apply(this) // provide context to keep this functionality
