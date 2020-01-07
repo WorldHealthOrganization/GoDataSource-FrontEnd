@@ -20,7 +20,7 @@ export class ContactsOfContactsDataService {
     /**
      * Get list of contacts of contacts
      */
-    getContactsOfContactsList(
+    getContactsList(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<ContactOfContactModel[]> {
@@ -32,11 +32,11 @@ export class ContactsOfContactsDataService {
 
     /**
      * Get the total number of contacts of contacts
-     * @param {string} selectedOutbreakId
+     * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<any>}
      */
-    getContactsOfContactsCount(
+    getContactsCount(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<any> {
@@ -50,8 +50,26 @@ export class ContactsOfContactsDataService {
      * @param contactData
      * @returns {Observable<any>}
      */
-    createContactOfContact(outbreakId: string, contactData): Observable<any>{
+    createContact(outbreakId: string, contactData): Observable<any>{
         return this.http.post(`outbreaks/${outbreakId}/contacts`, contactData);
+    }
+
+    /**
+     * Modify an existing contact of contact
+     * @param {string} outbreakId
+     * @param {string} contactId
+     * @param {string} contactData
+     * @returns {Observable<ContactOfContactModel>}
+     */
+    modifyContact(
+        outbreakId: string,
+        contactId: string,
+        contactData: string,
+    ): Observable<ContactOfContactModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}`, contactData),
+            ContactOfContactModel
+        );
     }
 
     /**

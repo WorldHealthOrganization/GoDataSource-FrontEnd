@@ -31,9 +31,12 @@ const routes: Routes = [
         component: fromPages.ModifyContactOfContactComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_CONTACTS_OF_CONTACTS],
+            permissions: [PERMISSION.READ_CONTACT],
             action: ViewModifyComponentAction.VIEW
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     },
     // Modify contact of contact
     {
@@ -41,7 +44,7 @@ const routes: Routes = [
         component: fromPages.ModifyContactOfContactComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CONTACTS_OF_CONTACTS],
+            permissions: [PERMISSION.WRITE_CONTACT],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [

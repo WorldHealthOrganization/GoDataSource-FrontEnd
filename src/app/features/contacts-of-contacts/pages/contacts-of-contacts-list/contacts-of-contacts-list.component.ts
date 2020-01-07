@@ -145,7 +145,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CONTACT',
             click: (item: ContactModel) => {
-                this.router.navigate(['/contacts', item.id, 'view']);
+                console.log(`111qasdasd`);
+                this.router.navigate(['/contacts-of-contacts', item.id, 'view']);
             },
             visible: (item: ContactModel): boolean => {
                 return !item.deleted;
@@ -157,7 +158,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_MODIFY_CONTACT',
             click: (item: ContactModel) => {
-                this.router.navigate(['/contacts', item.id, 'modify']);
+                console.log(`qasdasd`);
+                this.router.navigate(['/contacts-of-contacts', item.id, 'modify']);
             },
             visible: (item: ContactModel): boolean => {
                 return !item.deleted &&
@@ -760,7 +762,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
             // retrieve the list of Contacts
             this.contactsOfContactsList$ = this.contactsOfContactsDataService
-                .getContactsOfContactsList(this.selectedOutbreak.id, this.queryBuilder)
+                .getContactsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
                     tap(this.checkEmptyList.bind(this)),
                     tap((data: any[]) => {
@@ -781,7 +783,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
-            this.contactsListCount$ = this.contactsOfContactsDataService.getContactsOfContactsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
+            this.contactsListCount$ = this.contactsOfContactsDataService.getContactsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }
 

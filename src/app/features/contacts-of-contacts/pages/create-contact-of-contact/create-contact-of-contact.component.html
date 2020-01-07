@@ -11,7 +11,7 @@
         <!-- Personal step -->
         <mat-step [stepControl]="personalForm">
             <form #personalForm="ngForm">
-                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_CONTACT_TAB_PERSONAL_TITLE'| translate}}</ng-template>
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE'| translate}}</ng-template>
 
                 <!-- Personal Details section -->
                 <mat-card class="page-section">
@@ -20,8 +20,8 @@
                             <app-form-input
                                 name="firstName"
                                 [(ngModel)]="contactData.firstName"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME' | translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
                                 required="true"
                                 maxlength="200">
                             </app-form-input>
@@ -29,24 +29,24 @@
                             <app-form-input
                                 name="middleName"
                                 [(ngModel)]="contactData.middleName"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME' | translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION"
                                 maxlength="200">
                             </app-form-input>
 
                             <app-form-input
                                 name="lastName"
                                 [(ngModel)]="contactData.lastName"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION"
                                 maxlength="200">
                             </app-form-input>
 
                             <app-form-select
                                 name="gender"
                                 [(ngModel)]="contactData.gender"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_GENDER' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER' | translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION"
                                 [options]="genderList$ | async">
                             </app-form-select>
                         </div>
@@ -59,8 +59,8 @@
                                 <app-form-input
                                     name="visualId"
                                     [(ngModel)]="contactData.visualId"
-                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
-                                    tooltip="LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                                    [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
+                                    tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
                                     [tooltipTranslateData]="visualIDTranslateData"
                                     [maxlength]="255"
                                     app-general-async-validator
@@ -70,8 +70,8 @@
                                 <app-form-select
                                     name="occupation"
                                     [(ngModel)]="contactData.occupation"
-                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
-                                    tooltip="LNG_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION"
+                                    [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
+                                    tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION"
                                     [options]="occupationsList$ | async">
                                 </app-form-select>
                             </div>
@@ -80,11 +80,11 @@
                                 fxFlex
                                 name="ageDob"
                                 [(ngModel)]="contactData"
-                                ageButtonLabel="LNG_CONTACT_FIELD_LABEL_AGE_BUTTON"
-                                dobButtonLabel="LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON"
-                                dobPlaceholder="LNG_CONTACT_FIELD_LABEL_DOB"
-                                dobTooltip="LNG_CONTACT_FIELD_LABEL_DOB_DESCRIPTION"
-                                ageTooltip="LNG_CONTACT_FIELD_LABEL_AGE_DESCRIPTION">
+                                ageButtonLabel="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE_BUTTON"
+                                dobButtonLabel="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON"
+                                dobPlaceholder="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOB"
+                                dobTooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOB_DESCRIPTION"
+                                ageTooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE_DESCRIPTION">
                             </app-form-age-dob>
                         </div>
 
@@ -93,8 +93,8 @@
                             <app-form-select
                                 name="pregnancyStatus"
                                 [(ngModel)]="contactData.pregnancyStatus"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS' | translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
                                 [options]="pregnancyStatusList$ | async">
                             </app-form-select>
 
@@ -102,8 +102,8 @@
                                 fxFlex
                                 name="dateOfReporting"
                                 [(ngModel)]="contactData.dateOfReporting"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
                                 required="true"
                                 [maxDate]="serverToday"
                                 app-date-validator
@@ -114,8 +114,8 @@
                                 fxFlex
                                 name="isDateOfReportingApproximate"
                                 [(ngModel)]="contactData.isDateOfReportingApproximate"
-                                [label]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION">
+                                [label]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION">
                             </app-form-slide-toggle>
 
                             <div fxFlex><!-- placeholder --></div>
@@ -125,7 +125,7 @@
 
                 <!-- Flag contact section -->
                 <div class="section-title">
-                    {{ 'LNG_PAGE_CREATE_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE' | translate }}
+                    {{ 'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE' | translate }}
                 </div>
                 <mat-card class="page-section">
                     <div fxLayout="column">
@@ -135,8 +135,8 @@
                                 fxFlex
                                 name="riskLevel"
                                 [(ngModel)]="contactData.riskLevel"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL' | translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
                                 [options]="riskLevelsList$ | async">
                             </app-form-select>
 
@@ -149,14 +149,14 @@
                             <app-form-textarea
                                 name="riskReason"
                                 [(ngModel)]="contactData.riskReason"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_RISK_REASON' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION">
+                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON' | translate"
+                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION">
                             </app-form-textarea>
                         </div>
                     </div>
                 </mat-card>
 
-                <div class="section-title">{{'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS' | translate}}</div>
+                <div class="section-title">{{'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS' | translate}}</div>
 
                 <!--Vaccines received section-->
                 <app-form-vaccines-list
@@ -167,7 +167,7 @@
 
                 <!-- Documents section -->
                 <div class="section-title">
-                    {{'LNG_CONTACT_FIELD_LABEL_DOCUMENTS' | translate}}
+                    {{'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENTS' | translate}}
                 </div>
                 <app-form-document-list
                     name="documents"
@@ -185,7 +185,7 @@
         <mat-step [stepControl]="addressForm">
             <form #addressForm="ngForm">
                 <ng-template matStepLabel>
-                    {{ 'LNG_PAGE_CREATE_CONTACT_TAB_ADDRESS_TITLE' | translate }}
+                    {{ 'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_ADDRESS_TITLE' | translate }}
                 </ng-template>
 
                 <app-form-address-list
@@ -206,7 +206,7 @@
         <mat-step [stepControl]="relationshipForm">
             <form #relationshipForm="ngForm">
                 <ng-template matStepLabel>
-                    {{ 'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_TITLE' | translate }}
+                    {{ 'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_RELATIONSHIP_TITLE' | translate }}
                 </ng-template>
 
                 <mat-card class="page-section">
@@ -237,14 +237,13 @@
                 <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                 <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent"
                         (click)="createNewContact([personalForm, addressForm, relationshipForm])">
-                    {{'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_BUTTON' | translate}}
+                    {{'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_ACTION_CREATE_CONTACT_BUTTON' | translate}}
                 </button>
                 <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent"
                         (click)="createNewContact([personalForm, addressForm, relationshipForm], true)">
-                    {{'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_ANOTHER_CONTACT_BUTTON' | translate}}
+                    {{'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_ACTION_CREATE_ANOTHER_CONTACT_BUTTON' | translate}}
                 </button>
             </div>
         </mat-step>
     </mat-horizontal-stepper>
-
 </div>

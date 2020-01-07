@@ -198,22 +198,11 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
      */
     private initializeBreadcrumbs() {
         if (this.relatedEntityData) {
-            // case or event?
-            if (this.relatedEntityData.type === EntityType.CASE) {
-                // creating contact for a case
-                this.breadcrumbs = [
-                    new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-                    new BreadcrumbItemModel(this.relatedEntityData.name, `/cases/${this.relatedEntityData.id}/view`),
-                    new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_TITLE', '.', true)
-                ];
-            } else {
-                // creating contact for an event
-                this.breadcrumbs = [
-                    new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
-                    new BreadcrumbItemModel(this.relatedEntityData.name, `/events/${this.relatedEntityData.id}/view`),
-                    new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_TITLE', '.', true)
-                ];
-            }
+            this.breadcrumbs = [
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
+                new BreadcrumbItemModel(this.relatedEntityData.name, `/contacts/${this.relatedEntityData.id}/view`),
+                new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TITLE', '.', true)
+            ];
         }
     }
 
