@@ -138,7 +138,8 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
      * Reverse persons of an existing relationship
      */
     reverseExistingRelationship() {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REVERSE_PERSONS')
+        this.dialogService
+            .showConfirm('LNG_DIALOG_CONFIRM_REVERSE_PERSONS')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     const relationshipPersons = {

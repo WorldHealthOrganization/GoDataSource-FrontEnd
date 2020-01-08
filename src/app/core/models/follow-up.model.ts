@@ -5,14 +5,17 @@ import { DateDefaultPipe } from '../../shared/pipes/date-default-pipe/date-defau
 import { IAnswerData, QuestionModel } from './question.model';
 import { BaseModel } from './base.model';
 import { FillLocationModel } from './fill-location.model';
-import { IPermissionBasic } from './permission.interface';
+import { IPermissionBasic, IPermissionBasicBulk, IPermissionFollowUp } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
+import { OutbreakModel } from './outbreak.model';
 
 export class FollowUpModel
     extends BaseModel
     implements
-        IPermissionBasic {
+        IPermissionBasic,
+        IPermissionBasicBulk,
+        IPermissionFollowUp {
     id: string;
     date: string;
     address: AddressModel;
@@ -110,6 +113,19 @@ export class FollowUpModel
     static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_DELETE) : false; }
 
     /**
+     * Static Permissions - IPermissionBasicBulk
+     */
+    static canBulkCreate(user: UserModel): boolean { return false; }
+    static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.FOLLOW_BULK_MODIFY) : false); }
+    static canBulkDelete(user: UserModel): boolean { return false; }
+    static canBulkRestore(user: UserModel): boolean { return false; }
+
+    /**
+     * Static Permissions - IPermissionFollowUp
+     */
+    static canListDashboard(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_LIST_RANGE) : false; }
+
+    /**
      * Constructor
      */
     constructor(
@@ -149,6 +165,19 @@ export class FollowUpModel
     canCreate(user: UserModel): boolean { return FollowUpModel.canCreate(user); }
     canModify(user: UserModel): boolean { return FollowUpModel.canModify(user); }
     canDelete(user: UserModel): boolean { return FollowUpModel.canDelete(user); }
+
+    /**
+     * Permissions - IPermissionBasicBulk
+     */
+    canBulkCreate(user: UserModel): boolean { return FollowUpModel.canBulkCreate(user); }
+    canBulkModify(user: UserModel): boolean { return FollowUpModel.canBulkModify(user); }
+    canBulkDelete(user: UserModel): boolean { return FollowUpModel.canBulkDelete(user); }
+    canBulkRestore(user: UserModel): boolean { return FollowUpModel.canBulkRestore(user); }
+
+    /**
+     * Permissions - IPermissionFollowUp
+     */
+    canListDashboard(user: UserModel): boolean { return FollowUpModel.canListDashboard(user); }
 
     /**
      * Get date formatted

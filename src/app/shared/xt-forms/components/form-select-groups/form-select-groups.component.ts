@@ -103,6 +103,7 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
     @Input() groupValueKey: string;
     @Input() groupTooltipKey: string;
     @Input() groupOptionsKey: string;
+    @Input() groupOptionHiddenKey: string;
     @Input() groupOptionLabelKey: string;
     @Input() groupOptionValueKey: string;
     @Input() groupOptionTooltipKey: string;
@@ -324,7 +325,7 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
         ) {
             this.groups.forEach((group) => {
                 // map group
-                this.groupsMap[group[this.groupValueKey]] = group;
+                this.groupsMap[group[this.groupValueKey]] = _.cloneDeep(group);
 
                 // set partial key
                 const partialValue: string = uuid();
@@ -337,13 +338,29 @@ export class FormSelectGroupsComponent extends ElementBase<string[]> implements 
                 this.groupKeys.map.none[noneValue] = group[this.groupValueKey];
 
                 // map options
-                (group[this.groupOptionsKey] || []).forEach((option) => {
+                const oldOptions: any[] = group[this.groupOptionsKey] || [];
+                const newOptions: any[] = [];
+                oldOptions.forEach((option) => {
+                    // exclude hidden properties
+                    if (
+                        this.groupOptionHiddenKey &&
+                        option[this.groupOptionHiddenKey]
+                    ) {
+                        return;
+                    }
+
+                    // add it to the list
+                    newOptions.push(option);
+
                     // map option
                     this.optionsMap[option[this.groupOptionValueKey]] = {
                         groupValue: group[this.groupValueKey],
                         option: option
                     };
                 });
+
+                // set options
+                group[this.groupOptionsKey] = newOptions;
             });
         }
     }

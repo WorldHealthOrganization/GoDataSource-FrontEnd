@@ -79,7 +79,9 @@ const routes: Routes = [
         component: fromPages.ImportContactDataComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CONTACT]
+            permissions: [
+                PERMISSION.CONTACT_IMPORT
+            ]
         }
     },
 

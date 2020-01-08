@@ -26,6 +26,7 @@ import { RelationshipModel } from '../../../../core/models/entity-and-relationsh
     styleUrls: ['./modify-event.component.less']
 })
 export class ModifyEventComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
@@ -44,6 +45,9 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
 
     serverToday: Moment = moment();
 
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
@@ -57,6 +61,9 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
         super(route);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -84,6 +91,9 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
             });
     }
 
+    /**
+     * Modify event
+     */
     modifyEvent(form: NgForm) {
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 

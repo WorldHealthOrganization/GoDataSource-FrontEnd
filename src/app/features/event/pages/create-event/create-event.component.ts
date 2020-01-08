@@ -28,6 +28,7 @@ import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-co
 export class CreateEventComponent
     extends CreateConfirmOnChanges
     implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // selected outbreak ID
@@ -56,6 +57,9 @@ export class CreateEventComponent
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();

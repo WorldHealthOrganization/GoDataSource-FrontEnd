@@ -181,7 +181,7 @@ const routes: Routes = [
                     })
                 }
             },
-            // Contacts Module routes
+            // Contact Module routes
             {
                 path: ModulePath.ContactModule,
                 loadChildren: './features/contact/contact.module#ContactModule',
@@ -190,10 +190,29 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [
-                        PERMISSION.READ_OUTBREAK,
-                        PERMISSION.READ_CONTACT
-                    ]
+                    permissions: new PermissionExpression({
+                        and: [
+                            PERMISSION.OUTBREAK_VIEW,
+                            new PermissionExpression({
+                                or: [
+                                    PERMISSION.CONTACT_LIST,
+                                    PERMISSION.CONTACT_CREATE,
+                                    PERMISSION.CONTACT_VIEW,
+                                    PERMISSION.CONTACT_MODIFY,
+                                    PERMISSION.CONTACT_BULK_CREATE,
+                                    PERMISSION.CONTACT_BULK_MODIFY,
+                                    PERMISSION.CONTACT_VIEW_MOVEMENT_MAP,
+                                    PERMISSION.CONTACT_VIEW_CHRONOLOGY_CHART,
+                                    PERMISSION.FOLLOW_UP_LIST,
+                                    PERMISSION.FOLLOW_UP_LIST_RANGE,
+                                    PERMISSION.FOLLOW_UP_CREATE,
+                                    PERMISSION.FOLLOW_UP_VIEW,
+                                    PERMISSION.FOLLOW_UP_MODIFY,
+                                    PERMISSION.FOLLOW_BULK_MODIFY
+                                ]
+                            })
+                        ]
+                    })
                 }
             },
             // Case Module routes
@@ -420,8 +439,9 @@ const routes: Routes = [
                             PERMISSION.LOCATION_IMPORT,
                             PERMISSION.LANGUAGE_IMPORT_TOKENS,
                             PERMISSION.SYNC_IMPORT_PACKAGE,
-                            PERMISSION.REFERENCE_DATA_IMPORT
-                            // ...case / contact / lab results
+                            PERMISSION.REFERENCE_DATA_IMPORT,
+                            PERMISSION.CONTACT_IMPORT
+                            // ...case / lab results
                         ]
                     })
                 }

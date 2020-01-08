@@ -68,7 +68,7 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     modify: ContactModel.canModifyRelationshipContacts,
                     delete: ContactModel.canDeleteRelationshipContacts,
                     share: ContactModel.canShareRelationship,
-                    changeSource: ContactModel.canChangeSource,
+                    changeSource: () => false,
                     bulkDelete: ContactModel.canBulkDeleteRelationshipContacts
                 },
                 exposures: {
@@ -77,7 +77,7 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     modify: ContactModel.canModifyRelationshipExposures,
                     delete: ContactModel.canDeleteRelationshipExposures,
                     share: ContactModel.canShareRelationship,
-                    changeSource: () => false,
+                    changeSource: ContactModel.canChangeSource,
                     bulkDelete: ContactModel.canBulkDeleteRelationshipExposures
                 }
             }

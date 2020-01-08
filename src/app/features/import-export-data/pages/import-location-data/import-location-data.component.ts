@@ -8,6 +8,7 @@ import { ImportDataExtension } from '../../components/import-data/model';
 import { LocationModel } from '../../../../core/models/location.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-import-case-data',
@@ -43,7 +44,8 @@ export class ImportLocationDataComponent {
     constructor(
         private cacheService: CacheService,
         private router: Router,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private redirectService: RedirectService
     ) {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -80,7 +82,15 @@ export class ImportLocationDataComponent {
      * Finished import
      */
     finished() {
+        // remove cached locations
         this.cacheService.remove(CacheKey.LOCATIONS);
-        this.router.navigate(['/locations']);
+
+        // redirect
+        if (LocationModel.canList(this.authUser)) {
+            this.router.navigate(['/locations']);
+        } else {
+            // fallback
+            this.redirectService.to(['/import-export-data/location-data/import']);
+        }
     }
 }

@@ -5,7 +5,14 @@
 
             <div class="topnav-actions">
                 <button
-                    *ngIf="!appliedListFilter"
+                    *ngIf="!appliedListFilter && (
+                        ContactModel.canModify(authUser) ||
+                        (exportContactsUrl && ContactModel.canExport(authUser)) ||
+                        ContactModel.canImport(authUser) ||
+                        ContactModel.canExportRelationships(authUser) ||
+                        (exportContactsDailyFollowUpListUrl && ContactModel.canExportDailyFollowUpList(authUser)) ||
+                        (exportContactsDailyFollowUpsFormUrl && ContactModel.canExportDailyFollowUpsForm(authUser))
+                    )"
                     mat-raised-button
                     color="accent"
                     [matMenuTriggerFor]="quickActionsMenu">
@@ -14,7 +21,7 @@
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <ng-container
-                        *ngIf="hasContactWriteAccess()">
+                        *ngIf="ContactModel.canBulkModify(authUser)">
                         <button
                             mat-menu-item
                             (click)="changeContactFinalFollowUpStatus()">
@@ -25,7 +32,7 @@
                     </ng-container>
 
                     <app-export-button
-                        *ngIf="exportContactsUrl"
+                        *ngIf="exportContactsUrl && ContactModel.canExport(authUser)"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE' | translate"
@@ -41,25 +48,27 @@
                     </app-export-button>
 
                     <button
-                        *ngIf="hasContactWriteAccess()"
+                        *ngIf="ContactModel.canImport(authUser)"
                         mat-menu-item
                         [routerLink]="['/import-export-data', 'contact-data', 'import']">
                         {{'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON' | translate}}
                     </button>
 
-                    <mat-divider></mat-divider>
+                    <mat-divider
+                        *ngIf="ContactModel.canExport(authUser) || ContactModel.canImport(authUser)"></mat-divider>
 
                     <button
+                        *ngIf="ContactModel.canExportRelationships(authUser)"
                         mat-menu-item
                         (click)="exportFilteredContactsRelationships()">
                         {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_EXPORT_CONTACTS_RELATIONSHIPS' | translate }}
                     </button>
 
                     <mat-divider
-                        *ngIf="exportContactsDailyFollowUpListUrl || exportContactsDailyFollowUpsFormUrl"></mat-divider>
+                        *ngIf="(exportContactsDailyFollowUpListUrl && ContactModel.canExportDailyFollowUpList(authUser)) || (exportContactsDailyFollowUpsFormUrl && ContactModel.canExportDailyFollowUpsForm(authUser))"></mat-divider>
 
                     <app-export-button
-                        *ngIf="exportContactsDailyFollowUpListUrl"
+                        *ngIf="exportContactsDailyFollowUpListUrl && ContactModel.canExportDailyFollowUpList(authUser)"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE' | translate"
@@ -73,7 +82,7 @@
                     </app-export-button>
 
                     <app-export-button
-                        *ngIf="exportContactsDailyFollowUpsFormUrl"
+                        *ngIf="exportContactsDailyFollowUpsFormUrl && ContactModel.canExportDailyFollowUpsForm(authUser)"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE' | translate"
@@ -180,26 +189,28 @@
                             <mat-divider></mat-divider>
 
                             <button
-                                *ngIf="exportContactsUrl"
+                                *ngIf="exportContactsUrl && ContactModel.canExport(authUser)"
                                 mat-menu-item
                                 (click)="exportSelectedContacts()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS' | translate }}
                             </button>
 
                             <button
+                                *ngIf="ContactModel.canExportDossier(authUser)"
                                 mat-menu-item
                                 (click)="exportSelectedContactsDossier()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER' | translate }}
                             </button>
 
                             <button
+                                *ngIf="ContactModel.canExportRelationships(authUser)"
                                 mat-menu-item
                                 (click)="exportSelectedContactsRelationship()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_RELATIONSHIPS' | translate }}
                             </button>
 
                             <ng-container
-                                *ngIf="hasContactWriteAccess()">
+                                *ngIf="ContactModel.canBulkModify(authUser)">
                                 <ng-container
                                     *app-selected-outbreak-is-active>
                                     <mat-divider></mat-divider>

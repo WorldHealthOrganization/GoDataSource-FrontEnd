@@ -19,7 +19,8 @@ export abstract class CreateConfirmOnChanges
         authUser: UserModel,
         model: IPermissionBasic,
         routePath: string,
-        recordID: string
+        recordID: string,
+        redirectToCreateData?: any
     ) {
         // navigate to proper page
         this.disableDirtyConfirm();
@@ -31,7 +32,10 @@ export abstract class CreateConfirmOnChanges
             router.navigate([`/${routePath}`]);
         } else {
             // fallback to current page since we already know that we have access to this page
-            redirectService.to([`/${routePath}/create`]);
+            redirectService.to(
+                [`/${routePath}/create`],
+                redirectToCreateData
+            );
         }
     }
 }

@@ -341,6 +341,16 @@ export interface IPermissionRelationship {
 }
 
 /**
+ * Follow-up
+ */
+export interface IPermissionFollowUp {
+    /**
+     * Can we list follow-up range ?
+     */
+    canListDashboard(user: UserModel): boolean;
+}
+
+/**
  * Case / Contact / Event - Relationship
  */
 export interface IPermissionRelatedRelationship {
@@ -428,6 +438,26 @@ export interface IPermissionRelatedRelationship {
      * Can bulk delete relationships contacts from events / cases & contacts
      */
     canBulkDeleteRelationshipContacts(user: UserModel): boolean;
+}
+
+/**
+ * Case / Contact - Movement
+ */
+export interface IPermissionMovement {
+    /**
+     * Can we display movement map ?
+     */
+    canViewMovementMap(user: UserModel): boolean;
+}
+
+/**
+ * Case / Contact - Chronology
+ */
+export interface IPermissionChronology {
+    /**
+     * Can we display chronology chart ?
+     */
+    canViewChronologyChart(user: UserModel): boolean;
 }
 
 /**
@@ -548,4 +578,34 @@ export interface IPermissionDuplicates {
      * Has permission to merge duplicate event records ?
      */
     canMergeEvents(user: UserModel): boolean;
+}
+
+/**
+ * Contact
+ */
+export interface IPermissionContact {
+    /**
+     * Has permission to generate visual id ?
+     */
+    canGenerateVisualId(user: UserModel): boolean;
+
+    /**
+     * Has permission to convert contact to case ?
+     */
+    canConvertToCase(user: UserModel): boolean;
+
+    /**
+     * Has permission to export daily follow-up list ?
+     */
+    canExportDailyFollowUpList(user: UserModel): boolean;
+
+    /**
+     * Has permission to export daily follow-up form ?
+     */
+    canExportDailyFollowUpsForm(user: UserModel): boolean;
+
+    /**
+     * Has permission to export contact dossier ?
+     */
+    canExportDossier(user: UserModel): boolean;
 }

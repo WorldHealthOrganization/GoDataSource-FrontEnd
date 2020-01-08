@@ -180,8 +180,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
                     'contacts',
                     'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL',
                     [
-                        PERMISSION.READ_OUTBREAK,
-                        PERMISSION.READ_CONTACT
+                        PERMISSION.CONTACT_LIST
                     ],
                     '/contacts',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
@@ -190,9 +189,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
                     'contact-follow-ups',
                     'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL',
                     [
-                        PERMISSION.READ_OUTBREAK,
-                        PERMISSION.READ_CONTACT,
-                        PERMISSION.READ_FOLLOWUP
+                        PERMISSION.FOLLOW_UP_LIST
                     ],
                     '/contacts/follow-ups',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
@@ -201,9 +198,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
                     'contact-range-follow-ups',
                     'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
                     [
-                        PERMISSION.READ_OUTBREAK,
-                        PERMISSION.READ_CONTACT,
-                        PERMISSION.READ_FOLLOWUP
+                        PERMISSION.FOLLOW_UP_LIST_RANGE
                     ],
                     '/contacts/range-follow-ups',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality

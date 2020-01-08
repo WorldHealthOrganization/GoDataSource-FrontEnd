@@ -6,6 +6,7 @@ import { ImportDataExtension } from '../../components/import-data/model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.model';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-import-sync-package',
@@ -30,7 +31,8 @@ export class ImportSyncPackageComponent {
     constructor(
         private cacheService: CacheService,
         private router: Router,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private redirectService: RedirectService
     ) {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -67,6 +69,11 @@ export class ImportSyncPackageComponent {
      * Finished import
      */
     finished() {
-        this.router.navigate(['/system-config/backups']);
+        if (SystemSyncLogModel.canList(this.authUser)) {
+            this.router.navigate(['/system-config/sync-logs']);
+        } else {
+            // fallback
+            this.redirectService.to(['/import-export-data/sync-package/import']);
+        }
     }
 }

@@ -10,7 +10,13 @@ const routes: Routes = [
     // Contact list
     {
         path: '',
-        component: fromPages.ContactsListComponent
+        component: fromPages.ContactsListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CONTACT_LIST
+            ]
+        }
     },
     // Create Contact
     {
@@ -18,7 +24,9 @@ const routes: Routes = [
         component: fromPages.CreateContactComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CONTACT]
+            permissions: [
+                PERMISSION.CONTACT_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -30,7 +38,9 @@ const routes: Routes = [
         component: fromPages.ModifyContactComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_CONTACT],
+            permissions: [
+                PERMISSION.CONTACT_VIEW
+            ],
             action: ViewModifyComponentAction.VIEW
         }
     },
@@ -40,7 +50,9 @@ const routes: Routes = [
         component: fromPages.ModifyContactComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CONTACT],
+            permissions: [
+                PERMISSION.CONTACT_MODIFY
+            ],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [
@@ -53,7 +65,9 @@ const routes: Routes = [
         component: fromPages.BulkCreateContactsComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CONTACT]
+            permissions: [
+                PERMISSION.CONTACT_BULK_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -65,7 +79,9 @@ const routes: Routes = [
         component: fromPages.BulkModifyContactsComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CONTACT]
+            permissions: [
+                PERMISSION.CONTACT_BULK_MODIFY
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -78,7 +94,9 @@ const routes: Routes = [
         component: fromPages.ViewMovementContactComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_CONTACT]
+            permissions: [
+                PERMISSION.CONTACT_VIEW_MOVEMENT_MAP
+            ]
         }
     },
 
@@ -88,7 +106,9 @@ const routes: Routes = [
         component: fromPages.ViewChronologyContactComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_CONTACT]
+            permissions: [
+                PERMISSION.CONTACT_VIEW_CHRONOLOGY_CHART
+            ]
         }
     },
 
@@ -98,7 +118,9 @@ const routes: Routes = [
         component: fromPages.ContactDailyFollowUpsListComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_FOLLOWUP]
+            permissions: [
+                PERMISSION.FOLLOW_UP_LIST
+            ]
         }
     },
     // Follow-ups list from a case
@@ -107,7 +129,9 @@ const routes: Routes = [
         component: fromPages.ContactDailyFollowUpsListComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_FOLLOWUP]
+            permissions: [
+                PERMISSION.FOLLOW_UP_LIST
+            ]
         }
     },
     // Follow-ups list from a contact
@@ -116,7 +140,9 @@ const routes: Routes = [
         component: fromPages.IndividualContactFollowUpsListComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_FOLLOWUP]
+            permissions: [
+                PERMISSION.FOLLOW_UP_LIST
+            ]
         }
     },
     // Range Follow-ups list
@@ -126,8 +152,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.READ_CONTACT,
-                PERMISSION.READ_FOLLOWUP
+                PERMISSION.FOLLOW_UP_LIST_RANGE
             ]
         }
     },
@@ -137,7 +162,9 @@ const routes: Routes = [
         component: fromPages.CreateContactFollowUpComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_FOLLOWUP]
+            permissions: [
+                PERMISSION.FOLLOW_UP_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -149,7 +176,9 @@ const routes: Routes = [
         component: fromPages.ModifyContactFollowUpComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_FOLLOWUP],
+            permissions: [
+                PERMISSION.FOLLOW_UP_VIEW
+            ],
             action: ViewModifyComponentAction.VIEW
         }
     },
@@ -159,7 +188,9 @@ const routes: Routes = [
         component: fromPages.ModifyContactFollowUpComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_FOLLOWUP],
+            permissions: [
+                PERMISSION.FOLLOW_UP_MODIFY
+            ],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [
@@ -172,7 +203,9 @@ const routes: Routes = [
         component: fromPages.ModifyContactFollowUpListComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_FOLLOWUP]
+            permissions: [
+                PERMISSION.FOLLOW_BULK_MODIFY
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard

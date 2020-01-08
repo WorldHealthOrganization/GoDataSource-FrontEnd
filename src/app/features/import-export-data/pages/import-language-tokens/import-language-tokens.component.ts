@@ -6,6 +6,7 @@ import { ImportDataExtension } from '../../components/import-data/model';
 import { LanguageModel } from '../../../../core/models/language.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-import-language-tokens',
@@ -25,6 +26,8 @@ export class ImportLanguageTokensComponent implements OnInit {
 
     importFileUrl: string;
 
+    languageId: string;
+
     /**
      * Constructor
      */
@@ -32,7 +35,8 @@ export class ImportLanguageTokensComponent implements OnInit {
         private cacheService: CacheService,
         private router: Router,
         protected route: ActivatedRoute,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private redirectService: RedirectService
     ) {}
 
     /**
@@ -42,7 +46,8 @@ export class ImportLanguageTokensComponent implements OnInit {
         this.route.params
             .subscribe((params: { languageId }) => {
                 // set import URL
-                this.importFileUrl = `/languages/${params.languageId}/language-tokens/import`;
+                this.languageId = params.languageId;
+                this.importFileUrl = `/languages/${this.languageId}/language-tokens/import`;
             });
 
         // get the authenticated user
@@ -80,7 +85,15 @@ export class ImportLanguageTokensComponent implements OnInit {
      * Finished import
      */
     finished() {
+        // remove cached languages
         this.cacheService.remove(CacheKey.LANGUAGES);
-        this.router.navigate(['/languages']);
+
+        // redirect
+        if (LanguageModel.canList(this.authUser)) {
+            this.router.navigate(['/languages']);
+        } else {
+            // fallback
+            this.redirectService.to([`/import-export-data/language-data/${this.languageId}/import-tokens`]);
+        }
     }
 }
