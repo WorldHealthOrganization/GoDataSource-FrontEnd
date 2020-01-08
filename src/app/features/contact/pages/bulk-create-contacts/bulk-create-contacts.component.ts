@@ -500,7 +500,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                     this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_INVALID_FIELDS');
                 } else {
                     // collect data from table
-                    this.hotTableWrapper.getData()
+                    this.hotTableWrapper
+                        .getData()
                         .subscribe((dataResponse: {
                             data: any[],
                             sheetCore: Handsontable
