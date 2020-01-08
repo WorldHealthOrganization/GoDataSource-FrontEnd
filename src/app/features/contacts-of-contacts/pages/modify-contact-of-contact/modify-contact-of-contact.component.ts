@@ -31,6 +31,7 @@ import {
     DialogAnswer, DialogAnswerButton, DialogButton,
     DialogComponent, DialogConfiguration, DialogField
 } from '../../../../shared/components/dialog/dialog.component';
+import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 
 @Component({
     selector: 'app-modify-contact-of-contact',
@@ -77,13 +78,12 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
         protected route: ActivatedRoute,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
-        private contactDataService: ContactDataService,
+        private contactsOfContactsDataService: ContactsOfContactsDataService,
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
         private router: Router,
         private dialogService: DialogService,
-        private i18nService: I18nService,
-        private relationshipDataService: RelationshipDataService
+        private i18nService: I18nService
     ) {
         super(route);
     }
@@ -132,7 +132,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
             this.contactOfContactId
         ) {
             console.log(`params`);
-            this.contactDataService
+            this.contactsOfContactsDataService
                 .getContact(this.selectedOutbreak.id, this.contactOfContactId, true)
                 .subscribe(contactDataReturned => {
                     console.log(contactDataReturned);
@@ -145,7 +145,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
 
                     // set visual ID validator
                     this.contactIdMaskValidator = new Observable((observer) => {
-                        this.contactDataService.checkContactVisualIDValidity(
+                        this.contactsOfContactsDataService.checkContactVisualIDValidity(
                             this.selectedOutbreak.id,
                             this.visualIDTranslateData.mask,
                             this.contactData.visualId,
@@ -195,7 +195,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
 
         // check for duplicates
         const loadingDialog = this.dialogService.showLoadingDialog();
-        this.contactDataService
+        this.contactsOfContactsDataService
             .findDuplicates(this.selectedOutbreak.id, {
                 ...this.contactData,
                 ...dirtyFields
@@ -214,7 +214,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                 // modify Contact
                 const runModifyContact = (finishCallBack?: () => void) => {
                     // modify the contact
-                    this.contactDataService
+                    this.contactsOfContactsDataService
                         .modifyContact(
                             this.selectedOutbreak.id,
                             this.contactOfContactId,

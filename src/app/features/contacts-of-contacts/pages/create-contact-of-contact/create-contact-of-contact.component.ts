@@ -32,6 +32,7 @@ import {
     DialogConfiguration, DialogField,
     DialogFieldType
 } from '../../../../shared/components/dialog/dialog.component';
+import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 
 @Component({
     selector: 'app-create-contact-of-contact',
@@ -70,7 +71,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
     constructor(
         private router: Router,
         private route: ActivatedRoute,
-        private contactDataService: ContactDataService,
+        private contactsOfContactsDataService: ContactsOfContactsDataService,
         private entityDataService: EntityDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
@@ -147,7 +148,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
 
                         // set visual ID validator
                         this.contactIdMaskValidator = new Observable((observer) => {
-                            this.contactDataService.checkContactVisualIDValidity(
+                            this.contactsOfContactsDataService.checkContactVisualIDValidity(
                                 selectedOutbreak.id,
                                 this.visualIDTranslateData.mask,
                                 this.contactData.visualId
@@ -232,7 +233,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
         ) {
             // check for duplicates
             const loadingDialog = this.dialogService.showLoadingDialog();
-            this.contactDataService
+            this.contactsOfContactsDataService
                 .findDuplicates(this.outbreakId, dirtyFields)
                 .pipe(
                     catchError((err) => {
@@ -248,7 +249,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
                     // add the new Contact
                     const runCreateContact = () => {
                         // add the new Contact
-                        this.contactDataService
+                        this.contactsOfContactsDataService
                             .createContact(this.outbreakId, dirtyFields)
                             .pipe(
                                 catchError((err) => {
@@ -274,7 +275,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
                                             this.snackbarService.showApiError(err);
 
                                             // remove contact
-                                            this.contactDataService
+                                            this.contactsOfContactsDataService
                                                 .deleteContact(this.outbreakId, contactData.id)
                                                 .subscribe();
 

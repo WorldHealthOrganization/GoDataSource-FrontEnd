@@ -91,32 +91,6 @@ export const EnglishUsLang = {
         /**
          * uiContactsOfContactsFields
          */
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME': 'Last name',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME': 'First name',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID': 'Visual Id',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION': 'Address',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE': 'Age',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER': 'Gender',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER': 'Phone number',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL': 'Risk level',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT': 'Date of last contact',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DELETED': 'Deleted',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE': 'Was case',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS': 'Number of contacts',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES': 'Number of exposures',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_BY': 'Created by',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_AT': 'Created at',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_BY': 'Updated by',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_AT': 'Updated at',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION': 'Occupation',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
-        // 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH': 'Date of birth',
-        'f': '',
-        'g': '',
-        'h': '',
-        'j': '',
-        'k': '',
-        'kk': '',
         'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS': 'Address',
         'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES': 'Address',
         'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE': 'Age',
@@ -217,7 +191,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_CONTACT': 'Restore contact',
 
         /**
-         * uiCreateContactOfContactPage
+         * uiCreateContactsOfContactsPage
          */
         'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE': 'Personal',
         'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_ACTION_CREATE_CONTACT_BUTTON': 'Create contact of contact',
@@ -230,6 +204,25 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_ACTION_COPY_ENTITY_ADDRESS_TOOLTIP': 'Copy main address from the parent entity',
         'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_ACTION_CREATE_ANOTHER_CONTACT_BUTTON': 'Create and add another',
         'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE': 'Flag this contact with a risk level for additional attention',
+
+        /**
+         * uiModifyContactsOfContactsPage
+         */
+        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE': 'Contact saved',
+        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_CHRONOLOGY': 'View chronology',
+        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_FOLLOW_UPS': 'View follow-ups',
+        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_MOVEMENT': 'View movement',
+        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_DUPLICATES_DIALOG_ACTION_MERGE_AT_LEAST_ONE_ERROR_MESSAGE': 'Please select at least one record with which to merge',
+        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG': 'This contact might already be in the system (see possible matches below). Do you still want to update this contact or merge possible matches?',
+        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_DUPLICATES_DIALOG_LABEL_MERGE_WITH': 'Merge with?',
+        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_ADDRESS_TITLE': 'Address',
+        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_DOCUMENTS_TITLE': 'Documents',
+        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE': 'Flag this contact with a risk level for additional attention',
+        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE': 'Personal',
+        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_VIEW_CONTACT_OF_CONTACT_TITLE': 'View {{name}}',
+        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_EXPOSURE': 'View exposure',
+        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE': 'Record Details'
 
         /**
          * REMOVE the tokens from below

@@ -6,14 +6,12 @@ import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -27,20 +25,18 @@ import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { RiskLevelModel } from '../../../../core/models/risk-level.model';
-import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
-import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
+import { catchError, map, share, tap } from 'rxjs/operators';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { AddressType } from '../../../../core/models/address.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 
 @Component({
     selector: 'app-contacts-of-contacts-list',
+    encapsulation: ViewEncapsulation.None,
     templateUrl: './contacts-of-contacts-list.component.html',
     styleUrls: ['./contacts-of-contacts-list.component.less']
 })
@@ -145,7 +141,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CONTACT',
             click: (item: ContactModel) => {
-                console.log(`111qasdasd`);
                 this.router.navigate(['/contacts-of-contacts', item.id, 'view']);
             },
             visible: (item: ContactModel): boolean => {
@@ -158,7 +153,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_MODIFY_CONTACT',
             click: (item: ContactModel) => {
-                console.log(`qasdasd`);
                 this.router.navigate(['/contacts-of-contacts', item.id, 'modify']);
             },
             visible: (item: ContactModel): boolean => {
