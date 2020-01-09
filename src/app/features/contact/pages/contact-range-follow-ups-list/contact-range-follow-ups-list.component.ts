@@ -38,17 +38,8 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     styleUrls: ['./contact-range-follow-ups-list.component.less']
 })
 export class ContactRangeFollowUpsListComponent extends ListComponent implements OnInit, OnDestroy {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_CONTACTS_TITLE',
-            '/contacts'
-        ),
-        new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE',
-            '.',
-            true
-        )
-    ];
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
@@ -92,6 +83,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     // constants
     ExportDataExtension = ExportDataExtension;
     ReferenceDataCategory = ReferenceDataCategory;
+    FollowUpModel = FollowUpModel;
 
     loadingDialog: LoadingDialogModel;
 
@@ -150,6 +142,9 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -220,14 +215,47 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                         });
                     });
             });
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        // init breadcrumbs
+        this.breadcrumbs = [];
+
+        // contacts breadcrumb
+        if (ContactModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_CONTACTS_TITLE',
+                    '/contacts'
+                )
+            );
+        }
+
+        // current page breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE',
+                '.',
+                true
+            )
+        );
     }
 
     /**
@@ -396,6 +424,9 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         this.needsRefreshList(instant);
     }
 
+    /**
+     * Reset filters
+     */
     resetFilters() {
         // reset filters in UI
         this.filters = {
@@ -422,6 +453,9 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         this.needsRefreshList();
     }
 
+    /**
+     * Apply filters
+     */
     applyFilters() {
         // clear query builder and apply each filter separately
         this.queryBuilder.clear();
@@ -459,7 +493,8 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         // filter by contact locations
         // only current addresses
         if (!_.isEmpty(this.filters.locationIds)) {
-            this.queryBuilder.addChildQueryBuilder('contact').filter
+            this.queryBuilder
+                .addChildQueryBuilder('contact').filter
                 .where({
                     addresses: {
                         $elemMatch: {

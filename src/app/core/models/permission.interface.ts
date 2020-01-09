@@ -348,6 +348,21 @@ export interface IPermissionFollowUp {
      * Can we list follow-up range ?
      */
     canListDashboard(user: UserModel): boolean;
+
+    /**
+     * Can we generate follow-ups ?
+     */
+    canGenerate(user: UserModel): boolean;
+
+    /**
+     * Can we export dashboard follow-ups ?
+     */
+    canExportRange(user: UserModel): boolean;
+
+    /**
+     * Can we export daily form ?
+     */
+    canExportDailyForm(user: UserModel): boolean;
 }
 
 /**

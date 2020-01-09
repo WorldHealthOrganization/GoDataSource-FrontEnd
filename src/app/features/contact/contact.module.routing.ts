@@ -204,7 +204,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.FOLLOW_BULK_MODIFY
+                PERMISSION.FOLLOW_UP_BULK_MODIFY
             ]
         },
         canDeactivate: [

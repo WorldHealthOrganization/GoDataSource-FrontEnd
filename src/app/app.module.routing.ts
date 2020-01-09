@@ -208,7 +208,7 @@ const routes: Routes = [
                                     PERMISSION.FOLLOW_UP_CREATE,
                                     PERMISSION.FOLLOW_UP_VIEW,
                                     PERMISSION.FOLLOW_UP_MODIFY,
-                                    PERMISSION.FOLLOW_BULK_MODIFY
+                                    PERMISSION.FOLLOW_UP_BULK_MODIFY
                                 ]
                             })
                         ]

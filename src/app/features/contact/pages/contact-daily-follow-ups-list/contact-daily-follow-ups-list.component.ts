@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { Observable, Subscription } from 'rxjs';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
@@ -35,6 +34,8 @@ import { throwError } from 'rxjs';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { TeamModel } from '../../../../core/models/team.model';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -43,6 +44,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     styleUrls: ['./contact-daily-follow-ups-list.component.less']
 })
 export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent implements OnInit, OnDestroy {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
@@ -75,6 +77,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     UserSettings = UserSettings;
     ExportDataExtension = ExportDataExtension;
     ReferenceDataCategory = ReferenceDataCategory;
+    FollowUpModel = FollowUpModel;
 
     availableSideFilters: FilterModel[];
     // values for side filter
@@ -116,7 +119,8 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 });
             },
             visible: (item: FollowUpModel): boolean => {
-                return !item.deleted;
+                return !item.deleted &&
+                    FollowUpModel.canView(this.authUser);
             }
         }),
 
@@ -137,7 +141,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    this.hasFollowUpsWriteAccess() &&
+                    FollowUpModel.canModify(this.authUser) &&
                     !Constants.isDateInTheFuture(item.date);
             }
         }),
@@ -147,22 +151,6 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             type: HoverRowActionType.MENU,
             icon: 'moreVertical',
             menuOptions: [
-                // Modify follow-up questionnaire
-                new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_QUESTIONNAIRE',
-                    click: (item: FollowUpModel) => {
-                        this.modifyQuestionnaire(item);
-                    },
-                    visible: (item: FollowUpModel): boolean => {
-                        return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasFollowUpsWriteAccess() &&
-                            !Constants.isDateInTheFuture(item.date);
-                    }
-                }),
-
                 // Delete Follow-up
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_FOLLOW_UP',
@@ -174,7 +162,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasFollowUpsWriteAccess();
+                            FollowUpModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -190,14 +178,47 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasFollowUpsWriteAccess();
+                            FollowUpModel.canRestore(this.authUser);
                     },
                     class: 'mat-menu-item-restore'
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: FollowUpModel): boolean => {
+                        // visible only if at least one of the previous...
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            FollowUpModel.canModify(this.authUser) &&
+                            !Constants.isDateInTheFuture(item.date);
+                    }
+                }),
+
+                // Modify follow-up questionnaire
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_QUESTIONNAIRE',
+                    click: (item: FollowUpModel) => {
+                        this.modifyQuestionnaire(item);
+                    },
+                    visible: (item: FollowUpModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            FollowUpModel.canModify(this.authUser) &&
+                            !Constants.isDateInTheFuture(item.date);
+                    }
                 })
             ]
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         protected snackbarService: SnackbarService,
         protected dialogService: DialogService,
@@ -219,6 +240,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         super.ngOnInit();
 
@@ -314,6 +338,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         this.initializeSideTableColumns();
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -345,13 +372,16 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      * Initialize breadcrumbs
      */
     private initializeBreadcrumbs() {
+        // init breadcrumbs
+        this.breadcrumbs = [];
+
         // add case / contact breadcrumbs
         if (!this.caseData) {
-            // init breadcrumbs
-            this.breadcrumbs = [];
-
             // add team workload page if necessary
-            if (this.teamWorkloadData) {
+            if (
+                this.teamWorkloadData &&
+                TeamModel.canListWorkload(this.authUser)
+            ) {
                 this.breadcrumbs.push(
                     new BreadcrumbItemModel(
                         'LNG_PAGE_TEAMS_WORKLOAD_TITLE',
@@ -360,12 +390,18 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 );
             }
 
-            // add default breadcrumbs
+            // list contacts
+            if (ContactModel.canList(this.authUser)) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        'LNG_PAGE_LIST_CONTACTS_TITLE',
+                        '/contacts'
+                    )
+                );
+            }
+
+            // current page
             this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    'LNG_PAGE_LIST_CONTACTS_TITLE',
-                    '/contacts'
-                ),
                 new BreadcrumbItemModel(
                     'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
                     '.',
@@ -373,21 +409,34 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 )
             );
         } else {
-            this.breadcrumbs = [
-                new BreadcrumbItemModel(
-                    'LNG_PAGE_LIST_CASES_TITLE',
-                    '/cases'
-                ),
-                new BreadcrumbItemModel(
-                    this.caseData.name,
-                    `/cases/${this.caseData.id}/view`
-                ),
+            // cases list
+            if (CaseModel.canList(this.authUser)) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        'LNG_PAGE_LIST_CASES_TITLE',
+                        '/cases'
+                    )
+                );
+            }
+
+            // case view
+            if (CaseModel.canView(this.authUser)) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        this.caseData.name,
+                        `/cases/${this.caseData.id}/view`
+                    )
+                );
+            }
+
+            // current page
+            this.breadcrumbs.push(
                 new BreadcrumbItemModel(
                     'LNG_PAGE_LIST_FOLLOW_UPS_FOR_RELATED_CONTACTS_TITLE',
                     '.',
                     true
                 )
-            ];
+            );
         }
     }
 
@@ -558,7 +607,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         ];
 
         // Contact
-        if (this.authUser.hasPermissions(PERMISSION.READ_CONTACT)) {
+        if (ContactModel.canList(this.authUser)) {
             this.availableSideFilters = [
                 ...this.availableSideFilters,
                 ...[
@@ -633,7 +682,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         }
 
         // Case
-        if (this.authUser.hasPermissions(PERMISSION.READ_CASE)) {
+        if (CaseModel.canList(this.authUser)) {
             this.availableSideFilters = [
                 ...this.availableSideFilters,
                 ...[
@@ -956,29 +1005,30 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 .getFilterYesNoOptions()
                 .subscribe((yesNoOptions: LabelValuePair[]) => {
                     const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
-                    this.dialogService.showInput(new DialogConfiguration({
-                        message: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE',
-                        yesLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON',
-                        fieldsList: [
-                            new DialogField({
-                                name: 'dates',
-                                required: true,
-                                value: {
-                                    startDate: moment().add(1, 'days').startOf('day').format(),
-                                    endDate: moment().add(1, 'days').endOf('day').format()
-                                },
-                                fieldType: DialogFieldType.DATE_RANGE
-                            }),
-                            new DialogField({
-                                name: 'targeted',
-                                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TARGETED_LABEL',
-                                inputOptions: yesNoOptionsFiltered,
-                                inputOptionsClearable: false,
-                                required: true,
-                                value: true
-                            })
-                        ]
-                    }))
+                    this.dialogService
+                        .showInput(new DialogConfiguration({
+                            message: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE',
+                            yesLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON',
+                            fieldsList: [
+                                new DialogField({
+                                    name: 'dates',
+                                    required: true,
+                                    value: {
+                                        startDate: moment().add(1, 'days').startOf('day').format(),
+                                        endDate: moment().add(1, 'days').endOf('day').format()
+                                    },
+                                    fieldType: DialogFieldType.DATE_RANGE
+                                }),
+                                new DialogField({
+                                    name: 'targeted',
+                                    placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TARGETED_LABEL',
+                                    inputOptions: yesNoOptionsFiltered,
+                                    inputOptionsClearable: false,
+                                    required: true,
+                                    value: true
+                                })
+                            ]
+                        }))
                         .subscribe((answer: DialogAnswer) => {
                             if (answer.button === DialogAnswerButton.Yes) {
                                 this.followUpsDataService

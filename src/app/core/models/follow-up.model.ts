@@ -1,11 +1,10 @@
 import * as _ from 'lodash';
 import { AddressModel } from './address.model';
 import { ContactModel } from './contact.model';
-import { DateDefaultPipe } from '../../shared/pipes/date-default-pipe/date-default.pipe';
 import { IAnswerData, QuestionModel } from './question.model';
 import { BaseModel } from './base.model';
 import { FillLocationModel } from './fill-location.model';
-import { IPermissionBasic, IPermissionBasicBulk, IPermissionFollowUp } from './permission.interface';
+import { IPermissionBasic, IPermissionBasicBulk, IPermissionExportable, IPermissionFollowUp, IPermissionRestorable } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
@@ -14,7 +13,9 @@ export class FollowUpModel
     extends BaseModel
     implements
         IPermissionBasic,
+        IPermissionRestorable,
         IPermissionBasicBulk,
+        IPermissionExportable,
         IPermissionFollowUp {
     id: string;
     date: string;
@@ -113,17 +114,30 @@ export class FollowUpModel
     static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_DELETE) : false; }
 
     /**
+     * Static Permissions - IPermissionRestorable
+     */
+    static canRestore(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_RESTORE) : false; }
+
+    /**
      * Static Permissions - IPermissionBasicBulk
      */
     static canBulkCreate(user: UserModel): boolean { return false; }
-    static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.FOLLOW_BULK_MODIFY) : false); }
-    static canBulkDelete(user: UserModel): boolean { return false; }
-    static canBulkRestore(user: UserModel): boolean { return false; }
+    static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.FOLLOW_UP_BULK_MODIFY) : false); }
+    static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.FOLLOW_UP_BULK_DELETE) : false); }
+    static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.FOLLOW_UP_BULK_RESTORE) : false); }
+
+    /**
+     * Static Permissions - IPermissionExportable
+     */
+    static canExport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_EXPORT) : false; }
 
     /**
      * Static Permissions - IPermissionFollowUp
      */
     static canListDashboard(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_LIST_RANGE) : false; }
+    static canGenerate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_GENERATE) : false; }
+    static canExportRange(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_EXPORT_RANGE) : false; }
+    static canExportDailyForm(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_EXPORT_DAILY_FORM) : false; }
 
     /**
      * Constructor
@@ -167,6 +181,11 @@ export class FollowUpModel
     canDelete(user: UserModel): boolean { return FollowUpModel.canDelete(user); }
 
     /**
+     * Permissions - IPermissionRestorable
+     */
+    canRestore(user: UserModel): boolean { return FollowUpModel.canRestore(user); }
+
+    /**
      * Permissions - IPermissionBasicBulk
      */
     canBulkCreate(user: UserModel): boolean { return FollowUpModel.canBulkCreate(user); }
@@ -175,15 +194,15 @@ export class FollowUpModel
     canBulkRestore(user: UserModel): boolean { return FollowUpModel.canBulkRestore(user); }
 
     /**
+     * Permissions - IPermissionExportable
+     */
+    canExport(user: UserModel): boolean { return FollowUpModel.canExport(user); }
+
+    /**
      * Permissions - IPermissionFollowUp
      */
     canListDashboard(user: UserModel): boolean { return FollowUpModel.canListDashboard(user); }
-
-    /**
-     * Get date formatted
-     */
-    get dateFormatted() {
-        const pD = new DateDefaultPipe();
-        return pD.transform(this.date);
-    }
+    canGenerate(user: UserModel): boolean { return FollowUpModel.canGenerate(user); }
+    canExportRange(user: UserModel): boolean { return FollowUpModel.canExportRange(user); }
+    canExportDailyForm(user: UserModel): boolean { return FollowUpModel.canExportDailyForm(user); }
 }
