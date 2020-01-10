@@ -327,7 +327,17 @@ const routes: Routes = [
                                     PERMISSION.RELATIONSHIP_LIST,
                                     PERMISSION.RELATIONSHIP_VIEW,
                                     PERMISSION.RELATIONSHIP_CREATE,
-                                    PERMISSION.RELATIONSHIP_MODIFY
+                                    PERMISSION.RELATIONSHIP_MODIFY,
+                                    PERMISSION.RELATIONSHIP_SHARE,
+                                    PERMISSION.CASE_LIST_ONSET_BEFORE_PRIMARY_CASE_REPORT,
+                                    PERMISSION.CASE_LIST_LONG_PERIOD_BETWEEN_DATES_REPORT,
+                                    new PermissionExpression({
+                                        or: [
+                                            PERMISSION.CASE_CHANGE_SOURCE_RELATIONSHIP,
+                                            PERMISSION.CONTACT_CHANGE_SOURCE_RELATIONSHIP,
+                                            PERMISSION.EVENT_CHANGE_SOURCE_RELATIONSHIP
+                                        ]
+                                    })
                                 ]
                             })
                         ]
