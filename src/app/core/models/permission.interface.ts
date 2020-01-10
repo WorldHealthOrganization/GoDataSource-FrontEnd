@@ -463,6 +463,11 @@ export interface IPermissionMovement {
      * Can we display movement map ?
      */
     canViewMovementMap(user: UserModel): boolean;
+
+    /**
+     * Can we export movement map ?
+     */
+    canExportMovementMap(user: UserModel): boolean;
 }
 
 /**
@@ -598,6 +603,56 @@ export interface IPermissionDuplicates {
 /**
  * Contact
  */
+export interface IPermissionCase {
+    /**
+     * Has permission to generate visual id ?
+     */
+    canGenerateVisualId(user: UserModel): boolean;
+
+    /**
+     * Has permission to convert case to contact ?
+     */
+    canConvertToContact(user: UserModel): boolean;
+
+    /**
+     * Has permission to download case investigation form ?
+     */
+    canExportInvestigationForm(user: UserModel): boolean;
+
+    /**
+     * Has permission to download empty investigation forms ?
+     */
+    canExportEmptyInvestigationForms(user: UserModel): boolean;
+
+    /**
+     * Has permission to group cases by classification ?
+     */
+    canGroupByClassification(user: UserModel): boolean;
+
+    /**
+     * Has permission to see secondary cases for which onset date is before primary case ?
+     */
+    canListOnsetBeforePrimaryReport(user: UserModel): boolean;
+
+    /**
+     * Has permission to see cases with long periods between onset dates ?
+     */
+    canListLongPeriodBetweenOnsetDatesReport(user: UserModel): boolean;
+
+    /**
+     * Has permission to export case dossier ?
+     */
+    canExportDossier(user: UserModel): boolean;
+
+    /**
+     * Has permission to determine isolated cases ?
+     */
+    canListIsolatedCases(user: UserModel): boolean;
+}
+
+/**
+ * Contact
+ */
 export interface IPermissionContact {
     /**
      * Has permission to generate visual id ?
@@ -623,4 +678,29 @@ export interface IPermissionContact {
      * Has permission to export contact dossier ?
      */
     canExportDossier(user: UserModel): boolean;
+}
+
+/**
+ * Gantt Chart
+ */
+export interface IPermissionGanttChart {
+    /**
+     * Has view permission ?
+     */
+    canViewDelayOnsetLabTesting(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewDelayOnsetHospitalization(user: UserModel): boolean;
+
+    /**
+     * Has export permission ?
+     */
+    canExportDelayOnsetLabTesting(user: UserModel): boolean;
+
+    /**
+     * Has export permission ?
+     */
+    canExportDelayOnsetHospitalization(user: UserModel): boolean;
 }

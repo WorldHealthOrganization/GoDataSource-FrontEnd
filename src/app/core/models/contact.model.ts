@@ -149,6 +149,7 @@ export class ContactModel
      * Static Permissions - IPermissionMovement
      */
     static canViewMovementMap(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_VIEW_MOVEMENT_MAP) : false); }
+    static canExportMovementMap(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_EXPORT_MOVEMENT_MAP) : false); }
 
     /**
      * Static Permissions - IPermissionChronology
@@ -283,6 +284,7 @@ export class ContactModel
      * Permissions - IPermissionMovement
      */
     canViewMovementMap(user: UserModel): boolean { return ContactModel.canViewMovementMap(user); }
+    canExportMovementMap(user: UserModel): boolean { return ContactModel.canExportMovementMap(user); }
 
     /**
      * Permissions - IPermissionChronology

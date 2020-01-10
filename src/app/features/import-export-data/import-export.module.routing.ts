@@ -59,7 +59,9 @@ const routes: Routes = [
         component: fromPages.ImportCaseDataComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CASE]
+            permissions: [
+                PERMISSION.CASE_IMPORT
+            ]
         }
     },
 
@@ -69,7 +71,9 @@ const routes: Routes = [
         component: fromPages.ImportCaseLabDataComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CASE]
+            permissions: [
+                PERMISSION.CASE_LAB_RESULT_IMPORT
+            ]
         }
     },
 

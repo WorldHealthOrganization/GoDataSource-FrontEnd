@@ -254,10 +254,17 @@
                 </div>
             </mat-header-cell>
             <mat-cell
-                *matCellDef="let item"
-                (click)="EventModel.canListRelationshipContacts(authUser) ? displayContacts(item) : ''"
-                class="mat-table-number-column">
-                {{ item.numberOfContacts }}
+                *matCellDef="let item">
+                <span
+                    *ngIf="EventModel.canListRelationshipContacts(authUser) else numberOfContacts"
+                    (click)="displayContacts(item)"
+                    class="mat-table-number-column">
+                    {{ item.numberOfContacts }}
+                </span>
+                <ng-template
+                    #numberOfContacts>
+                    {{ item.numberOfContacts }}
+                </ng-template>
             </mat-cell>
         </ng-container>
 
@@ -274,10 +281,17 @@
                 </div>
             </mat-header-cell>
             <mat-cell
-                *matCellDef="let item"
-                (click)="EventModel.canListRelationshipExposures(authUser) ? displayExposures(item) : ''"
-                class="mat-table-number-column">
-                {{ item.numberOfExposures }}
+                *matCellDef="let item">
+                <span
+                    *ngIf="EventModel.canListRelationshipExposures(authUser) else numberOfExposures"
+                    (click)="displayExposures(item)"
+                    class="mat-table-number-column">
+                    {{ item.numberOfExposures }}
+                </span>
+                <ng-template
+                    #numberOfExposures>
+                    {{ item.numberOfExposures }}
+                </ng-template>
             </mat-cell>
         </ng-container>
 

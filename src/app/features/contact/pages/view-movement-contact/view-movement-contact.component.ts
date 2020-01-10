@@ -27,6 +27,9 @@ export class ViewMovementContactComponent implements OnInit {
 
     @ViewChild('mapMovement') mapMovement: WorldMapMovementComponent;
 
+    // constants
+    ContactModel = ContactModel;
+
     // authenticated user details
     authUser: UserModel;
 

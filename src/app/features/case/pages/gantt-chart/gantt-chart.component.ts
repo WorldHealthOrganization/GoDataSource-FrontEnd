@@ -15,10 +15,14 @@ import { Observable } from 'rxjs';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { GanttChartModel } from '../../../../core/models/gantt-chart.model';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-gantt-chart',
@@ -27,10 +31,8 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./gantt-chart.component.less']
 })
 export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit {
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_GANTT_CHART_TITLE', '/gantt-chart')
-    ];
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // selected outbreak ID
     outbreakId: string;
@@ -45,14 +47,21 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
     @ViewChild('ganttChart') private ganttChart: GanttChartDelayOnsetDashletComponent;
 
     ganttChartTypes: Observable<any[]>;
+    ganttChartType: any;
 
-    ganttChartType: any = Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value;
-
+    // constants
     Constants = Constants;
+    GanttChartModel = GanttChartModel;
 
     // do architecture is x32?
     x86Architecture: boolean = false;
 
+    // authenticated user
+    authUser: UserModel;
+
+    /**
+     * Constructor
+     */
     constructor(
         private domService: DomService,
         private importExportDataService: ImportExportDataService,
@@ -60,16 +69,41 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
         private dialogService: DialogService,
         private genericDataService: GenericDataService,
         protected snackbarService: SnackbarService,
-        private systemSettingsDataService: SystemSettingsDataService
+        private systemSettingsDataService: SystemSettingsDataService,
+        private authDataService: AuthDataService
     ) {
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // initialize Side Filters
         this.initializeSideFilters();
+
         // load gantt types
-        this.ganttChartTypes = this.genericDataService.getGanttChartTypes();
+        this.ganttChartTypes = this.genericDataService
+            .getGanttChartTypes()
+            .pipe(
+                map((records: LabelValuePair[]) => {
+                    return records.filter((record: LabelValuePair): boolean => {
+                        switch (record.value) {
+                            case Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value:
+                                return GanttChartModel.canViewDelayOnsetLabTesting(this.authUser);
+                            case Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value:
+                                return GanttChartModel.canViewDelayOnsetHospitalization(this.authUser);
+                            default:
+                                // not supported
+                                return false;
+                        }
+                    });
+                })
+            );
+
         // check if platform architecture is x32
         this.systemSettingsDataService
             .getAPIVersion()
@@ -78,6 +112,31 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
                     this.x86Architecture = true;
                 }
             });
+
+        // select visible chart accordingly to user rights
+        if (GanttChartModel.canViewDelayOnsetLabTesting(this.authUser)) {
+            this.ganttChartType = Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value;
+        } else if (GanttChartModel.canViewDelayOnsetHospitalization(this.authUser)) {
+            this.ganttChartType = Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value;
+        } else {
+            // NOT SUPPORTED
+        }
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // set current page title
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel('LNG_PAGE_GANTT_CHART_TITLE', '/gantt-chart')
+        );
     }
 
     /**
@@ -135,6 +194,7 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
                 ganttChartName = 'app-gantt-chart-delay-onset-hospitalization-dashlet svg';
             }
 
+            // export graph as png image
             this.domService
                 .getPNGBase64(ganttChartName, '#tempCanvas')
                 .subscribe((pngBase64) => {

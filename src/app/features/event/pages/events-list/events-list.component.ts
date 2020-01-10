@@ -39,6 +39,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     styleUrls: ['./events-list.component.less']
 })
 export class EventsListComponent extends ListComponent implements OnInit, OnDestroy {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '.', true)
     ];
@@ -259,6 +260,9 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private eventDataService: EventDataService,
@@ -280,9 +284,13 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         // retrieve users

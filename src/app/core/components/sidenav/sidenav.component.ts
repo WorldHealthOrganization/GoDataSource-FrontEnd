@@ -134,8 +134,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
             'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
             'addFolder',
             [
-                PERMISSION.READ_OUTBREAK,
-                PERMISSION.READ_CASE
+                PERMISSION.CASE_LIST
             ],
             [],
             '/cases',
@@ -151,8 +150,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
                     'lab-results',
                     'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
                     [
-                        PERMISSION.READ_OUTBREAK,
-                        PERMISSION.READ_CASE
+                        PERMISSION.CASE_LAB_RESULT_LIST
                     ],
                     '/cases/lab-results',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
@@ -160,11 +158,12 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 new ChildNavItem(
                     'gantt-chart',
                     'LNG_LAYOUT_MENU_ITEM_GANTT_CHART',
-                    [
-                        PERMISSION.READ_OUTBREAK,
-                        PERMISSION.READ_CASE,
-                        PERMISSION.READ_REPORT
-                    ],
+                    new PermissionExpression({
+                        or: [
+                            PERMISSION.GANTT_CHART_VIEW_DELAY_ONSET_LAB_TESTING,
+                            PERMISSION.GANTT_CHART_VIEW_DELAY_ONSET_HOSPITALIZATION
+                        ]
+                    }),
                     '/cases/gantt-chart',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 )

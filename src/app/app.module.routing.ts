@@ -224,10 +224,27 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [
-                        PERMISSION.READ_OUTBREAK,
-                        PERMISSION.READ_CASE
-                    ]
+                    permissions: new PermissionExpression({
+                        and: [
+                            PERMISSION.OUTBREAK_VIEW,
+                            new PermissionExpression({
+                                or: [
+                                    PERMISSION.CASE_LIST,
+                                    PERMISSION.CASE_CREATE,
+                                    PERMISSION.CASE_VIEW,
+                                    PERMISSION.CASE_MODIFY,
+                                    PERMISSION.CASE_VIEW_MOVEMENT_MAP,
+                                    PERMISSION.CASE_VIEW_CHRONOLOGY_CHART,
+                                    PERMISSION.CASE_LAB_RESULT_LIST,
+                                    PERMISSION.CASE_LAB_RESULT_CREATE,
+                                    PERMISSION.CASE_LAB_RESULT_VIEW,
+                                    PERMISSION.CASE_LAB_RESULT_MODIFY,
+                                    PERMISSION.GANTT_CHART_VIEW_DELAY_ONSET_LAB_TESTING,
+                                    PERMISSION.GANTT_CHART_VIEW_DELAY_ONSET_HOSPITALIZATION
+                                ]
+                            })
+                        ]
+                    })
                 }
             },
             // Event Module routes
@@ -440,8 +457,9 @@ const routes: Routes = [
                             PERMISSION.LANGUAGE_IMPORT_TOKENS,
                             PERMISSION.SYNC_IMPORT_PACKAGE,
                             PERMISSION.REFERENCE_DATA_IMPORT,
-                            PERMISSION.CONTACT_IMPORT
-                            // ...case / lab results
+                            PERMISSION.CONTACT_IMPORT,
+                            PERMISSION.CASE_IMPORT,
+                            PERMISSION.CASE_LAB_RESULT_IMPORT
                         ]
                     })
                 }

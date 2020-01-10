@@ -610,10 +610,17 @@
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
-                (click)="displayContacts(item)"
-                [style.color]="getRiskColor(item)"
-                class="mat-table-number-column">
-                {{ item.numberOfContacts }}
+                [style.color]="getRiskColor(item)">
+                <span
+                    *ngIf="ContactModel.canListRelationshipContacts(authUser) else numberOfContacts"
+                    (click)="displayContacts(item)"
+                    class="mat-table-number-column">
+                    {{ item.numberOfContacts }}
+                </span>
+                <ng-template
+                    #numberOfContacts>
+                    {{ item.numberOfContacts }}
+                </ng-template>
             </mat-cell>
         </ng-container>
 
@@ -631,10 +638,17 @@
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
-                [style.color]="getRiskColor(item)"
-                (click)="displayExposures(item)"
-                class="mat-table-number-column">
-                {{ item.numberOfExposures }}
+                [style.color]="getRiskColor(item)">
+                <span
+                    *ngIf="ContactModel.canListRelationshipExposures(authUser) else numberOfExposures"
+                    (click)="displayExposures(item)"
+                    class="mat-table-number-column">
+                    {{ item.numberOfExposures }}
+                </span>
+                <ng-template
+                    #numberOfExposures>
+                    {{ item.numberOfExposures }}
+                </ng-template>
             </mat-cell>
         </ng-container>
 

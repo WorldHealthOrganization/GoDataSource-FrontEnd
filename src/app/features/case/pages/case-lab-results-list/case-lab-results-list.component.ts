@@ -24,7 +24,6 @@ import { Constants } from '../../../../core/models/constants';
 import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -38,9 +37,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 })
 export class CaseLabResultsListComponent extends ListComponent implements OnInit {
     // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // case
     caseId: string;
@@ -67,6 +64,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     // constants
     ReferenceDataCategory = ReferenceDataCategory;
     UserSettings = UserSettings;
+    CaseModel = CaseModel;
+    LabResultModel = LabResultModel;
 
     // available side filters
     availableSideFilters: FilterModel[];
@@ -85,7 +84,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                 this.router.navigate(['/cases', item.personId, 'lab-results', item.id, 'view']);
             },
             visible: (item: LabResultModel): boolean => {
-                return !item.deleted;
+                return !item.deleted &&
+                    LabResultModel.canView(this.authUser);
             }
         }),
 
@@ -101,7 +101,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    this.hasLabResultWriteAccess();
+                    LabResultModel.canModify(this.authUser);
             }
         }),
 
@@ -121,7 +121,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasLabResultWriteAccess();
+                            LabResultModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -137,7 +137,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasLabResultWriteAccess();
+                            LabResultModel.canRestore(this.authUser);
                     },
                     class: 'mat-menu-item-restore'
                 })
@@ -145,6 +145,9 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private authDataService: AuthDataService,
@@ -164,6 +167,9 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -191,9 +197,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                             this.caseData = new CaseModel(caseData);
                             this.initialCaseClassification = caseData.classification;
 
-                            // setup breadcrumbs
-                            this.breadcrumbs.push(new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/view`));
-                            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', '.', true));
+                            // initialize breadcrumbs
+                            this.initializeBreadcrumbs();
 
                             // initialize pagination
                             this.initPaginator();
@@ -214,6 +219,39 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // cases list
+        if (CaseModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+            );
+        }
+
+        // case view
+        if (
+            this.caseData &&
+            CaseModel.canView(this.authUser)
+        ) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(this.caseData.name, `/cases/${this.caseId}/view`)
+            );
+        }
+
+        // current page
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', '.', true)
+        );
     }
 
     /**
@@ -440,13 +478,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     }
 
     /**
-     * Check if we have write access to cases
-     * @returns {boolean}
+     * Delete lab results
      */
-    hasCaseWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-    }
-
     deleteLabResult(labResult: LabResultModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT')
@@ -536,13 +569,5 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                     }
                 }
             });
-    }
-
-    /**
-     * Check if we have write access to lab results
-     * @returns {boolean}
-     */
-    hasLabResultWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
     }
 }

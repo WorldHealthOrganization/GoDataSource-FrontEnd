@@ -48,6 +48,7 @@ export class CreateContactFollowUpComponent
 
     // provide constants to template
     EntityType = EntityType;
+    ContactModel = ContactModel;
 
     // authenticated user
     authUser: UserModel;

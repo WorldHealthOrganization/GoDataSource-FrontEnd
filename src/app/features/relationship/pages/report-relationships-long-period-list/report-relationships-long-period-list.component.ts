@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -14,9 +13,10 @@ import { catchError, tap } from 'rxjs/operators';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { ReportDifferenceOnsetRelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { RelationshipModel, ReportDifferenceOnsetRelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
     selector: 'app-report-relationships-long-period',
@@ -25,11 +25,8 @@ import { throwError } from 'rxjs/internal/observable/throwError';
     styleUrls: ['./report-relationships-long-period-list.component.less']
 })
 export class ReportRelationshipsLongPeriodListComponent extends ListComponent implements OnInit, OnDestroy {
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-        new BreadcrumbItemModel('LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_TITLE', '', true)
-    ];
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
@@ -70,6 +67,9 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
                                 longPeriod: true
                             }
                         });
+                    },
+                    visible: () => {
+                        return CaseModel.canView(this.authUser);
                     }
                 }),
 
@@ -85,6 +85,9 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
                                 longPeriod: true
                             }
                         });
+                    },
+                    visible: () => {
+                        return CaseModel.canView(this.authUser);
                     }
                 }),
 
@@ -95,12 +98,19 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
                         // #TODO TBD - if this is correct !?
                         const relationTypePath: string = _.find(item.persons, { id: item.people[0].model.id }).source ? 'contacts' : 'exposures';
                         this.router.navigate(['/relationships', EntityType.CASE, item.people[0].model.id, relationTypePath, item.id, 'view']);
+                    },
+                    visible: () => {
+                        return RelationshipModel.canView(this.authUser);
                     }
                 }),
 
                 // Divider
                 new HoverRowAction({
-                    type: HoverRowActionType.DIVIDER
+                    type: HoverRowActionType.DIVIDER,
+                    visible: () => {
+                        return CaseModel.canView(this.authUser) ||
+                            RelationshipModel.canView(this.authUser);
+                    }
                 }),
 
                 // Modify people 1
@@ -117,10 +127,10 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
                         });
                     },
                     visible: () => {
-                        return this.hasCaseWriteAccess() &&
-                            this.authUser &&
+                        return this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id;
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            CaseModel.canModify(this.authUser);
                     }
                 }),
 
@@ -138,10 +148,10 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
                         });
                     },
                     visible: () => {
-                        return this.hasCaseWriteAccess() &&
-                            this.authUser &&
+                        return this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id;
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            CaseModel.canModify(this.authUser);
                     }
                 }),
 
@@ -154,16 +164,19 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
                         this.router.navigate(['/relationships', EntityType.CASE, item.people[0].model.id, relationTypePath, item.id, 'modify']);
                     },
                     visible: () => {
-                        return this.hasCaseWriteAccess() &&
-                            this.authUser &&
+                        return this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id;
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            RelationshipModel.canModify(this.authUser);
                     }
                 })
             ]
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         protected snackbarService: SnackbarService,
@@ -176,6 +189,9 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -189,14 +205,40 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
                 // refresh
                 this.needsRefreshList(true);
             });
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // cases list
+        if (CaseModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+            );
+        }
+
+        // current page
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel('LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_TITLE', '', true)
+        );
     }
 
     /**
@@ -221,13 +263,5 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
         } else {
             finishCallback([]);
         }
-    }
-
-    /**
-     * Check if we have write access to cases
-     * @returns {boolean}
-     */
-    hasCaseWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
     }
 }

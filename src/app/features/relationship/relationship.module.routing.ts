@@ -150,9 +150,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.READ_OUTBREAK,
-                PERMISSION.READ_CASE,
-                PERMISSION.READ_REPORT
+                PERMISSION.CASE_LIST_ONSET_BEFORE_PRIMARY_CASE_REPORT
             ]
         }
     },
@@ -163,8 +161,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.READ_OUTBREAK,
-                PERMISSION.READ_REPORT
+                PERMISSION.CASE_LIST_LONG_PERIOD_BETWEEN_DATES_REPORT
             ]
         }
     }
