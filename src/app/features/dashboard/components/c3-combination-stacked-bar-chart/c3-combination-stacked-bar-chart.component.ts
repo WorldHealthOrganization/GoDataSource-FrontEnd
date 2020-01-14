@@ -1,7 +1,7 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import * as c3 from 'c3';
 import * as d3 from 'd3';
-import { FormatFunction } from 'c3';
+import { ChartConfiguration, FormatFunction } from 'c3';
 
 @Component({
     selector: 'app-c3-combination-stacked-bar-chart',
@@ -9,7 +9,9 @@ import { FormatFunction } from 'c3';
     templateUrl: './c3-combination-stacked-bar-chart.component.html',
     styleUrls: ['./c3-combination-stacked-bar-chart.component.less']
 })
-export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges, OnDestroy {
+export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
+
+    private init: boolean = false;
 
     @Input() chartData;
     @Input() chartDataColumns;
@@ -23,14 +25,24 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
     @Input() chartId: string;
     @Input() y2Max: number;
     @Input() y2Min: number;
+    @Input() needInitialZoomRange: boolean = false;
+    @Input() initialZoomRanges: [number, number];
 
     chart: any;
 
     maxTickCulling: number = 1;
 
     ngOnInit() {
-        // render c3 object
-        this.render();
+        if (this.needInitialZoomRange) {
+            // render c3 object
+            this.render();
+            this.init = true;
+        } else {
+            this.render();
+        }
+    }
+
+    ngAfterViewInit() {
     }
 
     ngOnDestroy(): void {
@@ -38,8 +50,10 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
     }
 
     ngOnChanges(): any {
-        // render c3 object
-        this.render();
+        if (this.init) {
+            // render c3 object
+            this.render();
+        }
     }
 
     private destroyChart() {
@@ -59,6 +73,11 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
         const chartIdBind = '#' + this.chartId;
         this.chart = c3.generate({
             bindto: chartIdBind,
+            oninit: () => {
+                setTimeout(() => {
+                    this.chart.zoom(this.initialZoomRanges ? this.initialZoomRanges : []);
+                });
+            },
             onrendered: () => {
                 // configure ticks
                 this.configureNumberOfTicks(this.chartDataCategories.length);
@@ -77,7 +96,8 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
                         const domainDiff = domain[1] - domain[0];
                         this.configureNumberOfTicks(domainDiff);
                     }
-                }
+                },
+                initialRange: this.initialZoomRanges ? this.initialZoomRanges : []
             },
             interaction: {
                 enabled: false
@@ -167,7 +187,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
             color: {
                 pattern: this.colorPattern
             }
-        });
+        } as ChartConfiguration);
 
     }
 
