@@ -41,6 +41,24 @@ export class DashboardModel
     static canExportContactFollowUpSuccessRateReport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DASHBOARD_EXPORT_CONTACT_FOLLOW_UP_SUCCESS_RATE_REPORT) : false; }
     static canExportEpiCurve(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DASHBOARD_EXPORT_EPI_CURVE) : false; }
     static canExportKpi(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DASHBOARD_EXPORT_KPI) : false; }
+    static canViewDashboard(user: UserModel): boolean {
+        // no user provided ? then we don't have access
+        if (!user) {
+            return false;
+        }
+
+        // check if we have at least one access to dashboard
+        const canMethods: string[] = Object.getOwnPropertyNames(DashboardModel)
+            .filter((propName: string) => propName.startsWith('can') && propName !== 'canViewDashboard');
+        for (const canMethod of canMethods) {
+            if (DashboardModel[canMethod](user)) {
+                return true;
+            }
+        }
+
+        // we don't have access
+        return false;
+    }
 
     /**
      * Constructor
@@ -82,4 +100,5 @@ export class DashboardModel
     canExportContactFollowUpSuccessRateReport(user: UserModel): boolean { return DashboardModel.canExportContactFollowUpSuccessRateReport(user); }
     canExportEpiCurve(user: UserModel): boolean { return DashboardModel.canExportEpiCurve(user); }
     canExportKpi(user: UserModel): boolean { return DashboardModel.canExportKpi(user); }
+    canViewDashboard(user: UserModel): boolean { return DashboardModel.canViewDashboard(user); }
 }

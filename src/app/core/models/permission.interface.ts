@@ -717,6 +717,11 @@ export interface IPermissionDashboard {
     /**
      * Has view permission ?
      */
+    canViewDashboard(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
     canViewCaseSummaryDashlet(user: UserModel): boolean;
 
     /**
