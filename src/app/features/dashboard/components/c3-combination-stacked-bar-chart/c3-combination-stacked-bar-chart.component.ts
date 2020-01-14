@@ -11,8 +11,6 @@ import { ChartConfiguration, FormatFunction } from 'c3';
 })
 export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
 
-    private init: boolean = false;
-
     @Input() chartData;
     @Input() chartDataColumns;
     @Input() chartDataCategories;
@@ -33,13 +31,8 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
     maxTickCulling: number = 1;
 
     ngOnInit() {
-        if (this.needInitialZoomRange) {
-            // render c3 object
-            this.render();
-            this.init = true;
-        } else {
-            this.render();
-        }
+        // render c3 object
+        this.render();
     }
 
     ngAfterViewInit() {
@@ -50,10 +43,8 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
     }
 
     ngOnChanges(): any {
-        if (this.init) {
-            // render c3 object
-            this.render();
-        }
+        // render c3 object
+        this.render();
     }
 
     private destroyChart() {
@@ -74,9 +65,11 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
         this.chart = c3.generate({
             bindto: chartIdBind,
             oninit: () => {
-                setTimeout(() => {
-                    this.chart.zoom(this.needInitialZoomRange ? this.initialZoomRanges : []);
-                });
+                if (this.needInitialZoomRange) {
+                    setTimeout(() => {
+                        this.chart.zoom(this.initialZoomRanges);
+                    });
+                }
             },
             onrendered: () => {
                 // configure ticks
@@ -97,7 +90,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
                         this.configureNumberOfTicks(domainDiff);
                     }
                 },
-                initialRange: this.needInitialZoomRange ? this.initialZoomRanges : []
+                initialRange: this.needInitialZoomRange ? this.initialZoomRanges : undefined
             },
             interaction: {
                 enabled: false
