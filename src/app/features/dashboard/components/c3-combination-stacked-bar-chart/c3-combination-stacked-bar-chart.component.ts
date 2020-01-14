@@ -9,7 +9,7 @@ import { ChartConfiguration, FormatFunction } from 'c3';
     templateUrl: './c3-combination-stacked-bar-chart.component.html',
     styleUrls: ['./c3-combination-stacked-bar-chart.component.less']
 })
-export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
+export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges, OnDestroy {
 
     @Input() chartData;
     @Input() chartDataColumns;
@@ -33,9 +33,6 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
     ngOnInit() {
         // render c3 object
         this.render();
-    }
-
-    ngAfterViewInit() {
     }
 
     ngOnDestroy(): void {
