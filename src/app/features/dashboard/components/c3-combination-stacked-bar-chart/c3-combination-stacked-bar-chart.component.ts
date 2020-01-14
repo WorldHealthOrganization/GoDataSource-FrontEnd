@@ -75,7 +75,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
             bindto: chartIdBind,
             oninit: () => {
                 setTimeout(() => {
-                    this.chart.zoom(this.initialZoomRanges ? this.initialZoomRanges : []);
+                    this.chart.zoom(this.needInitialZoomRange ? this.initialZoomRanges : []);
                 });
             },
             onrendered: () => {
@@ -97,7 +97,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
                         this.configureNumberOfTicks(domainDiff);
                     }
                 },
-                initialRange: this.initialZoomRanges ? this.initialZoomRanges : []
+                initialRange: this.needInitialZoomRange ? this.initialZoomRanges : []
             },
             interaction: {
                 enabled: false
