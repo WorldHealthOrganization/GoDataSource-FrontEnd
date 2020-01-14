@@ -1,6 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DashboardDashlet, DashboardKpiGroup } from '../../../../core/enums/dashboard.enum';
@@ -29,6 +28,19 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+
+interface IKpiGroup {
+    id: DashboardKpiGroup;
+    title: string;
+    dashlets: DashboardDashlet[];
+    hasAccess: (user: UserModel) => boolean;
+    permissions: {
+        [dashboardDashlet: string]: {
+            hasAccess: (user: UserModel) => boolean
+        }
+    };
+}
 
 @Component({
     selector: 'app-dashboard',
@@ -41,7 +53,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         new BreadcrumbItemModel('LNG_PAGE_DASHBOARD_TITLE', '.', true)
     ];
 
-    kpiGroups = [
+    kpiGroups: IKpiGroup[] = [
         // Cases KPIs
         {
             id: DashboardKpiGroup.CASE,
@@ -50,12 +62,74 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 DashboardDashlet.CASES_DECEASED,
                 DashboardDashlet.CASES_HOSPITALISED,
                 DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS,
-                DashboardDashlet.SUSPECT_CASES_REFUSING_TO_BE_TRANSFERRED_TO_A_TREATMENT_UNIT,
                 DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_AMONG_KNOWN_CONTACTS,
+                DashboardDashlet.SUSPECT_CASES_REFUSING_TO_BE_TRANSFERRED_TO_A_TREATMENT_UNIT,
                 DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_OUTSIDE_THE_TRANSMISSION_CHAINS,
                 DashboardDashlet.SUSPECT_CASES_WITH_PENDING_LAB_RESULT,
                 DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS
-            ]
+            ],
+            hasAccess: (user: UserModel): boolean => {
+                // can we check fo group permissions ?
+                if (
+                    !this.kpiGroupsMap ||
+                    !this.kpiGroupsMap[DashboardKpiGroup.CASE]
+                ) {
+                    return false;
+                }
+
+                // check that we have at least one group permission
+                const group: IKpiGroup = this.kpiGroupsMap[DashboardKpiGroup.CASE];
+                for (const dashletKey in group.permissions) {
+                    if (group.permissions[dashletKey].hasAccess(user)) {
+                        return true;
+                    }
+                }
+
+                // we don't have rights in this group
+                return false;
+            },
+            permissions: {
+                [DashboardDashlet.CASES_DECEASED]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewCaseDeceasedDashlet(user);
+                    }
+                },
+                [DashboardDashlet.CASES_HOSPITALISED]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewCaseHospitalizedDashlet(user);
+                    }
+                },
+                [DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewCaseWithLessThanXCotactsDashlet(user);
+                    }
+                },
+                [DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_AMONG_KNOWN_CONTACTS]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewNewCasesInPreviousXDaysAmongKnownContactsDashlet(user);
+                    }
+                },
+                [DashboardDashlet.SUSPECT_CASES_REFUSING_TO_BE_TRANSFERRED_TO_A_TREATMENT_UNIT]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewCasesRefusingTreatmentDashlet(user);
+                    }
+                },
+                [DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_OUTSIDE_THE_TRANSMISSION_CHAINS]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewNewCasesFromKnownCOTDashlet(user);
+                    }
+                },
+                [DashboardDashlet.SUSPECT_CASES_WITH_PENDING_LAB_RESULT]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewCasesWithPendingLabResultsDashlet(user);
+                    }
+                },
+                [DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewCasesNotIdentifiedThroughContactsDashlet(user);
+                    }
+                }
+            }
         },
         // Contacts KPIs
         {
@@ -70,7 +144,69 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 DashboardDashlet.CONTACTS_BECOMING_CASES_IN_TIME_AND_SPACE,
                 DashboardDashlet.CONTACTS_SEEN_EACH_DAY,
                 DashboardDashlet.CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP
-            ]
+            ],
+            hasAccess: (user: UserModel): boolean => {
+                // can we check fo group permissions ?
+                if (
+                    !this.kpiGroupsMap ||
+                    !this.kpiGroupsMap[DashboardKpiGroup.CONTACT]
+                ) {
+                    return false;
+                }
+
+                // check that we have at least one group permission
+                const group: IKpiGroup = this.kpiGroupsMap[DashboardKpiGroup.CONTACT];
+                for (const dashletKey in group.permissions) {
+                    if (group.permissions[dashletKey].hasAccess(user)) {
+                        return true;
+                    }
+                }
+
+                // we don't have rights in this group
+                return false;
+            },
+            permissions: {
+                [DashboardDashlet.CONTACTS_PER_CASE_MEAN]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewContactsPerCaseMeanDashlet(user);
+                    }
+                },
+                [DashboardDashlet.CONTACTS_PER_CASE_MEDIAN]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewContactsPerCaseMedianDashlet(user);
+                    }
+                },
+                [DashboardDashlet.CONTACTS_ON_THE_FOLLOW_UP_LIST]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewContactsFromFollowUpsDashlet(user);
+                    }
+                },
+                [DashboardDashlet.CONTACTS_LOST_TO_FOLLOW_UP]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewContactsLostToFollowUpsDashlet(user);
+                    }
+                },
+                [DashboardDashlet.CONTACTS_NOT_SEEN_IN_X_DAYS]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewContactsNotSeenInXDaysDashlet(user);
+                    }
+                },
+                [DashboardDashlet.CONTACTS_BECOMING_CASES_IN_TIME_AND_SPACE]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewContactsBecomeCasesDashlet(user);
+                    }
+                },
+                [DashboardDashlet.CONTACTS_SEEN_EACH_DAY]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewContactsSeenDashlet(user);
+                    }
+                },
+                [DashboardDashlet.CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewContactsWithSuccessfulFollowUpsDashlet(user);
+                    }
+                }
+            }
         },
         // Transmission Chains KPIs
         {
@@ -80,15 +216,56 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 DashboardDashlet.INDEPENDENT_TRANSMISSION_CHAINS,
                 DashboardDashlet.ACTIVE_TRANSMISSION_CHAINS,
                 DashboardDashlet.TRANSMISSION_CHAINS_FROM_CONTACTS_WHO_BECAME_CASES
-            ]
+            ],
+            hasAccess: (user: UserModel): boolean => {
+                // can we check fo group permissions ?
+                if (
+                    !this.kpiGroupsMap ||
+                    !this.kpiGroupsMap[DashboardKpiGroup.TRANSMISSION_CHAIN]
+                ) {
+                    return false;
+                }
+
+                // check that we have at least one group permission
+                const group: IKpiGroup = this.kpiGroupsMap[DashboardKpiGroup.TRANSMISSION_CHAIN];
+                for (const dashletKey in group.permissions) {
+                    if (group.permissions[dashletKey].hasAccess(user)) {
+                        return true;
+                    }
+                }
+
+                // we don't have rights in this group
+                return false;
+            },
+            permissions: {
+                [DashboardDashlet.INDEPENDENT_TRANSMISSION_CHAINS]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewIndependentCOTDashlet(user);
+                    }
+                },
+                [DashboardDashlet.ACTIVE_TRANSMISSION_CHAINS]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewActiveCOTDashlet(user);
+                    }
+                },
+                [DashboardDashlet.TRANSMISSION_CHAINS_FROM_CONTACTS_WHO_BECAME_CASES]: {
+                    hasAccess: (user: UserModel): boolean => {
+                        return DashboardModel.canViewNewChainsFromContactsWhoBecameCasesDashlet(user);
+                    }
+                }
+            }
         }
     ];
+    kpiGroupsMap: {
+        [id: string]: IKpiGroup
+    } = {};
 
     // authenticated user
     authUser: UserModel;
 
     // provide constants to template
     DashboardDashlet = DashboardDashlet;
+    DashboardModel = DashboardModel;
 
     selectedOutbreak: OutbreakModel;
 
@@ -119,12 +296,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     Constants = Constants;
 
-    epiCurveViewType = Constants.EPI_CURVE_TYPES.CLASSIFICATION.value;
-
+    epiCurveViewType;
     epiCurveViewTypes$: Observable<any[]>;
 
     caseClassificationsList$: Observable<LabelValuePair[]>;
 
+    /**
+     * Constructor
+     */
     constructor(
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -138,8 +317,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
         private referenceDataDataService: ReferenceDataDataService
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // map kpi groups
+        this.kpiGroupsMap = {};
+        this.kpiGroups.forEach((group) => {
+            this.kpiGroupsMap[group.id] = group;
+        });
 
         this.caseClassificationsList$ = this.referenceDataDataService
             .getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION)
@@ -184,12 +373,43 @@ export class DashboardComponent implements OnInit, OnDestroy {
             });
 
         // load epi curves types
-        this.epiCurveViewTypes$ = this.genericDataService.getEpiCurvesTypes();
+        this.epiCurveViewTypes$ = this.genericDataService
+            .getEpiCurvesTypes()
+            .pipe(map((data: LabelValuePair[]) => {
+                // keep only those types to which we have access
+                return data.filter((item: LabelValuePair): boolean => {
+                    switch (item.value) {
+                        case Constants.EPI_CURVE_TYPES.CLASSIFICATION.value:
+                            return DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this.authUser);
+                        case Constants.EPI_CURVE_TYPES.OUTCOME.value:
+                            return DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this.authUser);
+                        case Constants.EPI_CURVE_TYPES.REPORTING.value:
+                            return DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this.authUser);
+                        default:
+                            // NOT SUPPORTED
+                            return false;
+                    }
+                });
+            }));
+
+        // set default epi curve
+        if (DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this.authUser)) {
+            this.epiCurveViewType = Constants.EPI_CURVE_TYPES.CLASSIFICATION.value;
+        } else if (DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this.authUser)) {
+            this.epiCurveViewType = Constants.EPI_CURVE_TYPES.OUTCOME.value;
+        } else if (DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this.authUser)) {
+            this.epiCurveViewType = Constants.EPI_CURVE_TYPES.REPORTING.value;
+        } else {
+            // NOT SUPPORTED
+        }
 
         // initialize Side Filters
         this.initializeSideFilters();
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -326,30 +546,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         // persist changes
         this.persistUserDashboardSettings().subscribe();
-    }
-
-    /**
-     * Check if the user has read access to contacts
-     * @returns {boolean}
-     */
-    hasReadContactPermissions(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
-    }
-
-    /**
-     * Check if the user has read access to cases
-     * @returns {boolean}
-     */
-    hasReadCasePermissions(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_CASE);
-    }
-
-    /**
-     * Check if the user has read report permission
-     * @returns {boolean}
-     */
-    hasReadReportPermissions(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_REPORT);
     }
 
     /**
@@ -552,5 +748,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         // finished
         return qb;
+    }
+
+    /**
+     * Check if we have kpi group access
+     */
+    hasKpiAccess(): boolean {
+        // check if there is at least one group that has access
+        for (const group of this.kpiGroups) {
+            if (group.hasAccess(this.authUser)) {
+                return true;
+            }
+        }
+
+        // we don't have access
+        return false;
     }
 }

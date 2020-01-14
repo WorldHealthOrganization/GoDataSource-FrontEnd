@@ -704,3 +704,168 @@ export interface IPermissionGanttChart {
      */
     canExportDelayOnsetHospitalization(user: UserModel): boolean;
 }
+
+/**
+ * Dashboard
+ */
+export interface IPermissionDashboard {
+    /**
+     * Has view permission ?
+     */
+    canViewCaseSummaryDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewCasePerLocationLevelDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewCaseHospitalizedPieChartDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewCotSizeHistogramDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewEpiCurveStratifiedByClassificationDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewEpiCurveStratifiedByOutcomeDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewContactFollowUpReportDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewContactStatusReportDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewCaseDeceasedDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewCaseHospitalizedDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewCaseWithLessThanXCotactsDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewNewCasesInPreviousXDaysAmongKnownContactsDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewCasesRefusingTreatmentDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewNewCasesFromKnownCOTDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewCasesWithPendingLabResultsDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewCasesNotIdentifiedThroughContactsDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewContactsPerCaseMeanDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewContactsPerCaseMedianDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewContactsFromFollowUpsDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewContactsLostToFollowUpsDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewContactsNotSeenInXDaysDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewContactsBecomeCasesDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewContactsSeenDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewContactsWithSuccessfulFollowUpsDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewIndependentCOTDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewActiveCOTDashlet(user: UserModel): boolean;
+
+    /**
+     * Has view permission ?
+     */
+    canViewNewChainsFromContactsWhoBecameCasesDashlet(user: UserModel): boolean;
+
+    /**
+     * Has export permission ?
+     */
+    canExportCaseClassificationPerLocationReport(user: UserModel): boolean;
+
+    /**
+     * Has export permission ?
+     */
+    canExportContactFollowUpSuccessRateReport(user: UserModel): boolean;
+
+    /**
+     * Has export permission ?
+     */
+    canExportEpiCurve(user: UserModel): boolean;
+
+    /**
+     * Has export permission ?
+     */
+    canExportKpi(user: UserModel): boolean;
+}

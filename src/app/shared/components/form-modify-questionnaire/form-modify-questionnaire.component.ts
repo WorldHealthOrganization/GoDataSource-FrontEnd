@@ -6,7 +6,6 @@ import { OutbreakQestionnaireTypeEnum } from '../../../core/enums/outbreak-qesti
 import { ActivatedRoute } from '@angular/router';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { OutbreakTemplateModel } from '../../../core/models/outbreak-template.model';
-import { PERMISSION } from '../../../core/models/permission.model';
 import * as _ from 'lodash';
 import { AnswerModel, QuestionModel } from '../../../core/models/question.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
@@ -252,62 +251,59 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // init question actions
         this.questionActions = [];
 
-        // add question actions that require write permissions
-        if (this.hasWriteAccess()) {
-            // question settings
-            this.questionActions.push(new HoverRowAction({
-                icon: 'settings',
-                click: (questionIndex) => {
-                    this.modifyQuestion(questionIndex);
-                }
-            }));
+        // question settings
+        this.questionActions.push(new HoverRowAction({
+            icon: 'settings',
+            click: (questionIndex) => {
+                this.modifyQuestion(questionIndex);
+            }
+        }));
 
-            // move question above
-            this.questionActions.push(new HoverRowAction({
-                icon: 'arrowAUp',
-                click: (questionIndex) => {
-                    this.moveQuestionAbove(questionIndex);
-                }
-            }));
+        // move question above
+        this.questionActions.push(new HoverRowAction({
+            icon: 'arrowAUp',
+            click: (questionIndex) => {
+                this.moveQuestionAbove(questionIndex);
+            }
+        }));
 
-            // move question bellow
-            this.questionActions.push(new HoverRowAction({
-                icon: 'arrowADown',
-                click: (questionIndex) => {
-                    this.moveQuestionBellow(questionIndex);
-                }
-            }));
+        // move question bellow
+        this.questionActions.push(new HoverRowAction({
+            icon: 'arrowADown',
+            click: (questionIndex) => {
+                this.moveQuestionBellow(questionIndex);
+            }
+        }));
 
-            // other options
-            this.questionActions.push(new HoverRowAction({
-                type: HoverRowActionType.MENU,
-                icon: 'moreVertical',
-                menuOptions: [
-                    new HoverRowAction({
-                        menuOptionLabel: 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_TO_POSITION_X',
-                        click: (questionIndex) => {
-                            this.addMoveQuestionPosition(questionIndex);
-                        }
-                    }),
-                    new HoverRowAction({
-                        type: HoverRowActionType.DIVIDER
-                    }),
-                    new HoverRowAction({
-                        menuOptionLabel: 'LNG_PAGE_ACTION_CLONE',
-                        click: (questionIndex) => {
-                            this.cloneQuestion(questionIndex);
-                        }
-                    }),
-                    new HoverRowAction({
-                        menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
-                        click: (questionIndex) => {
-                            this.deleteQuestion(questionIndex);
-                        },
-                        class: 'mat-menu-item-delete'
-                    })
-                ]
-            }));
-        }
+        // other options
+        this.questionActions.push(new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_TO_POSITION_X',
+                    click: (questionIndex) => {
+                        this.addMoveQuestionPosition(questionIndex);
+                    }
+                }),
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER
+                }),
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_CLONE',
+                    click: (questionIndex) => {
+                        this.cloneQuestion(questionIndex);
+                    }
+                }),
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
+                    click: (questionIndex) => {
+                        this.deleteQuestion(questionIndex);
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        }));
     }
 
     /**
@@ -317,62 +313,59 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // init question actions
         this.answerActions = [];
 
-        // add answer actions that require write permissions
-        if (this.hasWriteAccess()) {
-            // answer settings
-            this.answerActions.push(new HoverRowAction({
-                icon: 'settings',
-                click: (answerIndex) => {
-                    this.modifyAnswer(answerIndex);
-                }
-            }));
+        // answer settings
+        this.answerActions.push(new HoverRowAction({
+            icon: 'settings',
+            click: (answerIndex) => {
+                this.modifyAnswer(answerIndex);
+            }
+        }));
 
-            // move answer above
-            this.answerActions.push(new HoverRowAction({
-                icon: 'arrowAUp',
-                click: (answerIndex) => {
-                    this.moveAnswerAbove(answerIndex);
-                }
-            }));
+        // move answer above
+        this.answerActions.push(new HoverRowAction({
+            icon: 'arrowAUp',
+            click: (answerIndex) => {
+                this.moveAnswerAbove(answerIndex);
+            }
+        }));
 
-            // move answer bellow
-            this.answerActions.push(new HoverRowAction({
-                icon: 'arrowADown',
-                click: (answerIndex) => {
-                    this.moveAnswerBellow(answerIndex);
-                }
-            }));
+        // move answer bellow
+        this.answerActions.push(new HoverRowAction({
+            icon: 'arrowADown',
+            click: (answerIndex) => {
+                this.moveAnswerBellow(answerIndex);
+            }
+        }));
 
-            // other options
-            this.answerActions.push(new HoverRowAction({
-                type: HoverRowActionType.MENU,
-                icon: 'moreVertical',
-                menuOptions: [
-                    new HoverRowAction({
-                        menuOptionLabel: 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_ANSWER_TO_POSITION_X',
-                        click: (answerIndex) => {
-                            this.addMoveQuestionAnswerPosition(answerIndex);
-                        }
-                    }),
-                    new HoverRowAction({
-                        type: HoverRowActionType.DIVIDER
-                    }),
-                    new HoverRowAction({
-                        menuOptionLabel: 'LNG_PAGE_ACTION_CLONE',
-                        click: (answerIndex) => {
-                            this.cloneAnswer(answerIndex);
-                        }
-                    }),
-                    new HoverRowAction({
-                        menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
-                        click: (answerIndex) => {
-                            this.deleteAnswer(answerIndex);
-                        },
-                        class: 'mat-menu-item-delete'
-                    })
-                ]
-            }));
-        }
+        // other options
+        this.answerActions.push(new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_ANSWER_TO_POSITION_X',
+                    click: (answerIndex) => {
+                        this.addMoveQuestionAnswerPosition(answerIndex);
+                    }
+                }),
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER
+                }),
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_CLONE',
+                    click: (answerIndex) => {
+                        this.cloneAnswer(answerIndex);
+                    }
+                }),
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
+                    click: (answerIndex) => {
+                        this.deleteAnswer(answerIndex);
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        }));
     }
 
     /**
@@ -636,20 +629,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 }
             });
         });
-    }
-
-    /**
-     * Check if we have write access to write to outbreaks or outbreak templates
-     * @returns {boolean}
-     */
-    hasWriteAccess(): boolean {
-        return this.parent ?
-            this.authUser.hasPermissions(
-                this.parent instanceof OutbreakTemplateModel ?
-                    PERMISSION.WRITE_SYS_CONFIG :
-                    PERMISSION.WRITE_OUTBREAK
-            ) :
-            false;
     }
 
     /**
