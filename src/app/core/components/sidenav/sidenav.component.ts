@@ -65,7 +65,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
             new ChildNavItem(
                 'saved-filters',
                 'LNG_LAYOUT_MENU_ITEM_SAVED_FILTERS_LABEL',
-                [PERMISSION.READ_SYS_CONFIG],
+                [],
                 '/saved-filters'
             ),
             new ChildNavItem(
@@ -77,7 +77,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
             new ChildNavItem(
                 'cloud-backup',
                 'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP_LABEL',
-                [PERMISSION.READ_SYS_CONFIG],
+                [
+                    PERMISSION.BACKUP_VIEW_CLOUD_BACKUP
+                ],
                 '/cloud-backup'
             ),
             new ChildNavItem(

@@ -23,7 +23,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     styleUrls: ['./saved-filters.component.less']
 })
 export class SavedFiltersComponent extends ListComponent implements OnInit {
-
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SAVED_FILTERS_TITLE', '.', true)
     ];
@@ -64,6 +64,9 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private savedFiltersService: SavedFiltersService,
         protected snackbarService: SnackbarService,
@@ -75,8 +78,10 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
-
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         // initialize pagination

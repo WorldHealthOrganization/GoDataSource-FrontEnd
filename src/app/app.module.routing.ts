@@ -86,10 +86,7 @@ const routes: Routes = [
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
-                ],
-                data: {
-                    permissions: [PERMISSION.READ_SYS_CONFIG]
-                }
+                ]
             },
             // Cloud Backup Module routes
             {
@@ -100,7 +97,9 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                    permissions: [
+                        PERMISSION.BACKUP_VIEW_CLOUD_BACKUP
+                    ]
                 }
             },
             // Saved Import Mapping Module routes
@@ -110,10 +109,7 @@ const routes: Routes = [
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
-                ],
-                data: {
-                    permissions: [PERMISSION.READ_SYS_CONFIG]
-                }
+                ]
             },
             // Terms of use Module routes
             {
@@ -122,10 +118,7 @@ const routes: Routes = [
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
-                ],
-                data: {
-                    permissions: [PERMISSION.READ_SYS_CONFIG]
-                }
+                ]
             },
             // Version
             {

@@ -158,6 +158,11 @@ export interface IPermissionBackup {
      * Has permission to set automatic backup settings
      */
     canSetAutomaticBackupSettings(user: UserModel): boolean;
+
+    /**
+     * Has permission to view cloud backup locations
+     */
+    canViewCloudBackupLocations(user: UserModel): boolean;
 }
 
 /**

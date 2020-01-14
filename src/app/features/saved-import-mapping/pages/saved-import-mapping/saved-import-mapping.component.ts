@@ -22,7 +22,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     styleUrls: ['./saved-import-mapping.component.less']
 })
 export class SavedImportMappingComponent extends ListComponent implements OnInit {
-
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_TITLE', '.', true)
     ];
@@ -63,6 +63,9 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         protected snackbarService: SnackbarService,
         private savedImportMappingService: SavedImportMappingService,
@@ -74,6 +77,9 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 

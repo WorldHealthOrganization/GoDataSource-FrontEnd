@@ -35,6 +35,7 @@ export class BackupModel
      * Static Permissions - IPermissionBackup
      */
     static canSetAutomaticBackupSettings(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.BACKUP_AUTOMATIC_SETTINGS) : false; }
+    static canViewCloudBackupLocations(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.BACKUP_VIEW_CLOUD_BACKUP) : false; }
 
     /**
      * Constructor
@@ -72,4 +73,5 @@ export class BackupModel
      * Permissions - IPermissionBackup
      */
     canSetAutomaticBackupSettings(user: UserModel): boolean { return BackupModel.canSetAutomaticBackupSettings(user); }
+    canViewCloudBackupLocations(user: UserModel): boolean { return BackupModel.canViewCloudBackupLocations(user); }
 }

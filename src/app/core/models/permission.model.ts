@@ -28,8 +28,6 @@ export enum PERMISSION {
     HELP_CATEGORY_ITEM_MODIFY = 'help_modify_category_item',
     HELP_CATEGORY_ITEM_DELETE = 'help_delete_category_item',
     HELP_CATEGORY_ITEM_APPROVE = 'help_approve_category_item',
-WRITE_HELP = 'write_help',
-APPROVE_HELP = 'approve_help',
 
     // reference data
     REFERENCE_DATA_LIST = 'reference_data_list_category',
@@ -40,7 +38,6 @@ APPROVE_HELP = 'approve_help',
     REFERENCE_DATA_CATEGORY_ITEM_CREATE = 'reference_data_create_category_item',
     REFERENCE_DATA_CATEGORY_ITEM_MODIFY = 'reference_data_modify_category_item',
     REFERENCE_DATA_CATEGORY_ITEM_DELETE = 'reference_data_delete_category_item',
-WRITE_REFERENCE_DATA = 'write_reference_data',
 
     // icon
     ICON_LIST = 'icon_list',
@@ -70,6 +67,7 @@ WRITE_REFERENCE_DATA = 'write_reference_data',
     BACKUP_DELETE = 'backup_delete',
     BACKUP_AUTOMATIC_SETTINGS = 'backup_automatic_settings',
     BACKUP_RESTORE = 'backup_restore',
+    BACKUP_VIEW_CLOUD_BACKUP = 'backup_view_cloud_location',
 
     // sync logs
     SYNC_LOG_LIST = 'sync_log_list',
@@ -129,8 +127,6 @@ WRITE_REFERENCE_DATA = 'write_reference_data',
     OUTBREAK_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE = 'outbreak_modify_contact_follow_up_questionnaire',
     OUTBREAK_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE = 'outbreak_modify_case_lab_result_questionnaire',
     OUTBREAK_CREATE_CLONE = 'outbreak_create_clone',
-READ_OUTBREAK = 'read_outbreak',
-WRITE_OUTBREAK = 'write_outbreak',
 
     // outbreak templates
     OUTBREAK_TEMPLATE_LIST = 'outbreak_template_list',
@@ -150,8 +146,6 @@ WRITE_OUTBREAK = 'write_outbreak',
     TEAM_MODIFY = 'team_modify',
     TEAM_DELETE = 'team_delete',
     TEAM_LIST_WORKLOAD = 'team_list_workload',
-READ_TEAM = 'read_team',
-WRITE_TEAM = 'write_team',
 
     // clusters
     CLUSTER_LIST = 'cluster_list',
@@ -188,7 +182,6 @@ WRITE_TEAM = 'write_team',
     EVENT_CHANGE_TARGET_RELATIONSHIP = 'event_change_target_relationships',
     EVENT_BULK_DELETE_RELATIONSHIP_CONTACTS = 'event_bulk_delete_relationships_contacts',
     EVENT_BULK_DELETE_RELATIONSHIP_EXPOSURES = 'event_bulk_delete_relationships_exposures',
-WRITE_EVENT = EVENT_MODIFY,
 
     // contacts
     CONTACT_LIST = 'contact_list',
@@ -231,8 +224,6 @@ WRITE_EVENT = EVENT_MODIFY,
     CONTACT_COUNT_SEEN = 'contact_count_seen',
     CONTACT_COUNT_SUCCESSFUL_FOLLOW_UPS = 'contact_count_successful_follow_ups',
     CONTACT_EXPORT_FOLLOW_UP_SUCCESS_RATE_REPORT = 'contact_export_follow_up_success_rate_report',
-READ_CONTACT = 'read_contact',
-WRITE_CONTACT = 'write_contact',
 
     // case
     CASE_LIST = 'case_list',
@@ -285,8 +276,6 @@ WRITE_CONTACT = 'write_contact',
     CASE_LIST_CASES_NEW_IN_KNOWN_COT = 'case_list_cases_new_in_known_cot',
     CASE_COUNT_CASES_CONTACTS = 'case_count_case_contacts',
     CASE_EXPORT_CLASSIFICATION_PER_LOCATION_REPORT = 'case_export_classification_per_location_report',
-READ_CASE = 'read_case',
-WRITE_CASE = 'write_case',
 
     // relationships
     RELATIONSHIP_LIST = 'relationship_list',
@@ -315,8 +304,6 @@ WRITE_CASE = 'write_case',
     FOLLOW_UP_BULK_DELETE = 'follow_up_bulk_delete',
     FOLLOW_UP_BULK_RESTORE = 'follow_up_bulk_restore',
     FOLLOW_UP_GROUP_BY_TEAM = 'follow_up_grouped_by_team',
-READ_FOLLOWUP = 'read_followup',
-WRITE_FOLLOWUP = 'write_followup',
 
     // lab results
     CASE_LAB_RESULT_LIST = 'lab_result_list',
@@ -391,16 +378,7 @@ WRITE_FOLLOWUP = 'write_followup',
     DASHBOARD_EXPORT_CASE_CLASSIFICATION_PER_LOCATION_REPORT = 'dashboard_export_case_classification_per_location_report',
     DASHBOARD_EXPORT_CONTACT_FOLLOW_UP_SUCCESS_RATE_REPORT = 'dashboard_export_contact_follow_up_success_rate_report',
     DASHBOARD_EXPORT_EPI_CURVE = 'dashboard_export_epi_curve',
-    DASHBOARD_EXPORT_KPI = 'dashboard_export_kpi',
-
-
-
-    // system config
-    READ_SYS_CONFIG = 'read_sys_config',
-    WRITE_SYS_CONFIG = 'write_sys_config',
-
-    // reports
-    READ_REPORT = 'read_report'
+    DASHBOARD_EXPORT_KPI = 'dashboard_export_kpi'
 }
 
 export interface IPermissionChildModel {
