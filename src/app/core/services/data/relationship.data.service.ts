@@ -19,6 +19,7 @@ import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
 import { map } from 'rxjs/operators';
 import { moment } from '../../helperClasses/x-moment';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class RelationshipDataService {
@@ -112,14 +113,14 @@ export class RelationshipDataService {
      * @param {EntityType} entityType
      * @param {string} entityId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getEntityExposuresCount(
         outbreakId: string,
         entityType: EntityType,
         entityId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const filter = queryBuilder.buildQuery();
 
         return this.http.get(
@@ -155,14 +156,14 @@ export class RelationshipDataService {
      * @param {EntityType} entityType
      * @param {string} entityId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getEntityContactsCount(
         outbreakId: string,
         entityType: EntityType,
         entityId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const filter = queryBuilder.buildQuery();
 
         return this.http.get(
@@ -481,14 +482,14 @@ export class RelationshipDataService {
      * @param {EntityType} entityType
      * @param {string} entityId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getEntityAvailablePeopleCount(
         outbreakId: string,
         entityType: EntityType,
         entityId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/available-people/count?where=${whereFilter}`);
     }

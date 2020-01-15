@@ -9,45 +9,82 @@ import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
-
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 
 @Component({
     selector: 'app-create-outbreak-template',
     templateUrl: './create-outbreak-template.component.html',
     styleUrls: ['./create-outbreak-template.component.less']
 })
-export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implements OnInit {
+export class CreateOutbreakTemplateComponent
+    extends CreateConfirmOnChanges
+    implements OnInit {
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '..'),
-        new BreadcrumbItemModel('LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TITLE', '.', true)
-    ];
+    // authenticated user details
+    authUser: UserModel;
 
     diseasesList$: Observable<any[]>;
 
     newOutbreakTemplate: OutbreakTemplateModel = new OutbreakTemplateModel();
 
+    /**
+     * Constructor
+     */
     constructor(
         private referenceDataDataService: ReferenceDataDataService,
         private formHelper: FormHelperService,
         private outbreakTemplateDataService: OutbreakTemplateDataService,
         private snackbarService: SnackbarService,
         private router: Router,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private authDataService: AuthDataService,
+        private redirectService: RedirectService
     ) {
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // get the lists for forms
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
     }
 
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (OutbreakTemplateModel.canList(this.authUser)) {
+            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '/outbreak-templates'));
+        }
+
+        // create breadcrumb
+        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TITLE', '.', true));
+    }
+
+    /**
+     * Create Outbreak Template
+     */
     createOutbreakTemplate(stepForms: NgForm[]) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
@@ -73,9 +110,16 @@ export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implem
                     // hide dialog
                     loadingDialog.close();
 
-                    // navigate to listing page
-                    this.disableDirtyConfirm();
-                    this.router.navigate([`/outbreak-templates/${newOutbreakTemplate.id}/modify`]);
+                    // navigate to proper page
+                    // method handles disableDirtyConfirm too...
+                    this.redirectToProperPageAfterCreate(
+                        this.router,
+                        this.redirectService,
+                        this.authUser,
+                        OutbreakTemplateModel,
+                        'outbreak-templates',
+                        newOutbreakTemplate.id
+                    );
                 });
         }
     }

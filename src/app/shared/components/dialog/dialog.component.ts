@@ -6,6 +6,7 @@ import { NgForm } from '@angular/forms';
 import { Constants } from '../../../core/models/constants';
 import { Observable } from 'rxjs';
 import { moment, Moment } from '../../../core/helperClasses/x-moment';
+import { SafeHtml } from '@angular/platform-browser';
 
 export enum DialogAnswerButton {
     Yes = 'Yes',
@@ -160,7 +161,7 @@ export class DialogField {
 
 export class DialogConfiguration {
     public message: string;
-    public additionalInfo: string;
+    public additionalInfo: string | SafeHtml;
     public yesLabel: string = 'LNG_DIALOG_CONFIRM_BUTTON_YES';
     public yesCssClass: string;
     public cancelLabel: string = 'LNG_DIALOG_CONFIRM_BUTTON_CANCEL';
@@ -198,7 +199,7 @@ export class DialogConfiguration {
 
     constructor(data: string | {
         message: string,
-        additionalInfo?: string,
+        additionalInfo?: string | SafeHtml,
         yesLabel?: string,
         cancelLabel?: string,
         placeholder?: string,

@@ -2,17 +2,25 @@ import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from
 import { Injectable } from '@angular/core';
 import { AuthDataService } from '../data/auth.data.service';
 import { ModulePath } from '../../enums/module-path.enum';
+import { UserModel } from '../../models/user.model';
 
 @Injectable()
 export class PasswordChangeGuard implements CanActivate {
-
+    /**
+     * Constructor
+     */
     constructor(
         private authDataService: AuthDataService,
         private router: Router
-    ) {
-    }
+    ) {}
 
-    canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+    /**
+     * Check if we need to change password before we access a different page
+     */
+    canActivate(
+        next: ActivatedRouteSnapshot,
+        state: RouterStateSnapshot
+    ) {
         // get the authenticated user
         const user = this.authDataService.getAuthenticatedUser();
 
@@ -26,7 +34,10 @@ export class PasswordChangeGuard implements CanActivate {
 
             // we need to force user to change his password
             // account module ( change password & set security questions )
-            if (next.routeConfig.path !== ModulePath.AccountModule) {
+            if (
+                next.routeConfig.path !== ModulePath.AccountModule &&
+                UserModel.canModifyOwnAccount(this.authDataService.getAuthenticatedUser())
+            ) {
                 this.router.navigate(['/account/change-password']);
                 return false;
             }

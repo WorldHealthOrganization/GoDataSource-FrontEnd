@@ -4,23 +4,23 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-
-                <button mat-raised-button color="accent"
-                        [matMenuTriggerFor]="quickActionsMenu">
+                <button
+                    *ngIf="(ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value && GanttChartModel.canExportDelayOnsetLabTesting(authUser)) ||
+                            (ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value && GanttChartModel.canExportDelayOnsetHospitalization(authUser))"
+                    mat-raised-button color="accent"
+                    [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
-                    <ng-container>
-
-                        <button
-                            mat-menu-item
-                            [disabled]="x86Architecture"
-                            (click)="generateGanttChartReport()">
-                            {{'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL' | translate}}
-                        </button>
-
-                    </ng-container>
+                    <button
+                        *ngIf="(ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value && GanttChartModel.canExportDelayOnsetLabTesting(authUser)) ||
+                            (ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value && GanttChartModel.canExportDelayOnsetHospitalization(authUser))"
+                        mat-menu-item
+                        [disabled]="x86Architecture"
+                        (click)="generateGanttChartReport()">
+                        {{'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL' | translate}}
+                    </button>
                 </mat-menu>
             </div>
         </div>
@@ -50,7 +50,7 @@
 
         <!-- gantt chart - lab test -->
         <app-gantt-chart-delay-onset-dashlet
-            *ngIf="ganttChartType == Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value"
+            *ngIf="ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value"
             #ganttChart
             [globalFilterDate]="globalFilterDate"
             [globalFilterLocationId]="globalFilterLocationId">
@@ -58,7 +58,7 @@
 
         <!-- gantt chart - hospitalization -->
         <app-gantt-chart-delay-onset-hospitalization-dashlet
-            *ngIf="ganttChartType == Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value"
+            *ngIf="ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value"
             #ganttChart
             [globalFilterDate]="globalFilterDate"
             [globalFilterLocationId]="globalFilterLocationId">

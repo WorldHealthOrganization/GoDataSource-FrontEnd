@@ -5,19 +5,20 @@
 
             <div class="topnav-actions">
 
-                <button mat-raised-button color="accent"
-                        [matMenuTriggerFor]="quickActionsMenu">
+                <button
+                    *ngIf="CaseModel.canExportMovementMap(authUser)"
+                    mat-raised-button color="accent"
+                    [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
-                    <ng-container>
-                        <button
-                            mat-menu-item
-                            (click)="exportCaseMovementMap()">
-                            {{'LNG_PAGE_VIEW_MOVEMENT_CASE_EXPORT' | translate}}
-                        </button>
-                    </ng-container>
+                    <button
+                        *ngIf="CaseModel.canExportMovementMap(authUser)"
+                        mat-menu-item
+                        (click)="exportCaseMovementMap()">
+                        {{'LNG_PAGE_VIEW_MOVEMENT_CASE_EXPORT' | translate}}
+                    </button>
                 </mat-menu>
 
             </div>

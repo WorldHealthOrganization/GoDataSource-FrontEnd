@@ -5,39 +5,21 @@
 
             <div class="topnav-actions">
 
-                <button mat-raised-button color="accent"
-                        [matMenuTriggerFor]="quickActionsMenu">
+                <button
+                    *ngIf="TransmissionChainModel.canExportCaseCountMap(authUser)"
+                    mat-raised-button color="accent"
+                    [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <button
+                        *ngIf="TransmissionChainModel.canExportCaseCountMap(authUser)"
                         mat-menu-item
                         (click)="exportCaseCountMap()">
                         {{'LNG_PAGE_CASE_COUNT_EXPORT_MAP' | translate}}
                     </button>
-
-                    <mat-divider></mat-divider>
-
-                    <button
-                        mat-menu-item
-                        [routerLink]="['/transmission-chains']">
-                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL' | translate}}
-                    </button>
-
-                    <button
-                        mat-menu-item
-                        [routerLink]="['/graphs/transmission-chain-bars']">
-                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAIN_BARS_LABEL' | translate}}
-                    </button>
-
-                    <button
-                        mat-menu-item
-                        [routerLink]="['/transmission-chains', 'list']">
-                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LIST_LABEL' | translate}}
-                    </button>
                 </mat-menu>
-
             </div>
         </div>
     </ng-container>

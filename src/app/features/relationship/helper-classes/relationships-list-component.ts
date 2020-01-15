@@ -8,7 +8,6 @@ import { CaseModel } from '../../../core/models/case.model';
 import { ContactModel } from '../../../core/models/contact.model';
 import { EventModel } from '../../../core/models/event.model';
 import { RelationshipType } from '../../../core/enums/relationship-type.enum';
-import { PERMISSION } from '../../../core/models/permission.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
@@ -18,21 +17,94 @@ import { catchError } from 'rxjs/operators';
 
 export abstract class RelationshipsListComponent extends ListComponent implements OnInit {
     // Entities Map for specific data
-    entityMap = {
+    entityMap: {
+        [entityType: string]: {
+            label: string,
+            link: string,
+            can: {
+                [type: string]: {
+                    view: (UserModel) => boolean,
+                    create: (UserModel) => boolean,
+                    modify: (UserModel) => boolean,
+                    delete: (UserModel) => boolean,
+                    share: (UserModel) => boolean,
+                    changeSource: (UserModel) => boolean,
+                    bulkDelete: (UserModel) => boolean
+                }
+            }
+        }
+    } = {
         [EntityType.CASE]: {
-            'label': 'LNG_PAGE_LIST_CASES_TITLE',
-            'link': '/cases',
-            'writePermission': PERMISSION.WRITE_CASE
+            label: 'LNG_PAGE_LIST_CASES_TITLE',
+            link: '/cases',
+            can: {
+                contacts: {
+                    view: CaseModel.canViewRelationshipContacts,
+                    create: CaseModel.canCreateRelationshipContacts,
+                    modify: CaseModel.canModifyRelationshipContacts,
+                    delete: CaseModel.canDeleteRelationshipContacts,
+                    share: CaseModel.canShareRelationship,
+                    changeSource: CaseModel.canChangeSource,
+                    bulkDelete: CaseModel.canBulkDeleteRelationshipContacts
+                },
+                exposures: {
+                    view: CaseModel.canViewRelationshipExposures,
+                    create: CaseModel.canCreateRelationshipExposures,
+                    modify: CaseModel.canModifyRelationshipExposures,
+                    delete: CaseModel.canDeleteRelationshipExposures,
+                    share: CaseModel.canShareRelationship,
+                    changeSource: () => false,
+                    bulkDelete: CaseModel.canBulkDeleteRelationshipExposures
+                }
+            }
         },
         [EntityType.CONTACT]: {
-            'label': 'LNG_PAGE_LIST_CONTACTS_TITLE',
-            'link': '/contacts',
-            'writePermission': PERMISSION.WRITE_CONTACT
+            label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+            link: '/contacts',
+            can: {
+                contacts: {
+                    view: ContactModel.canViewRelationshipContacts,
+                    create: ContactModel.canCreateRelationshipContacts,
+                    modify: ContactModel.canModifyRelationshipContacts,
+                    delete: ContactModel.canDeleteRelationshipContacts,
+                    share: ContactModel.canShareRelationship,
+                    changeSource: () => false,
+                    bulkDelete: ContactModel.canBulkDeleteRelationshipContacts
+                },
+                exposures: {
+                    view: ContactModel.canViewRelationshipExposures,
+                    create: ContactModel.canCreateRelationshipExposures,
+                    modify: ContactModel.canModifyRelationshipExposures,
+                    delete: ContactModel.canDeleteRelationshipExposures,
+                    share: ContactModel.canShareRelationship,
+                    changeSource: ContactModel.canChangeSource,
+                    bulkDelete: ContactModel.canBulkDeleteRelationshipExposures
+                }
+            }
         },
         [EntityType.EVENT]: {
-            'label': 'LNG_PAGE_LIST_EVENTS_TITLE',
-            'link': '/events',
-            'writePermission': PERMISSION.WRITE_EVENT
+            label: 'LNG_PAGE_LIST_EVENTS_TITLE',
+            link: '/events',
+            can: {
+                contacts: {
+                    view: EventModel.canViewRelationshipContacts,
+                    create: EventModel.canCreateRelationshipContacts,
+                    modify: EventModel.canModifyRelationshipContacts,
+                    delete: EventModel.canDeleteRelationshipContacts,
+                    share: EventModel.canShareRelationship,
+                    changeSource: EventModel.canChangeSource,
+                    bulkDelete: EventModel.canBulkDeleteRelationshipContacts
+                },
+                exposures: {
+                    view: EventModel.canViewRelationshipExposures,
+                    create: EventModel.canCreateRelationshipExposures,
+                    modify: EventModel.canModifyRelationshipExposures,
+                    delete: EventModel.canDeleteRelationshipExposures,
+                    share: EventModel.canShareRelationship,
+                    changeSource: () => false,
+                    bulkDelete: EventModel.canBulkDeleteRelationshipExposures
+                }
+            }
         }
     };
 
@@ -165,9 +237,51 @@ export abstract class RelationshipsListComponent extends ListComponent implement
     }
 
     /**
-     * Check if the authenticated user has WRITE access for the current person type
+     * Check if we're allowed to view event / case / contact relationships'
      */
-    hasEntityWriteAccess(): boolean {
-        return this.authUser.hasPermissions(this.entityMap[this.entityType].writePermission);
+    get entityCanView(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].view(this.authUser);
+    }
+
+    /**
+     * Check if we're allowed to create event / case / contact relationships'
+     */
+    get entityCanCreate(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].create(this.authUser);
+    }
+
+    /**
+     * Check if we're allowed to modify event / case / contact relationships'
+     */
+    get entityCanModify(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].modify(this.authUser);
+    }
+
+    /**
+     * Check if we're allowed to delete event / case / contact relationships'
+     */
+    get entityCanDelete(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].delete(this.authUser);
+    }
+
+    /**
+     * Check if we're allowed to share event / case / contact relationships'
+     */
+    get entityCanShare(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].share(this.authUser);
+    }
+
+    /**
+     * Check if we're allowed to change person source of a relationship
+     */
+    get entityCanChangeSource(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].changeSource(this.authUser);
+    }
+
+    /**
+     * Check if we're allowed to bulk delete relationships
+     */
+    get entityCanBulkDelete(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].bulkDelete(this.authUser);
     }
 }

@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { UserModel } from '../../models/user.model';
-import { UserRoleModel } from '../../models/user-role.model';
-import { PERMISSION, PermissionModel } from '../../models/permission.model';
+import { UserModel, UserRoleModel } from '../../models/user.model';
+import { IPermissionChildModel, PERMISSION, PermissionModel } from '../../models/permission.model';
 import * as _ from 'lodash';
 import { TeamModel } from '../../models/team.model';
 import { LocationModel } from '../../models/location.model';
@@ -86,6 +85,31 @@ export class ModelHelperService {
                 // keep only unique permissions
                 user.permissionIds = _.uniq(permissionIdsFromRoles);
 
+                // go through all permissions and add child permissions
+                if (user.availablePermissions) {
+                    // map group permissions for easy access
+                    const availableGroupPermissionsMap: {
+                        [allId: string]: PermissionModel
+                    } = {};
+                    user.availablePermissions.forEach((groupPermission: PermissionModel) => {
+                        availableGroupPermissionsMap[groupPermission.groupAllId] = groupPermission;
+                    });
+
+                    // determine all permissions and add child permissions
+                    const newPermissionIds = [...(user.permissionIds || [])];
+                    (user.permissionIds || []).forEach((permissionId: string) => {
+                        if (availableGroupPermissionsMap[permissionId]) {
+                            // add all child permissions from this group
+                            (availableGroupPermissionsMap[permissionId].permissions || []).forEach((permissionData) => {
+                                newPermissionIds.push(permissionData.id);
+                            });
+                        }
+                    });
+
+                    // replace user permissions
+                    user.permissionIds = newPermissionIds;
+                }
+
                 return user;
 
             case UserRoleModel:
@@ -97,8 +121,29 @@ export class ModelHelperService {
 
                 if (availablePermissions) {
                     // set role's permissions
-                    userRole.permissions = _.filter(availablePermissions, (permission: PermissionModel) => {
-                        return _.indexOf(userRole.permissionIds, permission.id) >= 0;
+                    const mappedPermissions: {
+                        [id: string]: IPermissionChildModel
+                    } = {};
+                    (availablePermissions || []).forEach((groupData: PermissionModel) => {
+                        // add group key
+                        mappedPermissions[groupData.groupAllId] = {
+                            id: groupData.groupAllId as any,
+                            label: groupData.groupLabel,
+                            description: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL_DESCRIPTION'
+                        };
+
+                        // add group child permissions
+                        (groupData.permissions || []).forEach((permission) => {
+                            mappedPermissions[permission.id] = permission;
+                        });
+                    });
+
+                    // map permissions for easy access
+                    userRole.permissions = [];
+                    (userRole.permissionIds || []).forEach((permissionId: string) => {
+                        if (mappedPermissions[permissionId]) {
+                            userRole.permissions.push(mappedPermissions[permissionId]);
+                        }
                     });
                 }
 

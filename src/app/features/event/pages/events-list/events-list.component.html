@@ -5,14 +5,17 @@
 
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
-                    <button *ngIf="hasEventWriteAccess()" mat-raised-button color="accent"
+                    <button *ngIf="EventModel.canCreate(authUser)" mat-raised-button color="accent"
                             [routerLink]="'./create'">
                         {{'LNG_COMMON_BUTTON_ADD'| translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </ng-container>
 
                 <button
-                    *ngIf="!appliedListFilter"
+                    *ngIf="!appliedListFilter && (
+                        (EventModel.canList(authUser) && EventModel.canListPersonsWithoutRelationships(authUser)) ||
+                        (RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser))
+                    )"
                     mat-raised-button
                     color="accent"
                     [matMenuTriggerFor]="quickActionsMenu">
@@ -21,6 +24,7 @@
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <button
+                        *ngIf="EventModel.canList(authUser) && EventModel.canListPersonsWithoutRelationships(authUser)"
                         mat-menu-item
                         [routerLink]="['/events']"
                         [queryParams]="{ applyListFilter: Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS }">
@@ -28,6 +32,7 @@
                     </button>
 
                     <button
+                        *ngIf="RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser)"
                         mat-menu-item
                         (click)="exportFilteredEventsRelationships()">
                         {{ 'LNG_PAGE_LIST_EVENTS_ACTION_EXPORT_EVENTS_RELATIONSHIPS' | translate }}
@@ -109,13 +114,16 @@
                                 {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
                             </button>
 
-                            <mat-divider></mat-divider>
+                            <ng-container
+                                *ngIf="RelationshipModel.canExport(authUser) && EventModel.canExportRelationships(authUser)">
+                                <mat-divider></mat-divider>
 
-                            <button
-                                mat-menu-item
-                                (click)="exportSelectedEventsRelationship()">
-                                {{ 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS_RELATIONSHIPS' | translate }}
-                            </button>
+                                <button
+                                    mat-menu-item
+                                    (click)="exportSelectedEventsRelationship()">
+                                    {{ 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS_RELATIONSHIPS' | translate }}
+                                </button>
+                            </ng-container>
                         </mat-menu>
                     </div>
                     <div class="column-filter">
@@ -246,10 +254,17 @@
                 </div>
             </mat-header-cell>
             <mat-cell
-                *matCellDef="let item"
-                (click)="displayContacts(item)"
-                class="mat-table-number-column">
-                {{ item.numberOfContacts }}
+                *matCellDef="let item">
+                <span
+                    *ngIf="EventModel.canListRelationshipContacts(authUser) else numberOfContacts"
+                    (click)="displayContacts(item)"
+                    class="mat-table-number-column">
+                    {{ item.numberOfContacts }}
+                </span>
+                <ng-template
+                    #numberOfContacts>
+                    {{ item.numberOfContacts }}
+                </ng-template>
             </mat-cell>
         </ng-container>
 
@@ -266,10 +281,17 @@
                 </div>
             </mat-header-cell>
             <mat-cell
-                *matCellDef="let item"
-                (click)="displayExposures(item)"
-                class="mat-table-number-column">
-                {{ item.numberOfExposures }}
+                *matCellDef="let item">
+                <span
+                    *ngIf="EventModel.canListRelationshipExposures(authUser) else numberOfExposures"
+                    (click)="displayExposures(item)"
+                    class="mat-table-number-column">
+                    {{ item.numberOfExposures }}
+                </span>
+                <ng-template
+                    #numberOfExposures>
+                    {{ item.numberOfExposures }}
+                </ng-template>
             </mat-cell>
         </ng-container>
 

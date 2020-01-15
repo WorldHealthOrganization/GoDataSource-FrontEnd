@@ -3,7 +3,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ReferenceDataCategoryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { NgForm } from '@angular/forms';
 import { IconModel } from '../../../../core/models/icon.model';
 import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
@@ -11,6 +11,7 @@ import { environment } from '../../../../../environments/environment';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 export enum IconExtension {
     PNG = '.png',
@@ -26,14 +27,10 @@ export enum IconExtension {
     styleUrls: ['./manage-icons-create.component.less']
 })
 export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements OnInit {
-    /**
-     * Breadcrumbs
-     */
+    // Breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
-    /**
-     * Extension mapped to mimes
-     */
+    // Extension mapped to mimes
     private allowedMimeTypes: string[] = [];
     private allowedMimeTypesMap = {
         [IconExtension.PNG]: 'image/png',
@@ -42,24 +39,16 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
         [IconExtension.BMP]: 'image/bmp'
     };
 
-    /**
-     * Category Name
-     */
+    // Category Name
     category: ReferenceDataCategoryModel;
 
-    /**
-     * Icon Model
-     */
+    // Icon Model
     icon: IconModel = new IconModel();
 
-    /**
-     * File uploader
-     */
+    // File uploader
     uploader: FileUploader;
 
-    /**
-     * Allowed extensions
-     */
+    // Allowed extensions
     _allowedExtensions: string[];
     set allowedExtensions(allowedExtensions: string[]) {
         // extensions
@@ -77,27 +66,22 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
         return this._allowedExtensions;
     }
 
-    /**
-     * Variables sent to translation pipe
-     */
+    // Variables sent to translation pipe
     translationData: {
         types?: string
     } = {};
 
-    /**
-     * Cursor is over drag-drop file zone
-     */
+    // Cursor is over drag-drop file zone
     hasFileOver: boolean = false;
 
-    /**
-     * Percent displayed when uploading a file
-     */
+    // Percent displayed when uploading a file
     progress: number = null;
 
-    /**
-     * Display spinner when True, otherwise display the form
-     */
+    // Display spinner when True, otherwise display the form
     displayLoading: boolean = false;
+
+    // authenticated user
+    authUser: UserModel;
 
     /**
      * Constructor
@@ -117,6 +101,9 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
      * Component initialized
      */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // extensions
         this.allowedExtensions = [
             IconExtension.PNG,
@@ -133,8 +120,8 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
             .subscribe((params: { categoryId }) => {
                 // retrieve Reference Data Category info
                 if (!params.categoryId) {
-                    // add breadcrumbs
-                    this.addBreadcrumbs();
+                    // update breadcrumbs
+                    this.initializeBreadcrumbs();
                 } else {
                     this.retrieveCategory(params.categoryId);
                 }
@@ -142,23 +129,31 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
     }
 
     /**
-     * Add breadcrumbs
+     * Initialize breadcrumbs
      */
-    addBreadcrumbs() {
-        // initialize
-        this.breadcrumbs = [
-            new BreadcrumbItemModel(
-                'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
-                '/reference-data'
-            )
-        ];
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
 
-        // add category if necessary
-        if (this.category) {
+        // add list breadcrumb only if we have permission
+        if (ReferenceDataCategoryModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
+            );
+        }
+
+        // add category
+        if (
+            this.category &&
+            ReferenceDataEntryModel.canList(this.authUser)
+        ) {
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
                     this.category.name,
-                    `/reference-data/${this.category.id}`
+                    `/reference-data/${this.category.id}`,
+                    false,
+                    {},
+                    this.category
                 )
             );
         }
@@ -171,7 +166,6 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
                 true
             )
         );
-
     }
 
     /**
@@ -185,8 +179,8 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
                 // set category
                 this.category = category;
 
-                // add breadcrumbs
-                this.addBreadcrumbs();
+                // update breadcrumbs
+                this.initializeBreadcrumbs();
             });
     }
 

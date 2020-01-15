@@ -9,7 +9,11 @@ const routes: Routes = [
     // Duplicate records list
     {
         path: '',
-        component: fromPages.DuplicateRecordsListComponent
+        component: fromPages.DuplicateRecordsListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.DUPLICATE_LIST]
+        }
     },
 
     // Case - Merge
@@ -18,7 +22,9 @@ const routes: Routes = [
         component: fromPages.CaseMergeDuplicateRecordsComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CASE]
+            permissions: [
+                PERMISSION.DUPLICATE_MERGE_CASES
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -31,7 +37,9 @@ const routes: Routes = [
         component: fromPages.ContactMergeDuplicateRecordsComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CONTACT]
+            permissions: [
+                PERMISSION.DUPLICATE_MERGE_CONTACTS
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -44,7 +52,9 @@ const routes: Routes = [
         component: fromPages.EventMergeDuplicateRecordsComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_EVENT]
+            permissions: [
+                PERMISSION.DUPLICATE_MERGE_EVENTS
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard

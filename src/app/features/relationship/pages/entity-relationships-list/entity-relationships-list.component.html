@@ -6,7 +6,7 @@
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
                     <button
-                        *ngIf="entityId && entityType && hasEntityWriteAccess()"
+                        *ngIf="entityId && entityType && RelationshipModel.canCreate(this.authUser) && entityCanCreate"
                         mat-raised-button color="accent"
                         [routerLink]="['/relationships', entityType, entityId, relationshipTypeRoutePath, 'available-entities']">
                         {{'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP' | translate}} <span class="xt-icon">addCircle</span>
@@ -95,10 +95,13 @@
                                 {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
                             </button>
 
-                            <ng-container *ngIf="hasCaseWriteAccess() || hasContactWriteAccess()">
+                            <ng-container *ngIf="(RelationshipModel.canShare(authUser) && entityCanShare) ||
+                                entityCanChangeSource || (RelationshipModel.canBulkDelete(authUser) && entityCanBulkDelete)">
+
                                 <mat-divider></mat-divider>
 
                                 <button
+                                    *ngIf="RelationshipModel.canShare(authUser) && entityCanShare"
                                     [disabled]="checkedRecords.length < 1"
                                     mat-menu-item
                                     (click)="shareSelectedRelationships()">
@@ -106,21 +109,24 @@
                                 </button>
 
                                 <button
-                                    *ngIf="relationshipType === RelationshipType.CONTACT && (hasCaseWriteAccess() || hasContactWriteAccess())"
+                                    *ngIf="entityCanChangeSource"
                                     mat-menu-item
                                     [disabled]="checkedRecords.length === 0"
                                     (click)="changeSourceForSelectedRelationships()">
                                     {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE' | translate }}
                                 </button>
 
-                                <mat-divider></mat-divider>
+                                <ng-container
+                                    *ngIf="RelationshipModel.canBulkDelete(authUser) && entityCanBulkDelete">
+                                    <mat-divider></mat-divider>
 
-                                <button
-                                    [disabled]="checkedRecords.length < 1"
-                                    mat-menu-item
-                                    (click)="deleteSelectedRelationships()">
-                                    {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS' | translate }}
-                                </button>
+                                    <button
+                                        [disabled]="checkedRecords.length < 1"
+                                        mat-menu-item
+                                        (click)="deleteSelectedRelationships()">
+                                        {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS' | translate }}
+                                    </button>
+                                </ng-container>
                             </ng-container>
                         </mat-menu>
                     </div>

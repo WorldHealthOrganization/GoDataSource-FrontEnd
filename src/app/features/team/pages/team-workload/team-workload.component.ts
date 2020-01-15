@@ -14,6 +14,10 @@ import { FormDateRangeSliderData } from '../../../../shared/xt-forms/components/
 import { Subscription } from 'rxjs';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { TeamModel } from '../../../../core/models/team.model';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs/internal/observable/throwError';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 interface ITeamMap {
     id: string;
@@ -28,17 +32,8 @@ interface ITeamMap {
     styleUrls: ['./team-workload.component.less']
 })
 export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDestroy {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_TEAMS_TITLE',
-            '/teams'
-        ),
-        new BreadcrumbItemModel(
-            'LNG_PAGE_TEAMS_WORKLOAD_TITLE',
-            '.',
-            true
-        )
-    ];
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     selectedOutbreak: OutbreakModel;
 
@@ -49,9 +44,7 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
     // loading flag - display spinner instead of table
     displayLoading: boolean = false;
 
-    /**
-     * Filter slider data
-     */
+    // Filter slider data
     slideFilterData: {
         minDate: Moment,
         maxDate: Moment,
@@ -62,9 +55,10 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
         maxRange: 0
     };
 
-    /**
-     * Slider Date Filter Value
-     */
+    // authenticated user
+    authUser: UserModel;
+
+    // Slider Date Filter Value
     sliderDateFilterValue: FormDateRangeSliderData;
 
     getSelectedOutbreakSubject: Subscription;
@@ -77,7 +71,8 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
         private followUpsDataService: FollowUpsDataService,
         protected snackbarService: SnackbarService,
         private i18nService: I18nService,
-        private teamDataService: TeamDataService
+        private teamDataService: TeamDataService,
+        private authDataService: AuthDataService
     ) {
         super(
             snackbarService
@@ -88,6 +83,9 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
      * Component initialized
      */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // get teams
         this.displayLoading = true;
         this.teamDataService
@@ -128,6 +126,25 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                         }
                     });
             });
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (TeamModel.canList(this.authUser)) {
+            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_TEAMS_TITLE', '/teams'));
+        }
+
+        // workload breadcrumb
+        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_TEAMS_WORKLOAD_TITLE', '.', true));
     }
 
     /**
@@ -176,6 +193,13 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
                 // retrieve the list of Follow Ups
                 this.followUpsDataService
                     .getFollowUpsPerDayTeam(this.selectedOutbreak.id, this.queryBuilder)
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            finishCallback([]);
+                            return throwError(err);
+                        })
+                    )
                     .subscribe((metricTeamsFollowups: TeamFollowupsPerDayModel) => {
                         // set headers
                         this.dates = dates;

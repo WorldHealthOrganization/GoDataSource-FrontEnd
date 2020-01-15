@@ -6,19 +6,22 @@
 
         <div class="topnav-actions">
             <button
-                *ngIf="hasLocationWriteAccess()"
+                *ngIf="LocationModel.canCreate(authUser)"
                 mat-raised-button
                 color="accent"
                 [routerLink]="parentId ? ['/locations', parentId, 'create'] : ['/locations', 'create']">
                 {{( parentId ? 'LNG_PAGE_LIST_LOCATIONS_ADD_SUBLOCATION_BUTTON' : 'LNG_PAGE_LIST_LOCATIONS_ADD_LOCATION_BUTTON') | translate}} <span class="xt-icon">addCircle</span>
             </button>
 
-            <button mat-raised-button color="accent" [matMenuTriggerFor]="quickActionsMenu">
+            <button
+                *ngIf="!parentId && !appliedListFilter && (LocationModel.canExport(authUser) || LocationModel.canImport(authUser))"
+                mat-raised-button color="accent" [matMenuTriggerFor]="quickActionsMenu">
                 {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
             </button>
 
             <mat-menu #quickActionsMenu="matMenu">
                 <app-export-button
+                    *ngIf="LocationModel.canExport(authUser)"
                     [menuItem]="true"
                     [label]="'LNG_PAGE_LIST_LOCATIONS_EXPORT_BUTTON' | translate"
                     [message]="'LNG_PAGE_LIST_LOCATIONS_EXPORT_TITLE' | translate"
@@ -29,7 +32,7 @@
                     (exportFinished)="closeLoadingDialog()">
                 </app-export-button>
 
-                <ng-container *ngIf="!parentId && !appliedListFilter && hasLocationWriteAccess()">
+                <ng-container *ngIf="LocationModel.canImport(authUser)">
                     <button
                         mat-menu-item
                         [routerLink]="['/import-export-data', 'hierarchical-locations', 'import']">
@@ -411,6 +414,7 @@
         *ngIf="parentId"
         class="form-actions">
         <button
+            *ngIf="LocationModel.canView(authUser)"
             mat-raised-button
             color="accent"
             [routerLink]="['/locations', parentId, 'view']"
@@ -419,7 +423,7 @@
         </button>
 
         <button
-            *ngIf="hasLocationWriteAccess()"
+            *ngIf="LocationModel.canModify(authUser)"
             mat-raised-button
             color="accent"
             [routerLink]="['/locations', parentId, 'modify']"
