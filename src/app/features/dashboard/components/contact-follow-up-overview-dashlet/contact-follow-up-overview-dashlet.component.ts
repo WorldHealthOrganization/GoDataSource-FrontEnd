@@ -204,9 +204,9 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
         // construct the milestones
         const maxMilestone = chartData[followedUpTranslated].length;
         const firstMilestone = maxMilestone - this.outbreak.periodOfFollowup;
-        const secondMilestone = maxMilestone;
+
         // setup zoom ranges based on milestones
-        this.dashletZoomRanges = [firstMilestone, secondMilestone];
+        this.dashletZoomRanges = [firstMilestone, maxMilestone];
 
         this.lineData = percentageTranslated;
         // finish
