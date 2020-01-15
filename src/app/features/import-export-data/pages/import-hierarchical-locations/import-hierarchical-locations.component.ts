@@ -20,7 +20,6 @@ export class ImportHierarchicalLocationsComponent {
     authUser: UserModel;
 
     allowedExtensions: string[] = [
-        ImportDataExtension.XML,
         ImportDataExtension.JSON
     ];
 
