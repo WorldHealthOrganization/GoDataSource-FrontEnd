@@ -1,5 +1,5 @@
 <app-dashboard-custom-metric-dashlet
-    [link]="'/contacts'"
+    [link]="ContactModel.canList(authUser) ? '/contacts' : ''"
     [params]="getDashletParamsIncludingGlobalFilters({applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN, x: xDaysNotSeen })"
     [value]="contactsNotSeenCount"
     (hide)="onHide()"

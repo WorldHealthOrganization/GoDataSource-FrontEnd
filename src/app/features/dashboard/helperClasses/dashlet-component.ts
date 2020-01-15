@@ -5,8 +5,13 @@ import { Subscriber } from 'rxjs';
 import { ListFilterDataService } from '../../../core/services/data/list-filter.data.service';
 import * as _ from 'lodash';
 import { Moment } from '../../../core/helperClasses/x-moment';
+import { AuthDataService } from '../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../core/models/user.model';
 
 export abstract class DashletComponent {
+    // authenticated user
+    authUser: UserModel;
+
     // Global filters => Date
     private _globalFilterDate: Moment;
     @Input() set globalFilterDate(globalFilterDate: Moment) {
@@ -46,8 +51,12 @@ export abstract class DashletComponent {
      * @param listFilterDataService
      */
     protected constructor(
-        protected listFilterDataService: ListFilterDataService
-    ) {}
+        protected listFilterDataService: ListFilterDataService,
+        protected authDataService: AuthDataService
+    ) {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+    }
 
     /**
      * Global Filters changed

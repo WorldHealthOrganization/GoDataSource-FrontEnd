@@ -6,7 +6,6 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
@@ -25,7 +24,11 @@ import { throwError } from 'rxjs';
     styleUrls: ['./modify-help-item.component.less']
 })
 export class ModifyHelpItemComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // constants
+    HelpItemModel = HelpItemModel;
 
     helpItemData: HelpItemModel = new HelpItemModel();
     categoryId: string;
@@ -37,6 +40,9 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
     // authenticated user
     authUser: UserModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private helpDataService: HelpDataService,
@@ -51,6 +57,9 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
         super(route);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -65,7 +74,6 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
                     .getHelpCategory(this.categoryId)
                     .subscribe((category) => {
                         this.selectedCategory = category;
-                        this.createBreadcrumbs();
 
                         // get item
                         this.helpDataService
@@ -74,6 +82,9 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
                                 // since this is cached we need to clone it because otherwise we modify the existing object and if we chose to discard changes...
                                 // for help items this isn't really necessary, because get id isn't cached as it is for languages but still it is a good idea to clone it
                                 this.helpItemData = new HelpItemModel(helpItemData);
+
+                                // initialize breadcrumbs
+                                this.initializeBreadcrumbs();
 
                                 // ngx-wig isn't pristine at start when setting ng-model
                                 // so we need to hack it
@@ -91,41 +102,64 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
     }
 
     /**
-     * Create breadcrumbs
+     * Initialize breadcrumbs
      */
-    createBreadcrumbs() {
-        this.breadcrumbs = [
-            new BreadcrumbItemModel(
-                'LNG_PAGE_LIST_HELP_CATEGORIES_TITLE',
-                '/help/categories'
-            ),
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
 
-            new BreadcrumbItemModel(
-                this.selectedCategory.name,
-                `/help/categories/${this.categoryId}/view`,
-                false,
-                {},
-                {}
-            ),
+        // add list breadcrumb only if we have permission
+        if (HelpCategoryModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories')
+            );
+        }
 
-            new BreadcrumbItemModel(
-                'LNG_PAGE_LIST_HELP_ITEMS_TITLE',
-                `/help/categories/${this.categoryId}/items`,
-                false,
-                {},
-                {}
-            ),
+        // view category breadcrumb
+        if (
+            HelpCategoryModel.canView(this.authUser) &&
+            this.selectedCategory
+        ) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    this.selectedCategory.name,
+                    `/help/categories/${this.categoryId}/view`,
+                    false,
+                    {},
+                    this.selectedCategory
+                )
+            );
+        }
 
+        // list children
+        if (HelpItemModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_HELP_ITEMS_TITLE',
+                    `/help/categories/${this.categoryId}/items`,
+                    false,
+                    {},
+                    {}
+                )
+            );
+        }
+
+        // view / modify breadcrumb
+        this.breadcrumbs.push(
             new BreadcrumbItemModel(
                 this.viewOnly ? 'LNG_PAGE_VIEW_HELP_ITEM_TITLE' : 'LNG_PAGE_MODIFY_HELP_ITEM_TITLE',
                 '.',
                 true,
                 {},
-                {}
+                this.helpItemData
             )
-        ];
+        );
     }
 
+    /**
+     * Modify help category item
+     * @param form
+     */
     modifyHelpCategoryItem(form: NgForm) {
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
@@ -172,19 +206,11 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
                 // remove help items from cache
                 this.cacheService.remove(CacheKey.HELP_ITEMS);
 
-                // update breadcrumb
-                this.createBreadcrumbs();
+                // initialize breadcrumbs
+                this.initializeBreadcrumbs();
 
                 // hide dialog
                 loadingDialog.close();
             });
-    }
-
-    /**
-     * Check if we have write access to help
-     * @returns {boolean}
-     */
-    hasHelpWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_HELP);
     }
 }

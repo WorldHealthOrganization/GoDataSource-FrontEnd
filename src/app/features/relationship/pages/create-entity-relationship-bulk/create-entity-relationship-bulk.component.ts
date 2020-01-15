@@ -207,7 +207,8 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
             targets: relationshipTargets,
             relationship: this.relationship
         };
-        this.relationshipDataService.createBulkRelationships(this.selectedOutbreak.id, relationshipsBulkData)
+        this.relationshipDataService
+            .createBulkRelationships(this.selectedOutbreak.id, relationshipsBulkData)
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showError(err.message);

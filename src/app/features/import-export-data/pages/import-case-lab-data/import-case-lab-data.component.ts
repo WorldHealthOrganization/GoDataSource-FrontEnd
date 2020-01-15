@@ -8,6 +8,11 @@ import { Constants } from '../../../../core/models/constants';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { QuestionModel } from '../../../../core/models/question.model';
 import { ImportDataExtension } from '../../components/import-data/model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { UserModel } from '../../../../core/models/user.model';
+import { CaseModel } from '../../../../core/models/case.model';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
 
 @Component({
     selector: 'app-import-case-lab-data',
@@ -16,19 +21,12 @@ import { ImportDataExtension } from '../../components/import-data/model';
     styleUrls: ['./import-case-lab-data.component.less']
 })
 export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_CASES_TITLE',
-            '/cases'
-        ),
-        new BreadcrumbItemModel(
-            'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE',
-            '',
-            true
-        )
-    ];
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     Constants = Constants;
+
+    authUser: UserModel;
 
     allowedExtensions: string[] = [
         ImportDataExtension.CSV,
@@ -63,15 +61,24 @@ export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
 
     /**
      * Constructor
-     * @param router
-     * @param route
      */
     constructor(
         private router: Router,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private authDataService: AuthDataService,
+        private redirectService: RedirectService
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // update breadcrumbs
+        this.initializeBreadcrumbs();
+
         // get number of deceased cases
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -90,6 +97,9 @@ export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -98,7 +108,52 @@ export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
         }
     }
 
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (CaseModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_CASES_TITLE',
+                    '/cases'
+                )
+            );
+        }
+
+        // add list breadcrumb only if we have permission
+        if (LabResultModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
+                    '/cases/lab-results'
+                )
+            );
+        }
+
+        // import breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE',
+                '.',
+                true
+            )
+        );
+    }
+
+    /**
+     * Finished
+     */
     finished() {
-        this.router.navigate(['/cases', 'lab-results']);
+        if (LabResultModel.canList(this.authUser)) {
+            this.router.navigate(['/cases/lab-results']);
+        } else {
+            // fallback
+            this.redirectService.to(['/import-export-data/case-lab-data/import']);
+        }
     }
 }

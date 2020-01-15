@@ -12,7 +12,13 @@ const routes: Routes = [
     // Outbreaks list
     {
         path: '',
-        component: fromPages.OutbreakListComponent
+        component: fromPages.OutbreakListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.OUTBREAK_LIST
+            ]
+        }
     },
     // Create Outbreak
     {
@@ -20,7 +26,11 @@ const routes: Routes = [
         component: fromPages.CreateOutbreakComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_OUTBREAK]
+            permissions: [
+                // list for checking if there is another outbreak with the same name
+                PERMISSION.OUTBREAK_LIST,
+                PERMISSION.OUTBREAK_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -35,7 +45,9 @@ const routes: Routes = [
         },
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_OUTBREAK],
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW
+            ],
             action: ViewModifyComponentAction.VIEW
         }
     },
@@ -48,7 +60,12 @@ const routes: Routes = [
         },
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_OUTBREAK],
+            permissions: [
+                // list for checking if there is another outbreak with the same name
+                PERMISSION.OUTBREAK_LIST,
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.OUTBREAK_MODIFY
+            ],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [
@@ -62,7 +79,11 @@ const routes: Routes = [
         component: fromPages.OutbreakQuestionnaireComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_OUTBREAK],
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.OUTBREAK_MODIFY,
+                PERMISSION.OUTBREAK_MODIFY_CASE_QUESTIONNAIRE
+            ],
             questionnaire: OutbreakQestionnaireTypeEnum.CASE
         },
         canDeactivate: [
@@ -76,7 +97,11 @@ const routes: Routes = [
         component: fromPages.OutbreakQuestionnaireComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_OUTBREAK],
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.OUTBREAK_MODIFY,
+                PERMISSION.OUTBREAK_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE
+            ],
             questionnaire: OutbreakQestionnaireTypeEnum.FOLLOW_UP
         },
         canDeactivate: [
@@ -90,7 +115,11 @@ const routes: Routes = [
         component: fromPages.OutbreakQuestionnaireComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_OUTBREAK],
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.OUTBREAK_MODIFY,
+                PERMISSION.OUTBREAK_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE
+            ],
             questionnaire: OutbreakQestionnaireTypeEnum.CASE_LAB_RESULT
         },
         canDeactivate: [
@@ -104,7 +133,9 @@ const routes: Routes = [
         component: fromPages.InconsistenciesListComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_OUTBREAK]
+            permissions: [
+                PERMISSION.OUTBREAK_SEE_INCONSISTENCIES
+            ]
         }
     }
 ];

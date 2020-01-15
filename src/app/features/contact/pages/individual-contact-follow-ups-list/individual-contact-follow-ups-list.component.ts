@@ -22,11 +22,14 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { map, share, tap } from 'rxjs/operators';
+import { catchError, map, share, tap } from 'rxjs/operators';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { DialogField, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { FollowUpPage } from '../../typings/follow-up-page';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { throwError } from 'rxjs/internal/observable/throwError';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
     selector: 'app-individual-contact-follow-ups-list',
@@ -35,6 +38,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
     styleUrls: ['./individual-contact-follow-ups-list.component.less']
 })
 export class IndividualContactFollowUpsListComponent extends FollowUpsListComponent implements OnInit, OnDestroy {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
@@ -47,7 +51,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
 
     // follow ups list
     followUpsList$: Observable<FollowUpModel[]>;
-    followUpsListCount$: Observable<any>;
+    followUpsListCount$: Observable<IBasicCount>;
 
     // dropdowns values
     yesNoOptionsList$: Observable<any[]>;
@@ -64,6 +68,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
     UserSettings = UserSettings;
     ExportDataExtension = ExportDataExtension;
     ReferenceDataCategory = ReferenceDataCategory;
+    FollowUpModel = FollowUpModel;
 
     contactId: string;
     contactData: ContactModel;
@@ -87,7 +92,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 });
             },
             visible: (item: FollowUpModel): boolean => {
-                return !item.deleted;
+                return !item.deleted &&
+                    FollowUpModel.canView(this.authUser);
             }
         }),
 
@@ -107,7 +113,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    this.hasFollowUpsWriteAccess() &&
+                    FollowUpModel.canModify(this.authUser) &&
                     !Constants.isDateInTheFuture(item.date);
             }
         }),
@@ -117,22 +123,6 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             type: HoverRowActionType.MENU,
             icon: 'moreVertical',
             menuOptions: [
-                // Modify follow-up questionnaire
-                new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_QUESTIONNAIRE',
-                    click: (item: FollowUpModel) => {
-                        this.modifyQuestionnaire(item);
-                    },
-                    visible: (item: FollowUpModel): boolean => {
-                        return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasFollowUpsWriteAccess() &&
-                            !Constants.isDateInTheFuture(item.date);
-                    }
-                }),
-
                 // Delete Follow-up
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_FOLLOW_UP',
@@ -144,7 +134,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasFollowUpsWriteAccess();
+                            FollowUpModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -160,14 +150,47 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasFollowUpsWriteAccess();
+                            FollowUpModel.canRestore(this.authUser);
                     },
                     class: 'mat-menu-item-restore'
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: FollowUpModel): boolean => {
+                        // visible only if at least one of the previous...
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            FollowUpModel.canModify(this.authUser) &&
+                            !Constants.isDateInTheFuture(item.date);
+                    }
+                }),
+
+                // Modify follow-up questionnaire
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_QUESTIONNAIRE',
+                    click: (item: FollowUpModel) => {
+                        this.modifyQuestionnaire(item);
+                    },
+                    visible: (item: FollowUpModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            FollowUpModel.canModify(this.authUser) &&
+                            !Constants.isDateInTheFuture(item.date);
+                    }
                 })
             ]
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         protected snackbarService: SnackbarService,
         protected dialogService: DialogService,
@@ -189,6 +212,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         super.ngOnInit();
 
@@ -243,6 +269,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         this.initializeSideTableColumns();
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -303,13 +332,18 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         this.breadcrumbs = [];
 
         // add contact breadcrumbs
-        this.breadcrumbs.push(new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_CONTACTS_TITLE',
-            '/contacts'
-        ));
+        if (ContactModel.canList(this.authUser)) {
+            this.breadcrumbs.push(new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_CONTACTS_TITLE',
+                '/contacts'
+            ));
+        }
 
         // add contact data ?
-        if (this.contactData) {
+        if (
+            this.contactData &&
+            CaseModel.canView(this.authUser)
+        ) {
             this.breadcrumbs.push(new BreadcrumbItemModel(
                 this.contactData.name,
                 `/contacts/${this.contactData.id}/view`
@@ -497,6 +531,11 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             this.followUpsList$ = this.followUpsDataService
                 .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback([]);
+                        return throwError(err);
+                    }),
                     map((followUps: FollowUpModel[]) => {
                         return FollowUpModel.determineAlertness(
                             this.selectedOutbreak.contactFollowUpTemplate,
@@ -538,6 +577,10 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
             this.followUpsListCount$ = this.followUpsDataService
                 .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
                     share()
                 );
         }

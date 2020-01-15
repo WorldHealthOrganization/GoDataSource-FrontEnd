@@ -4,9 +4,8 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-
                 <button
-                    *ngIf="!appliedListFilter"
+                    *ngIf="!appliedListFilter && LabResultModel.canImport(authUser)"
                     mat-raised-button
                     color="accent"
                     [matMenuTriggerFor]="quickActionsMenu">
@@ -15,7 +14,7 @@
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <ng-container *app-selected-outbreak-is-active>
-                        <ng-container *ngIf="hasLabResultWriteAccess()">
+                        <ng-container *ngIf="LabResultModel.canImport(authUser)">
                             <button
                                 mat-menu-item
                                 [routerLink]="['/import-export-data', 'case-lab-data', 'import']">
@@ -25,7 +24,6 @@
                     </ng-container>
                 </mat-menu>
             </div>
-
         </div>
     </ng-container>
 </app-topnav>

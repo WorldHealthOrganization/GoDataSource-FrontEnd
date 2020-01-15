@@ -13,7 +13,6 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -30,6 +29,9 @@ import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/vali
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
 
 @Component({
     selector: 'app-modify-case',
@@ -38,6 +40,7 @@ import { Moment, moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./modify-case.component.less']
 })
 export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
@@ -58,6 +61,10 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     // provide constants to template
     EntityType = EntityType;
     Constants = Constants;
+    CaseModel = CaseModel;
+    ContactModel = ContactModel;
+    LabResultModel = LabResultModel;
+    FollowUpModel = FollowUpModel;
 
     serverToday: Moment = moment();
 
@@ -77,6 +84,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     displayRefresh: boolean = false;
     @ViewChild('visualId') visualId: NgModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         protected route: ActivatedRoute,
@@ -92,6 +102,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         super(route);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -107,7 +120,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         this.route.queryParams
             .subscribe((queryParams: any) => {
                 this.queryParams = queryParams;
-                this.buildBreadcrumbs();
+
+                // initialize breadcrumbs
+                this.initializeBreadcrumbs();
             });
 
         this.route.params
@@ -131,37 +146,49 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     }
 
     /**
-     * Breadcrumbs
+     * Initialize breadcrumbs
      */
-    buildBreadcrumbs() {
-        if (this.caseData) {
-            // initialize breadcrumbs
-            this.breadcrumbs = [
+    private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // case list page
+        if (CaseModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
                 new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-            ];
+            );
+        }
 
-            // do we need to add onset breadcrumb ?
-            // no need to check rights since this params should be set only if we come from that page
-            if (this.queryParams.onset) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(
-                        'LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE',
-                        '/relationships/date-onset'
-                    )
-                );
-            }
+        // do we need to add onset breadcrumb ?
+        // no need to check rights since this params should be set only if we come from that page
+        if (
+            this.queryParams.onset &&
+            CaseModel.canListOnsetBeforePrimaryReport(this.authUser)
+        ) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE',
+                    '/relationships/date-onset'
+                )
+            );
+        }
 
-            // do we need to add long period between onset dates breadcrumb ?
-            // no need to check rights since this params should be set only if we come from that page
-            if (this.queryParams.longPeriod) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(
-                        'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_TITLE',
-                        '/relationships/long-period'
-                    )
-                );
-            }
+        // do we need to add long period between onset dates breadcrumb ?
+        // no need to check rights since this params should be set only if we come from that page
+        if (
+            this.queryParams.longPeriod &&
+            CaseModel.canListLongPeriodBetweenOnsetDatesReport(this.authUser)
+        ) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_TITLE',
+                    '/relationships/long-period'
+                )
+            );
+        }
 
+        // current page breadcrumb
+        if (this.caseData) {
             // current page title
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
@@ -229,17 +256,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                     qb
                 )
                 .subscribe((cases: CaseModel[]) => {
-                    // add breadcrumb
-                    this.breadcrumbs.push(
-                        new BreadcrumbItemModel(
-                            this.viewOnly ? 'LNG_PAGE_VIEW_CASE_TITLE' : 'LNG_PAGE_MODIFY_CASE_TITLE',
-                            '.',
-                            true,
-                            {},
-                            this.caseData
-                        )
-                    );
-
                     // set data only when we have everything
                     this.caseData = new CaseModel(cases[0]);
 
@@ -285,37 +301,16 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                             observer.complete();
                         });
                     });
-                    // breadcrumbs
-                    this.buildBreadcrumbs();
 
+                    // initialize breadcrumbs
+                    this.initializeBreadcrumbs();
                 });
         }
     }
 
     /**
-     * Check if we have write access to cases
-     * @returns {boolean}
+     * Modify case
      */
-    hasCaseWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-    }
-
-    /**
-     * Check if we have access to create a contact
-     * @returns {boolean}
-     */
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-    }
-
-    /**
-     * Check if we have access to read a follow-up
-     * @returns {boolean}
-     */
-    hasFollowUpReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP);
-    }
-
     modifyCase(form: NgForm) {
         // validate form
         if (!this.formHelper.validateForm(form)) {

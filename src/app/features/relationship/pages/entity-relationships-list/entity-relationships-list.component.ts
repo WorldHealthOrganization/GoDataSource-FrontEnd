@@ -19,16 +19,16 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { catchError, share, tap } from 'rxjs/operators';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
-import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { throwError } from 'rxjs';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -44,7 +44,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     relationshipsListRecordsMap: {
         [idRelationship: string]: EntityModel
     } = {};
-    relationshipsListCount$: Observable<any>;
+    relationshipsListCount$: Observable<IBasicCount>;
 
     outbreakSubscriber: Subscription;
 
@@ -66,6 +66,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     EntityType = EntityType;
     UserSettings = UserSettings;
     RelationshipType = RelationshipType;
+    RelationshipModel = RelationshipModel;
 
     recordActions: HoverRowAction[] = [
         // View Relationship
@@ -74,6 +75,11 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             iconTooltip: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_VIEW_RELATIONSHIP',
             click: (item: EntityModel) => {
                 this.router.navigate(['/relationships', this.entityType, this.entityId, this.relationshipTypeRoutePath, item.relationship.id, 'view']);
+            },
+            visible: (item: EntityModel) => {
+                return !item.relationship.deleted &&
+                    RelationshipModel.canView(this.authUser) &&
+                    this.entityCanView;
             }
         }),
 
@@ -88,7 +94,8 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                 return this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    this.hasEntityWriteAccess();
+                    RelationshipModel.canModify(this.authUser) &&
+                    this.entityCanModify;
             }
         }),
 
@@ -107,7 +114,8 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                         return this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasEntityWriteAccess();
+                            RelationshipModel.canDelete(this.authUser) &&
+                            this.entityCanDelete;
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -205,22 +213,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     onPersonLoaded() {
         // (re)initialize breadcrumbs
         this.initializeBreadcrumbs();
-    }
-
-    /**
-     * Check if the user has write access to contacts
-     * @returns {boolean}
-     */
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-    }
-
-    /**
-     * Check if the user has write access to cases
-     * @returns {boolean}
-     */
-    hasCaseWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
     }
 
     private initializeBreadcrumbs() {
@@ -334,13 +326,19 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
             // request data
             if (this.relationshipType === RelationshipType.EXPOSURE) {
                 // retrieve the list of exposures
-                this.relationshipsList$ = this.relationshipDataService.getEntityExposures(
-                    this.selectedOutbreak.id,
-                    this.entityType,
-                    this.entityId,
-                    this.queryBuilder
-                )
+                this.relationshipsList$ = this.relationshipDataService
+                    .getEntityExposures(
+                        this.selectedOutbreak.id,
+                        this.entityType,
+                        this.entityId,
+                        this.queryBuilder
+                    )
                     .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            finishCallback([]);
+                            return throwError(err);
+                        }),
                         tap(this.checkEmptyList.bind(this)),
                         tap((entities: EntityModel[]) => {
                             // map models
@@ -397,20 +395,36 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
 
             if (this.relationshipType === RelationshipType.EXPOSURE) {
                 // count the exposures
-                this.relationshipsListCount$ = this.relationshipDataService.getEntityExposuresCount(
-                    this.selectedOutbreak.id,
-                    this.entityType,
-                    this.entityId,
-                    countQueryBuilder
-                ).pipe(share());
+                this.relationshipsListCount$ = this.relationshipDataService
+                    .getEntityExposuresCount(
+                        this.selectedOutbreak.id,
+                        this.entityType,
+                        this.entityId,
+                        countQueryBuilder
+                    )
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            return throwError(err);
+                        }),
+                        share()
+                    );
             } else {
                 // count the contacts
-                this.relationshipsListCount$ = this.relationshipDataService.getEntityContactsCount(
-                    this.selectedOutbreak.id,
-                    this.entityType,
-                    this.entityId,
-                    countQueryBuilder
-                ).pipe(share());
+                this.relationshipsListCount$ = this.relationshipDataService
+                    .getEntityContactsCount(
+                        this.selectedOutbreak.id,
+                        this.entityType,
+                        this.entityId,
+                        countQueryBuilder
+                    )
+                    .pipe(
+                        catchError((err) => {
+                            this.snackbarService.showApiError(err);
+                            return throwError(err);
+                        }),
+                        share()
+                    );
             }
         }
     }

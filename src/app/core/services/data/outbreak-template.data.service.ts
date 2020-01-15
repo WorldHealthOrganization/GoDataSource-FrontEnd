@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { OutbreakTemplateModel } from '../../models/outbreak-template.model';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class OutbreakTemplateDataService {
@@ -31,7 +32,7 @@ export class OutbreakTemplateDataService {
      * Retrieve the number of Outbreak Templates
      * @param {RequestQueryBuilder} queryBuilder
      */
-    getOutbreakTemplatesCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+    getOutbreakTemplatesCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`templates/count?where=${whereFilter}`);
     }

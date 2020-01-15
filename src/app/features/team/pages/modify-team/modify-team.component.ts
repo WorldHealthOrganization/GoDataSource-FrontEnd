@@ -7,7 +7,6 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { Observable } from 'rxjs';
@@ -28,17 +27,10 @@ import { throwError } from 'rxjs';
 })
 export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
     // breadcrumb header
-    public breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_TEAMS_TITLE',
-            '/teams'
-        ),
-        new BreadcrumbItemModel(
-            'LNG_PAGE_MODIFY_TEAM_TITLE',
-            '.',
-            true
-        )
-    ];
+    public breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // constants
+    TeamModel = TeamModel;
 
     teamId: string;
     teamData: TeamModel = new TeamModel();
@@ -46,6 +38,9 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
     usersList$: Observable<UserModel[]>;
     existingUsers: string[];
 
+    /**
+     * Constructor
+     */
     constructor(
         private teamDataService: TeamDataService,
         private router: Router,
@@ -59,6 +54,9 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
         super(route);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -89,6 +87,31 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                         });
                 }
             });
+
+        // update breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (TeamModel.canList(this.authUser)) {
+            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_TEAMS_TITLE', '/teams'));
+        }
+
+        // view / modify breadcrumb
+        this.breadcrumbs.push(new BreadcrumbItemModel(
+            this.viewOnly ?
+                'LNG_PAGE_VIEW_TEAM_TITLE' :
+                'LNG_PAGE_MODIFY_TEAM_TITLE',
+            '.',
+            true
+        ));
     }
 
     /**
@@ -143,14 +166,6 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
     }
 
     /**
-     * Check if we have write access to teams
-     * @returns {boolean}
-     */
-    hasTeamWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_TEAM);
-    }
-
-    /**
      * Trigger when the users dropdown changes
      * @param users
      */
@@ -183,25 +198,28 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                 }
             }, true);
 
-        this.teamDataService.getTeamsList(qb).subscribe((teamsList) => {
-            const teamsNames = [];
-            _.forEach(teamsList, (team) => {
-                teamsNames.push(team.name);
-            });
+        this.teamDataService
+            .getTeamsList(qb)
+            .subscribe((teamsList) => {
+                const teamsNames = [];
+                _.forEach(teamsList, (team) => {
+                    teamsNames.push(team.name);
+                });
 
-            if (teamsNames.length > 0) {
-                this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_ADD_USER_TEAM', {teamNames: teamsNames.join()})
-                    .subscribe((answer: DialogAnswer) => {
-                        if (answer.button === DialogAnswerButton.Cancel) {
-                            // update userIds to remove the user from the dropdown
-                            const index = this.teamData.userIds.indexOf(idUser);
-                            this.teamData.userIds.splice(index, 1);
-                            // make a clone so the binding will know that the object changed. It's not working with splice only.
-                            this.teamData.userIds = [...this.teamData.userIds];
-                        }
-                    });
-            }
-        });
+                if (teamsNames.length > 0) {
+                    this.dialogService
+                        .showConfirm('LNG_DIALOG_CONFIRM_ADD_USER_TEAM', {teamNames: teamsNames.join()})
+                        .subscribe((answer: DialogAnswer) => {
+                            if (answer.button === DialogAnswerButton.Cancel) {
+                                // update userIds to remove the user from the dropdown
+                                const index = this.teamData.userIds.indexOf(idUser);
+                                this.teamData.userIds.splice(index, 1);
+                                // make a clone so the binding will know that the object changed. It's not working with splice only.
+                                this.teamData.userIds = [...this.teamData.userIds];
+                            }
+                        });
+                }
+            });
     }
 
     /**

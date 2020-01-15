@@ -5,6 +5,7 @@ import { ContactModel } from './contact.model';
 import { EventModel } from './event.model';
 import { DateDefaultPipe } from '../../shared/pipes/date-default-pipe/date-default.pipe';
 import { OutbreakModel } from './outbreak.model';
+import { IPermissionBasic } from './permission.interface';
 
 export class LocationUsageModel {
     followUp: FollowUpModel[];
@@ -36,7 +37,32 @@ export enum UsageDetailsItemType {
 }
 
 export class UsageDetailsItem {
-    type: string;
+    private _type: string;
+    private _typePermissions: IPermissionBasic;
+    set type(type: string) {
+        this._type = type;
+        switch (this.type) {
+            case UsageDetailsItemType.FOLLOW_UP:
+                this._typePermissions = FollowUpModel;
+                break;
+            case UsageDetailsItemType.EVENT:
+                this._typePermissions = EventModel;
+                break;
+            case UsageDetailsItemType.CONTACT:
+                this._typePermissions = ContactModel;
+                break;
+            case UsageDetailsItemType.CASE:
+                this._typePermissions = CaseModel;
+                break;
+        }
+    }
+    get type(): string {
+        return this._type;
+    }
+    get typePermissions(): IPermissionBasic {
+        return this._typePermissions;
+    }
+
     typeLabel: string;
     name: string;
     viewUrl: string;

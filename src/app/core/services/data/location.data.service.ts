@@ -9,6 +9,7 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { HierarchicalLocationModel } from '../../models/hierarchical-location.model';
 import { LocationUsageModel } from '../../models/location-usage.model';
 import { map, share, tap } from 'rxjs/operators';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class LocationDataService {
@@ -110,12 +111,12 @@ export class LocationDataService {
      *
      * @param {string} parentId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getLocationsCountByParent(
         parentId: string = null,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
 
         // define parent condition
         const parentCondition = {

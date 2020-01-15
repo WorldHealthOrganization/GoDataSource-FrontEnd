@@ -45,6 +45,11 @@ export class DebounceTimeCaller {
             // wait for debounce time
             // make new request
             this.refreshTimeoutID = setTimeout(() => {
+                // no subscriber ?
+                if (!this.subscriber) {
+                    return;
+                }
+
                 // call
                 this.subscriber.next();
 

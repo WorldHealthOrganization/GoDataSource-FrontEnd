@@ -22,7 +22,16 @@ export class ReferenceDataDataService {
         private cacheService: CacheService,
         private i18nService: I18nService
     ) {
-        this.categoriesList$ = this.http.get(`reference-data/available-categories`).pipe(share());
+        this.categoriesList$ = this.http
+            .get(`reference-data/available-categories`)
+            .pipe(
+                map((categories: any[]) => {
+                   return (categories || []).sort((item1: ReferenceDataCategoryModel, item2: ReferenceDataCategoryModel) => {
+                       return (item1.name ? this.i18nService.instant(item1.name) : '').localeCompare(item2.name ? this.i18nService.instant(item2.name) : '');
+                   });
+                }),
+                share()
+            );
 
         // retrieve categories
         this.referenceDataListMap$ = this.getCategoriesList()
