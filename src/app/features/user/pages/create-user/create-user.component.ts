@@ -57,7 +57,7 @@ export class CreateUserComponent
         private outbreakDataService: OutbreakDataService,
         private formHelper: FormHelperService,
         private dialogService: DialogService,
-        private referenceDataService: ReferenceDataDataService
+        private referenceDataService: ReferenceDataDataService,
         private redirectService: RedirectService
     ) {
         super();

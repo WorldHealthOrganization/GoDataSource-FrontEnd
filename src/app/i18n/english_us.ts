@@ -124,9 +124,14 @@ export const EnglishUsLang = {
         /**
          * uiFormInputValidationErrors
          */
-        'LNG_FORM_VALIDATION_ERROR_MISSING_REQUIRED_OPTIONS': 'Missing options: {{options}}'
+        'LNG_FORM_VALIDATION_ERROR_MISSING_REQUIRED_OPTIONS': 'Missing options: {{options}}',
 
-
+        /**
+         * uiUserFields
+         * Request change translation to an existing token
+         * (Should be "telephone number" since we can add only one phone number at this time)
+         */
+        'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS': 'Telephone Number'
 
         /**
          * REMOVE the tokens from below
