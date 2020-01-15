@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable, throwError } from 'rxjs';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -37,6 +36,9 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { AddressType } from '../../../../core/models/address.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
     selector: 'app-contacts-list',
@@ -45,19 +47,21 @@ import { EntityHelperService } from '../../../../core/services/helper/entity-hel
     styleUrls: ['./contacts-list.component.less']
 })
 export class ContactsListComponent extends ListComponent implements OnInit, OnDestroy {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '.', true)
     ];
 
     // constants
     Constants = Constants;
+    ContactModel = ContactModel;
 
     // authenticated user
     authUser: UserModel;
 
     // list of existing contacts
     contactsList$: Observable<ContactModel[]>;
-    contactsListCount$: Observable<any>;
+    contactsListCount$: Observable<IBasicCount>;
 
     outbreakSubscriber: Subscription;
 
@@ -147,7 +151,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 this.router.navigate(['/contacts', item.id, 'view']);
             },
             visible: (item: ContactModel): boolean => {
-                return !item.deleted;
+                return !item.deleted &&
+                    ContactModel.canView(this.authUser);
             }
         }),
 
@@ -163,7 +168,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    this.hasContactWriteAccess();
+                    ContactModel.canModify(this.authUser);
             }
         }),
 
@@ -172,23 +177,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             type: HoverRowActionType.MENU,
             icon: 'moreVertical',
             menuOptions: [
-                // Convert Contact to Case
-                new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE',
-                    click: (item: ContactModel) => {
-                        this.convertContactToCase(item);
-                    },
-                    visible: (item: ContactModel): boolean => {
-                        return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess() &&
-                            this.hasCaseWriteAccess();
-                    },
-                    class: 'mat-menu-item-delete'
-                }),
-
                 // Delete Contact
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_CONTACT',
@@ -200,7 +188,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            ContactModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -214,7 +202,36 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            ContactModel.canDelete(this.authUser);
+                    }
+                }),
+
+                // Convert Contact to Case
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE',
+                    click: (item: ContactModel) => {
+                        this.convertContactToCase(item);
+                    },
+                    visible: (item: ContactModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            ContactModel.canConvertToCase(this.authUser);
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: ContactModel): boolean => {
+                        // visible only if at least one of the first two items is visible
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            ContactModel.canConvertToCase(this.authUser);
                     }
                 }),
 
@@ -229,8 +246,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess() &&
-                            this.hasFollowUpWriteAccess();
+                            FollowUpModel.canCreate(this.authUser);
                     }
                 }),
 
@@ -243,8 +259,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess() &&
-                            this.hasFollowUpWriteAccess();
+                            FollowUpModel.canCreate(this.authUser);
                     }
                 }),
 
@@ -255,7 +270,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         this.router.navigate(['/relationships', EntityType.CONTACT, item.id, 'exposures']);
                     },
                     visible: (item: ContactModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted &&
+                            ContactModel.canListRelationshipExposures(this.authUser);
                     }
                 }),
 
@@ -264,7 +280,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     type: HoverRowActionType.DIVIDER,
                     visible: (item: ContactModel): boolean => {
                         // visible only if at least one of the previous...
-                        return !item.deleted;
+                        return !item.deleted &&
+                            ContactModel.canListRelationshipExposures(this.authUser);
                     }
                 }),
 
@@ -276,7 +293,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     },
                     visible: (item: ContactModel): boolean => {
                         return !item.deleted &&
-                            this.hasContactFollowUpReadAccess();
+                            FollowUpModel.canList(this.authUser);
                     }
                 }),
 
@@ -286,7 +303,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     visible: (item: ContactModel): boolean => {
                         // visible only if at least one of the previous...
                         return !item.deleted &&
-                            this.hasContactFollowUpReadAccess();
+                            FollowUpModel.canList(this.authUser);
                     }
                 }),
 
@@ -297,7 +314,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         this.router.navigate(['/contacts', item.id, 'movement']);
                     },
                     visible: (item: ContactModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted &&
+                            ContactModel.canViewMovementMap(this.authUser);
                     }
                 }),
 
@@ -308,7 +326,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         this.router.navigate(['/contacts', item.id, 'chronology']);
                     },
                     visible: (item: ContactModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted &&
+                            ContactModel.canViewChronologyChart(this.authUser);
                     }
                 }),
 
@@ -323,7 +342,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            ContactModel.canRestore(this.authUser);
                     },
                     class: 'mat-menu-item-restore'
                 })
@@ -331,6 +350,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private contactDataService: ContactDataService,
@@ -353,6 +375,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // add page title
         this.contactsDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_TITLE') +
@@ -448,6 +473,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         this.initializeSideTableColumns();
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -645,7 +673,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         ];
 
         // Relation - Follow-up
-        if (this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP)) {
+        if (FollowUpModel.canList(this.authUser)) {
             this.availableSideFilters = [
                 ...this.availableSideFilters,
                 ...[
@@ -692,7 +720,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         }
 
         // Relation - Cases
-        if (this.authUser.hasPermissions(PERMISSION.READ_CASE)) {
+        if (CaseModel.canList(this.authUser)) {
             this.availableSideFilters = [
                 ...this.availableSideFilters,
                 ...[
@@ -768,6 +796,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             this.contactsList$ = this.contactDataService
                 .getContactsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback([]);
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap((data: any[]) => {
                         finishCallback(data);
@@ -787,7 +820,15 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
-            this.contactsListCount$ = this.contactDataService.getContactsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
+            this.contactsListCount$ = this.contactDataService
+                .getContactsCount(this.selectedOutbreak.id, countQueryBuilder)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
+                    share()
+                );
         }
     }
 
@@ -822,38 +863,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     }
 
     /**
-     * Check if we have write access to contacts
-     * @returns {boolean}
-     */
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-    }
-
-    /**
-     * Check if we have write access to case
-     * @returns {boolean}
-     */
-    hasCaseWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-    }
-
-    /**
-     * Check if we have write access to follow-ups
-     * @returns {boolean}
-     */
-    hasFollowUpWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
-    }
-
-    /**
-     * Check if we have access view a contact follow-up
-     * @returns {boolean}
-     */
-    hasContactFollowUpReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP);
-    }
-
-    /**
      * Retrieve risk color accordingly to risk level
      * @param item
      */
@@ -870,7 +879,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
     /**
      * Delete specific contact that belongs to the selected outbreak
-     * @param {ContactModel} contact
      */
     deleteContact(contact: ContactModel) {
         // show confirm dialog to confirm the action
@@ -896,6 +904,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             });
     }
 
+    /**
+     * Restore contact
+     */
     restoreContact(contact: ContactModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_CONTACT', new ContactModel(contact))

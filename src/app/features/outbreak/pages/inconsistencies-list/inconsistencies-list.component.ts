@@ -6,7 +6,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { Observable } from 'rxjs';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -19,8 +18,9 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { share, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { HoverRowAction } from '../../../../shared/components';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Component({
     selector: 'app-inconsistencies-list',
@@ -47,6 +47,12 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
 
+    fixedTableColumns: string[] = [
+        'lastName',
+        'firstName',
+        'inconsistencies'
+    ];
+
     recordActions: HoverRowAction[] = [
         // View Item
         new HoverRowAction({
@@ -54,6 +60,11 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
             iconTooltip: 'LNG_PAGE_ACTION_VIEW',
             click: (item: CaseModel | ContactModel | EventModel) => {
                 this.router.navigateByUrl(this.getItemRouterLink(item, 'view'));
+            },
+            visible: (item: CaseModel | ContactModel | EventModel): boolean => {
+                return !item.deleted &&
+                    this.authUser &&
+                    this.canViewItem(item);
             }
         }),
 
@@ -69,7 +80,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
                     this.authUser &&
                     this.outbreak &&
                     this.authUser.activeOutbreakId === this.outbreak.id &&
-                    this.getAccessPermissions(item);
+                    this.canModifyItem(item);
             }
         })
     ];
@@ -95,8 +106,8 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
      * Component initialized
      */
     ngOnInit() {
-        // init breadcrumbs
-        this.initBreadcrumbs();
+        // update breadcrumbs
+        this.initializeBreadcrumbs();
 
         // reference data
         const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
@@ -123,8 +134,8 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
                         // outbreak
                         this.outbreak = outbreak;
 
-                        // init breadcrumbs
-                        this.initBreadcrumbs();
+                        // update breadcrumbs
+                        this.initializeBreadcrumbs();
 
                         // ...and re-load the list when the Selected Outbreak is changed
                         this.needsRefreshList(true);
@@ -140,6 +151,11 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
             this.entitiesList$ = this.outbreakDataService
                 .getPeopleInconsistencies(this.outbreak.id, this.queryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback([]);
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap((data: any[]) => {
                         finishCallback(data);
@@ -153,39 +169,44 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
     /**
      * Init breadcrumbs
      */
-    initBreadcrumbs() {
-        // initialize
-        this.breadcrumbs = [
-            new BreadcrumbItemModel(
-                'LNG_PAGE_LIST_OUTBREAKS_TITLE',
-                '/outbreaks',
-                false
-            )
-        ];
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (OutbreakModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks')
+            );
+        }
 
         // add outbreak details ?
         if (this.outbreak) {
-            // outbreak details
-            const viewOrModify: string = this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK) ?
-                'modify' :
-                'view';
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    this.outbreak.name,
-                    `/outbreaks/${this.outbreak.id}/${viewOrModify}`,
-                    false
-                )
-            );
-
-            // add inconsistencies breadcrumb
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    'LNG_PAGE_LIST_INCONSISTENCIES_TITLE',
-                    '.',
-                    true
-                )
-            );
+            if (OutbreakModel.canModify(this.authUser)) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        this.outbreak.name,
+                        `/outbreaks/${this.outbreak.id}/modify`
+                    )
+                );
+            } else if (OutbreakModel.canView(this.authUser)) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        this.outbreak.name,
+                        `/outbreaks/${this.outbreak.id}/view`
+                    )
+                );
+            }
         }
+
+        // add inconsistencies breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_INCONSISTENCIES_TITLE',
+                '.',
+                true
+            )
+        );
     }
 
     /**
@@ -194,17 +215,6 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
     getPersonTypeColor(personType: string) {
         const personTypeData = _.get(this.personTypesListMap, personType);
         return _.get(personTypeData, 'colorCode', '');
-    }
-
-    /**
-     * Table columns
-     */
-    getTableColumns(): string[] {
-        return [
-            'lastName',
-            'firstName',
-            'inconsistencies'
-        ];
     }
 
     /**
@@ -225,43 +235,43 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
     }
 
     /**
-     * Get the permission for different type of item
+     * Check if we can view item
      * @param {Object} item
      * @returns {boolean}
      */
-    getAccessPermissions(item: CaseModel | ContactModel | EventModel) {
+    canViewItem(item: CaseModel | ContactModel | EventModel): boolean {
+        // check if we can modify item
         switch (item.type) {
             case EntityType.CASE:
-                return this.hasCaseWriteAccess();
+                return CaseModel.canView(this.authUser);
             case EntityType.CONTACT:
-                return this.hasContactWriteAccess();
+                return ContactModel.canView(this.authUser);
             case EntityType.EVENT:
-                return this.hasEventWriteAccess();
+                return EventModel.canView(this.authUser);
         }
+
+        // :)
+        return false;
     }
 
     /**
-     * Check if we have access to write cluster's cases
+     * Check if we can modify item
+     * @param {Object} item
      * @returns {boolean}
      */
-    hasCaseWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-    }
+    canModifyItem(item: CaseModel | ContactModel | EventModel): boolean {
+        // check if we can modify item
+        switch (item.type) {
+            case EntityType.CASE:
+                return CaseModel.canModify(this.authUser);
+            case EntityType.CONTACT:
+                return ContactModel.canModify(this.authUser);
+            case EntityType.EVENT:
+                return EventModel.canModify(this.authUser);
+        }
 
-    /**
-     * Check if we have access to write cluster's contacts
-     * @returns {boolean}
-     */
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-    }
-
-    /**
-     * Check if we have access to write cluster's event
-     * @returns {boolean}
-     */
-    hasEventWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
+        // :)
+        return false;
     }
 
     /**

@@ -20,6 +20,7 @@ import { MetricCasesBasedOnContactStatusModel } from '../../models/metrics/metri
 import { catchError, map } from 'rxjs/operators';
 import { throwError, of } from 'rxjs';
 import { moment } from '../../helperClasses/x-moment';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class CaseDataService {
@@ -145,12 +146,12 @@ export class CaseDataService {
      * Return count of cases
      * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getCasesCount(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const filter = queryBuilder.buildQuery();
         return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }

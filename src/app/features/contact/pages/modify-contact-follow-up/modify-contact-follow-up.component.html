@@ -18,13 +18,12 @@
                 <!-- Details section -->
                 <mat-card class="page-section" fxLayout="column">
                     <div
+                        *ngIf="ContactModel.canView(authUser)"
                         class="follow-ups-title"
-                        fxLayout="row" fxLayoutGap="20px"
-                    >
+                        fxLayout="row" fxLayoutGap="20px">
                         <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
                         <a
-                            [routerLink]="['/contacts', followUpData.contact.id, 'view']"
-                        >
+                            [routerLink]="['/contacts', followUpData.contact.id, 'view']">
                             {{ followUpData.contact.name }}
                         </a>
                     </div>
@@ -180,7 +179,7 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button
-            *ngIf="viewOnly && hasFollowUpsWriteAccess() && !Constants.isDateInTheFuture(followUpData.date)"
+            *ngIf="viewOnly && FollowUpModel.canModify(authUser) && !Constants.isDateInTheFuture(followUpData.date)"
             mat-raised-button type="button" color="accent"
             [routerLink]="['/contacts', contactId, 'follow-ups', followUpId, 'modify']"
             [queryParams]="{rootPage: rootPage, rootCaseId: rootCaseId}"
@@ -194,6 +193,7 @@
             </button>
 
             <button
+                *ngIf="FollowUpModel.canList(authUser)"
                 type="button"
                 routerLink="/contacts/follow-ups"
                 mat-raised-button>
@@ -204,13 +204,11 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button
-            *ngIf="hasContactReadAccess()"
+            *ngIf="ContactModel.canView(authUser)"
             mat-raised-button
             type="button"
             [routerLink]="['/contacts', contactId, 'view']">
             {{ 'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_VIEW_CONTACT' | translate }}
         </button>
-
-
     </div>
 </form>

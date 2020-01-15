@@ -2,9 +2,8 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { Observable } from 'rxjs';
-import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -18,7 +17,6 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
     styleUrls: ['./my-profile.component.less']
 })
 export class MyProfileComponent extends ViewModifyComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_MY_PROFILE_TITLE'),
     ];
@@ -32,6 +30,9 @@ export class MyProfileComponent extends ViewModifyComponent implements OnInit {
     rolesList$: Observable<UserRoleModel[]>;
     outbreaksList$: Observable<OutbreakModel[]>;
 
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private userRoleDataService: UserRoleDataService,
@@ -42,6 +43,9 @@ export class MyProfileComponent extends ViewModifyComponent implements OnInit {
         super(route);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
         // retrieve the User instance
@@ -53,7 +57,7 @@ export class MyProfileComponent extends ViewModifyComponent implements OnInit {
 
         // get the list of roles to populate the dropdown in UI
         this.rolesList$ = this.userRoleDataService.getRolesList();
-        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
+        this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
     }
 
 }

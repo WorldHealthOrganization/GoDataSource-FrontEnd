@@ -8,6 +8,8 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 import { Subscription } from 'rxjs';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import * as _ from 'lodash';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-contacts-on-followup-list-dashlet',
@@ -21,6 +23,7 @@ export class ContactsOnFollowupListDashletComponent extends DashletComponent imp
 
     // constants to be used for applyListFilters
     Constants = Constants;
+    ContactModel = ContactModel;
 
     // outbreak
     outbreakId: string;
@@ -35,14 +38,24 @@ export class ContactsOnFollowupListDashletComponent extends DashletComponent imp
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
 
+    /**
+     * Constructor
+     */
     constructor(
         private followUpDataService: FollowUpsDataService,
         private outbreakDataService: OutbreakDataService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        protected authDataService: AuthDataService
     ) {
-        super(listFilterDataService);
+        super(
+            listFilterDataService,
+            authDataService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         this.displayLoading = true;
         this.outbreakSubscriber = this.outbreakDataService
@@ -55,6 +68,9 @@ export class ContactsOnFollowupListDashletComponent extends DashletComponent imp
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

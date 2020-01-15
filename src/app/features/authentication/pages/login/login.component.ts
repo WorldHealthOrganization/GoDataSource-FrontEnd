@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { LoginModel } from '../../../../core/models/login.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
@@ -8,6 +7,8 @@ import { AuthModel } from '../../../../core/models/auth.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { UserModel } from '../../../../core/models/user.model';
+import { LoginModel } from '../../../../core/models/login.model';
 
 @Component({
     selector: 'app-login',
@@ -16,17 +17,22 @@ import { catchError } from 'rxjs/operators';
     styleUrls: ['./login.component.less']
 })
 export class LoginComponent implements OnInit {
-
+    // used by template
     user = new LoginModel();
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
         private i18nService: I18nService
-    ) {
-    }
+    ) {}
 
+    /**
+     * Initialize
+     */
     ngOnInit() {
         // check if user is authenticated
         if (this.authDataService.isAuthenticated()) {
@@ -35,6 +41,9 @@ export class LoginComponent implements OnInit {
         }
     }
 
+    /**
+     * Login
+     */
     login(form: NgForm) {
         if (form.valid) {
             const dirtyFields: any = form.value;
@@ -50,7 +59,6 @@ export class LoginComponent implements OnInit {
                 )
                 .subscribe((auth: AuthModel) => {
                     // successfully authenticated;
-
                     // use authenticated user's preferred language
                     this.i18nService
                         .loadUserLanguage()
@@ -64,16 +72,17 @@ export class LoginComponent implements OnInit {
                             );
 
                             // check if user needs to change password
-                            if (auth.user.passwordChange) {
+                            if (
+                                auth.user.passwordChange &&
+                                UserModel.canModifyOwnAccount(this.authDataService.getAuthenticatedUser())
+                            ) {
                                 // user must change password
                                 this.router.navigate(['/account/change-password']);
                             } else {
                                 // redirect to dashboard landing page
                                 this.router.navigate(['']);
                             }
-
                         });
-
                 });
         }
     }

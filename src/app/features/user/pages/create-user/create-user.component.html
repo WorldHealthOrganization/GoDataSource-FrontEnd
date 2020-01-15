@@ -74,9 +74,10 @@
                             <div fxFlex><!-- placeholder --></div>
                         </div>
 
-                        <div fxLayout="row" fxLayoutGap="20px">
+                        <div
+                            *ngIf="OutbreakModel.canList(authUser)"
+                            fxLayout="row" fxLayoutGap="20px">
                             <app-form-select
-                                *ngIf="hasOutbreakReadAccess()"
                                 name="outbreakIds"
                                 [(ngModel)]="newUser.outbreakIds"
                                 [placeholder]="'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS' | translate"
@@ -89,7 +90,6 @@
                             </app-form-select>
 
                             <app-form-select
-                                *ngIf="hasOutbreakReadAccess()"
                                 name="activeOutbreakId"
                                 [(ngModel)]="newUser.activeOutbreakId"
                                 [placeholder]="'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK' | translate"

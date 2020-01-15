@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable ,  Subscription } from 'rxjs';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -28,7 +27,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
-import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { throwError } from 'rxjs';
@@ -37,6 +36,10 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { AddressType } from '../../../../core/models/address.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
 
 @Component({
     selector: 'app-cases-list',
@@ -45,6 +48,7 @@ import { EntityHelperService } from '../../../../core/services/helper/entity-hel
     styleUrls: ['./cases-list.component.less']
 })
 export class CasesListComponent extends ListComponent implements OnInit, OnDestroy {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '.', true)
     ];
@@ -55,7 +59,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     selectedOutbreak: OutbreakModel;
     // list of existing cases
     casesList$: Observable<CaseModel[]>;
-    casesListCount$: Observable<any>;
+    casesListCount$: Observable<IBasicCount>;
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -73,7 +77,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     clustersListAsLabelValuePair$: Observable<LabelValuePair[]>;
     caseRiskLevelsList$: Observable<any[]>;
     yesNoOptionsWithoutAllList$: Observable<any[]>;
-    outcomeList: Observable<any[]>;
 
     // available side filters
     availableSideFilters: FilterModel[] = [];
@@ -85,6 +88,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     EntityType = EntityType;
     UserSettings = UserSettings;
     ReferenceDataCategory = ReferenceDataCategory;
+    LabResultModel = LabResultModel;
+    CaseModel = CaseModel;
 
     notACaseFilter: boolean | string = false;
 
@@ -142,7 +147,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 this.router.navigate(['/cases', item.id, 'view']);
             },
             visible: (item: CaseModel): boolean => {
-                return !item.deleted;
+                return !item.deleted &&
+                    CaseModel.canView(this.authUser);
             }
         }),
 
@@ -158,7 +164,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    this.hasCaseWriteAccess();
+                    CaseModel.canModify(this.authUser);
             }
         }),
 
@@ -167,23 +173,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             type: HoverRowActionType.MENU,
             icon: 'moreVertical',
             menuOptions: [
-                // Convert Case To Contact
-                new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT',
-                    click: (item: CaseModel) => {
-                        this.convertCaseToContact(item);
-                    },
-                    visible: (item: CaseModel): boolean => {
-                        return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasCaseWriteAccess() &&
-                            this.hasContactWriteAccess();
-                    },
-                    class: 'mat-menu-item-delete'
-                }),
-
                 // Delete Case
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE',
@@ -195,7 +184,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasCaseWriteAccess();
+                            CaseModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -209,7 +198,36 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasCaseWriteAccess();
+                            CaseModel.canDelete(this.authUser);
+                    }
+                }),
+
+                // Convert Case To Contact
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT',
+                    click: (item: CaseModel) => {
+                        this.convertCaseToContact(item);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            CaseModel.canConvertToContact(this.authUser);
+                    },
+                    class: 'mat-menu-item-delete'
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: CaseModel): boolean => {
+                        // visible only if at least one of the first two items is visible
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            CaseModel.canConvertToContact(this.authUser);
                     }
                 }),
 
@@ -229,7 +247,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            ContactModel.canCreate(this.authUser) &&
+                            CaseModel.canCreateContact(this.authUser);
                     }
                 }),
 
@@ -249,7 +268,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            ContactModel.canBulkCreate(this.authUser) &&
+                            CaseModel.canBulkCreateContact(this.authUser);
                     }
                 }),
 
@@ -261,8 +281,15 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         return !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id && (
+                                (
+                                    ContactModel.canCreate(this.authUser) &&
+                                    CaseModel.canCreateContact(this.authUser)
+                                ) || (
+                                    ContactModel.canBulkCreate(this.authUser) &&
+                                    CaseModel.canBulkCreateContact(this.authUser)
+                                )
+                            );
                     }
                 }),
 
@@ -273,7 +300,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         this.router.navigate(['/relationships', EntityType.CASE, item.id, 'contacts']);
                     },
                     visible: (item: CaseModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted &&
+                            RelationshipModel.canList(this.authUser) &&
+                            CaseModel.canListRelationshipContacts(this.authUser);
                     }
                 }),
 
@@ -284,7 +313,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         this.router.navigate(['/relationships', EntityType.CASE, item.id, 'exposures']);
                     },
                     visible: (item: CaseModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted &&
+                            RelationshipModel.canList(this.authUser) &&
+                            CaseModel.canListRelationshipExposures(this.authUser);
                     }
                 }),
 
@@ -293,7 +324,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     type: HoverRowActionType.DIVIDER,
                     visible: (item: CaseModel): boolean => {
                         // visible only if at least one of the previous two items is visible
-                        return !item.deleted;
+                        return !item.deleted &&
+                            RelationshipModel.canList(this.authUser) && (
+                                CaseModel.canListRelationshipContacts(this.authUser) ||
+                                CaseModel.canListRelationshipExposures(this.authUser)
+                            );
                     }
                 }),
 
@@ -305,7 +340,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     },
                     visible: (item: CaseModel): boolean => {
                         return !item.deleted &&
-                            this.hasCaseWriteAccess();
+                            LabResultModel.canList(this.authUser);
                     }
                 }),
 
@@ -317,7 +352,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     },
                     visible: (item: CaseModel): boolean => {
                         return !item.deleted &&
-                            this.hasContactFollowUpReadAccess();
+                            FollowUpModel.canList(this.authUser);
                     }
                 }),
 
@@ -327,8 +362,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     visible: (item: CaseModel): boolean => {
                         // visible only if at least one of the previous two items is visible
                         return !item.deleted && (
-                            this.hasCaseWriteAccess() ||
-                            this.hasContactFollowUpReadAccess()
+                            LabResultModel.canList(this.authUser) ||
+                            FollowUpModel.canList(this.authUser)
                         );
                     }
                 }),
@@ -340,7 +375,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         this.router.navigate(['/cases', item.id, 'movement']);
                     },
                     visible: (item: CaseModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted &&
+                            CaseModel.canViewMovementMap(this.authUser);
                     }
                 }),
 
@@ -351,7 +387,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         this.router.navigate(['/cases', item.id, 'chronology']);
                     },
                     visible: (item: CaseModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted &&
+                            CaseModel.canViewChronologyChart(this.authUser);
                     }
                 }),
 
@@ -359,7 +396,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 new HoverRowAction({
                     type: HoverRowActionType.DIVIDER,
                     visible: (item: CaseModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted && (
+                            CaseModel.canViewMovementMap(this.authUser) ||
+                            CaseModel.canViewChronologyChart(this.authUser)
+                        );
                     }
                 }),
 
@@ -371,8 +411,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     },
                     visible: (item: CaseModel): boolean => {
                         return !item.deleted &&
-                            this.hasReportAccess() &&
-                            this.hasContactReadAccess();
+                            CaseModel.canExportInvestigationForm(this.authUser);
                     }
                 }),
 
@@ -387,7 +426,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasCaseWriteAccess();
+                            CaseModel.canRestore(this.authUser);
                     },
                     class: 'mat-menu-item-restore'
                 })
@@ -395,6 +434,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private caseDataService: CaseDataService,
@@ -419,6 +461,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // add page title
         this.casesDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE') +
@@ -494,6 +539,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         this.initializeSideTableColumns();
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -822,6 +870,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             this.casesList$ = this.caseDataService
                 .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback([]);
+                        return throwError(err);
+                    }),
                     map((cases: CaseModel[]) => {
                         // refresh badges list with applied filter
                         this.getCasesGroupedByClassification();
@@ -853,7 +906,15 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
-            this.casesListCount$ = this.caseDataService.getCasesCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
+            this.casesListCount$ = this.caseDataService
+                .getCasesCount(this.selectedOutbreak.id, countQueryBuilder)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
+                    share()
+                );
         }
     }
 
@@ -885,47 +946,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             );
     }
 
-
-    /**
-     * Check if we have write access to cases
-     * @returns {boolean}
-     */
-    hasCaseWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-    }
-
-    /**
-     * Check if we have access view a contact
-     * @returns {boolean}
-     */
-    hasContactReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
-    }
-
-    /**
-     * Check if we have access view a contact follow-up
-     * @returns {boolean}
-     */
-    hasContactFollowUpReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP);
-    }
-
-    /**
-     * Check if we have access to create a contact
-     * @returns {boolean}
-     */
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-    }
-
-    /**
-     * Check if we have access to reports
-     * @returns {boolean}
-     */
-    hasReportAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_REPORT);
-    }
-
     /**
      * Retrieve Case classification color accordingly to Case's Classification value
      * @param item
@@ -940,7 +960,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * @param {CaseModel} caseModel
      */
     deleteCase(caseModel: CaseModel) {
-        this.caseDataService.getExposedContactsForCase(this.selectedOutbreak.id, caseModel.id)
+        this.caseDataService
+            .getExposedContactsForCase(this.selectedOutbreak.id, caseModel.id)
             .subscribe((exposedContacts: {count: number}) => {
                 if (exposedContacts) {
                     const translateData = {
@@ -979,7 +1000,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      */
     restoreCase(caseModel: CaseModel) {
         // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_CASE', new CaseModel(caseModel))
+        this.dialogService
+            .showConfirm('LNG_DIALOG_CONFIRM_RESTORE_CASE', new CaseModel(caseModel))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.caseDataService
@@ -1005,7 +1027,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      */
     convertCaseToContact(caseModel: CaseModel) {
         // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT', new CaseModel(caseModel))
+        this.dialogService
+            .showConfirm('LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT', new CaseModel(caseModel))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.caseDataService

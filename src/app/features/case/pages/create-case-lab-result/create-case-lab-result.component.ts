@@ -15,11 +15,14 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
+import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-create-case-relationship',
@@ -27,11 +30,11 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
     templateUrl: './create-case-lab-result.component.html',
     styleUrls: ['./create-case-lab-result.component.less']
 })
-export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implements OnInit {
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-    ];
+export class CreateCaseLabResultComponent
+    extends CreateConfirmOnChanges
+    implements OnInit {
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     labResultData: LabResultModel = new LabResultModel();
 
@@ -48,6 +51,12 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
 
     serverToday: Moment = moment();
 
+    // constants
+    CaseModel = CaseModel;
+
+    // authenticated user
+    authUser: UserModel;
+
     /**
      * Check if we need to display warning message that case date of onset is after sample taken date
      */
@@ -59,6 +68,9 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
             moment(this.caseData.dateOfOnset).startOf('day').isAfter(moment(this.labResultData.dateSampleTaken).startOf('day'));
     }
 
+    /**
+     * Constructor
+     */
     constructor(
         private route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
@@ -67,14 +79,22 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
         private router: Router,
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
+        private authDataService: AuthDataService,
         private formHelper: FormHelperService,
         private labResultDataService: LabResultDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private redirectService: RedirectService
     ) {
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE);
         this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST);
         this.resultTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT);
@@ -107,23 +127,57 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
                             .subscribe((caseData: CaseModel) => {
                                 this.caseData = caseData;
 
-                                // add new breadcrumb: Case Modify page
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(caseData.name, `/cases/${this.caseData.id}/view`)
-                                );
-                                // add new breadcrumb: Lab Results list page
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', `/cases/${this.caseData.id}/lab-results`)
-                                );
-                                // add new breadcrumb : page title
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel('LNG_PAGE_CREATE_CASE_LAB_RESULT_TITLE', '.', true)
-                                );
+                                // initialize page breadcrumbs
+                                this.initializeBreadcrumbs();
                             });
                     });
             });
+
+        // initialize page breadcrumbs
+        this.initializeBreadcrumbs();
     }
 
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // case list
+        if (CaseModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+            );
+        }
+
+        // case view
+        if (
+            this.caseData &&
+            CaseModel.canView(this.authUser)
+        ) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(this.caseData.name, `/cases/${this.caseData.id}/view`)
+            );
+        }
+
+        // lab result list
+        if (LabResultModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', `/cases/${this.caseData.id}/lab-results`)
+            );
+        }
+
+        // current page
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel('LNG_PAGE_CREATE_CASE_LAB_RESULT_TITLE', '.', true)
+        );
+    }
+
+    /**
+     * Create lab result
+     * @param stepForms
+     */
     createLabResult(stepForms: NgForm[]) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
@@ -151,9 +205,20 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
                     // hide dialog
                     loadingDialog.close();
 
-                    // navigate to listing page
+                    // navigate to proper page
                     this.disableDirtyConfirm();
-                    this.router.navigate([`/cases/${this.caseData.id}/lab-results/${newLabResult.id}/modify`]);
+                    if (LabResultModel.canModify(this.authUser)) {
+                        this.router.navigate([`/cases/${this.caseData.id}/lab-results/${newLabResult.id}/modify`]);
+                    } else if (LabResultModel.canView(this.authUser)) {
+                        this.router.navigate([`/cases/${this.caseData.id}/lab-results/${newLabResult.id}/view`]);
+                    } else if (LabResultModel.canList(this.authUser)) {
+                        this.router.navigate([`/cases/${this.caseData.id}/lab-results`]);
+                    } else {
+                        // fallback to current page since we already know that we have access to this page
+                        this.redirectService.to(
+                            [`/cases/${this.caseData.id}/lab-results/create`]
+                        );
+                    }
                 });
         }
     }

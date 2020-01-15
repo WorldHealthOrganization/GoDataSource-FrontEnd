@@ -5,6 +5,7 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { BackupModel } from '../../models/backup.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { RequestSortDirection } from '../../helperClasses/request-query-builder/request-sort';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class SystemBackupDataService {
@@ -51,9 +52,9 @@ export class SystemBackupDataService {
 
     /**
      * Get total number of entries based on the applied filter
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
-    getBackupListCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+    getBackupListCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`backups/count?where=${whereFilter}`);
     }

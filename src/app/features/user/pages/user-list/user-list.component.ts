@@ -1,15 +1,13 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -21,6 +19,7 @@ import { Router } from '@angular/router';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-user-list',
@@ -29,7 +28,6 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
     styleUrls: ['./user-list.component.less']
 })
 export class UserListComponent extends ListComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '.', true)
     ];
@@ -37,14 +35,27 @@ export class UserListComponent extends ListComponent implements OnInit {
     // authenticated user
     authUser: UserModel;
 
+    // constants
+    UserModel = UserModel;
+
     // list of existing users
     usersList$: Observable<UserModel[]>;
-    usersListCount$: Observable<any>;
+    usersListCount$: Observable<IBasicCount>;
 
     rolesList$: Observable<UserRoleModel[]>;
     outbreaksListMap: any = {};
     outbreaksList$: Observable<OutbreakModel[]>;
     institutionsList$: Observable<LabelValuePair[]>;
+
+    fixedTableColumns: string[] = [
+        'lastName',
+        'firstName',
+        'email',
+        'institutionName',
+        'telephoneNumbers',
+        'role',
+        'availableOutbreaks'
+    ];
 
     recordActions: HoverRowAction[] = [
         // View User
@@ -53,6 +64,10 @@ export class UserListComponent extends ListComponent implements OnInit {
             iconTooltip: 'LNG_PAGE_LIST_USERS_ACTION_VIEW_USER',
             click: (item: UserModel) => {
                 this.router.navigate(['/users', item.id, 'view']);
+            },
+            visible: (item: UserModel): boolean => {
+                return item.id !== this.authUser.id &&
+                    UserModel.canView(this.authUser);
             }
         }),
 
@@ -65,7 +80,7 @@ export class UserListComponent extends ListComponent implements OnInit {
             },
             visible: (item: UserModel): boolean => {
                 return item.id !== this.authUser.id &&
-                    this.hasUserWriteAccess();
+                    UserModel.canModify(this.authUser);
             }
         }),
 
@@ -82,7 +97,7 @@ export class UserListComponent extends ListComponent implements OnInit {
                     },
                     visible: (item: UserModel): boolean => {
                         return item.id !== this.authUser.id &&
-                            this.hasUserWriteAccess();
+                            UserModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -90,6 +105,9 @@ export class UserListComponent extends ListComponent implements OnInit {
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private userDataService: UserDataService,
@@ -105,23 +123,25 @@ export class UserListComponent extends ListComponent implements OnInit {
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
-
         this.rolesList$ = this.userRoleDataService.getRolesList();
 
         this.institutionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
 
         this.outbreakDataService
-            .getOutbreaksList()
+            .getOutbreaksListReduced()
             .subscribe( (outbreaks) => {
               _.forEach(outbreaks, (outbreak, key) => {
                     this.outbreaksListMap[outbreak.id] = outbreak;
                 });
         });
 
-        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
+        this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
 
         // initialize pagination
         this.initPaginator();
@@ -137,6 +157,11 @@ export class UserListComponent extends ListComponent implements OnInit {
         this.usersList$ = this.userDataService
             .getUsersList(this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback([]);
+                    return throwError(err);
+                }),
                 tap(this.checkEmptyList.bind(this)),
                 tap((data: any[]) => {
                     finishCallback(data);
@@ -152,31 +177,15 @@ export class UserListComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.usersListCount$ = this.userDataService.getUsersCount(countQueryBuilder).pipe(share());
-    }
-
-    /**
-     * Check if we have write access to users
-     * @returns {boolean}
-     */
-    hasUserWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_USER_ACCOUNT);
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'lastName',
-            'firstName',
-            'email',
-            'institutionName',
-            'telephoneNumbers',
-            'role',
-            'availableOutbreaks'
-        ];
+        this.usersListCount$ = this.userDataService
+            .getUsersCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     deleteUser(user: UserModel) {

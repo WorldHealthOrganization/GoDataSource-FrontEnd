@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { PERMISSION } from '../../models/permission.model';
+import { PermissionExpression } from '../../models/user.model';
 
 export class AbstractNavItem {
     constructor(
@@ -22,7 +23,7 @@ export class ChildNavItem extends AbstractNavItem {
     constructor(
         public id: string,
         public label: string,
-        public permissions: PERMISSION[] = [],
+        public permissions: PERMISSION[] | PermissionExpression = [],
         public link: string | null = null,
         visible: boolean | ((c: ChildNavItem | void) => boolean) = true
     ) {
@@ -36,7 +37,7 @@ export class NavItem extends AbstractNavItem {
         public id: string,
         public label: string,
         public icon: string,
-        public permissions: PERMISSION[] = [],
+        public permissions: PERMISSION[] | PermissionExpression = [],
         public children: ChildNavItem[] = [],
         public link: string | null = null,
         visible: boolean | ((n: NavItem | void) => boolean) = true

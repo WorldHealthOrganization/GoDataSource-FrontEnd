@@ -12,7 +12,6 @@ import { AddressModel, AddressType } from '../../../../core/models/address.model
 import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import * as _ from 'lodash';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -24,6 +23,10 @@ import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/vali
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-create-case',
@@ -31,14 +34,14 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
     templateUrl: './create-case.component.html',
     styleUrls: ['./create-case.component.less']
 })
-export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit {
+export class CreateCaseComponent
+    extends CreateConfirmOnChanges
+    implements OnInit {
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
+
     @ViewChild('personalForm') personalForm: NgForm;
     @ViewChild('infectionForm') infectionForm: NgForm;
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-        new BreadcrumbItemModel('LNG_PAGE_CREATE_CASE_TITLE', '.', true)
-    ];
 
     caseData: CaseModel = new CaseModel();
     // case UID (coming from query params, optionally)
@@ -62,6 +65,12 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
 
     caseIdMaskValidator: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
+    // authenticated user details
+    authUser: UserModel;
+
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -71,12 +80,20 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private dialogService: DialogService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private redirectService: RedirectService,
+        private authDataService: AuthDataService
     ) {
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
@@ -89,6 +106,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                 if (params.uid) {
                     this.caseUID = params.uid;
 
+                    // initialize breadcrumbs
                     this.initializeBreadcrumbs();
                 }
             });
@@ -114,23 +132,35 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
 
                 // set visual ID validator
                 this.caseIdMaskValidator = new Observable((observer) => {
-                    this.caseDataService.checkCaseVisualIDValidity(
-                        this.selectedOutbreak.id,
-                        this.visualIDTranslateData.mask,
-                        this.caseData.visualId
-                    ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                        observer.next(isValid);
-                        observer.complete();
-                    });
+                    this.caseDataService
+                        .checkCaseVisualIDValidity(
+                            this.selectedOutbreak.id,
+                            this.visualIDTranslateData.mask,
+                            this.caseData.visualId
+                        )
+                        .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                            observer.next(isValid);
+                            observer.complete();
+                        });
                 });
             });
     }
 
+    /**
+     * Initialize breadcrumbs
+     */
     private initializeBreadcrumbs() {
-        this.breadcrumbs = [
-            new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-        ];
+        // reset
+        this.breadcrumbs = [];
 
+        // case list page
+        if (CaseModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+            );
+        }
+
+        // current page breadcrumb
         if (this.caseUID) {
             this.breadcrumbs.push(
                 new BreadcrumbItemModel('LNG_PAGE_CREATE_CASE_WITH_UID_TITLE', '.', true, {}, {uid: this.caseUID})
@@ -206,9 +236,16 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                                 // hide dialog
                                 loadingDialog.close();
 
-                                // navigate to listing page
-                                this.disableDirtyConfirm();
-                                this.router.navigate([`/cases/${newCase.id}/modify`]);
+                                // navigate to proper page
+                                // method handles disableDirtyConfirm too...
+                                this.redirectToProperPageAfterCreate(
+                                    this.router,
+                                    this.redirectService,
+                                    this.authUser,
+                                    CaseModel,
+                                    'cases',
+                                    newCase.id
+                                );
                             });
                     };
 
@@ -235,11 +272,12 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                         });
 
                         // display dialog
-                        this.dialogService.showConfirm(new DialogConfiguration({
-                            message: 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_CONFIRM_MSG',
-                            customInput: true,
-                            fieldsList: possibleDuplicates,
-                        }))
+                        this.dialogService
+                            .showConfirm(new DialogConfiguration({
+                                message: 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_CONFIRM_MSG',
+                                customInput: true,
+                                fieldsList: possibleDuplicates,
+                            }))
                             .subscribe((answer) => {
                                 if (answer.button === DialogAnswerButton.Yes) {
                                     runCreateCase();

@@ -13,8 +13,10 @@ import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/help
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { share, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { throwError } from 'rxjs/internal/observable/throwError';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-audit-logs-list',
@@ -29,7 +31,7 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
 
     // list of existing audit logs
     auditLogsList$: Observable<AuditLogModel[]>;
-    auditLogsListCount$: Observable<any>;
+    auditLogsListCount$: Observable<IBasicCount>;
 
     // options
     usersList$: Observable<any>;
@@ -48,6 +50,9 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
     // constants
     UserSettings = UserSettings;
 
+    /**
+     * Constructor
+     */
     constructor(
         private dialogService: DialogService,
         private auditLogDataService: AuditLogDataService,
@@ -60,6 +65,9 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // set default filter rules
         this.initializeHeaderFilters();
@@ -156,6 +164,11 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
         this.auditLogsList$ = this.auditLogDataService
             .getAuditLogsList(this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback([]);
+                    return throwError(err);
+                }),
                 tap(this.checkEmptyList.bind(this)),
                 tap((data: any[]) => {
                     finishCallback(data);
@@ -171,7 +184,15 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.auditLogsListCount$ = this.auditLogDataService.getAuditLogsCount(countQueryBuilder).pipe(share());
+        this.auditLogsListCount$ = this.auditLogDataService
+            .getAuditLogsCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**

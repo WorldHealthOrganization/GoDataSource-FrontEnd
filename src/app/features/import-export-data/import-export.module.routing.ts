@@ -12,7 +12,9 @@ const routes: Routes = [
         component: fromPages.ImportLocationDataComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG]
+            permissions: [
+                PERMISSION.LOCATION_IMPORT
+            ]
         }
     },
     // Import hierarchical locations
@@ -21,7 +23,9 @@ const routes: Routes = [
         component: fromPages.ImportHierarchicalLocationsComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG]
+            permissions: [
+                PERMISSION.LOCATION_IMPORT
+            ]
         }
     },
 
@@ -31,7 +35,9 @@ const routes: Routes = [
         component: fromPages.ImportLanguageTokensComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG]
+            permissions: [
+                PERMISSION.LANGUAGE_IMPORT_TOKENS
+            ]
         }
     },
 
@@ -41,7 +47,9 @@ const routes: Routes = [
         component: fromPages.ImportReferenceDataComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_REFERENCE_DATA]
+            permissions: [
+                PERMISSION.REFERENCE_DATA_IMPORT
+            ]
         }
     },
 
@@ -51,7 +59,9 @@ const routes: Routes = [
         component: fromPages.ImportCaseDataComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CASE]
+            permissions: [
+                PERMISSION.CASE_IMPORT
+            ]
         }
     },
 
@@ -61,7 +71,9 @@ const routes: Routes = [
         component: fromPages.ImportCaseLabDataComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CASE]
+            permissions: [
+                PERMISSION.CASE_LAB_RESULT_IMPORT
+            ]
         }
     },
 
@@ -71,7 +83,9 @@ const routes: Routes = [
         component: fromPages.ImportContactDataComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CONTACT]
+            permissions: [
+                PERMISSION.CONTACT_IMPORT
+            ]
         }
     },
 
@@ -81,7 +95,9 @@ const routes: Routes = [
         component: fromPages.ImportSyncPackageComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG]
+            permissions: [
+                PERMISSION.SYNC_IMPORT_PACKAGE
+            ]
         }
     }
 ];

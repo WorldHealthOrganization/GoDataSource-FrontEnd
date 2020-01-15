@@ -1,8 +1,9 @@
+// tslint:disable:no-use-before-declare
 import * as _ from 'lodash';
-import { UserRoleModel } from './user-role.model';
-import { PERMISSION } from './permission.model';
+import { IPermissionChildModel, PERMISSION, PermissionModel } from './permission.model';
 import { SecurityQuestionModel } from './securityQuestion.model';
 import { UserSettingsDashboardModel } from './user-settings-dashboard.model';
+import { IPermissionBasic, IPermissionUser } from './permission.interface';
 
 export enum UserSettings {
     AUDIT_LOG_FIELDS = 'auditLogFields',
@@ -23,7 +24,8 @@ export enum UserSettings {
     SYNC_CLIENT_APPLICATIONS_FIELDS = 'syncClientApplicationsFields',
     SYNC_LOGS_FIELDS = 'syncLogsFields',
     REF_DATA_CAT_ENTRIES_FIELDS = 'refDataCatEntriesFields',
-    SHARE_RELATIONSHIPS = 'shareRelationships'
+    SHARE_RELATIONSHIPS = 'shareRelationships',
+    USER_ROLE_FIELDS = 'userRoleFields'
 }
 
 /**
@@ -49,9 +51,131 @@ abstract class UserSettingsHandlers {
     static SYNC_LOGS_FIELDS = [];
     static REF_DATA_CAT_ENTRIES_FIELDS = [];
     static SHARE_RELATIONSHIPS = [];
+    static USER_ROLE_FIELDS = [];
 }
 
-export class UserModel {
+export interface IPermissionExpressionAnd {
+    and: (PERMISSION | PermissionExpression)[];
+}
+
+export interface IPermissionExpressionOr {
+    or: (PERMISSION | PermissionExpression)[];
+}
+
+export class PermissionExpression {
+    /**
+     * Constructor
+     */
+    constructor(
+        public permission: PERMISSION |
+            IPermissionExpressionAnd |
+            IPermissionExpressionOr
+    ) {}
+
+    /**
+     * Check if an user passes required permissions from this model
+     * @param authUser
+     */
+    allowed(authUser: UserModel): boolean {
+        // check recursively if we have access
+        if (typeof this.permission === 'object') {
+            // and / or conditions
+            if ((this.permission as any).and !== undefined) {
+                // go through and see if all conditions match
+                const permission: IPermissionExpressionAnd = this.permission as IPermissionExpressionAnd;
+                for (const condition of permission.and) {
+                    // if complex expression then we need to check further
+                    if (condition instanceof PermissionExpression) {
+                        if (!condition.allowed(authUser)) {
+                            return false;
+                        }
+
+                        // check if user has this permission
+                    } else if (!authUser.permissionIdsMapped[condition]) {
+                        return false;
+                    }
+                }
+
+                // all match
+                return true;
+            } else if ((this.permission as any).or !== undefined) {
+                // go through and see if at least one condition matches
+                const permission: IPermissionExpressionOr = this.permission as IPermissionExpressionOr;
+                for (const condition of permission.or) {
+                    // if complex expression then we need to check further
+                    if (condition instanceof PermissionExpression) {
+                        if (condition.allowed(authUser)) {
+                            return true;
+                        }
+
+                    // check if user has this permission
+                    } else if (authUser.permissionIdsMapped[condition]) {
+                        return true;
+                    }
+                }
+
+                // no match ?
+                return false;
+            }
+
+            // invalid object
+            return false;
+        }
+
+        // simple permission
+        return !!authUser.permissionIdsMapped[this.permission];
+    }
+}
+
+export class UserRoleModel
+    implements
+        IPermissionBasic {
+    id: string | null;
+    name: string | null;
+    permissionIds: PERMISSION[];
+    description: string | null;
+    permissions: IPermissionChildModel[];
+
+    users: UserModel[];
+
+    /**
+     * Static Permissions - IPermissionBasic
+     */
+    static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_VIEW) : false; }
+    static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_LIST) : false; }
+    static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_CREATE) : false; }
+    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_VIEW, PERMISSION.USER_ROLE_MODIFY) : false; }
+    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_DELETE) : false; }
+
+    /**
+     * Constructor
+     */
+    constructor(data = null) {
+        this.id = _.get(data, 'id');
+        this.name = _.get(data, 'name');
+        this.permissionIds = _.get(data, 'permissionIds', []);
+        this.description = _.get(data, 'description');
+
+        this.users = _.get(data, 'users', [])
+            .map((userData) => {
+                return new UserModel(userData);
+            });
+    }
+
+    /**
+     * Permissions - IPermissionBasic
+     */
+    canView(user: UserModel): boolean { return UserRoleModel.canView(user); }
+    canList(user: UserModel): boolean { return UserRoleModel.canList(user); }
+    canCreate(user: UserModel): boolean { return UserRoleModel.canCreate(user); }
+    canModify(user: UserModel): boolean { return UserRoleModel.canModify(user); }
+    canDelete(user: UserModel): boolean { return UserRoleModel.canDelete(user); }
+}
+
+export class UserModel
+    implements
+        IPermissionBasic,
+        IPermissionUser {
     id: string;
     firstName: string;
     lastName: string;
@@ -63,7 +187,21 @@ export class UserModel {
     languageId: string;
     roleIds: string[];
     roles: UserRoleModel[] = [];
-    permissionIds: PERMISSION[] = [];
+
+    private _permissionIds: PERMISSION[] = [];
+    permissionIdsMapped: {
+        [permissionId: string]: boolean
+    } = {};
+    set permissionIds(permissionIds: PERMISSION[]) {
+        this._permissionIds = permissionIds;
+        this.permissionIdsMapped = _.transform(permissionIds, (a, v) => {
+            a[v] = true;
+        }, {});
+    }
+    get permissionIds(): PERMISSION[] {
+        return this._permissionIds;
+    }
+
     securityQuestions: SecurityQuestionModel[] = [];
     settings: { [key: string]: any } = {};
     institutionName: string;
@@ -71,6 +209,26 @@ export class UserModel {
         [key: string]: string
     };
 
+    availablePermissions: PermissionModel[];
+
+    /**
+     * Static Permissions - IPermissionBasic
+     */
+    static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_VIEW) : false; }
+    static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_LIST) : false; }
+    static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_CREATE) : false; }
+    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_VIEW, PERMISSION.USER_MODIFY) : false; }
+    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_DELETE) : false; }
+
+    /**
+     * Static Permissions - IPermissionUser
+     */
+    static canModifyOwnAccount(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_MODIFY_OWN_ACCOUNT) : false; }
+    static canListForFilters(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_LIST_FOR_FILTERS) : false; }
+
+    /**
+     * Constructor
+     */
     constructor(data = null) {
         this.id = _.get(data, 'id');
         this.firstName = _.get(data, 'firstName');
@@ -83,23 +241,50 @@ export class UserModel {
         this.languageId = _.get(data, 'languageId');
         this.roleIds = _.get(data, 'roleIds', []);
         this.securityQuestions = _.get(data, 'securityQuestions', [new SecurityQuestionModel(), new SecurityQuestionModel()]);
+        this.availablePermissions = _.get(data, 'availablePermissions');
         this.institutionName = _.get(data, 'institutionName');
         this.telephoneNumbers = _.get(data, 'telephoneNumbers', {});
+
         // initialize all settings
         this.initializeSettings(data);
     }
 
-    hasPermissions(...permissionIds: PERMISSION[]): boolean {
-        // ensure that the permission IDs list has unique elements
-        permissionIds = _.uniq(permissionIds);
+    /**
+     * Permissions - IPermissionBasic
+     */
+    canView(user: UserModel): boolean { return UserModel.canView(user); }
+    canList(user: UserModel): boolean { return UserModel.canList(user); }
+    canCreate(user: UserModel): boolean { return UserModel.canCreate(user); }
+    canModify(user: UserModel): boolean { return UserModel.canModify(user); }
+    canDelete(user: UserModel): boolean { return UserModel.canDelete(user); }
 
-        // get the permissions that the user has
-        const havingPermissions = _.filter(permissionIds, (permissionId) => {
-            return this.permissionIds.indexOf(permissionId) >= 0;
-        });
+    /**
+     * Permissions - IPermissionUser
+     */
+    canModifyOwnAccount(user: UserModel): boolean { return UserModel.canModifyOwnAccount(user); }
+    canListForFilters(user: UserModel): boolean { return UserModel.canListForFilters(user); }
 
-        // user must have all permissions
-        return havingPermissions.length === permissionIds.length;
+    /**
+     * Check if user has specific permissions
+     */
+    hasPermissions(...permissionIds: (PERMISSION | PermissionExpression)[]): boolean {
+        // check if all permissions are in our list allowed permissions
+        for (const permission of permissionIds) {
+            if (
+                (
+                    permission instanceof PermissionExpression &&
+                    !permission.allowed(this)
+                ) || (
+                    !(permission instanceof PermissionExpression) &&
+                    !this.permissionIdsMapped[permission as PERMISSION]
+                )
+            ) {
+                return false;
+            }
+        }
+
+        // all permissions are allowed
+        return true;
     }
 
     hasRole(roleId): boolean {
