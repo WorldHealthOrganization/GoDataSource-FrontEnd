@@ -8,15 +8,16 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
-import { PeoplePossibleDuplicateModel } from '../../../../core/models/people-possible-duplicate.model';
+import { PeoplePossibleDuplicateGroupModel, PeoplePossibleDuplicateModel } from '../../../../core/models/people-possible-duplicate.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { AddressModel } from '../../../../core/models/address.model';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { FormControl, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { share, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { throwError } from 'rxjs/internal/observable/throwError';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-duplicate-records-list',
@@ -25,6 +26,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
     styleUrls: ['./duplicate-records-list.component.less']
 })
 export class DuplicateRecordsListComponent extends ListComponent implements OnInit, OnDestroy {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '.', true)
     ];
@@ -44,7 +46,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
 
     // duplicates
     duplicatesList: PeoplePossibleDuplicateModel;
-    duplicatesListCount$: Observable<any>;
+    duplicatesListCount$: Observable<IBasicCount>;
 
     /**
      * Visible table columns
@@ -59,6 +61,9 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
         'address'
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private authDataService: AuthDataService,
@@ -70,6 +75,9 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -87,6 +95,9 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -104,9 +115,16 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             this.duplicatesList = null;
             this.outbreakDataService
                 .getPeoplePossibleDuplicates(this.selectedOutbreak.id, this.queryBuilder)
-                .pipe(tap((duplicatesList) => {
-                    this.checkEmptyList(duplicatesList.groups);
-                }))
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback([]);
+                        return throwError(err);
+                    }),
+                    tap((duplicatesList) => {
+                        this.checkEmptyList(duplicatesList.groups);
+                    })
+                )
                 .subscribe((duplicatesList) => {
                     this.duplicatesList = duplicatesList;
 
@@ -127,7 +145,15 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
-            this.duplicatesListCount$ = this.outbreakDataService.getPeoplePossibleDuplicatesCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
+            this.duplicatesListCount$ = this.outbreakDataService
+                .getPeoplePossibleDuplicatesCount(this.selectedOutbreak.id, countQueryBuilder)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
+                    share()
+                );
         }
     }
 
@@ -213,17 +239,6 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             .map((id: string) => this.duplicatesList.peopleMap[id])
             .uniqBy('type')
             .map('type')
-            .filter((type: EntityType) => {
-                // check permissions
-                switch (type) {
-                    case EntityType.CASE:
-                        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-                    case EntityType.CONTACT:
-                        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-                    case EntityType.EVENT:
-                        return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
-                }
-            })
             .value();
 
         // we shouldn't be able to merge two types...
@@ -246,5 +261,22 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
                 }
             }
         );
+    }
+
+    /**
+     * Check if group has merge permission
+     */
+    hasMergePermission(group: PeoplePossibleDuplicateGroupModel): boolean {
+        switch (group.groupType) {
+            case EntityType.CASE:
+                return PeoplePossibleDuplicateModel.canMergeCases(this.authUser);
+            case EntityType.CONTACT:
+                return PeoplePossibleDuplicateModel.canMergeContacts(this.authUser);
+            case EntityType.EVENT:
+                return PeoplePossibleDuplicateModel.canMergeEvents(this.authUser);
+            default:
+                // not supported
+                return false;
+        }
     }
 }

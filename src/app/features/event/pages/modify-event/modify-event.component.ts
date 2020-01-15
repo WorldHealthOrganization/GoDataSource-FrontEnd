@@ -11,12 +11,13 @@ import { EventDataService } from '../../../../core/services/data/event.data.serv
 import { EntityType } from '../../../../core/models/entity-type';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 
 @Component({
     selector: 'app-modify-event',
@@ -25,10 +26,14 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./modify-event.component.less']
 })
 export class ModifyEventComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
+    EventModel = EventModel;
+    ContactModel = ContactModel;
+    RelationshipModel = RelationshipModel;
 
     eventId: string;
     outbreakId: string;
@@ -40,6 +45,9 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
 
     serverToday: Moment = moment();
 
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
@@ -53,6 +61,9 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
         super(route);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -72,12 +83,17 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
                             .getEvent(selectedOutbreak.id, this.eventId, true)
                             .subscribe(eventDataReturned => {
                                 this.eventData = new EventModel(eventDataReturned);
-                                this.createBreadcrumbs();
+
+                                // update breadcrumbs
+                                this.initializeBreadcrumbs();
                             });
                     });
             });
     }
 
+    /**
+     * Modify event
+     */
     modifyEvent(form: NgForm) {
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
@@ -112,7 +128,7 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE');
 
                 // update breadcrumb
-                this.createBreadcrumbs();
+                this.initializeBreadcrumbs();
 
                 // hide dialog
                 loadingDialog.close();
@@ -120,34 +136,26 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
     }
 
     /**
-     * Check if we have write access to events
-     * @returns {boolean}
+     * Initialize breadcrumbs
      */
-    hasEventWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
-    }
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
 
-    /**
-     * Check if we have access to create a contact
-     * @returns {boolean}
-     */
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-    }
+        // add list breadcrumb only if we have permission
+        if (EventModel.canList(this.authUser)) {
+            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'));
+        }
 
-    /**
-     * Create breadcrumbs
-     */
-    createBreadcrumbs() {
-        this.breadcrumbs = [
-            new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
-            new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_EVENT_TITLE' : 'LNG_PAGE_MODIFY_EVENT_TITLE',
-                '.',
-                true,
-                {},
-                this.eventData
-            )
-        ];
+        // view / modify breadcrumb
+        this.breadcrumbs.push(new BreadcrumbItemModel(
+            this.viewOnly ?
+                'LNG_PAGE_VIEW_EVENT_TITLE' :
+                'LNG_PAGE_MODIFY_EVENT_TITLE',
+            '.',
+            true,
+            {},
+            this.eventData
+        ));
     }
 }

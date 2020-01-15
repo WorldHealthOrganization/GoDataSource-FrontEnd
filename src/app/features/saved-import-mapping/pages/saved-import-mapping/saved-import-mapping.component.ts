@@ -14,6 +14,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { Constants } from '../../../../core/models/constants';
 import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-saved-import-mapping',
@@ -21,7 +22,7 @@ import { HoverRowAction, HoverRowActionType } from '../../../../shared/component
     styleUrls: ['./saved-import-mapping.component.less']
 })
 export class SavedImportMappingComponent extends ListComponent implements OnInit {
-
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_TITLE', '.', true)
     ];
@@ -33,7 +34,13 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
     });
 
     savedImportMappingsList$: Observable<SavedImportMappingModel[]>;
-    savedImportMappingsListCount$: Observable<any>;
+    savedImportMappingsListCount$: Observable<IBasicCount>;
+
+    fixedTableColumns: string[] = [
+        'name',
+        'isPublic',
+        'mappingKey'
+    ];
 
     recordActions: HoverRowAction[] = [
         // Other actions
@@ -56,6 +63,9 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         protected snackbarService: SnackbarService,
         private savedImportMappingService: SavedImportMappingService,
@@ -67,6 +77,9 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
@@ -83,6 +96,11 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
         this.savedImportMappingsList$ = this.savedImportMappingService
             .getImportMappingsList(this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback([]);
+                    return throwError(err);
+                }),
                 tap(this.checkEmptyList.bind(this)),
                 tap((data: any[]) => {
                     finishCallback(data);
@@ -97,19 +115,15 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.savedImportMappingsListCount$ = this.savedImportMappingService.getImportMappingsListCount(countQueryBuilder).pipe(share());
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'name',
-            'isPublic',
-            'mappingKey'
-        ];
+        this.savedImportMappingsListCount$ = this.savedImportMappingService
+            .getImportMappingsListCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**

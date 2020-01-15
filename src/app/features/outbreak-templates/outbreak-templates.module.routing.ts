@@ -11,7 +11,13 @@ const routes: Routes = [
     // outbreak templates list
     {
         path: '',
-        component: fromPages.OutbreakTemplatesListComponent
+        component: fromPages.OutbreakTemplatesListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.OUTBREAK_TEMPLATE_LIST
+            ]
+        }
     },
     // create outbreak template
     {
@@ -19,7 +25,9 @@ const routes: Routes = [
         component: fromPages.CreateOutbreakTemplateComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG],
+            permissions: [
+                PERMISSION.OUTBREAK_TEMPLATE_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -31,7 +39,9 @@ const routes: Routes = [
         component: fromPages.ModifyOutbreakTemplateComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_SYS_CONFIG],
+            permissions: [
+                PERMISSION.OUTBREAK_TEMPLATE_VIEW
+            ],
             action: ViewModifyComponentAction.VIEW
         }
     },
@@ -41,7 +51,10 @@ const routes: Routes = [
         component: fromPages.ModifyOutbreakTemplateComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG],
+            permissions: [
+                PERMISSION.OUTBREAK_TEMPLATE_VIEW,
+                PERMISSION.OUTBREAK_TEMPLATE_MODIFY
+            ],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [
@@ -55,7 +68,11 @@ const routes: Routes = [
         component: fromPages.OutbreakTemplateQuestionnaireComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_OUTBREAK],
+            permissions: [
+                PERMISSION.OUTBREAK_TEMPLATE_VIEW,
+                PERMISSION.OUTBREAK_TEMPLATE_MODIFY,
+                PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_QUESTIONNAIRE
+            ],
             questionnaire: OutbreakQestionnaireTypeEnum.CASE
         },
         canDeactivate: [
@@ -69,7 +86,11 @@ const routes: Routes = [
         component: fromPages.OutbreakTemplateQuestionnaireComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_OUTBREAK],
+            permissions: [
+                PERMISSION.OUTBREAK_TEMPLATE_VIEW,
+                PERMISSION.OUTBREAK_TEMPLATE_MODIFY,
+                PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE
+            ],
             questionnaire: OutbreakQestionnaireTypeEnum.FOLLOW_UP
         },
         canDeactivate: [
@@ -83,7 +104,11 @@ const routes: Routes = [
         component: fromPages.OutbreakTemplateQuestionnaireComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_OUTBREAK],
+            permissions: [
+                PERMISSION.OUTBREAK_TEMPLATE_VIEW,
+                PERMISSION.OUTBREAK_TEMPLATE_MODIFY,
+                PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE
+            ],
             questionnaire: OutbreakQestionnaireTypeEnum.CASE_LAB_RESULT
         },
         canDeactivate: [

@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Constants } from '../../../../core/models/constants';
 import * as _ from 'lodash';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-contacts-per-case-median-dashlet',
@@ -29,14 +30,24 @@ export class ContactsPerCaseMedianDashletComponent extends DashletComponent impl
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
 
+    /**
+     * Constructor
+     */
     constructor(
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        protected authDataService: AuthDataService
     ) {
-        super(listFilterDataService);
+        super(
+            listFilterDataService,
+            authDataService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         this.displayLoading = true;
         this.outbreakSubscriber = this.outbreakDataService
@@ -49,6 +60,9 @@ export class ContactsPerCaseMedianDashletComponent extends DashletComponent impl
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

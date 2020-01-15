@@ -96,9 +96,10 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button *ngIf="hasHelpWriteAccess() && viewOnly"
-                mat-raised-button type="button" color="accent"
-                [routerLink]="['/help/categories', categoryId, 'items', itemId, 'modify']">
+        <button
+            *ngIf="viewOnly && HelpItemModel.canModify(authUser)"
+            mat-raised-button type="button" color="accent"
+            [routerLink]="['/help/categories', categoryId, 'items', itemId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT'| translate}}
         </button>
 
@@ -107,8 +108,11 @@
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
 
-            <button type="button" [routerLink]="['/help/categories', categoryId, 'items']"
-                    mat-raised-button>
+            <button
+                *ngIf="HelpItemModel.canList(authUser)"
+                type="button"
+                [routerLink]="['/help/categories', categoryId, 'items']"
+                mat-raised-button>
                 {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
             </button>
         </ng-container>

@@ -10,17 +10,29 @@
         <span class="header-message">{{ 'LNG_PAGE_CLOUD_BACKUP_HEADER_TITLE' | translate}}</span>
 
         <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="30px">
-            <span fxFlex>{{'LNG_PAGE_CLOUD_BACKUP_APP_INSTALL' | translate}}</span>
-            <span class="path-value">{{cloudBackup?.install}}</span>
-            <button (click)="copyToClipBoard(cloudBackup.install)" class="mat-raised-button">
+            <span fxFlex>
+                {{'LNG_PAGE_CLOUD_BACKUP_APP_INSTALL' | translate}}
+            </span>
+            <span class="path-value">
+                {{cloudBackup?.install}}
+            </span>
+            <button
+                (click)="copyToClipBoard(cloudBackup.install)"
+                class="mat-raised-button">
                 {{'LNG_PAGE_ACTION_COPY_TO_CLIPBOARD' | translate}}
             </button>
         </div>
 
         <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="30px">
-            <span fxFlex>{{'LNG_PAGE_CLOUD_BACKUP_APP_BACKUP_PATH' | translate}}</span>
-            <span class="path-value">{{cloudBackup?.backUp}}</span>
-            <button (click)="copyToClipBoard(cloudBackup.backUp)" class="mat-raised-button">
+            <span fxFlex>
+                {{'LNG_PAGE_CLOUD_BACKUP_APP_BACKUP_PATH' | translate}}
+            </span>
+            <span class="path-value">
+                {{cloudBackup?.backUp}}
+            </span>
+            <button
+                (click)="copyToClipBoard(cloudBackup.backUp)"
+                class="mat-raised-button">
                 {{'LNG_PAGE_ACTION_COPY_TO_CLIPBOARD' | translate}}
             </button>
         </div>

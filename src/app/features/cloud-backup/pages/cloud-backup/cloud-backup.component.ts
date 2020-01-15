@@ -11,7 +11,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 })
 
 export class CloudBackupComponent implements OnInit {
-
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_CLOUD_BACKUP_TITLE', '.')
     ];
@@ -21,20 +21,28 @@ export class CloudBackupComponent implements OnInit {
         backUp: string
     };
 
+    /**
+     * Constructor
+     */
     constructor(
         private systemSettingsDataService: SystemSettingsDataService,
         private snackbarService: SnackbarService
-    ) {
-        this.systemSettingsDataService.getCloudBackupPaths()
+    ) {}
+
+    /**
+     * Component initialized
+     */
+    ngOnInit() {
+        this.systemSettingsDataService
+            .getCloudBackupPaths()
             .subscribe((cloudBackup) => {
                 this.cloudBackup = cloudBackup;
             });
     }
 
-    ngOnInit() {
-
-    }
-
+    /**
+     * Copy to clipboard
+     */
     copyToClipBoard(textToCopy: string) {
         const textBox = document.createElement('textarea');
         textBox.style.position = 'fixed';

@@ -24,6 +24,8 @@ import { Constants } from '../../../../core/models/constants';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { SheetCellType } from '../../../../core/models/sheet/sheet-cell-type';
 import * as Handsontable from 'handsontable';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-bulk-modify-contacts',
@@ -32,10 +34,8 @@ import * as Handsontable from 'handsontable';
     styleUrls: ['./bulk-modify-contacts.component.less']
 })
 export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
-        new BreadcrumbItemModel('LNG_PAGE_BULK_MODIFY_CONTACTS_TITLE', '.', true)
-    ];
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     @ViewChild('inputForMakingFormDirty') inputForMakingFormDirty;
     @ViewChild('hotTableWrapper') hotTableWrapper: HotTableWrapperComponent;
@@ -71,6 +71,12 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     // subscribers
     outbreakSubscriber: Subscription;
 
+    // authenticated user details
+    authUser: UserModel;
+
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -79,12 +85,19 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
         private i18nService: I18nService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private authDataService: AuthDataService
     ) {
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION).pipe(share());
@@ -117,14 +130,44 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                         });
                     });
             });
+
+        // initialize page breadcrumbs
+        this.initializeBreadcrumbs();
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // contacts list page
+        if (ContactModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+            );
+        }
+
+        // current page breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                'LNG_PAGE_BULK_MODIFY_CONTACTS_TITLE',
+                '.',
+                true
+            )
+        );
     }
 
     /**
@@ -136,7 +179,11 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
             !contactIds ||
             contactIds.length < 1
         ) {
-            this.router.navigate(['/contacts']);
+            if (ContactModel.canList(this.authUser)) {
+                this.router.navigate(['/contacts']);
+            } else {
+                this.router.navigate(['/']);
+            }
         }
 
         // outbreak not retrieved ?
@@ -464,7 +511,11 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                                     // navigate to listing page
                                     this.disableDirtyConfirm();
                                     loadingDialog.close();
-                                    this.router.navigate(['/contacts']);
+                                    if (ContactModel.canList(this.authUser)) {
+                                        this.router.navigate(['/contacts']);
+                                    } else {
+                                        this.router.navigate(['/']);
+                                    }
                                 });
                         });
                 }

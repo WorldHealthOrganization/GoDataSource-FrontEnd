@@ -11,6 +11,7 @@ import { EntityModel } from '../../models/entity-and-relationship.model';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../models/label-value-pair';
 import { map } from 'rxjs/operators';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class ClusterDataService {
@@ -60,12 +61,12 @@ export class ClusterDataService {
      * Return total number of clusters for an Outbreak
      * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getClustersCount(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
 
         const whereFilter = queryBuilder.filter.generateCondition(true);
 
@@ -157,13 +158,13 @@ export class ClusterDataService {
      * @param {string} outbreakId
      * @param {string} clusterId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getClusterPeopleCount(
         outbreakId: string,
         clusterId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
 
         const whereFilter = queryBuilder.filter.generateCondition(true);
 

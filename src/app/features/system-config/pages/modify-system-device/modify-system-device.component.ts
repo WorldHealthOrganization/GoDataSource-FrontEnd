@@ -10,6 +10,8 @@ import { DeviceModel } from '../../../../core/models/device.model';
 import { DeviceDataService } from '../../../../core/services/data/device.data.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-modify-system-device',
@@ -20,21 +22,36 @@ import { throwError } from 'rxjs';
 export class ModifySystemDeviceComponent extends ViewModifyComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [];
 
+    // constants
+    DeviceModel = DeviceModel;
+
     deviceId: string;
+
+    authUser: UserModel;
 
     deviceData: DeviceModel = new DeviceModel();
 
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private dialogService: DialogService,
-        private deviceDataService: DeviceDataService
+        private deviceDataService: DeviceDataService,
+        private authDataService: AuthDataService
     ) {
         super(route);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // retrieve query params
         this.route.params
             .subscribe((params: { deviceId }) => {
@@ -44,26 +61,27 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
     }
 
     /**
-     * Breadcrumbs
+     * Initialize breadcrumbs
      */
-    buildBreadcrumbs() {
-        if (this.deviceData) {
-            // initialize breadcrumbs
-            this.breadcrumbs = [
-                new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '/system-config/devices', false)
-            ];
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
 
-            // current page title
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    this.viewOnly ? 'LNG_PAGE_VIEW_SYSTEM_DEVICE_TITLE' : 'LNG_PAGE_MODIFY_SYSTEM_DEVICE_TITLE',
-                    '.',
-                    true,
-                    {},
-                    this.deviceData
-                )
-            );
+        // add list breadcrumb only if we have permission
+        if (DeviceModel.canList(this.authUser)) {
+            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '/system-config/devices'));
         }
+
+        // view / modify breadcrumb
+        this.breadcrumbs.push(new BreadcrumbItemModel(
+            this.viewOnly ?
+                'LNG_PAGE_VIEW_SYSTEM_DEVICE_TITLE' :
+                'LNG_PAGE_MODIFY_SYSTEM_DEVICE_TITLE',
+            '.',
+            true,
+            {},
+            this.deviceData
+        ));
     }
 
     /**
@@ -71,18 +89,21 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
      */
     retrieveDeviceData() {
         // get device
-        if (
-            this.deviceId
-        ) {
+        if (this.deviceId) {
             this.deviceDataService
                 .getDevice(this.deviceId)
                 .subscribe( (device) => {
                     this.deviceData = device;
-                    this.buildBreadcrumbs();
+
+                    // update breadcrumbs
+                    this.initializeBreadcrumbs();
                 });
         }
     }
 
+    /**
+     * Modify device
+     */
     modifyDevice(form: NgForm) {
         // validate form
         if (!this.formHelper.validateForm(form)) {

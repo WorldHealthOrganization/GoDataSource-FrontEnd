@@ -6,7 +6,6 @@ import { OutbreakQestionnaireTypeEnum } from '../../../core/enums/outbreak-qesti
 import { ActivatedRoute } from '@angular/router';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { OutbreakTemplateModel } from '../../../core/models/outbreak-template.model';
-import { PERMISSION } from '../../../core/models/permission.model';
 import * as _ from 'lodash';
 import { AnswerModel, QuestionModel } from '../../../core/models/question.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
@@ -72,9 +71,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     // authenticated user
     authUser: UserModel;
 
-    /**
-     * Refresh language tokens before loading questionnaire data
-     */
+    // Refresh language tokens before loading questionnaire data
     private _refreshLanguageTokensDisabled: boolean = false;
     @Input() refreshLanguageTokens: boolean = true;
 
@@ -90,158 +87,99 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // init questionnaire data
         this.initQuestionnaireData();
     }
-
     get parent(): OutbreakModel | OutbreakTemplateModel {
         return this._parent;
     }
 
-    /**
-     * Display change label instead of save ( used by additional questions )
-     */
+    // Display change label instead of save ( used by additional questions )
     @Input() displayChangeButton: boolean = false;
 
-    /**
-     * Template used ( case, follow-up, lab )
-     */
+    // Template used ( case, follow-up, lab )
     questionnaireType: OutbreakQestionnaireTypeEnum;
 
-    /**
-     * Questionnaire questions
-     */
+    // Questionnaire questions
     questionnaireData: QuestionModel[];
 
-    /**
-     * Questionnaire question variables
-     */
+    // Questionnaire question variables
     questionVariables: {
         [lowercaseVariable: string]: string
     } = {};
 
-    /**
-     * Extra Question variables prepended to questionVariables
-     */
+    // Extra Question variables prepended to questionVariables
     @Input() extraQuestionVariables: {
         [lowercase_variable: string]: string
     } = {};
 
-    /**
-     * Question In Edit Mode
-     */
+    // Question In Edit Mode
     questionIndexInEditMode: number = null;
 
-    /**
-     * Question In Edit Mode Clone
-     */
+    // Question In Edit Mode Clone - used to keep a copy of the question in case we decide to discard changes
     questionInEditModeClone: QuestionModel;
 
-    /**
-     * Question Answer In Edit Mode
-     */
+    // Question Answer In Edit Mode - used to keep a copy of the question answer in case we decide to discard changes
     questionAnswerIndexInEditMode: number = null;
 
-    /**
-     * Question Answer In Edit Mode Clone
-     */
+    // Question Answer In Edit Mode Clone
     questionAnswerInEditModeClone: AnswerModel;
 
-    /**
-     * Question Answer Dummy Parent - used for recursive questions ( additional questions )
-     */
+    // Question Answer Dummy Parent - used for recursive questions ( additional questions )
     questionAnswerDummyParent: OutbreakModel | OutbreakTemplateModel;
 
-    /**
-     * Saving data
-     */
+    // Flag to say when saving data is in progress
     savingData: boolean = false;
 
-    /**
-     * Loading data
-     */
+    // Flag to say when we're loading data
     loadingData: boolean = true;
 
-    /**
-     * List of categories for a form-question
-     */
+    // List of categories for a form-question
     questionCategoriesInstantList: LabelValuePair[];
 
-    /**
-     * List of answer types
-     */
+    // List of answer types
     answerTypesInstantList: LabelValuePair[];
 
-    /**
-     * List of answers display orientations
-     */
+    // List of answers display orientations
     answersDisplayInstantList: LabelValuePair[];
 
-    /**
-     * Child question is in edit mode ?
-     */
+    // Child question is in edit mode ?
     childQuestionIsInEditMode: boolean = false;
 
-    /**
-     * Question Actions
-     */
+    // Question Actions - hover actions list
     questionActions: HoverRowAction[] = [];
 
-    /**
-     * Question Answer Actions
-     */
+    // Question Answer Actions
     answerActions: HoverRowAction[] = [];
 
-    /**
-     * Allow question variable change
-     */
+    // Allow question variable change
     @Input() allowQuestionVariableChange: boolean = false;
 
-    /**
-     * Remove new / uuid / clone flags when saving data
-     */
+    // Remove new / uuid / clone flags when saving data
     @Input() cleanQuestionAndAnswerFlagsOnSave: boolean = true;
 
-    /**
-     * Edit Mode - Question Form
-     */
+    // Edit Mode - Question Form
     @ViewChild('questionForm') questionForm: NgForm;
 
-    /**
-     * Edit Mode - Question Answer Form
-     */
+    // Edit Mode - Question Answer Form
     @ViewChild('answerForm') answerForm: NgForm;
 
-    /**
-     * Used to mark question form dirty
-     */
+    // Used to mark question form dirty
     @ViewChild('inputQuestionForMakingFormDirty') inputQuestionForMakingFormDirty: NgModel;
 
-    /**
-     * Used to mark answer form dirty
-     */
+    // Used to make answer form dirty
     @ViewChild('inputAnswerForMakingFormDirty') inputAnswerForMakingFormDirty: NgModel;
 
-    /**
-     * Question text input
-     */
+    // Question text input
     @ViewChild('questionText') questionText: FormInputComponent;
 
-    /**
-     * Question Answer label input
-     */
+    // Question Answer label input
     @ViewChild('answerLabel') answerLabel: FormInputComponent;
 
-    /**
-     * Breadcrumbs init
-     */
+    // Breadcrumbs initialization event - called when breadcrumbs can be initialized
     @Output() initBreadcrumbs = new EventEmitter<FormModifyQuestionnaireBreadcrumbsData>();
 
-    /**
-     * Save outbreak questionnaire
-     */
+    // Save outbreak questionnaire
     @Output() updateQuestionnaire = new EventEmitter<FormModifyQuestionnaireUpdateData>();
 
-    /**
-     * triggered when edit mode has changed
-     */
+    // Triggered when edit mode has changed
     @Output() questionEditModeChanged = new EventEmitter<boolean>();
 
     /**
@@ -313,62 +251,59 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // init question actions
         this.questionActions = [];
 
-        // add question actions that require write permissions
-        if (this.hasWriteAccess()) {
-            // question settings
-            this.questionActions.push(new HoverRowAction({
-                icon: 'settings',
-                click: (questionIndex) => {
-                    this.modifyQuestion(questionIndex);
-                }
-            }));
+        // question settings
+        this.questionActions.push(new HoverRowAction({
+            icon: 'settings',
+            click: (questionIndex) => {
+                this.modifyQuestion(questionIndex);
+            }
+        }));
 
-            // move question above
-            this.questionActions.push(new HoverRowAction({
-                icon: 'arrowAUp',
-                click: (questionIndex) => {
-                    this.moveQuestionAbove(questionIndex);
-                }
-            }));
+        // move question above
+        this.questionActions.push(new HoverRowAction({
+            icon: 'arrowAUp',
+            click: (questionIndex) => {
+                this.moveQuestionAbove(questionIndex);
+            }
+        }));
 
-            // move question bellow
-            this.questionActions.push(new HoverRowAction({
-                icon: 'arrowADown',
-                click: (questionIndex) => {
-                    this.moveQuestionBellow(questionIndex);
-                }
-            }));
+        // move question bellow
+        this.questionActions.push(new HoverRowAction({
+            icon: 'arrowADown',
+            click: (questionIndex) => {
+                this.moveQuestionBellow(questionIndex);
+            }
+        }));
 
-            // other options
-            this.questionActions.push(new HoverRowAction({
-                type: HoverRowActionType.MENU,
-                icon: 'moreVertical',
-                menuOptions: [
-                    new HoverRowAction({
-                        menuOptionLabel: 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_TO_POSITION_X',
-                        click: (questionIndex) => {
-                            this.addMoveQuestionPosition(questionIndex);
-                        }
-                    }),
-                    new HoverRowAction({
-                        type: HoverRowActionType.DIVIDER
-                    }),
-                    new HoverRowAction({
-                        menuOptionLabel: 'LNG_PAGE_ACTION_CLONE',
-                        click: (questionIndex) => {
-                            this.cloneQuestion(questionIndex);
-                        }
-                    }),
-                    new HoverRowAction({
-                        menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
-                        click: (questionIndex) => {
-                            this.deleteQuestion(questionIndex);
-                        },
-                        class: 'mat-menu-item-delete'
-                    })
-                ]
-            }));
-        }
+        // other options
+        this.questionActions.push(new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_TO_POSITION_X',
+                    click: (questionIndex) => {
+                        this.addMoveQuestionPosition(questionIndex);
+                    }
+                }),
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER
+                }),
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_CLONE',
+                    click: (questionIndex) => {
+                        this.cloneQuestion(questionIndex);
+                    }
+                }),
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
+                    click: (questionIndex) => {
+                        this.deleteQuestion(questionIndex);
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        }));
     }
 
     /**
@@ -378,62 +313,59 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // init question actions
         this.answerActions = [];
 
-        // add answer actions that require write permissions
-        if (this.hasWriteAccess()) {
-            // answer settings
-            this.answerActions.push(new HoverRowAction({
-                icon: 'settings',
-                click: (answerIndex) => {
-                    this.modifyAnswer(answerIndex);
-                }
-            }));
+        // answer settings
+        this.answerActions.push(new HoverRowAction({
+            icon: 'settings',
+            click: (answerIndex) => {
+                this.modifyAnswer(answerIndex);
+            }
+        }));
 
-            // move answer above
-            this.answerActions.push(new HoverRowAction({
-                icon: 'arrowAUp',
-                click: (answerIndex) => {
-                    this.moveAnswerAbove(answerIndex);
-                }
-            }));
+        // move answer above
+        this.answerActions.push(new HoverRowAction({
+            icon: 'arrowAUp',
+            click: (answerIndex) => {
+                this.moveAnswerAbove(answerIndex);
+            }
+        }));
 
-            // move answer bellow
-            this.answerActions.push(new HoverRowAction({
-                icon: 'arrowADown',
-                click: (answerIndex) => {
-                    this.moveAnswerBellow(answerIndex);
-                }
-            }));
+        // move answer bellow
+        this.answerActions.push(new HoverRowAction({
+            icon: 'arrowADown',
+            click: (answerIndex) => {
+                this.moveAnswerBellow(answerIndex);
+            }
+        }));
 
-            // other options
-            this.answerActions.push(new HoverRowAction({
-                type: HoverRowActionType.MENU,
-                icon: 'moreVertical',
-                menuOptions: [
-                    new HoverRowAction({
-                        menuOptionLabel: 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_ANSWER_TO_POSITION_X',
-                        click: (answerIndex) => {
-                            this.addMoveQuestionAnswerPosition(answerIndex);
-                        }
-                    }),
-                    new HoverRowAction({
-                        type: HoverRowActionType.DIVIDER
-                    }),
-                    new HoverRowAction({
-                        menuOptionLabel: 'LNG_PAGE_ACTION_CLONE',
-                        click: (answerIndex) => {
-                            this.cloneAnswer(answerIndex);
-                        }
-                    }),
-                    new HoverRowAction({
-                        menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
-                        click: (answerIndex) => {
-                            this.deleteAnswer(answerIndex);
-                        },
-                        class: 'mat-menu-item-delete'
-                    })
-                ]
-            }));
-        }
+        // other options
+        this.answerActions.push(new HoverRowAction({
+            type: HoverRowActionType.MENU,
+            icon: 'moreVertical',
+            menuOptions: [
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_ANSWER_TO_POSITION_X',
+                    click: (answerIndex) => {
+                        this.addMoveQuestionAnswerPosition(answerIndex);
+                    }
+                }),
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER
+                }),
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_CLONE',
+                    click: (answerIndex) => {
+                        this.cloneAnswer(answerIndex);
+                    }
+                }),
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
+                    click: (answerIndex) => {
+                        this.deleteAnswer(answerIndex);
+                    },
+                    class: 'mat-menu-item-delete'
+                })
+            ]
+        }));
     }
 
     /**
@@ -697,20 +629,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 }
             });
         });
-    }
-
-    /**
-     * Check if we have write access to write to outbreaks or outbreak templates
-     * @returns {boolean}
-     */
-    hasWriteAccess(): boolean {
-        return this.parent ?
-            this.authUser.hasPermissions(
-                this.parent instanceof OutbreakTemplateModel ?
-                    PERMISSION.WRITE_SYS_CONFIG :
-                    PERMISSION.WRITE_OUTBREAK
-            ) :
-            false;
     }
 
     /**

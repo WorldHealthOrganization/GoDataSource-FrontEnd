@@ -12,8 +12,7 @@
     <!-- spinner -->
     <div class="spinner-graph"
          *ngIf="showLoading">
-        <mat-spinner>
-        </mat-spinner>
+        <mat-spinner></mat-spinner>
     </div>
 
     <!-- legend -->
@@ -128,7 +127,7 @@
         class="graph-actions" fxLayout="row" fxLayoutGap="30px">
         <!-- Toggle Edit mode -->
         <app-form-slide-toggle
-            *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value && isEditModeAvailable()"
+            *ngIf="isEditModeAvailable()"
             name="toggleEditMode"
             [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_EDIT_MODE_LABEL' | translate"
             [(ngModel)]="editMode"

@@ -8,6 +8,8 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 
 @Component({
     selector: 'app-number-of-active-chains-of-transmission-dashlet',
@@ -21,6 +23,7 @@ export class NumberOfActiveChainsOfTransmissionComponent extends DashletComponen
 
     // constants to be used for applyListFilter
     Constants: any = Constants;
+    TransmissionChainModel = TransmissionChainModel;
 
     // outbreak
     outbreakId: string;
@@ -32,14 +35,24 @@ export class NumberOfActiveChainsOfTransmissionComponent extends DashletComponen
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
 
+    /**
+     * Constructor
+     */
     constructor(
         private transmissionChainDataService: TransmissionChainDataService,
         private outbreakDataService: OutbreakDataService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        protected authDataService: AuthDataService
     ) {
-        super(listFilterDataService);
+        super(
+            listFilterDataService,
+            authDataService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get number of independent transmission chains
         this.displayLoading = true;
@@ -53,6 +66,9 @@ export class NumberOfActiveChainsOfTransmissionComponent extends DashletComponen
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

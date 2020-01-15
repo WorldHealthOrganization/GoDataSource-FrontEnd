@@ -6,15 +6,19 @@ import { Observable, Subscriber } from 'rxjs';
 import { DialogService } from '../helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { AuthDataService } from '../data/auth.data.service';
 
 @Injectable()
 export class LanguageResolver implements Resolve<any> {
+    /**
+     * Constructor
+     */
     constructor(
         private translateService: TranslateService,
         private i18nService: I18nService,
-        private dialogService: DialogService
-    ) {
-    }
+        private dialogService: DialogService,
+        private authDataService: AuthDataService
+    ) {}
 
     /**
      * Language loaded, we can display the website pages
@@ -46,9 +50,22 @@ export class LanguageResolver implements Resolve<any> {
                         // hide loading
                         loadingDialog.close();
 
-                        // finished
-                        observer.next();
-                        observer.complete();
+                        // this callback is called 99% of the time only when we refresh a page
+                        // refresh user permissions ?
+                        const authUser = this.authDataService.getAuthenticatedUser();
+                        if (!authUser) {
+                            // finished
+                            observer.next();
+                            observer.complete();
+                        } else {
+                            this.authDataService
+                                .reloadAndPersistAuthUser()
+                                .subscribe(() => {
+                                    // finished
+                                    observer.next();
+                                    observer.complete();
+                                });
+                        }
                     });
             }
         });

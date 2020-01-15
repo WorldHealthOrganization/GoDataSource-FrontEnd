@@ -17,9 +17,15 @@
 
         <!-- Submenu -->
         <mat-menu #menu="matMenu" xPosition="before" yPosition="below">
-            <button mat-menu-item *ngFor="let childItem of accountItem.children" [routerLink]="[childItem.link]">
-                {{childItem.label | translate}}
-            </button>
+            <ng-container
+                *ngFor="let childItem of accountItem.children">
+                <button
+                    *ngIf="shouldDisplayItem(childItem)"
+                    mat-menu-item
+                    [routerLink]="[childItem.link]">
+                    {{childItem.label | translate}}
+                </button>
+            </ng-container>
         </mat-menu>
 
         <!-- Menu Item Button -->

@@ -11,7 +11,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -26,6 +25,7 @@ import { HoverRowAction, HoverRowActionType } from '../../../../shared/component
 import { Router } from '@angular/router';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-lab-results',
@@ -34,14 +34,15 @@ import { Subscription } from 'rxjs/internal/Subscription';
     styleUrls: ['./lab-results-list.component.less']
 })
 export class LabResultsListComponent extends ListComponent implements OnInit, OnDestroy {
-
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_LAB_RESULTS_TITLE', '.', true),
     ];
+
     // lab results list
     labResultsList$: Observable<any>;
     // lab results count
-    labResultsListCount$: Observable<any>;
+    labResultsListCount$: Observable<IBasicCount>;
 
     labNamesList$: Observable<any[]>;
     sampleTypesList$: Observable<any[]>;
@@ -71,6 +72,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
     EntityType = EntityType;
     UserSettings = UserSettings;
     ReferenceDataCategory = ReferenceDataCategory;
+    LabResultModel = LabResultModel;
 
     recordActions: HoverRowAction[] = [
         // View Case Lab Results
@@ -85,7 +87,8 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
                 });
             },
             visible: (item: LabResultModel): boolean => {
-                return !item.deleted;
+                return !item.deleted &&
+                    LabResultModel.canView(this.authUser);
             }
         }),
 
@@ -105,7 +108,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    this.hasLabResultWriteAccess();
+                    LabResultModel.canModify(this.authUser);
             }
         }),
 
@@ -125,7 +128,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasLabResultWriteAccess();
+                            LabResultModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -141,7 +144,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasLabResultWriteAccess();
+                            LabResultModel.canRestore(this.authUser);
                     },
                     class: 'mat-menu-item-restore'
                 })
@@ -149,6 +152,9 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         protected snackbarService: SnackbarService,
@@ -163,6 +169,9 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         super(snackbarService);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -197,6 +206,9 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         this.initializeSideTableColumns();
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -385,8 +397,14 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
             this.queryBuilder.include('updatedByUser', true);
 
             // retrieve the list of lab results
-            this.labResultsList$ = this.labResultDataService.getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder)
+            this.labResultsList$ = this.labResultDataService
+                .getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback([]);
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap((data: any[]) => {
                         finishCallback(data);
@@ -406,16 +424,16 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
-            this.labResultsListCount$ = this.labResultDataService.getOutbreakLabResultsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
+            this.labResultsListCount$ = this.labResultDataService
+                .getOutbreakLabResultsCount(this.selectedOutbreak.id, countQueryBuilder)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
+                    share()
+                );
         }
-    }
-
-    /**
-     * Check if we have write access to lab results
-     * @returns {boolean}
-     */
-    hasLabResultWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
     }
 
     /**

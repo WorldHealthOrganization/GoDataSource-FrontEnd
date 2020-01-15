@@ -6,6 +6,8 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { Subscription } from 'rxjs';
+import { CaseModel } from '../../../../core/models/case.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-cases-hospitalised-dashlet',
@@ -14,11 +16,12 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./cases-hospitalised-dashlet.component.less']
 })
 export class CasesHospitalisedDashletComponent extends DashletComponent implements OnInit, OnDestroy {
-
     // number of hospitalised cases
     casesHospitalisedCount: number;
+
     // constants to be used for applyListFilters
     Constants: any = Constants;
+    CaseModel = CaseModel;
 
     // outbreak
     outbreakId: string;
@@ -26,18 +29,28 @@ export class CasesHospitalisedDashletComponent extends DashletComponent implemen
     // loading data
     displayLoading: boolean = false;
 
+    /**
+     * Constructor
+     */
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        protected authDataService: AuthDataService
     ) {
-        super(listFilterDataService);
+        super(
+            listFilterDataService,
+            authDataService
+        );
     }
 
     // subscribers
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get number of hospitalised cases
         this.displayLoading = true;
@@ -51,6 +64,9 @@ export class CasesHospitalisedDashletComponent extends DashletComponent implemen
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

@@ -5,7 +5,7 @@
 
             <div class="topnav-actions">
                 <button
-                    *ngIf="hasOutbreakTemplateWriteAccess()"
+                    *ngIf="OutbreakTemplateModel.canCreate(authUser)"
                     mat-raised-button
                     color="accent"
                     [routerLink]="'./create'">

@@ -9,6 +9,8 @@ import { AddressModel } from '../../../../core/models/address.model';
 import { forkJoin } from 'rxjs';
 import { WorldMapMovementComponent } from '../../../../common-modules/world-map-movement/components/world-map-movement/world-map-movement.component';
 import { EntityType } from '../../../../core/models/entity-type';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-view-movement-case',
@@ -17,23 +19,37 @@ import { EntityType } from '../../../../core/models/entity-type';
     styleUrls: ['./view-movement-case.component.less']
 })
 export class ViewMovementCaseComponent implements OnInit {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-    ];
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // constants
+    CaseModel = CaseModel;
 
     caseData: CaseModel = new CaseModel();
     movementAddresses: AddressModel[] = [];
 
     @ViewChild('mapMovement') mapMovement: WorldMapMovementComponent;
 
+    // authenticated user details
+    authUser: UserModel;
+
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private caseDataService: CaseDataService,
-        private outbreakDataService: OutbreakDataService
-    ) {
-    }
+        private outbreakDataService: OutbreakDataService,
+        private authDataService: AuthDataService
+    ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.route.params.subscribe((params: { caseId }) => {
             this.outbreakDataService
                 .getSelectedOutbreak()
@@ -47,24 +63,57 @@ export class ViewMovementCaseComponent implements OnInit {
                         ) => {
                             // case data
                             this.caseData = caseData;
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(
-                                    this.caseData.name,
-                                    `/cases/${this.caseData.id}/view`),
-                                new BreadcrumbItemModel(
-                                    'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE',
-                                    '.',
-                                    true,
-                                    {},
-                                    this.caseData
-                                )
-                            );
+
+                            // initialize page breadcrumbs
+                            this.initializeBreadcrumbs();
 
                             // movement data
                             this.movementAddresses = movementData;
                         });
                 });
         });
+
+        // initialize page breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // case list page
+        if (CaseModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+            );
+        }
+
+        // case breadcrumbs
+        if (this.caseData) {
+            // case view page
+            if (CaseModel.canView(this.authUser)) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        this.caseData.name,
+                        `/cases/${this.caseData.id}/view`
+                    )
+                );
+            }
+
+            // current page
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE',
+                    '.',
+                    true,
+                    {},
+                    this.caseData
+                )
+            );
+        }
     }
 
     /**

@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { UserModel } from '../../../../core/models/user.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -11,6 +10,9 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { CaseModel } from '../../../../core/models/case.model';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { EventModel } from '../../../../core/models/event.model';
 
 @Component({
     selector: 'app-relationship-summary',
@@ -19,16 +21,61 @@ import { RelationshipModel } from '../../../../core/models/entity-and-relationsh
     styleUrls: ['./relationship-summary.component.less']
 })
 export class RelationshipSummaryComponent implements OnInit, OnChanges {
-
     @Input() relationship: RelationshipModel;
-
     @Output() remove = new EventEmitter<void>();
     @Output() modifyRelationship = new EventEmitter<RelationshipModel>();
     @Output() deleteRelationship = new EventEmitter<RelationshipModel>();
     @Output() reverseRelationshipPersons = new EventEmitter<RelationshipModel>();
 
+    // Entities Map for specific data
+    entityMap: {
+        [entityType: string]: {
+            can: {
+                [type: string]: {
+                    view: (UserModel) => boolean,
+                    modify: (UserModel) => boolean,
+                    delete: (UserModel) => boolean,
+                    reverse: (UserModel) => boolean
+                }
+            }
+        }
+    } = {
+        [EntityType.CASE]: {
+            can: {
+                contacts: {
+                    view: CaseModel.canViewRelationshipContacts,
+                    modify: CaseModel.canModifyRelationshipContacts,
+                    delete: CaseModel.canDeleteRelationshipContacts,
+                    reverse: CaseModel.canReverseRelationship
+                }
+            }
+        },
+        [EntityType.CONTACT]: {
+            can: {
+                contacts: {
+                    view: ContactModel.canViewRelationshipContacts,
+                    modify: ContactModel.canModifyRelationshipContacts,
+                    delete: ContactModel.canDeleteRelationshipContacts,
+                    reverse: ContactModel.canReverseRelationship
+                }
+            }
+        },
+        [EntityType.EVENT]: {
+            can: {
+                contacts: {
+                    view: EventModel.canViewRelationshipContacts,
+                    modify: EventModel.canModifyRelationshipContacts,
+                    delete: EventModel.canDeleteRelationshipContacts,
+                    reverse: EventModel.canReverseRelationship
+                }
+            }
+        }
+    };
+
     // authenticated user
     authUser: UserModel;
+    RelationshipModel = RelationshipModel;
+
     selectedOutbreak: OutbreakModel;
     relationshipData: LabelValuePair[] = [];
 
@@ -36,28 +83,31 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
 
     canReverseRelation: boolean = true;
 
+    /**
+     * Constructor
+     */
     constructor(
         private authDataService: AuthDataService,
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService,
         private dialogService: DialogService
-    ) {
-    }
+    ) {}
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes.relationship) {
             // reset reversing action if the relationship was changed
             this.canReverseRelation = true;
-
             const relationship: SimpleChange = changes.relationship;
             this.updateRelationshipData(relationship.currentValue);
+
             // condition the reversing persons action if any of them is contact type
             this.canReverseRelation = !_.find(this.relationship.persons, { type : EntityType.CONTACT });
-
         }
-
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
@@ -88,7 +138,8 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
      * Reverse persons of an existing relationship
      */
     reverseExistingRelationship() {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REVERSE_PERSONS')
+        this.dialogService
+            .showConfirm('LNG_DIALOG_CONFIRM_REVERSE_PERSONS')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     const relationshipPersons = {
@@ -127,11 +178,47 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
         this.reverseRelationshipPersons.emit();
     }
 
-    hasCaseWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
+    /**
+     * Check if we're allowed to view event / case / contact relationships
+     */
+    get entityCanView(): boolean {
+        return this.relationship &&
+            this.relationship.sourcePerson &&
+            this.relationship.sourcePerson.type &&
+            this.entityMap[this.relationship.sourcePerson.type] &&
+            this.entityMap[this.relationship.sourcePerson.type].can['contacts'].view(this.authUser);
     }
 
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
+    /**
+     * Check if we're allowed to modify event / case / contact relationships
+     */
+    get entityCanModify(): boolean {
+        return this.relationship &&
+            this.relationship.sourcePerson &&
+            this.relationship.sourcePerson.type &&
+            this.entityMap[this.relationship.sourcePerson.type] &&
+            this.entityMap[this.relationship.sourcePerson.type].can['contacts'].modify(this.authUser);
+    }
+
+    /**
+     * Check if we're allowed to delete relationships
+     */
+    get entityCanDelete(): boolean {
+        return this.relationship &&
+            this.relationship.sourcePerson &&
+            this.relationship.sourcePerson.type &&
+            this.entityMap[this.relationship.sourcePerson.type] &&
+            this.entityMap[this.relationship.sourcePerson.type].can['contacts'].delete(this.authUser);
+    }
+
+    /**
+     * Check if we're allowed to reverse relationships
+     */
+    get entityCanReverse(): boolean {
+        return this.relationship &&
+            this.relationship.sourcePerson &&
+            this.relationship.sourcePerson.type &&
+            this.entityMap[this.relationship.sourcePerson.type] &&
+            this.entityMap[this.relationship.sourcePerson.type].can['contacts'].reverse(this.authUser);
     }
 }

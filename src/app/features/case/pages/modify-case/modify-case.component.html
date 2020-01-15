@@ -63,21 +63,20 @@
                                 fxFlex fxLayout="row" fxLayoutGap="20px">
                                 <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
                                 <!-- [maxlength]="255" -->
-                                    <app-form-input
-                                        name="visualId"
-                                        #visualId="ngModel"
-                                        [(ngModel)]="caseData.visualId"
-                                        [placeholder]="'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate"
-                                        tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
-                                        [displayRefresh]="displayRefresh"
-                                        (refresh)="generateVisualId()"
-                                        [tooltipTranslateData]="visualIDTranslateData"
-                                        [maxlength]="255"
-                                        [disabled]="viewOnly"
-                                        app-general-async-validator
-                                        [asyncValidatorObservable]="caseIdMaskValidator"
-                                    >
-                                    </app-form-input>
+                                <app-form-input
+                                    name="visualId"
+                                    #visualId="ngModel"
+                                    [(ngModel)]="caseData.visualId"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                                    [displayRefresh]="displayRefresh"
+                                    (refresh)="generateVisualId()"
+                                    [tooltipTranslateData]="visualIDTranslateData"
+                                    [maxlength]="255"
+                                    [disabled]="viewOnly"
+                                    app-general-async-validator
+                                    [asyncValidatorObservable]="caseIdMaskValidator">
+                                </app-form-input>
 
                                 <app-form-select
                                     name="occupation"
@@ -351,8 +350,8 @@
                                 app-date-validator
                                 [dateSameOrBefore]="serverToday"
                                 [dateSameOrAfter]="[
-                                'dateOfOnset'
-                            ]">
+                                    'dateOfOnset'
+                                ]">
                             </app-form-datepicker>
 
                             <div fxFlex><!-- placeholder --></div>
@@ -390,8 +389,7 @@
                                     tooltip="LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION"
                                     [useOutbreakLocations]="true"
                                     [disabled]="viewOnly"
-                                    [fixedDropPanel]="true"
-                                >
+                                    [fixedDropPanel]="true">
                                 </app-form-location-dropdown>
 
                                 <app-form-input
@@ -399,8 +397,7 @@
                                     [(ngModel)]="caseData.burialPlaceName"
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME' | translate"
                                     tooltip="LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION"
-                                    [disabled]="viewOnly"
-                                >
+                                    [disabled]="viewOnly">
                                 </app-form-input>
 
                             </ng-container>
@@ -441,11 +438,9 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <ng-container
-            *app-selected-outbreak-is-active
-        >
+            *app-selected-outbreak-is-active>
             <button
-                *ngIf="viewOnly &&
-                   hasCaseWriteAccess()"
+                *ngIf="viewOnly && CaseModel.canModify(authUser)"
                 type="button"
                 mat-raised-button color="accent"
                 [routerLink]="['/cases', caseId, 'modify']">
@@ -457,14 +452,19 @@
                     {{'LNG_COMMON_BUTTON_SAVE' | translate}}
                 </button>
 
-                <button type="button" [routerLink]="'/cases'" mat-raised-button>
+                <button
+                    *ngIf="CaseModel.canList(authUser)"
+                    type="button"
+                    [routerLink]="'/cases'"
+                    mat-raised-button>
                     {{'LNG_COMMON_BUTTON_CANCEL'| translate}}
                 </button>
             </ng-container>
 
             <div class="page-tabs-navbar-placeholder"></div>
 
-            <ng-container *ngIf="hasContactWriteAccess()">
+            <ng-container
+                *ngIf="CaseModel.canCreateContact(authUser) && ContactModel.canCreate(authUser)">
                 <button
                     type="button"
                     mat-raised-button color="accent"
@@ -477,25 +477,51 @@
             </ng-container>
         </ng-container>
 
-        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CASE, caseId, 'contacts']">
+        <button
+            *ngIf="CaseModel.canListRelationshipContacts(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/relationships', EntityType.CASE, caseId, 'contacts']">
             {{ 'LNG_COMMON_BUTTON_EXPOSURES_FROM' | translate }}
         </button>
-        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CASE, caseId, 'exposures']">
+        <button
+            *ngIf="CaseModel.canListRelationshipExposures(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/relationships', EntityType.CASE, caseId, 'exposures']">
             {{ 'LNG_COMMON_BUTTON_EXPOSURES_TO' | translate }}
         </button>
 
-        <div class="page-tabs-navbar-placeholder"></div>
+        <div
+            *ngIf="CaseModel.canListRelationshipContacts(authUser) || CaseModel.canListRelationshipExposures(authUser)"
+            class="page-tabs-navbar-placeholder"></div>
 
-        <button *ngIf="hasCaseWriteAccess()" mat-raised-button type="button" [routerLink]="['/cases', caseId, 'lab-results']">
+        <button
+            *ngIf="LabResultModel.canList(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/cases', caseId, 'lab-results']">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS' | translate }}
         </button>
-        <button mat-raised-button type="button" [routerLink]="['/cases', caseId, 'movement']">
+        <button
+            *ngIf="CaseModel.canViewMovementMap(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/cases', caseId, 'movement']">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT' | translate }}
         </button>
-        <button mat-raised-button type="button" [routerLink]="['/cases', caseId, 'chronology']">
+        <button
+            *ngIf="CaseModel.canViewChronologyChart(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/cases', caseId, 'chronology']">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY' | translate }}
         </button>
-        <button *ngIf="hasFollowUpReadAccess()" mat-raised-button type="button" [routerLink]="['/contacts/case-related-follow-ups', caseId]">
+        <button
+            *ngIf="FollowUpModel.canList(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/contacts/case-related-follow-ups', caseId]">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS' | translate }}
         </button>
     </div>

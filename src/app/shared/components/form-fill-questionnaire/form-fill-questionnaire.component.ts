@@ -77,19 +77,13 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
     // import constants into template
     Constants = Constants;
 
-    /**
-     * Hide categories
-     */
+    // Hide categories
     @Input() hideCategories: boolean = false;
 
-    /**
-     * Inactive sub-question
-     */
+    // Inactive sub-question
     @Input() inactiveSubquestion: boolean = false;
 
-    /**
-     * Child Index Value
-     */
+    // Child Index Value
     private _childValueIndex: number;
     @Input() set childValueIndex(childValueIndex: number) {
         // set the new child value index
@@ -102,9 +96,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         return this._childValueIndex;
     }
 
-    /**
-     * File uploader
-     */
+    // File uploader
     private _uploadersDataLocked: boolean = false;
     private _uploadersData: {
         [questionVariable: string]: UploaderData[]
@@ -122,15 +114,10 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         return this._uploadersData;
     }
 
-    /**
-     * Outbreak
-     */
+    // Selected Outbreak - the outbreak from which we need to load the questionnaire
     selectedOutbreak: OutbreakModel;
 
-    /**
-     * Set question and group them by category
-     * @param {QuestionModel[]} questions
-     */
+    // Set question and group them by category
     @Input() set questions(questions: QuestionModel[]) {
         // reset additional questions
         this.additionalQuestions = {};
@@ -201,17 +188,11 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         this.initializeUploader();
     }
 
-    /**
-     * Alternative name
-     */
+    // Alternative name
     private _alternativeName: string;
     @Input() set alternativeName(value: string) {
         this._alternativeName = value;
     }
-
-    /**
-     * Alternative name
-     */
     get alternativeName(): string {
         return this._alternativeName ? this._alternativeName : this.name;
     }

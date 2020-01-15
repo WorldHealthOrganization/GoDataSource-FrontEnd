@@ -21,7 +21,10 @@
                             class="lab-result-case-title"
                             fxLayout="row" fxLayoutGap="20px">
                             <ng-container
-                                *ngIf="labResultData?.entity?.id">
+                                *ngIf="labResultData?.entity?.id && (
+                                    (labResultData.entity.type === EntityType.CASE && CaseModel.canView(authUser)) ||
+                                    (labResultData.entity.type === EntityType.CONTACT && ContactModel.canView(authUser))
+                                )">
                                 <div>{{ (labResultData.entity.type === EntityType.CASE ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE' : 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT') | translate }}</div>
 
                                 <a
@@ -273,29 +276,26 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <ng-container
-            *app-selected-outbreak-is-active
-        >
-            <button *ngIf="viewOnly && hasCaseWriteAccess()"
-                    mat-raised-button type="button" color="accent"
-                    [routerLink]=" ['/cases', labResultData.personId, 'lab-results', labResultData.id, 'modify' ]"
-                    [queryParams]="{fromLabResultsList: fromLabResultsList}">
+            *app-selected-outbreak-is-active>
+            <button
+                *ngIf="viewOnly && LabResultModel.canModify(authUser)"
+                mat-raised-button type="button" color="accent"
+                [routerLink]=" ['/cases', labResultData.personId, 'lab-results', labResultData.id, 'modify' ]"
+                [queryParams]="{fromLabResultsList: fromLabResultsList}">
                 {{'LNG_COMMON_BUTTON_EDIT' | translate}}
             </button>
             <ng-container *ngIf="!viewOnly">
                 <button mat-raised-button color="accent">
                     {{'LNG_COMMON_BUTTON_SAVE' | translate}}
                 </button>
-                <button type="button"
-                        mat-raised-button
-                        [routerLink]="!fromLabResultsList ?
-                        ['/cases', labResultData.personId, 'lab-results'] :
-                        ['/cases/lab-results']">
+                <button
+                    *ngIf="LabResultModel.canList(authUser)"
+                    type="button"
+                    mat-raised-button
+                    [routerLink]="!fromLabResultsList ? ['/cases', labResultData.personId, 'lab-results'] : ['/cases/lab-results']">
                     {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
                 </button>
             </ng-container>
         </ng-container>
-
     </div>
-
-
 </form>

@@ -1,28 +1,49 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import * as fromPages from './pages';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
 import { RelationshipType } from '../../core/enums/relationship-type.enum';
+import { PermissionExpression } from '../../core/models/user.model';
 
 const relationshipTypeChildrenRoutes = [
     // Relationships list
     {
         path: '',
         component: fromPages.EntityRelationshipsListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.RELATIONSHIP_LIST
+            ]
+        }
     },
     // Create relationships (1): List available persons to be selected for creating new relationships
     {
         path: 'available-entities',
-        component: fromPages.AvailableEntitiesListComponent
+        component: fromPages.AvailableEntitiesListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.RELATIONSHIP_CREATE
+            ]
+        }
     },
     // Create relationships (2): Create relationships form
     {
         path: 'create',
         component: fromPages.CreateEntityRelationshipComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.RELATIONSHIP_CREATE
+            ]
+        },
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
@@ -30,12 +51,26 @@ const relationshipTypeChildrenRoutes = [
     // Share selected relationships (1): Select people to share with
     {
         path: 'share',
-        component: fromPages.EntityRelationshipsListAssignComponent
+        component: fromPages.EntityRelationshipsListAssignComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.RELATIONSHIP_SHARE
+            ]
+        }
     },
     // Share selected relationships (2): Create relationships form
     {
         path: 'share/create-bulk',
         component: fromPages.CreateEntityRelationshipBulkComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.RELATIONSHIP_SHARE
+            ]
+        },
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
@@ -43,13 +78,33 @@ const relationshipTypeChildrenRoutes = [
     // Switch Contact or Source for selected relationships
     {
         path: 'switch',
-        component: fromPages.AvailableEntitiesForSwitchListComponent
+        component: fromPages.AvailableEntitiesForSwitchListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: new PermissionExpression({
+                and: [
+                    PERMISSION.OUTBREAK_VIEW,
+                    new PermissionExpression({
+                        or: [
+                            PERMISSION.CASE_CHANGE_SOURCE_RELATIONSHIP,
+                            PERMISSION.CONTACT_CHANGE_SOURCE_RELATIONSHIP,
+                            PERMISSION.EVENT_CHANGE_SOURCE_RELATIONSHIP
+                        ]
+                    })
+                ]
+            })
+        }
     },
     // View Relationship
     {
         path: ':relationshipId/view',
         component: fromPages.ModifyEntityRelationshipComponent,
+        canActivate: [AuthGuard],
         data: {
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.RELATIONSHIP_VIEW
+            ],
             action: ViewModifyComponentAction.VIEW
         }
     },
@@ -57,7 +112,12 @@ const relationshipTypeChildrenRoutes = [
     {
         path: ':relationshipId/modify',
         component: fromPages.ModifyEntityRelationshipComponent,
+        canActivate: [AuthGuard],
         data: {
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.RELATIONSHIP_MODIFY
+            ],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [
@@ -73,7 +133,7 @@ const routes: Routes = [
         data: {
             relationshipType: RelationshipType.EXPOSURE
         },
-        children: relationshipTypeChildrenRoutes
+        children: relationshipTypeChildrenRoutes,
     },
     // Entity Contact Relationships
     {
@@ -90,8 +150,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.READ_CASE,
-                PERMISSION.READ_REPORT
+                PERMISSION.CASE_LIST_ONSET_BEFORE_PRIMARY_CASE_REPORT
             ]
         }
     },
@@ -102,7 +161,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.READ_REPORT
+                PERMISSION.CASE_LIST_LONG_PERIOD_BETWEEN_DATES_REPORT
             ]
         }
     }

@@ -2,12 +2,13 @@ import { ValidationResult } from './validate';
 import { ElementBaseFailure } from './element-base-failure';
 
 export class ErrorMessage {
-
+    /**
+     * Constructor
+     */
     constructor(
         private validator: ValidationResult,
         private key: string
-    ) {
-    }
+    ) {}
 
     /**
      * Get the error message for each validator
@@ -33,6 +34,13 @@ export class ErrorMessage {
                 return new ElementBaseFailure(
                     'LNG_FORM_VALIDATION_ERROR_MAX_NUMBER',
                     {max: this.validator.maxNumberValidator['max']}
+                );
+            case 'missingRequiredOptions':
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_MISSING_REQUIRED_OPTIONS',
+                    {
+                        options: this.validator.missingRequiredOptions['options'].join(', ')
+                    }
                 );
             case 'minlength':
                 return new ElementBaseFailure(

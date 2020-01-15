@@ -4,6 +4,7 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder/r
 import { Observable } from 'rxjs';
 import { SavedImportMappingModel } from '../../models/saved-import-mapping.model';
 import { ModelHelperService } from '../helper/model-helper.service';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 
 @Injectable()
@@ -32,9 +33,9 @@ export class SavedImportMappingService {
     /**
      * Return total number of saved import mappings
      * @param queryBuilder
-     * @returns {Observable<Object>}
+     * @returns {Observable<IBasicCount>}
      */
-    getImportMappingsListCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+    getImportMappingsListCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
 
         return this.http.get(`import-mappings/count?where=${whereFilter}`, {});

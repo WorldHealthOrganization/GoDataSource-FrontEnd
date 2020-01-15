@@ -1,5 +1,5 @@
 <app-dashboard-custom-metric-dashlet
-    [link]="'/cases'"
+    [link]="CaseModel.canList(authUser) ? '/cases' : ''"
     [params]="getDashletParamsIncludingGlobalFilters({applyListFilter: Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS})"
     [value]="count"
     (hide)="onHide()"
