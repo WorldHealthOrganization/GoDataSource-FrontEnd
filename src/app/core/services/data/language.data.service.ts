@@ -9,6 +9,7 @@ import { localLanguages } from '../../../i18n';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { map, share, tap } from 'rxjs/operators';
 import { moment, Moment } from '../../helperClasses/x-moment';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class LanguageDataService {
@@ -61,11 +62,11 @@ export class LanguageDataService {
 
     /**
      * Return total number of languages
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getLanguagesCount(
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`languages/count?where=${whereFilter}`);
     }

@@ -13,7 +13,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { throwError } from 'rxjs';
@@ -27,6 +26,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { Observable } from 'rxjs/internal/Observable';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 
 @Component({
     selector: 'app-transmission-chain-bars',
@@ -38,6 +38,9 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE', null, true)
     ];
+
+    // constants
+    TransmissionChainModel = TransmissionChainModel;
 
     // authenticated user
     authUser: UserModel;
@@ -84,6 +87,9 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
 
     @ViewChild('chart') chartContainer: ElementRef;
 
+    /**
+     * Constructor
+     */
     constructor(
         private authDataService: AuthDataService,
         private transmissionChainBarsService: TransmissionChainBarsService,
@@ -97,6 +103,9 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         private referenceDataDataService: ReferenceDataDataService
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // init color rectangles
         this.legendColors = {
@@ -132,6 +141,9 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // release graph data
         this.transmissionChainBarsService.destroy();
@@ -450,9 +462,5 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
 
         // rebuild graph
         this.loadGraph();
-    }
-
-    hasCaseReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_CASE);
     }
 }

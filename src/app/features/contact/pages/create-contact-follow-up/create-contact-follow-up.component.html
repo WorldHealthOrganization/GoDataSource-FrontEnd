@@ -17,9 +17,9 @@
                 <mat-card class="page-section" fxLayout="column">
                     <div fxLayout="row" fxLayoutGap="20px">
                         <ng-container
-                            *ngIf="contactData">
+                            *ngIf="contactData && ContactModel.canView(authUser)">
                             <div>{{EntityType.CONTACT | translate}}</div>
-                            <a [routerLink]="['/contacts', contactData.id, 'modify']">{{ contactData.name }}</a>
+                            <a [routerLink]="['/contacts', contactData.id, 'view']">{{ contactData.name }}</a>
                         </ng-container>
                     </div>
 

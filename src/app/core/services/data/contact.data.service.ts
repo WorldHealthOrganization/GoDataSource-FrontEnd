@@ -15,6 +15,7 @@ import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validat
 import { MetricContactsFollowedUpReportModel } from '../../models/metrics/metric-contacts-followed-up-report.model';
 import { catchError, map } from 'rxjs/operators';
 import { Observable, throwError, of } from 'rxjs';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class ContactDataService {
@@ -46,12 +47,12 @@ export class ContactDataService {
      * Return total number of contacts
      * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getContactsCount(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const filter = queryBuilder.buildQuery();
         return this.http.get(`outbreaks/${outbreakId}/contacts/filtered-count?filter=${filter}`);
     }

@@ -28,6 +28,7 @@ import { moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./contact-merge-duplicate-records.component.less']
 })
 export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '/duplicated-records'),
         new BreadcrumbItemModel('LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE', '.', true)
@@ -89,6 +90,9 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
         }
     };
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -100,6 +104,9 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get merge ids
         // retrieve query params

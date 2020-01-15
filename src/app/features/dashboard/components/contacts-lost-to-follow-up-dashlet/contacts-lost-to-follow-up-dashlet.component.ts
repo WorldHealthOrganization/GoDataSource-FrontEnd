@@ -10,6 +10,8 @@ import { Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import * as _ from 'lodash';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-contacts-lost-to-follow-up-dashlet',
@@ -23,6 +25,7 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
 
     // provide constants to template
     Constants = Constants;
+    ContactModel = ContactModel;
 
     // outbreak
     outbreakId: string;
@@ -34,14 +37,24 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
 
+    /**
+     * Constructor
+     */
     constructor(
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        protected authDataService: AuthDataService
     ) {
-        super(listFilterDataService);
+        super(
+            listFilterDataService,
+            authDataService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get number of deceased cases
         this.displayLoading = true;
@@ -55,6 +68,9 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

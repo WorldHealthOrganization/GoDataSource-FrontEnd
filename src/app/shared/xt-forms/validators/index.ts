@@ -13,6 +13,7 @@ import { MinMaxValidatorDirective } from './min-max-validator.directive';
 import { GeneralAsyncValidatorDirective } from './general-async-validator.directive';
 import { HasPropertyDirective } from './has-property.directive';
 import { NotNumberValidatorDirective } from './not-number-validator.directive';
+import { GroupOptionRequirementsValidator } from './group-option-requirements-validator.directive';
 
 export const validatorDirectives: any[] = [
     EmailValidatorDirective,
@@ -29,5 +30,6 @@ export const validatorDirectives: any[] = [
     MinMaxValidatorDirective,
     GeneralAsyncValidatorDirective,
     HasPropertyDirective,
-    NotNumberValidatorDirective
+    NotNumberValidatorDirective,
+    GroupOptionRequirementsValidator
 ];

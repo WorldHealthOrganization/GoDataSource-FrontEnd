@@ -8,7 +8,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ClusterModel } from '../../../../core/models/cluster.model';
@@ -18,6 +17,7 @@ import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-clusters-list',
@@ -26,10 +26,12 @@ import { Subscription } from 'rxjs/internal/Subscription';
     styleUrls: ['./clusters-list.component.less']
 })
 export class ClustersListComponent extends ListComponent implements OnInit, OnDestroy {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '.', true)
     ];
+
+    // constants
+    ClusterModel = ClusterModel;
 
     outbreakSubscriber: Subscription;
 
@@ -39,7 +41,12 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
     selectedOutbreak: OutbreakModel;
     // list of existing clusters
     clustersList$: Observable<ClusterModel[]>;
-    clustersListCount$: Observable<any>;
+    clustersListCount$: Observable<IBasicCount>;
+
+    fixedTableColumns: string[] = [
+        'name',
+        'description'
+    ];
 
     recordActions: HoverRowAction[] = [
         // View Cluster
@@ -48,6 +55,9 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
             iconTooltip: 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_CLUSTER',
             click: (item: ClusterModel) => {
                 this.router.navigate(['/clusters', item.id, 'view']);
+            },
+            visible: (): boolean => {
+                return ClusterModel.canView(this.authUser);
             }
         }),
 
@@ -62,7 +72,7 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
                 return this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    this.hasOutbreakWriteAccess();
+                    ClusterModel.canModify(this.authUser);
             }
         }),
 
@@ -81,7 +91,7 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
                         return this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasOutbreakWriteAccess();
+                            ClusterModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -94,7 +104,7 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
                         return this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasOutbreakWriteAccess();
+                            ClusterModel.canDelete(this.authUser);
                     }
                 }),
 
@@ -105,14 +115,16 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
                         this.router.navigate(['/clusters', item.id, 'people']);
                     },
                     visible: (): boolean => {
-                        return this.hasCaseReadAccess() ||
-                            this.hasContactReadAccess();
+                        return ClusterModel.canListPeople(this.authUser);
                     }
                 })
             ]
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private clusterDataService: ClusterDataService,
@@ -126,6 +138,9 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -143,6 +158,9 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -156,8 +174,14 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
      */
     refreshList(finishCallback: (records: any[]) => void) {
         if (this.selectedOutbreak) {
-            this.clustersList$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id, this.queryBuilder)
+            this.clustersList$ = this.clusterDataService
+                .getClusterList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback([]);
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap((data: any[]) => {
                         finishCallback(data);
@@ -177,43 +201,16 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
-            this.clustersListCount$ = this.clusterDataService.getClustersCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
+            this.clustersListCount$ = this.clusterDataService
+                .getClustersCount(this.selectedOutbreak.id, countQueryBuilder)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
+                    share()
+                );
         }
-    }
-
-    /**
-     * Check if we have write access to Outbreak
-     * @returns {boolean}
-     */
-    hasOutbreakWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
-    }
-
-    /**
-     * Check if we have access to View cluster's cases
-     * @returns {boolean}
-     */
-    hasCaseReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_CASE);
-    }
-
-    /**
-     * Check if we have access to View cluster's contacts
-     * @returns {boolean}
-     */
-    hasContactReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'name',
-            'description'
-        ];
     }
 
     /**

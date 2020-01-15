@@ -1496,11 +1496,12 @@ export abstract class ListComponent implements OnDestroy {
 
             // Filter contacts witch successful follow-up
             case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP:
-                this.listFilterDataService.filterContactsWithSuccessfulFollowup(
-                    globalFilters.date,
-                    globalFilters.locationId,
-                    globalFilters.classificationId
-                )
+                this.listFilterDataService
+                    .filterContactsWithSuccessfulFollowup(
+                        globalFilters.date,
+                        globalFilters.locationId,
+                        globalFilters.classificationId
+                    )
                     .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {
                         const contactIDs: string[] = _.chain(result.contacts)
                             .filter((item: ContactFollowedUp) => item.successfulFollowupsCount > 0)

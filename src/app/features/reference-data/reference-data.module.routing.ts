@@ -1,6 +1,5 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import * as fromPages from './pages';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../core/models/permission.model';
@@ -11,17 +10,35 @@ const routes: Routes = [
     // Reference Data Categories List
     {
         path: '',
-        component: fromPages.ReferenceDataCategoriesListComponent
+        component: fromPages.ReferenceDataCategoriesListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.REFERENCE_DATA_LIST
+            ]
+        }
     },
     // View Reference Data Category Entries List
     {
         path: ':categoryId',
         component: fromPages.ReferenceDataCategoryEntriesListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_LIST
+            ]
+        }
     },
     // Create new Reference Data entry
     {
         path: ':categoryId/create',
         component: fromPages.CreateReferenceDataEntryComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_CREATE
+            ]
+        },
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
@@ -32,6 +49,9 @@ const routes: Routes = [
         component: fromPages.ModifyReferenceDataEntryComponent,
         canActivate: [AuthGuard],
         data: {
+            permissions: [
+                PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_VIEW
+            ],
             action: ViewModifyComponentAction.VIEW
         }
     },
@@ -41,7 +61,9 @@ const routes: Routes = [
         component: fromPages.ModifyReferenceDataEntryComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_REFERENCE_DATA],
+            permissions: [
+                PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_MODIFY
+            ],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [
@@ -55,7 +77,9 @@ const routes: Routes = [
         component: fromPages.ManageIconsListComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_REFERENCE_DATA]
+            permissions: [
+                PERMISSION.ICON_LIST
+            ]
         }
     },
     // Manage Icons - Create
@@ -64,7 +88,9 @@ const routes: Routes = [
         component: fromPages.ManageIconsCreateComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_REFERENCE_DATA]
+            permissions: [
+                PERMISSION.ICON_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard

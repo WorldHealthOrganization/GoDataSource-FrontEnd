@@ -8,6 +8,7 @@ import { RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/r
 import { SecurityQuestionModel } from '../../models/securityQuestion.model';
 import * as _ from 'lodash';
 import { mergeMap } from 'rxjs/operators';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class UserDataService {
@@ -15,23 +16,19 @@ export class UserDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve the list of Users
      * @returns {Observable<UserModel[]>}
      */
     getUsersList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<UserModel[]> {
-
-        const qb = new RequestQueryBuilder();
         // include roles and permissions in response
+        const qb = new RequestQueryBuilder();
         qb.include('roles', true);
-
         qb.merge(queryBuilder);
 
         const filter = qb.buildQuery();
-
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`users?filter=${filter}`),
             UserModel
@@ -54,14 +51,12 @@ export class UserDataService {
     /**
      * Return total number of users
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getUsersCount(
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
-
+    ): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
-
         return this.http.get(`users/count?where=${whereFilter}`);
     }
 
@@ -75,7 +70,6 @@ export class UserDataService {
         userId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<UserModel> {
-
         const qb = new RequestQueryBuilder();
         // include roles and permissions in response
         qb.include('roles', true);
@@ -83,7 +77,6 @@ export class UserDataService {
         qb.merge(queryBuilder);
 
         const filter = qb.buildQuery();
-
         return this.modelHelper.mapObservableToModel(
             this.http.get(`users/${userId}?filter=${filter}`),
             UserModel
