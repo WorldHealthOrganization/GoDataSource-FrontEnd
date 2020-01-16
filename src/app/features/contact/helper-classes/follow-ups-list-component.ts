@@ -108,9 +108,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             this.teamsListLoadedMap = {};
             this.teamsListLoadedForHeaderSearch = _.map(this.teamsListLoaded, (team: TeamModel) => {
                 // map for easy access if we don't have access to write data to follow-ups
-                if (!FollowUpModel.canModify(this.authUser)) {
-                    this.teamsListLoadedMap[team.id] = team;
-                }
+                this.teamsListLoadedMap[team.id] = team;
 
                 // header search
                 return new LabelValuePair(
