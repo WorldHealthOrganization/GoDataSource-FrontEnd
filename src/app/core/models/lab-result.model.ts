@@ -16,9 +16,6 @@ export class LabResultModel
         IPermissionBasic,
         IPermissionRestorable,
         IPermissionImportable {
-    entity: CaseModel | ContactModel;
-    case: CaseModel;
-
     id: string;
     sampleIdentifier: string;
     dateSampleTaken: string;
@@ -36,6 +33,7 @@ export class LabResultModel
         [variable: string]: IAnswerData[];
     };
     personId: string;
+    person: CaseModel | ContactModel;
     testedFor: string;
 
     /**
@@ -63,14 +61,11 @@ export class LabResultModel
     constructor(data = null) {
         super(data);
 
-        this.entity = _.get(data, 'case');
-        this.entity = this.entity && this.entity.type === EntityType.CONTACT ?
-            new ContactModel(this.entity) :
-            new CaseModel(this.entity);
-
-        this.case = _.get(data, 'case');
-        if (!_.isEmpty(this.case)) {
-            this.case = new CaseModel(this.case);
+        this.person = _.get(data, 'person');
+        if (!_.isEmpty(this.person)) {
+            this.person = this.person.type === EntityType.CONTACT ?
+                new ContactModel(this.person) :
+                new CaseModel(this.person);
         }
 
         this.id = _.get(data, 'id');

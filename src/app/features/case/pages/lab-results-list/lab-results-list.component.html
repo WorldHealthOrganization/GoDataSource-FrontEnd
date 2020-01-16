@@ -92,7 +92,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.case?.visualId}}
+                {{ item.person?.visualId}}
             </mat-cell>
         </ng-container>
 
@@ -115,7 +115,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.case?.lastName }}
+                {{ item.person?.lastName }}
             </mat-cell>
         </ng-container>
 
@@ -138,7 +138,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.case?.firstName }}
+                {{ item.person?.firstName }}
             </mat-cell>
         </ng-container>
 
@@ -166,7 +166,7 @@
             <mat-cell *matCellDef="let item">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.CASE_CLASSIFICATION"
-                    [value]="item.case.classification">
+                    [value]="item.person.classification">
                 </app-reference-data-label>
             </mat-cell>
         </ng-container>
