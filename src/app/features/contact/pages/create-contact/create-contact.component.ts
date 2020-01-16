@@ -16,7 +16,6 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { EntityType } from '../../../../core/models/entity-type';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { EventModel } from '../../../../core/models/event.model';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
@@ -29,6 +28,9 @@ import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-create-contact',
@@ -36,7 +38,10 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
     templateUrl: './create-contact.component.html',
     styleUrls: ['./create-contact.component.less']
 })
-export class CreateContactComponent extends ConfirmOnFormChanges implements OnInit {
+export class CreateContactComponent
+    extends CreateConfirmOnChanges
+    implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // selected outbreak ID
@@ -63,6 +68,12 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
 
     contactIdMaskValidator: Observable<boolean>;
 
+    // authenticated user details
+    authUser: UserModel;
+
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -75,12 +86,19 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
         private i18nService: I18nService,
-        private redirectService: RedirectService
+        private redirectService: RedirectService,
+        private authDataService: AuthDataService
     ) {
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
@@ -193,24 +211,49 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
      * Initialize breadcrumbs
      */
     private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // do we have related data ?
         if (this.relatedEntityData) {
             // case or event?
             if (this.relatedEntityData.type === EntityType.CASE) {
-                // creating contact for a case
-                this.breadcrumbs = [
-                    new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-                    new BreadcrumbItemModel(this.relatedEntityData.name, `/cases/${this.relatedEntityData.id}/view`),
-                    new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_TITLE', '.', true)
-                ];
+                // case list
+                if (CaseModel.canList(this.authUser)) {
+                    this.breadcrumbs.push(
+                        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+                    );
+                }
+
+                // case view - this oen is required, but might change later
+                if (CaseModel.canView(this.authUser)) {
+                    this.breadcrumbs.push(
+                        new BreadcrumbItemModel(this.relatedEntityData.name, `/cases/${this.relatedEntityData.id}/view`)
+                    );
+                }
+            } else if (this.relatedEntityData.type === EntityType.EVENT) {
+                // event list
+                if (EventModel.canList(this.authUser)) {
+                    this.breadcrumbs.push(
+                        new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events')
+                    );
+                }
+
+                // event view - this oen is required, but might change later
+                if (EventModel.canView(this.authUser)) {
+                    this.breadcrumbs.push(
+                        new BreadcrumbItemModel(this.relatedEntityData.name, `/events/${this.relatedEntityData.id}/view`)
+                    );
+                }
             } else {
-                // creating contact for an event
-                this.breadcrumbs = [
-                    new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
-                    new BreadcrumbItemModel(this.relatedEntityData.name, `/events/${this.relatedEntityData.id}/view`),
-                    new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_TITLE', '.', true)
-                ];
+                // NOT SUPPORTED :)
             }
         }
+
+        // current page breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_TITLE', '.', true)
+        );
     }
 
     /**
@@ -299,8 +342,8 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                                         loadingDialog.close();
 
                                         // navigate to listing page
-                                        this.disableDirtyConfirm();
                                         if (andAnotherOne) {
+                                            this.disableDirtyConfirm();
                                             this.redirectService.to(
                                                 [`/contacts/create`],
                                                 {
@@ -309,7 +352,19 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                                                 }
                                             );
                                         } else {
-                                            this.router.navigate([`/contacts/${contactData.id}/modify`]);
+                                            // navigate to proper page
+                                            // method handles disableDirtyConfirm too...
+                                            this.redirectToProperPageAfterCreate(
+                                                this.router,
+                                                this.redirectService,
+                                                this.authUser,
+                                                ContactModel,
+                                                'contacts',
+                                                contactData.id, {
+                                                    entityType: this.entityType,
+                                                    entityId: this.entityId
+                                                }
+                                            );
                                         }
                                     });
                             });
@@ -338,11 +393,12 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                         });
 
                         // display dialog
-                        this.dialogService.showConfirm(new DialogConfiguration({
-                            message: 'LNG_PAGE_CREATE_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
-                            customInput: true,
-                            fieldsList: possibleDuplicates,
-                        }))
+                        this.dialogService
+                            .showConfirm(new DialogConfiguration({
+                                message: 'LNG_PAGE_CREATE_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
+                                customInput: true,
+                                fieldsList: possibleDuplicates,
+                            }))
                             .subscribe((answer) => {
                                 if (answer.button === DialogAnswerButton.Yes) {
                                     runCreateContact();

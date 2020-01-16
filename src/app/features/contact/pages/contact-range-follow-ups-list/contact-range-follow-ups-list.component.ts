@@ -22,12 +22,14 @@ import { FollowUpPage } from '../../typings/follow-up-page';
 import { RangeFollowUpsModel } from '../../../../core/models/range-follow-ups.model';
 import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { Observable } from 'rxjs';
-import { share } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { AddressType } from '../../../../core/models/address.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
+import { throwError } from 'rxjs/internal/observable/throwError';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -36,17 +38,8 @@ import { TeamDataService } from '../../../../core/services/data/team.data.servic
     styleUrls: ['./contact-range-follow-ups-list.component.less']
 })
 export class ContactRangeFollowUpsListComponent extends ListComponent implements OnInit, OnDestroy {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_CONTACTS_TITLE',
-            '/contacts'
-        ),
-        new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE',
-            '.',
-            true
-        )
-    ];
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
@@ -73,7 +66,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     } = {};
 
     // used for pagination
-    followUpsGroupedByContactCount$: Observable<any>;
+    followUpsGroupedByContactCount$: Observable<IBasicCount>;
     teamsList$: Observable<TeamModel[]>;
 
     // loading flag - display spinner instead of table
@@ -90,6 +83,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     // constants
     ExportDataExtension = ExportDataExtension;
     ReferenceDataCategory = ReferenceDataCategory;
+    FollowUpModel = FollowUpModel;
 
     loadingDialog: LoadingDialogModel;
 
@@ -148,6 +142,9 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -218,14 +215,47 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                         });
                     });
             });
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        // init breadcrumbs
+        this.breadcrumbs = [];
+
+        // contacts breadcrumb
+        if (ContactModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_CONTACTS_TITLE',
+                    '/contacts'
+                )
+            );
+        }
+
+        // current page breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE',
+                '.',
+                true
+            )
+        );
     }
 
     /**
@@ -256,6 +286,13 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             let maxDate: Moment;
             this.followUpsDataService
                 .getRangeFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback([]);
+                        return throwError(err);
+                    })
+                )
                 .subscribe((rangeData: RangeFollowUpsModel[]) => {
                     this.followUpsGroupedByContact = _.map(rangeData, (data: RangeFollowUpsModel) => {
                         // determine follow-up questionnaire alertness
@@ -331,7 +368,15 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
-            this.followUpsGroupedByContactCount$ = this.followUpsDataService.getRangeFollowUpsListCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
+            this.followUpsGroupedByContactCount$ = this.followUpsDataService
+                .getRangeFollowUpsListCount(this.selectedOutbreak.id, countQueryBuilder)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
+                    share()
+                );
         }
     }
 
@@ -379,6 +424,9 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         this.needsRefreshList(instant);
     }
 
+    /**
+     * Reset filters
+     */
     resetFilters() {
         // reset filters in UI
         this.filters = {
@@ -405,6 +453,9 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         this.needsRefreshList();
     }
 
+    /**
+     * Apply filters
+     */
     applyFilters() {
         // clear query builder and apply each filter separately
         this.queryBuilder.clear();
@@ -442,7 +493,8 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         // filter by contact locations
         // only current addresses
         if (!_.isEmpty(this.filters.locationIds)) {
-            this.queryBuilder.addChildQueryBuilder('contact').filter
+            this.queryBuilder
+                .addChildQueryBuilder('contact').filter
                 .where({
                     addresses: {
                         $elemMatch: {

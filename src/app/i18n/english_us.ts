@@ -30,6 +30,22 @@ export const EnglishUsLang = {
         'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_EXPOSURES': 'Full list of exposures',
 
         /**
+         * uiGanttChartDashlet
+         */
+        'LNG_PAGE_GANTT_CHART_TITLE': 'Gantt Chart',
+
+        /**
+         * uiModifyTeamPage
+         */
+        'LNG_PAGE_VIEW_TEAM_TITLE': 'View Team',
+
+        /**
+         * uiModifyUserPage
+         */
+        'LNG_PAGE_MODIFY_USER_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_VIEW_USER_TITLE': 'View {{name}}',
+
+        /**
          * uiCaseFields
          */
         'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS': 'Number of contacts',
@@ -82,6 +98,35 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_FOLLOW_UPS': 'Are you sure you want to delete selected follow-ups?',
         'LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_FOLLOW_UPS': 'Are you sure you want to restore selected follow-ups?',
 
+        /**
+         * uiUserRoleFields
+         */
+        'LNG_USER_ROLE_FIELD_LABEL_USERS': 'Users',
+
+        /**
+         * uiModifyUserRolePage
+         */
+        'LNG_PAGE_MODIFY_USER_ROLES_AFFECTED_USERS_TITLE': 'Affected Users',
+        'LNG_PAGE_MODIFY_USER_ROLES_AFFECTED_USERS_NONE_LABEL': 'None',
+
+        /**
+         * uiSyncLogsListPage
+         */
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_IMPORT_SYNC_PACKAGE_BUTTON': 'Import sync package',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_EXPORT_SYNC_PACKAGE_BUTTON': 'Export sync package',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ERROR_DETAILS_TITLE': 'Error details',
+
+        /**
+         * uiModifyReferenceDataEntryPage
+         */
+        'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_LABEL_NO_ICON': 'No icon',
+
+        /**
+         * uiFormInputValidationErrors
+         */
+        'LNG_FORM_VALIDATION_ERROR_MISSING_REQUIRED_OPTIONS': 'Missing options: {{options}}'
+
+
 
         /**
          * REMOVE the tokens from below
@@ -95,5 +140,8 @@ export const EnglishUsLang = {
         // LNG_PAGE_BULK_ADD_CONTACTS_LABEL_LOCATIONS_DESCRIPTION
         // LNG_PAGE_BULK_ADD_CONTACTS_TAB_ADD_CONTACTS
         // LNG_PAGE_LIST_FILTER_CASES_OUTSIDE_THE_TRANSMISSION_CHAINS
+        // LNG_PAGE_SYSTEM_BACKUPS_IMPORT_SYNC_PACKAGE_BUTTON
+        // LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE_BUTTON
+        // LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_LABEL_NO_COLOR
     }
 };

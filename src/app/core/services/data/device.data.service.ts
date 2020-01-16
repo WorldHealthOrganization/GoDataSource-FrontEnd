@@ -5,6 +5,7 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { DeviceModel } from '../../models/device.model';
 import { DeviceHistoryModel } from '../../models/device-history.model';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class DeviceDataService {
@@ -32,11 +33,11 @@ export class DeviceDataService {
 
     /**
      * Return total number of devices
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getDevicesCount(
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`devices/count?where=${whereFilter}`);
     }

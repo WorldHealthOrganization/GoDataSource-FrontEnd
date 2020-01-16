@@ -1,11 +1,10 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { EventModel } from '../../../../core/models/event.model';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -26,10 +25,12 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { LoadingDialogModel } from '../../../../shared/components/loading-dialog/loading-dialog.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
-import { throwError } from 'rxjs';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-events-list',
@@ -38,7 +39,7 @@ import { EntityHelperService } from '../../../../core/services/helper/entity-hel
     styleUrls: ['./events-list.component.less']
 })
 export class EventsListComponent extends ListComponent implements OnInit, OnDestroy {
-
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '.', true)
     ];
@@ -46,12 +47,16 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     // authenticated user
     authUser: UserModel;
 
+    // constants
+    EventModel = EventModel;
+    RelationshipModel = RelationshipModel;
+
     // user list
     userList$: Observable<UserModel[]>;
 
     // list of existing events
     eventsList$: Observable<EventModel[]>;
-    eventsListCount$: Observable<any>;
+    eventsListCount$: Observable<IBasicCount>;
     yesNoOptionsList$: Observable<any>;
 
     // events outbreak
@@ -93,7 +98,8 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                 this.router.navigate(['/events', item.id, 'view']);
             },
             visible: (item: EventModel): boolean => {
-                return !item.deleted;
+                return !item.deleted &&
+                    EventModel.canView(this.authUser);
             }
         }),
 
@@ -109,7 +115,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    this.hasEventWriteAccess();
+                    EventModel.canModify(this.authUser);
             }
         }),
 
@@ -129,7 +135,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasEventWriteAccess();
+                            EventModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -143,7 +149,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasEventWriteAccess();
+                            EventModel.canDelete(this.authUser);
                     }
                 }),
 
@@ -163,7 +169,8 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            ContactModel.canCreate(this.authUser) &&
+                            EventModel.canCreateContact(this.authUser);
                     }
                 }),
 
@@ -183,7 +190,8 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            ContactModel.canBulkCreate(this.authUser) &&
+                            EventModel.canBulkCreateContact(this.authUser);
                     }
                 }),
 
@@ -195,8 +203,15 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                         return !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id && (
+                                (
+                                    ContactModel.canCreate(this.authUser) &&
+                                    EventModel.canCreateContact(this.authUser)
+                                ) || (
+                                    ContactModel.canBulkCreate(this.authUser) &&
+                                    EventModel.canBulkCreateContact(this.authUser)
+                                )
+                            );
                     }
                 }),
 
@@ -207,7 +222,9 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                         this.router.navigate(['/relationships', EntityType.EVENT, item.id, 'contacts']);
                     },
                     visible: (item: EventModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted &&
+                            RelationshipModel.canList(this.authUser) &&
+                            EventModel.canListRelationshipContacts(this.authUser);
                     }
                 }),
 
@@ -218,7 +235,9 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                         this.router.navigate(['/relationships', EntityType.EVENT, item.id, 'exposures']);
                     },
                     visible: (item: EventModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted &&
+                            RelationshipModel.canList(this.authUser) &&
+                            EventModel.canListRelationshipExposures(this.authUser);
                     }
                 }),
 
@@ -233,7 +252,7 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasEventWriteAccess();
+                            EventModel.canRestore(this.authUser);
                     },
                     class: 'mat-menu-item-restore'
                 })
@@ -241,6 +260,9 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private eventDataService: EventDataService,
@@ -262,9 +284,13 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         // retrieve users
@@ -380,8 +406,14 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             );
 
             // retrieve the list of Events
-            this.eventsList$ = this.eventDataService.getEventsList(this.selectedOutbreak.id, this.queryBuilder)
+            this.eventsList$ = this.eventDataService
+                .getEventsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback([]);
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap((data: any[]) => {
                         finishCallback(data);
@@ -401,24 +433,16 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
-            this.eventsListCount$ = this.eventDataService.getEventsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
+            this.eventsListCount$ = this.eventDataService
+                .getEventsCount(this.selectedOutbreak.id, countQueryBuilder)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
+                    share()
+                );
         }
-    }
-
-    /**
-     * Check if we have write access to events
-     * @returns {boolean}
-     */
-    hasEventWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
-    }
-
-    /**
-     * Check if we have access to create a contact
-     * @returns {boolean}
-     */
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
     }
 
     /**

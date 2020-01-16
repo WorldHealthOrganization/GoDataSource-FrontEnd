@@ -16,6 +16,7 @@ import { Constants } from '../../models/constants';
 import { I18nService } from '../helper/i18n.service';
 import { map } from 'rxjs/operators';
 import { moment } from '../../helperClasses/x-moment';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class EntityDataService {
@@ -85,12 +86,12 @@ export class EntityDataService {
      * Return total number of Cases, Contacts and Events for an Outbreak
      * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getEntitiesCount(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
 
         const whereFilter = queryBuilder.filter.generateCondition(true);
 

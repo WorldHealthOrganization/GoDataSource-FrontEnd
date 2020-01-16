@@ -141,7 +141,7 @@
         <ng-container
             *app-selected-outbreak-is-active
         >
-            <button *ngIf="hasEventWriteAccess() && viewOnly"
+            <button *ngIf="viewOnly && EventModel.canModify(authUser)"
                     mat-raised-button type="button" color="accent"
                     [routerLink]="['/events', eventId, 'modify']">
                 {{'LNG_COMMON_BUTTON_EDIT'| translate}}
@@ -152,14 +152,20 @@
                     {{'LNG_COMMON_BUTTON_SAVE' | translate}}
                 </button>
 
-                <button type="button" [routerLink]="'/events'" mat-raised-button>
+                <button
+                    *ngIf="EventModel.canList(authUser)"
+                    type="button"
+                    mat-raised-button
+                    [routerLink]="'/events'">
                     {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
                 </button>
             </ng-container>
 
-            <div class="page-tabs-navbar-placeholder"></div>
+            <div
+                *ngIf="(viewOnly && EventModel.canModify(authUser)) || (!viewOnly && EventModel.canList(authUser))"
+                class="page-tabs-navbar-placeholder"></div>
 
-            <ng-container *ngIf="hasContactWriteAccess()">
+            <ng-container *ngIf="EventModel.canCreateContact(authUser) && ContactModel.canCreate(authUser)">
                 <button
                     type="button"
                     mat-raised-button color="accent"
@@ -172,10 +178,18 @@
             </ng-container>
         </ng-container>
 
-        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.EVENT, eventId, 'contacts']">
+        <button
+            *ngIf="EventModel.canListRelationshipContacts(authUser) && RelationshipModel.canList(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/relationships', EntityType.EVENT, eventId, 'contacts']">
             {{ 'LNG_COMMON_BUTTON_EXPOSURES_FROM' | translate }}
         </button>
-        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.EVENT, eventId, 'exposures']">
+        <button
+            *ngIf="EventModel.canListRelationshipExposures(authUser) && RelationshipModel.canList(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/relationships', EntityType.EVENT, eventId, 'exposures']">
             {{ 'LNG_COMMON_BUTTON_EXPOSURES_TO' | translate }}
         </button>
     </div>

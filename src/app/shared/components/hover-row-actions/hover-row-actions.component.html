@@ -48,7 +48,7 @@
 
                 <!-- Menu Options -->
                 <ng-container
-                    *ngFor="let menuOptionData of buttonData.menuOptions">
+                    *ngFor="let menuOptionData of buttonData.menuOptions; let isFirst = first; let isLast = last">
                     <!-- Menu Button -->
                     <button
                         *ngIf="menuOptionData.type === HoverRowActionType.BUTTON"
@@ -61,7 +61,7 @@
 
                     <!-- Menu Divider -->
                     <mat-divider
-                        *ngIf="menuOptionData.type === HoverRowActionType.DIVIDER"
+                        *ngIf="!isFirst && !isLast && menuOptionData.type === HoverRowActionType.DIVIDER"
                         [ngClass]="menuOptionData.class">
                     </mat-divider>
                 </ng-container>

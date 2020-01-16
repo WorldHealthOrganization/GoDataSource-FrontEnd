@@ -5,6 +5,7 @@
 
             <div class="topnav-actions">
                 <button
+                    *ngIf="exportRangeFollowUpsUrl && exportRangeExtraAPIData && FollowUpModel.canExportRange(authUser)"
                     mat-raised-button
                     color="accent"
                     [matMenuTriggerFor]="quickActionsMenu">
@@ -13,7 +14,7 @@
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <app-export-button
-                        *ngIf="exportRangeFollowUpsUrl && exportRangeExtraAPIData"
+                        *ngIf="exportRangeFollowUpsUrl && exportRangeExtraAPIData && FollowUpModel.canExportRange(authUser)"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_TITLE' | translate"
@@ -46,8 +47,7 @@
         <div>
             <button
                 mat-raised-button
-                (click)="toggleFilters()"
-            >
+                (click)="toggleFilters()">
                 {{ toggleFiltersButtonLabel | translate }}
             </button>
         </div>

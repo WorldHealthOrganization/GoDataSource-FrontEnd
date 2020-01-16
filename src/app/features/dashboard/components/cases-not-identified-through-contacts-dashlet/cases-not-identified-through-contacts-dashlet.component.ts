@@ -6,6 +6,8 @@ import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { Subscription } from 'rxjs';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
     selector: 'app-cases-not-identified-through-contacts-dashlet',
@@ -19,6 +21,7 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
 
     // constants to be used for applyListFilters
     Constants = Constants;
+    CaseModel = CaseModel;
 
     // outbreak
     outbreakId: string;
@@ -30,14 +33,24 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
 
+    /**
+     * Constructor
+     */
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        protected authDataService: AuthDataService
     ) {
-        super(listFilterDataService);
+        super(
+            listFilterDataService,
+            authDataService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get contacts on followup list count
         this.displayLoading = true;
@@ -51,6 +64,9 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

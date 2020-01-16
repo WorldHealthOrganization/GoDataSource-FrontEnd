@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { LabResultModel } from '../../models/lab-result.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { ModelHelperService } from '../helper/model-helper.service';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class LabResultDataService {
@@ -40,13 +41,13 @@ export class LabResultDataService {
      * @param {string} outbreakId
      * @param {string} caseId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getCaseLabResultsCount(
         outbreakId: string,
         caseId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`outbreaks/${outbreakId}/cases/${caseId}/lab-results/count?where=${whereFilter}`);
     }
@@ -72,12 +73,12 @@ export class LabResultDataService {
      * returns total number of lab results
      * @param {string} outbreakId
      * @param {RequestQueryBuilder}queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getOutbreakLabResultsCount(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const filter = queryBuilder.buildQuery();
         return this.http.get(`/outbreaks/${outbreakId}/lab-results/aggregate-filtered-count?filter=${filter}`);
     }

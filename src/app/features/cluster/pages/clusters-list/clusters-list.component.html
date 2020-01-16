@@ -5,7 +5,7 @@
 
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
-                    <button *ngIf="hasOutbreakWriteAccess()" mat-raised-button color="accent"
+                    <button *ngIf="ClusterModel.canCreate(authUser)" mat-raised-button color="accent"
                             [routerLink]="'./create'">
                         {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                     </button>
@@ -92,9 +92,9 @@
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+        <mat-header-row *matHeaderRowDef="fixedTableColumns"></mat-header-row>
         <mat-row
-            *matRowDef="let item; columns: getTableColumns()"
+            *matRowDef="let item; columns: fixedTableColumns"
             app-hover-row-actions
             [hoverRowActionsComponent]="hoverRow"
             [hoverRowActions]="recordActions"

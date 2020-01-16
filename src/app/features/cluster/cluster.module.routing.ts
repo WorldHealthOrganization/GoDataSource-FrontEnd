@@ -11,7 +11,13 @@ const routes: Routes = [
     // Clusters list
     {
         path: '',
-        component: fromPages.ClustersListComponent
+        component: fromPages.ClustersListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CLUSTER_LIST
+            ]
+        }
     },
     // Create Cluster
     {
@@ -19,7 +25,9 @@ const routes: Routes = [
         component: fromPages.CreateClusterComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_OUTBREAK]
+            permissions: [
+                PERMISSION.CLUSTER_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -31,15 +39,11 @@ const routes: Routes = [
         component: fromPages.ModifyClusterComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_OUTBREAK],
+            permissions: [
+                PERMISSION.CLUSTER_VIEW
+            ],
             action: ViewModifyComponentAction.VIEW
         }
-    },
-    // View clusters people
-    {
-        path: ':clusterId/people',
-        component: fromPages.ClustersPeopleListComponent,
-        canActivate: [AuthGuard]
     },
     // Edit Cluster
     {
@@ -47,12 +51,26 @@ const routes: Routes = [
         component: fromPages.ModifyClusterComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_OUTBREAK],
+            permissions: [
+                PERMISSION.CLUSTER_VIEW,
+                PERMISSION.CLUSTER_MODIFY
+            ],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
+    },
+    // View clusters people
+    {
+        path: ':clusterId/people',
+        component: fromPages.ClustersPeopleListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CLUSTER_LIST_PEOPLE
+            ]
+        }
     }
 ];
 

@@ -1,6 +1,5 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
@@ -11,7 +10,13 @@ const routes: Routes = [
     // Roles list
     {
         path: '',
-        component: fromPages.RolesListComponent
+        component: fromPages.RolesListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.USER_ROLE_LIST
+            ]
+        }
     },
     // Create new Role
     {
@@ -19,7 +24,9 @@ const routes: Routes = [
         component: fromPages.CreateRoleComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_ROLE]
+            permissions: [
+                PERMISSION.USER_ROLE_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -31,7 +38,9 @@ const routes: Routes = [
         component: fromPages.ModifyRoleComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_ROLE],
+            permissions: [
+                PERMISSION.USER_ROLE_VIEW
+            ],
             action: ViewModifyComponentAction.VIEW
         }
     },
@@ -41,7 +50,9 @@ const routes: Routes = [
         component: fromPages.ModifyRoleComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_ROLE],
+            permissions: [
+                PERMISSION.USER_ROLE_MODIFY
+            ],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [

@@ -4,6 +4,7 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder/request-query-builder';
 import { Observable } from 'rxjs';
 import { SavedFilterModel } from '../../models/saved-filters.model';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class SavedFiltersService {
@@ -31,9 +32,9 @@ export class SavedFiltersService {
     /**
      * Return total number of saved filters
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<Object>}
+     * @returns {Observable<IBasicCount>}
      */
-    getSavedFiltersListCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+    getSavedFiltersListCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
 
         return this.http.get(`filter-mappings/count?where=${whereFilter}`, {});

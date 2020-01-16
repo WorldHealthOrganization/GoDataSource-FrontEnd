@@ -6,7 +6,6 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { DialogAnswer, DialogAnswerButton, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
@@ -22,6 +21,7 @@ import { throwError, of, forkJoin } from 'rxjs';
 import { Router } from '@angular/router';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-client-applications-list',
@@ -30,9 +30,7 @@ import { moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./client-applications-list.component.less']
 })
 export class ClientApplicationsListComponent extends ListComponent implements OnInit {
-    /**
-     * Breadcrumbs
-     */
+    // Breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_TITLE', '.', true)
     ];
@@ -42,7 +40,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
 
     // client applications servers
     clientApplicationsServerList: SystemClientApplicationModel[] = [];
-    clientApplicationsServerListCount: { count: number };
+    clientApplicationsServerListCount: IBasicCount;
     clientApplicationsServerListAll: SystemClientApplicationModel[] = [];
 
     // settings
@@ -50,6 +48,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
 
     // constants
     UserSettings = UserSettings;
+    SystemClientApplicationModel = SystemClientApplicationModel;
 
     loadingDialog: LoadingDialogModel;
 
@@ -60,6 +59,9 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE',
             click: (item: SystemClientApplicationModel) => {
                 this.downloadConfFile(item);
+            },
+            visible: (item: SystemClientApplicationModel): boolean => {
+                return SystemClientApplicationModel.canDownloadConfFile(this.authUser);
             }
         }),
 
@@ -68,12 +70,17 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             icon: 'visibilityOf',
             iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE',
             click: (item: SystemClientApplicationModel, handler: HoverRowActionsDirective) => {
-                this.toggleActiveFlag(item);
-                handler.redraw();
+                this.toggleActiveFlag(
+                    item,
+                    false,
+                    () => {
+                        handler.redraw();
+                    }
+                );
             },
             visible: (item: SystemClientApplicationModel): boolean => {
-                return this.hasSysConfigWriteAccess() &&
-                    item.active;
+                return item.active &&
+                    SystemClientApplicationModel.canDisable(this.authUser);
             }
         }),
 
@@ -82,12 +89,17 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE',
             click: (item: SystemClientApplicationModel, handler: HoverRowActionsDirective) => {
-                this.toggleActiveFlag(item);
-                handler.redraw();
+                this.toggleActiveFlag(
+                    item,
+                    true,
+                    () => {
+                        handler.redraw();
+                    }
+                );
             },
             visible: (item: SystemClientApplicationModel): boolean => {
-                return this.hasSysConfigWriteAccess() &&
-                    !item.active;
+                return !item.active &&
+                    SystemClientApplicationModel.canEnable(this.authUser);
             }
         }),
 
@@ -103,7 +115,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                         this.deleteClientApplication(item);
                     },
                     visible: (): boolean => {
-                        return this.hasSysConfigWriteAccess();
+                        return SystemClientApplicationModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -166,7 +178,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
         ];
 
         // outbreaks
-        if (this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK)) {
+        if (OutbreakModel.canList(this.authUser)) {
             this.tableColumns.push(
                 new VisibleColumnModel({
                     field: 'outbreaks',
@@ -183,8 +195,8 @@ export class ClientApplicationsListComponent extends ListComponent implements On
         this.clientApplicationsServerList = [];
         this.clientApplicationsServerListAll = [];
 
-        const outbreaksList$: Observable<OutbreakModel[]> = this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK) ?
-            this.outbreakDataService.getOutbreaksList() :
+        const outbreaksList$: Observable<OutbreakModel[]> = OutbreakModel.canList(this.authUser) ?
+            this.outbreakDataService.getOutbreaksListReduced() :
             of([]);
 
         forkJoin(
@@ -194,6 +206,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
+                    finishCallback([]);
                     return throwError(err);
                 })
             )
@@ -255,14 +268,6 @@ export class ClientApplicationsListComponent extends ListComponent implements On
     }
 
     /**
-     * Check if we have write access to sys settings
-     * @returns {boolean}
-     */
-    hasSysConfigWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
-    }
-
-    /**
      * Delete record
      * @param item
      */
@@ -280,11 +285,10 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                         )
                         .subscribe((settings: SystemSettingsModel) => {
                             // filter client applications and remove client application
-                            const filteredClientApplications =
-                                settings.clientApplications
-                                    .filter((clientApp: SystemClientApplicationModel) => {
-                                        return clientApp.id !== clientApplication.id;
-                                });
+                            const filteredClientApplications = settings.clientApplications.filter((clientApp: SystemClientApplicationModel) => {
+                                return clientApp.id !== clientApplication.id;
+                            });
+
                             // save upstream servers
                             this.systemSettingsDataService
                                 .modifySystemSettings({
@@ -310,12 +314,12 @@ export class ClientApplicationsListComponent extends ListComponent implements On
 
     /**
      * Toggle active flag
-     * @param upstreamServer
      */
-    toggleActiveFlag(clientApplication: SystemClientApplicationModel) {
-        // toggle flag
-        clientApplication.active = !clientApplication.active;
-
+    toggleActiveFlag(
+        clientApplication: SystemClientApplicationModel,
+        newValue: boolean,
+        finishCallback: () => void
+    ) {
         // save
         this.systemSettingsDataService
             .getSystemSettings()
@@ -327,28 +331,36 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             )
             .subscribe((settings: SystemSettingsModel) => {
                 // map client applications and modify client application status
-                const modifiedClientApplications =
-                    _.map(settings.clientApplications, (clientApp: SystemClientApplicationModel) => {
-                        if (clientApp.id === clientApplication.id) {
-                            clientApp.active = !clientApplication.active;
-                        }
-                        return clientApp;
+                const childClientApplication: SystemClientApplicationModel = _.find(settings.clientApplications, (clientApp: SystemClientApplicationModel) => {
+                    return clientApp.id === clientApplication.id;
                 });
-                // save client applications
-                this.systemSettingsDataService
-                    .modifySystemSettings({
-                        clientApplications: modifiedClientApplications
-                    })
-                    .pipe(
-                        catchError((err) => {
-                            this.snackbarService.showApiError(err);
-                            return throwError(err);
+                if (childClientApplication) {
+                    // update data
+                    childClientApplication.active = newValue;
+
+                    // save client applications
+                    this.systemSettingsDataService
+                        .modifySystemSettings({
+                            clientApplications: settings.clientApplications
                         })
-                    )
-                    .subscribe(() => {
-                        // display success message
-                        this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE');
-                    });
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
+                        .subscribe(() => {
+                            // display success message
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE');
+
+                            // finished
+                            clientApplication.active = newValue;
+                            finishCallback();
+                        });
+                } else {
+                    // no client application found - must refresh page
+                    this.needsRefreshList(true);
+                }
             });
     }
 

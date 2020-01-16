@@ -8,6 +8,8 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 
 @Component({
     selector: 'app-new-chains-of-transmission-from-registered-contacts-dashlet',
@@ -34,14 +36,27 @@ export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent exten
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
 
+    // constants
+    TransmissionChainModel = TransmissionChainModel;
+
+    /**
+     * Constructor
+     */
     constructor(
         private outbreakDataService: OutbreakDataService,
         private transmissionChainDataService: TransmissionChainDataService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        protected authDataService: AuthDataService
     ) {
-        super(listFilterDataService);
+        super(
+            listFilterDataService,
+            authDataService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get number of deceased cases
         this.displayLoading = true;
@@ -55,6 +70,9 @@ export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent exten
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

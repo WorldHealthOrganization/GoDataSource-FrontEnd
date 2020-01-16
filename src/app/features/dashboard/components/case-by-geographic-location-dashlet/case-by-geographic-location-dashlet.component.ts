@@ -11,6 +11,9 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { Router } from '@angular/router';
 import { Constants } from '../../../../core/models/constants';
 import { Moment } from '../../../../core/helperClasses/x-moment';
+import { CaseModel } from '../../../../core/models/case.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-case-by-geographic-location-dashlet',
@@ -61,6 +64,9 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
     // loading data
     displayLoading: boolean = true;
 
+    // authenticated user
+    authUser: UserModel;
+
     /**
      * Global Filters changed
      */
@@ -68,13 +74,23 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
         this.refreshData();
     }), 100);
 
+    /**
+     * Constructor
+     */
     constructor(
         private outbreakDataService: OutbreakDataService,
         private caseDataService: CaseDataService,
-        private router: Router
+        private router: Router,
+        private authDataService: AuthDataService
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // outbreak
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -86,6 +102,9 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -131,6 +150,12 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
      * Redirect to cases page when user click on a piece of pie chart to display the cases that represent the part of pie chart
      */
     onDoughnutPress(pressed) {
+        // we need case list permission to redirect
+        if (!CaseModel.canList(this.authUser)) {
+            return;
+        }
+
+        // construct redirect global filter
         const global: {
             date?: Moment,
             locationId?: string,
@@ -152,6 +177,7 @@ export class CasesByGeographicLocationDashletComponent implements OnInit, OnDest
             global.classificationId = this.globalFilterClassificationId;
         }
 
+        // redirect
         this.router.navigate([`cases`],
             {
                 queryParams: {

@@ -8,6 +8,7 @@ import { HelpItemModel } from '../../models/help-item.model';
 import * as _ from 'lodash';
 import { CacheKey, CacheService } from '../helper/cache.service';
 import { map } from 'rxjs/operators';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class HelpDataService {
@@ -33,11 +34,11 @@ export class HelpDataService {
     /**
      * Return count of help categories
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getHelpCategoryCount(
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`help-categories/count?where=${whereFilter}`);
     }
@@ -142,12 +143,12 @@ export class HelpDataService {
      * Return count of help items from a category
      * @param {string} categoryId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getHelpItemsCategoryCount(
         categoryId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`help-categories/${categoryId}/help-items/count?where=${whereFilter}`);
     }

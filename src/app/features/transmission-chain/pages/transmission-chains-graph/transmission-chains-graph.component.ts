@@ -23,7 +23,6 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { SelectedNodes } from '../../classes/selected-nodes';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import * as FileSaver from 'file-saver';
 import { DomService } from '../../../../core/services/helper/dom.service';
@@ -35,6 +34,7 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 
 enum NodeAction {
     MODIFY_PERSON = 'modify-person',
@@ -49,7 +49,7 @@ enum NodeAction {
     styleUrls: ['./transmission-chains-graph.component.less']
 })
 export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
-
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', null, true)
     ];
@@ -89,7 +89,11 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     Constants = Constants;
     EntityType = EntityType;
     NodeAction = NodeAction;
+    TransmissionChainModel = TransmissionChainModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
@@ -106,6 +110,9 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         private systemSettingsDataService: SystemSettingsDataService
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -140,41 +147,15 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
-    }
-
-    hasCaseReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_CASE);
-    }
-
-    hasCaseWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-    }
-
-    hasEventWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
-    }
-
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-    }
-
-    canModifySelectedNode(): boolean {
-        return (
-            this.selectedNodes.nodes[0].type === EntityType.CASE &&
-            this.hasCaseWriteAccess()
-        ) || (
-            this.selectedNodes.nodes[0].type === EntityType.EVENT &&
-            this.hasEventWriteAccess()
-        ) || (
-            this.selectedNodes.nodes[0].type === EntityType.CONTACT &&
-            this.hasContactWriteAccess()
-        );
     }
 
     /**
