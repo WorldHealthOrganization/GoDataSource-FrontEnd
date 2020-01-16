@@ -21,20 +21,20 @@
                             class="lab-result-case-title"
                             fxLayout="row" fxLayoutGap="20px">
                             <ng-container
-                                *ngIf="labResultData?.entity?.id && (
-                                    (labResultData.entity.type === EntityType.CASE && CaseModel.canView(authUser)) ||
-                                    (labResultData.entity.type === EntityType.CONTACT && ContactModel.canView(authUser))
+                                *ngIf="labResultData?.person?.id && (
+                                    (labResultData.person.type === EntityType.CASE && CaseModel.canView(authUser)) ||
+                                    (labResultData.person.type === EntityType.CONTACT && ContactModel.canView(authUser))
                                 )">
-                                <div>{{ (labResultData.entity.type === EntityType.CASE ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE' : 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT') | translate }}</div>
+                                <div>{{ (labResultData.person.type === EntityType.CASE ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE' : 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT') | translate }}</div>
 
                                 <a
-                                    [routerLink]="[labResultData.entity.type === EntityType.CASE ? '/cases' : '/contacts', labResultData.personId, 'view']">
-                                    {{ labResultData.entity.name}}
+                                    [routerLink]="[labResultData.person.type === EntityType.CASE ? '/cases' : '/contacts', labResultData.personId, 'view']">
+                                    {{ labResultData.person.name}}
                                 </a>
 
                                 <div
-                                    *ngIf="labResultData.entity.type === EntityType.CONTACT">
-                                    {{ 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT_WITH_INFO' | translate: {caseName: labResultData.entity.name} }}
+                                    *ngIf="labResultData.person.type === EntityType.CONTACT">
+                                    {{ 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT_WITH_INFO' | translate: {caseName: labResultData.person.name} }}
                                 </div>
                             </ng-container>
                         </div>
