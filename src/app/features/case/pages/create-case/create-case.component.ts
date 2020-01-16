@@ -111,6 +111,9 @@ export class CreateCaseComponent
                 }
             });
 
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
+
         // by default, enforce Case having an address
         this.caseData.addresses.push(new AddressModel());
         // pre-set the initial address as "current address"
