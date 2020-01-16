@@ -1883,22 +1883,4 @@ export abstract class ListComponent implements OnDestroy {
         // set column configuration
         this.expandAllCellsForColumn[columnName] = expand;
     }
-
-    /**
-     * Convert value to a numer if necessary
-     * @param value string | number
-     */
-    toNumber(value): number {
-        try {
-            const newValue = _.isNumber(value) ?
-                value : (
-                    _.isString(value) && value.length > 0 ?
-                        parseFloat(value) :
-                        value
-                );
-            return newValue;
-        } catch (e) {
-            return value;
-        }
-    }
 }
