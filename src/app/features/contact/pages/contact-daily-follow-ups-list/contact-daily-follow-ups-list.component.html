@@ -426,20 +426,19 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 <app-form-select
-                    *ngIf="FollowUpModel.canModify(authUser) else elseTeamLabel"
+                    *ngIf="FollowUpModel.canModify(authUser) && !item.deleted"
                     name="teamId"
                     [ngModel]="item.teamId"
                     [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate"
                     [options]="teamsListLoaded"
                     optionLabelKey="name"
                     optionValueKey="id"
-                    (optionChanged)="changeFollowUpTeam(item, $event)"
-                    [disabled]="item.deleted">
+                    (optionChanged)="changeFollowUpTeam(item, $event)">
                 </app-form-select>
-                <ng-template
-                    #elseTeamLabel>
+                <ng-container
+                    *ngIf="!FollowUpModel.canModify(authUser) || item.deleted">
                     {{ teamsListLoadedMap[item.teamId] ? teamsListLoadedMap[item.teamId].name : '' }}
-                </ng-template>
+                </ng-container>
             </mat-cell>
         </ng-container>
 
@@ -496,20 +495,18 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
                 <app-form-slide-toggle
-                    *ngIf="FollowUpModel.canModify(authUser) else elseTargetedLabel"
+                    *ngIf="FollowUpModel.canModify(authUser) && !item.deleted"
                     name="targeted"
                     [(ngModel)]="item.targeted"
                     [label]="item.targeted ? ('LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate) : ('LNG_FOLLOW_UP_FIELD_LABEL_NOT_TARGETED' | translate)"
                     [tooltip]="item.targeted ? ('LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION' | translate ): ('LNG_FOLLOW_UP_FIELD_LABEL_NOT_TARGETED_DESCRIPTION' | translate)"
-                    (optionChanged)="setTargetedItem(item, $event)"
-                    [disabled]="item.deleted">
+                    (optionChanged)="setTargetedItem(item, $event)">
                 </app-form-slide-toggle>
-                <ng-template
-                    #elseTargetedLabel>
+                <ng-container *ngIf="!FollowUpModel.canModify(authUser) || item.deleted">
                     <app-yes-no-label
                         [value]="item.targeted">
                     </app-yes-no-label>
-                </ng-template>
+                </ng-container>
             </mat-cell>
         </ng-container>
 
