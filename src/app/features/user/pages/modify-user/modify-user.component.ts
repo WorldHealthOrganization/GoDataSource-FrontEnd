@@ -5,7 +5,7 @@ import { NgForm } from '@angular/forms';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
+import { PhoneNumberType, UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -32,6 +32,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
     // constants
     UserModel = UserModel;
     OutbreakModel = OutbreakModel;
+    PhoneNumberType = PhoneNumberType;
 
     // authenticated user
     authUser: UserModel;

@@ -73,8 +73,8 @@
                             </app-form-select>
 
                             <app-form-input
-                                name="telephoneNumbers['LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE']"
-                                [(ngModel)]="user.telephoneNumbers['LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE']"
+                                name="telephoneNumbers[{{PhoneNumberType.PRIMARY_PHONE_NUMBER}}]"
+                                [(ngModel)]="user.telephoneNumbers[PhoneNumberType.PRIMARY_PHONE_NUMBER]"
                                 [placeholder]="'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS' | translate"
                                 tooltip="LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS_DESCRIPTION"
                                 [disabled]="viewOnly">

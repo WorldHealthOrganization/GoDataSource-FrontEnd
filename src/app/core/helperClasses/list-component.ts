@@ -19,8 +19,9 @@ import {
     MetricContactsWithSuccessfulFollowUp
 } from '../models/metrics/metric.contacts-with-success-follow-up.model';
 import { VisibleColumnModel } from '../../shared/components/side-columns/model';
-import { AddressType } from '../models/address.model';
+import { AddressModel, AddressType } from '../models/address.model';
 import { moment, Moment } from './x-moment';
+import { PhoneNumberType } from '../models/user.model';
 
 export abstract class ListComponent implements OnDestroy {
     /**
@@ -433,6 +434,24 @@ export abstract class ListComponent implements OnDestroy {
                 property as string,
                 value
             );
+        }
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
+     * Filter by phone number
+     */
+    filterByPhone(value: string) {
+        if (!_.isEmpty(value)) {
+            const numberPattern = AddressModel.getPhoneNumberPattern(value);
+
+            this.queryBuilder.filter.where({
+                [`telephoneNumbers.${PhoneNumberType.PRIMARY_PHONE_NUMBER}`]: {
+                    regex: numberPattern
+                }
+            }, true);
         }
 
         // refresh list

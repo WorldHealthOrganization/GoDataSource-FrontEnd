@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
+import { UserModel, UserRoleModel, PhoneNumberType } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -37,6 +37,7 @@ export class UserListComponent extends ListComponent implements OnInit {
 
     // constants
     UserModel = UserModel;
+    PhoneNumberType = PhoneNumberType;
 
     // list of existing users
     usersList$: Observable<UserModel[]>;

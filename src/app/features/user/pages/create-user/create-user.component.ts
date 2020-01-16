@@ -5,7 +5,7 @@ import { NgForm } from '@angular/forms';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
+import { PhoneNumberType, UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
@@ -35,6 +35,7 @@ export class CreateUserComponent
 
     // constants
     OutbreakModel = OutbreakModel;
+    PhoneNumberType = PhoneNumberType;
 
     // authenticated user
     authUser: UserModel;
@@ -75,9 +76,9 @@ export class CreateUserComponent
 
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
 
-    this.institutionsList$ = this.referenceDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
+        this.institutionsList$ = this.referenceDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
 
-    // initialize breadcrumbs
+        // initialize breadcrumbs
         this.initializeBreadcrumbs();
     }
 

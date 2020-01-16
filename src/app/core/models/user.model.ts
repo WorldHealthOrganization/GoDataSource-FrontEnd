@@ -28,6 +28,10 @@ export enum UserSettings {
     USER_ROLE_FIELDS = 'userRoleFields'
 }
 
+export enum PhoneNumberType {
+    PRIMARY_PHONE_NUMBER = 'LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE'
+}
+
 /**
  * Custom handlers
  */

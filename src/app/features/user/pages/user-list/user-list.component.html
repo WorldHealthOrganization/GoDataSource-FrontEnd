@@ -121,7 +121,8 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="institutionsList$ | async"
-                            (optionChanged)="filterByTextField('institutionName', $event.value)"
+                            (optionChanged)="filterBySelectField('institutionName', $event, 'value')"
+                            [multiple]="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
                             [displayFilterIcon]="true"
@@ -141,12 +142,21 @@
                 <div class="table-header-cell">
                     <div class="column-header">{{'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS' | translate}}</div>
                     <div class="column-filter">
-                        <div> <!--Placeholder --> </div>
+                        <div>
+                            <app-form-input
+                                name="phoneNumberFilter"
+                                ngModel
+                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                (optionChanged)="filterByPhone($event)"
+                                app-reset-input-on-side-filter
+                                [displayFilterIcon]="true">
+                            </app-form-input>
+                        </div>
                     </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.telephoneNumbers['LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE'] | translate }}
+                {{ item.telephoneNumbers[PhoneNumberType.PRIMARY_PHONE_NUMBER] | translate }}
             </mat-cell>
         </ng-container>
 
