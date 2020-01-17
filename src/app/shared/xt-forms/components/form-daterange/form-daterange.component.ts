@@ -86,6 +86,41 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
     }
 
     /**
+     * Return dates for dateSameOrBefore directive
+     * @returns {Array}
+     */
+    getDateSameOrAfter(name: string) {
+        const dates = [];
+        // if start date is visible
+        if (this.startDateVisible) {
+            dates.push(name + '[startDate]');
+        }
+
+        // case we have min date
+        if (this.minDate) {
+            dates.push(this.minDate);
+        }
+
+        return dates;
+    }
+
+
+    getDateSameOrBefore(name: string) {
+        const dates = [];
+        // if end date is visible
+        if (this.endDateVisible) {
+            dates.push(name + '[endDate]');
+        }
+
+        // if we have max date
+        if (this.maxDate) {
+            dates.push(this.maxDate);
+        }
+
+        return dates;
+    }
+
+    /**
      * Function triggered when the input value is changed
      */
     onChange(validateGroup: boolean = true) {
