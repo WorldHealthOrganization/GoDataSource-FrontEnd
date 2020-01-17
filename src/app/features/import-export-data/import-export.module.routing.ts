@@ -72,7 +72,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.CASE_LAB_RESULT_IMPORT
+                PERMISSION.CASE_IMPORT_LAB_RESULT
             ]
         }
     },

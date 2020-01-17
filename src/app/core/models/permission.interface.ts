@@ -321,6 +321,46 @@ export interface IPermissionRelatedContact {
 }
 
 /**
+ * Related lab result ( used by case & contact )
+ */
+export interface IPermissionRelatedLabResult {
+    /**
+     * Has view permission ?
+     */
+    canViewLabResult(user: UserModel): boolean;
+
+    /**
+     * Has list permission ?
+     */
+    canListLabResult(user: UserModel): boolean;
+
+    /**
+     * Has create permission ?
+     */
+    canCreateLabResult(user: UserModel): boolean;
+
+    /**
+     * Has modify permission ?
+     */
+    canModifyLabResult(user: UserModel): boolean;
+
+    /**
+     * Has delete permission ?
+     */
+    canDeleteLabResult(user: UserModel): boolean;
+
+    /**
+     * Has restore permission ?
+     */
+    canRestoreLabResult(user: UserModel): boolean;
+
+    /**
+     * Has import permission ?
+     */
+    canImportLabResult(user: UserModel): boolean;
+}
+
+/**
  * Contact Bulk
  */
 export interface IPermissionRelatedContactBulk {

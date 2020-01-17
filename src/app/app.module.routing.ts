@@ -228,10 +228,10 @@ const routes: Routes = [
                                     PERMISSION.CASE_MODIFY,
                                     PERMISSION.CASE_VIEW_MOVEMENT_MAP,
                                     PERMISSION.CASE_VIEW_CHRONOLOGY_CHART,
-                                    PERMISSION.CASE_LAB_RESULT_LIST,
-                                    PERMISSION.CASE_LAB_RESULT_CREATE,
-                                    PERMISSION.CASE_LAB_RESULT_VIEW,
-                                    PERMISSION.CASE_LAB_RESULT_MODIFY,
+                                    PERMISSION.CASE_LIST_LAB_RESULT,
+                                    PERMISSION.CASE_CREATE_LAB_RESULT,
+                                    PERMISSION.CASE_VIEW_LAB_RESULT,
+                                    PERMISSION.CASE_MODIFY_LAB_RESULT,
                                     PERMISSION.GANTT_CHART_VIEW_DELAY_ONSET_LAB_TESTING,
                                     PERMISSION.GANTT_CHART_VIEW_DELAY_ONSET_HOSPITALIZATION
                                 ]
@@ -462,7 +462,7 @@ const routes: Routes = [
                             PERMISSION.REFERENCE_DATA_IMPORT,
                             PERMISSION.CONTACT_IMPORT,
                             PERMISSION.CASE_IMPORT,
-                            PERMISSION.CASE_LAB_RESULT_IMPORT
+                            PERMISSION.CASE_IMPORT_LAB_RESULT
                         ]
                     })
                 }

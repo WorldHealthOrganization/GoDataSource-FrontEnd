@@ -89,7 +89,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.CASE_LAB_RESULT_LIST
+                PERMISSION.CASE_LIST_LAB_RESULT
             ]
         }
     },
@@ -100,7 +100,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.CASE_LAB_RESULT_LIST
+                PERMISSION.CASE_LIST_LAB_RESULT
             ]
         }
     },
@@ -111,7 +111,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.CASE_LAB_RESULT_CREATE
+                PERMISSION.CASE_CREATE_LAB_RESULT
             ]
         },
         canDeactivate: [
@@ -125,7 +125,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.CASE_LAB_RESULT_VIEW
+                PERMISSION.CASE_VIEW_LAB_RESULT
             ],
             action: ViewModifyComponentAction.VIEW
         }
@@ -137,7 +137,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.CASE_LAB_RESULT_MODIFY
+                PERMISSION.CASE_MODIFY_LAB_RESULT
             ],
             action: ViewModifyComponentAction.MODIFY
         },

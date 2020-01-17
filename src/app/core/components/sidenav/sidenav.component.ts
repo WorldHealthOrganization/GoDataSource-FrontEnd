@@ -152,7 +152,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
                     'lab-results',
                     'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
                     [
-                        PERMISSION.CASE_LAB_RESULT_LIST
+                        PERMISSION.CASE_LIST_LAB_RESULT
                     ],
                     '/cases/lab-results',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
