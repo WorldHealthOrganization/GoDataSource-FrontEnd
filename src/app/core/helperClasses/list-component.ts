@@ -600,60 +600,6 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
-     * Filter by wasContactField
-     * @param {boolean} value
-     */
-    filterByWasContactField(value: boolean | null | undefined) {
-        if (value === false) {
-            this.queryBuilder.filter.where({
-                'wasContact': {
-                    'eq': false
-                }
-            }, true);
-        } else {
-            if (value === true) {
-                this.queryBuilder.filter.where({
-                    'wasContact': {
-                        'eq': true
-                    }
-                }, true);
-            } else {
-                this.queryBuilder.filter.remove('wasContact');
-            }
-        }
-
-        // refresh list
-        this.needsRefreshList();
-    }
-
-    /**
-     * Filter by wasCaseField
-     * @param {boolean} value
-     */
-    filterByWasCaseField(value: boolean | null | undefined) {
-        if (value === false) {
-            this.queryBuilder.filter.where({
-                'wasCase': {
-                    'eq': false
-                }
-            }, true);
-        } else {
-            if (value === true) {
-                this.queryBuilder.filter.where({
-                    'wasCase': {
-                        'eq': true
-                    }
-                }, true);
-            } else {
-                this.queryBuilder.filter.remove('wasCase');
-            }
-        }
-
-        // refresh list
-        this.needsRefreshList();
-    }
-
-    /**
      * Filter by relation
      * @param {string | string[]} relation
      * @returns {RequestFilter}
