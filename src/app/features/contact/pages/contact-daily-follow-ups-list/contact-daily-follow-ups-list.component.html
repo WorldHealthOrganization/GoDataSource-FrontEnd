@@ -80,7 +80,7 @@
     <app-counted-items-list
         *ngIf="!appliedListFilter"
         fxFlex
-        [items]="countedFollowUpsGroupedByTeams$| async"
+        [items]="countedFollowUpsGroupedByTeams$ | async"
         (optionChanged)="filterBySelectField('teamId', $event.ids, null)">
     </app-counted-items-list>
 </div>

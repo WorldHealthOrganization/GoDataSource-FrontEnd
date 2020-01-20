@@ -180,8 +180,6 @@ export class ContactDataService {
      * @returns {Observable<RiskLevelGroupModel>}
      */
     getContactsGroupedByRiskLevel(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<RiskLevelGroupModel> {
-        // remove 'countRelations' flag since we don't need it here
-        queryBuilder.filter.removeFlag(`countRelations`);
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/contacts/per-risk-level/count?filter=${filter}`),

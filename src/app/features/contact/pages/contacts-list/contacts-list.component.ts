@@ -837,11 +837,16 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      */
     getContactsGroupedByRiskLevel() {
         if (this.selectedOutbreak) {
+            // clone query builder to clear it
+            const clonedQueryBuilder = _.cloneDeep(this.queryBuilder);
+            clonedQueryBuilder.paginator.clear();
+            clonedQueryBuilder.sort.clear();
+            clonedQueryBuilder.filter.removeFlag(`countRelations`);
             this.countedContactsByRiskLevel$ = this.riskLevelRefData$
                 .pipe(
                     mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
                         return this.contactDataService
-                            .getContactsGroupedByRiskLevel(this.selectedOutbreak.id, this.queryBuilder)
+                            .getContactsGroupedByRiskLevel(this.selectedOutbreak.id, clonedQueryBuilder)
                             .pipe(
                                 map((data: RiskLevelGroupModel) => {
                                     return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
