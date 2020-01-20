@@ -11,7 +11,13 @@ const routes: Routes = [
     // Language list
     {
         path: '',
-        component: fromPages.LanguagesListComponent
+        component: fromPages.LanguagesListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.LANGUAGE_LIST
+            ]
+        }
     },
     // Create Language
     {
@@ -19,7 +25,9 @@ const routes: Routes = [
         component: fromPages.CreateLanguageComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG]
+            permissions: [
+                PERMISSION.LANGUAGE_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -31,7 +39,9 @@ const routes: Routes = [
         component: fromPages.ModifyLanguageComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_SYS_CONFIG],
+            permissions: [
+                PERMISSION.LANGUAGE_VIEW
+            ],
             action: ViewModifyComponentAction.VIEW
         }
     },
@@ -41,7 +51,9 @@ const routes: Routes = [
         component: fromPages.ModifyLanguageComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG],
+            permissions: [
+                PERMISSION.LANGUAGE_MODIFY
+            ],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [

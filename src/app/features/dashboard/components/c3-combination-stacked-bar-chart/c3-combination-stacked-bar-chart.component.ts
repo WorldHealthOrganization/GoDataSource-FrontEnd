@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import * as c3 from 'c3';
 import * as d3 from 'd3';
-import { FormatFunction } from 'c3';
+import { ChartConfiguration, FormatFunction } from 'c3';
 
 @Component({
     selector: 'app-c3-combination-stacked-bar-chart',
@@ -23,6 +23,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
     @Input() chartId: string;
     @Input() y2Max: number;
     @Input() y2Min: number;
+    @Input() initialZoomRanges: [number, number];
 
     chart: any;
 
@@ -59,6 +60,13 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
         const chartIdBind = '#' + this.chartId;
         this.chart = c3.generate({
             bindto: chartIdBind,
+            oninit: () => {
+                if (this.initialZoomRanges) {
+                    setTimeout(() => {
+                        this.chart.zoom(this.initialZoomRanges);
+                    });
+                }
+            },
             onrendered: () => {
                 // configure ticks
                 this.configureNumberOfTicks(this.chartDataCategories.length);
@@ -77,7 +85,8 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
                         const domainDiff = domain[1] - domain[0];
                         this.configureNumberOfTicks(domainDiff);
                     }
-                }
+                },
+                initialRange: this.initialZoomRanges ? this.initialZoomRanges : undefined
             },
             interaction: {
                 enabled: false
@@ -167,7 +176,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
             color: {
                 pattern: this.colorPattern
             }
-        });
+        } as ChartConfiguration);
 
     }
 

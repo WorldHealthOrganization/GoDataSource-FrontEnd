@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 
 @Component({
@@ -6,16 +6,9 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
     templateUrl: './terms-of-use.component.html',
     styleUrls: ['./terms-of-use.component.less']
 })
-export class TermsOfUseComponent implements OnInit {
-
+export class TermsOfUseComponent {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_TERMS_OF_USE_TITLE', '.')
     ];
-
-    constructor() {
-    }
-
-    ngOnInit() {
-    }
-
 }

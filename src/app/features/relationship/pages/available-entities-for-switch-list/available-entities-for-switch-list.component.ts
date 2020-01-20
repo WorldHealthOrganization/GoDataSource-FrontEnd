@@ -26,6 +26,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { AddressType } from '../../../../core/models/address.model';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-available-entities-for-switch-list',
@@ -36,7 +37,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
-    entitiesListCount$: Observable<any>;
+    entitiesListCount$: Observable<IBasicCount>;
     entityType: EntityType;
 
     // available side filters
@@ -56,6 +57,15 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     Constants = Constants;
     ReferenceDataCategory = ReferenceDataCategory;
     EntityType = EntityType;
+
+    fixedTableColumns: string[] = [
+        'radio',
+        'lastName',
+        'firstName',
+        'visualId',
+        'gender',
+        'place'
+    ];
 
     constructor(
         protected snackbarService: SnackbarService,
@@ -202,6 +212,11 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                     qb
                 )
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback([]);
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap((data: any[]) => {
                         finishCallback(data);
@@ -242,7 +257,13 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                     this.entityId,
                     qb
                 )
-                .pipe(share());
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
+                    share()
+                );
         }
     }
 
@@ -287,23 +308,6 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     getPersonTypeColor(personType: string) {
         const personTypeData = _.get(this.personTypesListMap, personType);
         return _.get(personTypeData, 'colorCode', '');
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        const columns = [
-            'radio',
-            'lastName',
-            'firstName',
-            'visualId',
-            'gender',
-            'place'
-        ];
-
-        return columns;
     }
 
     /**

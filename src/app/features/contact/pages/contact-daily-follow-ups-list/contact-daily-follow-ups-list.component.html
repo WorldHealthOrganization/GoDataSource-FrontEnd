@@ -4,14 +4,20 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button mat-raised-button color="accent" [matMenuTriggerFor]="quickActionsMenu">
+                <button
+                    *ngIf="(authUser.activeOutbreakId === selectedOutbreak?.id && FollowUpModel.canGenerate(authUser)) ||
+                        (!appliedListFilter && printFollowUpsUrl && FollowUpModel.canExportDailyForm(authUser)) ||
+                        (!appliedListFilter && exportFollowUpsUrl && FollowUpModel.canExport(authUser))"
+                    mat-raised-button
+                    color="accent"
+                    [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <ng-container *app-selected-outbreak-is-active>
                         <button
-                            *ngIf="hasFollowUpsWriteAccess()"
+                            *ngIf="FollowUpModel.canGenerate(authUser)"
                             mat-menu-item
                             (click)="generateFollowUps()">
                             {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_BUTTON' | translate }}
@@ -19,7 +25,7 @@
                     </ng-container>
 
                     <app-export-button
-                        *ngIf="!appliedListFilter && printFollowUpsUrl"
+                        *ngIf="!appliedListFilter && printFollowUpsUrl && FollowUpModel.canExportDailyForm(authUser)"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_TITLE' | translate"
@@ -34,7 +40,7 @@
                     </app-export-button>
 
                     <app-export-button
-                        *ngIf="!appliedListFilter && exportFollowUpsUrl"
+                        *ngIf="!appliedListFilter && exportFollowUpsUrl && FollowUpModel.canExport(authUser)"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE' | translate"
@@ -77,7 +83,6 @@
         [items]="countedFollowUpsGroupedByTeams$| async"
         (optionChanged)="filterBySelectField('teamId', $event.ids, null)">
     </app-counted-items-list>
-
 </div>
 
 <!-- Side filters -->
@@ -178,21 +183,22 @@
                                 <mat-divider></mat-divider>
 
                                 <button
-                                    *ngIf="hasFollowUpsWriteAccess()"
+                                    *ngIf="FollowUpModel.canBulkModify(authUser)"
                                     mat-menu-item
                                     (click)="modifySelectedFollowUps(table)">
                                     {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS' | translate }}
                                 </button>
 
                                 <button
-                                    *ngIf="exportFollowUpsUrl"
+                                    *ngIf="exportFollowUpsUrl && FollowUpModel.canExport(authUser)"
                                     mat-menu-item
                                     (click)="exportSelectedFollowUps()">
                                     {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS' | translate }}
                                 </button>
 
                                 <button
-                                    [disabled]="!checkedOnlyNotDeletedRecords || !hasFollowUpsWriteAccess()"
+                                    *ngIf="FollowUpModel.canBulkDelete(authUser)"
+                                    [disabled]="!checkedOnlyNotDeletedRecords"
                                     mat-menu-item
                                     (click)="deleteSelectedFollowUps()">
                                     <div
@@ -202,7 +208,8 @@
                                 </button>
 
                                 <button
-                                    [disabled]="!checkedOnlyDeletedRecords || !hasFollowUpsWriteAccess()"
+                                    *ngIf="FollowUpModel.canBulkRestore(authUser)"
+                                    [disabled]="!checkedOnlyDeletedRecords"
                                     mat-menu-item
                                     (click)="restoreSelectedFollowUps()">
                                     <div
@@ -419,7 +426,7 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 <app-form-select
-                    *ngIf="hasFollowUpsWriteAccess()"
+                    *ngIf="FollowUpModel.canModify(authUser) && !item.deleted else elseTeamLabel"
                     name="teamId"
                     [ngModel]="item.teamId"
                     [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate"
@@ -428,10 +435,10 @@
                     optionValueKey="id"
                     (optionChanged)="changeFollowUpTeam(item, $event)">
                 </app-form-select>
-                <div
-                    *ngIf="!hasFollowUpsWriteAccess()">
+                <ng-template
+                    #elseTeamLabel>
                     {{ teamsListLoadedMap[item.teamId] ? teamsListLoadedMap[item.teamId].name : '' }}
-                </div>
+                </ng-template>
             </mat-cell>
         </ng-container>
 
@@ -488,17 +495,19 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
                 <app-form-slide-toggle
-                    *ngIf="hasFollowUpsWriteAccess()"
+                    *ngIf="FollowUpModel.canModify(authUser) && !item.deleted else elseTargetedLabel"
                     name="targeted"
                     [(ngModel)]="item.targeted"
                     [label]="item.targeted ? ('LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate) : ('LNG_FOLLOW_UP_FIELD_LABEL_NOT_TARGETED' | translate)"
                     [tooltip]="item.targeted ? ('LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION' | translate ): ('LNG_FOLLOW_UP_FIELD_LABEL_NOT_TARGETED_DESCRIPTION' | translate)"
                     (optionChanged)="setTargetedItem(item, $event)">
                 </app-form-slide-toggle>
-                <app-yes-no-label
-                    *ngIf="!hasFollowUpsWriteAccess()"
-                    [value]="item.targeted">
-                </app-yes-no-label>
+                <ng-template
+                    #elseTargetedLabel>
+                    <app-yes-no-label
+                        [value]="item.targeted">
+                    </app-yes-no-label>
+                </ng-template>
             </mat-cell>
         </ng-container>
 

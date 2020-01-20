@@ -6,6 +6,8 @@ import { Constants } from '../../../../core/models/constants';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { Subscription, forkJoin } from 'rxjs';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
     selector: 'app-contacts-become-cases-dashlet',
@@ -19,6 +21,9 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
 
     // number of cases ( total )
     casesCount: number;
+
+    // constants
+    CaseModel = CaseModel;
 
     // params
     queryParams: any = {
@@ -35,14 +40,24 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
 
+    /**
+     * Constructor
+     */
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        protected authDataService: AuthDataService
     ) {
-        super(listFilterDataService);
+        super(
+            listFilterDataService,
+            authDataService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get contacts on followup list count
         this.displayLoading = true;
@@ -56,6 +71,9 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

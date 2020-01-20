@@ -318,6 +318,15 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
         // retrieve element bounding
         const bounding: HoverRowActionsRect = this.elementRef.nativeElement.getBoundingClientRect();
 
+        // element removed from page ?
+        if (bounding.top === 0) {
+            // hide
+            this.hideEverything();
+
+            // there is no point in continuing
+            return;
+        }
+
         // determine hover row bounding
         const scrolledX: number = this.determineParentScrollX();
         this.hoverRowRect.left = scrolledX + bounding.left;

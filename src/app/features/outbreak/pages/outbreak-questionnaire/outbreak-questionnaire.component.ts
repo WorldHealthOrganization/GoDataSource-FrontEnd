@@ -10,6 +10,8 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-outbreak-questionnaire',
@@ -20,6 +22,9 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges implements OnInit {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // authenticated user
+    authUser: UserModel;
 
     // outbreak to modify
     outbreak: OutbreakModel;
@@ -36,7 +41,8 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
         protected route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private authDataService: AuthDataService
     ) {
         super();
     }
@@ -45,6 +51,9 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
      * Initialized
      */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // get outbreak
         this.route.params
             .subscribe((params: { outbreakId }) => {
@@ -57,9 +66,9 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
     }
 
     /**
-     * Create breadcrumbs
+     * Initialize breadcrumbs
      */
-    createBreadcrumbs(breadData: FormModifyQuestionnaireBreadcrumbsData) {
+    initializeBreadcrumbs(breadData: FormModifyQuestionnaireBreadcrumbsData) {
         // determine questionnaire breadcrumb token
         let questionnaireToken: string;
         switch (breadData.type) {
@@ -74,22 +83,37 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
                 break;
         }
 
-        // set breadcrumbs
-        this.breadcrumbs = [
-            new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks'),
-            new BreadcrumbItemModel(
-                'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_OUTBREAK_TITLE',
-                `/outbreaks/${this.outbreak.id}/view`,
-                false,
-                {},
-                this.outbreak
-            ),
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (OutbreakModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks')
+            );
+        }
+
+        // add view breadcrumb only if we have permission
+        if (OutbreakModel.canView(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_OUTBREAK_TITLE',
+                    `/outbreaks/${this.outbreak.id}/view`,
+                    false,
+                    {},
+                    this.outbreak
+                )
+            );
+        }
+
+        // add active bread
+        this.breadcrumbs.push(
             new BreadcrumbItemModel(
                 questionnaireToken,
                 `/outbreaks/${this.outbreak.id}/${breadData.type}`,
                 true
             )
-        ];
+        );
     }
 
     /**

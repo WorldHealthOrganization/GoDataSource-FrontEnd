@@ -10,10 +10,8 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
-
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
@@ -24,7 +22,11 @@ import { throwError } from 'rxjs';
     styleUrls: ['./modify-outbreak-template.component.less']
 })
 export class ModifyOutbreakTemplateComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // constants
+    OutbreakTemplateModel = OutbreakTemplateModel;
 
     // authenticated user
     authUser: UserModel;
@@ -35,6 +37,9 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
     // list of diseases
     diseasesList$: Observable<any[]>;
 
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
@@ -47,6 +52,9 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
         super(route);
     }
 
+    /**
+     * Component initialization
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -62,14 +70,41 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
                     .getOutbreakTemplate(this.outbreakTemplateId)
                     .subscribe(outbreakTemplateData => {
                         this.outbreakTemplate = outbreakTemplateData;
-                        this.createBreadcrumbs();
+
+                        // update breadcrumbs
+                        this.initializeBreadcrumbs();
                     });
             });
     }
 
     /**
-     * Handle form submit
-     * @param form
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (OutbreakTemplateModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '/outbreak-templates')
+            );
+        }
+
+        // view / modify breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TEMPLATE_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TITLE',
+                '.',
+                true,
+                {},
+                this.outbreakTemplate
+            )
+        );
+    }
+
+    /**
+     * Modify outbreak template
      */
     modifyOutbreakTemplate(form: NgForm) {
         // validate form
@@ -100,32 +135,11 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
                 // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
 
-                // update breadcrumb
-                this.createBreadcrumbs();
+                // update breadcrumbs
+                this.initializeBreadcrumbs();
 
                 // hide dialog
                 loadingDialog.close();
             });
-    }
-
-    /**
-     * Check if we have write access to outbreak templates
-     * @returns {boolean}
-     */
-    hasOutbreakTemplateWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
-    }
-
-    createBreadcrumbs() {
-        this.breadcrumbs = [
-            new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '/outbreak-templates'),
-            new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TEMPLATE_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TITLE',
-                '.',
-                true,
-                {},
-                this.outbreakTemplate
-            )
-        ];
     }
 }

@@ -7,13 +7,16 @@ import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Observable } from 'rxjs';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-create-location',
@@ -21,20 +24,24 @@ import { throwError } from 'rxjs';
     templateUrl: './create-location.component.html',
     styleUrls: ['./create-location.component.less']
 })
-export class CreateLocationComponent extends ConfirmOnFormChanges implements OnInit {
-    // breadcrumb header
-    public breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_LOCATIONS_TITLE',
-            '/locations'
-        )
-    ];
+export class CreateLocationComponent
+    extends CreateConfirmOnChanges
+    implements OnInit {
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
+
     locationData: LocationModel = new LocationModel();
 
     geographicalLevelsList$: Observable<any>;
 
     parentId: string;
 
+    // authenticated user details
+    authUser: UserModel;
+
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private locationDataService: LocationDataService,
@@ -42,12 +49,19 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
         private route: ActivatedRoute,
         private formHelper: FormHelperService,
         private referenceDataDataService: ReferenceDataDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private authDataService: AuthDataService,
+        private redirectService: RedirectService
     ) {
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
 
@@ -56,20 +70,30 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
             .subscribe((params: { parentId }) => {
                 // set parent
                 this.parentId = params.parentId;
-
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(
-                        'LNG_PAGE_CREATE_LOCATION_TITLE',
-                        '.',
-                        true
-                    )
-                );
             });
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (LocationModel.canList(this.authUser)) {
+            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_LOCATIONS_TITLE', '/locations'));
+        }
+
+        // create breadcrumb
+        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_LOCATION_TITLE', '.', true));
     }
 
     /**
      * Create Location
-     * @param {NgForm[]} stepForms
      */
     createNewLocation(stepForms: NgForm[]) {
         // get forms fields
@@ -129,9 +153,16 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
                     // hide dialog
                     loadingDialog.close();
 
-                    // navigate to listing page
-                    this.disableDirtyConfirm();
-                    this.router.navigate([`/locations/${newLocation.id}/modify`]);
+                    // navigate to proper page
+                    // method handles disableDirtyConfirm too...
+                    this.redirectToProperPageAfterCreate(
+                        this.router,
+                        this.redirectService,
+                        this.authUser,
+                        LocationModel,
+                        'locations',
+                        newLocation.id
+                    );
                 });
         }
     }

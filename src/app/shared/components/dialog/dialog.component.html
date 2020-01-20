@@ -10,7 +10,7 @@
     <div
         *ngIf="confirmData?.additionalInfo"
         class="dialog-additional-info"
-        [innerHTML]="confirmData?.additionalInfo | translate:confirmData?.translateData">
+        [innerHTML]="confirmData?.additionalInfo.localeCompare ? (confirmData?.additionalInfo | translate:confirmData?.translateData) : confirmData?.additionalInfo">
     </div>
 
     <form #form="ngForm" fxLayout="column">

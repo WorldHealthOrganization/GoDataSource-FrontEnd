@@ -13,7 +13,6 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import * as _ from 'lodash';
@@ -23,6 +22,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { EntityType } from 'app/core/models/entity-type';
 import { CaseModel } from '../../../../core/models/case.model';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-modify-case-relationship',
@@ -31,6 +31,7 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./modify-case-lab-result.component.less']
 })
 export class ModifyCaseLabResultComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     authUser: UserModel;
@@ -40,6 +41,11 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
 
     // lab results
     labResultData: LabResultModel = new LabResultModel();
+
+    // constants
+    CaseModel = CaseModel;
+    ContactModel = ContactModel;
+    LabResultModel = LabResultModel;
 
     // variable for breadcrumbs manipulation if we're coming from lab result list
     fromLabResultsList: boolean = false;
@@ -60,12 +66,15 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
      */
     get displayOnsetDateWarningMessage(): boolean {
         return this.labResultData &&
-            this.labResultData.entity &&
-            (this.labResultData.entity as CaseModel).dateOfOnset &&
+            this.labResultData.person &&
+            (this.labResultData.person as CaseModel).dateOfOnset &&
             this.labResultData.dateSampleTaken &&
-            moment((this.labResultData.entity as CaseModel).dateOfOnset).startOf('day').isAfter(moment(this.labResultData.dateSampleTaken).startOf('day'));
+            moment((this.labResultData.person as CaseModel).dateOfOnset).startOf('day').isAfter(moment(this.labResultData.dateSampleTaken).startOf('day'));
     }
 
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
@@ -81,6 +90,9 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
         super(route);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE);
@@ -139,14 +151,78 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                                     // is returning an array of objects. In this case there can't be more than one item in the response
                                     this.labResultData = new LabResultModel(labResults[0]);
 
-                                    // update breadcrumbs
-                                    this.createBreadcrumbs();
+                                    // initialize breadcrumbs
+                                    this.initializeBreadcrumbs();
                                 });
                         }
                     });
             });
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
     }
 
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        // init
+        this.breadcrumbs = [];
+
+        // case list
+        if (CaseModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_CASES_TITLE',
+                    '/cases'
+                )
+            );
+        }
+
+        // case view
+        if (
+            !this.fromLabResultsList &&
+            this.labResultData &&
+            this.labResultData.person &&
+            this.labResultData.person.id &&
+            CaseModel.canView(this.authUser)
+        ) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    this.labResultData.person.name,
+                    `/cases/${this.labResultData.person.id}/view`
+                )
+            );
+        }
+
+        // lab result list
+        if (LabResultModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE',
+                    this.fromLabResultsList || !this.labResultData || !this.labResultData.person || !this.labResultData.person.id ?
+                        '/cases/lab-results' :
+                        `/cases/${this.labResultData.person.id}/lab-results`
+                )
+            );
+        }
+
+        // current page
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE',
+                null,
+                true,
+                {},
+                this.labResultData
+            )
+        );
+    }
+
+    /**
+     * Modify lab result
+     * @param form
+     */
     modifyLabResult(form: NgForm) {
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
@@ -172,9 +248,9 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
             )
             .subscribe((modifiedLabResult: LabResultModel) => {
                 // update model
-                const parentData = this.labResultData.entity;
+                const parentData = this.labResultData.person;
                 this.labResultData = modifiedLabResult;
-                this.labResultData.entity = parentData;
+                this.labResultData.person = parentData;
 
                 // mark form as pristine
                 form.form.markAsPristine();
@@ -182,64 +258,11 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                 // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_LAB_RESULT_ACTION_MODIFY_CASE_LAB_RESULT_SUCCESS_MESSAGE');
 
-                // update breadcrumb
-                this.createBreadcrumbs();
+                // initialize breadcrumbs
+                this.initializeBreadcrumbs();
 
                 // hide dialog
                 loadingDialog.close();
             });
     }
-
-    /**
-     * Check if we have write access to cases
-     * @returns {boolean}
-     */
-    hasCaseWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-    }
-
-    /**
-     * Create breadcrumbs
-     */
-    createBreadcrumbs() {
-        // construct breadcrumbs
-        this.breadcrumbs = [
-            new BreadcrumbItemModel(
-                'LNG_PAGE_LIST_CASES_TITLE',
-                '/cases'
-            )
-        ];
-
-        // add case model only if necessary
-        if (
-            !this.fromLabResultsList &&
-            this.labResultData.entity &&
-            this.labResultData.entity.id
-        ) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    this.labResultData.entity.name,
-                    `/cases/${this.labResultData.entity.id}/view`
-                )
-            );
-        }
-
-        // add remaining breadcrumbs
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel(
-                'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE',
-                this.fromLabResultsList || !this.labResultData.entity || this.labResultData.entity.id ?
-                '/cases/lab-results' :
-                `/cases/${this.labResultData.entity.id}/lab-results`
-            ),
-            new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE',
-                null,
-                true,
-                {},
-                this.labResultData
-            )
-        );
-    }
-
 }

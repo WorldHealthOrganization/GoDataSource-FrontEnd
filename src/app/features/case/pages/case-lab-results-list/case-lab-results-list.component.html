@@ -5,7 +5,10 @@
 
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
-                    <button mat-raised-button color="accent" [routerLink]="'./create'">
+                    <button
+                        *ngIf="LabResultModel.canCreate(authUser)"
+                        mat-raised-button color="accent"
+                        [routerLink]="'./create'">
                         {{'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_ADD_LAB_RESULT' | translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </ng-container>
@@ -34,9 +37,10 @@
 
 <mat-card class="page-section page-content">
     <div class="top-section-wrapper">
-        <div *ngIf="hasCaseWriteAccess()"
-            fxFlex fxLayout="column">
-            <div fxFlex fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="start center">
+        <div fxFlex fxLayout="column">
+            <div
+                *ngIf="CaseModel.canModify(authUser)"
+                fxFlex fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="start center">
                 <div class="info-label">
                     {{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION_INFO' | translate }}
                 </div>

@@ -19,7 +19,8 @@
         </mat-list-item>
 
         <div class="topnav-static-actions" fxLayout="row">
-            <ng-container *ngIf="showSelectedOutbreakDropdown()">
+            <ng-container
+                *ngIf="OutbreakModel.canView(authUser)">
                 <mat-divider [vertical]="true"></mat-divider>
 
                 <mat-list-item>

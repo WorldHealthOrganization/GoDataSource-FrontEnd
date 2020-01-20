@@ -23,7 +23,7 @@ import { throwError } from 'rxjs';
     styleUrls: ['./event-merge-duplicate-records.component.less']
 })
 export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges implements OnInit {
-
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '/duplicated-records'),
         new BreadcrumbItemModel('LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TITLE', '.', true)
@@ -67,6 +67,9 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
         }
     };
 
+    /**
+     * Constructor
+     */
     constructor(
         private route: ActivatedRoute,
         private router: Router,
@@ -77,6 +80,9 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get merge ids
         // retrieve query params

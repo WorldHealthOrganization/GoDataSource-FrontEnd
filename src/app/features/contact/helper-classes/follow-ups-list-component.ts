@@ -1,6 +1,5 @@
 import { ListComponent } from '../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
-import { PERMISSION } from '../../../core/models/permission.model';
 import { UserModel } from '../../../core/models/user.model';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { FollowUpModel } from '../../../core/models/follow-up.model';
@@ -69,6 +68,9 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
 
     loadingDialog: LoadingDialogModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         protected snackbarService: SnackbarService,
         protected dialogService: DialogService,
@@ -82,6 +84,9 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // add page title
         this.followUpsDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') +
@@ -103,9 +108,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             this.teamsListLoadedMap = {};
             this.teamsListLoadedForHeaderSearch = _.map(this.teamsListLoaded, (team: TeamModel) => {
                 // map for easy access if we don't have access to write data to follow-ups
-                if (!this.hasFollowUpsWriteAccess()) {
-                    this.teamsListLoadedMap[team.id] = team;
-                }
+                this.teamsListLoadedMap[team.id] = team;
 
                 // header search
                 return new LabelValuePair(
@@ -145,14 +148,6 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
         ) {
             this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`;
         }
-    }
-
-    /**
-     * Check if we have access to create / generate follow-ups
-     * @returns {boolean}
-     */
-    hasFollowUpsWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
     }
 
     /**

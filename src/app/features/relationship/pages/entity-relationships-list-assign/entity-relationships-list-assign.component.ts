@@ -17,11 +17,13 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { map, share, tap } from 'rxjs/operators';
+import { catchError, map, share, tap } from 'rxjs/operators';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { UserSettings } from '../../../../core/models/user.model';
+import { throwError } from 'rxjs/internal/observable/throwError';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-entity-relationships-list-assign',
@@ -34,7 +36,7 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
 
     // entities list relationships
     entitiesList$: Observable<(CaseModel | ContactModel | EventModel)[]>;
-    entitiesListCount$: Observable<any>;
+    entitiesListCount$: Observable<IBasicCount>;
 
     // available side filters
     availableSideFilters: FilterModel[];
@@ -273,6 +275,11 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
                     this.queryBuilder
                 )
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback([]);
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap((data: any[]) => {
                         finishCallback(data);
@@ -296,7 +303,15 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
-            this.entitiesListCount$ = this.entityDataService.getEntitiesCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
+            this.entitiesListCount$ = this.entityDataService
+                .getEntitiesCount(this.selectedOutbreak.id, countQueryBuilder)
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
+                    share()
+                );
         }
     }
 
