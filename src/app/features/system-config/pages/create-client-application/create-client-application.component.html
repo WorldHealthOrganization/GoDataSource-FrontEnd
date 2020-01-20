@@ -34,7 +34,7 @@
                             </div>
 
                             <app-form-select
-                                *ngIf="hasOutbreakReadAccess()"
+                                *ngIf="OutbreakModel.canList(authUser)"
                                 name="outbreakIDs"
                                 [ngModel]="clientApplicationData.outbreakIDs"
                                 [placeholder]="'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS' | translate"
@@ -45,7 +45,7 @@
                                 [multiple]="true">
                             </app-form-select>
                             <div
-                                *ngIf="!hasOutbreakReadAccess()"
+                                *ngIf="!OutbreakModel.canList(authUser)"
                                 fxFlex>
                                 <!-- placeholder -->
                             </div>

@@ -9,7 +9,6 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Observable } from 'rxjs';
@@ -30,6 +29,9 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
     // breadcrumb header
     public breadcrumbs: BreadcrumbItemModel[] = [];
 
+    // constants
+    LocationModel = LocationModel;
+
     locationId: string;
     locationData: LocationModel = new LocationModel();
     authUser: UserModel;
@@ -42,6 +44,9 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
     @ViewChild('latInput') latInput: NgModel;
     @ViewChild('lngInput') lngInput: NgModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         private locationDataService: LocationDataService,
         private router: Router,
@@ -55,6 +60,9 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
         super(route);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -84,11 +92,42 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                     .subscribe((locationData: {}) => {
                         // location data
                         this.locationData = new LocationModel(locationData);
-                        this.createBreadcrumbs();
+
+                        // update breadcrumbs
+                        this.initializeBreadcrumbs();
                     });
             });
     }
 
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (LocationModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_LOCATIONS_TITLE', '/locations')
+            );
+        }
+
+        // view / modify breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_LOCATION_TITLE' : 'LNG_PAGE_MODIFY_LOCATION_TITLE',
+                '.',
+                true,
+                {},
+                this.locationData
+            )
+        );
+    }
+
+    /**
+     * Modify location
+     */
     modifyLocation(form: NgForm) {
         // retrieve dirty fields
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
@@ -149,48 +188,65 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                 // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE');
 
-                // update breadcrumb
-                this.createBreadcrumbs();
+                // update breadcrumbs
+                this.initializeBreadcrumbs();
 
                 // refresh location breadcrumbs
                 this.locationBreadcrumbs.refreshBreadcrumbs();
-                if (dirtyFields.geoLocation) {
-                    this.locationDataService.getLocationUsageCount(modifiedLocation.id)
+                if (
+                    dirtyFields.geoLocation &&
+                    LocationModel.canPropagateGeoToPersons(this.authUser)
+                ) {
+                    this.locationDataService
+                        .getLocationUsageCount(modifiedLocation.id)
+                        .pipe(
+                            catchError((err) => {
+                                this.snackbarService.showApiError(err);
+                                loadingDialog.close();
+                                return throwError(err);
+                            })
+                        )
                         .subscribe((usedEntitiesCount) => {
                             if (usedEntitiesCount.count > 0) {
-                                this.dialogService.showConfirm(new DialogConfiguration({
-                                    message: 'LNG_DIALOG_CONFIRM_PROPAGATE_LAT_LNG',
-                                    cancelLabel: 'LNG_COMMON_LABEL_NO'
-                                })).subscribe((answer: DialogAnswer) => {
-                                    if (answer.button === DialogAnswerButton.Yes) {
-                                        // propagate values to all the entities that have in use this location
-                                        this.locationDataService.propagateGeoLocation(modifiedLocation.id)
-                                            .pipe(
-                                                catchError((err) => {
-                                                    this.snackbarService.showApiError(err);
-                                                    return throwError(err);
-                                                })
-                                            )
-                                            .subscribe(() => {
-                                                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE');
-                                            });
-                                    }
-                                });
+                                this.dialogService
+                                    .showConfirm(new DialogConfiguration({
+                                        message: 'LNG_DIALOG_CONFIRM_PROPAGATE_LAT_LNG',
+                                        cancelLabel: 'LNG_COMMON_LABEL_NO'
+                                    }))
+                                    .subscribe((answer: DialogAnswer) => {
+                                        if (answer.button === DialogAnswerButton.Yes) {
+                                            // propagate values to all the entities that have in use this location
+                                            this.locationDataService
+                                                .propagateGeoLocation(modifiedLocation.id)
+                                                .pipe(
+                                                    catchError((err) => {
+                                                        this.snackbarService.showApiError(err);
+                                                        loadingDialog.close();
+                                                        return throwError(err);
+                                                    })
+                                                )
+                                                .subscribe(() => {
+                                                    // hide dialog
+                                                    loadingDialog.close();
+
+                                                    // success msg
+                                                    this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE');
+                                                });
+                                        } else {
+                                            // hide dialog
+                                            loadingDialog.close();
+                                        }
+                                    });
+                            } else {
+                                // hide dialog
+                                loadingDialog.close();
                             }
                         });
+                } else {
+                    // hide dialog
+                    loadingDialog.close();
                 }
-
-                // hide dialog
-                loadingDialog.close();
             });
-    }
-
-    /**
-     * Check if we have write access to locations
-     * @returns {boolean}
-     */
-    hasLocationWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
     }
 
     /**
@@ -219,25 +275,5 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             value.length > 0 : (
                 value || value === 0
             );
-    }
-
-    /**
-     * Create breadcrumbs
-     */
-    createBreadcrumbs() {
-        this.breadcrumbs = [
-            new BreadcrumbItemModel(
-                'LNG_PAGE_LIST_LOCATIONS_TITLE',
-                '/locations'
-            ),
-
-            new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_LOCATION_TITLE' : 'LNG_PAGE_MODIFY_LOCATION_TITLE',
-                '.',
-                true,
-                {},
-                this.locationData
-            )
-        ];
     }
 }

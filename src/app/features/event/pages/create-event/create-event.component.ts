@@ -9,12 +9,15 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import * as _ from 'lodash';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { AddressType } from '../../../../core/models/address.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 
 @Component({
     selector: 'app-create-event',
@@ -22,12 +25,11 @@ import { Moment, moment } from '../../../../core/helperClasses/x-moment';
     templateUrl: './create-event.component.html',
     styleUrls: ['./create-event.component.less']
 })
-export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit {
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
-        new BreadcrumbItemModel('LNG_PAGE_CREATE_EVENT_TITLE', '.', true)
-    ];
+export class CreateEventComponent
+    extends CreateConfirmOnChanges
+    implements OnInit {
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // selected outbreak ID
     outbreakId: string;
@@ -36,18 +38,32 @@ export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit
 
     serverToday: Moment = moment();
 
+    // authenticated user details
+    authUser: UserModel;
+
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private eventDataService: EventDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private authDataService: AuthDataService,
+        private redirectService: RedirectService
     ) {
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // get selected outbreak
         this.outbreakDataService
             .getSelectedOutbreak()
@@ -57,6 +73,25 @@ export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit
 
         // pre-set the initial address as "current address"
         this.eventData.address.typeId = AddressType.CURRENT_ADDRESS;
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (EventModel.canList(this.authUser)) {
+            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'));
+        }
+
+        // create breadcrumb
+        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_EVENT_TITLE', '.', true));
     }
 
     /**
@@ -88,9 +123,16 @@ export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit
                     // hide dialog
                     loadingDialog.close();
 
-                    // navigate to listing page
-                    this.disableDirtyConfirm();
-                    this.router.navigate([`/events/${newEvent.id}/modify`]);
+                    // navigate to proper page
+                    // method handles disableDirtyConfirm too...
+                    this.redirectToProperPageAfterCreate(
+                        this.router,
+                        this.redirectService,
+                        this.authUser,
+                        EventModel,
+                        'events',
+                        newEvent.id
+                    );
                 });
         }
     }

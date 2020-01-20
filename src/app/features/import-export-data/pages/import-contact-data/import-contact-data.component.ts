@@ -7,6 +7,10 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { Constants } from '../../../../core/models/constants';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { ImportDataExtension } from '../../components/import-data/model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-import-contact-data',
@@ -15,21 +19,14 @@ import { ImportDataExtension } from '../../components/import-data/model';
     styleUrls: ['./import-contact-data.component.less']
 })
 export class ImportContactDataComponent implements OnInit, OnDestroy {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_CONTACTS_TITLE',
-            '/contacts'
-        ),
-        new BreadcrumbItemModel(
-            'LNG_PAGE_IMPORT_CONTACT_DATA_TITLE',
-            '',
-            true
-        )
-    ];
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     outbreakSubscriber: Subscription;
 
     Constants = Constants;
+
+    authUser: UserModel;
 
     allowedExtensions: string[] = [
         ImportDataExtension.CSV,
@@ -68,15 +65,24 @@ export class ImportContactDataComponent implements OnInit, OnDestroy {
 
     /**
      * Constructor
-     * @param router
-     * @param route
      */
     constructor(
         private router: Router,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private authDataService: AuthDataService,
+        private redirectService: RedirectService
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // update breadcrumbs
+        this.initializeBreadcrumbs();
+
         // get number of deceased cases
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -92,6 +98,9 @@ export class ImportContactDataComponent implements OnInit, OnDestroy {
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -100,7 +109,42 @@ export class ImportContactDataComponent implements OnInit, OnDestroy {
         }
     }
 
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (ContactModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_CONTACTS_TITLE',
+                    '/contacts'
+                )
+            );
+        }
+
+        // import breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                'LNG_PAGE_IMPORT_CONTACT_DATA_TITLE',
+                '.',
+                true
+            )
+        );
+    }
+
+    /**
+     * Finished import
+     */
     finished() {
-        this.router.navigate(['/contacts']);
+        if (ContactModel.canList(this.authUser)) {
+            this.router.navigate(['/contacts']);
+        } else {
+            // fallback
+            this.redirectService.to(['/import-export-data/contact-data/import']);
+        }
     }
 }

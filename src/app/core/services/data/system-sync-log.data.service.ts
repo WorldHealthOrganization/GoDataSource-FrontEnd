@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { SystemSyncLogModel } from '../../models/system-sync-log.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class SystemSyncLogDataService {
@@ -44,11 +45,11 @@ export class SystemSyncLogDataService {
     /**
      * Return count of Sync logs
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getSyncLogsCount(
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`sync-logs/count?where=${whereFilter}`);
     }

@@ -14,6 +14,9 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as FileSaver from 'file-saver';
 import { Constants } from '../../../../core/models/constants';
+import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-case-count-map',
@@ -35,6 +38,10 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
 
     // constants
     WorldMapMarkerLayer = WorldMapMarkerLayer;
+    TransmissionChainModel = TransmissionChainModel;
+
+    // authenticated user
+    authUser: UserModel;
 
     showSettings: boolean = false;
     filters: TransmissionChainFilters = new TransmissionChainFilters();
@@ -53,13 +60,17 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
         private dialogService: DialogService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private authDataService: AuthDataService
     ) {}
 
     /**
      * Component initialized
      */
     ngOnInit() {
+        // authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -73,6 +84,9 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

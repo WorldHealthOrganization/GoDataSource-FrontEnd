@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { AuditLogModel } from '../../models/audit-log.model';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class AuditLogDataService {
@@ -31,9 +32,9 @@ export class AuditLogDataService {
     /**
      * Return count of audit logs
      * @param {RequestQueryBuilder} queryBuilder Required since we shouldn't retrieve all of them at a time...
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
-    getAuditLogsCount(queryBuilder: RequestQueryBuilder): Observable<any> {
+    getAuditLogsCount(queryBuilder: RequestQueryBuilder): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`audit-logs/count?where=${whereFilter}`);
     }

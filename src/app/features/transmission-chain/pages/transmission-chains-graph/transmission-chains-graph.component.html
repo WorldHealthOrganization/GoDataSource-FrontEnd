@@ -5,48 +5,28 @@
 
             <div class="topnav-actions">
 
-                <button mat-raised-button color="accent"
-                        [matMenuTriggerFor]="quickActionsMenu">
+                <button
+                    *ngIf="TransmissionChainModel.canExportGraphs(authUser)"
+                    mat-raised-button color="accent"
+                    [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <button
+                        *ngIf="TransmissionChainModel.canExportGraphs(authUser)"
                         [disabled]="x86Architecture"
                         mat-menu-item
                         (click)="exportVisualizedMapOrGraph()">
                         {{ buttonText | translate}}
                     </button>
-
-                    <mat-divider></mat-divider>
-
-                    <button
-                        mat-menu-item
-                        [routerLink]="['/graphs/transmission-chain-bars']">
-                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAIN_BARS_LABEL' | translate}}
-                    </button>
-
-                    <button
-                        mat-menu-item
-                        [routerLink]="['/transmission-chains', 'list']">
-                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LIST_LABEL' | translate}}
-                    </button>
-
-                    <button
-                        *ngIf="hasCaseReadAccess()"
-                        mat-menu-item
-                        [routerLink]="['/transmission-chains', 'case-count-map']">
-                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_COUNT_MAP_LABEL' | translate}}
-                    </button>
                 </mat-menu>
-
             </div>
         </div>
     </ng-container>
 </app-topnav>
 
 <mat-card class="page-section page-content">
-
     <!-- Chains of transmission -->
     <app-transmission-chains-dashlet
         [sizeOfChainsFilter]="sizeOfChainsFilter"
@@ -54,9 +34,8 @@
         [selectedEntityType]="selectedEntityType"
         (nodeTapped)="onNodeTap($event)"
         (edgeTapped)="onEdgeTap($event)"
-        (changeEditMode)="onEditModeChange($event)"
-    ></app-transmission-chains-dashlet>
-
+        (changeEditMode)="onEditModeChange($event)">
+    </app-transmission-chains-dashlet>
 </mat-card>
 
 <div
@@ -88,15 +67,14 @@
                 (remove)="removeRelationship()"
                 (modifyRelationship)="modifySelectedRelationship($event)"
                 (deleteRelationship)="deleteSelectedRelationship($event)"
-                (reverseRelationshipPersons)="refreshAfterReverseRelationshipPersons()"
-                >
+                (reverseRelationshipPersons)="refreshAfterReverseRelationshipPersons()">
             </app-relationship-summary>
         </mat-card>
     </div>
 
     <!-- Create relationship between 2 nodes -->
     <mat-card
-        *ngIf="selectedNodes.canCreateRelationship && hasCaseWriteAccess()"
+        *ngIf="selectedNodes.canCreateRelationship"
         class="page-section quick-action create-relationship"
         fxFlex fxLayout="column"
     >
@@ -141,7 +119,7 @@
 
     <!-- Modify Person -->
     <mat-card
-        *ngIf="selectedNodes.nodes.length === 1 && currentNodeAction === NodeAction.MODIFY_PERSON && canModifySelectedNode()"
+        *ngIf="selectedNodes.nodes.length === 1 && currentNodeAction === NodeAction.MODIFY_PERSON"
         class="page-section quick-action modify-person"
         fxFlex fxLayout="column"
     >

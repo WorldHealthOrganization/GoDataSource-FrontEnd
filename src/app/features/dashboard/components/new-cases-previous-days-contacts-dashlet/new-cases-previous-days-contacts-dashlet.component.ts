@@ -9,6 +9,8 @@ import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import * as _ from 'lodash';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
     selector: 'app-new-cases-previous-days-contacts-dashlet',
@@ -19,12 +21,16 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 export class NewCasesPreviousDaysContactsDashletComponent extends DashletComponent implements OnInit, OnDestroy {
     // number of cases with less than x contacts
     casesAmongContactsCount: number = 0;
+
     // number of new cases
     newCases: number = 0;
+
     // x metric set on outbreak
     xDaysAmongContacts: number;
+
     // constants to be used for applyListFilters
     Constants = Constants;
+    CaseModel = CaseModel;
 
     // outbreak
     outbreakId: string;
@@ -41,14 +47,24 @@ export class NewCasesPreviousDaysContactsDashletComponent extends DashletCompone
         this.refreshData();
     }));
 
+    /**
+     * Constructor
+     */
     constructor(
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        protected authDataService: AuthDataService
     ) {
-        super(listFilterDataService);
+        super(
+            listFilterDataService,
+            authDataService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get contacts on followup list count
         this.displayLoading = true;
@@ -63,6 +79,9 @@ export class NewCasesPreviousDaysContactsDashletComponent extends DashletCompone
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

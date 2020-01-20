@@ -5,7 +5,7 @@
 
             <div class="topnav-actions">
                 <button
-                    *ngIf="hasHelpWriteAccess()"
+                    *ngIf="HelpCategoryModel.canList(authUser)"
                     mat-raised-button color="accent"
                     [routerLink]="'./categories'">
                     {{'LNG_PAGE_GLOBAL_HELP_BUTTON_MANAGE_CATEGORIES' | translate}}

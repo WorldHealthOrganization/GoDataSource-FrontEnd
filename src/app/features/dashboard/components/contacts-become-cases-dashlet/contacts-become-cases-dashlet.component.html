@@ -1,5 +1,5 @@
 <app-dashboard-custom-metric-dashlet
-    [link]="['/cases']"
+    [link]="CaseModel.canList(authUser) ? '/cases' : ''"
     [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
     [value]="contactsBecomeCasesCount + ' / ' + casesCount"
     (hide)="onHide()"

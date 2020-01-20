@@ -2,36 +2,6 @@
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-
-            <div class="topnav-actions">
-
-                <button mat-raised-button color="accent"
-                        [matMenuTriggerFor]="quickActionsMenu">
-                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
-                </button>
-
-                <mat-menu #quickActionsMenu="matMenu">
-                    <button
-                        mat-menu-item
-                        [routerLink]="['/transmission-chains']">
-                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL' | translate}}
-                    </button>
-
-                    <button
-                        mat-menu-item
-                        [routerLink]="['/graphs/transmission-chain-bars']">
-                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAIN_BARS_LABEL' | translate}}
-                    </button>
-
-                    <button
-                        *ngIf="hasCaseReadAccess()"
-                        mat-menu-item
-                        [routerLink]="['/transmission-chains', 'case-count-map']">
-                        {{'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_COUNT_MAP_LABEL' | translate}}
-                    </button>
-                </mat-menu>
-
-            </div>
         </div>
     </ng-container>
 </app-topnav>
@@ -73,10 +43,19 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                <a *ngIf="item.rootPerson" [routerLink]="['/transmission-chains']"
-                   [queryParams]="{ personId: item.rootPerson.id, selectedEntityType: item.rootPerson.type }">
-                    {{ item.rootPerson.name }}
-                </a>
+                <ng-container
+                    *ngIf="item.rootPerson">
+                    <a
+                        *ngIf="TransmissionChainModel.canViewAnyGraph(authUser) else noPersonLinkToGraph"
+                        [routerLink]="['/transmission-chains']"
+                        [queryParams]="{ personId: item.rootPerson.id, selectedEntityType: item.rootPerson.type }">
+                        {{ item.rootPerson.name }}
+                    </a>
+                    <ng-template
+                        #noPersonLinkToGraph>
+                        {{ item.rootPerson.name }}
+                    </ng-template>
+                </ng-container>
             </mat-cell>
         </ng-container>
 
@@ -146,8 +125,8 @@
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+        <mat-header-row *matHeaderRowDef="fixedTableColumns"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: fixedTableColumns"></mat-row>
     </mat-table>
 
     <div

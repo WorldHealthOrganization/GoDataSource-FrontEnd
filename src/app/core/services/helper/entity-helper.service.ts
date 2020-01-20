@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
-import { EntityModel } from '../../models/entity-and-relationship.model';
+import { EntityModel, RelationshipModel } from '../../models/entity-and-relationship.model';
 import {
     DialogButton, DialogComponent, DialogConfiguration, DialogField,
     DialogFieldType
@@ -17,6 +17,8 @@ import { RelationshipDataService } from '../data/relationship.data.service';
 import { SnackbarService } from './snackbar.service';
 import { throwError } from 'rxjs/index';
 import { catchError } from 'rxjs/internal/operators';
+import { AuthDataService } from '../data/auth.data.service';
+import { UserModel } from '../../models/user.model';
 
 export enum SentFromColumn {
     CONTACTS = 'fromContacts',
@@ -31,7 +33,8 @@ export class EntityHelperService {
     constructor(
         private dialogService: DialogService,
         private relationshipDataService: RelationshipDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private authDataService: AuthDataService
     ) {}
 
     /**
@@ -66,7 +69,11 @@ export class EntityHelperService {
                 loadingDialog.close();
 
                 // display popup
-                this.displayEntitiesAndRelationships(SentFromColumn.CONTACTS, entity, relationshipsData);
+                this.displayEntitiesAndRelationships(
+                    SentFromColumn.CONTACTS,
+                    entity,
+                    relationshipsData
+                );
             });
     }
 
@@ -102,7 +109,11 @@ export class EntityHelperService {
                 loadingDialog.close();
 
                 // display popup
-                this.displayEntitiesAndRelationships(SentFromColumn.EXPOSURES, entity, relationshipsData);
+                this.displayEntitiesAndRelationships(
+                    SentFromColumn.EXPOSURES,
+                    entity,
+                    relationshipsData
+                );
             });
     }
 
@@ -117,28 +128,41 @@ export class EntityHelperService {
         if (!_.isEmpty(relationshipsData)) {
             // split relationships data into entities and relationships
             // entities collection
-            const entities: DialogField[] = [
-                // add link to full resource
-                new DialogField({
-                    name: 'link',
-                    fieldType: DialogFieldType.LINK,
-                    routerLink: [
-                        from === SentFromColumn.CONTACTS ?
-                            `/relationships/${entity.type}/${entity.id}/contacts` :
-                            `/relationships/${entity.type}/${entity.id}/exposures`
-                    ],
-                    placeholder: from === SentFromColumn.CONTACTS ?
-                        'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_CONTACTS' :
-                        'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_EXPOSURES',
-                    linkTarget: '_blank'
-                }),
-                // add section title for entities
-                new DialogField({
-                    name: '_',
-                    fieldType: DialogFieldType.SECTION_TITLE,
-                    placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_SECTION_TITLE'
-                })
-            ];
+            const entities: DialogField[] = [];
+
+            // add links to list relationship page only if we're alloed to view that page
+            const authUser: UserModel = this.authDataService.getAuthenticatedUser();
+            if (
+                RelationshipModel.canList(authUser) && (
+                    from === SentFromColumn.CONTACTS ?
+                        entity.canListRelationshipContacts(authUser) :
+                        entity.canListRelationshipExposures(authUser)
+                )
+            ) {
+                entities.push(
+                    // add link to full resource
+                    new DialogField({
+                        name: 'link',
+                        fieldType: DialogFieldType.LINK,
+                        routerLink: [
+                            from === SentFromColumn.CONTACTS ?
+                                `/relationships/${entity.type}/${entity.id}/contacts` :
+                                `/relationships/${entity.type}/${entity.id}/exposures`
+                        ],
+                        placeholder: from === SentFromColumn.CONTACTS ?
+                            'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_CONTACTS' :
+                            'LNG_DIALOG_GENERAL_DIALOG_LINK_FULL_LIST_EXPOSURES',
+                        linkTarget: '_blank'
+                    }),
+
+                    // add section title for entities
+                    new DialogField({
+                        name: '_',
+                        fieldType: DialogFieldType.SECTION_TITLE,
+                        placeholder: 'LNG_PAGE_LIST_CASES_DIALOG_ENTITY_SECTION_TITLE'
+                    })
+                );
+            }
 
             // relationships collection
             const relationships: DialogField[] = [
@@ -158,7 +182,7 @@ export class EntityHelperService {
                     fieldType: DialogFieldType.ACTION,
                     placeholder: relationshipData.model.name,
                     actionData: relationshipData.model,
-                    actionCallback: (item) => {
+                    actionCallback: relationshipData.model.canView(authUser) ? ((item) => {
                         // show entity information
                         this.dialogService.showCustomDialog(
                             ViewCotNodeDialogComponent,
@@ -171,7 +195,7 @@ export class EntityHelperService {
                                 }
                             }
                         );
-                    }
+                    }) : null
                 }));
 
                 // construct relationship label for dialog
@@ -197,7 +221,7 @@ export class EntityHelperService {
                     fieldType: DialogFieldType.ACTION,
                     placeholder: relationshipLabel,
                     actionData: relationshipData.relationship,
-                    actionCallback: (item) => {
+                    actionCallback: relationshipData.relationship.canView(authUser) ? ((item) => {
                         // show entity information
                         this.dialogService.showCustomDialog(
                             ViewCotEdgeDialogComponent,
@@ -210,7 +234,7 @@ export class EntityHelperService {
                                 }
                             }
                         );
-                    }
+                    }) : null
                 }));
         });
 

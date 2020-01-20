@@ -11,7 +11,14 @@ const routes: Routes = [
     // Events list
     {
         path: '',
-        component: fromPages.EventsListComponent
+        component: fromPages.EventsListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.EVENT_LIST
+            ]
+        }
     },
     // Create Event
     {
@@ -19,7 +26,10 @@ const routes: Routes = [
         component: fromPages.CreateEventComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_EVENT]
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.EVENT_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -31,7 +41,10 @@ const routes: Routes = [
         component: fromPages.ModifyEventComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_EVENT],
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.EVENT_VIEW
+            ],
             action: ViewModifyComponentAction.VIEW
         }
     },
@@ -41,7 +54,11 @@ const routes: Routes = [
         component: fromPages.ModifyEventComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_EVENT],
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.EVENT_VIEW,
+                PERMISSION.EVENT_MODIFY
+            ],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [

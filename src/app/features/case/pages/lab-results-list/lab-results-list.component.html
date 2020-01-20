@@ -4,9 +4,8 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-
                 <button
-                    *ngIf="!appliedListFilter"
+                    *ngIf="!appliedListFilter && LabResultModel.canImport(authUser)"
                     mat-raised-button
                     color="accent"
                     [matMenuTriggerFor]="quickActionsMenu">
@@ -15,7 +14,7 @@
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <ng-container *app-selected-outbreak-is-active>
-                        <ng-container *ngIf="hasLabResultWriteAccess()">
+                        <ng-container *ngIf="LabResultModel.canImport(authUser)">
                             <button
                                 mat-menu-item
                                 [routerLink]="['/import-export-data', 'case-lab-data', 'import']">
@@ -25,7 +24,6 @@
                     </ng-container>
                 </mat-menu>
             </div>
-
         </div>
     </ng-container>
 </app-topnav>
@@ -94,7 +92,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.case?.visualId}}
+                {{ item.person?.visualId}}
             </mat-cell>
         </ng-container>
 
@@ -117,7 +115,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.case?.lastName }}
+                {{ item.person?.lastName }}
             </mat-cell>
         </ng-container>
 
@@ -140,7 +138,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.case?.firstName }}
+                {{ item.person?.firstName }}
             </mat-cell>
         </ng-container>
 
@@ -168,7 +166,7 @@
             <mat-cell *matCellDef="let item">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.CASE_CLASSIFICATION"
-                    [value]="item.case.classification">
+                    [value]="item.person.classification">
                 </app-reference-data-label>
             </mat-cell>
         </ng-container>

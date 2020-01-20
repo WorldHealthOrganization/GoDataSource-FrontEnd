@@ -15,7 +15,9 @@
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px">
+                        <div
+                            *ngIf="CaseModel.canView(authUser)"
+                            fxLayout="row" fxLayoutGap="20px">
                             <div>{{'LNG_PAGE_CREATE_CASE_LAB_RESULT_FIELD_LABEL_CASE' | translate}}</div>
                             <a [routerLink]="['/cases', caseData?.id, 'view']">{{ caseData?.name }}</a>
                         </div>

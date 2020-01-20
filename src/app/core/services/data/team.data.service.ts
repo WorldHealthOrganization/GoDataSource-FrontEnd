@@ -5,6 +5,7 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 
 import { TeamModel } from '../../models/team.model';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class TeamDataService {
@@ -39,11 +40,11 @@ export class TeamDataService {
     /**
      * Return total number of teams
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getTeamsCount(
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
 
         const whereFilter = queryBuilder.filter.generateCondition(true);
 
