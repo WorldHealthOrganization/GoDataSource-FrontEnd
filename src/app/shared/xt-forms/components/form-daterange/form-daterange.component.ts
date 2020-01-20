@@ -86,7 +86,7 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
     }
 
     /**
-     * Return dates for dateSameOrBefore directive
+     * Return dates for dateSameOrAfter directive
      * @returns {Array}
      */
     getDateSameOrAfter(name: string) {
@@ -104,7 +104,11 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
         return dates;
     }
 
-
+    /**
+     * Return dates for dateSameOrBefore
+     * @param {string} name
+     * @returns {Array}
+     */
     getDateSameOrBefore(name: string) {
         const dates = [];
         // if end date is visible
