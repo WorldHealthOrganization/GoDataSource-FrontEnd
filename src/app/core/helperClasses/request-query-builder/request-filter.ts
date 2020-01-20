@@ -135,6 +135,32 @@ export class RequestFilter {
     }
 
     /**
+     * Filter by a phone number
+     * @param {string} property
+     * @param {string} value
+     * @param {boolean} replace
+     * @returns {RequestFilter}
+     */
+    byPhoneNumber(
+        property: string,
+        value: string,
+        replace: boolean = true
+    ) {
+        // do we need to remove condition ?
+        if (_.isEmpty(value)) {
+            this.remove(property);
+        } else {
+            this.where({
+                [property]: {
+                    regex: value
+                }
+            }, replace);
+        }
+
+        return this;
+    }
+
+    /**
      * Filter by comparing a field if it is equal to the provided value
      * @param {string} property
      * @param {string | number} value

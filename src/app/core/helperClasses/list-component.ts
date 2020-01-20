@@ -442,17 +442,20 @@ export abstract class ListComponent implements OnDestroy {
 
     /**
      * Filter by phone number
+     * @param {string} property
+     * @param {string} value
      */
-    filterByPhone(value: string) {
-        if (!_.isEmpty(value)) {
-            const numberPattern = AddressModel.getPhoneNumberPattern(value);
+    filterByPhoneNumber(
+        property: string,
+        value: string
+    ) {
+        // build number pattern
+        const numberPattern = !_.isEmpty(value) ? AddressModel.getPhoneNumberPattern(value) : '';
 
-            this.queryBuilder.filter.where({
-                [`telephoneNumbers.${PhoneNumberType.PRIMARY_PHONE_NUMBER}`]: {
-                    regex: numberPattern
-                }
-            }, true);
-        }
+        this.queryBuilder.filter.byPhoneNumber(
+            property as string,
+            numberPattern
+        );
 
         // refresh list
         this.needsRefreshList();
