@@ -21,7 +21,6 @@ import {
 import { VisibleColumnModel } from '../../shared/components/side-columns/model';
 import { AddressModel, AddressType } from '../models/address.model';
 import { moment, Moment } from './x-moment';
-import { PhoneNumberType } from '../models/user.model';
 
 export abstract class ListComponent implements OnDestroy {
     /**
