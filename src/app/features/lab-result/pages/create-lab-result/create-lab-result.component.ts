@@ -164,7 +164,7 @@ export class CreateCaseLabResultComponent
         // lab result list
         if (LabResultModel.canList(this.authUser)) {
             this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', `/cases/${this.caseData.id}/lab-results`)
+                new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', `/cases/${this.caseData.id}/lab-results`)
             );
         }
 

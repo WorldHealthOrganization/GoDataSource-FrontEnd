@@ -199,7 +199,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
         if (LabResultModel.canList(this.authUser)) {
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
-                    'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE',
+                    'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE',
                     this.fromLabResultsList || !this.labResultData || !this.labResultData.person || !this.labResultData.person.id ?
                         '/cases/lab-results' :
                         `/cases/${this.labResultData.person.id}/lab-results`
