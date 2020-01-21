@@ -494,10 +494,10 @@
             class="page-tabs-navbar-placeholder"></div>
 
         <button
-            *ngIf="LabResultModel.canList(authUser)"
+            *ngIf="LabResultModel.canList(authUser) && CaseModel.canListLabResult(authUser)"
             mat-raised-button
             type="button"
-            [routerLink]="['/cases', caseId, 'lab-results']">
+            [routerLink]="['/lab-results', 'cases', caseId]">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS' | translate }}
         </button>
         <button

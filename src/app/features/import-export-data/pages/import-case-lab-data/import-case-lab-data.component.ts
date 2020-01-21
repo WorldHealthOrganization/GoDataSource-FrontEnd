@@ -47,7 +47,7 @@ export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
     ImportServerModelNames = ImportServerModelNames;
 
     fieldsWithoutTokens = {
-        questionnaireAnswers: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS'
+        questionnaireAnswers: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS'
     };
 
     requiredDestinationFields = [
@@ -130,7 +130,7 @@ export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
                     'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
-                    '/cases/lab-results'
+                    '/lab-results'
                 )
             );
         }
@@ -150,7 +150,7 @@ export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
      */
     finished() {
         if (LabResultModel.canList(this.authUser)) {
-            this.router.navigate(['/cases/lab-results']);
+            this.router.navigate(['/lab-results']);
         } else {
             // fallback
             this.redirectService.to(['/import-export-data/case-lab-data/import']);

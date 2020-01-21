@@ -11,22 +11,26 @@
         <!-- Details step -->
         <mat-step [stepControl]="detailsForm">
             <form #detailsForm="ngForm">
-                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_CASE_LAB_RESULT_TAB_DETAILS' | translate }}</ng-template>
+                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_LAB_RESULT_TAB_DETAILS' | translate }}</ng-template>
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
                         <div
-                            *ngIf="CaseModel.canView(authUser)"
+                            *ngIf="(entityData && personType === EntityType.CASE && CaseModel.canView(authUser)) || (entityData && personType === EntityType.CONTACT && ContactModel.canView(authUser))"
                             fxLayout="row" fxLayoutGap="20px">
-                            <div>{{'LNG_PAGE_CREATE_CASE_LAB_RESULT_FIELD_LABEL_CASE' | translate}}</div>
-                            <a [routerLink]="['/cases', caseData?.id, 'view']">{{ caseData?.name }}</a>
+                            <div>
+                                {{'LNG_PAGE_CREATE_LAB_RESULT_FIELD_LABEL_ENTITY' | translate}}
+                            </div>
+                            <a [routerLink]="['/' + EntityModel.getLinkForEntityType(personType), entityData.id, 'view']">
+                                {{ entityData.name }}
+                            </a>
                         </div>
 
                         <div
                             *ngIf="displayOnsetDateWarningMessage"
                             class="warning-message"
                             fxLayout="row">
-                            {{ 'LNG_PAGE_CREATE_CASE_LAB_RESULT_WARNING_CASE_DATEOFONSET_AFTER_SAMPLE_TAKEN' | translate }}
+                            {{ 'LNG_PAGE_CREATE_LAB_RESULT_WARNING_CASE_DATEOFONSET_AFTER_SAMPLE_TAKEN' | translate }}
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
@@ -199,7 +203,7 @@
         <!-- Questionnaire step -->
         <mat-step [stepControl]="questionnaireForm">
             <form #questionnaireForm="ngForm">
-                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate }}</ng-template>
+                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate }}</ng-template>
 
                 <!-- Questionnaire section -->
                 <app-form-fill-questionnaire
@@ -222,7 +226,7 @@
             <div class="stepper-navigation-buttons">
                 <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                 <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent" (click)="createLabResult([detailsForm, questionnaireForm])">
-                    {{'LNG_PAGE_CREATE_CASE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON' | translate}}
+                    {{'LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON' | translate}}
                 </button>
             </div>
         </mat-step>

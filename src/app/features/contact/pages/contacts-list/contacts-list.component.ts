@@ -39,6 +39,7 @@ import { EntityHelperService } from '../../../../core/services/helper/entity-hel
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { CaseModel } from '../../../../core/models/case.model';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
 
 @Component({
     selector: 'app-contacts-list',
@@ -282,6 +283,21 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         // visible only if at least one of the previous...
                         return !item.deleted &&
                             ContactModel.canListRelationshipExposures(this.authUser);
+                    }
+                }),
+
+                // See contact lab results
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_LAB_RESULTS',
+                    click: (item: ContactModel) => {
+                        this.router.navigate(['/lab-results', 'contacts', item.id]);
+                    },
+                    visible: (item: ContactModel): boolean => {
+                        return !item.deleted &&
+                            this.selectedOutbreak &&
+                            this.selectedOutbreak.isContactLabResultsActive &&
+                            LabResultModel.canList(this.authUser) &&
+                            ContactModel.canListLabResult(this.authUser);
                     }
                 }),
 

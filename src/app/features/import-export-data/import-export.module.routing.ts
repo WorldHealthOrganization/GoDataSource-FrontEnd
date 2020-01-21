@@ -89,6 +89,18 @@ const routes: Routes = [
         }
     },
 
+    // Import contact lab data
+    {
+        path: 'contact-lab-data/import',
+        component: fromPages.ImportContactLabDataComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CONTACT_IMPORT_LAB_RESULT
+            ]
+        }
+    },
+
     // Import sync package
     {
         path: 'sync-package/import',

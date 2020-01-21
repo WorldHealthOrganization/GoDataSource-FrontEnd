@@ -227,6 +227,9 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private outbreakDataService: OutbreakDataService,
         private userDataService: UserDataService,
@@ -243,6 +246,9 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.activeOptionsList$ = this.genericDataService.getFilterYesNoOptions();
@@ -309,6 +315,11 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
             new VisibleColumnModel({
                 field: 'active',
                 label: 'LNG_OUTBREAK_FIELD_LABEL_ACTIVE'
+            }),
+            new VisibleColumnModel({
+                field: 'isContactLabResultsActive',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'deleted',

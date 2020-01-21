@@ -33,6 +33,7 @@ export class LabResultModel
         [variable: string]: IAnswerData[];
     };
     personId: string;
+    personType: EntityType;
     person: CaseModel | ContactModel;
     testedFor: string;
 
@@ -82,6 +83,7 @@ export class LabResultModel
         this.status = _.get(data, 'status', Constants.PROGRESS_OPTIONS.IN_PROGRESS.value);
         this.quantitativeResult = _.get(data, 'quantitativeResult');
         this.personId = _.get(data, 'personId');
+        this.personType = _.get(data, 'personType');
         this.testedFor = _.get(data, 'testedFor');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});

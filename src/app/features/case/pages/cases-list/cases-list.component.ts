@@ -336,11 +336,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS',
                     click: (item: CaseModel) => {
-                        this.router.navigate(['/cases', item.id, 'lab-results']);
+                        this.router.navigate(['/lab-results', 'cases', item.id]);
                     },
                     visible: (item: CaseModel): boolean => {
                         return !item.deleted &&
-                            LabResultModel.canList(this.authUser);
+                            LabResultModel.canList(this.authUser) &&
+                            CaseModel.canListLabResult(this.authUser);
                     }
                 }),
 

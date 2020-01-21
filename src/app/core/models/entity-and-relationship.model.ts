@@ -157,46 +157,21 @@ export class EntityModel {
     model: CaseModel | ContactModel | EventModel;
     relationship: RelationshipModel;
 
-    constructor(data) {
-        this.type = _.get(data, 'type');
-
-        this.relationship = _.get(data, 'relationship');
-        if (!_.isEmpty(this.relationship)) {
-            this.relationship = this.relationship instanceof RelationshipModel ?
-                this.relationship :
-                new RelationshipModel(this.relationship);
-        }
-
-        switch (this.type) {
-            case EntityType.CASE:
-                this.model = new CaseModel(data);
-                break;
-
-            case EntityType.CONTACT:
-                this.model = new ContactModel(data);
-                break;
-
-            case EntityType.EVENT:
-                this.model = new EventModel(data);
-                break;
-        }
-    }
-
+    /**
+     * Link accordingly to type
+     */
     static getLinkForEntityType(entityType: EntityType): string {
-        let entityTypeLink = '';
         switch (entityType) {
             case EntityType.CASE:
-                entityTypeLink = 'cases';
-                break;
+                return 'cases';
             case EntityType.CONTACT:
-                entityTypeLink = 'contacts';
-                break;
+                return 'contacts';
             case EntityType.EVENT:
-                entityTypeLink = 'events';
-                break;
+                return 'events';
         }
 
-        return entityTypeLink;
+        // finished
+        return '';
     }
 
     /**
@@ -460,5 +435,33 @@ export class EntityModel {
      */
     static getPersonLink(person): string {
         return `/${EntityModel.getLinkForEntityType(person.type)}/${person.id}/view`;
+    }
+
+    /**
+     * Constructor
+     */
+    constructor(data) {
+        this.type = _.get(data, 'type');
+
+        this.relationship = _.get(data, 'relationship');
+        if (!_.isEmpty(this.relationship)) {
+            this.relationship = this.relationship instanceof RelationshipModel ?
+                this.relationship :
+                new RelationshipModel(this.relationship);
+        }
+
+        switch (this.type) {
+            case EntityType.CASE:
+                this.model = new CaseModel(data);
+                break;
+
+            case EntityType.CONTACT:
+                this.model = new ContactModel(data);
+                break;
+
+            case EntityType.EVENT:
+                this.model = new EventModel(data);
+                break;
+        }
     }
 }

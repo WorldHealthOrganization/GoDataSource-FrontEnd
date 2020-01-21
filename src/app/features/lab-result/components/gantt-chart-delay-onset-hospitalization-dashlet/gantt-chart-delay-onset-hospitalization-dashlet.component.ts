@@ -75,12 +75,18 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
         this.refreshData();
     }), 100);
 
+    /**
+     * Constructor
+     */
     constructor(
         private caseDataService: CaseDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private outbreakDataService: OutbreakDataService
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // retrieve ref data
         this.displayLoading = true;
@@ -110,6 +116,9 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

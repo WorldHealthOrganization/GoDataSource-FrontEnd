@@ -13,19 +13,21 @@
     <div class="form-content">
         <mat-tab-group class="page-tabs-navbar">
 
-            <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_DETAILS_TITLE' | translate">
+            <mat-tab [label]="'LNG_PAGE_MODIFY_LAB_RESULT_TAB_DETAILS_TITLE' | translate">
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
                         <div
-                            class="lab-result-case-title"
+                            class="lab-result-title"
                             fxLayout="row" fxLayoutGap="20px">
                             <ng-container
                                 *ngIf="labResultData?.person?.id && (
                                     (labResultData.person.type === EntityType.CASE && CaseModel.canView(authUser)) ||
                                     (labResultData.person.type === EntityType.CONTACT && ContactModel.canView(authUser))
                                 )">
-                                <div>{{ (labResultData.person.type === EntityType.CASE ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE' : 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT') | translate }}</div>
+                                <div>
+                                    {{'LNG_PAGE_VIEW_LAB_RESULT_FIELD_LABEL_ENTITY' | translate}}
+                                </div>
 
                                 <a
                                     [routerLink]="[labResultData.person.type === EntityType.CASE ? '/cases' : '/contacts', labResultData.personId, 'view']">
@@ -33,8 +35,8 @@
                                 </a>
 
                                 <div
-                                    *ngIf="labResultData.person.type === EntityType.CONTACT">
-                                    {{ 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT_WITH_INFO' | translate: {caseName: labResultData.person.name} }}
+                                    *ngIf="labResultData.person.type === EntityType.CONTACT && labResultData.person.wasCase">
+                                    {{ 'LNG_PAGE_MODIFY_LAB_RESULT_FIELD_LABEL_CONTACT_WITH_INFO' | translate: {caseName: labResultData.person.name} }}
                                 </div>
                             </ng-container>
                         </div>
@@ -43,7 +45,7 @@
                             *ngIf="displayOnsetDateWarningMessage"
                             class="warning-message"
                             fxLayout="row">
-                            {{ 'LNG_PAGE_VIEW_CASE_LAB_RESULT_WARNING_CASE_DATEOFONSET_AFTER_SAMPLE_TAKEN' | translate }}
+                            {{ 'LNG_PAGE_MODIFY_LAB_RESULT_WARNING_CASE_DATEOFONSET_AFTER_SAMPLE_TAKEN' | translate }}
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
@@ -216,7 +218,7 @@
 
                 <!-- Create / update by user information section -->
                 <div class="section-title">
-                    {{ 'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE' | translate }}
+                    {{ 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE' | translate }}
                 </div>
                 <mat-card class="page-section">
                     <div fxLayout="column">
@@ -259,13 +261,13 @@
 
             </mat-tab>
 
-            <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate">
+            <mat-tab [label]="'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate">
                 <app-form-fill-questionnaire
                     name="questionnaireAnswers"
                     [ngModel]="labResultData.questionnaireAnswers"
                     [questions]="selectedOutbreak.labResultsTemplate"
                     [disabled]="viewOnly"
-                    [componentTitle]="'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate">
+                    [componentTitle]="'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate">
                 </app-form-fill-questionnaire>
             </mat-tab>
 
@@ -278,9 +280,9 @@
         <ng-container
             *app-selected-outbreak-is-active>
             <button
-                *ngIf="viewOnly && LabResultModel.canModify(authUser)"
+                *ngIf="viewOnly && ((personType === EntityType.CASE && CaseModel.canModifyLabResult(authUser)) || (personType === EntityType.CONTACT && ContactModel.canModifyLabResult(authUser)))"
                 mat-raised-button type="button" color="accent"
-                [routerLink]=" ['/cases', labResultData.personId, 'lab-results', labResultData.id, 'modify' ]"
+                [routerLink]=" ['/lab-results', EntityModel.getLinkForEntityType(personType), labResultData.personId, labResultData.id, 'modify' ]"
                 [queryParams]="{fromLabResultsList: fromLabResultsList}">
                 {{'LNG_COMMON_BUTTON_EDIT' | translate}}
             </button>
@@ -289,10 +291,10 @@
                     {{'LNG_COMMON_BUTTON_SAVE' | translate}}
                 </button>
                 <button
-                    *ngIf="LabResultModel.canList(authUser)"
+                    *ngIf="(personType === EntityType.CASE && CaseModel.canListLabResult(authUser)) || (personType === EntityType.CONTACT && ContactModel.canListLabResult(authUser))"
                     type="button"
                     mat-raised-button
-                    [routerLink]="!fromLabResultsList ? ['/cases', labResultData.personId, 'lab-results'] : ['/cases/lab-results']">
+                    [routerLink]="fromLabResultsList ? ['/lab-results'] : ['/lab-results', EntityModel.getLinkForEntityType(personType), labResultData.personId]">
                     {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
                 </button>
             </ng-container>

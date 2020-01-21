@@ -7,7 +7,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -21,27 +21,31 @@ import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { catchError, share, tap } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
-import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityType } from '../../../../core/models/entity-type';
+import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 
 @Component({
-    selector: 'app-case-lab-results-list',
+    selector: 'app-entity-lab-results-list',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './case-lab-results-list.component.html',
-    styleUrls: ['./case-lab-results-list.component.less']
+    templateUrl: './entity-lab-results-list.component.html',
+    styleUrls: ['./entity-lab-results-list.component.less']
 })
-export class CaseLabResultsListComponent extends ListComponent implements OnInit {
+export class EntityLabResultsListComponent extends ListComponent implements OnInit {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // case
-    caseId: string;
-    caseData: CaseModel = new CaseModel();
+    // entity
+    personType: EntityType;
+    entityData: CaseModel | ContactModel;
+
     initialCaseClassification: string;
 
     // user list
@@ -65,7 +69,9 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     ReferenceDataCategory = ReferenceDataCategory;
     UserSettings = UserSettings;
     CaseModel = CaseModel;
-    LabResultModel = LabResultModel;
+    ContactModel = ContactModel;
+    EntityType = EntityType;
+    EntityModel = EntityModel;
 
     // available side filters
     availableSideFilters: FilterModel[];
@@ -76,32 +82,50 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     authUser: UserModel;
 
     recordActions: HoverRowAction[] = [
-        // View Case Lab Results
+        // View Lab Results
         new HoverRowAction({
             icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_VIEW_LAB_RESULT',
+            iconTooltip: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_VIEW_LAB_RESULT',
             click: (item: LabResultModel) => {
-                this.router.navigate(['/cases', item.personId, 'lab-results', item.id, 'view']);
+                // case / contact lab result ?
+                this.router.navigate(['/lab-results', EntityModel.getLinkForEntityType(item.personType), item.personId, item.id, 'view']);
             },
             visible: (item: LabResultModel): boolean => {
                 return !item.deleted &&
-                    LabResultModel.canView(this.authUser);
+                    LabResultModel.canView(this.authUser) && (
+                        (
+                            item.personType === EntityType.CASE &&
+                            CaseModel.canViewLabResult(this.authUser)
+                        ) || (
+                            item.personType === EntityType.CONTACT &&
+                            ContactModel.canViewLabResult(this.authUser)
+                        )
+                    );
             }
         }),
 
         // Modify Case Lab Results
         new HoverRowAction({
             icon: 'settings',
-            iconTooltip: 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT',
+            iconTooltip: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT',
             click: (item: LabResultModel) => {
-                this.router.navigate(['/cases', item.personId, 'lab-results', item.id, 'modify']);
+                // case / contact lab result ?
+                this.router.navigate(['/lab-results', EntityModel.getLinkForEntityType(item.personType), item.personId, item.id, 'modify']);
             },
             visible: (item: LabResultModel): boolean => {
                 return !item.deleted &&
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    LabResultModel.canModify(this.authUser);
+                    LabResultModel.canModify(this.authUser) && (
+                        (
+                            item.personType === EntityType.CASE &&
+                            CaseModel.canModifyLabResult(this.authUser)
+                        ) || (
+                            item.personType === EntityType.CONTACT &&
+                            ContactModel.canModifyLabResult(this.authUser)
+                        )
+                    );
             }
         }),
 
@@ -110,9 +134,9 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
             type: HoverRowActionType.MENU,
             icon: 'moreVertical',
             menuOptions: [
-                // Delete Case Lab Results
+                // Delete Lab Results
                 new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_LAB_RESULT',
+                    menuOptionLabel: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_LAB_RESULT',
                     click: (item: LabResultModel) => {
                         this.deleteLabResult(item);
                     },
@@ -121,14 +145,22 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            LabResultModel.canDelete(this.authUser);
+                            LabResultModel.canDelete(this.authUser) && (
+                                (
+                                    item.personType === EntityType.CASE &&
+                                    CaseModel.canDeleteLabResult(this.authUser)
+                                ) || (
+                                    item.personType === EntityType.CONTACT &&
+                                    ContactModel.canDeleteLabResult(this.authUser)
+                                )
+                            );
                     },
                     class: 'mat-menu-item-delete'
                 }),
 
-                // Restore a deleted Case Lab Results
+                // Restore a deleted Lab Results
                 new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT',
+                    menuOptionLabel: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT',
                     click: (item: LabResultModel) => {
                         this.restoreLabResult(item);
                     },
@@ -137,7 +169,15 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                             this.authUser &&
                             this.selectedOutbreak &&
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            LabResultModel.canRestore(this.authUser);
+                            LabResultModel.canRestore(this.authUser) && (
+                                (
+                                    item.personType === EntityType.CASE &&
+                                    CaseModel.canRestoreLabResult(this.authUser)
+                                ) || (
+                                    item.personType === EntityType.CONTACT &&
+                                    ContactModel.canRestoreLabResult(this.authUser)
+                                )
+                            );
                     },
                     class: 'mat-menu-item-restore'
                 })
@@ -154,6 +194,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         private route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
         private caseDataService: CaseDataService,
+        private contactDataService: ContactDataService,
         private labResultDataService: LabResultDataService,
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
@@ -177,35 +218,51 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         // retrieve users
         this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
-        // retrieve case information
-        this.route.params.subscribe((params: { caseId }) => {
-            // get selected outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    // selected outbreak
-                    this.selectedOutbreak = selectedOutbreak;
+        // retrieve page information
+        this.route.data.subscribe((data: { personType: EntityType }) => {
+            // set page person type
+            this.personType = data.personType;
 
-                    // initialize side filters
-                    this.initializeSideFilters();
+            // retrieve entity information
+            this.route.params.subscribe((params: { caseId?: string, contactId?: string }) => {
+                // get selected outbreak
+                this.outbreakDataService
+                    .getSelectedOutbreak()
+                    .subscribe((selectedOutbreak: OutbreakModel) => {
+                        // selected outbreak
+                        this.selectedOutbreak = selectedOutbreak;
 
-                    // get case data
-                    this.caseDataService
-                        .getCase(this.selectedOutbreak.id, params.caseId)
-                        .subscribe((caseData: CaseModel) => {
-                            this.caseId = caseData.id;
-                            this.caseData = new CaseModel(caseData);
-                            this.initialCaseClassification = caseData.classification;
+                        // initialize side filters
+                        this.initializeSideFilters();
 
-                            // initialize breadcrumbs
-                            this.initializeBreadcrumbs();
+                        // determine entity endpoint that we need to call
+                        const entitySubscriber: Observable<CaseModel | ContactModel> = this.personType === EntityType.CONTACT ?
+                            this.contactDataService.getContact(this.selectedOutbreak.id, params.contactId) :
+                            this.caseDataService.getCase(this.selectedOutbreak.id, params.caseId);
 
-                            // initialize pagination
-                            this.initPaginator();
-                            // ...and load the list of items
-                            this.needsRefreshList(true);
+                        // get entity ( case / contact ) data
+                        entitySubscriber
+                            .subscribe((entityData: CaseModel | ContactModel) => {
+                                this.entityData = entityData;
+
+                                // update initial classification
+                                if (this.personType === EntityType.CASE) {
+                                    this.initialCaseClassification = (entityData as CaseModel).classification;
+                                }
+
+                                // initialize breadcrumbs
+                                this.initializeBreadcrumbs();
+
+                                // initialize pagination
+                                this.initPaginator();
+                                // ...and load the list of items
+                                this.needsRefreshList(true);
+                        });
                     });
-                });
+            });
+
+            // initialize breadcrumbs
+            this.initializeBreadcrumbs();
         });
 
         // get the option list for side filters
@@ -214,14 +271,10 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE).pipe(share());
         this.labNamesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME).pipe(share());
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
-
-        // initialize breadcrumbs
-        this.initializeBreadcrumbs();
     }
 
     /**
@@ -231,26 +284,46 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         // reset
         this.breadcrumbs = [];
 
-        // cases list
-        if (CaseModel.canList(this.authUser)) {
+        // entity list
+        if (
+            this.personType === EntityType.CONTACT &&
+            ContactModel.canList(this.authUser)
+        ) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+            );
+        } else if (
+            this.personType === EntityType.CASE &&
+            CaseModel.canList(this.authUser)
+        ) {
             this.breadcrumbs.push(
                 new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
             );
         }
 
-        // case view
-        if (
-            this.caseData &&
-            CaseModel.canView(this.authUser)
-        ) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(this.caseData.name, `/cases/${this.caseId}/view`)
-            );
+        // person breadcrumbs
+        if (this.entityData) {
+            // entity view
+            if (
+                this.personType === EntityType.CONTACT &&
+                ContactModel.canView(this.authUser)
+            ) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(this.entityData.name, `/contacts/${this.entityData.id}/view`)
+                );
+            } else if (
+                this.personType === EntityType.CASE &&
+                CaseModel.canView(this.authUser)
+            ) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(this.entityData.name, `/cases/${this.entityData.id}/view`)
+                );
+            }
         }
 
         // current page
         this.breadcrumbs.push(
-            new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', '.', true)
+            new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', '.', true)
         );
     }
 
@@ -262,63 +335,63 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         this.tableColumns = [
             new VisibleColumnModel({
                 field: 'sampleIdentifier',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID'
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID'
             }),
             new VisibleColumnModel({
                 field: 'dateSampleTaken',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN'
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN'
             }),
             new VisibleColumnModel({
                 field: 'dateSampleDelivered',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED'
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED'
             }),
             new VisibleColumnModel({
                 field: 'dateOfResult',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT'
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT'
             }),
             new VisibleColumnModel({
                 field: 'labName',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME'
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME'
             }),
             new VisibleColumnModel({
                 field: 'sampleType',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE'
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE'
             }),
             new VisibleColumnModel({
                 field: 'testType',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE'
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE'
             }),
             new VisibleColumnModel({
                 field: 'result',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT'
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT'
             }),
             new VisibleColumnModel({
                 field: 'testedFor',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TESTED_FOR'
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR'
             }),
             new VisibleColumnModel({
                 field: 'deleted',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DELETED',
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
                 visible: false
             }),
             new VisibleColumnModel({
                 field: 'createdBy',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_BY',
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY',
                 visible: false
             }),
             new VisibleColumnModel({
                 field: 'createdAt',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_AT',
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT',
                 visible: false
             }),
             new VisibleColumnModel({
                 field: 'updatedBy',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_BY',
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY',
                 visible: false
             }),
             new VisibleColumnModel({
                 field: 'updatedAt',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_AT',
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT',
                 visible: false
             })
         ];
@@ -340,82 +413,82 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         this.availableSideFilters = [
             new FilterModel({
                 fieldName: 'sampleIdentifier',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
+                fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
                 type: FilterType.TEXT,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'dateSampleTaken',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
+                fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
                 type: FilterType.RANGE_DATE,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'dateSampleDelivered',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
+                fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
                 type: FilterType.RANGE_DATE,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'dateOfResult',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
+                fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
                 type: FilterType.RANGE_DATE,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'labName',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME',
+                fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
                 type: FilterType.SELECT,
                 options$: this.labNamesList$,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'sampleType',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
+                fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
                 type: FilterType.SELECT,
                 options$: this.sampleTypesList$,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'testType',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
+                fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
                 type: FilterType.SELECT,
                 options$: this.testTypesList$,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'result',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT',
+                fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
                 type: FilterType.SELECT,
                 options$: this.labTestResultsList$,
             }),
             new FilterModel({
                 fieldName: 'dateTesting',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
+                fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
                 type: FilterType.RANGE_DATE,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'testedFor',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
+                fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
                 type: FilterType.TEXT,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'notes',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES',
+                fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
                 type: FilterType.TEXT,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'status',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS',
+                fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
                 type: FilterType.TEXT,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'questionnaireAnswers',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+                fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
                 type: FilterType.QUESTIONNAIRE_ANSWERS,
                 questionnaireTemplate: this.selectedOutbreak.labResultsTemplate
             })
@@ -428,7 +501,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     refreshList(finishCallback: (records: any[]) => void) {
         if (
             this.selectedOutbreak &&
-            this.caseId
+            this.personType &&
+            this.entityData
         ) {
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
@@ -436,7 +510,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
 
             // retrieve the list of lab results
             this.labResultsList$ = this.labResultDataService
-                .getCaseLabResults(this.selectedOutbreak.id, this.caseId, this.queryBuilder)
+                .getEntityLabResults(this.selectedOutbreak.id, EntityModel.getLinkForEntityType(this.personType), this.entityData.id, this.queryBuilder)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
@@ -459,14 +533,15 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     refreshListCount() {
         if (
             this.selectedOutbreak &&
-            this.caseId
+            this.personType &&
+            this.entityData
         ) {
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
             this.labResultsListCount$ = this.labResultDataService
-                .getCaseLabResultsCount(this.selectedOutbreak.id, this.caseId, countQueryBuilder)
+                .getEntityLabResultsCount(this.selectedOutbreak.id, EntityModel.getLinkForEntityType(this.personType), this.entityData.id, countQueryBuilder)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
@@ -482,7 +557,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
      */
     deleteLabResult(labResult: LabResultModel) {
         // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT')
+        this.dialogService
+            .showConfirm('LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete lab result
@@ -495,7 +571,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                             })
                         )
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
                             this.needsRefreshList(true);
@@ -510,12 +586,18 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
      */
     restoreLabResult(labResult: LabResultModel) {
         // show confirm dialog to confirm de action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_LAB_RESULT', new LabResultModel(labResult))
+        this.dialogService
+            .showConfirm('LNG_DIALOG_CONFIRM_RESTORE_LAB_RESULT', new LabResultModel(labResult))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // restore lab result
                     this.labResultDataService
-                        .restoreLabResult(this.selectedOutbreak.id, labResult.personId, labResult.id)
+                        .restoreLabResult(
+                            this.selectedOutbreak.id,
+                            EntityModel.getLinkForEntityType(labResult.personType),
+                            labResult.personId,
+                            labResult.id
+                        )
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
@@ -537,20 +619,20 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
      * @param {LabelValuePair} classificationOption
      */
     changeCaseClassification(classificationOption: LabelValuePair) {
-        if (_.isEmpty(this.caseData)) {
+        if (_.isEmpty(this.entityData)) {
             return;
         }
 
-        const translateData = {
-            caseName: this.i18nService.instant(this.caseData.name),
-            classification: this.i18nService.instant(classificationOption.value)
-        };
         // show confirm dialog
         this.dialogService
-            .showConfirm('LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION', translateData)
+            .showConfirm('LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION', {
+                caseName: this.i18nService.instant(this.entityData.name),
+                classification: this.i18nService.instant(classificationOption.value)
+            })
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
-                    this.caseDataService.modifyCase(this.selectedOutbreak.id, this.caseId, {classification: classificationOption.value})
+                    this.caseDataService
+                        .modifyCase(this.selectedOutbreak.id, this.entityData.id, {classification: classificationOption.value})
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
@@ -565,7 +647,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                 } else {
                     if (answer.button === DialogAnswerButton.Cancel) {
                         // update the ngModel for select
-                        this.caseData.classification = this.initialCaseClassification;
+                        (this.entityData as CaseModel).classification = this.initialCaseClassification;
                     }
                 }
             });
