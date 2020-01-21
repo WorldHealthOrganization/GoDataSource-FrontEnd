@@ -23,14 +23,15 @@ import { EntityType } from 'app/core/models/entity-type';
 import { CaseModel } from '../../../../core/models/case.model';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 
 @Component({
-    selector: 'app-modify-case-relationship',
+    selector: 'app-modify-lab-result',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './modify-case-lab-result.component.html',
-    styleUrls: ['./modify-case-lab-result.component.less']
+    templateUrl: './modify-lab-result.component.html',
+    styleUrls: ['./modify-lab-result.component.less']
 })
-export class ModifyCaseLabResultComponent extends ViewModifyComponent implements OnInit {
+export class ModifyLabResultComponent extends ViewModifyComponent implements OnInit {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -46,6 +47,11 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
     CaseModel = CaseModel;
     ContactModel = ContactModel;
     LabResultModel = LabResultModel;
+    EntityType = EntityType;
+    EntityModel = EntityModel;
+
+    // entity data
+    personType: EntityType;
 
     // variable for breadcrumbs manipulation if we're coming from lab result list
     fromLabResultsList: boolean = false;
@@ -58,15 +64,13 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
 
     serverToday: Moment = moment();
 
-    // constants
-    EntityType = EntityType;
-
     /**
      * Check if we need to display warning message that case date of onset is after sample taken date
      */
     get displayOnsetDateWarningMessage(): boolean {
         return this.labResultData &&
             this.labResultData.person &&
+            this.personType === EntityType.CASE &&
             (this.labResultData.person as CaseModel).dateOfOnset &&
             this.labResultData.dateSampleTaken &&
             moment((this.labResultData.person as CaseModel).dateOfOnset).startOf('day').isAfter(moment(this.labResultData.dateSampleTaken).startOf('day'));
@@ -108,58 +112,64 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
             }
         });
 
-        this.route.params
-            .subscribe((params: {caseId, labResultId}) => {
-                // get selected outbreak
-                this.outbreakDataService
-                    .getSelectedOutbreak()
-                    .subscribe((selectedOutbreak: OutbreakModel) => {
-                        this.selectedOutbreak = selectedOutbreak;
-                        if (this.selectedOutbreak) {
-                            // params.caseId can actually be either a case or a contact lately
-                            // construct query builder
-                            const qb: RequestQueryBuilder = new RequestQueryBuilder();
-                            qb.filter
-                                .where({
-                                    id: params.labResultId
-                                });
+        // retrieve page information
+        this.route.data.subscribe((data: { personType: EntityType }) => {
+            // set page person type
+            this.personType = data.personType;
 
-                            // retrieve created user & modified user information
-                            qb.include('createdByUser', true);
-                            qb.include('updatedByUser', true);
+            // retrieve entity information
+            this.route.params
+                .subscribe((params: { labResultId }) => {
+                    // get selected outbreak
+                    this.outbreakDataService
+                        .getSelectedOutbreak()
+                        .subscribe((selectedOutbreak: OutbreakModel) => {
+                            this.selectedOutbreak = selectedOutbreak;
+                            if (this.selectedOutbreak) {
+                                // construct query builder
+                                const qb: RequestQueryBuilder = new RequestQueryBuilder();
+                                qb.filter
+                                    .where({
+                                        id: params.labResultId
+                                    });
 
-                            // get lab results
-                            this.labResultDataService
-                                .getOutbreakLabResults(this.selectedOutbreak.id, qb)
-                                .pipe(
-                                    catchError((err) => {
-                                        this.snackbarService.showApiError(err);
-                                        this.disableDirtyConfirm();
-                                        this.router.navigate(['/cases/lab-results']);
-                                        return throwError(err);
-                                    })
-                                )
-                                .subscribe((labResults: LabResultModel[]) => {
-                                    // not found ?
-                                    if (_.isEmpty(labResults)) {
-                                        this.disableDirtyConfirm();
-                                        this.router.navigate(['/cases/lab-results']);
-                                        return;
-                                    }
+                                // retrieve created user & modified user information
+                                qb.include('createdByUser', true);
+                                qb.include('updatedByUser', true);
 
-                                    // creating labResult and caseData with the first item from response because api
-                                    // is returning an array of objects. In this case there can't be more than one item in the response
-                                    this.labResultData = new LabResultModel(labResults[0]);
+                                // get lab results
+                                this.labResultDataService
+                                    .getOutbreakLabResults(this.selectedOutbreak.id, qb)
+                                    .pipe(
+                                        catchError((err) => {
+                                            this.snackbarService.showApiError(err);
+                                            this.disableDirtyConfirm();
+                                            this.router.navigate(['/']);
+                                            return throwError(err);
+                                        })
+                                    )
+                                    .subscribe((labResults: LabResultModel[]) => {
+                                        // not found ?
+                                        if (_.isEmpty(labResults)) {
+                                            this.disableDirtyConfirm();
+                                            this.router.navigate(['/']);
+                                            return;
+                                        }
 
-                                    // initialize breadcrumbs
-                                    this.initializeBreadcrumbs();
-                                });
-                        }
-                    });
-            });
+                                        // creating labResult and caseData with the first item from response because api
+                                        // is returning an array of objects. In this case there can't be more than one item in the response
+                                        this.labResultData = new LabResultModel(labResults[0]);
 
-        // initialize breadcrumbs
-        this.initializeBreadcrumbs();
+                                        // initialize breadcrumbs
+                                        this.initializeBreadcrumbs();
+                                    });
+                            }
+                        });
+                });
+
+            // initialize page breadcrumbs
+            this.initializeBreadcrumbs();
+        });
     }
 
     /**
@@ -169,48 +179,84 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
         // init
         this.breadcrumbs = [];
 
-        // case list
-        if (CaseModel.canList(this.authUser)) {
+        // entity list
+        if (
+            this.personType === EntityType.CONTACT &&
+            ContactModel.canList(this.authUser)
+        ) {
             this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    'LNG_PAGE_LIST_CASES_TITLE',
-                    '/cases'
-                )
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+            );
+        } else if (
+            this.personType === EntityType.CASE &&
+            CaseModel.canList(this.authUser)
+        ) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
             );
         }
 
-        // case view
+        // case / contact view
         if (
             !this.fromLabResultsList &&
             this.labResultData &&
             this.labResultData.person &&
-            this.labResultData.person.id &&
-            CaseModel.canView(this.authUser)
+            this.labResultData.person.id
         ) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    this.labResultData.person.name,
-                    `/cases/${this.labResultData.person.id}/view`
-                )
-            );
-        }
+            if (
+                this.personType === EntityType.CONTACT &&
+                ContactModel.canView(this.authUser)
+            ) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        this.labResultData.person.name,
+                        `/contacts/${this.labResultData.person.id}/view`
+                    )
+                );
+            } else if (
+                this.personType === EntityType.CASE &&
+                CaseModel.canView(this.authUser)
+            ) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        this.labResultData.person.name,
+                        `/cases/${this.labResultData.person.id}/view`
+                    )
+                );
+            }
 
-        // lab result list
-        if (LabResultModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE',
-                    this.fromLabResultsList || !this.labResultData || !this.labResultData.person || !this.labResultData.person.id ?
-                        '/cases/lab-results' :
-                        `/cases/${this.labResultData.person.id}/lab-results`
-                )
-            );
+            // lab result list
+            if (
+                this.personType === EntityType.CONTACT &&
+                ContactModel.canListLabResult(this.authUser)
+            ) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', `/lab-results/contacts/${this.labResultData.person.id}`)
+                );
+            } else if (
+                this.personType === EntityType.CASE &&
+                CaseModel.canListLabResult(this.authUser)
+            ) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', `/lab-results/cases/${this.labResultData.person.id}`)
+                );
+            }
+        } else if (this.fromLabResultsList) {
+            // lab result list
+            if (LabResultModel.canList(this.authUser)) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE',
+                        '/lab-results'
+                    )
+                );
+            }
         }
 
         // current page
         this.breadcrumbs.push(
             new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE',
+                this.viewOnly ? 'LNG_PAGE_VIEW_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_LAB_RESULT_TITLE',
                 null,
                 true,
                 {},
@@ -256,7 +302,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                 form.form.markAsPristine();
 
                 // display message
-                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_LAB_RESULT_ACTION_MODIFY_CASE_LAB_RESULT_SUCCESS_MESSAGE');
+                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LAB_RESULT_ACTION_MODIFY_LAB_RESULT_SUCCESS_MESSAGE');
 
                 // initialize breadcrumbs
                 this.initializeBreadcrumbs();

@@ -11,7 +11,18 @@ import { VaccineModel } from './vaccine.model';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
-import { IPermissionBasic, IPermissionBasicBulk, IPermissionChronology, IPermissionContact, IPermissionExportable, IPermissionImportable, IPermissionMovement, IPermissionRelatedRelationship, IPermissionRestorable } from './permission.interface';
+import {
+    IPermissionBasic,
+    IPermissionBasicBulk,
+    IPermissionChronology,
+    IPermissionContact,
+    IPermissionExportable,
+    IPermissionImportable,
+    IPermissionMovement,
+    IPermissionRelatedLabResult,
+    IPermissionRelatedRelationship,
+    IPermissionRestorable
+} from './permission.interface';
 
 export interface IFollowUpHistory {
     startDate: string;
@@ -30,7 +41,8 @@ export class ContactModel
         IPermissionRelatedRelationship,
         IPermissionMovement,
         IPermissionChronology,
-        IPermissionContact {
+        IPermissionContact,
+        IPermissionRelatedLabResult {
     id: string;
     firstName: string;
     middleName: string;
@@ -166,6 +178,17 @@ export class ContactModel
     static canExportDossier(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_EXPORT_DOSSIER) : false); }
 
     /**
+     * Static Permissions - IPermissionRelatedLabResult
+     */
+    static canViewLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_VIEW_LAB_RESULT) : false); }
+    static canListLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_LIST_LAB_RESULT) : false); }
+    static canCreateLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_CREATE_LAB_RESULT) : false); }
+    static canModifyLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_MODIFY_LAB_RESULT) : false); }
+    static canDeleteLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_DELETE_LAB_RESULT) : false); }
+    static canRestoreLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_RESTORE_LAB_RESULT) : false); }
+    static canImportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_IMPORT_LAB_RESULT) : false); }
+
+    /**
      * Constructor
      */
     constructor(data = null) {
@@ -299,6 +322,17 @@ export class ContactModel
     canExportDailyFollowUpList(user: UserModel): boolean { return ContactModel.canExportDailyFollowUpList(user); }
     canExportDailyFollowUpsForm(user: UserModel): boolean { return ContactModel.canExportDailyFollowUpsForm(user); }
     canExportDossier(user: UserModel): boolean { return ContactModel.canExportDossier(user); }
+
+    /**
+     * Permissions - IPermissionRelatedLabResult
+     */
+    canViewLabResult(user: UserModel): boolean { return ContactModel.canViewLabResult(user); }
+    canListLabResult(user: UserModel): boolean { return ContactModel.canListLabResult(user); }
+    canCreateLabResult(user: UserModel): boolean { return ContactModel.canCreateLabResult(user); }
+    canModifyLabResult(user: UserModel): boolean { return ContactModel.canModifyLabResult(user); }
+    canDeleteLabResult(user: UserModel): boolean { return ContactModel.canDeleteLabResult(user); }
+    canRestoreLabResult(user: UserModel): boolean { return ContactModel.canRestoreLabResult(user); }
+    canImportLabResult(user: UserModel): boolean { return ContactModel.canImportLabResult(user); }
 
     /**
      * Contact Name

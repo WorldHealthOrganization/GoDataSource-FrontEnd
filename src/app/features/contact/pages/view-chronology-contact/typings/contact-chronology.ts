@@ -7,13 +7,16 @@ import { RelationshipModel } from '../../../../../core/models/entity-and-relatio
 import { CaseModel } from '../../../../../core/models/case.model';
 import { EventModel } from '../../../../../core/models/event.model';
 import { I18nService } from '../../../../../core/services/helper/i18n.service';
+import { LabResultModel } from '../../../../../core/models/lab-result.model';
 
 export class ContactChronology {
-    static getChronologyEntries(i18nService: I18nService,
-                                contactData: ContactModel,
-                                followUps: FollowUpModel[],
-                                relationshipsData?: RelationshipModel[]): ChronologyItem[] {
-
+    static getChronologyEntries(
+        i18nService: I18nService,
+        contactData: ContactModel,
+        followUps: FollowUpModel[],
+        relationshipsData?: RelationshipModel[],
+        labResults?: LabResultModel[]
+    ): ChronologyItem[] {
         const chronologyEntries: ChronologyItem [] = [];
         const sourcePersons = [];
 
@@ -74,6 +77,18 @@ export class ContactChronology {
                 }));
             }
         });
+
+        // isolation dates
+        if (!_.isEmpty(labResults)) {
+            _.forEach(labResults, (labResult) => {
+                if (!_.isEmpty(labResult.dateOfResult)) {
+                    chronologyEntries.push(new ChronologyItem({
+                        date: labResult.dateOfResult,
+                        label: 'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_LABEL_LAB_RESULT_DATE'
+                    }));
+                }
+            });
+        }
 
         // followup history
         if (!_.isEmpty(contactData.followUpHistory)) {

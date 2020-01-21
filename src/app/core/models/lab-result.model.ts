@@ -33,27 +33,28 @@ export class LabResultModel
         [variable: string]: IAnswerData[];
     };
     personId: string;
+    personType: EntityType;
     person: CaseModel | ContactModel;
     testedFor: string;
 
     /**
      * Static Permissions - IPermissionBasic
      */
-    static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LAB_RESULT_VIEW) : false); }
-    static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LAB_RESULT_LIST) : false); }
-    static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LAB_RESULT_CREATE) : false); }
-    static canModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LAB_RESULT_VIEW, PERMISSION.CASE_LAB_RESULT_MODIFY) : false); }
-    static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LAB_RESULT_DELETE) : false); }
+    static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_VIEW) : false); }
+    static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_LIST) : false); }
+    static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_CREATE) : false); }
+    static canModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_VIEW, PERMISSION.LAB_RESULT_MODIFY) : false); }
+    static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_DELETE) : false); }
 
     /**
      * Static Permissions - IPermissionRestorable
      */
-    static canRestore(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_LAB_RESULT_RESTORE) : false; }
+    static canRestore(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.LAB_RESULT_RESTORE) : false; }
 
     /**
      * Static Permissions - IPermissionImportable
      */
-    static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LAB_RESULT_IMPORT) : false); }
+    static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_IMPORT) : false); }
 
     /**
      * Constructor
@@ -82,6 +83,7 @@ export class LabResultModel
         this.status = _.get(data, 'status', Constants.PROGRESS_OPTIONS.IN_PROGRESS.value);
         this.quantitativeResult = _.get(data, 'quantitativeResult');
         this.personId = _.get(data, 'personId');
+        this.personType = _.get(data, 'personType');
         this.testedFor = _.get(data, 'testedFor');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});

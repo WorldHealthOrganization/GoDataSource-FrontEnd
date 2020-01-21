@@ -1,28 +1,17 @@
-<app-topnav>
+<app-topnav [activeOutbreakEditable]="false">
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button
-                    *ngIf="!appliedListFilter && LabResultModel.canImport(authUser)"
-                    mat-raised-button
-                    color="accent"
-                    [matMenuTriggerFor]="quickActionsMenu">
-                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
-                </button>
-
-                <mat-menu #quickActionsMenu="matMenu">
-                    <ng-container *app-selected-outbreak-is-active>
-                        <ng-container *ngIf="LabResultModel.canImport(authUser)">
-                            <button
-                                mat-menu-item
-                                [routerLink]="['/import-export-data', 'case-lab-data', 'import']">
-                                {{ 'LNG_PAGE_LIST_LAB_RESULTS_IMPORT_BUTTON' | translate }}
-                            </button>
-                        </ng-container>
-                    </ng-container>
-                </mat-menu>
+                <ng-container *app-selected-outbreak-is-active>
+                    <button
+                        *ngIf="(entityData && personType === EntityType.CASE && CaseModel.canCreateLabResult(authUser)) || (entityData && personType === EntityType.CONTACT && ContactModel.canCreateLabResult(authUser))"
+                        mat-raised-button color="accent"
+                        [routerLink]="['/lab-results', EntityModel.getLinkForEntityType(personType), entityData.id, 'create']">
+                        {{'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_ADD_LAB_RESULT' | translate}} <span class="xt-icon">addCircle</span>
+                    </button>
+                </ng-container>
             </div>
         </div>
     </ng-container>
@@ -30,7 +19,7 @@
 
 <!-- Side columns -->
 <app-side-columns
-    [tableColumnsUserSettingsKey]="UserSettings.LAB_RESULTS_FIELDS"
+    [tableColumnsUserSettingsKey]="UserSettings.CASE_LAB_FIELDS"
     [tableColumns]="tableColumns"
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
@@ -47,22 +36,46 @@
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">
-    <!-- Reset Filters -->
-    <div class="reset-filters">
-        <button
-            type="button"
-            mat-raised-button
-            color="accent"
-            (click)="resetFiltersToSideFilters()">
-            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
-        </button>
-        <button
-            type="button"
-            mat-raised-button
-            color="accent"
-            (click)="needsRefreshList(true)">
-            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
-        </button>
+    <div class="top-section-wrapper">
+        <div fxFlex fxLayout="column">
+            <div
+                *ngIf="personType === EntityType.CASE && CaseModel.canModify(authUser)"
+                fxFlex fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="start center">
+                <div class="info-label">
+                    {{ 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION_INFO' | translate }}
+                </div>
+
+                <div>
+                    <app-form-select
+                        name="classificationFilter"
+                        [ngModel]="entityData?.classification"
+                        [options]="caseClassificationsList$ | async"
+                        (optionChanged)="changeCaseClassification($event)"
+                        required="true"
+                        [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION' | translate"
+                        [tooltip]="'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION_DESCRIPTION' | translate">
+                    </app-form-select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reset Filters -->
+        <div class="reset-filters">
+            <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="resetFiltersToSideFilters()">
+                {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+            </button>
+            <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="needsRefreshList(true)">
+                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+            </button>
+        </div>
     </div>
 
     <!-- Hover question effects / actions -->
@@ -73,109 +86,13 @@
 
     <mat-table #table [dataSource]="labResultsList$ | async" matSort (matSortChange)="sortBy($event)">
 
-        <!-- Case ID-->
-        <ng-container matColumnDef="case.visualId">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_CASE_LAB_RESULT_FIELD_LABEL_PERSON_ID' | translate}}</div>
-                    <div class="column-filter">
-                        <app-form-input
-                            name="caseVisualIdFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('case.visualId', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                {{ item.person?.visualId}}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Case Last Name -->
-        <ng-container matColumnDef="case.lastName">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_LAST_NAME' | translate}}</div>
-                    <div class="column-filter">
-                        <app-form-input
-                            name="nameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('case.lastName', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                {{ item.person?.lastName }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Case First Name -->
-        <ng-container matColumnDef="case.firstName">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_FIRST_NAME' | translate}}</div>
-                    <div class="column-filter">
-                        <app-form-input
-                            name="nameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('case.firstName', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                {{ item.person?.firstName }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Classification -->
-        <ng-container matColumnDef="case.classification">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION' | translate}}</div>
-                    <div class="column-filter">
-                        <app-form-select
-                            name="classificationFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="caseClassificationsList$ | async"
-                            (optionChanged)="filterBySelectField('case.classification', $event, 'value')"
-                            multiple="true"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item">
-                <app-reference-data-label
-                    [category]="ReferenceDataCategory.CASE_CLASSIFICATION"
-                    [value]="item.person.classification">
-                </app-reference-data-label>
-            </mat-cell>
-        </ng-container>
-
         <!-- Sample Lab Identifier -->
         <ng-container matColumnDef="sampleIdentifier">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID' | translate }}</div>
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-input
                             name="sampleIdentifierFilter"
@@ -197,7 +114,9 @@
         <ng-container matColumnDef="dateSampleTaken">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN' | translate }}</div>
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN' | translate}}
+                    </div>
                     <div class="column-filter">
                         <app-form-daterange
                             name="dateSampleTakenFilter"
@@ -218,7 +137,9 @@
         <ng-container matColumnDef="dateSampleDelivered">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED' | translate}}</div>
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED' | translate}}
+                    </div>
                     <div class="column-filter">
                         <app-form-daterange
                             name="dateSampleDeliveredFilter"
@@ -239,7 +160,9 @@
         <ng-container matColumnDef="dateOfResult">
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT' | translate }}</div>
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT' | translate}}
+                    </div>
                     <div class="column-filter">
                         <app-form-daterange
                             name="dateOfResultFilter"
@@ -260,7 +183,9 @@
         <ng-container matColumnDef="labName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME' | translate }}</div>
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME' | translate}}
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="labNameFilter"
@@ -289,7 +214,9 @@
         <ng-container matColumnDef="sampleType">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE' | translate}}</div>
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE' | translate}}
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="sampleTypeFilter"
@@ -318,7 +245,9 @@
         <ng-container matColumnDef="testType">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE' | translate }}</div>
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE' | translate}}
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="testTypeFilter"
@@ -347,7 +276,9 @@
         <ng-container matColumnDef="result">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT' | translate }}</div>
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_RESULT' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="resultFilter"
@@ -376,7 +307,9 @@
         <ng-container matColumnDef="testedFor">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TESTED_FOR' | translate }}</div>
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR' | translate}}
+                    </div>
                     <div class="column-filter">
                         <app-form-input
                             name="testedFor"
@@ -399,7 +332,8 @@
         <ng-container matColumnDef="deleted">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_CASE_LAB_RESULT_FIELD_LABEL_DELETED' | translate}}
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_DELETED' | translate}}
                     </div>
                     <div class="column-filter">
                         <app-form-select
@@ -426,7 +360,7 @@
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">
-                        {{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_BY' | translate }}
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY' | translate}}
                     </div>
                     <div class="column-filter">
                         <app-form-select
@@ -455,7 +389,7 @@
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
-                        {{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_AT' | translate }}
+                        {{ 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT' | translate }}
                     </div>
                     <div class="column-filter">
                         <app-form-daterange
@@ -477,7 +411,7 @@
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">
-                        {{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_BY' | translate }}
+                        {{ 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY' | translate }}
                     </div>
                     <div class="column-filter">
                         <app-form-select
@@ -506,7 +440,7 @@
             <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">
-                        {{ 'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_AT' | translate }}
+                        {{ 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT' | translate }}
                     </div>
                     <div class="column-filter">
                         <app-form-daterange

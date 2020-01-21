@@ -198,7 +198,6 @@
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
-
                             <app-form-select
                                 name="reportingGeographicalLevelId"
                                 [(ngModel)]="outbreak.reportingGeographicalLevelId"
@@ -212,7 +211,14 @@
                                 [disabled]="viewOnly">
                             </app-form-select>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-slide-toggle
+                                name="isContactLabResultsActive"
+                                [(ngModel)]="outbreak.isContactLabResultsActive"
+                                [label]="'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
+
                             <div fxFlex><!-- placeholder --></div>
                             <div fxFlex><!-- placeholder --></div>
                         </div>

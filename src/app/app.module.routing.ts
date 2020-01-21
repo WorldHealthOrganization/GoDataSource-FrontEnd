@@ -227,13 +227,7 @@ const routes: Routes = [
                                     PERMISSION.CASE_VIEW,
                                     PERMISSION.CASE_MODIFY,
                                     PERMISSION.CASE_VIEW_MOVEMENT_MAP,
-                                    PERMISSION.CASE_VIEW_CHRONOLOGY_CHART,
-                                    PERMISSION.CASE_LAB_RESULT_LIST,
-                                    PERMISSION.CASE_LAB_RESULT_CREATE,
-                                    PERMISSION.CASE_LAB_RESULT_VIEW,
-                                    PERMISSION.CASE_LAB_RESULT_MODIFY,
-                                    PERMISSION.GANTT_CHART_VIEW_DELAY_ONSET_LAB_TESTING,
-                                    PERMISSION.GANTT_CHART_VIEW_DELAY_ONSET_HOSPITALIZATION
+                                    PERMISSION.CASE_VIEW_CHRONOLOGY_CHART
                                 ]
                             })
                         ]
@@ -258,6 +252,37 @@ const routes: Routes = [
                                     PERMISSION.EVENT_VIEW,
                                     PERMISSION.EVENT_CREATE,
                                     PERMISSION.EVENT_MODIFY
+                                ]
+                            })
+                        ]
+                    })
+                }
+            },
+            // Lab Result Module routes
+            {
+                path: ModulePath.LabResultModule,
+                loadChildren: './features/lab-result/lab-result.module#LabResultModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: new PermissionExpression({
+                        and: [
+                            PERMISSION.OUTBREAK_VIEW,
+                            new PermissionExpression({
+                                or: [
+                                    PERMISSION.LAB_RESULT_LIST,
+                                    PERMISSION.GANTT_CHART_VIEW_DELAY_ONSET_LAB_TESTING,
+                                    PERMISSION.GANTT_CHART_VIEW_DELAY_ONSET_HOSPITALIZATION,
+                                    PERMISSION.CASE_LIST_LAB_RESULT,
+                                    PERMISSION.CASE_CREATE_LAB_RESULT,
+                                    PERMISSION.CASE_VIEW_LAB_RESULT,
+                                    PERMISSION.CASE_MODIFY_LAB_RESULT,
+                                    PERMISSION.CONTACT_LIST_LAB_RESULT,
+                                    PERMISSION.CONTACT_CREATE_LAB_RESULT,
+                                    PERMISSION.CONTACT_VIEW_LAB_RESULT,
+                                    PERMISSION.CONTACT_MODIFY_LAB_RESULT
                                 ]
                             })
                         ]
@@ -461,8 +486,9 @@ const routes: Routes = [
                             PERMISSION.SYNC_IMPORT_PACKAGE,
                             PERMISSION.REFERENCE_DATA_IMPORT,
                             PERMISSION.CONTACT_IMPORT,
+                            PERMISSION.CONTACT_IMPORT_LAB_RESULT,
                             PERMISSION.CASE_IMPORT,
-                            PERMISSION.CASE_LAB_RESULT_IMPORT
+                            PERMISSION.CASE_IMPORT_LAB_RESULT
                         ]
                     })
                 }

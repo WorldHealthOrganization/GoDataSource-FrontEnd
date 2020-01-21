@@ -44,6 +44,7 @@ export class OutbreakModel
     longPeriodsBetweenCaseOnset: number;
     reportingGeographicalLevelId: string;
     arcGisServers: MapServerModel[];
+    isContactLabResultsActive: boolean;
 
     // used for displaying information when hovering an outbreak from topnav component
     // no need to save this one in the database
@@ -104,11 +105,10 @@ export class OutbreakModel
         this.noLessContacts = _.get(data, 'noLessContacts');
         this.noDaysNewContacts = _.get(data, 'noDaysNewContacts', 1);
         this.reportingGeographicalLevelId = _.get(data, 'reportingGeographicalLevelId', '');
-        // TODO read from reference data
-        // this.caseClassification = [{"test": "test"}];
         this.caseIdMask = _.get(data, 'caseIdMask');
         this.contactIdMask = _.get(data, 'contactIdMask');
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
+        this.isContactLabResultsActive = _.get(data, 'isContactLabResultsActive', false);
 
         this.caseInvestigationTemplate = _.map(
             _.get(data, 'caseInvestigationTemplate', []),

@@ -72,7 +72,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.CASE_LAB_RESULT_IMPORT
+                PERMISSION.CASE_IMPORT_LAB_RESULT
             ]
         }
     },
@@ -85,6 +85,18 @@ const routes: Routes = [
         data: {
             permissions: [
                 PERMISSION.CONTACT_IMPORT
+            ]
+        }
+    },
+
+    // Import contact lab data
+    {
+        path: 'contact-lab-data/import',
+        component: fromPages.ImportContactLabDataComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CONTACT_IMPORT_LAB_RESULT
             ]
         }
     },

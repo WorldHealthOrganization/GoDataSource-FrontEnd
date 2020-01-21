@@ -8,30 +8,31 @@ import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class LabResultDataService {
-
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {
-    }
+    ) {}
 
     /**
-     * Retrieve the list of Lab Results for a Case
+     * Retrieve the list of Lab Results for a Case or a Contact
      * @param {string} outbreakId
-     * @param {string} caseId
+     * @param {string} entityPath
+     * @param {string} entityId
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<LabResultModel[]>}
      */
-    getCaseLabResults(
+    getEntityLabResults(
         outbreakId: string,
-        caseId: string,
+        entityPath: string,
+        entityId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<LabResultModel[]> {
-
         const filter = queryBuilder.buildQuery();
-
         return this.modelHelper.mapObservableListToModel(
-            this.http.get(`outbreaks/${outbreakId}/cases/${caseId}/lab-results?filter=${filter}`),
+            this.http.get(`outbreaks/${outbreakId}/${entityPath}/${entityId}/lab-results?filter=${filter}`),
             LabResultModel
         );
     }
@@ -39,17 +40,19 @@ export class LabResultDataService {
     /**
      * Return total number of Lab Results for a Case
      * @param {string} outbreakId
-     * @param {string} caseId
+     * @param {string} entityPath
+     * @param {string} entityId
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<IBasicCount>}
      */
-    getCaseLabResultsCount(
+    getEntityLabResultsCount(
         outbreakId: string,
-        caseId: string,
+        entityPath: string,
+        entityId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
-        return this.http.get(`outbreaks/${outbreakId}/cases/${caseId}/lab-results/count?where=${whereFilter}`);
+        return this.http.get(`outbreaks/${outbreakId}/${entityPath}/${entityId}/lab-results/count?where=${whereFilter}`);
     }
 
     /**
@@ -86,12 +89,18 @@ export class LabResultDataService {
     /**
      * Create Lab Result
      * @param {string} outbreakId
-     * @param {string} caseId
+     * @param {string} entityPath
+     * @param {string} entityId
      * @param labResultData
      * @returns {Observable<any>}
      */
-    createLabResult(outbreakId: string, caseId: string, labResultData): Observable<any> {
-        return this.http.post(`outbreaks/${outbreakId}/cases/${caseId}/lab-results`, labResultData);
+    createLabResult(
+        outbreakId: string,
+        entityPath: string,
+        entityId: string,
+        labResultData
+    ): Observable<any> {
+        return this.http.post(`outbreaks/${outbreakId}/${entityPath}/${entityId}/lab-results`, labResultData);
     }
 
     /**
@@ -127,12 +136,18 @@ export class LabResultDataService {
     /**
      * Restore a deleted Lab Result
      * @param {string} outbreakId
-     * @param {string} caseId
+     * @param {string} entityPath
+     * @param {string} entityId
      * @param {string} labResultId
      * @returns {Observable<any>}
      */
-    restoreLabResult(outbreakId: string, caseId: string, labResultId: string): Observable<any> {
-        return this.http.post(`outbreaks/${outbreakId}/cases/${caseId}/lab-results/${labResultId}/restore`, {});
+    restoreLabResult(
+        outbreakId: string,
+        entityPath: string,
+        entityId: string,
+        labResultId: string
+    ): Observable<any> {
+        return this.http.post(`outbreaks/${outbreakId}/${entityPath}/${entityId}/lab-results/${labResultId}/restore`, {});
     }
 }
 

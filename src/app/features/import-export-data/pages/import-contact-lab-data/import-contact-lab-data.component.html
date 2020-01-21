@@ -1,0 +1,20 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<app-import-data
+    [allowedExtensions]="allowedExtensions"
+    [title]="'LNG_PAGE_IMPORT_CONTACT_LAB_DATA_TITLE'"
+    [displayLoading]="displayLoading"
+    (finished)="finished()"
+    [importFileUrl]="importFileUrl"
+    [importDataUrl]="importDataUrl"
+    [model]="ImportServerModelNames.CONTACT_LAB_RESULTS"
+    [fieldsWithoutTokens]="fieldsWithoutTokens"
+    [requiredDestinationFields]="requiredDestinationFields"
+    [savedImportPage]="Constants.APP_IMPORT_PAGE.CASE_LAB_DATA.value"
+    [extraDataUsedToFormatData]="selectedOutbreak?.labResultsTemplate"
+    [formatDataBeforeUse]="formatDataBeforeUse">
+</app-import-data>
