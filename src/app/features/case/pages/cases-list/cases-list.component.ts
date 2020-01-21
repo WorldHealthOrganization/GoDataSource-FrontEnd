@@ -955,11 +955,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * Get cases grouped by classification with needed filter
      */
     getCasesGroupedByClassification() {
+        // clone queryBuilder to clear it
+        const clonedQueryBuilder = _.cloneDeep(this.queryBuilder);
+        clonedQueryBuilder.paginator.clear();
+        clonedQueryBuilder.sort.clear();
+        clonedQueryBuilder.filter.removeFlag('countRelations');
         this.countedCasesGroupedByClassification$ = this.caseClassifications$
             .pipe(
                 mergeMap((refClassificationData: ReferenceDataCategoryModel) => {
                     return this.caseDataService
-                        .getCasesGroupedByClassification(this.selectedOutbreak.id, this.queryBuilder)
+                        .getCasesGroupedByClassification(this.selectedOutbreak.id, clonedQueryBuilder)
                         .pipe(
                             map((data) => {
                                 return _.map(data ? data.classification : [], (item, itemId) => {
