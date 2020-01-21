@@ -23,6 +23,7 @@ export class FormCaseCenterDaterangeListComponent extends ListBase<CaseCenterDat
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
     @Input() minDate: Moment | string;
+    @Input() maxDate: Moment | string;
     @Input() componentTitle: string;
     // case date of onset used to display a warning if the date range start date is before date of onset
     @Input() dateOfOnset: Moment | string;
