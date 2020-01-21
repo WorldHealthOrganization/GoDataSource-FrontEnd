@@ -198,8 +198,8 @@ export class SidenavComponent implements OnInit, OnDestroy {
                     'contacts-of-contacts',
                     'LNG_LAYOUT_MENU_ITEM_CONTACTS_OF_CONTACTS_LABEL',
                     [
-                        PERMISSION.READ_OUTBREAK,
-                        PERMISSION.READ_CONTACT
+                        PERMISSION.OUTBREAK_LIST,
+                        PERMISSION.CONTACT_LIST
                     ],
                     '/contacts-of-contacts',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality

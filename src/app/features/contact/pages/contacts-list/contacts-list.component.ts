@@ -257,8 +257,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         return !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id
                     }
                 }),
 
@@ -270,8 +269,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         return !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            this.hasContactWriteAccess();
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id
                     }
                 }),
 

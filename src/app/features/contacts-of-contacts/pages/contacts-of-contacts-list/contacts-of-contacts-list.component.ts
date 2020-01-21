@@ -33,6 +33,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { AddressType } from '../../../../core/models/address.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
     selector: 'app-contacts-of-contacts-list',
@@ -682,7 +683,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         // }
 
         // Relation - Cases
-        if (this.authUser.hasPermissions(PERMISSION.READ_CASE)) {
+        if (CaseModel.canList(this.authUser)) {
             this.availableSideFilters = [
                 ...this.availableSideFilters,
                 ...[
@@ -811,23 +812,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     //     }
     // }
 
-    /**
-     * Check if we have write access to contacts
-     * @returns {boolean}
-     */
-    hasContactOfContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-    }
-
-    /**
-     * Check if we have write access to case
-     * @returns {boolean}
-     */
-    hasCaseWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-    }
-
-    // /**
+        // /**
     //  * Check if we have write access to follow-ups
     //  * @returns {boolean}
     //  */
