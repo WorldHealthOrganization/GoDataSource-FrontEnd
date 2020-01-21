@@ -5,7 +5,7 @@ import { NgForm } from '@angular/forms';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
+import { PhoneNumberType, UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -16,6 +16,9 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-modify-user',
@@ -29,6 +32,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
     // constants
     UserModel = UserModel;
     OutbreakModel = OutbreakModel;
+    PhoneNumberType = PhoneNumberType;
 
     // authenticated user
     authUser: UserModel;
@@ -38,6 +42,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
     passwordConfirmModel: string;
     rolesList$: Observable<UserRoleModel[]>;
     outbreaksList$: Observable<OutbreakModel[]>;
+    institutionsList$: Observable<LabelValuePair[]>;
 
     /**
      * Constructor
@@ -51,7 +56,8 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
         private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private formHelper: FormHelperService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private referenceDataService: ReferenceDataDataService
     ) {
         super(route);
     }
@@ -82,6 +88,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
         // get the list of roles to populate the dropdown in UI
         this.rolesList$ = this.userRoleDataService.getRolesList();
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
+        this.institutionsList$ = this.referenceDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
     }
 
     /**

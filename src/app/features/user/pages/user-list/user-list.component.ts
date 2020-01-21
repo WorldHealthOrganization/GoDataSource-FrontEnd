@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
+import { UserModel, UserRoleModel, PhoneNumberType } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -16,6 +16,9 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
@@ -34,6 +37,7 @@ export class UserListComponent extends ListComponent implements OnInit {
 
     // constants
     UserModel = UserModel;
+    PhoneNumberType = PhoneNumberType;
 
     // list of existing users
     usersList$: Observable<UserModel[]>;
@@ -42,11 +46,14 @@ export class UserListComponent extends ListComponent implements OnInit {
     rolesList$: Observable<UserRoleModel[]>;
     outbreaksListMap: any = {};
     outbreaksList$: Observable<OutbreakModel[]>;
+    institutionsList$: Observable<LabelValuePair[]>;
 
     fixedTableColumns: string[] = [
         'lastName',
         'firstName',
         'email',
+        'institutionName',
+        'telephoneNumbers',
         'role',
         'availableOutbreaks'
     ];
@@ -109,7 +116,8 @@ export class UserListComponent extends ListComponent implements OnInit {
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
         private outbreakDataService: OutbreakDataService,
-        private userRoleDataService: UserRoleDataService
+        private userRoleDataService: UserRoleDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(
             snackbarService
@@ -123,6 +131,8 @@ export class UserListComponent extends ListComponent implements OnInit {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.rolesList$ = this.userRoleDataService.getRolesList();
+
+        this.institutionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
 
         this.outbreakDataService
             .getOutbreaksListReduced()

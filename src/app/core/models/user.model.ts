@@ -28,6 +28,10 @@ export enum UserSettings {
     USER_ROLE_FIELDS = 'userRoleFields'
 }
 
+export enum PhoneNumberType {
+    PRIMARY_PHONE_NUMBER = 'LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE'
+}
+
 /**
  * Custom handlers
  */
@@ -204,6 +208,10 @@ export class UserModel
 
     securityQuestions: SecurityQuestionModel[] = [];
     settings: { [key: string]: any } = {};
+    institutionName: string;
+    telephoneNumbers: {
+        [key: string]: string
+    };
 
     availablePermissions: PermissionModel[];
 
@@ -238,6 +246,8 @@ export class UserModel
         this.roleIds = _.get(data, 'roleIds', []);
         this.securityQuestions = _.get(data, 'securityQuestions', [new SecurityQuestionModel(), new SecurityQuestionModel()]);
         this.availablePermissions = _.get(data, 'availablePermissions');
+        this.institutionName = _.get(data, 'institutionName');
+        this.telephoneNumbers = _.get(data, 'telephoneNumbers', {});
 
         // initialize all settings
         this.initializeSettings(data);

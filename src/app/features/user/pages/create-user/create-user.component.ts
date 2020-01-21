@@ -5,7 +5,7 @@ import { NgForm } from '@angular/forms';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
+import { PhoneNumberType, UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
@@ -17,6 +17,9 @@ import { throwError } from 'rxjs';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-create-user',
@@ -32,6 +35,7 @@ export class CreateUserComponent
 
     // constants
     OutbreakModel = OutbreakModel;
+    PhoneNumberType = PhoneNumberType;
 
     // authenticated user
     authUser: UserModel;
@@ -40,6 +44,7 @@ export class CreateUserComponent
     passwordConfirmModel: string;
     rolesList$: Observable<UserRoleModel[]>;
     outbreaksList$: Observable<OutbreakModel[]>;
+    institutionsList$: Observable<LabelValuePair[]>;
 
     /**
      * Constructor
@@ -53,6 +58,7 @@ export class CreateUserComponent
         private outbreakDataService: OutbreakDataService,
         private formHelper: FormHelperService,
         private dialogService: DialogService,
+        private referenceDataService: ReferenceDataDataService,
         private redirectService: RedirectService
     ) {
         super();
@@ -69,6 +75,8 @@ export class CreateUserComponent
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
+
+        this.institutionsList$ = this.referenceDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
 
         // initialize breadcrumbs
         this.initializeBreadcrumbs();

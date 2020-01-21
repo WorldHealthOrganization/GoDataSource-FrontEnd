@@ -440,6 +440,24 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
+     * Filter by phone number
+     * @param {string} property
+     * @param {string} value
+     */
+    filterByPhoneNumber(
+        property: string,
+        value: string
+    ) {
+        this.queryBuilder.filter.byPhoneNumber(
+            property as string,
+            value
+        );
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
      * Filter the list by equality
      * @param {string} property
      * @param {*} value
