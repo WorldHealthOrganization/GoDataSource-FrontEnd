@@ -8,10 +8,12 @@ import { ContactModel } from '../../../../../core/models/contact.model';
 import { EventModel } from '../../../../../core/models/event.model';
 
 export class CaseChronology {
-    static getChronologyEntries(i18nService: I18nService,
-                                caseData: CaseModel,
-                                labResults: LabResultModel[],
-                                relationshipsData?: RelationshipModel[]): ChronologyItem[] {
+    static getChronologyEntries(
+        i18nService: I18nService,
+        caseData: CaseModel,
+        labResults: LabResultModel[],
+        relationshipsData?: RelationshipModel[]
+    ): ChronologyItem[] {
         const chronologyEntries: ChronologyItem [] = [];
         const sourcePersons = [];
 

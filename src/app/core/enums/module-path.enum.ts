@@ -9,6 +9,7 @@ export enum ModulePath {
     ContactsOfContactsModule = 'contacts-of-contacts',
     CaseModule = 'cases',
     EventModule = 'events',
+    LabResultModule = 'lab-results',
     DuplicateRecordsModule = 'duplicated-records',
     ClusterModule = 'clusters',
     RelationshipModule = 'relationships',

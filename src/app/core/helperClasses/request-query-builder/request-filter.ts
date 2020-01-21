@@ -26,6 +26,33 @@ export class RequestFilter {
     }
 
     /**
+     * Construct phone regex pattern used by queries
+     * @param phoneNumber
+     */
+    static getPhoneNumberPattern(
+        phoneNumber: string
+    ): string {
+        // nothing provided ?
+        if (!phoneNumber) {
+            return null;
+        }
+
+        // construct search pattern
+        const digits: string[] = phoneNumber.match(/[0-9]/g);
+        if (
+            !digits ||
+            digits.length < 1
+        ) {
+            return null;
+        }
+
+        // construct search pattern
+        return '[^0-9]*' + digits.map((digit: string) => {
+            return digit + '[^0-9]*';
+        }).join('');
+    }
+
+    /**
      * Set flag
      * @param property
      * @param value
@@ -131,6 +158,35 @@ export class RequestFilter {
                 [property]: RequestFilterGenerator.textContains(value)
             }, replace);
         }
+        return this;
+    }
+
+    /**
+     * Filter by a phone number
+     * @param {string} property
+     * @param {string} value
+     * @param {boolean} replace
+     * @returns {RequestFilter}
+     */
+    byPhoneNumber(
+        property: string,
+        value: string,
+        replace: boolean = true
+    ) {
+        // do we need to remove condition ?
+        if (_.isEmpty(value)) {
+            this.remove(property);
+        } else {
+            // build number pattern
+            const numberPattern = !_.isEmpty(value) ? RequestFilter.getPhoneNumberPattern(value) : '';
+
+            this.where({
+                [property]: {
+                    regex: numberPattern
+                }
+            }, replace);
+        }
+
         return this;
     }
 

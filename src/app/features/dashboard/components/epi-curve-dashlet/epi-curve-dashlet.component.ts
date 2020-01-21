@@ -78,6 +78,9 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
         this.refreshData();
     }), 100);
 
+    /**
+     * Constructor
+     */
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
@@ -85,6 +88,9 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
         private i18nService: I18nService
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // retrieve ref data
         this.displayLoading = true;
@@ -117,6 +123,9 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

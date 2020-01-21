@@ -1,4 +1,5 @@
-<app-topnav>
+<app-topnav
+    [activeOutbreakEditable]="false">
     <ng-container dynamic-section>
         <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
     </ng-container>
@@ -8,7 +9,7 @@
     <app-form-modify-questionnaire
         #questionnaire
         [parent]="outbreakTemplate"
-        (initBreadcrumbs)="createBreadcrumbs($event)"
+        (initBreadcrumbs)="initializeBreadcrumbs($event)"
         (updateQuestionnaire)="updateQuestionnaire($event)">
     </app-form-modify-questionnaire>
 </mat-card>

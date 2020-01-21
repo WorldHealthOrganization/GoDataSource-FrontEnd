@@ -11,6 +11,7 @@ import { FormRadioComponent } from './form-radio/form-radio.component';
 import { FormDateSliderComponent } from './form-date-slider/form-date-slider.component';
 import { FormDateRangeSliderComponent } from './form-date-range-slider/form-date-range-slider.component';
 import { FormHiddenInputComponent } from './form-hidden-input/form-hidden-input.component';
+import { FormSelectGroupsComponent } from './form-select-groups/form-select-groups.component';
 
 export const components: any[] = [
     FormValidationComponent,
@@ -25,5 +26,6 @@ export const components: any[] = [
     FormRadioComponent,
     FormDateSliderComponent,
     FormDateRangeSliderComponent,
-    FormHiddenInputComponent
+    FormHiddenInputComponent,
+    FormSelectGroupsComponent
 ];

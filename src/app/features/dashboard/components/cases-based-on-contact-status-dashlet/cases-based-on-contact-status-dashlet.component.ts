@@ -75,13 +75,18 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
         this.refreshData();
     }), 100);
 
+    /**
+     * Constructor
+     */
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
         private i18nService: I18nService
-    ) {
-    }
+    ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // retrieve ref data
         this.displayLoading = true;
@@ -97,6 +102,9 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

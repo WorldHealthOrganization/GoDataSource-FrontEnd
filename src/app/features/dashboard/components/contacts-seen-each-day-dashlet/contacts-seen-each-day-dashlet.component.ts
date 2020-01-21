@@ -5,6 +5,8 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { Subscription } from 'rxjs';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-contacts-seen-each-day-dashlet',
@@ -16,6 +18,7 @@ export class ContactsSeenEachDayDashletComponent extends DashletComponent implem
     // number of contacts seen each day
     contactsSeenEachDay: number;
 
+    // params
     queryParams: any = {
         applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_SEEN
     };
@@ -24,7 +27,8 @@ export class ContactsSeenEachDayDashletComponent extends DashletComponent implem
     dataForDate: Moment = moment();
 
     // constants to be used for applyListFilter
-    Constants: any = Constants;
+    Constants = Constants;
+    ContactModel = ContactModel;
 
     // loading data
     displayLoading: boolean = false;
@@ -32,16 +36,29 @@ export class ContactsSeenEachDayDashletComponent extends DashletComponent implem
     // subscribers
     previousSubscriber: Subscription;
 
+    /**
+     * Constructor
+     */
     constructor(
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        protected authDataService: AuthDataService
     ) {
-        super(listFilterDataService);
+        super(
+            listFilterDataService,
+            authDataService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         this.refreshDataCaller.call();
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // release previous subscriber
         if (this.previousSubscriber) {
@@ -69,11 +86,12 @@ export class ContactsSeenEachDayDashletComponent extends DashletComponent implem
             moment();
 
         this.displayLoading = true;
-        this.previousSubscriber = this.listFilterDataService.filterContactsSeen(
-            this.globalFilterDate,
-            this.globalFilterLocationId,
-            this.globalFilterClassificationId
-        )
+        this.previousSubscriber = this.listFilterDataService
+            .filterContactsSeen(
+                this.globalFilterDate,
+                this.globalFilterLocationId,
+                this.globalFilterClassificationId
+            )
             .subscribe((result: MetricContactsSeenEachDays) => {
                 this.contactsSeenEachDay = result.contactsSeenCount;
                 this.displayLoading = false;

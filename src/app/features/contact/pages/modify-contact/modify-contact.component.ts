@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm, NgModel } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,14 +13,13 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField } from '../../../../shared/components';
 import * as _ from 'lodash';
-import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { MatDialogRef } from '@angular/material';
@@ -28,8 +27,11 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
+import { EventModel } from '../../../../core/models/event.model';
+import { CaseModel } from '../../../../core/models/case.model';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
 
 @Component({
     selector: 'app-modify-contact',
@@ -38,10 +40,17 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./modify-contact.component.less']
 })
 export class ModifyContactComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
+
+    // constants
+    ContactModel = ContactModel;
+    FollowUpModel = FollowUpModel;
+    RelationshipModel = RelationshipModel;
+    LabResultModel = LabResultModel;
 
     contactId: string;
     selectedOutbreak: OutbreakModel;
@@ -70,6 +79,9 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     displayRefresh: boolean = false;
     @ViewChild('visualId') visualId: NgModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         private referenceDataDataService: ReferenceDataDataService,
         protected route: ActivatedRoute,
@@ -86,6 +98,9 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         super(route);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -116,6 +131,34 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                         this.retrieveContactExposure();
                     });
             });
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (ContactModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+            );
+        }
+
+        // view / modify breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                this.viewOnly ?
+                    'LNG_PAGE_VIEW_CONTACT_TITLE' :
+                    'LNG_PAGE_MODIFY_CONTACT_TITLE',
+                '.',
+                true,
+                {},
+                this.contactData
+            )
+        );
     }
 
     /**
@@ -150,7 +193,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                         });
                     });
 
-                    this.createBreadcrumbs();
+                    // update breadcrumb
+                    this.initializeBreadcrumbs();
                 });
         }
     }
@@ -167,12 +211,13 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         ) {
             const qb = new RequestQueryBuilder();
             qb.limit(2);
-            this.relationshipDataService.getEntityRelationships(
-                this.selectedOutbreak.id,
-                EntityType.CONTACT,
-                this.contactId,
-                qb
-            )
+            this.relationshipDataService
+                .getEntityRelationships(
+                    this.selectedOutbreak.id,
+                    EntityType.CONTACT,
+                    this.contactId,
+                    qb
+                )
                 .subscribe((relationships) => {
                     if (relationships.length === 1) {
                         // we found the exposure
@@ -185,21 +230,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     }
 
     /**
-     * Check if we have write access to contacts
-     * @returns {boolean}
+     * Modify contact
      */
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-    }
-
-    /**
-     * Check if we have access to read a follow-up
-     * @returns {boolean}
-     */
-    hasFollowUpReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP);
-    }
-
     modifyContact(form: NgForm) {
         // validate form
         if (!this.formHelper.validateForm(form)) {
@@ -263,7 +295,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
 
                                 // update breadcrumb
-                                this.createBreadcrumbs();
+                                this.initializeBreadcrumbs();
 
                                 // hide dialog
                                 loadingDialog.close();
@@ -366,23 +398,6 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     }
 
     /**
-     * Create breadcrumbs
-     */
-    createBreadcrumbs() {
-        this.breadcrumbs = [];
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
-            new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_CONTACT_TITLE' : 'LNG_PAGE_MODIFY_CONTACT_TITLE',
-                '.',
-                true,
-                {},
-                this.contactData
-            )
-        );
-    }
-
-    /**
      * Generate visual ID for contact
      */
     generateVisualId() {
@@ -399,5 +414,28 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         return contactExposure ?
             EntityModel.getPersonLink(contactExposure) :
             null;
+    }
+
+    /**
+     * Check if we have permission to view exposure
+     */
+    canViewExposure(): boolean {
+        // we don't have exposure data ?
+        if (!this.contactExposure) {
+            return;
+        }
+
+        // check if we have access
+        switch (this.contactExposure.type) {
+            case EntityType.EVENT:
+                return EventModel.canView(this.authUser);
+            case EntityType.CONTACT:
+                return ContactModel.canView(this.authUser);
+            case EntityType.CASE:
+                return CaseModel.canView(this.authUser);
+        }
+
+        // not supported
+        return false;
     }
 }

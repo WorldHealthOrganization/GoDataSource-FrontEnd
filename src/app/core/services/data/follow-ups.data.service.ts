@@ -13,6 +13,7 @@ import { MetricContactsWithSuccessfulFollowUp } from '../../models/metrics/metri
 import { TeamFollowupsPerDayModel } from '../../models/team-followups-per-day.model';
 import { RangeFollowUpsModel } from '../../models/range-follow-ups.model';
 import { map, mergeMap } from 'rxjs/operators';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class FollowUpsDataService {
@@ -138,12 +139,12 @@ export class FollowUpsDataService {
      * Return count of follow-ups
      * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getFollowUpsCount(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const filter = queryBuilder.buildQuery();
         return this.http.get(`outbreaks/${outbreakId}/follow-ups/filtered-count?filter=${filter}`);
     }
@@ -354,12 +355,12 @@ export class FollowUpsDataService {
      * Count groups => FollowUps grouped by contacts from an Outbreak
      * @param {string} outbreakId
      * @param queryBuilder
-     * @returns {Observable<FollowUpModel[]>}
+     * @returns {Observable<IBasicCount>}
      */
     getRangeFollowUpsListCount(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const filter = queryBuilder.buildQuery();
         return this.http.get(`outbreaks/${outbreakId}/range-follow-ups/count?filter=${filter}`);
     }

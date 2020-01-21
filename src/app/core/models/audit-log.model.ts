@@ -1,5 +1,7 @@
 import * as _ from 'lodash';
 import { UserModel } from './user.model';
+import { IPermissionBasic } from './permission.interface';
+import { PERMISSION } from './permission.model';
 
 export class AuditLogChangeDataModel {
     field: string;
@@ -13,7 +15,9 @@ export class AuditLogChangeDataModel {
     }
 }
 
-export class AuditLogModel {
+export class AuditLogModel
+    implements
+        IPermissionBasic {
     id: string;
     action: string;
     modelName: string;
@@ -25,6 +29,18 @@ export class AuditLogModel {
     createdAt: string;
     recordId: string;
 
+    /**
+     * Static Permissions - IPermissionBasic
+     */
+    static canView(user: UserModel): boolean { return false; }
+    static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.AUDIT_LOG_LIST) : false; }
+    static canCreate(user: UserModel): boolean { return false; }
+    static canModify(user: UserModel): boolean { return false; }
+    static canDelete(user: UserModel): boolean { return false; }
+
+    /**
+     * Constructor
+     */
     constructor(data = null) {
         this.id = _.get(data, 'id');
         this.recordId = _.get(data, 'recordId');
@@ -41,4 +57,13 @@ export class AuditLogModel {
             return new AuditLogChangeDataModel(item);
         });
     }
+
+    /**
+     * Permissions - IPermissionBasic
+     */
+    canView(user: UserModel): boolean { return AuditLogModel.canView(user); }
+    canList(user: UserModel): boolean { return AuditLogModel.canList(user); }
+    canCreate(user: UserModel): boolean { return AuditLogModel.canCreate(user); }
+    canModify(user: UserModel): boolean { return AuditLogModel.canModify(user); }
+    canDelete(user: UserModel): boolean { return AuditLogModel.canDelete(user); }
 }

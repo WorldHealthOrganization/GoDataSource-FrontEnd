@@ -167,7 +167,8 @@ export class TransmissionChainDataService {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`/outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases/filtered-count?filter=${filter}`),
-            MetricIndependentTransmissionChainsModel);
+            MetricIndependentTransmissionChainsModel
+        );
     }
 
     /**

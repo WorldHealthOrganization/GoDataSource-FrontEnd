@@ -11,7 +11,13 @@ const routes: Routes = [
     // Teams list
     {
         path: '',
-        component: fromPages.TeamListComponent
+        component: fromPages.TeamListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.TEAM_LIST
+            ]
+        }
     },
     // Create Team
     {
@@ -19,7 +25,9 @@ const routes: Routes = [
         component: fromPages.CreateTeamComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_TEAM]
+            permissions: [
+                PERMISSION.TEAM_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -31,7 +39,9 @@ const routes: Routes = [
         component: fromPages.ModifyTeamComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_TEAM],
+            permissions: [
+                PERMISSION.TEAM_VIEW
+            ],
             action: ViewModifyComponentAction.VIEW
         }
     },
@@ -41,7 +51,9 @@ const routes: Routes = [
         component: fromPages.ModifyTeamComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_TEAM],
+            permissions: [
+                PERMISSION.TEAM_MODIFY
+            ],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [
@@ -54,10 +66,11 @@ const routes: Routes = [
         component: fromPages.TeamWorkloadComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_TEAM]
+            permissions: [
+                PERMISSION.TEAM_LIST_WORKLOAD
+            ]
         }
-    },
-
+    }
 ];
 
 export const routing: ModuleWithProviders = RouterModule.forChild(routes);

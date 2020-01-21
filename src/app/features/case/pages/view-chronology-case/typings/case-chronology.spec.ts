@@ -59,7 +59,7 @@ describe('CaseChronology', () => {
 
             // determine expected chronology items
             const caseData: CaseModel = getObserverData(await CaseDataServiceMock.getCase(OutbreakDataServiceMock.selectedOutbreakId, CaseDataServiceMock.selectedCaseId));
-            const labResultsData: LabResultModel[] = getObserverData(await LabResultDataServiceMock.getCaseLabResults(OutbreakDataServiceMock.selectedOutbreakId, caseData.id));
+            const labResultsData: LabResultModel[] = getObserverData(await LabResultDataServiceMock.getEntityLabResults(OutbreakDataServiceMock.selectedOutbreakId, 'cases', caseData.id));
             let expectedChronologyItems = CaseChronology.getChronologyEntries(
                 I18nServiceMock as any,
                 caseData,

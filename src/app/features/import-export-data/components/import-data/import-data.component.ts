@@ -32,6 +32,7 @@ import { throwError } from 'rxjs';
 
 export enum ImportServerModelNames {
     CASE_LAB_RESULTS = 'labResult',
+    CONTACT_LAB_RESULTS = 'labResult',
     REFERENCE_DATA = 'referenceData',
     LOCATION = 'location',
     OUTBREAK = 'outbreak',

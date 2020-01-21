@@ -1,0 +1,83 @@
+.form-select-groups-container {
+    @position-helper: 24px;
+    .mat-form-field {
+        width: 100%;
+
+        .select-group-group-selected {
+            white-space: normal;
+        }
+
+        .select-group-group-selected-clear {
+            display: inline-block;
+            width: 16px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: rgba(0,0,0,.54);
+            line-height: 1;
+
+            &:hover {
+                cursor: pointer;
+                color: rgba(0,0,0,.87);
+            }
+        }
+    }
+}
+
+.select-group-group-panel {
+    max-height: 320px !important;
+
+    .select-group-line {
+        .select-group-line-label {
+            display: inline-block;
+            height: 25px;
+            line-height: 25px;
+            vertical-align: top;
+
+            font-weight: bold;
+        }
+    }
+
+    .mat-optgroup-label {
+        line-height: normal !important;
+        height: auto !important;
+        padding: 7px 16px 7px 3px !important;
+
+        &:hover {
+            cursor: pointer;
+            background-color: rgba(0,0,0,.04);
+        }
+    }
+
+    .mat-option {
+        line-height: normal !important;
+        height: auto !important;
+        padding: 7px 16px !important;
+
+        &.select-group-option {
+            font-weight: bold;
+        }
+
+        &.select-group-option-partial {
+            white-space: normal;
+        }
+
+        &.mat-option-disabled {
+            color: rgba(0,0,0,.87);
+        }
+
+        .select-group-option-info-right {
+            padding-left: 17px;
+            color: #777;
+            font-size: 12px;
+            width: 100%;
+            text-align: right;
+
+            .select-group-option-info-right-content {
+                display: inline-block;
+                text-align: left;
+                white-space: normal;
+            }
+        }
+    }
+}

@@ -9,6 +9,16 @@
                     class="topnav-actions">
 
                     <button
+                        *ngIf="DashboardModel.canExportCaseClassificationPerLocationReport(authUser) || DashboardModel.canExportContactFollowUpSuccessRateReport(authUser) || (
+                            DashboardModel.canExportEpiCurve(authUser) && (
+                                DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(authUser) ||
+                                DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(authUser) ||
+                                DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(authUser)
+                            )
+                        ) || (
+                            DashboardModel.canExportKpi(authUser) &&
+                            hasKpiAccess()
+                        )"
                         mat-raised-button color="accent"
                         [matMenuTriggerFor]="quickActionsMenu">
                         {{'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL' | translate}} <span class="xt-icon">arrowDown</span>
@@ -16,6 +26,7 @@
 
                     <mat-menu #quickActionsMenu="matMenu">
                         <app-export-button
+                            *ngIf="DashboardModel.canExportCaseClassificationPerLocationReport(authUser)"
                             [menuItem]="true"
                             [fileType]="ExportDataExtension.PDF"
                             [label]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"
@@ -28,6 +39,7 @@
                         </app-export-button>
 
                         <app-export-button
+                            *ngIf="DashboardModel.canExportContactFollowUpSuccessRateReport(authUser)"
                             [menuItem]="true"
                             [fileType]="ExportDataExtension.PDF"
                             [label]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate"
@@ -40,7 +52,11 @@
                         </app-export-button>
 
                         <button
-                            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+                            *ngIf="DashboardModel.canExportEpiCurve(authUser) && (
+                                DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(authUser) ||
+                                DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(authUser) ||
+                                DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(authUser)
+                            )"
                             mat-menu-item
                             [disabled]="x86Architecture"
                             (click)="generateEpiCurveReport()">
@@ -48,6 +64,7 @@
                         </button>
 
                         <button
+                            *ngIf="DashboardModel.canExportKpi(authUser) && hasKpiAccess()"
                             mat-menu-item
                             [disabled]="x86Architecture"
                             (click)="generateKpisReport()">
@@ -76,16 +93,18 @@
         <!-- Dashboard items -->
         <div
             class="page-content"
-            fxLayout="column"
-        >
+            fxLayout="column">
             <div fxLayout="row" fxLayoutAlign="space-between">
-                <div fxFlex="33">
+                <div
+                    *ngIf="DashboardModel.canViewCaseSummaryDashlet(authUser)"
+                    fxFlex="33">
                     <mat-card class="dashboard-gauge">
-                        <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE' | translate}}</div>
+                        <div class="other-kpi-header">
+                            {{'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE' | translate}}
+                        </div>
                         <!-- case summary pie chart -->
                         <div fxLayoutAlign="center">
                             <app-case-summary-dashlet
-                                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                                 [globalFilterDate]="globalFilterDate"
                                 [globalFilterLocationId]="globalFilterLocationId"
                                 [globalFilterClassificationId]="globalFilterClassificationId">
@@ -94,15 +113,16 @@
                     </mat-card>
                 </div>
 
-                <div fxFlex="33">
+                <div
+                    *ngIf="DashboardModel.canViewCasePerLocationLevelDashlet(authUser)"
+                    fxFlex="33">
                     <!-- cases by geographic location - pie chart -->
                     <mat-card class="dashboard-gauge">
-                        <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_BY_GEOGRAPHIC_LOCATION_TITLE' |
-                            translate}}
+                        <div class="other-kpi-header">
+                            {{'LNG_PAGE_DASHBOARD_CASE_BY_GEOGRAPHIC_LOCATION_TITLE' | translate}}
                         </div>
                         <div fxLayoutAlign="center">
                             <app-case-by-geographic-location-dashlet
-                                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                                 [globalFilterDate]="globalFilterDate"
                                 [globalFilterLocationId]="globalFilterLocationId"
                                 [globalFilterClassificationId]="globalFilterClassificationId">
@@ -111,14 +131,16 @@
                     </mat-card>
                 </div>
 
-                <div fxFlex="33">
+                <div
+                    *ngIf="DashboardModel.canViewCaseHospitalizedPieChartDashlet(authUser)"
+                    fxFlex="33">
                     <mat-card class="dashboard-gauge">
-                        <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE' | translate}}
+                        <div class="other-kpi-header">
+                            {{'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE' | translate}}
                         </div>
                         <!-- case hospitalization status pie chart -->
                         <div fxLayoutAlign="center">
                             <app-cases-hospitalized-pie-chart-dashlet
-                                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                                 [globalFilterDate]="globalFilterDate"
                                 [globalFilterLocationId]="globalFilterLocationId"
                                 [globalFilterClassificationId]="globalFilterClassificationId">
@@ -129,14 +151,15 @@
             </div>
 
             <!-- Histogram - chains of transmission -->
-            <mat-card class="page-section">
-                <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_TITLE' |
-                    translate}}
+            <mat-card
+                *ngIf="DashboardModel.canViewCotSizeHistogramDashlet(authUser)"
+                class="page-section">
+                <div class="other-kpi-header">
+                    {{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_TITLE' | translate}}
                 </div>
 
                 <!-- histogram - chains of transmission size -->
                 <app-histogram-transmission-chains-size-dashlet
-                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                     [globalFilterDate]="globalFilterDate"
                     [globalFilterLocationId]="globalFilterLocationId"
                     [globalFilterClassificationId]="globalFilterClassificationId">
@@ -145,7 +168,9 @@
 
             <!-- Epidemiological Curve -->
             <mat-card
-                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+                *ngIf="DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(authUser) ||
+                    DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(authUser) ||
+                    DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(authUser)"
                 class="page-section">
 
                 <div class="other-kpi-header">
@@ -163,7 +188,7 @@
 
                 <!-- epi curve -->
                 <app-epi-curve-dashlet
-                    *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.CLASSIFICATION.value"
+                    *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.CLASSIFICATION.value && DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(authUser)"
                     [globalFilterDate]="globalFilterDate"
                     [globalFilterLocationId]="globalFilterLocationId"
                     [globalFilterClassificationId]="globalFilterClassificationId">
@@ -171,7 +196,7 @@
 
                 <!-- epi curve outcome -->
                 <app-epi-curve-outcome-dashlet
-                    *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.OUTCOME.value"
+                    *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.OUTCOME.value && DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(authUser)"
                     [globalFilterDate]="globalFilterDate"
                     [globalFilterLocationId]="globalFilterLocationId"
                     [globalFilterClassificationId]="globalFilterClassificationId">
@@ -179,7 +204,7 @@
 
                 <!-- epi curve reporting -->
                 <app-epi-curve-reporting-dashlet
-                    *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.REPORTING.value"
+                    *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.REPORTING.value && DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(authUser)"
                     [globalFilterDate]="globalFilterDate"
                     [globalFilterLocationId]="globalFilterLocationId"
                     [globalFilterClassificationId]="globalFilterClassificationId">
@@ -187,14 +212,15 @@
             </mat-card>
 
             <!-- Contact follow-up overview -->
-            <mat-card class="page-section">
+            <mat-card
+                *ngIf="DashboardModel.canViewContactFollowUpReportDashlet(authUser)"
+                class="page-section">
                 <div class="other-kpi-header">
                     {{'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_TITLE' | translate}}
                 </div>
 
                 <!-- Contact follow-up overview c3 chart -->
                 <app-contact-follow-up-overview-dashlet
-                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                     [globalFilterDate]="globalFilterDate"
                     [globalFilterLocationId]="globalFilterLocationId"
                     [globalFilterClassificationId]="globalFilterClassificationId">
@@ -202,14 +228,15 @@
             </mat-card>
 
             <!-- Cases based on contact status -->
-            <mat-card class="page-section">
+            <mat-card
+                *ngIf="DashboardModel.canViewContactStatusReportDashlet(authUser)"
+                class="page-section">
                 <div class="other-kpi-header">
                     {{'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_TITLE' | translate}}
                 </div>
 
                 <!-- Cases based on contact status c3 chart -->
                 <app-cases-based-on-contact-status-dashlet
-                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                     [globalFilterDate]="globalFilterDate"
                     [globalFilterLocationId]="globalFilterLocationId"
                     [globalFilterClassificationId]="globalFilterClassificationId">
@@ -218,318 +245,271 @@
 
             <!-- KPIs -->
             <div #kpiSection>
-                <mat-card
-                    *ngFor="let group of kpiGroups"
-                    class="page-section">
+                <ng-container
+                    *ngFor="let group of kpiGroups">
+                    <mat-card
+                        *ngIf="group.hasAccess(authUser)"
+                        class="page-section">
 
-                    <!-- KPIs section header -->
-                    <div class="dashlet-kpi-header" fxLayout="row" fxLayoutAlign="space-between center">
-                        <div>
-                            {{group.title | translate}}
-                        </div>
+                        <!-- KPIs section header -->
+                        <div class="dashlet-kpi-header" fxLayout="row" fxLayoutAlign="space-between center">
+                            <div>
+                                {{group.title | translate}}
+                            </div>
 
-                        <div>
-                            <button mat-icon-button [disableRipple]="true" [matMenuTriggerFor]="actionsMenu">
-                                <span class="xt-icon">menu</span>
-                            </button>
-
-                            <mat-menu #actionsMenu="matMenu">
-                                <button class="dashboard-kpi-menu-item" mat-menu-item
-                                        (click)="showAllDashlets(group.id)">
-                                    {{'LNG_PAGE_DASHBOARD_KPI_SECTION_MENU_SHOW_ALL_LABEL' | translate}}
+                            <div>
+                                <button mat-icon-button [disableRipple]="true" [matMenuTriggerFor]="actionsMenu">
+                                    <span class="xt-icon">menu</span>
                                 </button>
-                            </mat-menu>
+
+                                <mat-menu #actionsMenu="matMenu">
+                                    <button
+                                        type="button"
+                                        class="dashboard-kpi-menu-item"
+                                        mat-menu-item
+                                        (click)="showAllDashlets(group.id)">
+                                        {{'LNG_PAGE_DASHBOARD_KPI_SECTION_MENU_SHOW_ALL_LABEL' | translate}}
+                                    </button>
+                                </mat-menu>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- KPIs list -->
-                    <div fxLayout="row wrap">
-                        <ng-container *ngFor="let dashlet of group.dashlets">
-                            <!-- Cases who have died -->
-                            <app-cases-deceased-dashlet
-                                *ngIf="dashlet === DashboardDashlet.CASES_DECEASED &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadCasePermissions() && hasReadReportPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-cases-deceased-dashlet>
+                        <!-- KPIs list -->
+                        <div fxLayout="row wrap">
+                            <ng-container *ngFor="let dashlet of group.dashlets">
+                                <ng-container *ngIf="group.permissions[dashlet] && group.permissions[dashlet].hasAccess(authUser)">
+                                    <!-- Cases who have died -->
+                                    <app-cases-deceased-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.CASES_DECEASED &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-cases-deceased-dashlet>
 
-                            <!-- Cases hospitalised -->
-                            <app-cases-hospitalised-dashlet
-                                *ngIf="dashlet === DashboardDashlet.CASES_HOSPITALISED &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadCasePermissions() && hasReadReportPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-cases-hospitalised-dashlet>
+                                    <!-- Cases hospitalised -->
+                                    <app-cases-hospitalised-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.CASES_HOSPITALISED &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-cases-hospitalised-dashlet>
 
-                            <!-- Cases with Less than x Contacts -->
-                            <app-cases-less-contacts-dashlet
-                                *ngIf="
-                                    dashlet === DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadCasePermissions() && hasReadReportPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-cases-less-contacts-dashlet>
+                                    <!-- Cases with Less than x Contacts -->
+                                    <app-cases-less-contacts-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-cases-less-contacts-dashlet>
 
-                            <!-- New cases detected in the previous x days among contacts -->
-                            <app-new-cases-previous-days-contacts-dashlet
-                                *ngIf="
-                                    dashlet === DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_AMONG_KNOWN_CONTACTS &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadCasePermissions() && hasReadReportPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-new-cases-previous-days-contacts-dashlet>
+                                    <!-- New cases detected in the previous x days among contacts -->
+                                    <app-new-cases-previous-days-contacts-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_AMONG_KNOWN_CONTACTS &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-new-cases-previous-days-contacts-dashlet>
 
-                            <!-- Cases refusing to be transferred to a treatment unit -->
-                            <app-cases-refusing-treatment-dashlet
-                                *ngIf="
-                                    dashlet === DashboardDashlet.SUSPECT_CASES_REFUSING_TO_BE_TRANSFERRED_TO_A_TREATMENT_UNIT &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadCasePermissions() && hasReadReportPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-cases-refusing-treatment-dashlet>
+                                    <!-- Cases refusing to be transferred to a treatment unit -->
+                                    <app-cases-refusing-treatment-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.SUSPECT_CASES_REFUSING_TO_BE_TRANSFERRED_TO_A_TREATMENT_UNIT &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-cases-refusing-treatment-dashlet>
 
-                            <!-- New cases in previous x days in known transmission chains -->
-                            <app-new-cases-previous-days-transmission-chains-dashlet
-                                *ngIf="
-                                    dashlet === DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_OUTSIDE_THE_TRANSMISSION_CHAINS &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadCasePermissions() && hasReadReportPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-new-cases-previous-days-transmission-chains-dashlet>
+                                    <!-- New cases in previous x days in known transmission chains -->
+                                    <app-new-cases-previous-days-transmission-chains-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_OUTSIDE_THE_TRANSMISSION_CHAINS &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-new-cases-previous-days-transmission-chains-dashlet>
 
-                            <!-- Suspect Cases where the lab result is pending -->
-                            <app-cases-pending-lab-results-dashlet
-                                *ngIf="
-                                dashlet === DashboardDashlet.SUSPECT_CASES_WITH_PENDING_LAB_RESULT &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadCasePermissions() && hasReadReportPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-cases-pending-lab-results-dashlet>
+                                    <!-- Suspect Cases where the lab result is pending -->
+                                    <app-cases-pending-lab-results-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.SUSPECT_CASES_WITH_PENDING_LAB_RESULT &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-cases-pending-lab-results-dashlet>
 
-                            <!-- Number of cases who are not identified though known contact list -->
-                            <app-cases-not-identified-through-contacts-dashlet
-                                *ngIf="
-                                    dashlet === DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadCasePermissions() && hasReadReportPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-cases-not-identified-through-contacts-dashlet>
+                                    <!-- Number of cases who are not identified though known contact list -->
+                                    <app-cases-not-identified-through-contacts-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-cases-not-identified-through-contacts-dashlet>
 
-                            <!-- Contacts per case mean -->
-                            <app-contacts-per-case-mean-dashlet
-                                *ngIf="
-                                    dashlet === DashboardDashlet.CONTACTS_PER_CASE_MEAN &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadContactPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-contacts-per-case-mean-dashlet>
+                                    <!-- Contacts per case mean -->
+                                    <app-contacts-per-case-mean-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.CONTACTS_PER_CASE_MEAN &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-contacts-per-case-mean-dashlet>
 
-                            <!-- Contacts per case median -->
-                            <app-contacts-per-case-median-dashlet
-                                *ngIf="
-                                    dashlet === DashboardDashlet.CONTACTS_PER_CASE_MEDIAN &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadContactPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-contacts-per-case-median-dashlet>
+                                    <!-- Contacts per case median -->
+                                    <app-contacts-per-case-median-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.CONTACTS_PER_CASE_MEDIAN &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-contacts-per-case-median-dashlet>
 
-                            <!-- Contacts on the follow-up list -->
-                            <app-contacts-on-followup-list-dashlet
-                                *ngIf="
-                                    dashlet === DashboardDashlet.CONTACTS_ON_THE_FOLLOW_UP_LIST &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadContactPermissions() && hasReadReportPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-contacts-on-followup-list-dashlet>
+                                    <!-- Contacts on the follow-up list -->
+                                    <app-contacts-on-followup-list-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.CONTACTS_ON_THE_FOLLOW_UP_LIST &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-contacts-on-followup-list-dashlet>
 
-                            <!-- Contacts Lost to follow-up -->
-                            <app-contacts-lost-to-follow-up-dashlet
-                                *ngIf="
-                                    dashlet === DashboardDashlet.CONTACTS_LOST_TO_FOLLOW_UP &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadContactPermissions() && hasReadReportPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-contacts-lost-to-follow-up-dashlet>
+                                    <!-- Contacts Lost to follow-up -->
+                                    <app-contacts-lost-to-follow-up-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.CONTACTS_LOST_TO_FOLLOW_UP &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-contacts-lost-to-follow-up-dashlet>
 
-                            <!-- Contacts Not Seen -->
-                            <app-contacts-not-seen-dashlet
-                                *ngIf="
-                                    dashlet === DashboardDashlet.CONTACTS_NOT_SEEN_IN_X_DAYS &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadContactPermissions() && hasReadReportPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-contacts-not-seen-dashlet>
+                                    <!-- Contacts Not Seen -->
+                                    <app-contacts-not-seen-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.CONTACTS_NOT_SEEN_IN_X_DAYS &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-contacts-not-seen-dashlet>
 
-                            <!-- Number of contacts becoming cases in period & location -->
-                            <app-contacts-become-cases-dashlet
-                                *ngIf="
-                                    dashlet === DashboardDashlet.CONTACTS_BECOMING_CASES_IN_TIME_AND_SPACE &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadContactPermissions() && hasReadReportPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-contacts-become-cases-dashlet>
+                                    <!-- Number of contacts becoming cases in period & location -->
+                                    <app-contacts-become-cases-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.CONTACTS_BECOMING_CASES_IN_TIME_AND_SPACE &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-contacts-become-cases-dashlet>
 
-                            <!-- Contacts seen each day -->
-                            <app-contacts-seen-each-day-dashlet
-                                *ngIf="
-                                    dashlet === DashboardDashlet.CONTACTS_SEEN_EACH_DAY &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadContactPermissions() && hasReadReportPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-contacts-seen-each-day-dashlet>
+                                    <!-- Contacts seen each day -->
+                                    <app-contacts-seen-each-day-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.CONTACTS_SEEN_EACH_DAY &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-contacts-seen-each-day-dashlet>
 
-                            <!-- Contacts with successful follow-ups -->
-                            <app-contacts-with-successful-follow-ups-dashlet
-                                *ngIf="
-                                    dashlet === DashboardDashlet.CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadContactPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-contacts-with-successful-follow-ups-dashlet>
+                                    <!-- Contacts with successful follow-ups -->
+                                    <app-contacts-with-successful-follow-ups-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-contacts-with-successful-follow-ups-dashlet>
 
-                            <!-- number of independent chains of transmission -->
-                            <app-independent-transmission-chains-dashlet
-                                *ngIf="
-                                    dashlet === DashboardDashlet.INDEPENDENT_TRANSMISSION_CHAINS &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadCasePermissions() && hasReadReportPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-independent-transmission-chains-dashlet>
+                                    <!-- number of independent chains of transmission -->
+                                    <app-independent-transmission-chains-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.INDEPENDENT_TRANSMISSION_CHAINS &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-independent-transmission-chains-dashlet>
 
-                            <!-- Number of active chains of transmission -->
-                            <app-number-of-active-chains-of-transmission-dashlet
-                                *ngIf="
-                                    dashlet === DashboardDashlet.ACTIVE_TRANSMISSION_CHAINS &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadReportPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-number-of-active-chains-of-transmission-dashlet>
+                                    <!-- Number of active chains of transmission -->
+                                    <app-number-of-active-chains-of-transmission-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.ACTIVE_TRANSMISSION_CHAINS &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-number-of-active-chains-of-transmission-dashlet>
 
-                            <!-- Number of new chains of transmission from registered contacts who have became cases-->
-                            <app-new-chains-of-transmission-from-registered-contacts-dashlet
-                                *ngIf="
-                                    dashlet === DashboardDashlet.TRANSMISSION_CHAINS_FROM_CONTACTS_WHO_BECAME_CASES &&
-                                    isDashletVisible(dashlet) &&
-                                    hasReadReportPermissions()
-                                "
-                                (hide)="hideDashlet(dashlet)"
-                                (moveBefore)="moveDashletBefore(dashlet)"
-                                (moveAfter)="moveDashletAfter(dashlet)"
-                                [globalFilterDate]="globalFilterDate"
-                                [globalFilterLocationId]="globalFilterLocationId"
-                                [globalFilterClassificationId]="globalFilterClassificationId">
-                            </app-new-chains-of-transmission-from-registered-contacts-dashlet>
-                        </ng-container>
-                    </div>
-                </mat-card>
+                                    <!-- Number of new chains of transmission from registered contacts who have became cases-->
+                                    <app-new-chains-of-transmission-from-registered-contacts-dashlet
+                                        *ngIf="dashlet === DashboardDashlet.TRANSMISSION_CHAINS_FROM_CONTACTS_WHO_BECAME_CASES &&
+                                            isDashletVisible(dashlet)"
+                                        (hide)="hideDashlet(dashlet)"
+                                        (moveBefore)="moveDashletBefore(dashlet)"
+                                        (moveAfter)="moveDashletAfter(dashlet)"
+                                        [globalFilterDate]="globalFilterDate"
+                                        [globalFilterLocationId]="globalFilterLocationId"
+                                        [globalFilterClassificationId]="globalFilterClassificationId">
+                                    </app-new-chains-of-transmission-from-registered-contacts-dashlet>
+                                </ng-container>
+                            </ng-container>
+                        </div>
+                    </mat-card>
+                </ng-container>
             </div>
 
             <canvas id="tempCanvas"></canvas>

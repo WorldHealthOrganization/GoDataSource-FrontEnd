@@ -119,6 +119,20 @@
                                 [disabled]="viewOnly">
                             </app-form-input>
                         </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-slide-toggle
+                                name="isContactLabResultsActive"
+                                [(ngModel)]="outbreakTemplate.isContactLabResultsActive"
+                                [label]="'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_LAB_RESULTS_ACTIVE' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_LAB_RESULTS_ACTIVE_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
                     </div>
                 </mat-card>
             </mat-tab>
@@ -129,11 +143,12 @@
     <!-- outbreak form actions -->
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
-        <button *ngIf="viewOnly && hasOutbreakTemplateWriteAccess()"
-                mat-raised-button
-                type="button"
-                color="accent"
-                [routerLink]="['/outbreak-templates', outbreakTemplateId, 'modify']">
+        <button
+            *ngIf="viewOnly && OutbreakTemplateModel.canModify(authUser)"
+            mat-raised-button
+            type="button"
+            color="accent"
+            [routerLink]="['/outbreak-templates', outbreakTemplateId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
         <ng-container *ngIf="!viewOnly">
@@ -143,16 +158,21 @@
                 type="submit">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
-            <button type="button"
-                    [routerLink]="['/outbreak-templates']"
-                    mat-raised-button>
+            <button
+                *ngIf="OutbreakTemplateModel.canList(authUser)"
+                type="button"
+                [routerLink]="['/outbreak-templates']"
+                mat-raised-button>
                 {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
             </button>
         </ng-container>
 
-        <div class="page-tabs-navbar-placeholder"></div>
+        <div
+            *ngIf="(viewOnly && OutbreakTemplateModel.canModify(authUser)) || !viewOnly"
+            class="page-tabs-navbar-placeholder"></div>
 
         <button
+            *ngIf="OutbreakTemplateModel.canModifyCaseQuestionnaire(authUser)"
             mat-raised-button
             type="button"
             [routerLink]="['/outbreak-templates', outbreakTemplateId, 'case-questionnaire']">
@@ -160,6 +180,7 @@
         </button>
 
         <button
+            *ngIf="OutbreakTemplateModel.canModifyContactFollowUpQuestionnaire(authUser)"
             mat-raised-button
             type="button"
             [routerLink]="['/outbreak-templates', outbreakTemplateId, 'contact-follow-up-questionnaire']">
@@ -167,6 +188,7 @@
         </button>
 
         <button
+            *ngIf="OutbreakTemplateModel.canModifyCaseLabResultQuestionnaire(authUser)"
             mat-raised-button
             type="button"
             [routerLink]="['/outbreak-templates', outbreakTemplateId, 'case-lab-results-questionnaire']">

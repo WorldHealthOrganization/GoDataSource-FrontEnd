@@ -13,6 +13,9 @@ import { Constants } from '../../../../core/models/constants';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { Moment } from '../../../../core/helperClasses/x-moment';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
     selector: 'app-cases-hospitalized-pie-chart-dashlet',
@@ -63,6 +66,9 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
     // loading data
     displayLoading: boolean = true;
 
+    // authenticated user
+    authUser: UserModel;
+
     /**
      * Global Filters changed
      */
@@ -70,16 +76,25 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
         this.refreshData();
     }), 100);
 
+    /**
+     * Constructor
+     */
     constructor(
         private outbreakDataService: OutbreakDataService,
         private caseDataService: CaseDataService,
         private i18nService: I18nService,
         protected snackbarService: SnackbarService,
-        private router: Router
-    ) {
-    }
+        private router: Router,
+        private authDataService: AuthDataService
+    ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // outbreak
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -91,6 +106,9 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -115,6 +133,12 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
      * Redirect to cases page when user click on a piece of pie chart to display the cases that represent the part of pie chart
      */
     onDoughnutPress(pressed) {
+        // we need case list permission to redirect
+        if (!CaseModel.canList(this.authUser)) {
+            return;
+        }
+
+        // construct redirect global filter
         const global: {
             date?: Moment,
             locationId?: string,
@@ -136,6 +160,7 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
             global.classificationId = this.globalFilterClassificationId;
         }
 
+        // redirect
         this.router.navigate([`cases`],
             {
                 queryParams: {
@@ -231,12 +256,9 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
             // retrieve data
             this.displayLoading = true;
             this.previousSubscriber = forkJoin(
-                this.caseDataService
-                    .getHospitalisedCasesCount(this.outbreakId, this.globalFilterDate, qb),
-                this.caseDataService
-                    .getIsolatedCasesCount(this.outbreakId, this.globalFilterDate, qb),
-                this.caseDataService
-                    .getNotHospitalisedCasesCount(this.outbreakId, this.globalFilterDate, qb)
+                this.caseDataService.getHospitalisedCasesCount(this.outbreakId, this.globalFilterDate, qb),
+                this.caseDataService.getIsolatedCasesCount(this.outbreakId, this.globalFilterDate, qb),
+                this.caseDataService.getNotHospitalisedCasesCount(this.outbreakId, this.globalFilterDate, qb)
             )
                 .pipe(
                     catchError((err) => {

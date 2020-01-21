@@ -6,21 +6,21 @@ import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { SVGGantt } from 'gantt';
+import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../../../core/models/metrics/metric-cases-delay-between-onset-lab-test.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import * as _ from 'lodash';
 import { Subscription ,  Subscriber } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/index';
-import { MetricCasesDelayBetweenOnsetHospitalizationModel } from '../../../../core/models/metrics/metric-cases-delay-between-onset-hospitalization.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
-    selector: 'app-gantt-chart-delay-onset-hospitalization-dashlet',
+    selector: 'app-gantt-chart-delay-onset-dashlet',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './gantt-chart-delay-onset-hospitalization-dashlet.component.html',
-    styleUrls: ['./gantt-chart-delay-onset-hospitalization-dashlet.component.less']
+    templateUrl: './gantt-chart-delay-onset-dashlet.component.html',
+    styleUrls: ['./gantt-chart-delay-onset-dashlet.component.less']
 })
-export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnInit, OnDestroy {
+export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
     // constants
     Constants = Constants;
 
@@ -75,12 +75,18 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
         this.refreshData();
     }), 100);
 
+    /**
+     * Constructor
+     */
     constructor(
         private caseDataService: CaseDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private outbreakDataService: OutbreakDataService
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // retrieve ref data
         this.displayLoading = true;
@@ -110,6 +116,9 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -141,7 +150,7 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
      */
     displayChart() {
         // remove existing element then create the new one
-        const elem = document.getElementById('gantt-svg-root-hospitalization');
+        const elem = document.getElementById('gantt-svg-root');
         if (elem) {
             elem.innerHTML = '';
         }
@@ -152,7 +161,7 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
             !_.isEmpty(this.ganttData[0].children)
         ) {
             this.ganttChart = new SVGGantt(
-                '#gantt-svg-root-hospitalization',
+                '#gantt-svg-root',
                 this.ganttData,
                 this.options
             );
@@ -162,7 +171,7 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
     /**
      * format the data in the desired format
      */
-    formatData(metricResults: MetricCasesDelayBetweenOnsetHospitalizationModel[]) {
+    formatData(metricResults: MetricCasesDelayBetweenOnsetLabTestModel[]) {
         // initialize
         this.ganttData = [];
         const chartDataItem: any = {};
@@ -174,14 +183,14 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
         _.forEach(metricResults, (result) => {
             if (
                 !_.isEmpty(result.dateOfOnset) &&
-                !_.isEmpty(result.hospitalizationIsolationDate)
+                !_.isEmpty(result.dateSampleTaken)
                 && result.delay > 0
             ) {
                 const chartDataItemChild: any = {};
                 chartDataItemChild.id = result.case.id;
                 chartDataItemChild.name = result.case.name;
                 chartDataItemChild.from = new Date(Date.parse(result.dateOfOnset));
-                chartDataItemChild.to = new Date(Date.parse(result.hospitalizationIsolationDate));
+                chartDataItemChild.to = new Date(Date.parse(result.dateSampleTaken));
                 chartDataItem.children.push(chartDataItemChild);
             }
         });
@@ -239,7 +248,7 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
             // load data and display chart
             this.displayLoading = true;
             this.previousSubscriber = this.caseDataService
-                .getDelayBetweenOnsetAndHospitalization(this.outbreakId, qb)
+                .getDelayBetweenOnsetAndLabTesting(this.outbreakId, qb)
                 .subscribe((results) => {
                     // configure data
                     this.formatData(results);

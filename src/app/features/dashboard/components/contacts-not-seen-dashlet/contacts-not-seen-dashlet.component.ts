@@ -10,6 +10,8 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-contacts-not-seen-dashlet',
@@ -26,6 +28,7 @@ export class ContactsNotSeenDashletComponent extends DashletComponent implements
 
     // constants to be used for applyListFilters
     Constants: any = Constants;
+    ContactModel = ContactModel;
 
     // outbreak
     outbreakId: string;
@@ -42,14 +45,24 @@ export class ContactsNotSeenDashletComponent extends DashletComponent implements
         this.refreshData();
     }));
 
+    /**
+     * Constructor
+     */
     constructor(
         private followUpDataService: FollowUpsDataService,
         private outbreakDataService: OutbreakDataService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        protected authDataService: AuthDataService
     ) {
-        super(listFilterDataService);
+        super(
+            listFilterDataService,
+            authDataService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get number of not seen contacts
         this.displayLoading = true;
@@ -64,6 +77,9 @@ export class ContactsNotSeenDashletComponent extends DashletComponent implements
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

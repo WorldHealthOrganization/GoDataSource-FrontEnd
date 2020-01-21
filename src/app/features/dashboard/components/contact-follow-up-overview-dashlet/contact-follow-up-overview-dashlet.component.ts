@@ -65,6 +65,8 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
     outbreakId: string;
     outbreak: OutbreakModel;
 
+    dashletZoomRanges: [number, number];
+
     // subscribers
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
@@ -79,15 +81,22 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
         this.refreshData();
     }), 100);
 
+    /**
+     * Constructor
+     */
     constructor(
         private contactDataService: ContactDataService,
         private outbreakDataService: OutbreakDataService,
         private i18nService: I18nService
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // retrieve ref data
         this.displayLoading = true;
+
         // outbreak
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -100,6 +109,9 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -188,6 +200,13 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
             }
 
         });
+
+        // construct the milestones
+        const maxMilestone = chartData[followedUpTranslated].length;
+        const firstMilestone = maxMilestone - this.outbreak.periodOfFollowup;
+
+        // setup zoom ranges based on milestones
+        this.dashletZoomRanges = [firstMilestone, maxMilestone];
 
         this.lineData = percentageTranslated;
         // finish

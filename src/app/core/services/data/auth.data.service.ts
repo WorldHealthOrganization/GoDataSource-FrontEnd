@@ -1,10 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-
-
-
 import * as _ from 'lodash';
 import { StorageService, StorageKey } from '../helper/storage.service';
 import { UserDataService } from './user.data.service';
@@ -56,15 +52,21 @@ export class AuthDataService {
             );
     }
 
+    /**
+     * Reload user settings
+     */
     reloadAndPersistAuthUser(): Observable<AuthModel> {
+        // refresh logic data
         const authData = this.getAuthData();
         const userId = _.get(authData, 'user.id', '');
+
         // get user info
         return this.userDataService.getUser(userId)
             .pipe(
                 map((userInstance: UserModel) => {
                     // keep user info
                     authData.user = userInstance;
+
                     // cache auth data with authenticated user information
                     this.storageService.set(StorageKey.AUTH_DATA, authData);
                     return authData;

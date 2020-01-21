@@ -13,25 +13,30 @@
     <div class="form-content">
         <mat-tab-group class="page-tabs-navbar">
 
-            <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_DETAILS_TITLE' | translate">
+            <mat-tab [label]="'LNG_PAGE_MODIFY_LAB_RESULT_TAB_DETAILS_TITLE' | translate">
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
                         <div
-                            class="lab-result-case-title"
+                            class="lab-result-title"
                             fxLayout="row" fxLayoutGap="20px">
                             <ng-container
-                                *ngIf="labResultData?.entity?.id">
-                                <div>{{ (labResultData.entity.type === EntityType.CASE ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CASE' : 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT') | translate }}</div>
+                                *ngIf="labResultData?.person?.id && (
+                                    (labResultData.person.type === EntityType.CASE && CaseModel.canView(authUser)) ||
+                                    (labResultData.person.type === EntityType.CONTACT && ContactModel.canView(authUser))
+                                )">
+                                <div>
+                                    {{'LNG_PAGE_VIEW_LAB_RESULT_FIELD_LABEL_ENTITY' | translate}}
+                                </div>
 
                                 <a
-                                    [routerLink]="[labResultData.entity.type === EntityType.CASE ? '/cases' : '/contacts', labResultData.personId, 'view']">
-                                    {{ labResultData.entity.name}}
+                                    [routerLink]="[labResultData.person.type === EntityType.CASE ? '/cases' : '/contacts', labResultData.personId, 'view']">
+                                    {{ labResultData.person.name}}
                                 </a>
 
                                 <div
-                                    *ngIf="labResultData.entity.type === EntityType.CONTACT">
-                                    {{ 'LNG_PAGE_VIEW_CASE_LAB_RESULT_FIELD_LABEL_CONTACT_WITH_INFO' | translate: {caseName: labResultData.entity.name} }}
+                                    *ngIf="labResultData.person.type === EntityType.CONTACT && labResultData.person.wasCase">
+                                    {{ 'LNG_PAGE_MODIFY_LAB_RESULT_FIELD_LABEL_CONTACT_WITH_INFO' | translate: {caseName: labResultData.person.name} }}
                                 </div>
                             </ng-container>
                         </div>
@@ -40,15 +45,15 @@
                             *ngIf="displayOnsetDateWarningMessage"
                             class="warning-message"
                             fxLayout="row">
-                            {{ 'LNG_PAGE_VIEW_CASE_LAB_RESULT_WARNING_CASE_DATEOFONSET_AFTER_SAMPLE_TAKEN' | translate }}
+                            {{ 'LNG_PAGE_MODIFY_LAB_RESULT_WARNING_CASE_DATEOFONSET_AFTER_SAMPLE_TAKEN' | translate }}
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="sampleIdentifier"
                                 [ngModel]="labResultData.sampleIdentifier"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID' | translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID_DESCRIPTION"
                                 [disabled]="viewOnly">
                             </app-form-input>
 
@@ -56,8 +61,8 @@
                                 name="dateSampleTaken"
                                 [(ngModel)]="labResultData.dateSampleTaken"
                                 required="true"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN' | translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN_DESCRIPTION"
                                 [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="[
@@ -72,8 +77,8 @@
                             <app-form-datepicker
                                 name="dateSampleDelivered"
                                 [ngModel]="labResultData.dateSampleDelivered"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED' | translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED_DESCRIPTION"
                                 [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="[
@@ -90,8 +95,8 @@
                             <app-form-datepicker
                                 name="dateTesting"
                                 [ngModel]="labResultData.dateTesting"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_TESTING' | translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_TESTING_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING_DESCRIPTION"
                                 [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="[
@@ -110,8 +115,8 @@
                             <app-form-datepicker
                                 name="dateOfResult"
                                 [ngModel]="labResultData.dateOfResult"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT' | translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT_DESCRIPTION"
                                 [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="serverToday"
@@ -126,8 +131,8 @@
                             <app-form-select
                                 name="labName"
                                 [ngModel]="labResultData.labName"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME' | translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME_DESCRIPTION"
                                 [options]="labNameOptionsList$ | async"
                                 optionLabelKey="label"
                                 optionValueKey="value"
@@ -137,8 +142,8 @@
                             <app-form-select
                                 name="sampleType"
                                 [ngModel]="labResultData.sampleType"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE' | translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE_DESCRIPTION"
                                 [options]="sampleTypesList$ | async"
                                 optionLabelKey="label"
                                 optionValueKey="value"
@@ -148,8 +153,8 @@
                             <app-form-select
                                 name="testType"
                                 [ngModel]="labResultData.testType"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE' | translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE_DESCRIPTION"
                                 [options]="testTypesList$ | async"
                                 optionLabelKey="label"
                                 optionValueKey="value"
@@ -161,8 +166,8 @@
                             <app-form-select
                                 name="result"
                                 [ngModel]="labResultData.result"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT' | translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_RESULT' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_RESULT_DESCRIPTION"
                                 [options]="resultTypesList$ | async"
                                 optionLabelKey="label"
                                 optionValueKey="value"
@@ -172,16 +177,16 @@
                             <app-form-input
                                 name="testedFor"
                                 [ngModel]="labResultData.testedFor"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_TESTED_FOR' | translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_TESTED_FOR_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR_DESCRIPTION"
                                 [disabled]="viewOnly">
                             </app-form-input>
 
                             <app-form-select
                                 name="status"
                                 [ngModel]="labResultData.status"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS' | translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_STATUS' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_STATUS_DESCRIPTION"
                                 [options]="progressOptionsList$ | async"
                                 optionLabelKey="label"
                                 optionValueKey="value"
@@ -191,8 +196,8 @@
                             <app-form-textarea
                                 name="quantitativeResult"
                                 [ngModel]="labResultData.quantitativeResult"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT' | translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT_DESCRIPTION"
                                 minRows="1"
                                 [disabled]="viewOnly">
                             </app-form-textarea>
@@ -202,8 +207,8 @@
                             <app-form-textarea
                                 name="notes"
                                 [ngModel]="labResultData.notes"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES' | translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_NOTES' | translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_NOTES_DESCRIPTION"
                                 minRows="1"
                                 [disabled]="viewOnly">
                             </app-form-textarea>
@@ -213,7 +218,7 @@
 
                 <!-- Create / update by user information section -->
                 <div class="section-title">
-                    {{ 'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE' | translate }}
+                    {{ 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE' | translate }}
                 </div>
                 <mat-card class="page-section">
                     <div fxLayout="column">
@@ -222,32 +227,32 @@
                             <app-form-input
                                 name="createdByUser"
                                 [ngModel]="labResultData.createdByUser?.name"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_BY'| translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_BY_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY'| translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY_DESCRIPTION"
                                 [disabled]="true">
                             </app-form-input>
 
                             <app-form-input
                                 name="createdAt"
                                 [ngModel]="labResultData.createdAt | dateTimeDefault"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_AT'| translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_CREATED_AT_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT'| translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT_DESCRIPTION"
                                 [disabled]="true">
                             </app-form-input>
 
                             <app-form-input
                                 name="updatedByUser"
                                 [ngModel]="labResultData.updatedByUser?.name"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_BY'| translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_BY_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY'| translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY_DESCRIPTION"
                                 [disabled]="true">
                             </app-form-input>
 
                             <app-form-input
                                 name="updatedAt"
                                 [ngModel]="labResultData.updatedAt | dateTimeDefault"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_AT'| translate"
-                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_UPDATED_AT_DESCRIPTION"
+                                [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT'| translate"
+                                tooltip="LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT_DESCRIPTION"
                                 [disabled]="true">
                             </app-form-input>
                         </div>
@@ -256,13 +261,13 @@
 
             </mat-tab>
 
-            <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate">
+            <mat-tab [label]="'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate">
                 <app-form-fill-questionnaire
                     name="questionnaireAnswers"
                     [ngModel]="labResultData.questionnaireAnswers"
                     [questions]="selectedOutbreak.labResultsTemplate"
                     [disabled]="viewOnly"
-                    [componentTitle]="'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate">
+                    [componentTitle]="'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate">
                 </app-form-fill-questionnaire>
             </mat-tab>
 
@@ -273,29 +278,26 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <ng-container
-            *app-selected-outbreak-is-active
-        >
-            <button *ngIf="viewOnly && hasCaseWriteAccess()"
-                    mat-raised-button type="button" color="accent"
-                    [routerLink]=" ['/cases', labResultData.personId, 'lab-results', labResultData.id, 'modify' ]"
-                    [queryParams]="{fromLabResultsList: fromLabResultsList}">
+            *app-selected-outbreak-is-active>
+            <button
+                *ngIf="viewOnly && ((personType === EntityType.CASE && CaseModel.canModifyLabResult(authUser)) || (personType === EntityType.CONTACT && ContactModel.canModifyLabResult(authUser)))"
+                mat-raised-button type="button" color="accent"
+                [routerLink]=" ['/lab-results', EntityModel.getLinkForEntityType(personType), labResultData.personId, labResultData.id, 'modify' ]"
+                [queryParams]="{fromLabResultsList: fromLabResultsList}">
                 {{'LNG_COMMON_BUTTON_EDIT' | translate}}
             </button>
             <ng-container *ngIf="!viewOnly">
                 <button mat-raised-button color="accent">
                     {{'LNG_COMMON_BUTTON_SAVE' | translate}}
                 </button>
-                <button type="button"
-                        mat-raised-button
-                        [routerLink]="!fromLabResultsList ?
-                        ['/cases', labResultData.personId, 'lab-results'] :
-                        ['/cases/lab-results']">
+                <button
+                    *ngIf="(personType === EntityType.CASE && CaseModel.canListLabResult(authUser)) || (personType === EntityType.CONTACT && ContactModel.canListLabResult(authUser))"
+                    type="button"
+                    mat-raised-button
+                    [routerLink]="fromLabResultsList ? ['/lab-results'] : ['/lab-results', EntityModel.getLinkForEntityType(personType), labResultData.personId]">
                     {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
                 </button>
             </ng-container>
         </ng-container>
-
     </div>
-
-
 </form>

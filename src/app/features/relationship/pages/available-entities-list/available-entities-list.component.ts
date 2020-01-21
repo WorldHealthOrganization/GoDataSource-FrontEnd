@@ -18,10 +18,12 @@ import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { map, share, tap } from 'rxjs/operators';
+import { catchError, map, share, tap } from 'rxjs/operators';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { AddressType } from '../../../../core/models/address.model';
+import { throwError } from 'rxjs/internal/observable/throwError';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -34,7 +36,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
 
     // entities list relationships
     entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
-    entitiesListCount$: Observable<any>;
+    entitiesListCount$: Observable<IBasicCount>;
 
     // available side filters
     availableSideFilters: FilterModel[];
@@ -53,6 +55,20 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     Constants = Constants;
     ReferenceDataCategory = ReferenceDataCategory;
     EntityType = EntityType;
+
+    fixedTableColumns: string[] = [
+        'checkbox',
+        'hasDuplicate',
+        'lastName',
+        'firstName',
+        'visualId',
+        'age',
+        'gender',
+        'riskLevel',
+        'classification',
+        'place',
+        'address'
+    ];
 
     constructor(
         protected snackbarService: SnackbarService,
@@ -183,6 +199,11 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
                     this.queryBuilder
                 )
                 .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        finishCallback([]);
+                        return throwError(err);
+                    }),
                     tap(this.checkEmptyList.bind(this)),
                     tap((data: any[]) => {
                         finishCallback(data);
@@ -213,7 +234,13 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
                     this.entityId,
                     this.queryBuilder
                 )
-                .pipe(share());
+                .pipe(
+                    catchError((err) => {
+                        this.snackbarService.showApiError(err);
+                        return throwError(err);
+                    }),
+                    share()
+                );
         }
     }
 
@@ -327,28 +354,6 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
     getPersonTypeColor(personType: string) {
         const personTypeData = _.get(this.personTypesListMap, personType);
         return _.get(personTypeData, 'colorCode', '');
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        const columns = [
-            'checkbox',
-            'hasDuplicate',
-            'lastName',
-            'firstName',
-            'visualId',
-            'age',
-            'gender',
-            'riskLevel',
-            'classification',
-            'place',
-            'address'
-        ];
-
-        return columns;
     }
 
     selectEntities(form: NgForm) {
