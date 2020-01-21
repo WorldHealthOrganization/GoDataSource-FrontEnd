@@ -177,16 +177,15 @@ export class RequestFilter {
         if (_.isEmpty(value)) {
             this.remove(property);
         } else {
-            // build number pattern
-            const numberPattern = !_.isEmpty(value) ? RequestFilter.getPhoneNumberPattern(value) : '';
-
+            // build number pattern condition
             this.where({
                 [property]: {
-                    regex: numberPattern
+                    regex: RequestFilter.getPhoneNumberPattern(value)
                 }
             }, replace);
         }
 
+        // finished
         return this;
     }
 

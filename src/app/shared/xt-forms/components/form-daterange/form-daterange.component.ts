@@ -30,11 +30,12 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
     // min date
     private _minDate: Moment;
     @Input() set minDate(value: Moment) {
+        // set value
         this._minDate = value;
+
         // update dates
         this.updateDateSameOrAfter();
     }
-
     get minDate(): Moment {
         return this._minDate;
     }
@@ -42,11 +43,12 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
     // max date
     private _maxDate: Moment;
     @Input() set maxDate(value: Moment) {
+        // set value
         this._maxDate = value;
+
         // update dates
         this.updateDateSameOrBefore();
     }
-
     get maxDate(): Moment {
         return this._maxDate;
     }
@@ -56,8 +58,13 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
     // start date
     private _startDateVisible: boolean = true;
     @Input() set startDateVisible(value: boolean) {
+        // set value
         this._startDateVisible = value;
+
+        // update dates
         this.updateDateSameOrAfter();
+
+        // set date range
         if (!this._startDateVisible) {
             this.dateRange.startDate = null;
         }
@@ -69,9 +76,13 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
     // end date
     private _endDateVisible: boolean = true;
     @Input() set endDateVisible(value: boolean) {
+        // set value
         this._endDateVisible = value;
+
         // update dates
         this.updateDateSameOrBefore();
+
+        // set date range
         if (!this._endDateVisible) {
             this.dateRange.endDate = null;
         }
@@ -80,6 +91,9 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
         return this._endDateVisible;
     }
 
+    /**
+     * Constructor
+     */
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
@@ -116,7 +130,9 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
      * Return dates for dateSameOrAfter directive
      */
     private updateDateSameOrAfter() {
+        // reset value
         this.dateSameOrAfter = [];
+
         // if start date is visible
         if (this.startDateVisible) {
             this.dateSameOrAfter.push(this.name + '[startDate]');
@@ -132,7 +148,9 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
      * Return dates for dateSameOrBefore
      */
     private updateDateSameOrBefore() {
+        // reset value
         this.dateSameOrBefore = [];
+
         // if end date is visible
         if (this.endDateVisible) {
             this.dateSameOrBefore.push(this.name + '[endDate]');
