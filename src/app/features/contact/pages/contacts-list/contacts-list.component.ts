@@ -92,6 +92,11 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
     // yes / no / all options
     yesNoOptionsList$: Observable<any[]>;
+    pregnancyStatusList$: Observable<any[]>;
+
+    // vaccines
+    vaccineList$: Observable<any[]>;
+    vaccineStatusList$: Observable<any[]>;
 
     // available side filters
     availableSideFilters: FilterModel[];
@@ -395,6 +400,10 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         // retrieve users
         this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
 
+        this.pregnancyStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
+        this.vaccineList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES);
+        this.vaccineStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES_STATUS);
+
         // dialog fields for daily follow-ups print
         this.genericDataService
             .getRangeFollowUpGroupByOptions(true)
@@ -669,7 +678,31 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
                 type: FilterType.RANGE_DATE,
                 sortable: true
-            })
+            }),
+            new FilterModel({
+                fieldName: 'pregnancyStatus',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
+                type: FilterType.SELECT,
+                options$: this.pregnancyStatusList$
+            }),
+            new FilterModel({
+                fieldName: 'vaccinesReceived.vaccine',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VACCINE',
+                type: FilterType.MULTISELECT,
+                options$: this.vaccineList$
+            }),
+            new FilterModel({
+                fieldName: 'vaccinesReceived.status',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VACCINE_STATUS',
+                type: FilterType.MULTISELECT,
+                options$: this.vaccineStatusList$
+            }),
+            new FilterModel({
+                fieldName: 'vaccinesReceived.date',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VACCINE_DATE',
+                type: FilterType.RANGE_DATE,
+            }),
+
         ];
 
         // Relation - Follow-up
