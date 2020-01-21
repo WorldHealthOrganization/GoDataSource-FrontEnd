@@ -19,7 +19,7 @@ import {
     MetricContactsWithSuccessfulFollowUp
 } from '../models/metrics/metric.contacts-with-success-follow-up.model';
 import { VisibleColumnModel } from '../../shared/components/side-columns/model';
-import { AddressModel, AddressType } from '../models/address.model';
+import { AddressType } from '../models/address.model';
 import { moment, Moment } from './x-moment';
 
 export abstract class ListComponent implements OnDestroy {
