@@ -151,10 +151,18 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 new ChildNavItem(
                     'lab-results',
                     'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
-                    [
-                        PERMISSION.CASE_LAB_RESULT_LIST
-                    ],
-                    '/cases/lab-results',
+                    new PermissionExpression({
+                        and: [
+                            PERMISSION.LAB_RESULT_LIST,
+                            new PermissionExpression({
+                                or: [
+                                    PERMISSION.CASE_LIST_LAB_RESULT,
+                                    PERMISSION.CONTACT_LIST_LAB_RESULT
+                                ]
+                            })
+                        ]
+                    }),
+                    '/lab-results',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 ),
                 new ChildNavItem(
@@ -166,7 +174,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
                             PERMISSION.GANTT_CHART_VIEW_DELAY_ONSET_HOSPITALIZATION
                         ]
                     }),
-                    '/cases/gantt-chart',
+                    '/lab-results/gantt-chart',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 )
             ]

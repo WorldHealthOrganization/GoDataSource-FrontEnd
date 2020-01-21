@@ -11,16 +11,16 @@ import { ImportDataExtension } from '../../components/import-data/model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { UserModel } from '../../../../core/models/user.model';
-import { CaseModel } from '../../../../core/models/case.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
-    selector: 'app-import-case-lab-data',
+    selector: 'app-import-contact-lab-data',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './import-case-lab-data.component.html',
-    styleUrls: ['./import-case-lab-data.component.less']
+    templateUrl: './import-contact-lab-data.component.html',
+    styleUrls: ['./import-contact-lab-data.component.less']
 })
-export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
+export class ImportContactLabDataComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -89,7 +89,7 @@ export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
 
                     // set URLs
                     this.importFileUrl = `outbreaks/${selectedOutbreak.id}/importable-files`;
-                    this.importDataUrl = `outbreaks/${selectedOutbreak.id}/cases/lab-results/import-importable-file-using-map`;
+                    this.importDataUrl = `outbreaks/${selectedOutbreak.id}/contacts/lab-results/import-importable-file-using-map`;
 
                     // display import form
                     this.displayLoading = false;
@@ -116,11 +116,11 @@ export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
         this.breadcrumbs = [];
 
         // add list breadcrumb only if we have permission
-        if (CaseModel.canList(this.authUser)) {
+        if (ContactModel.canList(this.authUser)) {
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
-                    'LNG_PAGE_LIST_CASES_TITLE',
-                    '/cases'
+                    'LNG_PAGE_LIST_CONTACTS_TITLE',
+                    '/contacts'
                 )
             );
         }
@@ -138,7 +138,7 @@ export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
         // import breadcrumb
         this.breadcrumbs.push(
             new BreadcrumbItemModel(
-                'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE',
+                'LNG_PAGE_IMPORT_CONTACT_LAB_DATA_TITLE',
                 '.',
                 true
             )
@@ -153,7 +153,7 @@ export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
             this.router.navigate(['/lab-results']);
         } else {
             // fallback
-            this.redirectService.to(['/import-export-data/case-lab-data/import']);
+            this.redirectService.to(['/import-export-data/contact-lab-data/import']);
         }
     }
 }

@@ -24,6 +24,7 @@ export class OutbreakTemplateModel
     caseInvestigationTemplate: QuestionModel[];
     contactFollowUpTemplate: QuestionModel[];
     labResultsTemplate: QuestionModel[];
+    isContactLabResultsActive: boolean;
 
     /**
      * Static Permissions - IPermissionBasic
@@ -61,6 +62,7 @@ export class OutbreakTemplateModel
         this.noLessContacts = _.get(data, 'noLessContacts');
         this.noDaysNewContacts = _.get(data, 'noDaysNewContacts', 1);
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
+        this.isContactLabResultsActive = _.get(data, 'isContactLabResultsActive', false);
         this.caseInvestigationTemplate = _.map(
             _.get(data, 'caseInvestigationTemplate', []),
             (lData: any) => {

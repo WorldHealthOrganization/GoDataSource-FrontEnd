@@ -10,12 +10,15 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ContactChronology } from './typings/contact-chronology';
-import { forkJoin } from 'rxjs/index';
+import { forkJoin, of } from 'rxjs/index';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { EntityType } from '../../../../core/models/entity-type';
+import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 
 @Component({
     selector: 'app-view-chronology-contact',
@@ -43,7 +46,8 @@ export class ViewChronologyContactComponent implements OnInit {
         private followUpsDataService: FollowUpsDataService,
         private relationshipDataService: RelationshipDataService,
         private i18nService: I18nService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private labResultDataService: LabResultDataService
     ) {}
 
     /**
@@ -88,10 +92,32 @@ export class ViewChronologyContactComponent implements OnInit {
                                         qqb
                                     ),
                                 this.followUpsDataService
-                                    .getFollowUpsList(selectedOutbreak.id, qb)
-                            ).subscribe(([relationshipsData, followUps]: [RelationshipModel[], FollowUpModel[]]) => {
+                                    .getFollowUpsList(selectedOutbreak.id, qb),
+                                !selectedOutbreak.isContactLabResultsActive ?
+                                        of<LabResultModel[]>([]) :
+                                        this.labResultDataService
+                                            .getEntityLabResults(
+                                                selectedOutbreak.id,
+                                                EntityModel.getLinkForEntityType(EntityType.CONTACT),
+                                                this.contactData.id
+                                            )
+                            ).subscribe(([
+                                relationshipsData,
+                                followUps,
+                                labResults
+                            ]: [
+                                RelationshipModel[],
+                                FollowUpModel[],
+                                LabResultModel[]
+                            ]) => {
                                 // set data
-                                this.chronologyEntries = ContactChronology.getChronologyEntries(this.i18nService, this.contactData, followUps, relationshipsData);
+                                this.chronologyEntries = ContactChronology.getChronologyEntries(
+                                    this.i18nService,
+                                    this.contactData,
+                                    followUps,
+                                    relationshipsData,
+                                    labResults
+                                );
                             });
 
                         });

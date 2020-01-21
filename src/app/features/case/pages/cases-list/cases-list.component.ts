@@ -74,6 +74,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     yesNoOptionsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
     outcomeList$: Observable<any[]>;
+    pregnancyStatsList$: Observable<any[]>;
+
+    // vaccines
+    vaccineList$: Observable<any[]>;
+    vaccineStatusList$: Observable<any[]>;
+
     clustersListAsLabelValuePair$: Observable<LabelValuePair[]>;
     caseRiskLevelsList$: Observable<any[]>;
     yesNoOptionsWithoutAllList$: Observable<any[]>;
@@ -336,11 +342,12 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS',
                     click: (item: CaseModel) => {
-                        this.router.navigate(['/cases', item.id, 'lab-results']);
+                        this.router.navigate(['/lab-results', 'cases', item.id]);
                     },
                     visible: (item: CaseModel): boolean => {
                         return !item.deleted &&
-                            LabResultModel.canList(this.authUser);
+                            LabResultModel.canList(this.authUser) &&
+                            CaseModel.canListLabResult(this.authUser);
                     }
                 }),
 
@@ -500,6 +507,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+        this.pregnancyStatsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
+        this.vaccineList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES);
+        this.vaccineStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.VACCINES_STATUS);
 
         // init side filters
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
@@ -819,6 +829,29 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
                 type: FilterType.QUESTIONNAIRE_ANSWERS,
                 questionnaireTemplate: this.selectedOutbreak.caseInvestigationTemplate
+            }),
+            new FilterModel({
+                fieldName: 'pregnancyStatus',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+                type: FilterType.MULTISELECT,
+                options$: this.pregnancyStatsList$
+            }),
+            new FilterModel({
+                fieldName: 'vaccinesReceived.vaccine',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE',
+                type: FilterType.MULTISELECT,
+                options$: this.vaccineList$
+            }),
+            new FilterModel({
+                fieldName: 'vaccinesReceived.status',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE_STATUS',
+                type: FilterType.MULTISELECT,
+                options$: this.vaccineStatusList$
+            }),
+            new FilterModel({
+                fieldName: 'vaccinesReceived.date',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE',
+                type: FilterType.RANGE_DATE
             })
         ];
     }

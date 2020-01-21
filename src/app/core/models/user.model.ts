@@ -272,6 +272,24 @@ export class UserModel
      * Check if user has specific permissions
      */
     hasPermissions(...permissionIds: (PERMISSION | PermissionExpression)[]): boolean {
+        // do we have anything to check ?
+        if (permissionIds.length < 1) {
+            return true;
+        }
+
+        // just one, then there is no point to loop
+        // optimization ?
+        if (permissionIds.length === 1) {
+            // expression ?
+            const permission = permissionIds[0];
+            if (permission instanceof PermissionExpression) {
+                return permission.allowed(this);
+            }
+
+            // simple permissions
+            return this.permissionIdsMapped[permission as PERMISSION];
+        }
+
         // check if all permissions are in our list allowed permissions
         for (const permission of permissionIds) {
             if (

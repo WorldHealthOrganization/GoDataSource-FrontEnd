@@ -18,7 +18,7 @@ import {
     IPermissionImportable,
     IPermissionMovement,
     IPermissionRelatedContact,
-    IPermissionRelatedContactBulk,
+    IPermissionRelatedContactBulk, IPermissionRelatedLabResult,
     IPermissionRelatedRelationship,
     IPermissionRestorable
 } from './permission.interface';
@@ -38,7 +38,8 @@ export class CaseModel
         IPermissionRelatedContactBulk,
         IPermissionMovement,
         IPermissionChronology,
-        IPermissionCase {
+        IPermissionCase,
+        IPermissionRelatedLabResult {
     id: string;
     firstName: string;
     middleName: string;
@@ -199,6 +200,17 @@ export class CaseModel
     static canListIsolatedCases(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LIST_ISOLATED_CASES) : false); }
 
     /**
+     * Static Permissions - IPermissionRelatedLabResult
+     */
+    static canViewLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_VIEW_LAB_RESULT) : false); }
+    static canListLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LIST_LAB_RESULT) : false); }
+    static canCreateLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_CREATE_LAB_RESULT) : false); }
+    static canModifyLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_MODIFY_LAB_RESULT) : false); }
+    static canDeleteLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_DELETE_LAB_RESULT) : false); }
+    static canRestoreLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_RESTORE_LAB_RESULT) : false); }
+    static canImportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_IMPORT_LAB_RESULT) : false); }
+
+    /**
      * Constructor
      */
     constructor(data = null) {
@@ -357,6 +369,17 @@ export class CaseModel
     canListLongPeriodBetweenOnsetDatesReport(user: UserModel): boolean { return CaseModel.canListLongPeriodBetweenOnsetDatesReport(user); }
     canExportDossier(user: UserModel): boolean { return CaseModel.canExportDossier(user); }
     canListIsolatedCases(user: UserModel): boolean { return CaseModel.canListIsolatedCases(user); }
+
+    /**
+     * Permissions - IPermissionRelatedLabResult
+     */
+    canViewLabResult(user: UserModel): boolean { return CaseModel.canViewLabResult(user); }
+    canListLabResult(user: UserModel): boolean { return CaseModel.canListLabResult(user); }
+    canCreateLabResult(user: UserModel): boolean { return CaseModel.canCreateLabResult(user); }
+    canModifyLabResult(user: UserModel): boolean { return CaseModel.canModifyLabResult(user); }
+    canDeleteLabResult(user: UserModel): boolean { return CaseModel.canDeleteLabResult(user); }
+    canRestoreLabResult(user: UserModel): boolean { return CaseModel.canRestoreLabResult(user); }
+    canImportLabResult(user: UserModel): boolean { return CaseModel.canImportLabResult(user); }
 
     /**
      * Case Name

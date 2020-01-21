@@ -65,6 +65,8 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
     outbreakId: string;
     outbreak: OutbreakModel;
 
+    dashletZoomRanges: [number, number];
+
     // subscribers
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
@@ -198,6 +200,13 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
             }
 
         });
+
+        // construct the milestones
+        const maxMilestone = chartData[followedUpTranslated].length;
+        const firstMilestone = maxMilestone - this.outbreak.periodOfFollowup;
+
+        // setup zoom ranges based on milestones
+        this.dashletZoomRanges = [firstMilestone, maxMilestone];
 
         this.lineData = percentageTranslated;
         // finish

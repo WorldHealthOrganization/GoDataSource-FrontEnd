@@ -119,6 +119,20 @@
                                 [disabled]="viewOnly">
                             </app-form-input>
                         </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-slide-toggle
+                                name="isContactLabResultsActive"
+                                [(ngModel)]="outbreakTemplate.isContactLabResultsActive"
+                                [label]="'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_LAB_RESULTS_ACTIVE' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_LAB_RESULTS_ACTIVE_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
                     </div>
                 </mat-card>
             </mat-tab>

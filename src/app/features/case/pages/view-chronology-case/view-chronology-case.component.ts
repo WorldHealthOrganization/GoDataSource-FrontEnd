@@ -11,11 +11,12 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { CaseChronology } from './typings/case-chronology';
 import { forkJoin } from 'rxjs/index';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-view-chronology-case',
@@ -80,10 +81,26 @@ export class ViewChronologyCaseComponent implements OnInit {
                                         qb
                                     ),
                                 // lab sample taken and lab result dates
-                                this.labResultDataService.getCaseLabResults(selectedOutbreak.id, this.caseData.id)
-                            ).subscribe(([relationshipData, labResults]: [RelationshipModel[], LabResultModel[]]) => {
+                                this.labResultDataService
+                                    .getEntityLabResults(
+                                        selectedOutbreak.id,
+                                        EntityModel.getLinkForEntityType(EntityType.CASE),
+                                        this.caseData.id
+                                    )
+                            ).subscribe(([
+                                relationshipData,
+                                labResults
+                            ]: [
+                                RelationshipModel[],
+                                LabResultModel[]
+                            ]) => {
                                 // set data
-                                this.chronologyEntries = CaseChronology.getChronologyEntries(this.i18nService, this.caseData, labResults, relationshipData);
+                                this.chronologyEntries = CaseChronology.getChronologyEntries(
+                                    this.i18nService,
+                                    this.caseData,
+                                    labResults,
+                                    relationshipData
+                                );
                             });
                         });
                 });

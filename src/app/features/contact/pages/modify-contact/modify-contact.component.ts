@@ -31,6 +31,7 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { CaseModel } from '../../../../core/models/case.model';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
 
 @Component({
     selector: 'app-modify-contact',
@@ -49,6 +50,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     ContactModel = ContactModel;
     FollowUpModel = FollowUpModel;
     RelationshipModel = RelationshipModel;
+    LabResultModel = LabResultModel;
 
     contactId: string;
     selectedOutbreak: OutbreakModel;

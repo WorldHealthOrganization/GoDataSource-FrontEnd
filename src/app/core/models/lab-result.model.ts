@@ -16,9 +16,6 @@ export class LabResultModel
         IPermissionBasic,
         IPermissionRestorable,
         IPermissionImportable {
-    entity: CaseModel | ContactModel;
-    case: CaseModel;
-
     id: string;
     sampleIdentifier: string;
     dateSampleTaken: string;
@@ -36,26 +33,28 @@ export class LabResultModel
         [variable: string]: IAnswerData[];
     };
     personId: string;
+    personType: EntityType;
+    person: CaseModel | ContactModel;
     testedFor: string;
 
     /**
      * Static Permissions - IPermissionBasic
      */
-    static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LAB_RESULT_VIEW) : false); }
-    static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LAB_RESULT_LIST) : false); }
-    static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LAB_RESULT_CREATE) : false); }
-    static canModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LAB_RESULT_VIEW, PERMISSION.CASE_LAB_RESULT_MODIFY) : false); }
-    static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LAB_RESULT_DELETE) : false); }
+    static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_VIEW) : false); }
+    static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_LIST) : false); }
+    static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_CREATE) : false); }
+    static canModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_VIEW, PERMISSION.LAB_RESULT_MODIFY) : false); }
+    static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_DELETE) : false); }
 
     /**
      * Static Permissions - IPermissionRestorable
      */
-    static canRestore(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CASE_LAB_RESULT_RESTORE) : false; }
+    static canRestore(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.LAB_RESULT_RESTORE) : false; }
 
     /**
      * Static Permissions - IPermissionImportable
      */
-    static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LAB_RESULT_IMPORT) : false); }
+    static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_IMPORT) : false); }
 
     /**
      * Constructor
@@ -63,14 +62,11 @@ export class LabResultModel
     constructor(data = null) {
         super(data);
 
-        this.entity = _.get(data, 'case');
-        this.entity = this.entity && this.entity.type === EntityType.CONTACT ?
-            new ContactModel(this.entity) :
-            new CaseModel(this.entity);
-
-        this.case = _.get(data, 'case');
-        if (!_.isEmpty(this.case)) {
-            this.case = new CaseModel(this.case);
+        this.person = _.get(data, 'person');
+        if (!_.isEmpty(this.person)) {
+            this.person = this.person.type === EntityType.CONTACT ?
+                new ContactModel(this.person) :
+                new CaseModel(this.person);
         }
 
         this.id = _.get(data, 'id');
@@ -87,6 +83,7 @@ export class LabResultModel
         this.status = _.get(data, 'status', Constants.PROGRESS_OPTIONS.IN_PROGRESS.value);
         this.quantitativeResult = _.get(data, 'quantitativeResult');
         this.personId = _.get(data, 'personId');
+        this.personType = _.get(data, 'personType');
         this.testedFor = _.get(data, 'testedFor');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
