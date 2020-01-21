@@ -150,9 +150,12 @@ export class RequestFilter {
         if (_.isEmpty(value)) {
             this.remove(property);
         } else {
+            // build number pattern
+            const numberPattern = !_.isEmpty(value) ? this.getPhoneNumberPattern(value) : '';
+
             this.where({
                 [property]: {
-                    regex: value
+                    regex: numberPattern
                 }
             }, replace);
         }
@@ -683,5 +686,32 @@ export class RequestFilter {
             returnCondition = condition;
         }
         return stringified ? JSON.stringify(returnCondition) : returnCondition;
+    }
+
+    /**
+     * Construct phone regex pattern used by queries
+     * @param phoneNumber
+     */
+    getPhoneNumberPattern(
+        phoneNumber: string
+    ): string {
+        // nothing provided ?
+        if (!phoneNumber) {
+            return null;
+        }
+
+        // construct search pattern
+        const digits: string[] = phoneNumber.match(/[0-9]/g);
+        if (
+            !digits ||
+            digits.length < 1
+        ) {
+            return null;
+        }
+
+        // construct search pattern
+        return '[^0-9]*' + digits.map((digit: string) => {
+            return digit + '[^0-9]*';
+        }).join('');
     }
 }

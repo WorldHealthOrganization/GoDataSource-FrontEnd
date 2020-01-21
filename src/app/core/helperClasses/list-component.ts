@@ -448,12 +448,9 @@ export abstract class ListComponent implements OnDestroy {
         property: string,
         value: string
     ) {
-        // build number pattern
-        const numberPattern = !_.isEmpty(value) ? AddressModel.getPhoneNumberPattern(value) : '';
-
         this.queryBuilder.filter.byPhoneNumber(
             property as string,
-            numberPattern
+            value
         );
 
         // refresh list
