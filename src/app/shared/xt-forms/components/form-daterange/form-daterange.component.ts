@@ -57,6 +57,7 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
     private _startDateVisible: boolean = true;
     @Input() set startDateVisible(value: boolean) {
         this._startDateVisible = value;
+        this.updateDateSameOrAfter();
         if (!this._startDateVisible) {
             this.dateRange.startDate = null;
         }
@@ -69,6 +70,8 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
     private _endDateVisible: boolean = true;
     @Input() set endDateVisible(value: boolean) {
         this._endDateVisible = value;
+        // update dates
+        this.updateDateSameOrBefore();
         if (!this._endDateVisible) {
             this.dateRange.endDate = null;
         }
@@ -132,7 +135,7 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
         this.dateSameOrBefore = [];
         // if end date is visible
         if (this.endDateVisible) {
-            this.dateSameOrBefore.push(name + '[endDate]');
+            this.dateSameOrBefore.push(this.name + '[endDate]');
         }
 
         // if we have max date
