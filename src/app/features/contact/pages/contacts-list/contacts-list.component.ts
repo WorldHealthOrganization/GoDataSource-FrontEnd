@@ -1174,7 +1174,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      * @param {boolean} value
      */
     filterByWasCaseField(value: boolean | null | undefined) {
-        console.log(value);
         if (value === false) {
             this.queryBuilder.filter.where({
                 'wasCase': {
