@@ -24,8 +24,32 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
     @Input() fromTooltip: string;
     @Input() toTooltip: string;
 
-    @Input() minDate: Moment;
-    @Input() maxDate: Moment;
+    dateSameOrAfter: any[];
+    dateSameOrBefore: any[];
+
+    // min date
+    private _minDate: Moment;
+    @Input() set minDate(value: Moment) {
+        this._minDate = value;
+        // update dates
+        this.updateDateSameOrAfter();
+    }
+
+    get minDate(): Moment {
+        return this._minDate;
+    }
+
+    // max date
+    private _maxDate: Moment;
+    @Input() set maxDate(value: Moment) {
+        this._maxDate = value;
+        // update dates
+        this.updateDateSameOrBefore();
+    }
+
+    get maxDate(): Moment {
+        return this._maxDate;
+    }
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
@@ -87,41 +111,34 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
 
     /**
      * Return dates for dateSameOrAfter directive
-     * @returns {Array}
      */
-    getDateSameOrAfter(name: string) {
-        const dates = [];
+    private updateDateSameOrAfter() {
+        this.dateSameOrAfter = [];
         // if start date is visible
         if (this.startDateVisible) {
-            dates.push(name + '[startDate]');
+            this.dateSameOrAfter.push(this.name + '[startDate]');
         }
 
         // case we have min date
         if (this.minDate) {
-            dates.push(this.minDate);
+            this.dateSameOrAfter.push(this.minDate);
         }
-
-        return dates;
     }
 
     /**
      * Return dates for dateSameOrBefore
-     * @param {string} name
-     * @returns {Array}
      */
-    getDateSameOrBefore(name: string) {
-        const dates = [];
+    private updateDateSameOrBefore() {
+        this.dateSameOrBefore = [];
         // if end date is visible
         if (this.endDateVisible) {
-            dates.push(name + '[endDate]');
+            this.dateSameOrBefore.push(name + '[endDate]');
         }
 
         // if we have max date
         if (this.maxDate) {
-            dates.push(this.maxDate);
+            this.dateSameOrBefore.push(this.maxDate);
         }
-
-        return dates;
     }
 
     /**
