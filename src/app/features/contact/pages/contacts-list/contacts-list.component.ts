@@ -700,9 +700,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             new FilterModel({
                 fieldName: 'vaccinesReceived.date',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VACCINE_DATE',
-                type: FilterType.RANGE_DATE,
-            }),
-
+                type: FilterType.RANGE_DATE
+            })
         ];
 
         // Relation - Follow-up
