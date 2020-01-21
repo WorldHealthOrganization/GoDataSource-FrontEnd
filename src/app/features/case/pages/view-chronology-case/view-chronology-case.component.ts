@@ -81,10 +81,26 @@ export class ViewChronologyCaseComponent implements OnInit {
                                         qb
                                     ),
                                 // lab sample taken and lab result dates
-                                this.labResultDataService.getEntityLabResults(selectedOutbreak.id, EntityModel.getLinkForEntityType(EntityType.CASE), this.caseData.id)
-                            ).subscribe(([relationshipData, labResults]: [RelationshipModel[], LabResultModel[]]) => {
+                                this.labResultDataService
+                                    .getEntityLabResults(
+                                        selectedOutbreak.id,
+                                        EntityModel.getLinkForEntityType(EntityType.CASE),
+                                        this.caseData.id
+                                    )
+                            ).subscribe(([
+                                relationshipData,
+                                labResults
+                            ]: [
+                                RelationshipModel[],
+                                LabResultModel[]
+                            ]) => {
                                 // set data
-                                this.chronologyEntries = CaseChronology.getChronologyEntries(this.i18nService, this.caseData, labResults, relationshipData);
+                                this.chronologyEntries = CaseChronology.getChronologyEntries(
+                                    this.i18nService,
+                                    this.caseData,
+                                    labResults,
+                                    relationshipData
+                                );
                             });
                         });
                 });
