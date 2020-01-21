@@ -579,10 +579,11 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterBySelectField('wasCase',$event)"
+                            (optionChanged)="filterByWasCaseField($event.value)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
                         </app-form-select>
                     </div>
                 </div>
