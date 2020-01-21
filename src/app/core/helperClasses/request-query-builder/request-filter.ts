@@ -26,6 +26,33 @@ export class RequestFilter {
     }
 
     /**
+     * Construct phone regex pattern used by queries
+     * @param phoneNumber
+     */
+    static getPhoneNumberPattern(
+        phoneNumber: string
+    ): string {
+        // nothing provided ?
+        if (!phoneNumber) {
+            return null;
+        }
+
+        // construct search pattern
+        const digits: string[] = phoneNumber.match(/[0-9]/g);
+        if (
+            !digits ||
+            digits.length < 1
+        ) {
+            return null;
+        }
+
+        // construct search pattern
+        return '[^0-9]*' + digits.map((digit: string) => {
+            return digit + '[^0-9]*';
+        }).join('');
+    }
+
+    /**
      * Set flag
      * @param property
      * @param value
@@ -151,7 +178,7 @@ export class RequestFilter {
             this.remove(property);
         } else {
             // build number pattern
-            const numberPattern = !_.isEmpty(value) ? this.getPhoneNumberPattern(value) : '';
+            const numberPattern = !_.isEmpty(value) ? RequestFilter.getPhoneNumberPattern(value) : '';
 
             this.where({
                 [property]: {
@@ -686,32 +713,5 @@ export class RequestFilter {
             returnCondition = condition;
         }
         return stringified ? JSON.stringify(returnCondition) : returnCondition;
-    }
-
-    /**
-     * Construct phone regex pattern used by queries
-     * @param phoneNumber
-     */
-    getPhoneNumberPattern(
-        phoneNumber: string
-    ): string {
-        // nothing provided ?
-        if (!phoneNumber) {
-            return null;
-        }
-
-        // construct search pattern
-        const digits: string[] = phoneNumber.match(/[0-9]/g);
-        if (
-            !digits ||
-            digits.length < 1
-        ) {
-            return null;
-        }
-
-        // construct search pattern
-        return '[^0-9]*' + digits.map((digit: string) => {
-            return digit + '[^0-9]*';
-        }).join('');
     }
 }
