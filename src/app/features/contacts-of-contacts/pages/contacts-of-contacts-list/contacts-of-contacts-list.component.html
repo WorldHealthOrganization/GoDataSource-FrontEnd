@@ -41,10 +41,10 @@
                     </app-export-button>
 
                     <button
-                        *ngIf="hasContactOfContactWriteAccess()"
                         mat-menu-item
                         [routerLink]="['/import-export-data', 'contact-data', 'import']">
                         {{'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON' | translate}}
+                        <!--*ngIf="hasContactOfContactWriteAccess()"-->
                     </button>
 
                     <mat-divider></mat-divider>
@@ -198,8 +198,8 @@
                                 {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_RELATIONSHIPS' | translate }}
                             </button>
 
-                            <ng-container
-                                *ngIf="hasContactOfContactWriteAccess()">
+                            <ng-container>
+                                <!--*ngIf="hasContactOfContactWriteAccess()"-->
                                 <ng-container
                                     *app-selected-outbreak-is-active>
                                     <mat-divider></mat-divider>

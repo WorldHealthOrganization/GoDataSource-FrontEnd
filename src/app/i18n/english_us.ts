@@ -114,6 +114,8 @@ export const EnglishUsLang = {
         'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_EXPOSURE': 'Exposure Date ( {{exposureName}} )',
         'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS': 'Vaccines received',
         'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION': '',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS': 'Number of contacts',
+        'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES': 'Number of exposures',
 
         /**
          * uiContactsOfContactsListPage

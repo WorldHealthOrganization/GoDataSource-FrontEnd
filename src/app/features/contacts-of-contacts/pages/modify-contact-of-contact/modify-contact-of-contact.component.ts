@@ -14,15 +14,12 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import * as _ from 'lodash';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { catchError } from 'rxjs/internal/operators';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -101,14 +98,12 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
 
         this.route.params
             .subscribe((params: {contactOfContactId}) => {
-            console.log(params);
                 this.contactOfContactId = params.contactOfContactId;
 
                 // get current outbreak
                 this.outbreakDataService
                     .getSelectedOutbreak()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
-                        console.log(`params`);
                         this.selectedOutbreak = selectedOutbreak;
                         if (!_.isEmpty(this.selectedOutbreak.contactIdMask)) {
                             this.displayRefresh = true;
@@ -131,11 +126,9 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
             this.selectedOutbreak.id &&
             this.contactOfContactId
         ) {
-            console.log(`params`);
             this.contactsOfContactsDataService
                 .getContact(this.selectedOutbreak.id, this.contactOfContactId, true)
                 .subscribe(contactDataReturned => {
-                    console.log(contactDataReturned);
                     this.contactData = new ContactModel(contactDataReturned);
 
                     // set visual ID translate data
