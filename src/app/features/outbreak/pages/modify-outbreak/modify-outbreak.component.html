@@ -325,6 +325,15 @@
             {{ 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE' | translate }}
         </button>
 
+        <!--to change in contact-->
+        <button
+            *ngIf="OutbreakModel.canModifyContactQuestionnaire(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/outbreaks', outbreakId, 'contact-questionnaire']">
+            {{ 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE' | translate }}
+        </button>
+
         <button
             *ngIf="OutbreakModel.canModifyContactFollowUpQuestionnaire(authUser)"
             mat-raised-button

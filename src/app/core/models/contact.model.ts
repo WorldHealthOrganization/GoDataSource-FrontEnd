@@ -23,6 +23,7 @@ import {
     IPermissionRelatedRelationship,
     IPermissionRestorable
 } from './permission.interface';
+import { IAnswerData } from './question.model';
 
 export interface IFollowUpHistory {
     startDate: string;
@@ -80,6 +81,10 @@ export class ContactModel
 
     vaccinesReceived: VaccineModel[];
     pregnancyStatus: string;
+
+    questionnaireAnswers: {
+        [variable: string]: IAnswerData[];
+    };
 
     inconsistencies: InconsistencyModel[];
     relationship: any;
@@ -225,6 +230,8 @@ export class ContactModel
             return new VaccineModel(vaccineData);
         });
         this.pregnancyStatus = _.get(data, 'pregnancyStatus');
+
+        this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
 
         this.riskLevel = _.get(data, 'riskLevel');
         this.riskReason = _.get(data, 'riskReason');

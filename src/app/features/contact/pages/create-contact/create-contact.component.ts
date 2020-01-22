@@ -44,8 +44,8 @@ export class CreateContactComponent
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // selected outbreak ID
-    outbreakId: string;
+    // selected outbreak
+    selectedOutbreak: OutbreakModel = new OutbreakModel();
 
     contactData: ContactModel = new ContactModel();
 
@@ -149,7 +149,7 @@ export class CreateContactComponent
                         })
                     )
                     .subscribe((selectedOutbreak: OutbreakModel) => {
-                        this.outbreakId = selectedOutbreak.id;
+                        this.selectedOutbreak = selectedOutbreak;
 
                         // set visual ID translate data
                         this.visualIDTranslateData = {
@@ -283,7 +283,7 @@ export class CreateContactComponent
             // check for duplicates
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.contactDataService
-                .findDuplicates(this.outbreakId, dirtyFields)
+                .findDuplicates(this.selectedOutbreak.id, dirtyFields)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
@@ -299,7 +299,7 @@ export class CreateContactComponent
                     const runCreateContact = () => {
                         // add the new Contact
                         this.contactDataService
-                            .createContact(this.outbreakId, dirtyFields)
+                            .createContact(this.selectedOutbreak.id, dirtyFields)
                             .pipe(
                                 catchError((err) => {
                                     this.snackbarService.showApiError(err);
@@ -313,7 +313,7 @@ export class CreateContactComponent
                             .subscribe((contactData: ContactModel) => {
                                 this.relationshipDataService
                                     .createRelationship(
-                                        this.outbreakId,
+                                        this.selectedOutbreak.id,
                                         EntityType.CONTACT,
                                         contactData.id,
                                         relationship
@@ -325,7 +325,7 @@ export class CreateContactComponent
 
                                             // remove contact
                                             this.contactDataService
-                                                .deleteContact(this.outbreakId, contactData.id)
+                                                .deleteContact(this.selectedOutbreak.id, contactData.id)
                                                 .subscribe();
 
                                             // hide dialog

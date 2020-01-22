@@ -201,6 +201,27 @@
             </form>
         </mat-step>
 
+        <!--to change to contact-->
+        <!-- Questionnaire step -->
+        <mat-step [stepControl]="questionnaireForm">
+            <form #questionnaireForm="ngForm">
+                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_CONTACT_TAB_QUESTIONNAIRE_TITLE' | translate }}</ng-template>
+
+                <!-- Questionnaire section -->
+                <app-form-fill-questionnaire
+                    name="questionnaireAnswers"
+                    [ngModel]="contactData.questionnaireAnswers"
+                    [questions]="selectedOutbreak.caseInvestigationTemplate">
+                </app-form-fill-questionnaire>
+
+                <div class="stepper-navigation-buttons">
+                    <button matStepperPrevious mat-raised-button type="button">{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
+                </div>
+            </form>
+        </mat-step>
+
+
         <!-- Relationship step -->
         <mat-step [stepControl]="relationshipForm">
             <form #relationshipForm="ngForm">
