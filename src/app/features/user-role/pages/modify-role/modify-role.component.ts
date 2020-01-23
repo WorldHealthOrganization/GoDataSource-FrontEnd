@@ -25,6 +25,7 @@ import { UserRoleHelper } from '../../../../core/helperClasses/user-role.helper'
     styleUrls: ['./modify-role.component.less']
 })
 export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // constants
