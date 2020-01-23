@@ -17,8 +17,13 @@ export const EnglishUsLang = {
          * Request change translation to an existing token
          * (Should be "telephone number" since we can add only one phone number at this time)
          */
-        'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS': 'Telephone Number'
+        'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS': 'Telephone Number',
 
+        /**
+         * uiOutbreakQuestionnaireTemplates
+         */
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_NESTED_QUESTIONS': 'Nested questions',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_NESTED_QUESTIONS': 'Nested questions',
 
         /**
          * REMOVE the tokens from below
