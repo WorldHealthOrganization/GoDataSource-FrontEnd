@@ -17,7 +17,12 @@ export const EnglishUsLang = {
          * Request change translation to an existing token
          * (Should be "telephone number" since we can add only one phone number at this time)
          */
-        'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS': 'Telephone Number'
+        'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS': 'Telephone Number',
+
+        /**
+         * uiChainsOfTransmissionGraph
+         */
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_FULL_SCREEN_LABEL': 'Full screen'
 
 
         /**
