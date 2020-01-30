@@ -2,6 +2,30 @@ app-world-map {
     display: flex;
     flex-direction: column;
 
+    .full-screen-map {
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: white;
+        width: 100vw !important;
+        height: 100vh !important;
+    }
+
+    .toggle-full-screen {
+        position: absolute;
+        right: 0;
+        margin-right: 20px;
+        z-index: 999;
+    }
+
+    .full-screen-toggle-item {
+        position: fixed;
+        top: 0;
+        right: 0;
+        margin-right: 20px;
+        z-index: 999;
+    }
+
     .app-world-map-disclaimer {
         margin-bottom: 30px;
 

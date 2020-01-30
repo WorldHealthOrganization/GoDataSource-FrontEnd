@@ -22,8 +22,12 @@ export const EnglishUsLang = {
         /**
          * uiChainsOfTransmissionGraph
          */
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_FULL_SCREEN_LABEL': 'Full screen'
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_FULL_SCREEN_LABEL': 'Full screen',
 
+        /**
+         * uiWorldMap
+         */
+        'LNG_PAGE_WORLD_MAP_FULL_SCREEN_LABEL': 'Full screen'
 
         /**
          * REMOVE the tokens from below

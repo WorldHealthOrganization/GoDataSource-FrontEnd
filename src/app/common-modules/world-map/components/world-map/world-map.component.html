@@ -1,5 +1,17 @@
+<!--Full screen map-->
+<div>
+    <app-form-slide-toggle
+        [ngClass]="{'full-screen-toggle-item': fullScreenMode, 'toggle-full-screen': !fullScreenMode}"
+        [(ngModel)]="fullScreenMode"
+        [label]="'LNG_PAGE_WORLD_MAP_FULL_SCREEN_LABEL' | translate"
+        (optionChanged)="refreshMap()">
+    </app-form-slide-toggle>
+
+</div>
+
 <!-- Draw map -->
 <div
+    [ngClass]="{'full-screen-map' : fullScreenMode}"
     *ngIf="!displayLoading && layers.length > 0"
     id="worldMap"
     [style.width]="width"
@@ -17,7 +29,7 @@
 
 <!-- Disclaimer -->
 <div
-    *ngIf="displayDisclaimer"
+    *ngIf="displayDisclaimer && !fullScreenMode"
     fxLayout="column"
     class="app-world-map-disclaimer">
     <!-- Show / Hide Disclaimer -->

@@ -405,6 +405,8 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      */
     @Input() groupPathTitle: string;
 
+    fullScreenMode: boolean = false;
+
     /**
      * Constructor
      */
@@ -1015,6 +1017,10 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             // finished update
             this.clusterUpdatePending = null;
         }, 50);
+    }
+
+    refreshMap() {
+        this.updateMapSizeOnWindowResize();
     }
 
     /**
