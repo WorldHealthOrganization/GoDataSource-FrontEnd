@@ -125,7 +125,6 @@
     <div
         *ngIf="!showLoading && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)"
         class="graph-actions" fxLayout="row" fxLayoutGap="30px">
-
         <!-- Toggle Edit mode -->
         <app-form-slide-toggle
             *ngIf="isEditModeAvailable()"
@@ -149,7 +148,6 @@
             [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LEGEND_LABEL' | translate"
             [(ngModel)]="showLegend">
         </app-form-slide-toggle>
-
     </div>
 
     <div
