@@ -12,6 +12,37 @@
             <div fxLayout="row" fxLayoutGap="20px">
                 <div fxFlex fxLayout="row" fxLayoutGap="5px">
                     <app-form-datepicker
+                        [name]="name + '[dateOfFirstContact]'"
+                        [(ngModel)]="relationship.dateOfFirstContact"
+                        [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT' | translate"
+                        tooltip="LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT_DESCRIPTION"
+                        [disabled]="disabled"
+                        [required]="required"
+                        (optionChanged)="onChange()"
+                        [maxDate]="currentDate"
+                        app-date-validator
+                        [dateSameOrBefore]="currentDate"
+                        [dateSameOrAfter]="minimumDate"
+                        [minDate]="minimumDate">
+                    </app-form-datepicker>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('contactDate')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-datepicker
                         [name]="name + '[contactDate]'"
                         [(ngModel)]="relationship.contactDate"
                         [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE' | translate"
@@ -79,6 +110,9 @@
                     </div>
                 </div>
 
+            </div>
+
+            <div fxLayout="row" fxLayoutGap="20px">
                 <div fxFlex fxLayout="row" fxLayoutGap="5px">
                     <app-form-select
                         [name]="name + '[exposureTypeId]'"
@@ -107,9 +141,7 @@
                         </button>
                     </div>
                 </div>
-            </div>
 
-            <div fxLayout="row" fxLayoutGap="20px">
                 <div fxFlex fxLayout="row" fxLayoutGap="5px">
                     <app-form-select
                         [name]="name + '[exposureFrequencyId]'"
@@ -196,34 +228,6 @@
                         </button>
                     </div>
                 </div>
-
-                <div fxFlex fxLayout="row" fxLayoutGap="5px">
-                    <app-form-input
-                        [name]="name + '[socialRelationshipDetail]'"
-                        [(ngModel)]="relationship.socialRelationshipDetail"
-                        [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP' | translate"
-                        tooltip="LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION"
-                        [disabled]="disabled"
-                        optionLabelKey="label"
-                        optionValueKey="value"
-                        required="false"
-                        (optionChanged)="onChange()">
-                    </app-form-input>
-                    <div
-                        *ngIf="displayCopyField"
-                        fxFlex="40px"
-                        fxLayout="column"
-                        fxLayoutAlign="center">
-                        <button
-                            class="copy-field-button"
-                            type="button"
-                            mat-icon-button
-                            [title]="displayCopyFieldDescription"
-                            (click)="triggerCopyValue('socialRelationshipDetail')">
-                            <span class="xt-icon">fileCopy</span>
-                        </button>
-                    </div>
-                </div>
             </div>
 
             <div fxLayout="row" fxLayoutGap="20px">
@@ -256,7 +260,33 @@
                     </div>
                 </div>
 
-                <div fxFlex><!-- placeholder --></div>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-input
+                        [name]="name + '[socialRelationshipDetail]'"
+                        [(ngModel)]="relationship.socialRelationshipDetail"
+                        [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP' | translate"
+                        tooltip="LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION"
+                        [disabled]="disabled"
+                        optionLabelKey="label"
+                        optionValueKey="value"
+                        required="false"
+                        (optionChanged)="onChange()">
+                    </app-form-input>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('socialRelationshipDetail')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
 
                 <div fxFlex><!-- placeholder --></div>
 

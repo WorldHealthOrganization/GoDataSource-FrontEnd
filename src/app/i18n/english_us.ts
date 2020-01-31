@@ -22,8 +22,13 @@ export const EnglishUsLang = {
         /**
          * uiChainsOfTransmissionGraph
          */
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_FULL_SCREEN_LABEL': 'Full screen'
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_FULL_SCREEN_LABEL': 'Full screen',
 
+        /**
+         * uiRelationshipFields
+         */
+        'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT': 'Date of first contact',
+        'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT_DESCRIPTION': '',
 
         /**
          * REMOVE the tokens from below
