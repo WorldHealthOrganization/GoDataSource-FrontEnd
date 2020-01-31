@@ -20,11 +20,6 @@ export const EnglishUsLang = {
         'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS': 'Telephone Number',
 
         /**
-         * uiChainsOfTransmissionGraph
-         */
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_FULL_SCREEN_LABEL': 'Full screen',
-
-        /**
          * uiRelationshipFields
          */
         'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT': 'Date of first contact',
