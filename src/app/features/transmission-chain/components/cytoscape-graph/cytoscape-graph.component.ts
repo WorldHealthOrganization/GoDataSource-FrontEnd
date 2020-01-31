@@ -408,7 +408,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
             this.iAmFullScreen = false;
             document.getElementById('cy').style.height = '550px';
         } else {
-            // if full-screen is OF, enable the flag for further use and updated the height
+            // if full-screen is OFF, enable the flag for further use and updated the height
             this.iAmFullScreen = true;
             document.getElementById('cy').style.height = '100vh';
         }
