@@ -16,7 +16,7 @@
     </div>
 
     <!-- legend -->
-    <div [ngClass]="{'full-screen-graph-legend': fullScreen, 'graph-legend': !fullScreen}"
+    <div class="graph-legend"
          *ngIf="legend && showLegend && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)">
         <!-- node color -->
         <div *ngIf="legend.nodeColorKeys && legend.nodeColorKeys.length"
@@ -124,12 +124,11 @@
     <!-- Toggles -->
     <div
         *ngIf="!showLoading && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)"
-        fxLayout="row" fxLayoutGap="30px"
-        [ngClass]="{'full-screen-graph-actions': fullScreen, 'graph-actions': !fullScreen}">
+        class="graph-actions" fxLayout="row" fxLayoutGap="30px">
 
         <!-- Toggle Edit mode -->
         <app-form-slide-toggle
-            *ngIf="isEditModeAvailable() && !fullScreen"
+            *ngIf="isEditModeAvailable()"
             name="toggleEditMode"
             [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_EDIT_MODE_LABEL' | translate"
             [(ngModel)]="editMode"
@@ -151,20 +150,13 @@
             [(ngModel)]="showLegend">
         </app-form-slide-toggle>
 
-        <!-- Toggle full screen -->
-        <app-form-slide-toggle
-            name="toggleFullScreenMode"
-            [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_FULL_SCREEN_LABEL' | translate"
-            [(ngModel)]="fullScreen"
-            (optionChanged)="updateFullScreenViewPort()"
-        ></app-form-slide-toggle>
     </div>
 
     <div
         [fxShow]="!showLoading && transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
         <!-- zoom in / out buttons -->
         <div
-            [ngClass]="{'full-screen-cy-zoom-buttons': fullScreen, 'cy-zoom-buttons': !fullScreen}">
+            class="cy-zoom-buttons">
             <button
                 mat-raised-button
                 class="cy-zoom-button"
@@ -185,7 +177,7 @@
         <!-- cytoscape element -->
         <div
             id="cy"
-            [ngClass]="{'xt-icon full-screen ': fullScreen, 'cy xt-icon': !fullScreen}">
+            class="cy xt-icon">
         </div>
     </div>
 
@@ -251,7 +243,6 @@
         || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
         || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value)"
     mat-raised-button
-    [ngClass]="{'full-screen-bottomed-item': fullScreen}"
     (click)="switchTimelineView(timelineViewType === 'horizontal' ? 'vertical' : 'horizontal')">
     {{ ( timelineViewType === 'horizontal' ? 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL' : 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' )| translate }}
 </button>
