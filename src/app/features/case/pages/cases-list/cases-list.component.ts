@@ -1300,33 +1300,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     }
 
     /**
-     * Filter by wasContactField
-     * @param {boolean} value
-     */
-    filterByWasContactField(value: boolean | null | undefined) {
-        if (value === false) {
-            this.queryBuilder.filter.where({
-                'wasContact': {
-                    'eq': false
-                }
-            }, true);
-        } else {
-            if (value === true) {
-                this.queryBuilder.filter.where({
-                    'wasContact': {
-                        'eq': true
-                    }
-                }, true);
-            } else {
-                this.queryBuilder.filter.remove('wasContact');
-            }
-        }
-
-        // refresh list
-        this.needsRefreshList();
-    }
-
-    /**
      * Display loading dialog
      */
     showLoadingDialog() {
