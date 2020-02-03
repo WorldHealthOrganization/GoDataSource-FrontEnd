@@ -324,7 +324,10 @@
             {{ 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_FOLLOW_UPS' | translate }}
         </button>
         <button
-            *ngIf="LabResultModel.canList(authUser) && ContactModel.canListLabResult(authUser)"
+            *ngIf="
+                LabResultModel.canList(authUser) &&
+                ContactModel.canListLabResult(authUser) &&
+                selectedOutbreak.isContactLabResultsActive"
             mat-raised-button
             type="button"
             [routerLink]="['/lab-results', 'contacts', contactId]">
