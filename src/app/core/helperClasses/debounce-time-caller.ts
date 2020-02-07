@@ -1,6 +1,11 @@
 import { Constants } from '../models/constants';
 import { Subscriber } from 'rxjs';
 
+export enum DebounceTimeCallerType {
+    RESET_AND_WAIT_FOR_NEXT,
+    DONT_RESET_AND_WAIT
+}
+
 export class DebounceTimeCaller {
     // The ID value of the timer
     protected refreshTimeoutID: any = null;
@@ -8,7 +13,8 @@ export class DebounceTimeCaller {
     // initialize
     constructor(
         private subscriber: Subscriber<void>,
-        private time: number = Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS
+        private time: number = Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS,
+        private type: DebounceTimeCallerType = DebounceTimeCallerType.RESET_AND_WAIT_FOR_NEXT
     ) {}
 
     /**
@@ -39,23 +45,30 @@ export class DebounceTimeCaller {
             // call
             this.subscriber.next();
         } else {
-            // stop previous request
-            this.clearRefreshTimeout();
+            if (
+                this.type === DebounceTimeCallerType.RESET_AND_WAIT_FOR_NEXT || (
+                    this.type === DebounceTimeCallerType.DONT_RESET_AND_WAIT &&
+                    !this.refreshTimeoutID
+                )
+            ) {
+                // stop previous request
+                this.clearRefreshTimeout();
 
-            // wait for debounce time
-            // make new request
-            this.refreshTimeoutID = setTimeout(() => {
-                // no subscriber ?
-                if (!this.subscriber) {
-                    return;
-                }
+                // wait for debounce time
+                // make new request
+                this.refreshTimeoutID = setTimeout(() => {
+                    // no subscriber ?
+                    if (!this.subscriber) {
+                        return;
+                    }
 
-                // call
-                this.subscriber.next();
+                    // timeout executed - clear
+                    this.refreshTimeoutID = null;
 
-                // timeout executed - clear
-                this.refreshTimeoutID = null;
-            }, this.time);
+                    // call
+                    this.subscriber.next();
+                }, this.time);
+            }
         }
     }
 
