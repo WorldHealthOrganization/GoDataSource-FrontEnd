@@ -10,18 +10,23 @@ import { SystemSettingsVersionModel } from '../../../../core/models/system-setti
     styleUrls: ['./version.component.less']
 })
 export class VersionComponent implements OnInit {
-
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_VERSION_TITLE', '.')
     ];
 
     versionData: SystemSettingsVersionModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         private systemSettingsDataService: SystemSettingsDataService
-    ) {
-    }
+    ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         this.systemSettingsDataService
             .getAPIVersion()

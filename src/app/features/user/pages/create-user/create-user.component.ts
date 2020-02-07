@@ -20,6 +20,7 @@ import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-co
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-create-user',
@@ -69,7 +70,9 @@ export class CreateUserComponent
      */
     ngOnInit() {
         // get the list of roles to populate the dropdown in UI
-        this.rolesList$ = this.userRoleDataService.getRolesList();
+        const qb = new RequestQueryBuilder();
+        qb.sort.by('name');
+        this.rolesList$ = this.userRoleDataService.getRolesList(qb);
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
