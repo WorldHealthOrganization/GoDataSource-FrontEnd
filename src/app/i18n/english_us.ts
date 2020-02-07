@@ -20,7 +20,8 @@ export const EnglishUsLang = {
         'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS': 'Telephone Number',
 
         /**
-         *
+         * NEW GROUP
+         * uiAuthentication
          */
         'LNG_AUTHENTICATION_TOKEN_EXPIRE_DIALOG_TITLE': 'No activity detected in the last few minutes, you will be signed out if you don\'t perform any action',
         'LNG_AUTHENTICATION_TOKEN_EXPIRE_DIALOG_CONTINUE_BUTTON': 'I\'m still here...',
