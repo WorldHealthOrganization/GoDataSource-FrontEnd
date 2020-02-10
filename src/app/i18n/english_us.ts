@@ -27,6 +27,11 @@ export const EnglishUsLang = {
         'LNG_AUTHENTICATION_TOKEN_EXPIRE_DIALOG_CONTINUE_BUTTON': 'I\'m still here...',
 
 
+        /**
+         * uiRelationshipFields
+         */
+        'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT': 'Date of first contact',
+        'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT_DESCRIPTION': '',
 
         /**
          * REMOVE the tokens from below
