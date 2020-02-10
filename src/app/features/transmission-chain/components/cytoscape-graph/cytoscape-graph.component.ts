@@ -97,7 +97,9 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     showLegend: boolean = true;
     // toggle edit mode
     editMode: boolean = false;
+    // toggle full screen
     fullScreen: boolean = false;
+    // full screen tracker
     iAmFullScreen: boolean = false;
 
     // display labels

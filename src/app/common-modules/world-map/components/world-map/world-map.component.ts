@@ -407,7 +407,6 @@ export class WorldMapComponent implements OnInit, OnDestroy {
 
     /**
      * It's full screen activated?
-     * @type {boolean}
      */
     fullScreenMode: boolean = false;
 
