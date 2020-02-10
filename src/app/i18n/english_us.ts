@@ -34,6 +34,11 @@ export const EnglishUsLang = {
         'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT_DESCRIPTION': '',
 
         /**
+         * uiOutbreakQuestionnaireTemplates
+         */
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_NESTED_QUESTIONS': 'Nested questions',
+
+        /**
          * REMOVE the tokens from below
          */
         // ...
