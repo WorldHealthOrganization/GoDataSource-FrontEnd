@@ -17,7 +17,7 @@
                         [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT' | translate"
                         tooltip="LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT_DESCRIPTION"
                         [disabled]="disabled"
-                        [required]="required"
+                        [required]="false"
                         (optionChanged)="onChange()"
                         [maxDate]="currentDate"
                         app-date-validator
@@ -35,7 +35,7 @@
                             type="button"
                             mat-icon-button
                             [title]="displayCopyFieldDescription"
-                            (click)="triggerCopyValue('contactDate')">
+                            (click)="triggerCopyValue('dateOfFirstContact')">
                             <span class="xt-icon">fileCopy</span>
                         </button>
                     </div>
