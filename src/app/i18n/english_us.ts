@@ -27,7 +27,7 @@ export const EnglishUsLang = {
         /**
          * uiWorldMap
          */
-        'LNG_PAGE_WORLD_MAP_FULL_SCREEN_LABEL': 'Full screen'
+        'LNG_PAGE_WORLD_MAP_FULL_SCREEN_LABEL': 'Full screen',
 
         /**
          * NEW GROUP
