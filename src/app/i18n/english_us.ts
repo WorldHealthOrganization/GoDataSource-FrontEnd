@@ -37,7 +37,6 @@ export const EnglishUsLang = {
          * uiOutbreakQuestionnaireTemplates
          */
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_NESTED_QUESTIONS': 'Nested questions',
-        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_NESTED_QUESTIONS': 'Nested questions',
 
         /**
          * REMOVE the tokens from below

@@ -1653,19 +1653,20 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * @param {QuestionModel} questionModel
      */
     hasNestedQuestions(questionModel: QuestionModel) {
-        // check if question has at least one answer
-        if (questionModel.answers.length > 0) {
-            let hasNestedQuestions = false;
-            // check if at least one answer has at least one additional question
-            _.forEach(questionModel.answers, (answer: AnswerModel) => {
-                if (!_.isEmpty(answer.additionalQuestions)) {
-                    hasNestedQuestions = true;
-                }
-            });
-            return hasNestedQuestions;
-        } else {
-            // return if question has no answers
+        // if there's no answers return
+        if (questionModel.answers.length < 1) {
             return false;
         }
+
+        // check if question has at least one answer
+        let hasNestedQuestions = false;
+        // check if at least one answer has at least one additional question
+        _.forEach(questionModel.answers, (answer: AnswerModel) => {
+            if (!_.isEmpty(answer.additionalQuestions)) {
+                hasNestedQuestions = true;
+                return false;
+            }
+        });
+        return hasNestedQuestions;
     }
 }
