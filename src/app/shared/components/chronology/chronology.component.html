@@ -1,12 +1,14 @@
 <mgl-timeline [alternate]="false">
     <mgl-timeline-entry *ngFor="let entry of entries">
-        <mgl-timeline-entry-header>
+        <mgl-timeline-entry-header
+            (click)="noClick($event)">
             {{ entry.date | dateDefault }}
         </mgl-timeline-entry-header>
 
         <mgl-timeline-entry-dot
             class="primary"
-            [size]="27">
+            [size]="27"
+            (click)="noClick($event)">
             <span>
                 {{ entry.daysSincePreviousEvent }}
             </span>

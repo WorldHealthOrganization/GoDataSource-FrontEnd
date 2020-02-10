@@ -40,4 +40,12 @@ export class ChronologyComponent {
     get entries(): ChronologyItem[] {
         return this._entries;
     }
+
+    /**
+     * Prevent expanding time-line component
+     */
+    noClick(event: MouseEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
 }
