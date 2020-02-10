@@ -30,13 +30,14 @@ export enum ExportDataExtension {
 
 @Injectable()
 export class DialogService {
-
+    /**
+     * Constructor
+     */
     constructor(
         private dialog: MatDialog,
         private importExportDataService: ImportExportDataService,
         private snackbarService: SnackbarService
-    ) {
-    }
+    ) {}
 
     /**
      * Show a Confirm Dialog
@@ -48,6 +49,24 @@ export class DialogService {
         messageToken: DialogConfiguration | string,
         translateData = {}
     ): Observable<DialogAnswer> {
+        return this
+            .showConfirmDialog(
+                messageToken,
+                translateData
+            )
+            .afterClosed();
+    }
+
+    /**
+     * Show a Confirm Dialog
+     * @param {DialogConfiguration | string} messageToken - Can be either a message ( string ) or an object of type DialogConfiguration
+     * @param {{}} translateData
+     * @returns {Observable<DialogAnswer>}
+     */
+    showConfirmDialog(
+        messageToken: DialogConfiguration | string,
+        translateData = {}
+    ): MatDialogRef<DialogComponent> {
         // construct dialog message data
         const dialogMessage = DialogComponent.defaultConfigWithData(messageToken);
         (dialogMessage.data as DialogConfiguration).translateData = translateData;
@@ -56,7 +75,7 @@ export class DialogService {
         return this.dialog.open(
             DialogComponent,
             dialogMessage
-        ).afterClosed();
+        );
     }
 
     /**
