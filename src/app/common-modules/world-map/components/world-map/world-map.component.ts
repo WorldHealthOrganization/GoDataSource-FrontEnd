@@ -405,6 +405,10 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      */
     @Input() groupPathTitle: string;
 
+    /**
+     * It's full screen activated?
+     * @type {boolean}
+     */
     fullScreenMode: boolean = false;
 
     /**
@@ -1017,10 +1021,6 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             // finished update
             this.clusterUpdatePending = null;
         }, 50);
-    }
-
-    refreshMap() {
-        this.updateMapSizeOnWindowResize();
     }
 
     /**

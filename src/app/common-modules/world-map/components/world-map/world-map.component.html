@@ -1,13 +1,10 @@
 <!--Full screen map-->
-<div>
-    <app-form-slide-toggle
-        [ngClass]="{'full-screen-on': fullScreenMode, 'toggle-full-screen': !fullScreenMode}"
-        [(ngModel)]="fullScreenMode"
-        [label]="'LNG_PAGE_WORLD_MAP_FULL_SCREEN_LABEL' | translate"
-        (optionChanged)="refreshMap()">
-    </app-form-slide-toggle>
-
-</div>
+<app-form-slide-toggle
+    [ngClass]="{'full-screen-on': fullScreenMode, 'toggle-full-screen': !fullScreenMode}"
+    [(ngModel)]="fullScreenMode"
+    [label]="'LNG_PAGE_WORLD_MAP_FULL_SCREEN_LABEL' | translate"
+    (optionChanged)="updateMapSize()">
+</app-form-slide-toggle>
 
 <!-- Draw map -->
 <div
