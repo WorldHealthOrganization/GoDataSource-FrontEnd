@@ -11,7 +11,6 @@ import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { EntityType } from '../../../../core/models/entity-type';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';

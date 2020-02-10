@@ -59,6 +59,7 @@ export enum PERMISSION {
     USER_ROLE_CREATE = 'user_role_create',
     USER_ROLE_MODIFY = 'user_role_modify',
     USER_ROLE_DELETE = 'user_role_delete',
+    USER_ROLE_CREATE_CLONE = 'user_role_create_clone',
 
     // backups
     BACKUP_LIST = 'backup_list',

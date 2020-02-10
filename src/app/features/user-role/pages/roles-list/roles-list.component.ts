@@ -87,7 +87,28 @@ export class RolesListComponent extends ListComponent implements OnInit {
                             UserRoleModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
-                })
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (item: UserRoleModel): boolean => {
+                        // visible only if at least one of the previous...
+                        return !this.authUser.hasRole(item.id) &&
+                            UserRoleModel.canDelete(this.authUser);
+                    }
+                }),
+
+                // Clone Role
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_USER_ROLES_ACTION_CLONE_ROLE',
+                    click: (item: UserRoleModel) => {
+                        this.cloneRole(item);
+                    },
+                    visible: (): boolean => {
+                        return UserRoleModel.canClone(this.authUser);
+                    }
+                }),
             ]
         })
     ];
@@ -223,5 +244,18 @@ export class RolesListComponent extends ListComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    /**
+     * Create clone
+     */
+    private cloneRole(userRole: UserRoleModel) {
+        this.router.navigate(
+            [`/user-roles/create`], {
+                queryParams: {
+                    cloneId: userRole.id
+                }
+            }
+        );
     }
 }
