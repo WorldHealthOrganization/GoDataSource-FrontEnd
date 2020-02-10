@@ -19,6 +19,7 @@ import { throwError } from 'rxjs';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-modify-user',
@@ -86,7 +87,9 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
         });
 
         // get the list of roles to populate the dropdown in UI
-        this.rolesList$ = this.userRoleDataService.getRolesList();
+        const qb = new RequestQueryBuilder();
+        qb.sort.by('name');
+        this.rolesList$ = this.userRoleDataService.getRolesList(qb);
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
         this.institutionsList$ = this.referenceDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
     }
