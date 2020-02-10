@@ -327,7 +327,7 @@
             *ngIf="
                 LabResultModel.canList(authUser) &&
                 ContactModel.canListLabResult(authUser) &&
-                selectedOutbreak.isContactLabResultsActive"
+                selectedOutbreak?.isContactLabResultsActive"
             mat-raised-button
             type="button"
             [routerLink]="['/lab-results', 'contacts', contactId]">
