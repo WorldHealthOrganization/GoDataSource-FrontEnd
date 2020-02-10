@@ -274,6 +274,45 @@ export class RequestFilter {
     }
 
     /**
+     * Filter by boolean but include "exists" criteria too for a more accurate search
+     * @param {string} property
+     * @param {boolean} value
+     * @param {boolean} replace
+     */
+    byBooleanUsingExist(property: string, value: boolean | null | undefined) {
+        // create condition with OR criteria
+        const orCondition = {
+            or: [
+                {
+                    [property]: {
+                        eq: value
+                    }
+                },
+                {
+                    [property]: {
+                        exists: value
+                    }
+                }
+            ]
+        };
+
+        // remove existing property and condition
+        this.remove(property);
+        this.removeCondition(orCondition);
+
+        // apply filter
+        if (value === false) {
+            this.where(orCondition);
+        } else if (value === true) {
+            this.where({
+                [property]: {
+                    eq: true
+                }
+            });
+        }
+    }
+
+    /**
      * Filter by a range field ('from' / 'to')
      * @param {string} property
      * @param value Object with 'from' and 'to' properties

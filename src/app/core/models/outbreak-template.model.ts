@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import { QuestionModel } from './question.model';
 import { IPermissionBasic, IPermissionOutbreakTemplate, IPermissionQuestionnaire } from './permission.interface';
 import { UserModel } from './user.model';
-import { OutbreakModel } from './outbreak.model';
 import { PERMISSION } from './permission.model';
 
 export class OutbreakTemplateModel

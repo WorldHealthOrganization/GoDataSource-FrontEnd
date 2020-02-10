@@ -1223,33 +1223,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     }
 
     /**
-     * Filter by wasCaseField
-     * @param {boolean} value
-     */
-    filterByWasCaseField(value: boolean | null | undefined) {
-        if (value === false) {
-            this.queryBuilder.filter.where({
-                'wasCase': {
-                    'eq': false
-                }
-            }, true);
-        } else {
-            if (value === true) {
-                this.queryBuilder.filter.where({
-                    'wasCase': {
-                        'eq': true
-                    }
-                }, true);
-            } else {
-                this.queryBuilder.filter.remove('wasCase');
-            }
-        }
-
-        // refresh list
-        this.needsRefreshList();
-    }
-
-    /**
      * Filter by locations selected in location-drop-down
      * @param locations
      */

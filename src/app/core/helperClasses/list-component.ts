@@ -592,6 +592,19 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
+     * Filter by boolean with exists condition
+     * @param {string} property
+     * @param value
+     */
+    filterByBooleanUsingExistField(property: string, value: any) {
+        // filter by boolean using exist
+        this.queryBuilder.filter.byBooleanUsingExist(property, value);
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
      * Filter by deleted field
      * @param value
      */
