@@ -124,6 +124,9 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     // provide constants to template
     EntityModel = EntityModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private router: Router,
@@ -134,11 +137,17 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,
         private authDataService: AuthDataService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -149,6 +158,9 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
 
             this.initializeBreadcrumbs();
         });
+
+        // show loading
+        this.showLoadingDialog(false);
 
         // get person type and ID from route params
         this.route.params
@@ -206,6 +218,9 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             this.relationshipId &&
             this.selectedOutbreak
         ) {
+            // show loading
+            this.showLoadingDialog(false);
+
             // get relationship data
             this.relationshipDataService
                 .getEntityRelationship(this.selectedOutbreak.id, this.entityType, this.entityId, this.relationshipId)
@@ -226,6 +241,9 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                     this.canReverseRelation = !_.find(this.relationship.persons, { type : EntityType.CONTACT });
 
                     this.initializeBreadcrumbs();
+
+                    // hide loading
+                    this.hideLoadingDialog();
                 });
         }
     }
@@ -293,8 +311,10 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
 
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify the relationship
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.relationshipDataService
             .modifyRelationship(
                 this.selectedOutbreak.id,
@@ -306,7 +326,8 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showError(err.message);
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 })
             )
@@ -320,8 +341,8 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                 // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
             });
     }
 

@@ -38,11 +38,14 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
         protected route: ActivatedRoute,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private dialogService: DialogService,
+        protected dialogService: DialogService,
         private deviceDataService: DeviceDataService,
         private authDataService: AuthDataService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -51,6 +54,9 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // show loading
+        this.showLoadingDialog(false);
 
         // retrieve query params
         this.route.params
@@ -90,6 +96,9 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
     retrieveDeviceData() {
         // get device
         if (this.deviceId) {
+            // show loading
+            this.showLoadingDialog(false);
+
             this.deviceDataService
                 .getDevice(this.deviceId)
                 .subscribe( (device) => {
@@ -97,6 +106,9 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
 
                     // update breadcrumbs
                     this.initializeBreadcrumbs();
+
+                    // hide loading
+                    this.hideLoadingDialog();
                 });
         }
     }
@@ -113,14 +125,17 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
         // retrieve dirty fields
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify the Device
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.deviceDataService
             .modifyDevice(this.deviceId, dirtyFields)
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 })
             )
@@ -134,8 +149,8 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
                 // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_SYSTEM_DEVICE_ACTION_MODIFY_SYSTEM_DEVICE_SUCCESS_MESSAGE');
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
             });
     }
 
