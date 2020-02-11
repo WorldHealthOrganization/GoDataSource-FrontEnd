@@ -102,9 +102,11 @@
 
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
-        <button type="button"
-                [routerLink]="'/users'"
-                mat-raised-button>
+        <button
+            *ngIf="UserModel.canList(authUser)"
+            type="button"
+            [routerLink]="'/users'"
+            mat-raised-button>
             {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
         </button>
     </div>

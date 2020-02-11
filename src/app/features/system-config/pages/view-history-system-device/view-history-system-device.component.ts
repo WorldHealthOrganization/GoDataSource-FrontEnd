@@ -33,11 +33,14 @@ export class ViewHistorySystemDeviceComponent extends ViewModifyComponent implem
         protected route: ActivatedRoute,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private dialogService: DialogService,
+        protected dialogService: DialogService,
         private deviceDataService: DeviceDataService,
         private authDataService: AuthDataService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -47,6 +50,9 @@ export class ViewHistorySystemDeviceComponent extends ViewModifyComponent implem
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        // show loading
+        this.showLoadingDialog(false);
+
         // retrieve query params
         this.route.params
             .subscribe((params: { deviceId }) => {
@@ -54,6 +60,9 @@ export class ViewHistorySystemDeviceComponent extends ViewModifyComponent implem
                 this.deviceDataService.getHistoryDevice(this.deviceId)
                     .subscribe( (results) => {
                         this.deviceHistoryList = results;
+
+                        // hide loading
+                        this.hideLoadingDialog();
                     });
 
                 // update breadcrumbs

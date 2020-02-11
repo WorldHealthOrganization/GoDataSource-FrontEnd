@@ -89,9 +89,12 @@ export class ModifyLabResultComponent extends ViewModifyComponent implements OnI
         private genericDataService: GenericDataService,
         private labResultDataService: LabResultDataService,
         private authDataService: AuthDataService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -111,6 +114,9 @@ export class ModifyLabResultComponent extends ViewModifyComponent implements OnI
                 this.fromLabResultsList = JSON.parse(queryParams.fromLabResultsList);
             }
         });
+
+        // show loading
+        this.showLoadingDialog(false);
 
         // retrieve page information
         this.route.data.subscribe((data: { personType: EntityType }) => {
@@ -162,6 +168,9 @@ export class ModifyLabResultComponent extends ViewModifyComponent implements OnI
 
                                         // initialize breadcrumbs
                                         this.initializeBreadcrumbs();
+
+                                        // hide loading
+                                        this.hideLoadingDialog();
                                     });
                             }
                         });
@@ -276,8 +285,10 @@ export class ModifyLabResultComponent extends ViewModifyComponent implements OnI
             return;
         }
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify the lab result
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.labResultDataService
             .modifyLabResult(
                 this.selectedOutbreak.id,
@@ -288,7 +299,8 @@ export class ModifyLabResultComponent extends ViewModifyComponent implements OnI
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showError(err.message);
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 })
             )
@@ -307,8 +319,8 @@ export class ModifyLabResultComponent extends ViewModifyComponent implements OnI
                 // initialize breadcrumbs
                 this.initializeBreadcrumbs();
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
             });
     }
 }

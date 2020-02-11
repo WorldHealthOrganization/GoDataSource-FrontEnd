@@ -56,9 +56,12 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
         private snackbarService: SnackbarService,
         private router: Router,
         private authDataService: AuthDataService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -67,6 +70,9 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // show loading
+        this.showLoadingDialog(false);
 
         this.route.params
             .subscribe((params: {eventId}) => {
@@ -86,6 +92,9 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
 
                                 // update breadcrumbs
                                 this.initializeBreadcrumbs();
+
+                                // hide loading
+                                this.hideLoadingDialog();
                             });
                     });
             });
@@ -101,8 +110,10 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
             return;
         }
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify the event
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.eventDataService
             .modifyEvent(
                 this.outbreakId,
@@ -113,7 +124,8 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 })
             )
@@ -130,8 +142,8 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
                 // update breadcrumb
                 this.initializeBreadcrumbs();
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
             });
     }
 

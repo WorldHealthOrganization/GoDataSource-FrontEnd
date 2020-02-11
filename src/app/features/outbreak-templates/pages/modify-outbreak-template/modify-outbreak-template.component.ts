@@ -47,9 +47,12 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -62,6 +65,9 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
         // get the lists for form
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
 
+        // show loading
+        this.showLoadingDialog(false);
+
         this.route.params
             .subscribe((params: { outbreakTemplateId }) => {
                 this.outbreakTemplateId = params.outbreakTemplateId;
@@ -73,6 +79,9 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
 
                         // update breadcrumbs
                         this.initializeBreadcrumbs();
+
+                        // hide loading
+                        this.hideLoadingDialog();
                     });
             });
     }
@@ -114,14 +123,17 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
 
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify the outbreak template
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.outbreakTemplateDataService
             .modifyOutbreakTemplate(this.outbreakTemplateId, dirtyFields)
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showError(err.message);
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 })
             )
@@ -138,8 +150,8 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
                 // update breadcrumbs
                 this.initializeBreadcrumbs();
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
             });
     }
 }

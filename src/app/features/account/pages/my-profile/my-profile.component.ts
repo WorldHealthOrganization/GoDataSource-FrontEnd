@@ -9,6 +9,7 @@ import { UserRoleDataService } from '../../../../core/services/data/user-role.da
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-my-profile',
@@ -20,6 +21,9 @@ export class MyProfileComponent extends ViewModifyComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_MY_PROFILE_TITLE'),
     ];
+
+    // constants
+    UserModel = UserModel;
 
     // authenticated user
     authUser: UserModel;
@@ -38,9 +42,13 @@ export class MyProfileComponent extends ViewModifyComponent implements OnInit {
         private userRoleDataService: UserRoleDataService,
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -48,16 +56,22 @@ export class MyProfileComponent extends ViewModifyComponent implements OnInit {
      */
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // show loading
+        this.showLoadingDialog(false);
+
         // retrieve the User instance
         this.userDataService
             .getUser(this.authUser.id)
             .subscribe((user: UserModel) => {
                 this.user = user;
+
+                // hide loading
+                this.hideLoadingDialog();
             });
 
         // get the list of roles to populate the dropdown in UI
         this.rolesList$ = this.userRoleDataService.getRolesList();
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
     }
-
 }

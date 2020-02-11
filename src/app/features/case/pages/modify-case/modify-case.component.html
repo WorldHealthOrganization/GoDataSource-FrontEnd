@@ -422,6 +422,7 @@
 
             <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE' | translate">
                 <app-form-fill-questionnaire
+                    *ngIf="!!caseData?.id"
                     name="questionnaireAnswers"
                     [ngModel]="caseData.questionnaireAnswers"
                     [questions]="selectedOutbreak.caseInvestigationTemplate"
