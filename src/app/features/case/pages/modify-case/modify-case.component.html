@@ -109,8 +109,7 @@
                                 [maxlength]="255"
                                 [disabled]="viewOnly"
                                 app-general-async-validator
-                                [asyncValidatorObservable]="caseIdMaskValidator"
-                            >
+                                [asyncValidatorObservable]="viewOnly ? null : caseIdMaskValidator">
                             </app-form-input>
 
                             <app-form-datepicker
