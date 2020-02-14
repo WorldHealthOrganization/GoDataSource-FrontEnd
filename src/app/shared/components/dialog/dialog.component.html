@@ -203,7 +203,7 @@
         <ng-container *ngIf="confirmData?.infoExistingConfiguration">
             <div *ngFor="let infoField of confirmData?.infoFields">
                 <ng-container *ngIf="infoField.type != DialogFieldType.INFO_SECTION_TITLE">
-                    {{infoField.token | translate}} : {{ infoField.value}}
+                    {{ infoField.token | translate }} : {{ infoField.value }}
                 </ng-container>
             </div>
         </ng-container>
