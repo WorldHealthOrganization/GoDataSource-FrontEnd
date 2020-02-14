@@ -59,7 +59,32 @@
                     </div>
                 </div>
 
-                <div fxFlex><!-- placeholder --></div>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-input
+                        [name]="name + '[phoneNumber]'"
+                        [(ngModel)]="address.phoneNumber"
+                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER' | translate"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION"
+                        [disabled]="disabled"
+                        [required]="false"
+                        (input)="onChange()">
+                    </app-form-input>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('phoneNumber')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
+
                 <div fxFlex><!-- placeholder --></div>
             </div>
 
@@ -271,37 +296,6 @@
                 </div>
             </div>
 
-            <div fxLayout="row" fxLayoutGap="20px">
-                <div fxFlex fxLayout="row" fxLayoutGap="5px">
-                    <app-form-input
-                        [name]="name + '[phoneNumber]'"
-                        [(ngModel)]="address.phoneNumber"
-                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER' | translate"
-                        tooltip="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION"
-                        [disabled]="disabled"
-                        [required]="false"
-                        (input)="onChange()">
-                    </app-form-input>
-                    <div
-                        *ngIf="displayCopyField"
-                        fxFlex="40px"
-                        fxLayout="column"
-                        fxLayoutAlign="center">
-                        <button
-                            class="copy-field-button"
-                            type="button"
-                            mat-icon-button
-                            [title]="displayCopyFieldDescription"
-                            (click)="triggerCopyValue('phoneNumber')">
-                            <span class="xt-icon">fileCopy</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div fxFlex><!-- placeholder --></div>
-                <div fxFlex><!-- placeholder --></div>
-                <div fxFlex><!-- placeholder --></div>
-            </div>
         </div>
     </form>
 </div>
