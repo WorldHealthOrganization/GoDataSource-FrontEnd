@@ -26,7 +26,6 @@ export const EnglishUsLang = {
         'LNG_AUTHENTICATION_TOKEN_EXPIRE_DIALOG_TITLE': 'No activity detected in the last few minutes, you will be signed out if you don\'t perform any action',
         'LNG_AUTHENTICATION_TOKEN_EXPIRE_DIALOG_CONTINUE_BUTTON': 'I\'m still here...',
 
-
         /**
          * uiRelationshipFields
          */
@@ -37,6 +36,12 @@ export const EnglishUsLang = {
          * uiOutbreakQuestionnaireTemplates
          */
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_NESTED_QUESTIONS': 'Nested questions',
+
+        /**
+         * uiAutomaticBackupFields
+         */
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_EXISTING_CONFIGURATION': 'Existing configuration',
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_EXISTING_CONFIGURATION_DESCRIPTION': ''
 
         /**
          * REMOVE the tokens from below

@@ -435,6 +435,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
         return this.dialogService.showInput(new DialogConfiguration({
             message: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_TITLE',
             yesLabel: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SAVE_BUTTON',
+            infoExistingConfiguration: true,
             fieldsList: [
                 // location
                 new DialogField({
@@ -474,6 +475,13 @@ export class BackupsComponent extends ListComponent implements OnInit {
                     inputOptionsMultiple: true,
                     required: true,
                     value: this.settings.dataBackup.modules
+                }),
+                // existing automatic backup settings title
+                new DialogField({
+                    name: 'infoTitle',
+                    fieldType: DialogFieldType.INFO_SECTION_TITLE,
+                    placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_EXISTING_CONFIGURATION',
+                    description: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_EXISTING_CONFIGURATION_DESCRIPTION'
                 })
             ]
         })).subscribe((answer: DialogAnswer) => {

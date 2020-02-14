@@ -187,10 +187,26 @@
                             class="dialog-section-title">
                             {{ field.placeholder | translate }}
                         </div>
+
+                        <!-- Info Section Title -->
+                        <div
+                            *ngIf="field.fieldType === DialogFieldType.INFO_SECTION_TITLE && confirmData?.infoFields"
+                            class="dialog-section-title">
+                            {{ field.placeholder | translate }}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Info Section -->
+        <ng-container *ngIf="confirmData?.infoExistingConfiguration">
+            <div *ngFor="let infoField of confirmData?.infoFields">
+                <ng-container *ngIf="infoField.type != DialogFieldType.INFO_SECTION_TITLE">
+                    {{infoField.token | translate}} : {{ infoField.value}}
+                </ng-container>
+            </div>
+        </ng-container>
 
         <div fxLayout="row" fxLayoutAlign="end">
             <button

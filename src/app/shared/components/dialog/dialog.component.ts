@@ -60,6 +60,22 @@ export class DialogAnswer {
     ) {}
 }
 
+export class InfoField {
+    token: string;
+    value: string;
+    type: DialogFieldType;
+
+    constructor(data: {
+            token: string,
+            value: string,
+            type: DialogFieldType,
+    }) {
+        this.token = data.token;
+        this.value = data.value;
+        this.type = data.type;
+    }
+}
+
 export enum DialogFieldType {
     SELECT = 'select',
     TEXT = 'text',
@@ -69,7 +85,8 @@ export enum DialogFieldType {
     LINK = 'link',
     URL = 'url',
     ACTION = 'action',
-    SECTION_TITLE = 'section-title'
+    SECTION_TITLE = 'section-title',
+    INFO_SECTION_TITLE = 'info-section-title'
 }
 
 export class DialogField {
@@ -174,6 +191,8 @@ export class DialogConfiguration {
     public required: boolean = false;
     public buttons: DialogButton[];
     public addDefaultButtons: boolean = false;
+    public infoExistingConfiguration: boolean = false;
+    public infoFields: InfoField[] = [] ;
 
     // define fields
     private _fieldsList: DialogField[];
@@ -213,7 +232,8 @@ export class DialogConfiguration {
         buttons?: DialogButton[],
         addDefaultButtons?: boolean,
         yesCssClass?: string,
-        cancelCssClass?: string
+        cancelCssClass?: string,
+        infoExistingConfiguration?: boolean
     }) {
         // assign properties
         if (_.isString(data)) {
@@ -224,6 +244,11 @@ export class DialogConfiguration {
                 this,
                 data
             );
+        }
+
+        // generate fields about an existing configuration
+        if (this.infoExistingConfiguration) {
+            this.generateInfoFields();
         }
     }
 
@@ -238,6 +263,20 @@ export class DialogConfiguration {
                 this.fieldsListLayout[index] ?
                     `calc(${this.fieldsListLayout[index]}% - 20px)` :
                     'calc(100% - 20px)'
+            );
+        });
+    }
+
+    /**
+     * Generate info fields about an existing configuration
+     */
+    private generateInfoFields() {
+        _.each(this.fieldsList, (field: DialogField) => {
+            this.infoFields.push(new InfoField({
+                    token: field.placeholder,
+                    value: field.value,
+                    type: field.fieldType
+                })
             );
         });
     }
