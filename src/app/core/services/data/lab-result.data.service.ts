@@ -51,8 +51,8 @@ export class LabResultDataService {
         entityId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<IBasicCount> {
-        const whereFilter = queryBuilder.filter.generateCondition(true);
-        return this.http.get(`outbreaks/${outbreakId}/${entityPath}/${entityId}/lab-results/count?where=${whereFilter}`);
+        const filter = queryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/${entityPath}/${entityId}/lab-results/filtered-count?filter=${filter}`);
     }
 
     /**
