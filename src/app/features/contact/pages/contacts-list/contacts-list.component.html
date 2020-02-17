@@ -78,6 +78,7 @@
                         (exportStart)="showLoadingDialog()"
                         (exportFinished)="closeLoadingDialog()"
                         [queryBuilder]="queryBuilder"
+                        [queryBuilderClearOthers]="'countRelations'"
                         [extraDialogFields]="exportContactsDailyFollowUpListDialogFields">
                     </app-export-button>
 
@@ -91,7 +92,8 @@
                         [fileType]="exportContactsDailyFollowUpsFormFileType"
                         (exportStart)="showLoadingDialog()"
                         (exportFinished)="closeLoadingDialog()"
-                        [queryBuilder]="queryBuilder">
+                        [queryBuilder]="queryBuilder"
+                        [queryBuilderClearOthers]="'countRelations'">
                     </app-export-button>
                 </mat-menu>
             </div>
