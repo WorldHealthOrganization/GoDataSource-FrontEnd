@@ -929,9 +929,6 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      */
     refreshList(finishCallback: (records: any[]) => void) {
         if (this.selectedOutbreak) {
-            // refresh badges
-            this.getFollowUpsGroupedByTeams();
-
             // add case id
             if (this.caseId) {
                 this.queryBuilder.addChildQueryBuilder('case').filter.byEquality('id', this.caseId);
@@ -940,6 +937,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
+
+            // refresh badges
+            this.getFollowUpsGroupedByTeams();
 
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService
@@ -1091,8 +1091,14 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      */
     getFollowUpsGroupedByTeams() {
         if (this.selectedOutbreak) {
+            // cleanup query
+            const clonedQB = _.cloneDeep(this.queryBuilder);
+            clonedQB.paginator.clear();
+            clonedQB.sort.clear();
+
+            // retrieve count
             this.countedFollowUpsGroupedByTeams$ = this.followUpsDataService
-                .getCountedFollowUpsGroupedByTeams(this.selectedOutbreak.id, this.queryBuilder)
+                .getCountedFollowUpsGroupedByTeams(this.selectedOutbreak.id, clonedQB)
                 .pipe(
                     map((data) => {
                         return _.map(data.team, (teamData) => {
