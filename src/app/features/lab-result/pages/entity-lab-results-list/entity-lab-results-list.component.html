@@ -19,7 +19,7 @@
 
 <!-- Side columns -->
 <app-side-columns
-    [tableColumnsUserSettingsKey]="UserSettings.CASE_LAB_FIELDS"
+    [tableColumnsUserSettingsKey]="tableColumnsUserSettingsKey"
     [tableColumns]="tableColumns"
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
