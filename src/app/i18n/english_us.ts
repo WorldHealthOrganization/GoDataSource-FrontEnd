@@ -12,17 +12,6 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
-        /**
-         * uiSavedFiltersForPagesLabels
-         */
-        'LNG_APP_PAGE_CONTACT_LAB_RESULTS': 'Individual contact lab results',
-
-        /**
-         * savedImportMappingsPages
-         */
-        'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA': 'Case Lab data',
-        'LNG_APP_PAGE_IMPORT_CONTACT_LAB_DATA': 'Contact Lab data'
-
 
 
         /**
