@@ -8,13 +8,13 @@ import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class SavedFiltersService {
-
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {
-
-    }
+    ) {}
 
     /**
      * Retrieve the list of saved filters
