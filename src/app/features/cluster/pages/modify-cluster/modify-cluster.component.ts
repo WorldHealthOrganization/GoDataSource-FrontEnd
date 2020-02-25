@@ -47,9 +47,12 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -58,6 +61,9 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // show loading
+        this.showLoadingDialog(false);
 
         this.route.params.subscribe((params: { clusterId }) => {
             this.clusterId = params.clusterId;
@@ -76,6 +82,9 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
 
                             // update breadcrumbs
                             this.initializeBreadcrumbs();
+
+                            // hide loading
+                            this.hideLoadingDialog();
                         });
                 });
 
@@ -119,14 +128,17 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
             return;
         }
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify the Cluster
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.clusterDataService
             .modifyCluster(this.selectedOutbreak.id, this.clusterId, dirtyFields)
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showError(err.message);
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 })
             )
@@ -143,8 +155,8 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
                 // update breadcrumbs
                 this.initializeBreadcrumbs();
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
             });
     }
 }

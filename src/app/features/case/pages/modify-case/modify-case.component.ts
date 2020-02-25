@@ -97,9 +97,12 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private i18nService: I18nService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -115,6 +118,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
         this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
         this.pregnancyStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
+
+        // show loading
+        this.showLoadingDialog(false);
 
         // retrieve query params
         this.route.queryParams
@@ -249,6 +255,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                 this.caseId
             );
 
+            // show loading
+            this.showLoadingDialog(false);
+
             // get case
             this.caseDataService
                 .getCasesList(
@@ -304,6 +313,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                     // initialize breadcrumbs
                     this.initializeBreadcrumbs();
+
+                    // hide loading
+                    this.hideLoadingDialog();
                 });
         }
     }
@@ -327,8 +339,10 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             delete dirtyFields.ageDob;
         }
 
+        // show loading
+        this.showLoadingDialog();
+
         // check for duplicates
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.caseDataService
             .findDuplicates(this.selectedOutbreak.id, {
                 ...this.caseData,
@@ -338,8 +352,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
 
-                    // hide dialog
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
 
                     return throwError(err);
                 })
@@ -354,8 +368,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
 
-                                // hide dialog
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
 
                                 return throwError(err);
                             })
@@ -374,8 +388,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                                 // update breadcrumb
                                 this.retrieveCaseData();
 
-                                // hide dialog
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
                             } else {
                                 // finished
                                 finishCallBack();
@@ -445,8 +459,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                                         ...answer.inputValue.value.mergeWith
                                     ];
 
-                                    // hide dialog
-                                    loadingDialog.close();
+                                    // hide loading
+                                    this.hideLoadingDialog();
 
                                     // redirect to merge
                                     this.router.navigate(
@@ -460,8 +474,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                             } else if (answer.button === DialogAnswerButton.Extra_1) {
                                 runModifyCase();
                             } else {
-                                // hide dialog
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
                             }
                         });
                     };

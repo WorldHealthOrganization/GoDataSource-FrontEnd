@@ -91,11 +91,14 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
         private router: Router,
-        private dialogService: DialogService,
+        protected dialogService: DialogService,
         private i18nService: I18nService,
         private relationshipDataService: RelationshipDataService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -111,6 +114,9 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
         this.pregnancyStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
+
+        // show loading
+        this.showLoadingDialog(false);
 
         this.route.params
             .subscribe((params: {contactId}) => {
@@ -170,6 +176,9 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
             this.selectedOutbreak.id &&
             this.contactId
         ) {
+            // show loading
+            this.showLoadingDialog(false);
+
             this.contactDataService
                 .getContact(this.selectedOutbreak.id, this.contactId, true)
                 .subscribe(contactDataReturned => {
@@ -195,6 +204,9 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
 
                     // update breadcrumb
                     this.initializeBreadcrumbs();
+
+                    // hide loading
+                    this.hideLoadingDialog();
                 });
         }
     }
@@ -248,8 +260,10 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
             delete dirtyFields.ageDob;
         }
 
+        // show loading
+        this.showLoadingDialog();
+
         // check for duplicates
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.contactDataService
             .findDuplicates(this.selectedOutbreak.id, {
                 ...this.contactData,
@@ -259,8 +273,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
 
-                    // hide dialog
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
 
                     return throwError(err);
                 })
@@ -279,7 +293,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
                                 return throwError(err);
                             })
                         )
@@ -297,8 +312,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                                 // update breadcrumb
                                 this.initializeBreadcrumbs();
 
-                                // hide dialog
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
                             } else {
                                 // finished
                                 finishCallBack();
@@ -368,8 +383,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                                         ...answer.inputValue.value.mergeWith
                                     ];
 
-                                    // hide dialog
-                                    loadingDialog.close();
+                                    // hide loading
+                                    this.hideLoadingDialog();
 
                                     // redirect to merge
                                     this.router.navigate(
@@ -383,8 +398,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                             } else if (answer.button === DialogAnswerButton.Extra_1) {
                                 runModifyContact();
                             } else {
-                                // hide dialog
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
                             }
                         });
                     };

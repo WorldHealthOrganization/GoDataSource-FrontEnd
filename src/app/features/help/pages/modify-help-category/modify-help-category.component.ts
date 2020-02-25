@@ -46,9 +46,12 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
         private router: Router,
         private authDataService: AuthDataService,
         private i18nService: I18nService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -57,6 +60,9 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // show loading
+        this.showLoadingDialog(false);
 
         this.route.params
             .subscribe((params: { categoryId }) => {
@@ -69,6 +75,9 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
 
                         // update breadcrumbs
                         this.initializeBreadcrumbs();
+
+                        // hide loading
+                        this.hideLoadingDialog();
                     });
             });
     }
@@ -109,14 +118,17 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
             return;
         }
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify the category
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.helpDataService
             .modifyHelpCategory(this.categoryId, dirtyFields)
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 }),
                 switchMap((helpCategoryData) => {
@@ -125,7 +137,8 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
                                 return throwError(err);
                             }),
                             map(() => helpCategoryData)
@@ -145,8 +158,8 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
                 // update breadcrumbs
                 this.initializeBreadcrumbs();
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
             });
     }
 }

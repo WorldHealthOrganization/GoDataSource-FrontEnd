@@ -60,9 +60,12 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private authDataService: AuthDataService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -150,8 +153,10 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         // const dirtyFields: any = this.formHelper.getFields(form);
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify the outbreak
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.outbreakDataService
             .modifyOutbreak(
                 this.outbreakId,
@@ -161,7 +166,8 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 })
             )
@@ -178,8 +184,8 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
                 // update breadcrumbs
                 this.initializeBreadcrumbs();
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
             });
     }
 }

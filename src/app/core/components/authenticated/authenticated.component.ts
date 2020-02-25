@@ -22,6 +22,7 @@ import { Subscriber } from 'rxjs/internal-compatibility';
 import { ITokenInfo } from '../../models/auth.model';
 import { Moment } from 'moment';
 import * as moment from 'moment';
+import { ConfirmOnFormChanges, PageChangeConfirmationGuard } from '../../services/guards/page-change-confirmation-guard.service';
 
 @Component({
     selector: 'app-authenticated',
@@ -35,6 +36,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     static NO_ACTIVITY_POPUP_SHOULD_APPEAR_WHEN_LESS_THAN_SECONDS = 120;
     static NO_ACTIVITY_POPUP_SHOULD_REFRESH_TOKEN_IF_USER_ACTIVE = 240;
     static REFRESH_IF_USER_WAS_ACTIVE_IN_THE_LAST_SECONDS = 20;
+    static REFRESH_DISABLE_SECONDS = 7;
 
     // slide nav menu
     @ViewChild('snav') sideNav: MatSidenav;
@@ -55,6 +57,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     Constants = Constants;
 
     // token expire data
+    private lastRefreshUserTokenOrLogOut: Moment;
     private lastInputTime: Moment;
     private loadingDialog: LoadingDialogModel;
     private confirmDialog: MatDialogRef<DialogComponent>;
@@ -125,6 +128,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         // check if user is authenticated
         if (!this.authUser) {
             // user is NOT authenticated; redirect to Login page
+            this.prepareForRedirect();
             return this.router.navigate(['/auth/login']);
         }
 
@@ -289,6 +293,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
                                                                 .logout()
                                                                 .pipe(
                                                                     catchError(() => {
+                                                                        this.prepareForRedirect();
                                                                         this.router.navigate(['/auth/login']);
                                                                         dialogHandler.close();
                                                                         this.loadingDialog.close();
@@ -297,6 +302,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
                                                                     })
                                                                 )
                                                                 .subscribe(() => {
+                                                                    this.prepareForRedirect();
                                                                     this.router.navigate(['/auth/login']);
                                                                     dialogHandler.close();
                                                                     this.loadingDialog.close();
@@ -340,7 +346,20 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     private refreshUserTokenOrLogOut(
         hideDialogsOnSuccess: boolean
     ) {
+        // don't allow spam :)
+        if (
+            this.lastRefreshUserTokenOrLogOut &&
+            Math.floor(moment().diff(this.lastRefreshUserTokenOrLogOut) / 1000) < AuthenticatedComponent.REFRESH_DISABLE_SECONDS
+        ) {
+            // check again later
+            this.tokenCheckIfLoggedOutCaller.call();
+
+            // finished
+            return;
+        }
+
         // retrieve the user instance
+        this.lastRefreshUserTokenOrLogOut = moment();
         this.userDataService
             .getUser(this.authUser.id)
             .pipe(catchError((err) => {
@@ -360,6 +379,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
                             }
 
                             // finished
+                            this.prepareForRedirect();
                             this.router.navigate(['/auth/login']);
                             return throwError(err);
                         })
@@ -376,6 +396,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
                         }
 
                         // finished
+                        this.prepareForRedirect();
                         this.router.navigate(['/auth/login']);
                     });
 
@@ -398,5 +419,18 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
                 // check again later
                 this.tokenCheckIfLoggedOutCaller.call();
             });
+    }
+
+    /**
+     * Disable dialogs before redirect
+     */
+    private prepareForRedirect() {
+        // disable dialogs from showing
+        ConfirmOnFormChanges.disableAllDirtyConfirm();
+
+        // close dialogs in case any are visible
+        setTimeout(() => {
+            PageChangeConfirmationGuard.closeVisibleDirtyDialog();
+        });
     }
 }

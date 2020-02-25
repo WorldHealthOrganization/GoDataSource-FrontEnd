@@ -9,6 +9,7 @@ import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { UserModel } from '../../../../core/models/user.model';
 import { LoginModel } from '../../../../core/models/login.model';
+import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 @Component({
     selector: 'app-login',
@@ -34,6 +35,9 @@ export class LoginComponent implements OnInit {
      * Initialize
      */
     ngOnInit() {
+        // enable back dirty changes
+        ConfirmOnFormChanges.enableAllDirtyConfirm();
+
         // check if user is authenticated
         if (this.authDataService.isAuthenticated()) {
             // user is already authenticated; redirect to dashboard home page

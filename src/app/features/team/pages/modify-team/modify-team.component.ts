@@ -49,9 +49,12 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
         protected route: ActivatedRoute,
         private authDataService: AuthDataService,
         private userDataService: UserDataService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -66,6 +69,9 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
             .by('firstName', RequestSortDirection.ASC)
             .by('lastName', RequestSortDirection.ASC);
         this.usersList$ = this.userDataService.getUsersList(qbUsers);
+
+        // show loading
+        this.showLoadingDialog(false);
 
         this.route.params
             .subscribe((params: { teamId }) => {
@@ -84,6 +90,9 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                             // location data
                             this.teamData = new TeamModel(teamData);
                             this.existingUsers = this.teamData.userIds;
+
+                            // hide loading
+                            this.hideLoadingDialog();
                         });
                 }
             });
@@ -125,12 +134,15 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
             return;
         }
 
-        const loadingDialog = this.dialogService.showLoadingDialog();
+        // show loading
+        this.showLoadingDialog();
+
         this.checkTeamsInSameLocations(this.teamData.locationIds)
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 })
             )
@@ -141,7 +153,8 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showError(err.message);
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
                                 return throwError(err);
                             })
                         )
@@ -155,12 +168,12 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                             // display message
                             this.snackbarService.showSuccess('LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE');
 
-                            // hide dialog
-                            loadingDialog.close();
+                            // hide loading
+                            this.hideLoadingDialog();
                         });
                 } else {
-                    // hide dialog
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                 }
             });
     }
