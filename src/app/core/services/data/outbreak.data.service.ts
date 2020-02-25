@@ -112,9 +112,11 @@ export class OutbreakDataService {
     /**
      * Create a new Outbreak
      * @param { OutbreakModel } outbreak
+     * @param { string } outbreakTemplateId
      */
-    createOutbreak(outbreak: OutbreakModel): Observable<any> {
-        return this.http.post('outbreaks', outbreak)
+    createOutbreak(outbreak: OutbreakModel, outbreakTemplateId?: string): Observable<any> {
+        const path = !_.isEmpty(outbreakTemplateId) ? `outbreaks?templateId=${outbreakTemplateId}` : 'outbreaks';
+        return this.http.post(path, outbreak)
             .pipe(
                 mergeMap((res) => {
                     // re-determine the selected Outbreak

@@ -53,6 +53,8 @@ export class CreateOutbreakComponent
 
     serverToday: Moment = moment();
 
+    outbreakTemplateId: string;
+
     /**
      * Constructor
      */
@@ -97,6 +99,7 @@ export class CreateOutbreakComponent
         this.route.queryParams
             .subscribe((queryParams: { outbreakTemplateId }) => {
                 if (queryParams.outbreakTemplateId) {
+                    this.outbreakTemplateId = queryParams.outbreakTemplateId;
                     this.outbreakTemplateDataService.getOutbreakTemplate(queryParams.outbreakTemplateId)
                         .subscribe((outbreakTemplate: OutbreakTemplateModel) => {
                             // delete the id of the outbreak template
@@ -206,7 +209,7 @@ export class CreateOutbreakComponent
             const outbreakData = new OutbreakModel(dirtyFields);
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.outbreakDataService
-                .createOutbreak(outbreakData)
+                .createOutbreak(outbreakData, this.creatingOutbreakFromTemplate ? this.outbreakTemplateId : '')
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
