@@ -399,15 +399,19 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
             this.queryBuilder.include('createdByUser', true);
             this.queryBuilder.include('updatedByUser', true);
 
+            // since some flags can do damage to other endpoints called with the same flag, we should make sure we don't send it
+            // to do this, we clone the query filter before filtering by it
+            const clonedQB = _.cloneDeep(this.queryBuilder);
+
             // retrieve number of contacts & exposures for each record
-            this.queryBuilder.filter.flag(
+            clonedQB.filter.flag(
                 'countRelations',
                 true
             );
 
             // retrieve the list of Events
             this.eventsList$ = this.eventDataService
-                .getEventsList(this.selectedOutbreak.id, this.queryBuilder)
+                .getEventsList(this.selectedOutbreak.id, clonedQB)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);

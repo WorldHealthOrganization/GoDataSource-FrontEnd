@@ -19,6 +19,7 @@ import { throwError } from 'rxjs';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-modify-user',
@@ -56,10 +57,13 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
         private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private formHelper: FormHelperService,
-        private dialogService: DialogService,
+        protected dialogService: DialogService,
         private referenceDataService: ReferenceDataDataService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -68,6 +72,9 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // show loading
+        this.showLoadingDialog(false);
 
         // get the route params
         this.route.params.subscribe((params: {userId}) => {
@@ -82,11 +89,16 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
 
                     // update breadcrumbs
                     this.initializeBreadcrumbs();
+
+                    // hide loading
+                    this.hideLoadingDialog();
                 });
         });
 
         // get the list of roles to populate the dropdown in UI
-        this.rolesList$ = this.userRoleDataService.getRolesList();
+        const qb = new RequestQueryBuilder();
+        qb.sort.by('name');
+        this.rolesList$ = this.userRoleDataService.getRolesList(qb);
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
         this.institutionsList$ = this.referenceDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
     }
@@ -141,15 +153,17 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
         }
 
         if (form.valid && !_.isEmpty(dirtyFields)) {
+            // show loading
+            this.showLoadingDialog();
 
             // modify the user
-            const loadingDialog = this.dialogService.showLoadingDialog();
             this.userDataService
                 .modifyUser(this.userId, dirtyFields)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
-                        loadingDialog.close();
+                        // hide loading
+                        this.hideLoadingDialog();
                         return throwError(err);
                     })
                 )
@@ -165,7 +179,8 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showError(err.message);
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
                                 return throwError(err);
                             })
                         )
@@ -179,8 +194,8 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
                             // update breadcrumbs
                             this.initializeBreadcrumbs();
 
-                            // hide dialog
-                            loadingDialog.close();
+                            // hide loading
+                            this.hideLoadingDialog();
                         });
                 });
         }

@@ -13,18 +13,6 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
-         * uiUserFields
-         * Request change translation to an existing token
-         * (Should be "telephone number" since we can add only one phone number at this time)
-         */
-        'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS': 'Telephone Number',
-
-        /**
-         * uiModifyOutbreakPage
-         */
-        'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE': 'Contact form',
-
-        /**
          * uiModifyOutbreakTemplatePage
          */
         'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE': 'Contact form',

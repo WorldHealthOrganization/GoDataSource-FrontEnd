@@ -25,6 +25,7 @@ import { UserRoleHelper } from '../../../../core/helperClasses/user-role.helper'
     styleUrls: ['./modify-role.component.less']
 })
 export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // constants
@@ -46,11 +47,14 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private authDataService: AuthDataService,
-        private dialogService: DialogService,
+        protected dialogService: DialogService,
         private i18nService: I18nService,
         private sanitized: DomSanitizer
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -59,6 +63,9 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // show loading
+        this.showLoadingDialog(false);
 
         this.route.params.subscribe((params: {roleId}) => {
             // get the ID of the Role being modified
@@ -69,6 +76,9 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
                 .getRole(this.userRoleId)
                 .subscribe((role: UserRoleModel) => {
                     this.userRole = role;
+
+                    // hide loading
+                    this.hideLoadingDialog();
                 });
         });
 
@@ -117,14 +127,17 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
             return;
         }
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify the role
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.userRoleDataService
             .modifyRole(this.userRoleId, dirtyFields)
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 })
             )
@@ -138,8 +151,8 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
                 // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_USER_ROLES_ACTION_MODIFY_USER_ROLES_SUCCESS_MESSAGE');
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
             });
     }
 

@@ -52,9 +52,12 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
         private authDataService: AuthDataService,
         private iconDataService: IconDataService,
         private i18nService: I18nService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -66,6 +69,9 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // show loading
+        this.showLoadingDialog(false);
 
         // get the route params
         this.route.params
@@ -87,6 +93,9 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
 
                                 // update breadcrumbs
                                 this.initializeBreadcrumbs();
+
+                                // hide loading
+                                this.hideLoadingDialog();
                             });
                     });
             });
@@ -147,8 +156,10 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
             return;
         }
 
+        // show loading
+        this.showLoadingDialog();
+
         // get selected outbreak
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.referenceDataDataService
             .modifyEntry(
                 this.entryId,
@@ -158,7 +169,8 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showError(err.message);
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 }),
                 switchMap((modifiedReferenceDataEntry) => {
@@ -167,7 +179,8 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showError(err.message);
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
                                 return throwError(err);
                             }),
                             map(() => modifiedReferenceDataEntry)
@@ -189,8 +202,8 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
                 // update breadcrumbs
                 this.initializeBreadcrumbs();
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
             });
     }
 }

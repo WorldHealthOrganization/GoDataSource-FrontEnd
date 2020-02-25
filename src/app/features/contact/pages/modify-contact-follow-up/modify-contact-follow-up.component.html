@@ -164,6 +164,7 @@
 
             <mat-tab [label]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate">
                 <app-form-fill-questionnaire
+                    *ngIf="!!followUpData?.id"
                     name="questionnaireAnswers"
                     [ngModel]="followUpData.questionnaireAnswers"
                     [questions]="selectedOutbreak?.contactFollowUpTemplate"

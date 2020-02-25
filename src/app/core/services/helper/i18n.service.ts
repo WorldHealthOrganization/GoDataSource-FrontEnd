@@ -246,5 +246,14 @@ export class I18nService {
     public waitForLanguageInitialization(): Observable<void> {
         return this.languageLoadedEvent;
     }
+
+    /**
+     * Remove all data from storage that is handled by this service
+     */
+    public clearStorage() {
+        // remove language data
+        this.storageService.remove(StorageKey.SELECTED_LANGUAGE_ID);
+        this.storageService.remove(StorageKey.LANGUAGE_UPDATE_LAST);
+    }
 }
 

@@ -67,7 +67,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
 
     // constants
     ReferenceDataCategory = ReferenceDataCategory;
-    UserSettings = UserSettings;
     CaseModel = CaseModel;
     ContactModel = ContactModel;
     EntityType = EntityType;
@@ -76,7 +75,10 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     // available side filters
     availableSideFilters: FilterModel[];
     // values for side filter
-    savedFiltersType = Constants.APP_PAGE.CASE_LAB_RESULTS.value;
+    savedFiltersType;
+
+    // side filter
+    tableColumnsUserSettingsKey: UserSettings;
 
     // authenticated user
     authUser: UserModel;
@@ -222,6 +224,16 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         this.route.data.subscribe((data: { personType: EntityType }) => {
             // set page person type
             this.personType = data.personType;
+
+            // determine saved filter key from person type ( case / contact lab results )
+            this.savedFiltersType = this.personType === EntityType.CONTACT ?
+                Constants.APP_PAGE.CONTACT_LAB_RESULTS.value :
+                Constants.APP_PAGE.CASE_LAB_RESULTS.value;
+
+            // determine side filter key
+            this.tableColumnsUserSettingsKey = this.personType === EntityType.CONTACT ?
+                UserSettings.CONTACT_LAB_FIELDS :
+                UserSettings.CASE_LAB_FIELDS;
 
             // retrieve entity information
             this.route.params.subscribe((params: { caseId?: string, contactId?: string }) => {

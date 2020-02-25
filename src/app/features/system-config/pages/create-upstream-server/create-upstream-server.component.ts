@@ -153,6 +153,7 @@ export class CreateUpstreamServerComponent
      * @param {string} url
      */
     formatUrl(url: string) {
-        this.upstreamServerData.url = url.replace(/\s/g, '');
+        // if url is not empty format it
+        this.upstreamServerData.url = url ? url.replace(/\s/g, '') : '';
     }
 }

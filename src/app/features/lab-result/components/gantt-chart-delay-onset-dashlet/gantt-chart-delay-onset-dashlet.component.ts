@@ -183,8 +183,8 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
         _.forEach(metricResults, (result) => {
             if (
                 !_.isEmpty(result.dateOfOnset) &&
-                !_.isEmpty(result.dateSampleTaken)
-                && result.delay > 0
+                !_.isEmpty(result.dateSampleTaken) &&
+                result.delay > 0
             ) {
                 const chartDataItemChild: any = {};
                 chartDataItemChild.id = result.case.id;
