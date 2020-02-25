@@ -376,4 +376,15 @@ export class AuthDataService {
     public getTokenInfoSubject(): BehaviorSubject<ITokenInfo> {
         return this.tokenInfoSubscriberSubject;
     }
+
+    /**
+     * Remove all data from storage that is handled by this service
+     */
+    public clearStorage() {
+        // remove auth info from local storage
+        this.storageService.remove(StorageKey.AUTH_DATA);
+
+        // remove selected outbreak from local storage
+        this.storageService.remove(StorageKey.SELECTED_OUTBREAK_ID);
+    }
 }
