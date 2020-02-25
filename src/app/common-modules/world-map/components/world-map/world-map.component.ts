@@ -686,7 +686,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             this.mapClusterLayerSource.getExtent() :
             this.mapOverlayLayerSource.getExtent();
 
-        // if full screen is true prevent map resize
+        // if full screen is activated prevent map resize
         if (this.fullScreenMode) {
             return;
         }
