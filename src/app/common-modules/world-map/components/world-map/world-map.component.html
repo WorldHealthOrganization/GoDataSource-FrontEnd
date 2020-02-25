@@ -3,7 +3,7 @@
     [ngClass]="{'full-screen-on': fullScreenMode, 'toggle-full-screen': !fullScreenMode}"
     [(ngModel)]="fullScreenMode"
     [label]="'LNG_PAGE_WORLD_MAP_FULL_SCREEN_LABEL' | translate"
-    (optionChanged)="updateMapSize()">
+    (optionChanged)="updateMapSize($event)">
 </app-form-slide-toggle>
 
 <!-- Draw map -->

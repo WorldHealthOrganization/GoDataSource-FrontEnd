@@ -154,6 +154,7 @@
         <!-- Toggle full screen -->
         <app-form-slide-toggle
             name="toggleFullScreenMode"
+            [style.visibility]="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ? 'hidden': 'visible'"
             [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_FULL_SCREEN_LABEL' | translate"
             [(ngModel)]="fullScreen"
             (optionChanged)="updateFullScreenViewPort()"
@@ -204,6 +205,7 @@
             [centerLocation]="markers[0]?.point"
             [fitLayer]="WorldMapMarkerLayer.CLUSTER"
             [clusterDistance]="30"
+            (fullScreenToggle)="onFullScreenToggle($event)"
             groupMarkerTitle="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GROUP_DIALOG_MARKER_SECTION_TITLE"
             groupPathTitle="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GROUP_DIALOG_PATHS_SECTION_TITLE">
         </app-world-map>

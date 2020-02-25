@@ -1,4 +1,13 @@
-import { Component, HostListener, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+    Component,
+    EventEmitter,
+    HostListener,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
+    ViewEncapsulation
+} from '@angular/core';
 import * as _ from 'lodash';
 import Map from 'ol/Map';
 import View from 'ol/View';
@@ -411,6 +420,12 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     fullScreenMode: boolean = false;
 
     /**
+     * Event emitter for full screen toggle
+     * @type {EventEmitter<any>}
+     */
+    @Output() fullScreenToggle = new EventEmitter<any>();
+
+    /**
      * Constructor
      */
     constructor(
@@ -670,6 +685,11 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         this.markerBounds = this.fitLayer === WorldMapMarkerLayer.CLUSTER ?
             this.mapClusterLayerSource.getExtent() :
             this.mapOverlayLayerSource.getExtent();
+
+        // if full screen is true prevent map resize
+        if (this.fullScreenMode) {
+            return;
+        }
 
         // update map size
         this.updateMapSize();
@@ -1221,7 +1241,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     /**
      * Update map size
      */
-    public updateMapSize() {
+    public updateMapSize(toggleFullScreen?: boolean) {
         // check if map was initialized
         if (_.isEmpty(this.map)) {
             // finished
@@ -1232,6 +1252,9 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         setTimeout(() => {
             this.map.updateSize();
         });
+
+        // emit value to parent component
+        this.fullScreenToggle.emit(toggleFullScreen);
     }
 
     /**

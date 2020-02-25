@@ -417,6 +417,14 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     /**
+     * Full screen toggle from child component to update toggles section
+     * @param {boolean} fullScreenToggle
+     */
+    onFullScreenToggle(fullScreenToggle: boolean) {
+        this.fullScreen = fullScreenToggle;
+    }
+
+    /**
      * Render cytoscape graph
      */
     render() {
