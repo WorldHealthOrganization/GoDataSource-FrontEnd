@@ -101,7 +101,7 @@ const routes: Routes = [
             permissions: [
                 PERMISSION.OUTBREAK_VIEW,
                 PERMISSION.OUTBREAK_MODIFY,
-                PERMISSION.OUTBREAK_MODIFY_CASE_QUESTIONNAIRE
+                PERMISSION.OUTBREAK_MODIFY_CONTACT_QUESTIONNAIRE
             ],
             // to change in contact
             questionnaire: OutbreakQestionnaireTypeEnum.CONTACT

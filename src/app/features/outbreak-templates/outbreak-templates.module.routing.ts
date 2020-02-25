@@ -90,7 +90,7 @@ const routes: Routes = [
             permissions: [
                 PERMISSION.OUTBREAK_TEMPLATE_VIEW,
                 PERMISSION.OUTBREAK_TEMPLATE_MODIFY,
-                PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_QUESTIONNAIRE
+                PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CONTACT_QUESTIONNAIRE
             ],
             questionnaire: OutbreakQestionnaireTypeEnum.CONTACT
         },

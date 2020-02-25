@@ -39,7 +39,7 @@ export class OutbreakTemplateModel
      * Static Permissions - IPermissionQuestionnaire
      */
     static canModifyCaseQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_QUESTIONNAIRE) : false; }
-    static canModifyContactQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_QUESTIONNAIRE) : false; }
+    static canModifyContactQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CONTACT_QUESTIONNAIRE) : false; }
     static canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE) : false; }
     static canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE) : false; }
 
@@ -73,7 +73,7 @@ export class OutbreakTemplateModel
             });
         // CONTACT INVESTIGATION TEMPLATE
         this.contactInvestigationTemplate = _.map(
-            _.get(data, 'caseInvestigationTemplate', []),
+            _.get(data, 'contactInvestigationTemplate', []),
             (lData: any) => {
                 return new QuestionModel(lData);
             });
