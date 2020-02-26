@@ -16,8 +16,9 @@
     </div>
 
     <!-- legend -->
-    <div [ngClass]="{'full-screen-graph-legend': fullScreen, 'graph-legend': !fullScreen}"
-         *ngIf="legend && showLegend && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)">
+    <div
+        *ngIf="legend && showLegend && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)"
+        class="graph-legend {{ fullScreen ? 'full-screen-graph-legend' : '' }}">
         <!-- node color -->
         <div *ngIf="legend.nodeColorKeys && legend.nodeColorKeys.length"
              class="legend-name">
@@ -118,7 +119,6 @@
                 {{edgeIconItem | translate}}
             </div>
         </div>
-
     </div>
 
     <!-- Toggles -->
