@@ -259,7 +259,7 @@
                 <app-form-fill-questionnaire
                     name="questionnaireAnswers"
                     [ngModel]="contactData.questionnaireAnswers"
-                    [questions]="selectedOutbreak.contactInvestigationTemplate"
+                    [questions]="selectedOutbreak?.contactInvestigationTemplate"
                     [disabled]="viewOnly"
                     [componentTitle]="'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE' | translate">
                 </app-form-fill-questionnaire>

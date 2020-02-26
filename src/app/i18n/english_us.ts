@@ -13,10 +13,14 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiModifyOutbreakPage
+         */
+        'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE': 'Contact form',
+
+        /**
          * uiModifyOutbreakTemplatePage
          */
         'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE': 'Contact form',
-
 
         /**
          * uiCreateContactPage
