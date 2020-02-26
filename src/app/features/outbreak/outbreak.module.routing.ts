@@ -92,7 +92,6 @@ const routes: Routes = [
     },
 
     // Edit Outbreak Contact Questionnaire
-    // to change in contact
     {
         path: ':outbreakId/contact-questionnaire',
         component: fromPages.OutbreakQuestionnaireComponent,
@@ -103,7 +102,6 @@ const routes: Routes = [
                 PERMISSION.OUTBREAK_MODIFY,
                 PERMISSION.OUTBREAK_MODIFY_CONTACT_QUESTIONNAIRE
             ],
-            // to change in contact
             questionnaire: OutbreakQestionnaireTypeEnum.CONTACT
         },
         canDeactivate: [

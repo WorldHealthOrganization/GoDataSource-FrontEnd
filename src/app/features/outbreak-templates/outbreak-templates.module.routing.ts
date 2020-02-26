@@ -81,7 +81,6 @@ const routes: Routes = [
     },
 
     // Edit Outbreak Template Case Questionnaire
-    // to change in contact
     {
         path: ':outbreakTemplateId/contact-questionnaire',
         component: fromPages.OutbreakTemplateQuestionnaireComponent,
