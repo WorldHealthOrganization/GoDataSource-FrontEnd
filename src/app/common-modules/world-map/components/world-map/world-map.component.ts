@@ -1,4 +1,13 @@
-import { Component, HostListener, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+    Component,
+    EventEmitter,
+    HostListener,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
+    ViewEncapsulation
+} from '@angular/core';
 import * as _ from 'lodash';
 import Map from 'ol/Map';
 import View from 'ol/View';
@@ -404,6 +413,17 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      * Path ( lines ) section title for group dialog
      */
     @Input() groupPathTitle: string;
+
+    /**
+     * It's full screen activated?
+     */
+    fullScreenMode: boolean = false;
+
+    /**
+     * Event emitter for full screen toggle
+     * @type {EventEmitter<any>}
+     */
+    @Output() fullScreenToggle = new EventEmitter<any>();
 
     /**
      * Constructor
@@ -1227,6 +1247,18 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         setTimeout(() => {
             this.map.updateSize();
         });
+
+    }
+
+    /**
+     * Trigger map update and full screen toggle
+     */
+    fullScreenToggleTrigger() {
+        // update map size
+        this.updateMapSize();
+
+        // emit value to parent component
+        this.fullScreenToggle.emit(this.fullScreenMode);
     }
 
     /**
