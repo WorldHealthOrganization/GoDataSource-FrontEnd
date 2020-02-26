@@ -163,7 +163,7 @@
         [fxShow]="!showLoading && transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
         <!-- zoom in / out buttons -->
         <div
-            [ngClass]="{'full-screen-cy-zoom-buttons': fullScreen, 'cy-zoom-buttons': !fullScreen}">
+            class="cy-zoom-buttons {{ fullScreen ? 'cy-zoom-buttons-full-screen' : '' }}">
             <button
                 mat-raised-button
                 class="cy-zoom-button"
@@ -184,7 +184,7 @@
         <!-- cytoscape element -->
         <div
             id="cy"
-            [ngClass]="{'xt-icon full-screen ': fullScreen, 'cy xt-icon': !fullScreen}">
+            class="cy xt-icon {{ fullScreen ? 'cy-full-screen' : ''}}">
         </div>
     </div>
 
