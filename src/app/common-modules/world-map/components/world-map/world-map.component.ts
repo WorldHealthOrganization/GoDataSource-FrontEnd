@@ -686,11 +686,6 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             this.mapClusterLayerSource.getExtent() :
             this.mapOverlayLayerSource.getExtent();
 
-        // if full screen is activated prevent map resize
-        if (this.fullScreenMode) {
-            return;
-        }
-
         // update map size
         this.updateMapSize();
     }
@@ -1241,7 +1236,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     /**
      * Update map size
      */
-    public updateMapSize(toggleFullScreen?: boolean) {
+    public updateMapSize() {
         // check if map was initialized
         if (_.isEmpty(this.map)) {
             // finished
@@ -1253,8 +1248,17 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             this.map.updateSize();
         });
 
+    }
+
+    /**
+     * Trigger map update and full screen toggle
+     */
+    fullScreenToggleTrigger() {
+        // update map size
+        this.updateMapSize();
+
         // emit value to parent component
-        this.fullScreenToggle.emit(toggleFullScreen);
+        this.fullScreenToggle.emit(this.fullScreenMode);
     }
 
     /**
