@@ -154,9 +154,8 @@
         <app-form-slide-toggle
             *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value"
             [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_FULL_SCREEN_LABEL' | translate"
-            [(ngModel)]="fullScreen"
-            (optionChanged)="updateFullScreenViewPort()"
-        ></app-form-slide-toggle>
+            [(ngModel)]="fullScreen">
+        </app-form-slide-toggle>
     </div>
 
     <div

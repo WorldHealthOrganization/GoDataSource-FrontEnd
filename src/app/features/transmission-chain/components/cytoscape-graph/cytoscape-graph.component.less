@@ -1,13 +1,4 @@
 app-cytoscape-graph {
-    .cy-full-screen {
-        position: fixed;
-        background-color: white;
-        width: 100vw;
-        height: 100vh;
-        top: 0;
-        left: 0;
-    }
-
     .full-screen-bottomed-item {
         position: fixed;
         margin: 5px 7px;
@@ -44,11 +35,21 @@ app-cytoscape-graph {
     .cy {
         width: 97%;
         min-height: 550px;
+        height: 550px;
         display: block;
         padding: 20px;
         resize: vertical;
         overflow: hidden;
         border: 1px solid #d3d3d3;
+
+        &.cy-full-screen {
+            position: fixed;
+            background-color: white;
+            width: 100vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+        }
     }
 
     .spinner-graph mat-spinner {

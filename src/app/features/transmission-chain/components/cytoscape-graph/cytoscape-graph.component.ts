@@ -99,8 +99,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     editMode: boolean = false;
     // toggle full screen
     fullScreen: boolean = false;
-    // full screen tracker
-    iAmFullScreen: boolean = false;
 
     // display labels
     displayLabels: boolean = true;
@@ -399,21 +397,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     public ngOnChanges(): any {
         // render cytoscape object
         this.render();
-    }
-
-    /**
-     * Update view for full-screen mode and after full-screen is disabled
-     */
-    updateFullScreenViewPort() {
-        if (this.iAmFullScreen === true) {
-            // if full-screen is ON, disable flag and reset height of container
-            this.iAmFullScreen = false;
-            document.getElementById('cy').style.height = '550px';
-        } else {
-            // if full-screen is OFF, enable the flag for further use and updated the height
-            this.iAmFullScreen = true;
-            document.getElementById('cy').style.height = '100vh';
-        }
     }
 
     /**
