@@ -27,7 +27,9 @@
                                 [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_NAME' | translate"
                                 tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_NAME_DESCRIPTION"
                                 required="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                app-general-async-validator
+                                [asyncValidatorObservable]="outbreakTemplateNameValidator$">
                             </app-form-input>
                             <app-form-select
                                 name="disease"

@@ -86,15 +86,15 @@ export class OutbreakTemplateDataService {
      * Check if the name of the new outbreak template is unique
      * @returns {Observable<boolean | IGeneralAsyncValidatorResponse>}
      */
-    checkOutbreakTemplateNameUniquenessValidity(newOutbreakName: string, outbreakId?: string): Observable<boolean | IGeneralAsyncValidatorResponse> {
+    checkOutbreakTemplateNameUniquenessValidity(newOutbreakTemplateName: string, outbreakTemplateId?: string): Observable<boolean | IGeneralAsyncValidatorResponse> {
         const qb: RequestQueryBuilder = new RequestQueryBuilder();
-        qb.filter.byEquality('name', newOutbreakName, true, true);
+        qb.filter.byEquality('name', newOutbreakTemplateName, true, true);
 
-        // condition for modify outbreak
-        if (outbreakId) {
+        // condition for modify outbreak template
+        if (outbreakTemplateId) {
             qb.filter.where({
                 'id': {
-                    neq: outbreakId
+                    neq: outbreakTemplateId
                 }
             });
         }
@@ -106,7 +106,7 @@ export class OutbreakTemplateDataService {
                     return !countData.count ?
                         true : {
                             isValid: false,
-                            errMsg: 'LNG_FORM_VALIDATION_ERROR_OUTBREAK_NAME_NOT_UNIQUE'
+                            errMsg: 'LNG_FORM_VALIDATION_ERROR_OUTBREAK_TEMPLATE_NAME_NOT_UNIQUE'
                         };
                 })
             );
