@@ -23,6 +23,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_WORLD_MAP_FULL_SCREEN_LABEL': 'Full screen',
 
         /**
+         * uiFormInputValidationErrors
+         */
+        'LNG_FORM_VALIDATION_ERROR_OUTBREAK_TEMPLATE_NAME_NOT_UNIQUE': 'This name is already in use'
+
+        /**
          * REMOVE the tokens from below
          */
         // ...
