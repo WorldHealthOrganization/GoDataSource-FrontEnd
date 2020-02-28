@@ -183,14 +183,22 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
         _.forEach(metricResults, (result) => {
             if (
                 !_.isEmpty(result.dateOfOnset) &&
-                !_.isEmpty(result.dateSampleTaken) &&
-                result.delay > 0
+                !_.isEmpty(result.dateSampleTaken)
             ) {
+                // check if we have any result with no delay and increase the time on the dateOfOnset and set it as
+                // dateSampleTaken for labResult to be displayed on the chart
+                let delayedDate = new Date();
+                if (result.delay === 0 && result.dateOfOnset === result.dateSampleTaken) {
+                    const initialDate = new Date(result.dateOfOnset);
+                    // increasing time to the dateOfOnset to set it as dateSampleTaken
+                    initialDate.setTime(initialDate.getTime() + (10 * 60 * 60 * 1000));
+                    delayedDate = initialDate;
+                }
                 const chartDataItemChild: any = {};
                 chartDataItemChild.id = result.case.id;
                 chartDataItemChild.name = result.case.name;
                 chartDataItemChild.from = new Date(Date.parse(result.dateOfOnset));
-                chartDataItemChild.to = new Date(Date.parse(result.dateSampleTaken));
+                chartDataItemChild.to = delayedDate ? delayedDate : new Date(Date.parse(result.dateSampleTaken));
                 chartDataItem.children.push(chartDataItemChild);
             }
         });
