@@ -10,6 +10,7 @@ import { catchError } from 'rxjs/operators';
 import { UserModel } from '../../../../core/models/user.model';
 import { LoginModel } from '../../../../core/models/login.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-login',
@@ -28,7 +29,8 @@ export class LoginComponent implements OnInit {
         private router: Router,
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        protected dialogService: DialogService
     ) {}
 
     /**
@@ -52,11 +54,18 @@ export class LoginComponent implements OnInit {
         if (form.valid) {
             const dirtyFields: any = form.value;
 
+            // show loading
+            const loadingDialog = this.dialogService.showLoadingDialog();
+
             // try to authenticate the user
             this.authDataService
                 .login(dirtyFields)
                 .pipe(
                     catchError((err) => {
+                        // hide loading
+                        loadingDialog.close();
+
+                        // show error
                         this.snackbarService.showApiError(err);
                         return throwError(err);
                     })
@@ -67,7 +76,7 @@ export class LoginComponent implements OnInit {
                     this.i18nService
                         .loadUserLanguage()
                         .subscribe(() => {
-
+                            // show success message
                             this.snackbarService.showSuccess(
                                 'LNG_PAGE_LOGIN_ACTION_LOGIN_SUCCESS_MESSAGE',
                                 {
@@ -75,17 +84,36 @@ export class LoginComponent implements OnInit {
                                 }
                             );
 
-                            // check if user needs to change password
-                            if (
-                                auth.user.passwordChange &&
-                                UserModel.canModifyOwnAccount(this.authDataService.getAuthenticatedUser())
-                            ) {
-                                // user must change password
-                                this.router.navigate(['/account/change-password']);
-                            } else {
-                                // redirect to dashboard landing page
-                                this.router.navigate(['']);
-                            }
+                            // invalidate language
+                            this.i18nService.clearStorage();
+                            this.i18nService
+                                .loadUserLanguage()
+                                .pipe(
+                                    catchError((err) => {
+                                        // hide loading
+                                        loadingDialog.close();
+
+                                        // show api error
+                                        this.snackbarService.showApiError(err);
+                                        return throwError(err);
+                                    })
+                                )
+                                .subscribe(() => {
+                                    // hide loading
+                                    loadingDialog.close();
+
+                                    // check if user needs to change password
+                                    if (
+                                        auth.user.passwordChange &&
+                                        UserModel.canModifyOwnAccount(this.authDataService.getAuthenticatedUser())
+                                    ) {
+                                        // user must change password
+                                        this.router.navigate(['/account/change-password']);
+                                    } else {
+                                        // redirect to dashboard landing page
+                                        this.router.navigate(['']);
+                                    }
+                                });
                         });
                 });
         }
