@@ -41,11 +41,11 @@ export const EnglishUsLang = {
          * uiCreateContactPage
          */
         'LNG_PAGE_CREATE_CONTACT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+
         /**
          * uiModifyContactPage
          */
         'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire'
-
 
         /**
          * REMOVE the tokens from below
