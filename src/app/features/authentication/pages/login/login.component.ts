@@ -73,8 +73,20 @@ export class LoginComponent implements OnInit {
                 .subscribe((auth: AuthModel) => {
                     // successfully authenticated;
                     // use authenticated user's preferred language
+                    // invalidate language
+                    this.i18nService.clearStorage();
                     this.i18nService
                         .loadUserLanguage()
+                        .pipe(
+                            catchError((err) => {
+                                // hide loading
+                                loadingDialog.close();
+
+                                // show api error
+                                this.snackbarService.showApiError(err);
+                                return throwError(err);
+                            })
+                        )
                         .subscribe(() => {
                             // show success message
                             this.snackbarService.showSuccess(
@@ -84,36 +96,20 @@ export class LoginComponent implements OnInit {
                                 }
                             );
 
-                            // invalidate language
-                            this.i18nService.clearStorage();
-                            this.i18nService
-                                .loadUserLanguage()
-                                .pipe(
-                                    catchError((err) => {
-                                        // hide loading
-                                        loadingDialog.close();
+                            // hide loading
+                            loadingDialog.close();
 
-                                        // show api error
-                                        this.snackbarService.showApiError(err);
-                                        return throwError(err);
-                                    })
-                                )
-                                .subscribe(() => {
-                                    // hide loading
-                                    loadingDialog.close();
-
-                                    // check if user needs to change password
-                                    if (
-                                        auth.user.passwordChange &&
-                                        UserModel.canModifyOwnAccount(this.authDataService.getAuthenticatedUser())
-                                    ) {
-                                        // user must change password
-                                        this.router.navigate(['/account/change-password']);
-                                    } else {
-                                        // redirect to dashboard landing page
-                                        this.router.navigate(['']);
-                                    }
-                                });
+                            // check if user needs to change password
+                            if (
+                                auth.user.passwordChange &&
+                                UserModel.canModifyOwnAccount(this.authDataService.getAuthenticatedUser())
+                            ) {
+                                // user must change password
+                                this.router.navigate(['/account/change-password']);
+                            } else {
+                                // redirect to dashboard landing page
+                                this.router.navigate(['']);
+                            }
                         });
                 });
         }
