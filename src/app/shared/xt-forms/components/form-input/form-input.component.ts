@@ -60,6 +60,8 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
 
     @Input() displayFilterIcon: boolean = false;
 
+    @Input() tabIndex: number;
+
     @Input() maxlength: number;
     @Input() minlength: number;
 

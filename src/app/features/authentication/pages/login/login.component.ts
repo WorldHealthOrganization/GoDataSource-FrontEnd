@@ -11,6 +11,9 @@ import { UserModel } from '../../../../core/models/user.model';
 import { LoginModel } from '../../../../core/models/login.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { CaptchaDataService } from '../../../../core/services/data/captcha.data.service';
+import { Observable } from 'rxjs/internal/Observable';
+import { SafeHtml } from '@angular/platform-browser';
 
 @Component({
     selector: 'app-login',
@@ -22,6 +25,9 @@ export class LoginComponent implements OnInit {
     // used by template
     user = new LoginModel();
 
+    // captcha data
+    captchaData$: Observable<SafeHtml>;
+
     /**
      * Constructor
      */
@@ -30,7 +36,8 @@ export class LoginComponent implements OnInit {
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
         private i18nService: I18nService,
-        protected dialogService: DialogService
+        protected dialogService: DialogService,
+        private captchaDataService: CaptchaDataService
     ) {}
 
     /**
@@ -44,7 +51,11 @@ export class LoginComponent implements OnInit {
         if (this.authDataService.isAuthenticated()) {
             // user is already authenticated; redirect to dashboard home page
             this.router.navigate(['']);
+            return;
         }
+
+        // generate captcha
+        this.refreshCaptcha();
     }
 
     /**
@@ -64,6 +75,9 @@ export class LoginComponent implements OnInit {
                     catchError((err) => {
                         // hide loading
                         loadingDialog.close();
+
+                        // reset captcha no matter what...
+                        this.refreshCaptcha();
 
                         // show error
                         this.snackbarService.showApiError(err);
@@ -115,4 +129,18 @@ export class LoginComponent implements OnInit {
         }
     }
 
+    /**
+     * Refresh captcha
+     */
+    refreshCaptcha() {
+        this.captchaData$ = this.captchaDataService
+            .generateSVG()
+            .pipe(
+                catchError((err) => {
+                    // show error
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                })
+            );
+    }
 }

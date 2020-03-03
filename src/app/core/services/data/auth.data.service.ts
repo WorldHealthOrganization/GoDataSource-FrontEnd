@@ -64,7 +64,13 @@ export class AuthDataService {
      * @returns {Observable<any>}
      */
     login(user): Observable<AuthModel> {
-        return this.http.post(`users/login`, user)
+        return this.http
+            .post(
+                `users/login`,
+                user, {
+                    withCredentials: true
+                }
+            )
             .pipe(
                 switchMap((authRes) => {
                     // keep auth info
