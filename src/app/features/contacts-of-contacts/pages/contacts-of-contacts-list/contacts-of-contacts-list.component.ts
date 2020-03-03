@@ -756,7 +756,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
             // retrieve the list of Contacts
             this.contactsOfContactsList$ = this.contactsOfContactsDataService
-                .getContactsList(this.selectedOutbreak.id, this.queryBuilder)
+                .getContactsOfContactsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(
                     tap(this.checkEmptyList.bind(this)),
                     tap((data: any[]) => {
@@ -777,7 +777,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
-            this.contactsListCount$ = this.contactsOfContactsDataService.getContactsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
+            this.contactsListCount$ = this.contactsOfContactsDataService.getContactsOfContactsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }
 
@@ -811,22 +811,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     //     }
     // }
 
-        // /**
-    //  * Check if we have write access to follow-ups
-    //  * @returns {boolean}
-    //  */
-    // hasFollowUpWriteAccess(): boolean {
-    //     return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
-    // }
-
-    // /**
-    //  * Check if we have access view a contact follow-up
-    //  * @returns {boolean}
-    //  */
-    // hasContactFollowUpReadAccess(): boolean {
-    //     return this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP);
-    // }
-
     /**
      * Retrieve risk color accordingly to risk level
      * @param item
@@ -853,7 +837,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete contact
                     this.contactsOfContactsDataService
-                        .deleteContact(this.selectedOutbreak.id, contact.id)
+                        .deleteContactOfContact(this.selectedOutbreak.id, contact.id)
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showError(err.message);
@@ -876,7 +860,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.contactsOfContactsDataService
-                        .restoreContact(this.selectedOutbreak.id, contact.id)
+                        .restoreContactOfContact(this.selectedOutbreak.id, contact.id)
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showError(err.message);

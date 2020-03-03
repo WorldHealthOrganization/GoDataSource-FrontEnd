@@ -22,7 +22,7 @@
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="firstName"
-                                [(ngModel)]="contactData.firstName"
+                                [(ngModel)]="contactOfContactData.firstName"
                                 [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME'| translate"
                                 tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
                                 required="true"
@@ -32,7 +32,7 @@
 
                             <app-form-input
                                 name="middleName"
-                                [(ngModel)]="contactData.middleName"
+                                [(ngModel)]="contactOfContactData.middleName"
                                 [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME'| translate"
                                 tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION"
                                 maxlength="200"
@@ -41,7 +41,7 @@
 
                             <app-form-input
                                 name="lastName"
-                                [(ngModel)]="contactData.lastName"
+                                [(ngModel)]="contactOfContactData.lastName"
                                 [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
                                 tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION"
                                 maxlength="200"
@@ -50,7 +50,7 @@
 
                             <app-form-select
                                 name="gender"
-                                [(ngModel)]="contactData.gender"
+                                [(ngModel)]="contactOfContactData.gender"
                                 [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER' | translate"
                                 tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION"
                                 [options]="genderList$ | async"
@@ -66,7 +66,7 @@
                                 <app-form-input
                                     name="visualId"
                                     #visualId="ngModel"
-                                    [(ngModel)]="contactData.visualId"
+                                    [(ngModel)]="contactOfContactData.visualId"
                                     [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
                                     tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
                                     [tooltipTranslateData]="visualIDTranslateData"
@@ -80,7 +80,7 @@
 
                                 <app-form-select
                                     name="occupation"
-                                    [(ngModel)]="contactData.occupation"
+                                    [(ngModel)]="contactOfContactData.occupation"
                                     [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
                                     tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION"
                                     [options]="occupationsList$ | async"
@@ -91,7 +91,7 @@
                             <app-form-age-dob
                                 fxFlex
                                 name="ageDob"
-                                [(ngModel)]="contactData"
+                                [(ngModel)]="contactOfContactData"
                                 [disabled]="viewOnly"
                                 ageButtonLabel="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE_BUTTON"
                                 dobButtonLabel="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON"
@@ -104,7 +104,7 @@
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-select
                                 name="pregnancyStatus"
-                                [(ngModel)]="contactData.pregnancyStatus"
+                                [(ngModel)]="contactOfContactData.pregnancyStatus"
                                 [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS' | translate"
                                 tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
                                 [options]="pregnancyStatusList$ | async"
@@ -114,7 +114,7 @@
                             <app-form-datepicker
                                 fxFlex
                                 name="dateOfReporting"
-                                [(ngModel)]="contactData.dateOfReporting"
+                                [(ngModel)]="contactOfContactData.dateOfReporting"
                                 [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
                                 tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
                                 required="true"
@@ -127,7 +127,7 @@
                             <app-form-slide-toggle
                                 fxFlex
                                 name="isDateOfReportingApproximate"
-                                [(ngModel)]="contactData.isDateOfReportingApproximate"
+                                [(ngModel)]="contactOfContactData.isDateOfReportingApproximate"
                                 [label]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
                                 tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION"
                                 [disabled]="viewOnly">
@@ -135,7 +135,7 @@
 
                             <app-form-select
                                 name="followUp.status"
-                                [ngModel]="contactData.followUp?.status"
+                                [ngModel]="contactOfContactData.followUp?.status"
                                 [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS' | translate"
                                 tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION"
                                 [options]="finalFollowUpStatus$ | async"
@@ -159,7 +159,7 @@
                             <app-form-select
                                 fxFlex
                                 name="riskLevel"
-                                [(ngModel)]="contactData.riskLevel"
+                                [(ngModel)]="contactOfContactData.riskLevel"
                                 [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL' | translate"
                                 tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
                                 [options]="riskLevelsList$ | async"
@@ -174,7 +174,7 @@
                         <div fxLayout="row">
                             <app-form-textarea
                                 name="riskReason"
-                                [(ngModel)]="contactData.riskReason"
+                                [(ngModel)]="contactOfContactData.riskReason"
                                 [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON' | translate"
                                 tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION"
                                 [disabled]="viewOnly">
@@ -188,7 +188,7 @@
                 <!--Vaccines received section-->
                 <app-form-vaccines-list
                     name="vaccinesReceived"
-                    [(ngModel)]="contactData.vaccinesReceived"
+                    [(ngModel)]="contactOfContactData.vaccinesReceived"
                     [disabled]="viewOnly"
                     [required]="true">
                 </app-form-vaccines-list>
@@ -197,7 +197,7 @@
                 <div class="section-title">{{'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_DOCUMENTS_TITLE'| translate}}</div>
                 <app-form-document-list
                     name="documents"
-                    [(ngModel)]="contactData.documents"
+                    [(ngModel)]="contactOfContactData.documents"
                     [required]="true"
                     [disabled]="viewOnly">
                 </app-form-document-list>
@@ -212,7 +212,7 @@
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="createdByUser"
-                                [ngModel]="contactData.createdByUser?.name"
+                                [ngModel]="contactOfContactData.createdByUser?.name"
                                 [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_BY'| translate"
                                 tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_BY_DESCRIPTION"
                                 [disabled]="true">
@@ -220,7 +220,7 @@
 
                             <app-form-input
                                 name="createdAt"
-                                [ngModel]="contactData.createdAt | dateTimeDefault"
+                                [ngModel]="contactOfContactData.createdAt | dateTimeDefault"
                                 [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_AT'| translate"
                                 tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_AT_DESCRIPTION"
                                 [disabled]="true">
@@ -228,7 +228,7 @@
 
                             <app-form-input
                                 name="updatedByUser"
-                                [ngModel]="contactData.updatedByUser?.name"
+                                [ngModel]="contactOfContactData.updatedByUser?.name"
                                 [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_BY'| translate"
                                 tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_BY_DESCRIPTION"
                                 [disabled]="true">
@@ -236,7 +236,7 @@
 
                             <app-form-input
                                 name="updatedAt"
-                                [ngModel]="contactData.updatedAt | dateTimeDefault"
+                                [ngModel]="contactOfContactData.updatedAt | dateTimeDefault"
                                 [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_AT'| translate"
                                 tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_AT_DESCRIPTION"
                                 [disabled]="true">
@@ -249,7 +249,7 @@
             <mat-tab [label]="'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_ADDRESS_TITLE' | translate">
                 <app-form-address-list
                     name="addresses"
-                    [(ngModel)]="contactData.addresses"
+                    [(ngModel)]="contactOfContactData.addresses"
                     [disabled]="viewOnly"
                     [required]="true">
                 </app-form-address-list>
@@ -277,7 +277,7 @@
             </ng-container>
 
             <ng-container
-                *ngIf="viewOnly && hasContactWriteAccess()">
+                *ngIf="viewOnly">
                 <button
                     mat-raised-button type="button" color="accent"
                     [routerLink]="['/contacts-of-contacts', contactId, 'modify']"

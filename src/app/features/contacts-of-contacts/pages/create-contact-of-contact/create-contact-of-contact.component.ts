@@ -2,7 +2,6 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import * as _ from 'lodash';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -33,6 +32,7 @@ import {
     DialogFieldType
 } from '../../../../shared/components/dialog/dialog.component';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
     selector: 'app-create-contact-of-contact',
@@ -47,7 +47,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
     // selected outbreak ID
     outbreakId: string;
 
-    contactData: ContactModel = new ContactModel();
+    contactOfContactData: ContactOfContactModel = new ContactOfContactModel();
 
     entityType: EntityType;
     entityId: string;
@@ -93,9 +93,9 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 
         // by default, enforce Contact having an address
-        this.contactData.addresses.push(new AddressModel());
+        this.contactOfContactData.addresses.push(new AddressModel());
         // pre-set the initial address as "current address"
-        this.contactData.addresses[0].typeId = AddressType.CURRENT_ADDRESS;
+        this.contactOfContactData.addresses[0].typeId = AddressType.CURRENT_ADDRESS;
 
         // retrieve query params
         this.route.queryParams
@@ -108,17 +108,12 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
                     !this.entityType ||
                     !this.entityId
                 ) {
-                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED');
+                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED');
 
-                    // navigate to Cases/Events listing page
                     this.disableDirtyConfirm();
-                    if (this.entityType === EntityType.EVENT) {
-                        this.router.navigate(['/events']);
-                    } else {
-                        this.router.navigate(['/cases']);
-                    }
+                    // navigate to Contacts page
+                    this.router.navigate(['/contacts']);
 
-                    return;
                 }
 
                 // get selected outbreak
@@ -129,9 +124,9 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
                             // show error message
                             this.snackbarService.showError(err.message);
 
-                            // redirect to cases
+                            // redirect to contacts
                             this.disableDirtyConfirm();
-                            this.router.navigate(['/cases']);
+                            this.router.navigate(['/contacts']);
                             return throwError(err);
                         })
                     )
@@ -140,18 +135,18 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
 
                         // set visual ID translate data
                         this.visualIDTranslateData = {
-                            mask: ContactModel.generateContactIDMask(selectedOutbreak.contactIdMask)
+                            mask: ContactOfContactModel.generateContactOfContactIDMask(selectedOutbreak.contactOfContactIdMask)
                         };
 
                         // set visual id for contact
-                        this.contactData.visualId = this.visualIDTranslateData.mask;
+                        this.contactOfContactData.visualId = this.visualIDTranslateData.mask;
 
                         // set visual ID validator
                         this.contactIdMaskValidator = new Observable((observer) => {
-                            this.contactsOfContactsDataService.checkContactVisualIDValidity(
+                            this.contactsOfContactsDataService.checkContactOfContactVisualIDValidity(
                                 selectedOutbreak.id,
                                 this.visualIDTranslateData.mask,
-                                this.contactData.visualId
+                                this.contactOfContactData.visualId
                             ).subscribe((isValid: boolean) => {
                                 observer.next(isValid);
                                 observer.complete();
@@ -160,7 +155,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
 
                         // retrieve Case/Event information
                         this.entityDataService
-                            .getEntity(this.entityType, selectedOutbreak.id, this.entityId)
+                            .getEntity(EntityType.CONTACT, selectedOutbreak.id, this.entityId)
                             .pipe(
                                 catchError((err) => {
                                     // show error message
@@ -168,12 +163,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
 
                                     // navigate to Cases/Events listing page
                                     this.disableDirtyConfirm();
-                                    if (this.entityType === EntityType.EVENT) {
-                                        this.router.navigate(['/events']);
-                                    } else {
-                                        this.router.navigate(['/cases']);
-                                    }
-
+                                    this.router.navigate(['/contacts']);
                                     return throwError(err);
                                 })
                             )
@@ -212,7 +202,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
      * @param {NgForm[]} stepForms
      * @param {boolean} andAnotherOne
      */
-    createNewContact(stepForms: NgForm[], andAnotherOne: boolean = false) {
+    createNewContactOfContact(stepForms: NgForm[], andAnotherOne: boolean = false) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
         const relationship = _.get(dirtyFields, 'relationship');
@@ -245,12 +235,12 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
                         return throwError(err);
                     })
                 )
-                .subscribe((contactDuplicates: EntityDuplicatesModel) => {
+                .subscribe((contactOfContactDuplicates: EntityDuplicatesModel) => {
                     // add the new Contact
                     const runCreateContact = () => {
                         // add the new Contact
                         this.contactsOfContactsDataService
-                            .createContact(this.outbreakId, dirtyFields)
+                            .createContactOfContact(this.outbreakId, dirtyFields)
                             .pipe(
                                 catchError((err) => {
                                     this.snackbarService.showApiError(err);
@@ -261,12 +251,12 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
                                     return throwError(err);
                                 })
                             )
-                            .subscribe((contactData: ContactModel) => {
+                            .subscribe((contactOfContactData: ContactOfContactModel) => {
                                 this.relationshipDataService
                                     .createRelationship(
                                         this.outbreakId,
-                                        EntityType.CONTACT,
-                                        contactData.id,
+                                        EntityType.CONTACT_OF_CONTACT,
+                                        contactOfContactData.id,
                                         relationship
                                     )
                                     .pipe(
@@ -276,7 +266,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
 
                                             // remove contact
                                             this.contactsOfContactsDataService
-                                                .deleteContact(this.outbreakId, contactData.id)
+                                                .deleteContactOfContact(this.outbreakId, contactOfContactData.id)
                                                 .subscribe();
 
                                             // hide dialog
@@ -296,24 +286,24 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
                                         this.disableDirtyConfirm();
                                         if (andAnotherOne) {
                                             this.redirectService.to(
-                                                [`/contacts/create`],
+                                                [`/contacts-of-contacts/create`],
                                                 {
                                                     entityType: this.entityType,
                                                     entityId: this.entityId
                                                 }
                                             );
                                         } else {
-                                            this.router.navigate([`/contacts/${contactData.id}/modify`]);
+                                            this.router.navigate([`/contacts-of-contacts/${contactOfContactData.id}/modify`]);
                                         }
                                     });
                             });
                     };
 
                     // do we have duplicates ?
-                    if (contactDuplicates.duplicates.length > 0) {
+                    if (contactOfContactDuplicates.duplicates.length > 0) {
                         // construct list of possible duplicates
                         const possibleDuplicates: DialogField[] = [];
-                        _.each(contactDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
+                        _.each(contactOfContactDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
                             // contact model
                             const contactData: ContactModel = duplicate.model as ContactModel;
 

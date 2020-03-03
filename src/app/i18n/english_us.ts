@@ -20,6 +20,26 @@ export const EnglishUsLang = {
         'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS': 'Telephone Number',
 
         /**
+         * uiOutbreakFields
+         */
+        'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE': 'Allow creation of contact of contact?',
+        'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_CONTACT_OF_CONTACT_ID_MASK': 'Contact of contact ID mask',
+        'LNG_OUTBREAK_FIELD_LABEL_CONTACT_OF_CONTACT_ID_MASK_DESCRIPTION': '',
+        '': '',
+
+        /**
+         * uiOutbreakTemplateFields
+         */
+        'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE': 'Allow creation of contact of contact?',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE_DESCRIPTION': '',
+
+        /**
+         * uiContactFields
+         */
+        'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_CONTACT_OF_CONTACT': 'Add contact of contact',
+
+        /**
          * uiGenericLayout
          */
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_OF_CONTACTS_LABEL': 'Contacts of contacts',
@@ -142,6 +162,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_ACTION_COPY_ENTITY_ADDRESS_TOOLTIP': 'Copy main address from the parent entity',
         'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_ACTION_CREATE_ANOTHER_CONTACT_BUTTON': 'Create and add another',
         'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE': 'Flag this contact with a risk level for additional attention',
+        'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED': 'You can only add a contact of contact through a contact',
 
         /**
          * uiModifyContactsOfContactsPage

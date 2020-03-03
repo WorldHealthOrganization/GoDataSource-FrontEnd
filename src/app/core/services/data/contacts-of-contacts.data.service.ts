@@ -29,11 +29,11 @@ export class ContactsOfContactsDataService {
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<ContactOfContactModel[]>}
      */
-    getContactsList(outbreakId: string,
+    getContactsOfContactsList(outbreakId: string,
                     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<ContactOfContactModel[]> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableListToModel(
-            this.http.get(`outbreaks/${outbreakId}/contacts?filter=${filter}`),
+            this.http.get(`outbreaks/${outbreakId}/contacts-of-contacts?filter=${filter}`),
             ContactOfContactModel
         );
     }
@@ -44,10 +44,10 @@ export class ContactsOfContactsDataService {
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<any>}
      */
-    getContactsCount(outbreakId: string,
+    getContactsOfContactsCount(outbreakId: string,
                      queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
         const filter = queryBuilder.buildQuery();
-        return this.http.get(`outbreaks/${outbreakId}/contacts/filtered-count?filter=${filter}`);
+        return this.http.get(`outbreaks/${outbreakId}/contacts-of-contacts/filtered-count?filter=${filter}`);
     }
 
     /**
@@ -56,8 +56,8 @@ export class ContactsOfContactsDataService {
      * @param {string} contactId
      * @returns {Observable<any>}
      */
-    deleteContact(outbreakId: string, contactId: string): Observable<any> {
-        return this.http.delete(`outbreaks/${outbreakId}/contacts/${contactId}`);
+    deleteContactOfContact(outbreakId: string, contactId: string): Observable<any> {
+        return this.http.delete(`outbreaks/${outbreakId}/contacts-of-contacts/${contactId}`);
     }
 
     /**
@@ -66,8 +66,8 @@ export class ContactsOfContactsDataService {
      * @param contactData
      * @returns {Observable<any>}
      */
-    createContact(outbreakId: string, contactData): Observable<any> {
-        return this.http.post(`outbreaks/${outbreakId}/contacts`, contactData);
+    createContactOfContact(outbreakId: string, contactData): Observable<any> {
+        return this.http.post(`outbreaks/${outbreakId}/contacts-of-contacts`, contactData);
     }
 
     /**
@@ -77,11 +77,11 @@ export class ContactsOfContactsDataService {
      * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<ContactOfContactModel>}
      */
-    getContact(outbreakId: string,
+    getContactOfContact(outbreakId: string,
                contactId: string,
                retrieveCreatedUpdatedBy?: boolean): Observable<ContactOfContactModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/contacts/${contactId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`),
+            this.http.get(`outbreaks/${outbreakId}/contacts-of-contacts/${contactId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`),
             ContactOfContactModel
         );
     }
@@ -92,9 +92,9 @@ export class ContactsOfContactsDataService {
      * @param {string} contactId
      * @returns {Observable<AddressModel[]>}
      */
-    getContactMovement(outbreakId: string, contactId: string): Observable<AddressModel[]> {
+    getContactofContactMovement(outbreakId: string, contactId: string): Observable<AddressModel[]> {
         return this.modelHelper.mapObservableListToModel(
-            this.http.get(`outbreaks/${outbreakId}/contacts/${contactId}/movement`),
+            this.http.get(`outbreaks/${outbreakId}/contacts-of-contacts/${contactId}/movement`),
             AddressModel
         );
     }
@@ -110,7 +110,7 @@ export class ContactsOfContactsDataService {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.post(
-                `outbreaks/${outbreakId}/contacts/duplicates/find?filter=${filter}`,
+                `outbreaks/${outbreakId}/contacts-of-contacts/duplicates/find?filter=${filter}`,
                 contactData
             ),
             EntityDuplicatesModel
@@ -125,12 +125,12 @@ export class ContactsOfContactsDataService {
      * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<ContactOfContactModel>}
      */
-    modifyContact(outbreakId: string,
+    modifyContactOfContact(outbreakId: string,
                   contactId: string,
                   contactData,
                   retrieveCreatedUpdatedBy?: boolean): Observable<ContactOfContactModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, contactData),
+            this.http.put(`outbreaks/${outbreakId}/contacts-of-contacts/${contactId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, contactData),
             ContactOfContactModel
         );
     }
@@ -142,7 +142,7 @@ export class ContactsOfContactsDataService {
      * @param sourceEntityId
      * @param contactsData
      */
-    bulkAddContacts(outbreakId: string, sourceEntityType: EntityType, sourceEntityId: string, contactsData: any[]): Observable<any> {
+    bulkAddContactsOfContacts(outbreakId: string, sourceEntityType: EntityType, sourceEntityId: string, contactsData: any[]): Observable<any> {
         const entityTypeLinkPath = EntityModel.getLinkForEntityType(sourceEntityType);
 
         return this.http.post(`outbreaks/${outbreakId}/${entityTypeLinkPath}/${sourceEntityId}/contacts`, contactsData);
@@ -151,7 +151,7 @@ export class ContactsOfContactsDataService {
     /**
      * Modify multiple contacts of contacts
      */
-    bulkModifyContacts(outbreakId: string,
+    bulkModifyContactsOfContacts(outbreakId: string,
                        contactsData: any) {
         return this.http.put(
             `outbreaks/${outbreakId}/contacts/bulk`,
@@ -164,10 +164,10 @@ export class ContactsOfContactsDataService {
      * @param {string} outbreakId
      * @returns {Observable<RiskLevelGroupModel>}
      */
-    getContactsGroupedByRiskLevel(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<RiskLevelGroupModel> {
+    getContactsOfContactsGroupedByRiskLevel(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<RiskLevelGroupModel> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/contacts/per-risk-level/count?filter=${filter}`),
+            this.http.get(`outbreaks/${outbreakId}/contacts-of-contacts/per-risk-level/count?filter=${filter}`),
             RiskLevelGroupModel
         );
     }
@@ -178,8 +178,8 @@ export class ContactsOfContactsDataService {
      * @param {string} contactId
      * @returns {Observable<Object>}
      */
-    restoreContact(outbreakId: string, contactId: string): Observable<any> {
-        return this.http.post(`/outbreaks/${outbreakId}/contacts/${contactId}/restore`, {});
+    restoreContactOfContact(outbreakId: string, contactId: string): Observable<any> {
+        return this.http.post(`/outbreaks/${outbreakId}/contacts-of-contacts/${contactId}/restore`, {});
     }
 
     /**
@@ -188,8 +188,8 @@ export class ContactsOfContactsDataService {
      * @param {string} contactId
      * @returns {Observable<any>}
      */
-    convertContactToCase(outbreakId: string, contactId: string): Observable<any> {
-        return this.http.post(`outbreaks/${outbreakId}/contacts/${contactId}/convert-to-case`, {});
+    convertContactOfContactToCase(outbreakId: string, contactId: string): Observable<any> {
+        return this.http.post(`outbreaks/${outbreakId}/contacts-of-contacts/${contactId}/convert-to-case`, {});
     }
 
     /**
@@ -198,12 +198,12 @@ export class ContactsOfContactsDataService {
      * @param visualIdMask
      * @param personId Optional
      */
-    generateContactVisualID(outbreakId: string,
+    generateContactOfContactVisualID(outbreakId: string,
                             visualIdMask: string,
                             personId?: string): Observable<string | VisualIdErrorModel> {
         return this.http
             .post(
-                `outbreaks/${outbreakId}/contacts/generate-visual-id`,
+                `outbreaks/${outbreakId}/contacts-of-contacts/generate-visual-id`,
                 {
                     visualIdMask: visualIdMask,
                     personId: personId
@@ -233,11 +233,11 @@ export class ContactsOfContactsDataService {
      * @param visualIdMask
      * @param personId Optional
      */
-    checkContactVisualIDValidity(outbreakId: string,
+    checkContactOfContactVisualIDValidity(outbreakId: string,
                                  visualIdRealMask: string,
                                  visualIdMask: string,
                                  personId?: string): Observable<boolean | IGeneralAsyncValidatorResponse> {
-        return this.generateContactVisualID(
+        return this.generateContactOfContactVisualID(
             outbreakId,
             visualIdMask,
             personId

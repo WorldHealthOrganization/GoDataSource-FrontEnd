@@ -29,6 +29,7 @@ import {
     DialogComponent, DialogConfiguration, DialogField
 } from '../../../../shared/components/dialog/dialog.component';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
     selector: 'app-modify-contact-of-contact',
@@ -47,7 +48,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
     selectedOutbreak: OutbreakModel;
     contactExposure: RelationshipPersonModel;
 
-    contactData: ContactModel = new ContactModel();
+    contactOfContactData: ContactModel = new ContactModel();
 
     genderList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
@@ -65,7 +66,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
         mask: string
     };
 
-    contactIdMaskValidator: Observable<boolean>;
+    contactOfContactIdMaskValidator: Observable<boolean>;
 
     displayRefresh: boolean = false;
     @ViewChild('visualId') visualId: NgModel;
@@ -105,11 +106,11 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                     .getSelectedOutbreak()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.selectedOutbreak = selectedOutbreak;
-                        if (!_.isEmpty(this.selectedOutbreak.contactIdMask)) {
+                        if (!_.isEmpty(this.selectedOutbreak.contactOfContactIdMask)) {
                             this.displayRefresh = true;
                         }
                         // get contact
-                        this.retrieveContactData();
+                        this.retrieveContactOfContactData();
 
                         // get contact's exposure
                         // this.retrieveContactExposure();
@@ -120,29 +121,29 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
     /**
      * Retrieve contact information
      */
-    private retrieveContactData() {
+    private retrieveContactOfContactData() {
         if (
             this.selectedOutbreak &&
             this.selectedOutbreak.id &&
             this.contactOfContactId
         ) {
             this.contactsOfContactsDataService
-                .getContact(this.selectedOutbreak.id, this.contactOfContactId, true)
+                .getContactOfContact(this.selectedOutbreak.id, this.contactOfContactId, true)
                 .subscribe(contactDataReturned => {
-                    this.contactData = new ContactModel(contactDataReturned);
+                    this.contactOfContactData = new ContactModel(contactDataReturned);
 
                     // set visual ID translate data
                     this.visualIDTranslateData = {
-                        mask: ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
+                        mask: ContactOfContactModel.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask)
                     };
 
                     // set visual ID validator
-                    this.contactIdMaskValidator = new Observable((observer) => {
-                        this.contactsOfContactsDataService.checkContactVisualIDValidity(
+                    this.contactOfContactIdMaskValidator = new Observable((observer) => {
+                        this.contactsOfContactsDataService.checkContactOfContactVisualIDValidity(
                             this.selectedOutbreak.id,
                             this.visualIDTranslateData.mask,
-                            this.contactData.visualId,
-                            this.contactData.id
+                            this.contactOfContactData.visualId,
+                            this.contactOfContactData.id
                         ).subscribe((isValid: boolean) => {
                             observer.next(isValid);
                             observer.complete();
@@ -174,7 +175,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.contactsOfContactsDataService
             .findDuplicates(this.selectedOutbreak.id, {
-                ...this.contactData,
+                ...this.contactOfContactData,
                 ...dirtyFields
             })
             .pipe(
@@ -192,7 +193,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                 const runModifyContact = (finishCallBack?: () => void) => {
                     // modify the contact
                     this.contactsOfContactsDataService
-                        .modifyContact(
+                        .modifyContactOfContact(
                             this.selectedOutbreak.id,
                             this.contactOfContactId,
                             dirtyFields,
@@ -207,7 +208,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                         )
                         .subscribe((modifiedContact: ContactModel) => {
                             // update model
-                            this.contactData = modifiedContact;
+                            this.contactOfContactData = modifiedContact;
 
                             // mark form as pristine
                             form.form.markAsPristine();
@@ -241,16 +242,16 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                                 placeholder: 'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_LABEL_MERGE_WITH',
                                 inputOptions: _.map(contactDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
                                     // contact model
-                                    const contactData: ContactModel = duplicate.model as ContactModel;
+                                    const contactOfContactData: ContactOfContactModel = duplicate.model as ContactOfContactModel;
 
                                     // map
                                     return new LabelValuePair((index + 1) + '. ' +
                                         EntityModel.getNameWithDOBAge(
-                                            contactData,
+                                            contactOfContactData,
                                             this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
                                             this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
                                         ),
-                                        contactData.id
+                                        contactOfContactData.id
                                     );
                                 }),
                                 inputOptionsMultiple: true,
@@ -295,7 +296,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
 
                                     // redirect to merge
                                     this.router.navigate(
-                                        ['/duplicated-records', EntityModel.getLinkForEntityType(EntityType.CONTACT), 'merge'], {
+                                        ['/duplicated-records', EntityModel.getLinkForEntityType(EntityType.CONTACT_OF_CONTACT), 'merge'], {
                                             queryParams: {
                                                 ids: JSON.stringify(mergeIds)
                                             }
@@ -331,7 +332,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                 '.',
                 true,
                 {},
-                this.contactData
+                this.contactOfContactData
             )
         );
     }
@@ -341,7 +342,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
      */
     generateVisualId() {
         if (!_.isEmpty(this.selectedOutbreak.contactIdMask)) {
-            this.contactData.visualId = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);
+            this.contactOfContactData.visualId = ContactOfContactModel.generateContactOfContactIDMask(this.selectedOutbreak.contactIdMask);
             this.visualId.control.markAsDirty();
         }
     }

@@ -15,6 +15,7 @@ import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
 import { IPermissionBasic, IPermissionBasicBulk, IPermissionExportable, IPermissionRelationship } from './permission.interface';
+import { ContactOfContactModel } from './contact-of-contact.model';
 
 export class RelationshipModel
     extends BaseModel
@@ -168,6 +169,8 @@ export class EntityModel {
                 return 'contacts';
             case EntityType.EVENT:
                 return 'events';
+            case EntityType.CONTACT_OF_CONTACT:
+                return 'contacts-of-contacts';
         }
 
         // finished
@@ -303,7 +306,7 @@ export class EntityModel {
      * @param model
      */
     static getNameWithDOBAge(
-        model: CaseModel | ContactModel,
+        model: CaseModel | ContactModel | ContactOfContactModel,
         yearsLabel: string,
         monthsLabel: string
     ) {
