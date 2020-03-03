@@ -133,6 +133,14 @@ export class LoginComponent implements OnInit {
      * Refresh captcha
      */
     refreshCaptcha() {
-        this.captchaData$ = this.captchaDataService.generateSVG();
+        this.captchaData$ = this.captchaDataService
+            .generateSVG()
+            .pipe(
+                catchError((err) => {
+                    // show error
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                })
+            );
     }
 }
