@@ -30,6 +30,8 @@ import {
 } from '../../../../shared/components/dialog/dialog.component';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 
 @Component({
     selector: 'app-modify-contact-of-contact',
@@ -79,6 +81,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
         private contactsOfContactsDataService: ContactsOfContactsDataService,
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
+        private relationshipDataService: RelationshipDataService,
         private router: Router,
         private dialogService: DialogService,
         private i18nService: I18nService
@@ -113,7 +116,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                         this.retrieveContactOfContactData();
 
                         // get contact's exposure
-                        // this.retrieveContactExposure();
+                        this.retrieveContactExposure();
                     });
             });
     }
@@ -151,6 +154,36 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                     });
 
                     this.createBreadcrumbs();
+                });
+        }
+    }
+
+    /**
+     * Retrieve Contact of contact exposure: the Contact who is related to Contact of Contact
+     * Note: If there are more than one relationships, then we don't know the main Exposure so we do nothing here
+     */
+    private retrieveContactExposure() {
+        if (
+            this.selectedOutbreak &&
+            this.selectedOutbreak.id &&
+            this.contactOfContactId
+        ) {
+            const qb = new RequestQueryBuilder();
+            qb.limit(2);
+            this.relationshipDataService
+                .getEntityRelationships(
+                    this.selectedOutbreak.id,
+                    EntityType.CONTACT_OF_CONTACT,
+                    this.contactOfContactId,
+                    qb
+                )
+                .subscribe((relationships) => {
+                    if (relationships.length === 1) {
+                        // we found the exposure
+                        this.contactExposure = new RelationshipPersonModel(
+                            _.find(relationships[0].persons, (person) => person.id !== this.contactOfContactId)
+                        );
+                    }
                 });
         }
     }
@@ -326,7 +359,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
     createBreadcrumbs() {
         this.breadcrumbs = [];
         this.breadcrumbs.push(
-            new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
+            new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE', '/contacts-of-contacts'),
             new BreadcrumbItemModel(
                 this.viewOnly ? 'LNG_PAGE_VIEW_CONTACT_TITLE' : 'LNG_PAGE_MODIFY_CONTACT_TITLE',
                 '.',

@@ -22,7 +22,7 @@ export const EnglishUsLang = {
         /**
          * uiOutbreakFields
          */
-        'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE': 'Allow creation of contact of contact?',
+        'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE': 'Allow registration of contacts of contacts?',
         'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_CONTACT_OF_CONTACT_ID_MASK': 'Contact of contact ID mask',
         'LNG_OUTBREAK_FIELD_LABEL_CONTACT_OF_CONTACT_ID_MASK_DESCRIPTION': '',
@@ -31,7 +31,7 @@ export const EnglishUsLang = {
         /**
          * uiOutbreakTemplateFields
          */
-        'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE': 'Allow creation of contact of contact?',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE': 'Allow registration of contacts of contacts?',
         'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE_DESCRIPTION': '',
 
         /**

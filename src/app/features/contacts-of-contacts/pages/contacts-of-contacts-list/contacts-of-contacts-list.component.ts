@@ -33,6 +33,7 @@ import { AddressType } from '../../../../core/models/address.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
     selector: 'app-contacts-of-contacts-list',
@@ -54,7 +55,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
     // list of existing contacts
     contactsOfContactsList$: Observable<ContactModel[]>;
-    contactsListCount$: Observable<any>;
+    contactsOfContactsListCount$: Observable<any>;
 
     outbreakSubscriber: Subscription;
 
@@ -144,7 +145,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 this.router.navigate(['/contacts-of-contacts', item.id, 'view']);
             },
             visible: (item: ContactModel): boolean => {
-                return !item.deleted;
+                return !item.deleted &&
+                    ContactOfContactModel.canView(this.authUser);
             }
         }),
 
@@ -159,9 +161,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 return !item.deleted &&
                     this.authUser &&
                     this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id
-                    // &&
-                    // this.hasContactOfContactWriteAccess();
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    ContactOfContactModel.canModify(this.authUser);
             }
         }),
 
@@ -180,9 +181,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                         return !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id
-                            // &&
-                            // this.hasContactOfContactWriteAccess();
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            ContactOfContactModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -195,42 +195,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                         return !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id
-                            // &&
-                            // this.hasContactOfContactWriteAccess();
-                    }
-                }),
-
-                // // Add Follow-up to Contact
-                // new HoverRowAction({
-                //     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP',
-                //     click: (item: ContactModel) => {
-                //         this.router.navigate(['/contacts', item.id, 'follow-ups', 'create']);
-                //     },
-                //     visible: (item: ContactModel): boolean => {
-                //         return !item.deleted &&
-                //             this.authUser &&
-                //             this.selectedOutbreak &&
-                //             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                //             this.hasContactOfContactWriteAccess()
-                //             // &&
-                //             // this.hasFollowUpWriteAccess();
-                //     }
-                // }),
-
-                // Divider
-                new HoverRowAction({
-                    type: HoverRowActionType.DIVIDER,
-                    visible: (item: ContactModel): boolean => {
-                        // visible only if at least one of the first two items is visible
-                        return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id
-                            // &&
-                            // this.hasContactOfContactWriteAccess()
-                            // &&
-                            // this.hasFollowUpWriteAccess();
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id;
                     }
                 }),
 
@@ -241,7 +206,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                         this.router.navigate(['/relationships', EntityType.CONTACT, item.id, 'exposures']);
                     },
                     visible: (item: ContactModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted &&
+                            ContactOfContactModel.canListRelationshipExposures(this.authUser);
                     }
                 }),
 
@@ -251,30 +217,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                     visible: (item: ContactModel): boolean => {
                         // visible only if at least one of the previous...
                         return !item.deleted;
-                    }
-                }),
-
-                // // See contact follow-us
-                // new HoverRowAction({
-                //     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_FOLLOW_UPS',
-                //     click: (item: ContactModel) => {
-                //         this.router.navigate(['/contacts', 'contact-related-follow-ups', item.id]);
-                //     },
-                //     visible: (item: ContactModel): boolean => {
-                //         return !item.deleted
-                //             // &&
-                //             // this.hasContactFollowUpReadAccess();
-                //     }
-                // }),
-
-                // Divider
-                new HoverRowAction({
-                    type: HoverRowActionType.DIVIDER,
-                    visible: (item: ContactModel): boolean => {
-                        // visible only if at least one of the previous...
-                        return !item.deleted
-                            // &&
-                            // this.hasContactFollowUpReadAccess();
                     }
                 }),
 
@@ -282,10 +224,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_MOVEMENT',
                     click: (item: ContactModel) => {
-                        this.router.navigate(['/contacts', item.id, 'movement']);
+                        this.router.navigate(['/contacts-of-contacts', item.id, 'movement']);
                     },
                     visible: (item: ContactModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted
+                            // && ContactOfContactModel.canViewMovementMap(this.authUser);
                     }
                 }),
 
@@ -293,10 +236,12 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CHRONOLOGY',
                     click: (item: ContactModel) => {
-                        this.router.navigate(['/contacts', item.id, 'chronology']);
+                        this.router.navigate(['/contacts-of-contacts', item.id, 'chronology']);
                     },
                     visible: (item: ContactModel): boolean => {
-                        return !item.deleted;
+                        return !item.deleted
+                            // &&
+                            // ContactOfContactModel.canViewChronologyChart(this.authUser);
                     }
                 }),
 
@@ -310,9 +255,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                         return item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id
-                            // &&
-                            // this.hasContactWriteAccess();
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            ContactOfContactModel.canRestore(this.authUser);
                     },
                     class: 'mat-menu-item-restore'
                 })
@@ -777,7 +721,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             countQueryBuilder.sort.clear();
-            this.contactsListCount$ = this.contactsOfContactsDataService.getContactsOfContactsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
+            this.contactsOfContactsListCount$ = this.contactsOfContactsDataService.getContactsOfContactsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(share());
         }
     }
 

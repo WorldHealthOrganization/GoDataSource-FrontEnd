@@ -245,7 +245,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_CONTACT_OF_CONTACT',
                     click: (item: ContactModel) => {
-                        console.log(item);
                         this.router.navigate(['/contacts-of-contacts', 'create'], {
                             queryParams: {
                                 entityType: item.type,
@@ -257,7 +256,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         return !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.selectedOutbreak.isContactsOfContactsActive &&
+                            ContactModel.canCreateContactOfContact(this.authUser);
                     }
                 }),
 
@@ -269,7 +270,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         return !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            this.selectedOutbreak.isContactsOfContactsActive;
                     }
                 }),
 
@@ -313,6 +315,16 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     }
                 }),
 
+                // See contact contacts of contacts
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_ACTION_SEE_CONTACTS_TO',
+                    click: (item: ContactModel) => {
+                        this.router.navigate([`relationships`, EntityType.CONTACT, item.id, 'contacts-of-contacts']);
+                    },
+                    visible: (item: ContactModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
                 // Divider
                 new HoverRowAction({
                     type: HoverRowActionType.DIVIDER,

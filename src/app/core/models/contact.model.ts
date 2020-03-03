@@ -189,6 +189,11 @@ export class ContactModel
     static canImportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_IMPORT_LAB_RESULT) : false); }
 
     /**
+     * Static Permissions - IPermissionsContactsOfContacts
+     */
+    static canCreateContactOfContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CREATE) : false); };
+
+    /**
      * Constructor
      */
     constructor(data = null) {

@@ -47,7 +47,7 @@ export class ContactOfContactModel
     addresses: AddressModel[];
     riskLevel: string;
     riskReason: string;
-    type: EntityType = EntityType.CONTACT;
+    type: EntityType = EntityType.CONTACT_OF_CONTACT;
     dateOfReporting: string;
     dateOfLastContact: string;
     isDateOfReportingApproximate: boolean;

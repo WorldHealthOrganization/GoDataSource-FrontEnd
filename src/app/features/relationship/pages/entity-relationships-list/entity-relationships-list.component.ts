@@ -226,7 +226,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                     this.entity.name,
                     `${this.entityMap[this.entityType].link}/${this.entityId}/view`
                 ),
-                new BreadcrumbItemModel(this.relationshipsListPageTitle, null, true)
+                new BreadcrumbItemModel(this.relationshipsListPageTitle, null, true),
             ];
         }
     }
@@ -362,11 +362,13 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                     .pipe(
                         tap(this.checkEmptyList.bind(this)),
                         tap((entities: EntityModel[]) => {
+                            console.log(entities);
                             // map models
                             this.relationshipsListRecordsMap = {};
                             (entities || []).forEach((entity) => {
                                 this.relationshipsListRecordsMap[entity.relationship.id] = entity;
                             });
+                            console.log(this.relationshipsListRecordsMap);
 
                             // finished
                             finishCallback(entities);
