@@ -4,6 +4,12 @@ import { Observable } from 'rxjs';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { map } from 'rxjs/operators';
 
+export enum CaptchaDataFor {
+    LOGIN = 'login',
+    FORGOT_PASSWORD = 'forgot-password',
+    RESET_PASSWORD_QUESTIONS = 'reset-password-questions'
+}
+
 @Injectable()
 export class CaptchaDataService {
     /**
@@ -18,10 +24,10 @@ export class CaptchaDataService {
      * Generate SVG captcha
      * @returns {Observable<SafeHtml>}
      */
-    generateSVG(): Observable<SafeHtml> {
+    generateSVG(forComponent: CaptchaDataFor): Observable<SafeHtml> {
         return this.http
             .get(
-                'captcha/generate-svg', {
+                `captcha/generate-svg?forComponent=${forComponent}`, {
                     withCredentials: true
                 }
             )
