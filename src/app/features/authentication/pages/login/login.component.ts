@@ -11,7 +11,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { LoginModel } from '../../../../core/models/login.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { CaptchaDataService } from '../../../../core/services/data/captcha.data.service';
+import { CaptchaDataFor, CaptchaDataService } from '../../../../core/services/data/captcha.data.service';
 import { Observable } from 'rxjs/internal/Observable';
 import { SafeHtml } from '@angular/platform-browser';
 
@@ -77,6 +77,7 @@ export class LoginComponent implements OnInit {
                         loadingDialog.close();
 
                         // reset captcha no matter what...
+                        this.user.captcha = '';
                         this.refreshCaptcha();
 
                         // show error
@@ -134,7 +135,7 @@ export class LoginComponent implements OnInit {
      */
     refreshCaptcha() {
         this.captchaData$ = this.captchaDataService
-            .generateSVG()
+            .generateSVG(CaptchaDataFor.LOGIN)
             .pipe(
                 catchError((err) => {
                     // show error
