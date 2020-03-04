@@ -155,7 +155,7 @@ export class ReportDifferenceOnsetRelationshipModel extends RelationshipModel {
  */
 export class EntityModel {
     type: EntityType;
-    model: CaseModel | ContactModel | EventModel;
+    model: CaseModel | ContactModel | EventModel | ContactOfContactModel;
     relationship: RelationshipModel;
 
     /**
@@ -464,6 +464,10 @@ export class EntityModel {
 
             case EntityType.EVENT:
                 this.model = new EventModel(data);
+                break;
+
+            case EntityType.CONTACT_OF_CONTACT:
+                this.model = new ContactOfContactModel(data);
                 break;
         }
     }

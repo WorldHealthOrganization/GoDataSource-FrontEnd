@@ -13,24 +13,13 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
-                    <!--<ng-container-->
-                        <!--*ngIf="hasContactWriteAccess()">-->
-                        <!--<button-->
-                            <!--mat-menu-item-->
-                            <!--(click)="changeContactFinalFollowUpStatus()">-->
-                            <!--{{ 'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS' | translate }}-->
-                        <!--</button>-->
-
-                        <!--<mat-divider></mat-divider>-->
-                    <!--</ng-container>-->
-
                     <app-export-button
-                        *ngIf="exportContactsUrl"
+                        *ngIf="exportContactsOfContactsUrl"
                         [menuItem]="true"
-                        [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON' | translate"
-                        [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE' | translate"
-                        [url]="exportContactsUrl"
-                        [fileName]="contactsDataExportFileName"
+                        [label]="'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_TITLE' | translate"
+                        [url]="exportContactsOfContactsUrl"
+                        [fileName]="contactsOfContactsDataExportFileName"
                         [allowedExportTypes]="allowedExportTypes"
                         [displayEncrypt]="true"
                         [displayAnonymize]="true"
@@ -54,36 +43,6 @@
                         (click)="exportFilteredContactsRelationships()">
                         {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_EXPORT_CONTACTS_RELATIONSHIPS' | translate }}
                     </button>
-
-                    <!--<mat-divider-->
-                        <!--*ngIf="exportContactsDailyFollowUpListUrl || exportContactsDailyFollowUpsFormUrl"></mat-divider>-->
-
-                    <!--<app-export-button-->
-                        <!--*ngIf="exportContactsDailyFollowUpListUrl"-->
-                        <!--[menuItem]="true"-->
-                        <!--[label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_BUTTON' | translate"-->
-                        <!--[message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE' | translate"-->
-                        <!--[url]="exportContactsDailyFollowUpListUrl"-->
-                        <!--[fileName]="exportContactsDailyFollowUpListFileName"-->
-                        <!--[fileType]="exportContactsDailyFollowUpListFileType"-->
-                        <!--(exportStart)="showLoadingDialog()"-->
-                        <!--(exportFinished)="closeLoadingDialog()"-->
-                        <!--[queryBuilder]="queryBuilder"-->
-                        <!--[extraDialogFields]="exportContactsDailyFollowUpListDialogFields">-->
-                    <!--</app-export-button>-->
-
-                    <!--<app-export-button-->
-                        <!--*ngIf="exportContactsDailyFollowUpsFormUrl"-->
-                        <!--[menuItem]="true"-->
-                        <!--[label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_BUTTON' | translate"-->
-                        <!--[message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE' | translate"-->
-                        <!--[url]="exportContactsDailyFollowUpsFormUrl"-->
-                        <!--[fileName]="exportContactsDailyFollowUpsFormFileName"-->
-                        <!--[fileType]="exportContactsDailyFollowUpsFormFileType"-->
-                        <!--(exportStart)="showLoadingDialog()"-->
-                        <!--(exportFinished)="closeLoadingDialog()"-->
-                        <!--[queryBuilder]="queryBuilder">-->
-                    <!--</app-export-button>-->
                 </mat-menu>
             </div>
         </div>
@@ -182,19 +141,19 @@
                             <button
                                 *ngIf="exportContactsUrl"
                                 mat-menu-item
-                                (click)="exportSelectedContacts()">
+                                (click)="exportSelectedContactsOfContacts()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS' | translate }}
                             </button>
 
                             <button
                                 mat-menu-item
-                                (click)="exportSelectedContactsDossier()">
+                                (click)="exportSelectedContactsOfContactsDossier()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER' | translate }}
                             </button>
 
                             <button
                                 mat-menu-item
-                                (click)="exportSelectedContactsRelationship()">
+                                (click)="exportSelectedContactsOfContactsRelationship()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_RELATIONSHIPS' | translate }}
                             </button>
 
@@ -467,64 +426,6 @@
                 {{ item.dateOfLastContact | dateDefault }}
             </mat-cell>
         </ng-container>
-
-        <!--&lt;!&ndash; Date of the end of the Followup &ndash;&gt;-->
-        <!--<ng-container matColumnDef="followUp.endDate">-->
-            <!--<mat-header-cell class="has-date-range-filter" *matHeaderCellDef>-->
-                <!--<div class="table-header-cell">-->
-                    <!--<div mat-sort-header class="column-header">-->
-                        <!--{{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE' | translate }}-->
-                    <!--</div>-->
-                    <!--<div class="column-filter">-->
-                        <!--<app-form-daterange-->
-                            <!--name="dateOfTheEndOfTheFollowUpFilter"-->
-                            <!--ngModel-->
-                            <!--(changed)="filterByDateRangeField('followUp.endDate', $event)"-->
-                            <!--app-reset-input-on-side-filter>-->
-                        <!--</app-form-daterange>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</mat-header-cell>-->
-            <!--<mat-cell-->
-                <!--*matCellDef="let item"-->
-                <!--class="has-date-range-filter"-->
-                <!--[style.color]="getRiskColor(item)">-->
-                <!--{{ item.followUp?.endDate | dateDefault }}-->
-            <!--</mat-cell>-->
-        <!--</ng-container>-->
-
-        <!--&lt;!&ndash; Final Follow-up Status &ndash;&gt;-->
-        <!--<ng-container matColumnDef="followUp.status">-->
-            <!--<mat-header-cell *matHeaderCellDef>-->
-                <!--<div class="table-header-cell">-->
-                    <!--<div mat-sort-header class="column-header">-->
-                        <!--{{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS' | translate }}-->
-                    <!--</div>-->
-                    <!--<div class="column-filter">-->
-                        <!--<app-form-select-->
-                            <!--name="finalStatusFilter"-->
-                            <!--ngModel-->
-                            <!--[placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
-                            <!--[options]="finalFollowUpStatus$ | async"-->
-                            <!--(optionChanged)="filterBySelectField('followUp.status', $event)"-->
-                            <!--multiple="true"-->
-                            <!--app-reset-input-on-side-filter-->
-                            <!--[allowSelectionOfDisabledItems]="true"-->
-                            <!--[displayInvisibleItems]="true"-->
-                            <!--[displayFilterIcon]="true">-->
-                        <!--</app-form-select>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</mat-header-cell>-->
-            <!--<mat-cell-->
-                <!--*matCellDef="let item"-->
-                <!--[style.color]="getRiskColor(item)">-->
-                <!--<app-reference-data-label-->
-                    <!--[category]="ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS"-->
-                    <!--[value]="item.followUp?.status">-->
-                <!--</app-reference-data-label>-->
-            <!--</mat-cell>-->
-        <!--</ng-container>-->
 
         <!-- Deleted -->
         <ng-container matColumnDef="deleted">

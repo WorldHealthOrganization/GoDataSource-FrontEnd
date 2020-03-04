@@ -51,7 +51,21 @@ const routes: Routes = [
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
-    }
+    },
+    // Bulk Modify Contacts of contacts
+    // {
+    //     path: 'modify-bulk',
+    //     component: fromPages.BulkModifyContactsComponent,
+    //     canActivate: [AuthGuard],
+    //     data: {
+    //         permissions: [
+    //             PERMISSION.CONTACT_BULK_MODIFY
+    //         ]
+    //     },
+    //     canDeactivate: [
+    //         PageChangeConfirmationGuard
+    //     ]
+    // },
 ];
 
 export const routing: ModuleWithProviders = RouterModule.forChild(routes);

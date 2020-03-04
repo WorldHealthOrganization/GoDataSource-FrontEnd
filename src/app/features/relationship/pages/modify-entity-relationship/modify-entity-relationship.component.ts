@@ -23,6 +23,7 @@ import { EntityModel, RelationshipModel } from '../../../../core/models/entity-a
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
     selector: 'app-modify-entity-relationship',
@@ -83,6 +84,24 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                     modify: ContactModel.canModifyRelationshipExposures,
                     reverse: ContactModel.canReverseRelationship,
                     list: ContactModel.canListRelationshipExposures
+                }
+            }
+        },
+        [EntityType.CONTACT_OF_CONTACT]: {
+            label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+            link: '/contacts-of-contacts',
+            canList: ContactOfContactModel.canList,
+            canView: ContactOfContactModel.canView,
+            can: {
+                contacts: {
+                    modify: ContactOfContactModel.canModifyRelationshipContacts,
+                    reverse: ContactOfContactModel.canReverseRelationship,
+                    list: ContactOfContactModel.canListRelationshipContacts
+                },
+                exposures: {
+                    modify: ContactOfContactModel.canModifyRelationshipExposures,
+                    reverse: ContactOfContactModel.canReverseRelationship,
+                    list: ContactOfContactModel.canListRelationshipExposures
                 }
             }
         },

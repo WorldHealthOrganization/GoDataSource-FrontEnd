@@ -17,6 +17,8 @@ import { I18nService } from '../helper/i18n.service';
 import { map } from 'rxjs/operators';
 import { moment } from '../../helperClasses/x-moment';
 import { IBasicCount } from '../../models/basic-count.interface';
+import { ContactOfContactModel } from '../../models/contact-of-contact.model';
+import { ContactsOfContactsDataService } from './contacts-of-contacts.data.service';
 
 @Injectable()
 export class EntityDataService {
@@ -34,6 +36,12 @@ export class EntityDataService {
             deleteMethod: 'deleteContact',
             modifyMethod: 'modifyContact',
         },
+        [EntityType.CONTACT_OF_CONTACT]: {
+            dataService: this.contactsOfContactsDataService,
+            getMethod: 'getContactOfContact',
+            deleteMethod: 'deleteContactOfContact',
+            modifyMethod: 'modifyContactOfContact'
+        },
         [EntityType.EVENT]: {
             dataService: this.evenDataService,
             getMethod: 'getEvent',
@@ -46,6 +54,7 @@ export class EntityDataService {
         private http: HttpClient,
         private caseDataService: CaseDataService,
         private contactDataService: ContactDataService,
+        private contactsOfContactsDataService: ContactsOfContactsDataService,
         private evenDataService: EventDataService,
         private i18nService: I18nService
     ) {
@@ -60,7 +69,7 @@ export class EntityDataService {
     getEntitiesList(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<(CaseModel | ContactModel | EventModel)[]> {
+    ): Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]> {
 
         const qb = new RequestQueryBuilder();
         // include relation for Events

@@ -139,7 +139,7 @@ export class ContactModel
     /**
      * Static Permissions - IPermissionRelatedRelationship
      */
-    static canListRelationshipContacts(user: UserModel): boolean { return false; }
+    static canListRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST) : false); }
     static canViewRelationshipContacts(user: UserModel): boolean { return false; }
     static canCreateRelationshipContacts(user: UserModel): boolean { return false; }
     static canModifyRelationshipContacts(user: UserModel): boolean { return false; }
