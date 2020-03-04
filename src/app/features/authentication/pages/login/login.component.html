@@ -1,102 +1,103 @@
+<!-- Language select -->
+<app-topnav-unauthenticated></app-topnav-unauthenticated>
+
 <app-not-auth-template>
-        <div class="not-auth-title">
-            {{ 'LNG_PAGE_LOGIN_WELCOME_MESSAGE' | translate }}
-        </div>
+    <div class="not-auth-title">
+        {{ 'LNG_PAGE_LOGIN_WELCOME_MESSAGE' | translate }}
+    </div>
 
-        <form #form="ngForm" (submit)="login(form)" class="login-form">
-            <div fxLayout="row" fxLayoutAlign="center" class="not-auth-content-limited">
-                <div fxLayout="column" fxFlex>
-                    <!-- Email input -->
+    <form #form="ngForm" (submit)="login(form)" class="login-form">
+        <div fxLayout="row" fxLayoutAlign="center" class="not-auth-content-limited">
+            <div fxLayout="column" fxFlex>
+                <!-- Email input -->
+                <div
+                    class="login-row-specific-height"
+                    fxLayout="row">
+                    <app-form-input
+                        [tabIndex]="1"
+                        name="email"
+                        [(ngModel)]="user.email"
+                        [placeholder]="'LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS' | translate"
+                        required="true"
+                        app-email-validator>
+                    </app-form-input>
+                </div>
+
+                <!-- Password input -->
+                <div
+                    class="login-row-specific-height"
+                    fxLayout="row">
+                    <app-form-input
+                        [tabIndex]="2"
+                        class="password-input"
+                        type="password"
+                        name="password"
+                        [(ngModel)]="user.password"
+                        [placeholder]="'LNG_COMMON_FIELD_LABEL_PASSWORD' | translate"
+                        required="true">
+                    </app-form-input>
+
+                    <button
+                        mat-raised-button
+                        type="button"
+                        class="reset-pass-button"
+                        routerLink="/auth/forgot-password">
+                        {{ 'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL' | translate }}
+                    </button>
+                </div>
+
+                <!-- Captcha input -->
+                <div
+                    class="login-captcha-row"
+                    fxLayout="row">
+                    <!-- Captcha SVG -->
                     <div
-                        class="login-row-specific-height"
-                        fxLayout="row">
-                        <app-form-input
-                            [tabIndex]="1"
-                            name="email"
-                            [(ngModel)]="user.email"
-                            [placeholder]="'LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS' | translate"
-                            required="true"
-                            app-email-validator>
-                        </app-form-input>
-                    </div>
-
-                    <!-- Password input -->
-                    <div
-                        class="login-row-specific-height"
-                        fxLayout="row">
-                        <app-form-input
-                            [tabIndex]="2"
-                            class="password-input"
-                            type="password"
-                            name="password"
-                            [(ngModel)]="user.password"
-                            [placeholder]="'LNG_COMMON_FIELD_LABEL_PASSWORD' | translate"
-                            required="true">
-                        </app-form-input>
-
-                        <button
-                            mat-raised-button
-                            type="button"
-                            class="reset-pass-button"
-                            routerLink="/auth/forgot-password">
-                            {{ 'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL' | translate }}
-                        </button>
-                    </div>
-
-                    <!-- Captcha input -->
-                    <div
-                        class="login-captcha-row"
-                        fxLayout="row">
-                        <!-- Captcha SVG -->
+                        class="login-captcha-row-svg">
                         <div
-                            class="login-captcha-row-svg">
-                            <div
-                                fxLayout="row" fxLayoutAlign="start center"
-                                *ngIf="captchaData$ | async as captchaData; else loadingCaptcha">
-                                <!-- SVG -->
-                                <div [innerHTML]="captchaData"></div>
+                            fxLayout="row" fxLayoutAlign="start center"
+                            *ngIf="captchaData$ | async as captchaData; else loadingCaptcha">
+                            <!-- SVG -->
+                            <div [innerHTML]="captchaData"></div>
 
-                                <!-- Captcha SVG refresh -->
-                                <button
-                                    fxGrow="0"
-                                    type="button"
-                                    mat-icon-button
-                                    (click)="refreshCaptcha()">
-                                    <span class="xt-icon">refresh</span>
-                                </button>
-                            </div>
-
-                            <!-- Loading data -->
-                            <ng-template
-                                #loadingCaptcha>
-                                <div
-                                    class="login-captcha-row-svg-loading">
-                                    <mat-spinner></mat-spinner>
-                                </div>
-                            </ng-template>
+                            <!-- Captcha SVG refresh -->
+                            <button
+                                fxGrow="0"
+                                type="button"
+                                mat-icon-button
+                                (click)="refreshCaptcha()">
+                                <span class="xt-icon">refresh</span>
+                            </button>
                         </div>
 
-                        <!-- Captcha SVG input -->
-                        <app-form-input
-                            [tabIndex]="3"
-                            name="captcha"
-                            [(ngModel)]="user.captcha"
-                            [placeholder]="'LNG_COMMON_FIELD_LABEL_CAPTCHA' | translate"
-                            required="true">
-                        </app-form-input>
+                        <!-- Loading data -->
+                        <ng-template
+                            #loadingCaptcha>
+                            <div
+                                class="login-captcha-row-svg-loading">
+                                <mat-spinner></mat-spinner>
+                            </div>
+                        </ng-template>
                     </div>
 
-                    <!-- Login button -->
-                    <div fxLayout="column" class="app-theme">
-                        <button
-                            tabindex="4"
-                            mat-raised-button color="accent">
-                            {{ 'LNG_PAGE_LOGIN_ACTION_LOGIN_BUTTON' | translate }}
-                        </button>
-                    </div>
+                    <!-- Captcha SVG input -->
+                    <app-form-input
+                        [tabIndex]="3"
+                        name="captcha"
+                        [(ngModel)]="user.captcha"
+                        [placeholder]="'LNG_COMMON_FIELD_LABEL_CAPTCHA' | translate"
+                        required="true">
+                    </app-form-input>
+                </div>
+
+                <!-- Login button -->
+                <div fxLayout="column" class="app-theme">
+                    <button
+                        tabindex="4"
+                        mat-raised-button color="accent">
+                        {{ 'LNG_PAGE_LOGIN_ACTION_LOGIN_BUTTON' | translate }}
+                    </button>
                 </div>
             </div>
-
-        </form>
-
+        </div>
+    </form>
 </app-not-auth-template>
