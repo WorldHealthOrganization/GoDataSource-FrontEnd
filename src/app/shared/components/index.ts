@@ -51,6 +51,7 @@ import { FormNgxWigComponent } from './form-ngx-wig/form-ngx-wig.component';
 import { FormVaccinesListComponent } from './form-vaccines-list/form-vaccines-list.component';
 import { HotTableWrapperComponent } from './hot-table-wrapper/hot-table-wrapper.component';
 import { LocationDialogComponent } from './location-dialog/location-dialog.component';
+import { TopnavUnauthenticatedComponent } from './topnav-unauthenticated/topnav-unauthenticated.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -73,6 +74,7 @@ export const components: any[] = [
 
     // main layout
     TopnavComponent,
+    TopnavUnauthenticatedComponent,
     BreadcrumbsComponent,
     SideFiltersComponent,
     SideColumnsComponent,

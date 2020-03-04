@@ -1,0 +1,16 @@
+<div
+    class="topnav-unauthenticated">
+    <div
+        class="topnav-unauthenticated-list">
+        <app-form-select
+            name="language"
+            [(ngModel)]="selectedLanguageId"
+            [placeholder]="'LNG_LAYOUT_LANGUAGE_LABEL' | translate"
+            [options]="languagesList$ | async"
+            optionLabelKey="name"
+            optionValueKey="id"
+            (optionChanged)="selectLanguage($event)"
+            [clearable]="false">
+        </app-form-select>
+    </div>
+</div>
