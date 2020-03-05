@@ -127,7 +127,7 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
             .modifyLanguage(this.languageId, dirtyFields)
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     // hide loading
                     this.hideLoadingDialog();
                     return throwError(err);

@@ -62,7 +62,7 @@ export class LocationBreadcrumbsComponent implements OnInit {
                     .getLocation(this.locationId)
                     .pipe(
                         catchError((err) => {
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err);
                             this.router.navigate(['/locations']);
                             return throwError(err);
                         })

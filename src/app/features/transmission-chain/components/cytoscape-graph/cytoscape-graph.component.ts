@@ -1152,7 +1152,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                                         )
                                         .pipe(
                                             catchError((err) => {
-                                                this.snackbarService.showError(err.message);
+                                                this.snackbarService.showApiError(err);
                                                 loadingDialog.close();
                                                 return throwError(err);
                                             })

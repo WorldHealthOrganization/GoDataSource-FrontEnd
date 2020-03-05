@@ -578,7 +578,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                         .deleteLabResult(this.selectedOutbreak.id, labResult.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )

@@ -215,7 +215,7 @@ export class ManageIconsListComponent extends ListComponent implements OnInit {
                         .deleteIcon(icon.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )

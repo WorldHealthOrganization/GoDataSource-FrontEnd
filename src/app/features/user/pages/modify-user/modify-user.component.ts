@@ -179,7 +179,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
                         .reloadAndPersistAuthUser()
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 // hide loading
                                 this.hideLoadingDialog();
                                 return throwError(err);

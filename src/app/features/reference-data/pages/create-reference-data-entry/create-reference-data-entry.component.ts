@@ -147,7 +147,7 @@ export class CreateReferenceDataEntryComponent
             .createEntry(dirtyFields)
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     return throwError(err);
                 }),
                 switchMap((newReferenceDataEntry) => {

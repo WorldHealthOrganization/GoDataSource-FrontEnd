@@ -81,7 +81,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                         .getTeam(this.teamId)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 this.router.navigate(['/teams']);
                                 return throwError(err);
                             })
@@ -152,7 +152,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                         .modifyTeam(this.teamId, dirtyFields)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 // hide loading
                                 this.hideLoadingDialog();
                                 return throwError(err);

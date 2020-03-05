@@ -331,7 +331,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                                 } else if (err.code === ErrorCodes.DELETE_PARENT_MODEL) {
                                     this.snackbarService.showError('LNG_DIALOG_CONFIRM_LOCATION_HAS_CHILDREN', location);
                                 } else {
-                                    this.snackbarService.showError(err.message);
+                                    this.snackbarService.showApiError(err);
                                 }
 
                                 return throwError(err);
