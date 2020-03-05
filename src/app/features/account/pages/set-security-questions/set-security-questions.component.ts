@@ -63,7 +63,7 @@ export class SetSecurityQuestionsComponent implements OnInit {
                 .modifyUser(this.authUser.id, fields)
                 .pipe(
                     catchError((err) => {
-                        this.snackbarService.showError(err.message);
+                        this.snackbarService.showApiError(err);
                         return throwError(err);
                     })
                 )

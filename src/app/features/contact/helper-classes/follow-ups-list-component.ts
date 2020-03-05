@@ -164,7 +164,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                         .deleteFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -291,7 +291,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
                         .restoreFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -457,7 +457,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             .modifyFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id, {targeted: targeted})
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     return throwError(err);
                 })
             )

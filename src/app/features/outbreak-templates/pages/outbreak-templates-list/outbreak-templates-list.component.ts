@@ -252,7 +252,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                         .deleteOutbreakTemplate(outbreakTemplate.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )

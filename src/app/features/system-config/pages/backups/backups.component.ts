@@ -288,7 +288,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
                         .deleteBackup(item.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -315,7 +315,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
                 .restoreBackup(backupItemData.id)
                 .pipe(
                     catchError((err) => {
-                        this.snackbarService.showError(err.message);
+                        this.snackbarService.showApiError(err);
                         return throwError(err);
                     })
                 )
@@ -338,7 +338,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
                         .getBackup(this.waitForBackupIdToBeReady)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
 
                                 // can't continue with the restore
                                 this.waitForBackupIdToBeReady = undefined;
@@ -400,7 +400,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
                             .createBackup(answerBackup.inputValue.value)
                             .pipe(
                                 catchError((err) => {
-                                    this.snackbarService.showError(err.message);
+                                    this.snackbarService.showApiError(err);
                                     return throwError(err);
                                 })
                             )

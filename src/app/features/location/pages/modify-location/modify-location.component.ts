@@ -184,7 +184,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             )
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     // hide loading
                     this.hideLoadingDialog();
                     return throwError(err);
