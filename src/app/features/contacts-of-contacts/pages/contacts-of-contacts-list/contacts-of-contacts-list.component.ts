@@ -320,7 +320,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                     this.selectedOutbreak &&
                     this.selectedOutbreak.id
                 ) {
-                    this.exportContactsOfContactsUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts-of-contacts/export`;
+                    this.exportContactsOfContactsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts-of-contacts/export`;
 
                     // initialize side filters
                     this.initializeSideFilters();
@@ -672,7 +672,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         // display export dialog
         this.dialogService.showExportDialog({
             // required
-            message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
+            message: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_TITLE',
             url: this.exportContactsOfContactsUrl,
             fileName: this.contactsOfContactsDataExportFileName,
 
