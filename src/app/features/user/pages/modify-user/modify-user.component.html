@@ -126,6 +126,16 @@
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 type="password"
+                                name="oldPassword"
+                                [(ngModel)]="oldPassword"
+                                [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CURRENT_PASSWORD' | translate"
+                                tooltip="LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CURRENT_PASSWORD_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                [required]="!!user.password">
+                            </app-form-input>
+
+                            <app-form-input
+                                type="password"
                                 name="password"
                                 [(ngModel)]="user.password"
                                 [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD' | translate"
@@ -146,7 +156,6 @@
                                 [disabled]="viewOnly">
                             </app-form-input>
 
-                            <div fxFlex><!-- placeholder --></div>
                             <div fxFlex><!-- placeholder --></div>
                         </div>
                     </div>

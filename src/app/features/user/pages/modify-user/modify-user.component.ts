@@ -40,6 +40,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
 
     userId: string;
     user: UserModel = new UserModel();
+    oldPassword: string;
     passwordConfirmModel: string;
     rolesList$: Observable<UserRoleModel[]>;
     outbreaksList$: Observable<OutbreakModel[]>;
@@ -149,7 +150,8 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
 
         // remove password if empty
         if (_.isEmpty(dirtyFields.password)) {
-            delete dirtyFields.password;
+            delete dirtyFields.passwordConfirmModel;
+            delete dirtyFields.oldPassword;
         }
 
         if (form.valid && !_.isEmpty(dirtyFields)) {
@@ -170,6 +172,8 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
                 .subscribe((modifiedUser: UserModel) => {
                     // update model
                     this.user = modifiedUser;
+                    this.oldPassword = undefined;
+
                     // reset password confirm model
                     this.passwordConfirmModel = undefined;
 
