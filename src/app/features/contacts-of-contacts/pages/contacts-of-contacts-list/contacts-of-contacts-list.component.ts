@@ -4,12 +4,17 @@ import { Observable, throwError } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { ContactModel } from '../../../../core/models/contact.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, DialogField, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
+import {
+    CountedItemsListItem,
+    DialogAnswerButton,
+    HoverRowAction,
+    HoverRowActionType,
+    LoadingDialogModel
+} from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -24,7 +29,7 @@ import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { catchError, map, share, tap } from 'rxjs/operators';
+import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
@@ -32,8 +37,9 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { AddressType } from '../../../../core/models/address.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
-import { CaseModel } from '../../../../core/models/case.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
+import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 
 @Component({
     selector: 'app-contacts-of-contacts-list',
@@ -49,12 +55,13 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
     // constants
     Constants = Constants;
+    ContactOfContactModel =  ContactOfContactModel;
 
     // authenticated user
     authUser: UserModel;
 
     // list of existing contacts
-    contactsOfContactsList$: Observable<ContactModel[]>;
+    contactsOfContactsList$: Observable<ContactOfContactModel[]>;
     contactsOfContactsListCount$: Observable<any>;
 
     outbreakSubscriber: Subscription;
@@ -69,7 +76,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     genderList$: Observable<any[]>;
 
     // contacts grouped by risk level
-    countedContactsByRiskLevel$: Observable<any[]>;
+    countedContactsOfContactsByRiskLevel$: Observable<any[]>;
 
     // risk level
     riskLevelRefData$: Observable<ReferenceDataCategoryModel>;
@@ -102,22 +109,22 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     ];
 
     anonymizeFields: LabelValuePair[] = [
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_ID', 'id'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_FIRST_NAME', 'firstName'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME', 'middleName'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_LAST_NAME', 'lastName'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_GENDER', 'gender'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER', 'phoneNumber'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_OCCUPATION', 'occupation'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH', 'dob'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_AGE', 'age'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DOCUMENTS', 'documents'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_ADDRESSES', 'addresses'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL', 'riskLevel'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_RISK_REASON', 'riskReason'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_TYPE', 'type'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
-        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
+        new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ID', 'id'),
+        new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME', 'firstName'),
+        new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME', 'middleName'),
+        new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME', 'lastName'),
+        new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER', 'gender'),
+        new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER', 'phoneNumber'),
+        new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION', 'occupation'),
+        new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH', 'dob'),
+        new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE', 'age'),
+        new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENTS', 'documents'),
+        new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES', 'addresses'),
+        new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL', 'riskLevel'),
+        new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON', 'riskReason'),
+        new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_TYPE', 'type'),
+        new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
+        new LabelValuePair('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
     ];
 
     loadingDialog: LoadingDialogModel;
@@ -126,11 +133,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         // View Contact
         new HoverRowAction({
             icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CONTACT',
-            click: (item: ContactModel) => {
+            iconTooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CONTACT_OF_CONTACT',
+            click: (item: ContactOfContactModel) => {
                 this.router.navigate(['/contacts-of-contacts', item.id, 'view']);
             },
-            visible: (item: ContactModel): boolean => {
+            visible: (item: ContactOfContactModel): boolean => {
                 return !item.deleted &&
                     ContactOfContactModel.canView(this.authUser);
             }
@@ -139,11 +146,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         // Modify Contact
         new HoverRowAction({
             icon: 'settings',
-            iconTooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_MODIFY_CONTACT',
-            click: (item: ContactModel) => {
+            iconTooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_MODIFY_CONTACT_OF_CONTACT',
+            click: (item: ContactOfContactModel) => {
                 this.router.navigate(['/contacts-of-contacts', item.id, 'modify']);
             },
-            visible: (item: ContactModel): boolean => {
+            visible: (item: ContactOfContactModel): boolean => {
                 return !item.deleted &&
                     this.authUser &&
                     this.selectedOutbreak &&
@@ -159,11 +166,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             menuOptions: [
                 // Delete Contact
                 new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_CONTACT',
-                    click: (item: ContactModel) => {
-                        this.deleteContact(item);
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_CONTACT_OF_CONTACT',
+                    click: (item: ContactOfContactModel) => {
+                        this.deleteContactOfContact(item);
                     },
-                    visible: (item: ContactModel): boolean => {
+                    visible: (item: ContactOfContactModel): boolean => {
                         return !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
@@ -176,7 +183,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 // Divider
                 new HoverRowAction({
                     type: HoverRowActionType.DIVIDER,
-                    visible: (item: ContactModel): boolean => {
+                    visible: (item: ContactOfContactModel): boolean => {
                         // visible only if at least one of the first two items is visible
                         return !item.deleted &&
                             this.authUser &&
@@ -188,10 +195,10 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 // See contact exposures
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO',
-                    click: (item: ContactModel) => {
+                    click: (item: ContactOfContactModel) => {
                         this.router.navigate(['/relationships', EntityType.CONTACT_OF_CONTACT, item.id, 'exposures']);
                     },
-                    visible: (item: ContactModel): boolean => {
+                    visible: (item: ContactOfContactModel): boolean => {
                         return !item.deleted &&
                             ContactOfContactModel.canListRelationshipExposures(this.authUser);
                     }
@@ -200,7 +207,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 // Divider
                 new HoverRowAction({
                     type: HoverRowActionType.DIVIDER,
-                    visible: (item: ContactModel): boolean => {
+                    visible: (item: ContactOfContactModel): boolean => {
                         // visible only if at least one of the previous...
                         return !item.deleted;
                     }
@@ -209,10 +216,10 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 // View Contact movement map
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_MOVEMENT',
-                    click: (item: ContactModel) => {
+                    click: (item: ContactOfContactModel) => {
                         this.router.navigate(['/contacts-of-contacts', item.id, 'movement']);
                     },
-                    visible: (item: ContactModel): boolean => {
+                    visible: (item: ContactOfContactModel): boolean => {
                         return !item.deleted
                             // && ContactOfContactModel.canViewMovementMap(this.authUser);
                     }
@@ -221,10 +228,10 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 // View Contact chronology timeline
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CHRONOLOGY',
-                    click: (item: ContactModel) => {
+                    click: (item: ContactOfContactModel) => {
                         this.router.navigate(['/contacts-of-contacts', item.id, 'chronology']);
                     },
-                    visible: (item: ContactModel): boolean => {
+                    visible: (item: ContactOfContactModel): boolean => {
                         return !item.deleted
                             // &&
                             // ContactOfContactModel.canViewChronologyChart(this.authUser);
@@ -233,11 +240,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
                 // Restore a deleted contact
                 new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_CONTACT',
-                    click: (item: ContactModel) => {
-                        this.restoreContact(item);
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_CONTACT_OF_CONTACTS',
+                    click: (item: ContactOfContactModel) => {
+                        this.restoreContactOfContact(item);
                     },
-                    visible: (item: ContactModel): boolean => {
+                    visible: (item: ContactOfContactModel): boolean => {
                         return item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
@@ -326,8 +333,8 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                     this.initializeSideFilters();
                 }
 
-                // // get contacts grouped by risk level
-                // this.getContactsGroupedByRiskLevel();
+                // get contacts grouped by risk level
+                this.getContactsOfContactsGroupedByRiskLevel();
 
                 // initialize pagination
                 this.initPaginator();
@@ -394,10 +401,10 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 field: 'dateOfLastContact',
                 label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
             }),
-            new VisibleColumnModel({
-                field: 'wasCase',
-                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE'
-            }),
+            // new VisibleColumnModel({
+            //     field: 'wasCase',
+            //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE'
+            // }),
             new VisibleColumnModel({
                 field: 'numberOfContacts',
                 label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
@@ -513,7 +520,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     refreshList(finishCallback: (records: any[]) => void) {
         if (this.selectedOutbreak) {
             // refresh list of contacts grouped by risk level
-            // this.getContactsGroupedByRiskLevel();
+            this.getContactsOfContactsGroupedByRiskLevel();
 
             // retrieve created user & modified user information
             this.queryBuilder.include('createdByUser', true);
@@ -523,14 +530,15 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             this.queryBuilder.include('locations', true);
 
             // retrieve number of contacts & exposures for each record
-            this.queryBuilder.filter.flag(
+            const clonedQb = _.cloneDeep(this.queryBuilder);
+            clonedQb.filter.flag(
                 'countRelations',
                 true
             );
 
             // retrieve the list of Contacts
             this.contactsOfContactsList$ = this.contactsOfContactsDataService
-                .getContactsOfContactsList(this.selectedOutbreak.id, this.queryBuilder)
+                .getContactsOfContactsList(this.selectedOutbreak.id, clonedQb)
                 .pipe(
                     tap(this.checkEmptyList.bind(this)),
                     tap((data: any[]) => {
@@ -555,41 +563,41 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         }
     }
 
-    // /**
-    //  * Get contacts grouped by risk level
-    //  */
-    // getContactsGroupedByRiskLevel() {
-    //     if (this.selectedOutbreak) {
-    //         this.countedContactsByRiskLevel$ = this.riskLevelRefData$
-    //             .pipe(
-    //                 mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
-    //                     return this.contactDataService
-    //                         .getContactsGroupedByRiskLevel(this.selectedOutbreak.id, this.queryBuilder)
-    //                         .pipe(
-    //                             map((data: RiskLevelGroupModel) => {
-    //                                 return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
-    //                                     const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId}) as ReferenceDataEntryModel;
-    //                                     return new CountedItemsListItem(
-    //                                         item.count,
-    //                                         itemId as any,
-    //                                         item.contactIDs,
-    //                                         refItem ?
-    //                                             refItem.getColorCode() :
-    //                                             Constants.DEFAULT_COLOR_REF_DATA
-    //                                     );
-    //                                 });
-    //                             })
-    //                         );
-    //                 })
-    //             );
-    //     }
-    // }
+    /**
+     * Get contacts grouped by risk level
+     */
+    getContactsOfContactsGroupedByRiskLevel() {
+        if (this.selectedOutbreak) {
+            this.countedContactsOfContactsByRiskLevel$ = this.riskLevelRefData$
+                .pipe(
+                    mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
+                        return this.contactsOfContactsDataService
+                            .getContactsOfContactsGroupedByRiskLevel(this.selectedOutbreak.id, this.queryBuilder)
+                            .pipe(
+                                map((data: RiskLevelGroupModel) => {
+                                    return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
+                                        const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId}) as ReferenceDataEntryModel;
+                                        return new CountedItemsListItem(
+                                            item.count,
+                                            itemId as any,
+                                            item.contactIDs,
+                                            refItem ?
+                                                refItem.getColorCode() :
+                                                Constants.DEFAULT_COLOR_REF_DATA
+                                        );
+                                    });
+                                })
+                            );
+                    })
+                );
+        }
+    }
 
     /**
      * Retrieve risk color accordingly to risk level
      * @param item
      */
-    getRiskColor(item: ContactModel) {
+    getRiskColor(item: ContactOfContactModel) {
         // get risk data color
         const riskData = _.get(this.riskLevelsListMap, item.riskLevel);
         if (riskData) {
@@ -602,16 +610,16 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
     /**
      * Delete specific contact that belongs to the selected outbreak
-     * @param {ContactModel} contact
+     * @param {ContactOfContactModel} contactOfContact
      */
-    deleteContact(contact: ContactModel) {
+    deleteContactOfContact(contactOfContact: ContactOfContactModel) {
         // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CONTACT', contact)
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CONTACT_OF_CONTACT', contactOfContact)
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete contact
                     this.contactsOfContactsDataService
-                        .deleteContactOfContact(this.selectedOutbreak.id, contact.id)
+                        .deleteContactOfContact(this.selectedOutbreak.id, contactOfContact.id)
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showError(err.message);
@@ -619,7 +627,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                             })
                         )
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
                             this.needsRefreshList(true);
@@ -628,13 +636,13 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             });
     }
 
-    restoreContact(contact: ContactModel) {
+    restoreContactOfContact(contactOfContact: ContactOfContactModel) {
         // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_CONTACT', new ContactModel(contact))
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_CONTACT_OF_CONTACT', new ContactOfContactModel(contactOfContact))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.contactsOfContactsDataService
-                        .restoreContactOfContact(this.selectedOutbreak.id, contact.id)
+                        .restoreContactOfContact(this.selectedOutbreak.id, contactOfContact.id)
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showError(err.message);
@@ -924,7 +932,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     /**
      * Display contacts popup
      */
-    displayContacts(entity: ContactModel) {
+    displayContacts(entity: ContactOfContactModel) {
         // if we do not have contacts return
         if (entity.numberOfContacts < 1) {
             return;
@@ -940,7 +948,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     /**
      * Display exposures popup
      */
-    displayExposures(entity: ContactModel) {
+    displayExposures(entity: ContactOfContactModel) {
         // if we do not have any exposure return
         if (entity.numberOfExposures < 1) {
             return;
