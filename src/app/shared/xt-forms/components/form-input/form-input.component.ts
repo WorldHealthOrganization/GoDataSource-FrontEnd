@@ -33,6 +33,8 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
 
     @Input() placeholder: string;
 
+    @Input() autocomplete: string;
+
     @Input() type: string = 'text';
     @Input() required: boolean = false;
     @Input() name: string;
