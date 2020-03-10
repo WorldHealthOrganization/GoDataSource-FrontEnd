@@ -122,7 +122,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
     }
 
     /**
-     * Retrieve contact information
+     * Retrieve contact of contact information
      */
     private retrieveContactOfContactData() {
         if (
@@ -188,7 +188,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
         }
     }
 
-    modifyContact(form: NgForm) {
+    modifyContactOfContact(form: NgForm) {
         // validate form
         if (!this.formHelper.validateForm(form)) {
             return;
@@ -221,10 +221,10 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                     return throwError(err);
                 })
             )
-            .subscribe((contactDuplicates: EntityDuplicatesModel) => {
-                // modify Contact
-                const runModifyContact = (finishCallBack?: () => void) => {
-                    // modify the contact
+            .subscribe((contactOfContactDuplicates: EntityDuplicatesModel) => {
+                // modify the contact of contact
+                const runModifyContactOfContact = (finishCallBack?: () => void) => {
+                    // modify the contact of contact
                     this.contactsOfContactsDataService
                         .modifyContactOfContact(
                             this.selectedOutbreak.id,
@@ -248,7 +248,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
 
                             // display message
                             if (!finishCallBack) {
-                                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
+                                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_MODIFY_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
 
                                 // update breadcrumb
                                 this.createBreadcrumbs();
@@ -263,17 +263,17 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                 };
 
                 // do we have duplicates ?
-                if (contactDuplicates.duplicates.length > 0) {
+                if (contactOfContactDuplicates.duplicates.length > 0) {
                     // display dialog
                     const showDialog = () => {
                         this.dialogService.showConfirm(new DialogConfiguration({
-                            message: 'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
+                            message: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
                             yesLabel: 'LNG_COMMON_BUTTON_MERGE',
                             customInput: true,
                             fieldsList: [new DialogField({
                                 name: 'mergeWith',
-                                placeholder: 'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_LABEL_MERGE_WITH',
-                                inputOptions: _.map(contactDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
+                                placeholder: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_DUPLICATES_DIALOG_LABEL_MERGE_WITH',
+                                inputOptions: _.map(contactOfContactDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
                                     // contact model
                                     const contactOfContactData: ContactOfContactModel = duplicate.model as ContactOfContactModel;
 
@@ -307,7 +307,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                                     !answer.inputValue.value.mergeWith
                                 ) {
                                     // display need to select at least one record to merge with
-                                    this.snackbarService.showError('LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_ACTION_MERGE_AT_LEAST_ONE_ERROR_MESSAGE');
+                                    this.snackbarService.showError('LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_DUPLICATES_DIALOG_ACTION_MERGE_AT_LEAST_ONE_ERROR_MESSAGE');
 
                                     // display dialog again
                                     showDialog();
@@ -317,7 +317,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                                 }
 
                                 // save data first, followed by redirecting to merge
-                                runModifyContact(() => {
+                                runModifyContactOfContact(() => {
                                     // construct list of ids
                                     const mergeIds: string[] = [
                                         this.contactOfContactId,
@@ -337,7 +337,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                                     );
                                 });
                             } else if (answer.button === DialogAnswerButton.Extra_1) {
-                                runModifyContact();
+                                runModifyContactOfContact();
                             } else {
                                 // hide dialog
                                 loadingDialog.close();
@@ -348,7 +348,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
                     // display dialog
                     showDialog();
                 } else {
-                    runModifyContact();
+                    runModifyContactOfContact();
                 }
             });
     }
@@ -361,7 +361,7 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
         this.breadcrumbs.push(
             new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE', '/contacts-of-contacts'),
             new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_CONTACT_TITLE' : 'LNG_PAGE_MODIFY_CONTACT_TITLE',
+                this.viewOnly ? 'LNG_PAGE_VIEW_CONTACT_OF_CONTACT_TITLE' : 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TITLE',
                 '.',
                 true,
                 {},

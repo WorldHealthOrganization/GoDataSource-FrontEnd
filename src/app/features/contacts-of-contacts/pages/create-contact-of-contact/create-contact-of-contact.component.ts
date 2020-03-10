@@ -66,7 +66,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
         mask: string
     };
 
-    contactIdMaskValidator: Observable<boolean>;
+    contactOfContactMaskValidator: Observable<boolean>;
 
     constructor(
         private router: Router,
@@ -142,7 +142,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
                         this.contactOfContactData.visualId = this.visualIDTranslateData.mask;
 
                         // set visual ID validator
-                        this.contactIdMaskValidator = new Observable((observer) => {
+                        this.contactOfContactMaskValidator = new Observable((observer) => {
                             this.contactsOfContactsDataService.checkContactOfContactVisualIDValidity(
                                 selectedOutbreak.id,
                                 this.visualIDTranslateData.mask,
@@ -153,7 +153,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
                             });
                         });
 
-                        // retrieve Case/Event information
+                        // retrieve Contact information
                         this.entityDataService
                             .getEntity(EntityType.CONTACT, selectedOutbreak.id, this.entityId)
                             .pipe(
@@ -161,7 +161,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
                                     // show error message
                                     this.snackbarService.showError(err.message);
 
-                                    // navigate to Cases/Events listing page
+                                    // navigate to contacts listing page
                                     this.disableDirtyConfirm();
                                     this.router.navigate(['/contacts']);
                                     return throwError(err);
@@ -323,7 +323,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
 
                         // display dialog
                         this.dialogService.showConfirm(new DialogConfiguration({
-                            message: 'LNG_PAGE_CREATE_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
+                            message: 'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
                             customInput: true,
                             fieldsList: possibleDuplicates,
                         }))

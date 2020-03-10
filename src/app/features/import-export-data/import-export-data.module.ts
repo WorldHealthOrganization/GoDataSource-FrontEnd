@@ -7,7 +7,6 @@ import { SharedModule } from '../../shared/shared.module';
 
 // components
 import * as fromPages from './pages';
-import { ImportContactOfContactDataComponent } from './pages/import-contact-of-contact-data/import-contact-of-contact-data.component';
 
 @NgModule({
     imports: [
@@ -16,8 +15,7 @@ import { ImportContactOfContactDataComponent } from './pages/import-contact-of-c
         FileUploadModule
     ],
     declarations: [
-        ...fromPages.pageComponents,
-        ImportContactOfContactDataComponent
+        ...fromPages.pageComponents
     ],
     entryComponents: []
 })

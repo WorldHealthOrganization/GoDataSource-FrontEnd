@@ -86,7 +86,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIPS_TITLE': 'Export contact of contact relationships',
 
         /**
-         * uiCreateContactsOfContactsPage
+         * uiCreateContactOfContactPage
          */
         'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE': 'Personal',
         'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_ACTION_CREATE_CONTACT_BUTTON': 'Create contact of contact',
@@ -102,9 +102,9 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED': 'You can only add a contact of contact through a contact',
 
         /**
-         * uiModifyContactsOfContactsPage
+         * uiModifyContactOfContactPage
          */
-        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE': 'Contact saved',
+        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_MODIFY_CONTACT_OF_CONTACT_SUCCESS_MESSAGE': 'Contact of contact saved',
         'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_CHRONOLOGY': 'View chronology',
         'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_FOLLOW_UPS': 'View follow-ups',
         'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_MOVEMENT': 'View movement',
@@ -113,7 +113,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_DUPLICATES_DIALOG_LABEL_MERGE_WITH': 'Merge with?',
         'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_DOCUMENTS_TITLE': 'Documents',
-        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE': 'Flag this contact with a risk level for additional attention',
+        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE': 'Flag this contact of contact with a risk level for additional attention',
         'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE': 'Personal',
         'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TITLE': 'Modify {{name}}',
         'LNG_PAGE_VIEW_CONTACT_OF_CONTACT_TITLE': 'View {{name}}',
