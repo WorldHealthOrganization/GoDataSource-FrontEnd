@@ -42,6 +42,9 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
     previousSubscriber: Subscription;
     refdataSubscriber: Subscription;
 
+    // delay needed to display entries who doesn't have a delay between dates
+    delayTime = (10 * 60 * 60 * 1000);
+
     // Global filters => Date
     private _globalFilterDate: Moment;
     @Input() set globalFilterDate(globalFilterDate: Moment) {
@@ -185,23 +188,20 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
                 !_.isEmpty(result.dateOfOnset) &&
                 !_.isEmpty(result.dateSampleTaken)
             ) {
+                let toDate = new Date(Date.parse(result.dateSampleTaken));
                 // check if we have any result with no delay and increase the time on the dateOfOnset and set it as
                 // dateSampleTaken for labResult to be displayed on the chart
-                const delayedDate = () => {
-                    if (result.delay === 0 && result.dateOfOnset === result.dateSampleTaken) {
-                        const initialDate = new Date(result.dateOfOnset);
-                        // increasing time to the dateOfOnset to set it as dateSampleTaken
-                        initialDate.setTime(initialDate.getTime() + (10 * 60 * 60 * 1000));
-                        return initialDate;
-                    }
-                    return;
-                };
-                console.log(delayedDate());
+                if (result.delay === 0) {
+                    toDate  = new Date(result.dateOfOnset);
+                    // increasing time to the dateOfOnset to set it as dateSampleTaken
+                    toDate.setTime(toDate.getTime() + this.delayTime);
+                }
+
                 const chartDataItemChild: any = {};
                 chartDataItemChild.id = result.case.id;
                 chartDataItemChild.name = result.case.name;
                 chartDataItemChild.from = new Date(Date.parse(result.dateOfOnset));
-                chartDataItemChild.to = delayedDate() ? delayedDate() : new Date(Date.parse(result.dateSampleTaken));
+                chartDataItemChild.to = toDate;
                 chartDataItem.children.push(chartDataItemChild);
             }
         });
