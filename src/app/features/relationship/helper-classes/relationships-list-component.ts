@@ -263,7 +263,6 @@ export abstract class RelationshipsListComponent extends ListComponent implement
      * Route path for specific relationships type (exposures or contacts)
      */
     get relationshipTypeRoutePath(): string {
-        console.log(this.relationshipType);
         switch (this.relationshipType) {
             case RelationshipType.EXPOSURE:
                 return 'exposures';
@@ -285,9 +284,6 @@ export abstract class RelationshipsListComponent extends ListComponent implement
      * Check if we're allowed to create event / case / contact relationships'
      */
     get entityCanCreate(): boolean {
-        console.log(this.entityType);
-        console.log(this.entityMap);
-        console.log(this.entityMap[this.entityType]);
         return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].create(this.authUser);
     }
 
