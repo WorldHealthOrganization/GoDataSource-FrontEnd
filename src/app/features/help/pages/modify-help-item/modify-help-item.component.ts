@@ -207,7 +207,8 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
                         );
                 })
             )
-            .subscribe((helpItemData) => {
+            .subscribe((helpItemData: HelpItemModel) => {
+                console.log(helpItemData);
                 // update model
                 this.helpItemData = helpItemData;
 
@@ -225,6 +226,9 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
 
                 // hide loading
                 this.hideLoadingDialog();
+
+                // redirect to new path
+                this.router.navigate([`/help/categories/${helpItemData.categoryId}/items/${helpItemData.id}/modify`]);
             });
     }
 }
