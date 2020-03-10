@@ -314,6 +314,14 @@
             {{ 'LNG_COMMON_BUTTON_EXPOSURES_TO' | translate }}
         </button>
 
+        <button
+            *ngIf="ContactModel.canListRelationshipContacts(authUser) && RelationshipModel.canList(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/relationships', EntityType.CONTACT, contactId, 'contacts-of-contacts']">
+            {{ 'LNG_COMMON_BUTTON_CONTACTS_OF_CONTACTS_TO' | translate }}
+        </button>
+
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button

@@ -6,15 +6,13 @@
 
 <app-import-data
     [allowedExtensions]="allowedExtensions"
-    [title]="'LNG_PAGE_IMPORT_CONTACT_LAB_DATA_TITLE'"
+    [title]="'LNG_PAGE_IMPORT_CONTACT_OF_CONTACT_DATA_TITLE'"
     [displayLoading]="displayLoading"
     (finished)="finished()"
     [importFileUrl]="importFileUrl"
     [importDataUrl]="importDataUrl"
-    [model]="ImportServerModelNames.CONTACT_LAB_RESULTS"
+    [model]="ImportServerModelNames.CONTACT_OF_CONTACT"
     [fieldsWithoutTokens]="fieldsWithoutTokens"
     [requiredDestinationFields]="requiredDestinationFields"
-    [savedImportPage]="Constants.APP_IMPORT_PAGE.CASE_LAB_DATA.value"
-    [extraDataUsedToFormatData]="selectedOutbreak?.labResultsTemplate"
-    [formatDataBeforeUse]="formatDataBeforeUse">
+    [savedImportPage]="Constants.APP_IMPORT_PAGE.CONTACT_OF_CONTACT.value">
 </app-import-data>

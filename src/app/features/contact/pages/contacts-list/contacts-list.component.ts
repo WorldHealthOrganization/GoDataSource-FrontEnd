@@ -317,9 +317,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
                 // See contact contacts of contacts
                 new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_ACTION_SEE_CONTACTS_TO',
+                    menuOptionLabel: 'LNG_PAGE_ACTION_SEE_CONTACTS_OF_CONTACTS_TO',
                     click: (item: ContactModel) => {
-                        this.router.navigate([`/relationships`, EntityType.CONTACT, item.id, 'contacts']);
+                        this.router.navigate([`/relationships`, EntityType.CONTACT, item.id, 'contacts-of-contacts']);
                     },
                     visible: (item: ContactModel): boolean => {
                         return !item.deleted &&

@@ -88,6 +88,7 @@ const relationshipTypeChildrenRoutes = [
                         or: [
                             PERMISSION.CASE_CHANGE_SOURCE_RELATIONSHIP,
                             PERMISSION.CONTACT_CHANGE_SOURCE_RELATIONSHIP,
+                            PERMISSION.CONTACT_OF_CONTACT_CHANGE_SOURCE_RELATIONSHIP,
                             PERMISSION.EVENT_CHANGE_SOURCE_RELATIONSHIP
                         ]
                     })
@@ -140,6 +141,14 @@ const routes: Routes = [
         path: ':entityType/:entityId/contacts',
         data: {
             relationshipType: RelationshipType.CONTACT
+        },
+        children: relationshipTypeChildrenRoutes
+    },
+    // Entity Contact of Contact Relationship
+    {
+        path: ':entityType/:entityId/contacts-of-contacts',
+        data: {
+            relationshipType: RelationshipType.CONTACT_OF_CONTACT
         },
         children: relationshipTypeChildrenRoutes
     },

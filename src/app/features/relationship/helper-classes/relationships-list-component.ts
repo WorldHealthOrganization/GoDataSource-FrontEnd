@@ -249,16 +249,29 @@ export abstract class RelationshipsListComponent extends ListComponent implement
      * Relationships list page title, based on relationship type (Exposures or Contacts?)
      */
     get relationshipsListPageTitle(): string {
-        return this.relationshipType === RelationshipType.EXPOSURE ?
-            'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
-            'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
+        switch (this.relationshipType) {
+            case RelationshipType.EXPOSURE:
+                return 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE';
+            case RelationshipType.CONTACT:
+                return 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
+            case RelationshipType.CONTACT_OF_CONTACT:
+                return 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_OF_CONTACTS_TITLE';
+        }
     }
 
     /**
      * Route path for specific relationships type (exposures or contacts)
      */
     get relationshipTypeRoutePath(): string {
-        return this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures';
+        console.log(this.relationshipType);
+        switch (this.relationshipType) {
+            case RelationshipType.EXPOSURE:
+                return 'exposures';
+            case RelationshipType.CONTACT:
+                return 'contacts';
+            case RelationshipType.CONTACT_OF_CONTACT:
+                return 'contacts-of-contacts';
+        }
     }
 
     /**
@@ -272,6 +285,9 @@ export abstract class RelationshipsListComponent extends ListComponent implement
      * Check if we're allowed to create event / case / contact relationships'
      */
     get entityCanCreate(): boolean {
+        console.log(this.entityType);
+        console.log(this.entityMap);
+        console.log(this.entityMap[this.entityType]);
         return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].create(this.authUser);
     }
 

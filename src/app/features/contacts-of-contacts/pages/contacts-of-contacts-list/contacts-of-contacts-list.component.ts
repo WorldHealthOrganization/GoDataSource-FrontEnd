@@ -401,10 +401,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 field: 'dateOfLastContact',
                 label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
             }),
-            // new VisibleColumnModel({
-            //     field: 'wasCase',
-            //     label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE'
-            // }),
             new VisibleColumnModel({
                 field: 'numberOfContacts',
                 label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',

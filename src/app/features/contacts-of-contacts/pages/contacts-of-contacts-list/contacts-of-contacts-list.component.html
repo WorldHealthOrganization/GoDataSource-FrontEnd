@@ -64,12 +64,12 @@
         [value]="(contactsOfContactsListCount$ | async)?.count">
     </app-total-number-of-records>
     <!--Contacts grouped by risk level-->
-    <app-counted-items-list
-        *ngIf="!appliedListFilter"
-        fxFlex
-        [items]="countedContactsOfContactsByRiskLevel$ | async"
-        (optionChanged)="filterBySelectField('id', $event.ids, null)">
-    </app-counted-items-list>
+    <!--<app-counted-items-list-->
+        <!--*ngIf="!appliedListFilter"-->
+        <!--fxFlex-->
+        <!--[items]="countedContactsOfContactsByRiskLevel$ | async"-->
+        <!--(optionChanged)="filterBySelectField('id', $event.ids, null)">-->
+    <!--</app-counted-items-list>-->
 </div>
 
 <app-side-filters
@@ -457,36 +457,6 @@
                 </app-yes-no-label>
             </mat-cell>
         </ng-container>
-
-        <!--&lt;!&ndash; Was Case &ndash;&gt;-->
-        <!--<ng-container matColumnDef="wasCase">-->
-            <!--<mat-header-cell *matHeaderCellDef>-->
-                <!--<div class="table-header-cell">-->
-                    <!--<div mat-sort-header class="column-header">-->
-                        <!--{{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE' | translate }}-->
-                    <!--</div>-->
-                    <!--<div class="column-filter">-->
-                        <!--<app-form-select-->
-                            <!--name="wasCase"-->
-                            <!--ngModel-->
-                            <!--[placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
-                            <!--[options]="yesNoOptionsList$ | async"-->
-                            <!--(optionChanged)="filterBySelectField('wasCase',$event)"-->
-                            <!--app-reset-input-on-side-filter-->
-                            <!--[allowSelectionOfDisabledItems]="true"-->
-                            <!--[displayFilterIcon]="true">-->
-                        <!--</app-form-select>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</mat-header-cell>-->
-            <!--<mat-cell-->
-                <!--*matCellDef="let item"-->
-                <!--[style.color]="getRiskColor(item)">-->
-                <!--<app-yes-no-label-->
-                    <!--[value]="item.wasCase">-->
-                <!--</app-yes-no-label>-->
-            <!--</mat-cell>-->
-        <!--</ng-container>-->
 
         <!-- Number of Contacts -->
         <ng-container matColumnDef="numberOfContacts">

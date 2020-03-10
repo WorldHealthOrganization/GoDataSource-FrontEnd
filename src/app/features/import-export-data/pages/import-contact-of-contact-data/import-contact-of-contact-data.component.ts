@@ -25,6 +25,8 @@ export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
+    outbreakSubscriber: Subscription;
+
     Constants = Constants;
 
     authUser: UserModel;
@@ -38,8 +40,6 @@ export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
         ImportDataExtension.JSON
     ];
 
-    outbreakSubscriber: Subscription;
-
     displayLoading: boolean = true;
 
     importFileUrl: string = '';
@@ -48,17 +48,23 @@ export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
     ImportServerModelNames = ImportServerModelNames;
 
     fieldsWithoutTokens = {
-        questionnaireAnswers: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS'
+        relationship: 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP',
+        'addresses[]': 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
+        'documents[]': 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS',
+        'relationship.persons[]': 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP_PERSONS',
+        'vaccinesReceived[]': 'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED',
+
+        // !must be empty token - logic depends on it!
+        'addresses[].geoLocation': ''
     };
 
     requiredDestinationFields = [
-        'personId',
-        'dateSampleTaken'
+        'firstName',
+        'dateOfReporting',
+        'relationship.persons[].id',
+        'relationship.contactDate',
+        'relationship.certaintyLevelId'
     ];
-
-    formatDataBeforeUse = QuestionModel.formatQuestionnaireImportDefs;
-
-    selectedOutbreak: OutbreakModel;
 
     /**
      * Constructor
@@ -68,8 +74,7 @@ export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
         private redirectService: RedirectService
-    ) {
-    }
+    ) {}
 
     /**
      * Component initialized
@@ -86,12 +91,9 @@ export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
-                    // outbreak
-                    this.selectedOutbreak = selectedOutbreak;
-
                     // set URLs
                     this.importFileUrl = `outbreaks/${selectedOutbreak.id}/importable-files`;
-                    this.importDataUrl = `outbreaks/${selectedOutbreak.id}/contacts/lab-results/import-importable-file-using-map`;
+                    this.importDataUrl = `outbreaks/${selectedOutbreak.id}/contacts-of-contacts/import-importable-file-using-map`;
 
                     // display import form
                     this.displayLoading = false;
@@ -121,18 +123,8 @@ export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
         if (ContactModel.canList(this.authUser)) {
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
-                    'LNG_PAGE_LIST_CONTACTS_TITLE',
-                    '/contacts'
-                )
-            );
-        }
-
-        // add list breadcrumb only if we have permission
-        if (LabResultModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(
-                    'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
-                    '/lab-results'
+                    'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+                    '/contacts-of-contacts'
                 )
             );
         }
@@ -140,7 +132,7 @@ export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
         // import breadcrumb
         this.breadcrumbs.push(
             new BreadcrumbItemModel(
-                'LNG_PAGE_IMPORT_CONTACT_LAB_DATA_TITLE',
+                'LNG_PAGE_IMPORT_CONTACT_OF_CONTACT_DATA_TITLE',
                 '.',
                 true
             )
@@ -148,14 +140,14 @@ export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Finished
+     * Finished import
      */
     finished() {
-        if (LabResultModel.canList(this.authUser)) {
-            this.router.navigate(['/lab-results']);
+        if (ContactModel.canList(this.authUser)) {
+            this.router.navigate(['/contacts-of-contacts']);
         } else {
             // fallback
-            this.redirectService.to(['/import-export-data/contact-lab-data/import']);
+            this.redirectService.to(['/import-export-data/contact-of-contact-data/import']);
         }
     }
 }
