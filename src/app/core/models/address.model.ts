@@ -20,6 +20,7 @@ export class AddressModel {
     geoLocation: { lat: number, lng: number };
     geoLocationAccurate: boolean = false;
     phoneNumber: string;
+    email: string;
 
     /**
      * Search for current address
@@ -45,6 +46,7 @@ export class AddressModel {
         this.geoLocation = _.get(data, 'geoLocation', {});
         this.geoLocationAccurate = _.get(data, 'geoLocationAccurate', false);
         this.phoneNumber = _.get(data, 'phoneNumber');
+        this.email = _.get(data, 'email');
     }
 
     get fullAddress() {

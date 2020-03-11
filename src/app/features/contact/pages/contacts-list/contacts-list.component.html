@@ -422,6 +422,30 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Email  -->
+        <ng-container matColumnDef="email">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_CONTACT_FIELD_LABEL_EMAIL' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="emailFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('addresses.email', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+                <ng-container *ngFor="let emailAddress of item.emailAddresses">
+                    {{emailAddress}}<br/>
+                </ng-container>
+            </mat-cell>
+        </ng-container>
+
         <!-- Risk Level -->
         <ng-container matColumnDef="riskLevel">
             <mat-header-cell *matHeaderCellDef>

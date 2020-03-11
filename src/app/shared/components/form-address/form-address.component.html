@@ -85,7 +85,32 @@
                     </div>
                 </div>
 
-                <div fxFlex><!-- placeholder --></div>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-input
+                        [name]="name + '[email]'"
+                        [(ngModel)]="address.email"
+                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_EMAIL' | translate"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS"
+                        [disabled]="disabled"
+                        [required]="false"
+                        app-email-validator
+                        (input)="onChange()">
+                    </app-form-input>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('email')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div fxLayout="row" fxLayoutGap="20px">

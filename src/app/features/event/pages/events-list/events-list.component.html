@@ -241,6 +241,19 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Email -->
+        <ng-container matColumnDef="email">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{ 'LNG_EVENT_FIELD_LABEL_EMAIL' | translate }}</div>
+                    <div class="column-filter"></div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.address.email}}
+            </mat-cell>
+        </ng-container>
+
         <!-- Number of Contacts -->
         <ng-container matColumnDef="numberOfContacts">
             <mat-header-cell *matHeaderCellDef>

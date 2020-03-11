@@ -481,6 +481,10 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_AREA'
             }),
             new VisibleColumnModel({
+                field: 'email',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL'
+            }),
+            new VisibleColumnModel({
                 field: 'contact.dateOfLastContact',
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
             }),
