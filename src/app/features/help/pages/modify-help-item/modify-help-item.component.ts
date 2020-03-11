@@ -208,7 +208,6 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
                 })
             )
             .subscribe((helpItemData: HelpItemModel) => {
-                console.log(helpItemData);
                 // update model
                 this.helpItemData = helpItemData;
 
