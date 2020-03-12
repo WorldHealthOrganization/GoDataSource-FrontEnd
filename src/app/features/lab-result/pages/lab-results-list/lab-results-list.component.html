@@ -5,7 +5,13 @@
 
             <div class="topnav-actions">
                 <button
-                    *ngIf="!appliedListFilter && (CaseModel.canImportLabResult(authUser) || (selectedOutbreak && selectedOutbreak.isContactLabResultsActive && ContactModel.canImportLabResult(authUser)))"
+                    *ngIf="!appliedListFilter && (
+                        CaseModel.canImportLabResult(authUser) || (
+                            selectedOutbreak && selectedOutbreak.isContactLabResultsActive && ContactModel.canImportLabResult(authUser)
+                        ) || (
+                            exportLabResultsUrl && LabResultModel.canExport(authUser)
+                        )
+                    )"
                     mat-raised-button
                     color="accent"
                     [matMenuTriggerFor]="quickActionsMenu">
@@ -13,6 +19,22 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
+                    <app-export-button
+                        *ngIf="exportLabResultsUrl && LabResultModel.canExport(authUser)"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_LAB_RESULTS_EXPORT_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_LAB_RESULTS_EXPORT_TITLE' | translate"
+                        [url]="exportLabResultsUrl"
+                        [fileName]="exportLabResultsFileName"
+                        [allowedExportTypes]="allowedExportTypes"
+                        [displayEncrypt]="true"
+                        [displayAnonymize]="true"
+                        [anonymizeFields]="anonymizeFields"
+                        [queryBuilder]="queryBuilder"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
+                    </app-export-button>
+
                     <ng-container *app-selected-outbreak-is-active>
                         <button
                             *ngIf="CaseModel.canImportLabResult(authUser)"

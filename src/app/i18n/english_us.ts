@@ -28,6 +28,17 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_SEARCH': 'Search',
 
         /**
+         * uiLabResultsListPage
+         */
+        'LNG_PAGE_LIST_LAB_RESULTS_EXPORT_BUTTON': 'Export lab result data',
+        'LNG_PAGE_LIST_LAB_RESULTS_EXPORT_TITLE': 'Export lab result data',
+
+        /**
+         * uiLabResultsFields
+         */
+        'LNG_LAB_RESULT_FIELD_LABEL_ID': 'ID',
+
+        /**
          * uiFormInputValidationErrors
          */
         'LNG_FORM_VALIDATION_ERROR_OUTBREAK_TEMPLATE_NAME_NOT_UNIQUE': 'This name is already in use'
