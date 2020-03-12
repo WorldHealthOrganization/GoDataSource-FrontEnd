@@ -9,7 +9,10 @@
                         CaseModel.canImportLabResult(authUser) || (
                             selectedOutbreak && selectedOutbreak.isContactLabResultsActive && ContactModel.canImportLabResult(authUser)
                         ) || (
-                            exportLabResultsUrl && LabResultModel.canExport(authUser)
+                            exportLabResultsUrl && LabResultModel.canExport(authUser) && (
+                                CaseModel.canExportLabResult(authUser) ||
+                                ContactModel.canExportLabResult(authUser)
+                            )
                         )
                     )"
                     mat-raised-button
@@ -20,7 +23,7 @@
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <app-export-button
-                        *ngIf="exportLabResultsUrl && LabResultModel.canExport(authUser)"
+                        *ngIf="exportLabResultsUrl && LabResultModel.canExport(authUser) && (CaseModel.canExportLabResult(authUser) || ContactModel.canExportLabResult(authUser))"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_LAB_RESULTS_EXPORT_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_LAB_RESULTS_EXPORT_TITLE' | translate"
