@@ -21,6 +21,9 @@ import { Moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./gantt-chart-delay-onset-hospitalization-dashlet.component.less']
 })
 export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnInit, OnDestroy {
+    // delay needed to display entries who doesn't have a delay between dates
+    static DELAY_MISSING_ED_ADD_TIME: number = 10 * 60 * 60 * 1000;
+
     // constants
     Constants = Constants;
 
@@ -184,13 +187,19 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
             if (
                 !_.isEmpty(result.dateOfOnset) &&
                 !_.isEmpty(result.hospitalizationIsolationDate)
-                && result.delay > 0
             ) {
+                // create gantt render item
                 const chartDataItemChild: any = {};
                 chartDataItemChild.id = result.case.id;
                 chartDataItemChild.name = result.case.name;
                 chartDataItemChild.from = new Date(Date.parse(result.dateOfOnset));
-                chartDataItemChild.to = new Date(Date.parse(result.hospitalizationIsolationDate));
+
+                // set duration
+                chartDataItemChild.to = result.delay > 0 ?
+                    new Date(Date.parse(result.hospitalizationIsolationDate)) :
+                    new Date(new Date(result.dateOfOnset).getTime() + GanttChartDelayOnsetHospitalizationDashletComponent.DELAY_MISSING_ED_ADD_TIME);
+
+                // finished - add to list items to render
                 chartDataItem.children.push(chartDataItemChild);
             }
         });
