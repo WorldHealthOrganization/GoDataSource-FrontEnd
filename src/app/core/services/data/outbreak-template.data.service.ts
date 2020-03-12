@@ -54,7 +54,7 @@ export class OutbreakTemplateDataService {
      * @returns {Observable<any>}
      */
     createOutbreakTemplate(outbreakTemplate: OutbreakTemplateModel, outbreakTemplateId?: string): Observable<any> {
-        return this. http.post(`templates?${outbreakTemplateId ? `templateId=${outbreakTemplateId}` : ''}`, outbreakTemplate);
+        return this. http.post(`templates${outbreakTemplateId ? `?templateId=${outbreakTemplateId}` : ''}`, outbreakTemplate);
     }
 
     /**
