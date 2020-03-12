@@ -86,7 +86,8 @@
                                 optionValueKey="id"
                                 optionTooltipKey="description"
                                 [options]="outbreaksList$ | async"
-                                [multiple]="true">
+                                [multiple]="true"
+                                [enableFilterOptions]="true">
                             </app-form-select>
 
                             <app-form-select
@@ -97,7 +98,8 @@
                                 optionLabelKey="name"
                                 optionValueKey="id"
                                 optionTooltipKey="description"
-                                [options]="outbreaksList$ | async">
+                                [options]="outbreaksList$ | async"
+                                [enableFilterOptions]="true">
                             </app-form-select>
 
                             <div fxFlex><!-- placeholder --></div>
