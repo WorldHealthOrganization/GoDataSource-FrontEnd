@@ -299,25 +299,6 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
      * @param outbreakTemplateModel
      */
     cloneOutbreakTemplate(outbreakTemplateModel: OutbreakTemplateModel) {
-        // translate questionnaire questions
-        const translateQuestionnaire = (questions: QuestionModel[]) => {
-            _.each(questions, (question: QuestionModel) => {
-                // translate question
-                question.text = this.i18nService.instant(question.text);
-
-                // translate answers & sub questions
-                _.each(question.answers, (answer: AnswerModel) => {
-                    // translate answer
-                    answer.label = this.i18nService.instant(answer.label);
-
-                    // translate sub-question
-                    if (!_.isEmpty(answer.additionalQuestions)) {
-                        translateQuestionnaire(answer.additionalQuestions);
-                    }
-                });
-            });
-        };
-
         // get the outbreak to clone
         this.outbreakTemplateDataService
             .getOutbreakTemplate(outbreakTemplateModel.id)
@@ -341,31 +322,14 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                     )
                     .subscribe((answer) => {
                         if (answer.button === DialogAnswerButton.Yes) {
-                            // delete the id from the parent outbreak template
-                            delete outbreakTemplate.id;
 
                             // set the name for the cloned outbreak template
                             outbreakTemplate.name = answer.inputValue.value.clonedOutbreakTemplateName;
 
-                            // translate questionnaire questions - Case Form
-                            if (!_.isEmpty(outbreakTemplate.caseInvestigationTemplate)) {
-                                translateQuestionnaire(outbreakTemplate.caseInvestigationTemplate);
-                            }
-
-                            // translate questionnaire questions - Lab Results Form
-                            if (!_.isEmpty(outbreakTemplate.labResultsTemplate)) {
-                                translateQuestionnaire(outbreakTemplate.labResultsTemplate);
-                            }
-
-                            // translate questionnaire questions - Contact Follow-up
-                            if (!_.isEmpty(outbreakTemplate.contactFollowUpTemplate)) {
-                                translateQuestionnaire(outbreakTemplate.contactFollowUpTemplate);
-                            }
-
                             // show loading
                             const loadingDialog = this.dialogService.showLoadingDialog();
                             this.outbreakTemplateDataService
-                                .createOutbreakTemplate(outbreakTemplate)
+                                .createOutbreakTemplate(outbreakTemplate, outbreakTemplate.id)
                                 .pipe(
                                     catchError((err) => {
                                         this.snackbarService.showApiError(err);
