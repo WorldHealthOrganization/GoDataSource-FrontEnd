@@ -1049,7 +1049,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         .restoreCase(this.selectedOutbreak.id, caseModel.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )

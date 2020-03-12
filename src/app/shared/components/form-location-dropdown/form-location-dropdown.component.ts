@@ -317,7 +317,7 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
         const request = locationsList$
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     return throwError(err);
                 })
             )

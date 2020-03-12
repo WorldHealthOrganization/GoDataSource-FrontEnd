@@ -33,6 +33,8 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
 
     @Input() placeholder: string;
 
+    @Input() autocomplete: string;
+
     @Input() type: string = 'text';
     @Input() required: boolean = false;
     @Input() name: string;
@@ -59,6 +61,8 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
     }
 
     @Input() displayFilterIcon: boolean = false;
+
+    @Input() tabIndex: number;
 
     @Input() maxlength: number;
     @Input() minlength: number;

@@ -15,6 +15,7 @@ import { OutbreakTemplateDataService } from '../../../../core/services/data/outb
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
     selector: 'app-modify-outbreak-template',
@@ -36,6 +37,8 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
     outbreakTemplate: OutbreakTemplateModel = new OutbreakTemplateModel();
     // list of diseases
     diseasesList$: Observable<any[]>;
+    // outbreak template name validator
+    outbreakTemplateNameValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
     /**
      * Constructor
@@ -80,6 +83,13 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
                         // update breadcrumbs
                         this.initializeBreadcrumbs();
 
+                        this.outbreakTemplateNameValidator$ = new Observable((observer) => {
+                            this.outbreakTemplateDataService.checkOutbreakTemplateNameUniquenessValidity(this.outbreakTemplate.name, this.outbreakTemplate.id)
+                                .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                                    observer.next(isValid);
+                                    observer.complete();
+                                });
+                        });
                         // hide loading
                         this.hideLoadingDialog();
                     });
@@ -131,7 +141,7 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
             .modifyOutbreakTemplate(this.outbreakTemplateId, dirtyFields)
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     // hide loading
                     this.hideLoadingDialog();
                     return throwError(err);

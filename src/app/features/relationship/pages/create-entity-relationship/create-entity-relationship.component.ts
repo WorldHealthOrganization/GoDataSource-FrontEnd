@@ -159,7 +159,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
                 .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
                 .pipe(
                     catchError((err) => {
-                        this.snackbarService.showError(err.message);
+                        this.snackbarService.showApiError(err);
 
                         // Entity not found; navigate back to Entities list
                         this.router.navigate([this.entityMap[this.entityType].link]);

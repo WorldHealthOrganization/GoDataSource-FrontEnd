@@ -136,7 +136,7 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
             .modifyCluster(this.selectedOutbreak.id, this.clusterId, dirtyFields)
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     // hide loading
                     this.hideLoadingDialog();
                     return throwError(err);

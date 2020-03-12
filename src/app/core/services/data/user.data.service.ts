@@ -163,7 +163,12 @@ export class UserDataService {
      * @returns {Observable<Object>}
      */
     forgotPassword(data: any) {
-        return this.http.post('users/reset', data);
+        return this.http.post(
+            'users/reset',
+            data, {
+                withCredentials: true
+            }
+        );
     }
 
     /**
@@ -182,7 +187,12 @@ export class UserDataService {
      * @returns {Observable<Object>}
      */
     resetPasswordQuestions(data: any) {
-        return this.http.post(`users/reset-password-with-security-question`, data);
+        return this.http.post(
+            'users/reset-password-with-security-question',
+            data, {
+                withCredentials: true
+            }
+        );
     }
 
     /**

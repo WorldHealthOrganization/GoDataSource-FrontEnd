@@ -64,7 +64,13 @@ export class AuthDataService {
      * @returns {Observable<any>}
      */
     login(user): Observable<AuthModel> {
-        return this.http.post(`users/login`, user)
+        return this.http
+            .post(
+                `users/login`,
+                user, {
+                    withCredentials: true
+                }
+            )
             .pipe(
                 switchMap((authRes) => {
                     // keep auth info
@@ -152,17 +158,12 @@ export class AuthDataService {
      * @returns {Observable<any>}
      */
     logout(): Observable<any> {
-        return this.http.post(`users/logout`, null)
+        return this.http
+            .post(`users/logout`, null)
             .pipe(
                 tap(() => {
                     // clear token info
-                    this.destroyTokenInfo();
-
-                    // remove auth info from local storage
-                    this.storageService.remove(StorageKey.AUTH_DATA);
-
-                    // remove selected outbreak from local storage
-                    this.storageService.remove(StorageKey.SELECTED_OUTBREAK_ID);
+                    this.clearStorage();
                 })
             );
     }
@@ -381,6 +382,9 @@ export class AuthDataService {
      * Remove all data from storage that is handled by this service
      */
     public clearStorage() {
+        // clear token info
+        this.destroyTokenInfo();
+
         // remove auth info from local storage
         this.storageService.remove(StorageKey.AUTH_DATA);
 
