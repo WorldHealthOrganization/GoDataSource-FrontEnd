@@ -208,7 +208,6 @@ export class CreateOutbreakComponent
             // create outbreak
             const outbreakData = new OutbreakModel(dirtyFields);
             const loadingDialog = this.dialogService.showLoadingDialog();
-            console.log(outbreakData);
             this.outbreakDataService
                 .createOutbreak(outbreakData, this.creatingOutbreakFromTemplate ? this.outbreakTemplateId : '')
                 .pipe(
