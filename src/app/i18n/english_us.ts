@@ -25,8 +25,27 @@ export const EnglishUsLang = {
         /**
          * uiFormInputValidationErrors
          */
-        'LNG_FORM_VALIDATION_ERROR_OUTBREAK_TEMPLATE_NAME_NOT_UNIQUE': 'This name is already in use'
+        'LNG_FORM_VALIDATION_ERROR_OUTBREAK_TEMPLATE_NAME_NOT_UNIQUE': 'This name is already in use',
 
+        /**
+         * uiOutbreakTemplateListPage
+         */
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTIONS_CLONE_OUTBREAK_TEMPLATE': 'Clone outbreak template',
+
+        /**
+         * uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_CLONE_OUTBREAK_TEMPLATE': 'Name the clone of the outbreak template',
+
+        /**
+         * uiDialogsFieldsPlaceholders
+         */
+        'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_TEMPLATE_NAME': 'Cloned outbreak template name',
+
+        /**
+         * uiOutbreakTemplateListPage
+         */
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME': '{{name}} Clone'
         /**
          * REMOVE the tokens from below
          */

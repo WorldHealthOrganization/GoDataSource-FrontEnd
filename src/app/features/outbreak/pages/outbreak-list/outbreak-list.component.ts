@@ -540,7 +540,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
 
     /**
      * Clone an existing outbreak
-     * @param {OutbreakModel} outbreak
+     * @param {OutbreakModel} outbreakModel
      */
     cloneOutbreak(outbreakModel: OutbreakModel) {
         // translate questionnaire questions

@@ -9,15 +9,17 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
+import {DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField} from '../../../../shared/components/dialog/dialog.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
-import { catchError, share, tap } from 'rxjs/operators';
+import {catchError, map, share, switchMap, tap} from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import {I18nService} from '../../../../core/services/helper/i18n.service';
+import {AnswerModel, QuestionModel} from '../../../../core/models/question.model';
 
 @Component({
     selector: 'app-outbreak-templates-list',
@@ -142,6 +144,27 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                     visible: (): boolean => {
                         return OutbreakTemplateModel.canModifyCaseLabResultQuestionnaire(this.authUser);
                     }
+                }),
+
+                // Divider
+                new HoverRowAction({
+                    type: HoverRowActionType.DIVIDER,
+                    visible: (): boolean => {
+                        // must be 'canClone' TODO need new permission
+                        return OutbreakTemplateModel.canGenerateOutbreak(this.authUser);
+                    }
+                }),
+
+                // Clone Template Outbreak
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTIONS_CLONE_OUTBREAK_TEMPLATE',
+                    click: (item: OutbreakTemplateModel) => {
+                        this.cloneOutbreakTemplate(item);
+                    },
+                    visible: (item: OutbreakTemplateModel): boolean => {
+                        // new permission needed
+                        return OutbreakTemplateModel.canCreate(this.authUser);
+                    }
                 })
             ]
         })
@@ -156,7 +179,8 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
         private authDataService: AuthDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
-        private outbreakTemplateDataService: OutbreakTemplateDataService
+        private outbreakTemplateDataService: OutbreakTemplateDataService,
+        private i18nService: I18nService
     ) {
         super(
             snackbarService
@@ -267,6 +291,120 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                             this.needsRefreshList(true);
                         });
                 }
+            });
+    }
+
+    /**
+     * Clone existing outbreak template
+     * @param outbreakTemplateModel
+     */
+    cloneOutbreakTemplate(outbreakTemplateModel: OutbreakTemplateModel) {
+        // translate questionnaire questions
+        const translateQuestionnaire = (questions: QuestionModel[]) => {
+            _.each(questions, (question: QuestionModel) => {
+                // translate question
+                question.text = this.i18nService.instant(question.text);
+
+                // translate answers & sub questions
+                _.each(question.answers, (answer: AnswerModel) => {
+                    // translate answer
+                    answer.label = this.i18nService.instant(answer.label);
+
+                    // translate sub-question
+                    if (!_.isEmpty(answer.additionalQuestions)) {
+                        translateQuestionnaire(answer.additionalQuestions);
+                    }
+                });
+            });
+        };
+
+        // get the outbreak to clone
+        this.outbreakTemplateDataService
+            .getOutbreakTemplate(outbreakTemplateModel.id)
+            .subscribe((outbreakTemplate: OutbreakTemplateModel) => {
+                // create the clone of the parent outbreak
+                this.dialogService
+                    .showInput(
+                        new DialogConfiguration({
+                            message: 'LNG_DIALOG_CONFIRM_CLONE_OUTBREAK_TEMPLATE',
+                            yesLabel: 'LNG_COMMON_BUTTON_CLONE',
+                            required: true,
+                            fieldsList: [new DialogField({
+                                name: 'clonedOutbreakTemplateName',
+                                placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_TEMPLATE_NAME',
+                                required: true,
+                                type: 'text',
+                                value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME', {name: outbreakTemplate.name})
+                            })],
+                        }),
+                        true
+                    )
+                    .subscribe((answer) => {
+                        if (answer.button === DialogAnswerButton.Yes) {
+                            // delete the id from the parent outbreak template
+                            delete outbreakTemplate.id;
+
+                            // set the name for the cloned outbreak template
+                            outbreakTemplate.name = answer.inputValue.value.clonedOutbreakTemplateName;
+
+                            // translate questionnaire questions - Case Form
+                            if (!_.isEmpty(outbreakTemplate.caseInvestigationTemplate)) {
+                                translateQuestionnaire(outbreakTemplate.caseInvestigationTemplate);
+                            }
+
+                            // translate questionnaire questions - Lab Results Form
+                            if (!_.isEmpty(outbreakTemplate.labResultsTemplate)) {
+                                translateQuestionnaire(outbreakTemplate.labResultsTemplate);
+                            }
+
+                            // translate questionnaire questions - Contact Follow-up
+                            if (!_.isEmpty(outbreakTemplate.contactFollowUpTemplate)) {
+                                translateQuestionnaire(outbreakTemplate.contactFollowUpTemplate);
+                            }
+
+                            // show loading
+                            const loadingDialog = this.dialogService.showLoadingDialog();
+                            this.outbreakTemplateDataService
+                                .createOutbreakTemplate(outbreakTemplate)
+                                .pipe(
+                                    catchError((err) => {
+                                        this.snackbarService.showApiError(err);
+                                        loadingDialog.close();
+                                        return throwError(err);
+                                    }),
+                                    switchMap((clonedOutbreakTemplate) => {
+                                        // update language tokens to get the translation of submitted questions and answers
+                                        return this.i18nService.loadUserLanguage()
+                                            .pipe(
+                                                catchError((err) => {
+                                                    this.snackbarService.showApiError(err);
+                                                    loadingDialog.close();
+                                                    return throwError(err);
+                                                }),
+                                                map(() => clonedOutbreakTemplate)
+                                            );
+                                    })
+                                )
+                                .subscribe((clonedOutbreakTemplate) => {
+                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
+
+                                    // hide dialog
+                                    loadingDialog.close();
+
+                                    // navigate to modify page of the new outbreak
+                                    if (OutbreakTemplateModel.canModify(this.authUser)) {
+                                        this.router.navigate([`/outbreak-templates/${clonedOutbreakTemplate.id}/modify`]);
+                                    } else if (OutbreakTemplateModel.canView(this.authUser)) {
+                                        this.router.navigate([`/outbreak-templates/${clonedOutbreakTemplate.id}/view`]);
+                                    } else if (OutbreakTemplateModel.canList(this.authUser)) {
+                                        this.router.navigate([`/outbreak-templates`]);
+                                    } else {
+                                        // fallback to current page since we already know that we have access to this page
+                                        // Don't redirect :)
+                                    }
+                                });
+                        }
+                    });
             });
     }
 }
