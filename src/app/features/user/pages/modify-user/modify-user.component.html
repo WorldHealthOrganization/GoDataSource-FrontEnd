@@ -86,8 +86,7 @@
 
                         <div
                             *ngIf="OutbreakModel.canList(authUser)"
-                            fxLayout="row" fxLayoutGap="20px"
-                        >
+                            fxLayout="row" fxLayoutGap="20px">
                             <app-form-select
                                 name="outbreakIds"
                                 [(ngModel)]="user.outbreakIds"
@@ -98,7 +97,8 @@
                                 optionTooltipKey="description"
                                 [options]="outbreaksList$ | async"
                                 [multiple]="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [enableFilterOptions]="true">
                             </app-form-select>
 
                             <app-form-select
@@ -110,7 +110,8 @@
                                 optionValueKey="id"
                                 optionTooltipKey="description"
                                 [options]="outbreaksList$ | async"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [enableFilterOptions]="true">
                             </app-form-select>
 
                             <div fxFlex><!-- placeholder --></div>
