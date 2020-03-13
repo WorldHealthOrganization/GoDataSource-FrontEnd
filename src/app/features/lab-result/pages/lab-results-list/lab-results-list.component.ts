@@ -681,6 +681,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
     showLoadingDialog() {
         this.loadingDialog = this.dialogService.showLoadingDialog();
     }
+
     /**
      * Hide loading dialog
      */

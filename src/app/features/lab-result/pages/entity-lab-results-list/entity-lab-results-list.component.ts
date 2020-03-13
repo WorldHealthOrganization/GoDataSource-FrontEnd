@@ -716,6 +716,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     showLoadingDialog() {
         this.loadingDialog = this.dialogService.showLoadingDialog();
     }
+
     /**
      * Hide loading dialog
      */
