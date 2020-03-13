@@ -10,7 +10,7 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { Observable, throwError } from 'rxjs';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
@@ -21,7 +21,7 @@ import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { catchError, share, tap } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
-import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import { HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -31,6 +31,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-entity-lab-results-list',
@@ -50,6 +51,9 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
 
     // user list
     userList$: Observable<UserModel[]>;
+
+    // loading dialog handler
+    loadingDialog: LoadingDialogModel;
 
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
@@ -71,6 +75,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     ContactModel = ContactModel;
     EntityType = EntityType;
     EntityModel = EntityModel;
+    LabResultModel = LabResultModel;
 
     // available side filters
     availableSideFilters: FilterModel[];
@@ -83,6 +88,36 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     // authenticated user
     authUser: UserModel;
 
+    // export outbreak lab results
+    exportLabResultsUrl: string;
+    exportLabResultsFileName: string;
+    allowedExportTypes: ExportDataExtension[] = [
+        ExportDataExtension.CSV,
+        ExportDataExtension.XLS,
+        ExportDataExtension.XLSX,
+        ExportDataExtension.XML,
+        ExportDataExtension.JSON,
+        ExportDataExtension.ODS,
+        ExportDataExtension.PDF
+    ];
+    anonymizeFields: LabelValuePair[] = [
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_ID', 'id'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID', 'sampleIdentifier'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN', 'dateSampleTaken'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED', 'dateSampleDelivered'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING', 'dateTesting'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT', 'dateOfResult'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME', 'labName'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE', 'sampleType'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE', 'testType'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_RESULT', 'result'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_NOTES', 'notes'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_STATUS', 'status'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT', 'quantitativeResult'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
+    ];
+
+    // actions
     recordActions: HoverRowAction[] = [
         // View Lab Results
         new HoverRowAction({
@@ -243,6 +278,16 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         // selected outbreak
                         this.selectedOutbreak = selectedOutbreak;
+
+                        // export lab results url
+                        this.exportLabResultsUrl = null;
+                        if (
+                            this.selectedOutbreak &&
+                            this.selectedOutbreak.id
+                        ) {
+                            this.exportLabResultsUrl = `/outbreaks/${this.selectedOutbreak.id}/${EntityModel.getLinkForEntityType(this.personType)}/${this.personType === EntityType.CONTACT ? params.contactId : params.caseId}/lab-results/export`;
+                            this.exportLabResultsFileName = `${this.i18nService.instant(this.personType === EntityType.CONTACT ? 'LNG_PAGE_LIST_CONTACTS_TITLE' : 'LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`;
+                        }
 
                         // initialize side filters
                         this.initializeSideFilters();
@@ -663,5 +708,21 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                     }
                 }
             });
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
     }
 }

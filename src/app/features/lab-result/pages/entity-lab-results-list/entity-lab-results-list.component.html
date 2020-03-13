@@ -12,6 +12,40 @@
                         {{'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_ADD_LAB_RESULT' | translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </ng-container>
+
+                <button
+                    *ngIf="!appliedListFilter && (
+                        exportLabResultsUrl && LabResultModel.canExport(authUser) && (
+                            (personType === EntityType.CASE && CaseModel.canExportLabResult(authUser)) ||
+                            (personType === EntityType.CONTACT && ContactModel.canExportLabResult(authUser))
+                        )
+                    )"
+                    mat-raised-button
+                    color="accent"
+                    [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <app-export-button
+                        *ngIf="exportLabResultsUrl && LabResultModel.canExport(authUser) && (
+                            (personType === EntityType.CASE && CaseModel.canExportLabResult(authUser)) ||
+                            (personType === EntityType.CONTACT && ContactModel.canExportLabResult(authUser))
+                        )"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_EXPORT_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_EXPORT_TITLE' | translate"
+                        [url]="exportLabResultsUrl"
+                        [fileName]="exportLabResultsFileName"
+                        [allowedExportTypes]="allowedExportTypes"
+                        [displayEncrypt]="true"
+                        [displayAnonymize]="true"
+                        [anonymizeFields]="anonymizeFields"
+                        [queryBuilder]="queryBuilder"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
+                    </app-export-button>
+                </mat-menu>
             </div>
         </div>
     </ng-container>
