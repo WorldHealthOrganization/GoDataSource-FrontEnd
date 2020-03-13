@@ -234,7 +234,8 @@
         <button
             mat-raised-button
             color="accent"
-            (click)="switchWithSelectedRecord()">
+            (click)="switchWithSelectedRecord()"
+            [disabled]="!checkedAtLeastOneRecord">
             {{ 'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_SET_SOURCE_BUTTON' | translate}}
         </button>
     </div>

@@ -12,6 +12,40 @@
                         {{'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_ADD_LAB_RESULT' | translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </ng-container>
+
+                <button
+                    *ngIf="!appliedListFilter && (
+                        exportLabResultsUrl && LabResultModel.canExport(authUser) && (
+                            (personType === EntityType.CASE && CaseModel.canExportLabResult(authUser)) ||
+                            (personType === EntityType.CONTACT && ContactModel.canExportLabResult(authUser))
+                        )
+                    )"
+                    mat-raised-button
+                    color="accent"
+                    [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <app-export-button
+                        *ngIf="exportLabResultsUrl && LabResultModel.canExport(authUser) && (
+                            (personType === EntityType.CASE && CaseModel.canExportLabResult(authUser)) ||
+                            (personType === EntityType.CONTACT && ContactModel.canExportLabResult(authUser))
+                        )"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_EXPORT_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_EXPORT_TITLE' | translate"
+                        [url]="exportLabResultsUrl"
+                        [fileName]="exportLabResultsFileName"
+                        [allowedExportTypes]="allowedExportTypes"
+                        [displayEncrypt]="true"
+                        [displayAnonymize]="true"
+                        [anonymizeFields]="anonymizeFields"
+                        [queryBuilder]="queryBuilder"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
+                    </app-export-button>
+                </mat-menu>
             </div>
         </div>
     </ng-container>
@@ -325,6 +359,34 @@
 
             <mat-cell *matCellDef="let item">
                 {{ item.testedFor }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Status -->
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_STATUS' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="statusFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="progressOptionsList$ | async"
+                            (optionChanged)="filterBySelectField('status', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.status | translate }}
             </mat-cell>
         </ng-container>
 
