@@ -108,40 +108,6 @@ export class CreateOutbreakComponent
                             // make the new outbreak which is merged with the outbreak template
                             this.newOutbreak = new OutbreakModel(outbreakTemplate);
 
-                            // translate questionnaire questions
-                            const translateQuestionnaire = (questions: QuestionModel[]) => {
-                                _.each(questions, (question: QuestionModel) => {
-                                    // translate question
-                                    question.text = this.i18nService.instant(question.text);
-
-                                    // translate answers & sub questions
-                                    _.each(question.answers, (answer: AnswerModel) => {
-                                        // translate answer
-                                        answer.label = this.i18nService.instant(answer.label);
-
-                                        // translate sub-question
-                                        if (!_.isEmpty(answer.additionalQuestions)) {
-                                            translateQuestionnaire(answer.additionalQuestions);
-                                        }
-                                    });
-                                });
-                            };
-
-                            // translate questionnaire questions - Case Form
-                            if (!_.isEmpty(this.newOutbreak.caseInvestigationTemplate)) {
-                                translateQuestionnaire(this.newOutbreak.caseInvestigationTemplate);
-                            }
-
-                            // translate questionnaire questions - Lab Results Form
-                            if (!_.isEmpty(this.newOutbreak.labResultsTemplate)) {
-                                translateQuestionnaire(this.newOutbreak.labResultsTemplate);
-                            }
-
-                            // translate questionnaire questions - Contact Follow-up
-                            if (!_.isEmpty(this.newOutbreak.contactFollowUpTemplate)) {
-                                translateQuestionnaire(this.newOutbreak.contactFollowUpTemplate);
-                            }
-
                             // creating clone, we need to keep data from the template
                             this.creatingOutbreakFromTemplate = true;
                         });
