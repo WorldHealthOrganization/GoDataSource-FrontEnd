@@ -209,6 +209,7 @@ export class CaseModel
     static canDeleteLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_DELETE_LAB_RESULT) : false); }
     static canRestoreLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_RESTORE_LAB_RESULT) : false); }
     static canImportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_IMPORT_LAB_RESULT) : false); }
+    static canExportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_EXPORT_LAB_RESULT) : false); }
 
     /**
      * Constructor
@@ -380,6 +381,7 @@ export class CaseModel
     canDeleteLabResult(user: UserModel): boolean { return CaseModel.canDeleteLabResult(user); }
     canRestoreLabResult(user: UserModel): boolean { return CaseModel.canRestoreLabResult(user); }
     canImportLabResult(user: UserModel): boolean { return CaseModel.canImportLabResult(user); }
+    canExportLabResult(user: UserModel): boolean { return CaseModel.canExportLabResult(user); }
 
     /**
      * Case Name

@@ -266,7 +266,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         forkJoin(observableList$)
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     return throwError(err);
                 })
             )

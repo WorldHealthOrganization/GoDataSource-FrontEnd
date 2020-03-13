@@ -5,7 +5,7 @@ import { IAnswerData } from './question.model';
 import { ContactModel } from './contact.model';
 import { EntityType } from './entity-type';
 import { BaseModel } from './base.model';
-import { IPermissionBasic, IPermissionImportable, IPermissionRestorable } from './permission.interface';
+import { IPermissionBasic, IPermissionExportable, IPermissionImportable, IPermissionRestorable } from './permission.interface';
 import { UserModel } from './user.model';
 import { OutbreakModel } from './outbreak.model';
 import { PERMISSION } from './permission.model';
@@ -15,7 +15,8 @@ export class LabResultModel
     implements
         IPermissionBasic,
         IPermissionRestorable,
-        IPermissionImportable {
+        IPermissionImportable,
+        IPermissionExportable {
     id: string;
     sampleIdentifier: string;
     dateSampleTaken: string;
@@ -55,6 +56,11 @@ export class LabResultModel
      * Static Permissions - IPermissionImportable
      */
     static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_IMPORT) : false); }
+
+    /**
+     * Static Permissions - IPermissionExportable
+     */
+    static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_EXPORT) : false); }
 
     /**
      * Constructor
@@ -107,4 +113,9 @@ export class LabResultModel
      * Permissions - IPermissionImportable
      */
     canImport(user: UserModel): boolean { return LabResultModel.canImport(user); }
+
+    /**
+     * Permissions - IPermissionExportable
+     */
+    canExport(user: UserModel): boolean { return LabResultModel.canExport(user); }
 }

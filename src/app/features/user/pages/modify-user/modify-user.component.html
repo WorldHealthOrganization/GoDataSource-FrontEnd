@@ -86,8 +86,7 @@
 
                         <div
                             *ngIf="OutbreakModel.canList(authUser)"
-                            fxLayout="row" fxLayoutGap="20px"
-                        >
+                            fxLayout="row" fxLayoutGap="20px">
                             <app-form-select
                                 name="outbreakIds"
                                 [(ngModel)]="user.outbreakIds"
@@ -98,7 +97,8 @@
                                 optionTooltipKey="description"
                                 [options]="outbreaksList$ | async"
                                 [multiple]="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [enableFilterOptions]="true">
                             </app-form-select>
 
                             <app-form-select
@@ -110,7 +110,8 @@
                                 optionValueKey="id"
                                 optionTooltipKey="description"
                                 [options]="outbreaksList$ | async"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [enableFilterOptions]="true">
                             </app-form-select>
 
                             <div fxFlex><!-- placeholder --></div>
@@ -124,6 +125,16 @@
                     class="page-section">
                     <div fxLayout="column">
                         <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                type="password"
+                                name="oldPassword"
+                                [(ngModel)]="oldPassword"
+                                [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CURRENT_PASSWORD' | translate"
+                                tooltip="LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CURRENT_PASSWORD_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                [required]="!!user.password">
+                            </app-form-input>
+
                             <app-form-input
                                 type="password"
                                 name="password"
@@ -146,7 +157,6 @@
                                 [disabled]="viewOnly">
                             </app-form-input>
 
-                            <div fxFlex><!-- placeholder --></div>
                             <div fxFlex><!-- placeholder --></div>
                         </div>
                     </div>

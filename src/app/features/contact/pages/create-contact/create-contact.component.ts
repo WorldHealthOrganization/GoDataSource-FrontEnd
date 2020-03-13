@@ -140,7 +140,7 @@ export class CreateContactComponent
                     .pipe(
                         catchError((err) => {
                             // show error message
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err);
 
                             // redirect to cases
                             this.disableDirtyConfirm();
@@ -177,7 +177,7 @@ export class CreateContactComponent
                             .pipe(
                                 catchError((err) => {
                                     // show error message
-                                    this.snackbarService.showError(err.message);
+                                    this.snackbarService.showApiError(err);
 
                                     // navigate to Cases/Events listing page
                                     this.disableDirtyConfirm();

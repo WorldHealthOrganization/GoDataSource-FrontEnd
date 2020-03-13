@@ -12,6 +12,7 @@ import { MglTimelineModule } from 'angular-mgl-timeline';
 import { FileUploadModule } from 'ng2-file-upload';
 import { NgxWigModule } from 'ngx-wig';
 import { HotTableModule } from '@handsontable/angular';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 // components
 import * as fromSharedComponents from './components';
@@ -31,6 +32,7 @@ import * as fromSharedPipes from './pipes';
         MglTimelineModule,
         FileUploadModule,
         NgxWigModule,
+        NgxMatSelectSearchModule,
         HotTableModule.forRoot()
     ],
     declarations: [

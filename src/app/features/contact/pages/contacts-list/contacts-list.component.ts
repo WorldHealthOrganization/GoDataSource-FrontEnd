@@ -946,7 +946,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         .deleteContact(this.selectedOutbreak.id, contact.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -972,7 +972,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         .restoreContact(this.selectedOutbreak.id, contact.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -997,7 +997,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         .convertContactToCase(this.selectedOutbreak.id, contactModel.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )

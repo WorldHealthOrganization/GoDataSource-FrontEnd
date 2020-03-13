@@ -68,7 +68,8 @@
                                     [(ngModel)]="caseData.occupation"
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
                                     tooltip="LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION"
-                                    [options]="occupationsList$ | async">
+                                    [options]="occupationsList$ | async"
+                                    [enableFilterOptions]="true">
                                 </app-form-select>
                             </div>
 

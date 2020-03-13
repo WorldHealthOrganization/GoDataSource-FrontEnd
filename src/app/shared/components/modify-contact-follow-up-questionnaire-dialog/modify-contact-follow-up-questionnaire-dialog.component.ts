@@ -95,7 +95,7 @@ export class ModifyContactFollowUpQuestionnaireDialogComponent implements OnInit
             .pipe(
                 catchError((err) => {
                     this.loading = false;
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     return throwError(err);
                 })
             )

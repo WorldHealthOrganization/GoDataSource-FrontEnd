@@ -234,6 +234,7 @@ export enum PERMISSION {
     CONTACT_DELETE_LAB_RESULT = 'contact_delete_lab_result',
     CONTACT_RESTORE_LAB_RESULT = 'contact_restore_lab_result',
     CONTACT_IMPORT_LAB_RESULT = 'contact_import_lab_result',
+    CONTACT_EXPORT_LAB_RESULT = 'contact_export_lab_result',
 
     // case
     CASE_LIST = 'case_list',
@@ -293,6 +294,7 @@ export enum PERMISSION {
     CASE_DELETE_LAB_RESULT = 'case_delete_lab_result',
     CASE_RESTORE_LAB_RESULT = 'case_restore_lab_result',
     CASE_IMPORT_LAB_RESULT = 'case_import_lab_result',
+    CASE_EXPORT_LAB_RESULT = 'case_export_lab_result',
 
     // relationships
     RELATIONSHIP_LIST = 'relationship_list',
@@ -330,6 +332,7 @@ export enum PERMISSION {
     LAB_RESULT_DELETE = 'lab_result_delete',
     LAB_RESULT_RESTORE = 'lab_result_restore',
     LAB_RESULT_IMPORT = 'lab_result_import',
+    LAB_RESULT_EXPORT = 'lab_result_export',
 
     // gantt chart
     GANTT_CHART_VIEW_DELAY_ONSET_LAB_TESTING = 'gantt_chart_view_delay_onset_lab_testing',
