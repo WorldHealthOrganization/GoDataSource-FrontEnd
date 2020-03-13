@@ -242,7 +242,7 @@
         </ng-container>
 
         <!-- Email -->
-        <ng-container matColumnDef="email">
+        <ng-container matColumnDef="emailAddress">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">{{ 'LNG_EVENT_FIELD_LABEL_EMAIL' | translate }}</div>
@@ -250,7 +250,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.address.email}}
+                {{ item.address.emailAddress}}
             </mat-cell>
         </ng-container>
 

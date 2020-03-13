@@ -388,7 +388,7 @@
         </ng-container>
 
         <!-- Email  -->
-        <ng-container matColumnDef="email">
+        <ng-container matColumnDef="emailAddress">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL' | translate}}</div>
@@ -397,7 +397,7 @@
                             name="emailFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('addresses.email', $event)"
+                            (optionChanged)="filterByTextField('addresses.emailAddress', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -405,7 +405,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{item.address.email}}
+                {{item.address.emailAddress}}
             </mat-cell>
         </ng-container>
 
