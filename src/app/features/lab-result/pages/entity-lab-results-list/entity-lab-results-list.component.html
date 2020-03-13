@@ -362,6 +362,34 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Status -->
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_STATUS' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="statusFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="progressOptionsList$ | async"
+                            (optionChanged)="filterBySelectField('status', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.status | translate }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Deleted -->
         <ng-container matColumnDef="deleted">
             <mat-header-cell *matHeaderCellDef>

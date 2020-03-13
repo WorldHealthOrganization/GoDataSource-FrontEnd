@@ -55,6 +55,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
     labTestResultsList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any>;
     caseClassificationsList$: Observable<any[]>;
+    progressOptionsList$: Observable<any[]>;
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -260,6 +261,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST).pipe(share());
         this.labTestResultsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT).pipe(share());
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions().pipe(share());
+        this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
 
         // determine person type list accordingly to user permissions
         this.personTypeList = [];
@@ -378,6 +380,10 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
             new VisibleColumnModel({
                 field: 'result',
                 label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT'
+            }),
+            new VisibleColumnModel({
+                field: 'status',
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS'
             }),
             new VisibleColumnModel({
                 field: 'testedFor',

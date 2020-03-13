@@ -68,6 +68,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     labNamesList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
+    progressOptionsList$: Observable<any[]>;
 
     // constants
     ReferenceDataCategory = ReferenceDataCategory;
@@ -249,6 +250,9 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
      * Component initialized
      */
     ngOnInit() {
+        // progress options
+        this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
@@ -421,6 +425,10 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
             new VisibleColumnModel({
                 field: 'result',
                 label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT'
+            }),
+            new VisibleColumnModel({
+                field: 'status',
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS'
             }),
             new VisibleColumnModel({
                 field: 'testedFor',
