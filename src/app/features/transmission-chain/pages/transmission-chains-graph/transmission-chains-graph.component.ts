@@ -289,7 +289,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                             ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
                             ...{
                                 data: {
-                                    entity: entityData,
+                                    entity: entityData
                                 }
                             }
                         }
