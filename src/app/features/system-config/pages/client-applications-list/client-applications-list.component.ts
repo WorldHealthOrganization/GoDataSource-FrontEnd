@@ -61,7 +61,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                 this.downloadConfFile(item);
             },
             visible: (item: SystemClientApplicationModel): boolean => {
-                return SystemClientApplicationModel.canDownloadConfFile(this.authUser);
+                return SystemClientApplicationModel.canDownloadConfFile(this.authUser) && item.active;
             }
         }),
 
