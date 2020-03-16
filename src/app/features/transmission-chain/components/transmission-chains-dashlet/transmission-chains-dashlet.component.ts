@@ -44,7 +44,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     @Output() nodeTapped = new EventEmitter<GraphNodeModel>();
     @Output() edgeTapped = new EventEmitter<GraphEdgeModel>();
     @Output() changeEditMode = new EventEmitter<boolean>();
-    @Output() sendFilterOption = new EventEmitter<boolean>();
 
     // constants
     Constants = Constants;
@@ -345,6 +344,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             // add flags
             if (this.filters.showContacts) {
                 requestQueryBuilder.filter.flag('includeContacts', 1);
+                if (this.personId) {
+                    requestQueryBuilder.filter.flag('noContactChains', false);
+                }
             }
 
             // person query
@@ -401,9 +403,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * @returns {IterableIterator<any>}
      */
     onNodeTap(entity: GraphNodeModel) {
-        console.log(entity);
         this.nodeTapped.emit(entity);
-        this.sendFilterOption.emit(this.filters.showContacts ? this.filters.showContacts : false);
     }
 
     /**

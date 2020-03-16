@@ -537,7 +537,6 @@ export class TransmissionChainDataService {
                 });
             }
         }
-        console.log(graphData)
         return graphData;
     }
 

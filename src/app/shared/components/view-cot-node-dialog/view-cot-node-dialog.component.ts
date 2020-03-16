@@ -14,8 +14,7 @@ import { catchError, filter } from 'rxjs/internal/operators';
 
 export class ViewCOTNodeData {
     constructor(
-        public entity: CaseModel | EventModel | ContactModel,
-        public showContactsFilter: boolean
+        public entity: CaseModel | EventModel | ContactModel
     ) {}
 }
 
@@ -45,7 +44,6 @@ export class ViewCotNodeDialogComponent implements OnInit {
 
     // check if entity have relationship
     displayPersonChainOfTransmissionLink: boolean = false;
-    showContactsFilter: boolean = false;
 
     loading: boolean = true;
 
@@ -60,7 +58,6 @@ export class ViewCotNodeDialogComponent implements OnInit {
     ) {
         this.entity = this.data.entity;
         this.entityInfo = this.entityDataService.getLightObjectDisplay(this.entity);
-        this.showContactsFilter = this.data.showContactsFilter;
     }
 
     ngOnInit() {
@@ -75,7 +72,6 @@ export class ViewCotNodeDialogComponent implements OnInit {
                     return throwError(err);
                 }))
             .subscribe((relationshipCount: {count: number}) => {
-                console.log(relationshipCount);
                 if (relationshipCount.count > 0 ) {
                     this.displayPersonChainOfTransmissionLink = true;
                 }
