@@ -8,7 +8,6 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { LanguageModel } from '../../../../core/models/language.model';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -22,7 +21,11 @@ import { throwError } from 'rxjs';
     styleUrls: ['./modify-language.component.less']
 })
 export class ModifyLanguageComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // constants
+    LanguageModel = LanguageModel;
 
     languageId: string;
     languageData: LanguageModel = new LanguageModel();
@@ -30,6 +33,9 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
     // authenticated user
     authUser: UserModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private languageDataService: LanguageDataService,
@@ -38,14 +44,23 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
         private router: Router,
         private cacheService: CacheService,
         private authDataService: AuthDataService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // show loading
+        this.showLoadingDialog(false);
 
         this.route.params
             .subscribe((params: {languageId}) => {
@@ -56,19 +71,47 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
                     .subscribe((languageData: LanguageModel) => {
                         // since this is cached we need to clone it because otherwise we modify the existing object and if we chose to discard changes...
                         this.languageData = new LanguageModel(languageData);
-                        this.createBreadcrumbs();
+
+                        // update breadcrumbs
+                        this.initializeBreadcrumbs();
+
+                        // hide loading
+                        this.hideLoadingDialog();
                     });
             });
     }
 
     /**
-     * Check if we have write access
-     * @returns {boolean}
+     * Initialize breadcrumbs
      */
-    hasSysConfigWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (LanguageModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '/languages')
+            );
+        }
+
+        // view / modify breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                this.viewOnly ?
+                    'LNG_PAGE_VIEW_LANGUAGE_TITLE' :
+                    'LNG_PAGE_MODIFY_LANGUAGE_TITLE',
+                null,
+                true,
+                {},
+                this.languageData
+            )
+        );
     }
 
+    /**
+     * Modify Language
+     */
     modifyLanguage(form: NgForm) {
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
@@ -76,14 +119,17 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
             return;
         }
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify the event
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.languageDataService
             .modifyLanguage(this.languageId, dirtyFields)
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
-                    loadingDialog.close();
+                    this.snackbarService.showApiError(err);
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 }),
                 switchMap((modifiedLanguage) => {
@@ -95,7 +141,8 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
                                 return throwError(err);
                             }),
                             map(() => modifiedLanguage)
@@ -112,27 +159,11 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
                 // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LANGUAGE_ACTION_MODIFY_LANGUAGE_SUCCESS_MESSAGE');
 
-                // update breadcrumb
-                this.createBreadcrumbs();
+                // update breadcrumbs
+                this.initializeBreadcrumbs();
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
         });
-    }
-
-    /**
-     * Create breadcrumbs
-     */
-    createBreadcrumbs() {
-        this.breadcrumbs = [
-            new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '/languages'),
-            new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_LANGUAGE_TITLE' : 'LNG_PAGE_MODIFY_LANGUAGE_TITLE',
-                '.',
-                true,
-                {},
-                this.languageData
-            )
-        ];
     }
 }

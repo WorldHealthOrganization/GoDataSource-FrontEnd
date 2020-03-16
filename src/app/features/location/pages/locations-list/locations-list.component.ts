@@ -8,7 +8,6 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { DialogAnswerButton, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
@@ -25,6 +24,7 @@ import { RequestFilter } from '../../../../core/helperClasses/request-query-buil
 import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-locations-list',
@@ -43,6 +43,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
 
     // constants
     ExportDataExtension = ExportDataExtension;
+    LocationModel = LocationModel;
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -52,7 +53,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
 
     // list of existing locations
     locationsList$: Observable<LocationModel[]>;
-    locationsListCount$: Observable<any>;
+    locationsListCount$: Observable<IBasicCount>;
 
     yesNoOptionsList$: Observable<any[]>;
 
@@ -76,6 +77,9 @@ export class LocationsListComponent extends ListComponent implements OnInit {
             iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_VIEW_LOCATION',
             click: (item: LocationModel) => {
                 this.router.navigate(['/locations', item.id, 'view']);
+            },
+            visible: (): boolean => {
+                return LocationModel.canView(this.authUser);
             }
         }),
 
@@ -87,7 +91,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                 this.router.navigate(['/locations', item.id, 'modify']);
             },
             visible: (): boolean => {
-                return this.hasLocationWriteAccess();
+                return LocationModel.canModify(this.authUser);
             }
         }),
 
@@ -112,7 +116,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                         this.deleteLocation(item);
                     },
                     visible: (): boolean => {
-                        return this.hasLocationWriteAccess();
+                        return LocationModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -122,7 +126,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                     type: HoverRowActionType.DIVIDER,
                     visible: (): boolean => {
                         // visible only if at least one of the previous...
-                        return this.hasLocationWriteAccess();
+                        return LocationModel.canDelete(this.authUser);
                     }
                 }),
 
@@ -131,12 +135,18 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                     menuOptionLabel: 'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE',
                     click: (item: LocationModel) => {
                         this.router.navigate(['/locations', item.id, 'usage']);
+                    },
+                    visible: (): boolean => {
+                        return LocationModel.canListUsage(this.authUser);
                     }
                 })
             ]
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private authDataService: AuthDataService,
         private locationDataService: LocationDataService,
@@ -154,6 +164,9 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // add page title
         this.hierarchicalLocationsDataExportFileName = `${this.i18nService.instant('LNG_PAGE_LIST_LOCATIONS_TITLE')} - ${this.hierarchicalLocationsDataExportFileName}`;
@@ -255,6 +268,11 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         this.locationsList$ = this.locationDataService
             .getLocationsListByParent(this.parentId, this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback([]);
+                    return throwError(err);
+                }),
                 tap(this.checkEmptyList.bind(this)),
                 tap((data: any[]) => {
                     finishCallback(data);
@@ -270,7 +288,15 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.locationsListCount$ = this.locationDataService.getLocationsCountByParent(this.parentId, countQueryBuilder).pipe(share());
+        this.locationsListCount$ = this.locationDataService
+            .getLocationsCountByParent(this.parentId, countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**
@@ -305,7 +331,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                                 } else if (err.code === ErrorCodes.DELETE_PARENT_MODEL) {
                                     this.snackbarService.showError('LNG_DIALOG_CONFIRM_LOCATION_HAS_CHILDREN', location);
                                 } else {
-                                    this.snackbarService.showError(err.message);
+                                    this.snackbarService.showApiError(err);
                                 }
 
                                 return throwError(err);
@@ -319,14 +345,6 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                         });
                 }
             });
-    }
-
-    /**
-     * Check if we have write access to locations
-     * @returns {boolean}
-     */
-    hasLocationWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
     }
 
     /**

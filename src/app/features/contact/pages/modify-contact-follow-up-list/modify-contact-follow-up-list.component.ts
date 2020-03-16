@@ -21,6 +21,8 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { IAnswerData } from '../../../../core/models/question.model';
 import { throwError, forkJoin } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-modify-contact-follow-ups-list',
@@ -29,11 +31,8 @@ import { catchError, share } from 'rxjs/operators';
     styleUrls: ['./modify-contact-follow-up-list.component.less']
 })
 export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges implements OnInit {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
-        new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups'),
-        new BreadcrumbItemModel('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TITLE', '.', true)
-    ];
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // selected outbreak
     selectedOutbreak: OutbreakModel;
@@ -58,6 +57,12 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     // provide constants to template
     Object = Object;
 
+    // authenticated user
+    authUser: UserModel;
+
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -67,12 +72,19 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         private dialogService: DialogService,
         private formHelper: FormHelperService,
         private referenceDataDataService: ReferenceDataDataService,
-        private teamDataService: TeamDataService
+        private teamDataService: TeamDataService,
+        private authDataService: AuthDataService
     ) {
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // dropdowns
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS).pipe(share());
         this.teamsList$ = this.teamDataService.getTeamsList().pipe(share());
@@ -100,8 +112,41 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
 
                 this.loadFollowUps();
             });
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
     }
 
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // contacts list page
+        if (ContactModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+            );
+        }
+
+        // follow-ups list page
+        if (FollowUpModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups')
+            );
+        }
+
+        // current page
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TITLE', '.', true)
+        );
+    }
+
+    /**
+     * Load follow-ups
+     */
     private loadFollowUps() {
         if (
             this.selectedFollowUpsIds &&
@@ -128,6 +173,9 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         }
     }
 
+    /**
+     * Selected contacts
+     */
     get selectedContacts(): ContactModel[] {
         return this.selectedFollowUps
             .map((followUp) => followUp.contact)
@@ -149,6 +197,9 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
             });
     }
 
+    /**
+     * Get dirty fields
+     */
     getFormDirtyFields(stepForms: NgForm[]): any {
         const dirtyFields: any = this.formHelper.mergeDirtyFields(stepForms);
 
@@ -165,6 +216,9 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         return dirtyFields;
     }
 
+    /**
+     * Change step
+     */
     onChangeStep(step: { selectedIndex: number }, stepForms: NgForm[]) {
         if (step.selectedIndex === 2) {
             // reload dirty fields to display the changes
@@ -212,7 +266,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         forkJoin(observableList$)
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     return throwError(err);
                 })
             )

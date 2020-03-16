@@ -3,22 +3,36 @@ import { HostListener, Injectable, QueryList, ViewChildren } from '@angular/core
 import { Observable, Observer } from 'rxjs';
 import * as _ from 'lodash';
 import { DialogService } from '../helper/dialog.service';
-import { DialogAnswer, DialogAnswerButton } from '../../../shared/components/dialog/dialog.component';
+import { DialogAnswer, DialogAnswerButton, DialogComponent } from '../../../shared/components/dialog/dialog.component';
 import { NgForm } from '@angular/forms';
+import { MatDialogRef } from '@angular/material';
 
 /**
  * Extended by components that use ngForms to determine the dirtiness of a component & need confirmation before leaving a page
  */
 export class ConfirmOnFormChanges {
-    /**
-     * Children forms
-     */
+    // disable all dirty dialogs
+    private static _allConfirmDisabled: boolean = false;
+
+    // Children forms
     @ViewChildren(NgForm) protected canDeactivateForms: QueryList<NgForm>;
 
-    /**
-     * False, if confirm dialog should be shown when forms are dirty
-     */
+    // False, if confirm dialog should be shown when forms are dirty
     private _confirmDisabled: boolean = false;
+
+    /**
+     * Disable all dirty confirm dialogs
+     */
+    static disableAllDirtyConfirm() {
+        this._allConfirmDisabled = true;
+    }
+
+    /**
+     * Enable all dirty confirm dialogs
+     */
+    static enableAllDirtyConfirm() {
+        this._allConfirmDisabled = false;
+    }
 
     /**
      * Don't display confirm popup ( even if forms are dirty )
@@ -41,6 +55,7 @@ export class ConfirmOnFormChanges {
     canDeactivate(): boolean | Observable<boolean> {
         // there are no forms to check for changes
         if (
+            ConfirmOnFormChanges._allConfirmDisabled ||
             this._confirmDisabled ||
             !this.canDeactivateForms ||
             this.canDeactivateForms.length < 1
@@ -70,10 +85,25 @@ export class ConfirmOnFormChanges {
 
 @Injectable()
 export class PageChangeConfirmationGuard implements CanDeactivate<ConfirmOnFormChanges> {
+    // keep reference ti dialog so we don't show multiple dialogs
+    private static _dirtyDialog: MatDialogRef<DialogComponent>;
+
+    /**
+     * Close all visible dirty dialogs
+     */
+    static closeVisibleDirtyDialog() {
+        if (PageChangeConfirmationGuard._dirtyDialog) {
+            PageChangeConfirmationGuard._dirtyDialog.close();
+            PageChangeConfirmationGuard._dirtyDialog = null;
+        }
+    }
+
+    /**
+     * Constructor
+     */
     constructor(
         private dialogService: DialogService
-    ) {
-    }
+    ) {}
 
     /**
      * Handle can deactivate
@@ -125,12 +155,24 @@ export class PageChangeConfirmationGuard implements CanDeactivate<ConfirmOnFormC
      * @param observer Will be called with true, false accordingly to what options was selected
      */
     private displayConfirmationPopup(observer: Observer<boolean>) {
-        this.dialogService
-            .showConfirm('LNG_DIALOG_CONFIRM_UNSAVED_DATA')
+        // we shouldn't show multiple dialogs
+        if (PageChangeConfirmationGuard._dirtyDialog) {
+            return;
+        }
+
+        // create dialog
+        PageChangeConfirmationGuard._dirtyDialog = this.dialogService
+            .showConfirmDialog('LNG_DIALOG_CONFIRM_UNSAVED_DATA');
+
+        // display dialog
+        PageChangeConfirmationGuard._dirtyDialog
+            .afterClosed()
             .subscribe((dialogAnswer: DialogAnswer) => {
-                    observer.next(dialogAnswer.button === DialogAnswerButton.Yes);
-                    observer.complete();
-                }
-            );
+                observer.next(dialogAnswer && dialogAnswer.button === DialogAnswerButton.Yes);
+                observer.complete();
+
+                // dialog closed
+                PageChangeConfirmationGuard._dirtyDialog = null;
+            });
     }
 }

@@ -35,7 +35,6 @@ import { Moment, moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./transmission-chains-dashlet.component.less']
 })
 export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
-
     @ViewChild(CytoscapeGraphComponent) cytoscapeChild;
 
     @Input() sizeOfChainsFilter: string = null;
@@ -47,11 +46,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     @Output() changeEditMode = new EventEmitter<boolean>();
     @Output() sendFilterOption = new EventEmitter<boolean>();
 
+    // constants
+    Constants = Constants;
+
     selectedOutbreak: OutbreakModel;
     chainElements: TransmissionChainModel[];
     graphElements: IConvertChainToGraphElements;
-    selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
-    Constants = Constants;
+    selectedViewType: string;
     showSettings: boolean = false;
     filters: any | TransmissionChainFilters = {};
     resetFiltersData: any;
@@ -169,6 +170,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // subscribers
     outbreakSubscriber: Subscription;
 
+    /**
+     * Constructor
+     */
     constructor(
         private outbreakDataService: OutbreakDataService,
         private transmissionChainDataService: TransmissionChainDataService,
@@ -182,9 +186,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         private locationDataService: LocationDataService,
         private clusterDataService: ClusterDataService,
         protected route: ActivatedRoute
-    ) {
-    }
+    ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // init filters - only show cases and events first
         this.filters.showContacts = false;
@@ -242,7 +248,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.initializeReferenceData()
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     return throwError(err);
                 })
             )
@@ -289,6 +295,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -612,7 +621,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * @param viewType
      */
     viewTypeChanged(viewType) {
+        // update value
         this.selectedViewType = viewType.value;
+
         // refresh chain to load the new criteria
         this.displayChainsOfTransmission();
     }

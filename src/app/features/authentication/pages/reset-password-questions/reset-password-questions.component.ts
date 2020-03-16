@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Router } from '@angular/router';
@@ -10,6 +10,8 @@ import { Observable } from 'rxjs';
 import { SecurityQuestionModel } from '../../../../core/models/securityQuestion.model';
 import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
+import { SafeHtml } from '@angular/platform-browser';
+import { CaptchaDataFor, CaptchaDataService } from '../../../../core/services/data/captcha.data.service';
 
 @Component({
     selector: 'app-reset-password-questions',
@@ -17,28 +19,50 @@ import { catchError, share } from 'rxjs/operators';
     templateUrl: './reset-password-questions.component.html',
     styleUrls: ['./reset-password-questions.component.less']
 })
-export class ResetPasswordQuestionsComponent {
+export class ResetPasswordQuestionsComponent implements OnInit {
+    // captcha data
+    captchaData$: Observable<SafeHtml>;
 
     dataModel = {
+        captcha: '',
         email: null,
         questions: [{question: null, answer: null}, {question: null, answer: null}]
    };
     securityQuestionsList$: Observable<SecurityQuestionModel[]>;
 
-
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private authDataService: AuthDataService,
         private userDataService: UserDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private captchaDataService: CaptchaDataService
     ) {
         this.securityQuestionsList$ = this.userDataService.getSecurityQuestionsList().pipe(share());
     }
 
+    /**
+     * Initialize
+     */
+    ngOnInit() {
+        // check if user is authenticated
+        if (this.authDataService.isAuthenticated()) {
+            // user is already authenticated; redirect to dashboard home page
+            this.router.navigate(['']);
+            return;
+        }
 
+        // generate captcha
+        this.refreshCaptcha();
+    }
+
+    /**
+     * Reset password
+     */
     resetPassword(form: NgForm) {
-
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
         if (form.valid && !_.isEmpty(dirtyFields)) {
@@ -48,7 +72,12 @@ export class ResetPasswordQuestionsComponent {
                 .resetPasswordQuestions(dirtyFields)
                 .pipe(
                     catchError((err) => {
-                        this.snackbarService.showError(err.message);
+                        // reset captcha no matter what...
+                        this.dataModel.captcha = '';
+                        this.refreshCaptcha();
+
+                        // finish
+                        this.snackbarService.showApiError(err);
                         return throwError(err);
                     })
                 )
@@ -61,4 +90,18 @@ export class ResetPasswordQuestionsComponent {
         }
     }
 
+    /**
+     * Refresh captcha
+     */
+    refreshCaptcha() {
+        this.captchaData$ = this.captchaDataService
+            .generateSVG(CaptchaDataFor.RESET_PASSWORD_QUESTIONS)
+            .pipe(
+                catchError((err) => {
+                    // show error
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                })
+            );
+    }
 }

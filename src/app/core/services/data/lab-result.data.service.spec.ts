@@ -2,6 +2,7 @@ import { Observable, of } from 'rxjs';
 import { LabResultModel } from '../../models/lab-result.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { moment } from '../../helperClasses/x-moment';
+import { EntityType } from '../../models/entity-type';
 
 export const LabResultDataServiceMock: {
     selectedLabResultId: string,
@@ -10,7 +11,7 @@ export const LabResultDataServiceMock: {
             [caseId: string]: LabResultModel[]
         }
     },
-    getCaseLabResults: (outbreakId: string, caseId: string, queryBuilder?: RequestQueryBuilder) => Observable<LabResultModel[]>
+    getEntityLabResults: (outbreakId: string, entityPath: string, entityId: string, queryBuilder?: RequestQueryBuilder) => Observable<LabResultModel[]>
 } = {
     selectedLabResultId: 'labResult 1',
 
@@ -19,19 +20,21 @@ export const LabResultDataServiceMock: {
             'case 1': [
                 new LabResultModel({
                     id: 'labResult 1',
-                    dateOfResult: moment('2019-04-01', 'YYYY-MM-DD')
+                    dateOfResult: moment('2019-04-01', 'YYYY-MM-DD'),
+                    personType: EntityType.CASE
                 })
             ]
         }
     },
 
-    getCaseLabResults: (
+    getEntityLabResults: (
         outbreakId: string,
-        caseId: string
+        entityPath: string,
+        entityId: string
     ): Observable<LabResultModel[]> => {
         // finished
-        return of(LabResultDataServiceMock.labResults[outbreakId] && LabResultDataServiceMock.labResults[outbreakId][caseId] ?
-            LabResultDataServiceMock.labResults[outbreakId][caseId] :
+        return of(LabResultDataServiceMock.labResults[outbreakId] && LabResultDataServiceMock.labResults[outbreakId][entityId] ?
+            LabResultDataServiceMock.labResults[outbreakId][entityId] :
             []
         );
     }

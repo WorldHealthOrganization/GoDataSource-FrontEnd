@@ -6,6 +6,8 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { Subscription } from 'rxjs';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
     selector: 'app-cases-pending-lab-results-dashlet',
@@ -25,19 +27,30 @@ export class CasesPendingLabResultsDashletComponent extends DashletComponent imp
 
     // constants to be used for applyListFilters
     Constants: any = Constants;
+    CaseModel = CaseModel;
 
     // subscribers
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
 
+    /**
+     * Constructor
+     */
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        protected authDataService: AuthDataService
     ) {
-        super(listFilterDataService);
+        super(
+            listFilterDataService,
+            authDataService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get number of cases pending lab result
         this.displayLoading = true;
@@ -51,6 +64,9 @@ export class CasesPendingLabResultsDashletComponent extends DashletComponent imp
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

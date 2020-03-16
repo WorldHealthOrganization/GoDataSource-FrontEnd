@@ -29,6 +29,7 @@ import { moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./case-merge-duplicate-records.component.less']
 })
 export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '/duplicated-records'),
         new BreadcrumbItemModel('LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TITLE', '.', true)
@@ -147,6 +148,9 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
         }
     };
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -158,6 +162,9 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get merge ids
         // retrieve query params
@@ -520,7 +527,7 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
                     .pipe(
                         catchError((err) => {
                             this.displayLoading = false;
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err);
                             return throwError(err);
                         })
                     )

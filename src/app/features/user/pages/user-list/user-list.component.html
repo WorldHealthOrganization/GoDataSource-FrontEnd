@@ -4,7 +4,7 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button *ngIf="hasUserWriteAccess()" mat-raised-button color="accent" [routerLink]="'./create'">
+                <button *ngIf="UserModel.canCreate(authUser)" mat-raised-button color="accent" [routerLink]="'./create'">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
             </div>
@@ -107,6 +107,56 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
                 {{ item.email }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Institution  -->
+        <ng-container matColumnDef="institutionName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_INSTITUTION_NAME' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="institutionFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="institutionsList$ | async"
+                            (optionChanged)="filterBySelectField('institutionName', $event)"
+                            [multiple]="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.institutionName | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Phone number -->
+        <ng-container matColumnDef="telephoneNumbers">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS' | translate}}</div>
+                    <div class="column-filter">
+                        <div>
+                            <app-form-input
+                                name="phoneNumberFilter"
+                                ngModel
+                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                (optionChanged)="filterByPhoneNumber('telephoneNumbers.' + PhoneNumberType.PRIMARY_PHONE_NUMBER, $event)"
+                                app-reset-input-on-side-filter
+                                [displayFilterIcon]="true">
+                            </app-form-input>
+                        </div>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.telephoneNumbers[PhoneNumberType.PRIMARY_PHONE_NUMBER] | translate }}
             </mat-cell>
         </ng-container>
 
@@ -229,9 +279,9 @@
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+        <mat-header-row *matHeaderRowDef="fixedTableColumns"></mat-header-row>
         <mat-row
-            *matRowDef="let item; columns: getTableColumns()"
+            *matRowDef="let item; columns: fixedTableColumns"
             app-hover-row-actions
             [hoverRowActionsComponent]="hoverRow"
             [hoverRowActions]="recordActions"

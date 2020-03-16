@@ -5,8 +5,11 @@
 
             <div class="topnav-actions">
                 <ng-container>
-                    <button *ngIf="hasHelpWriteAccess()" mat-raised-button color="accent"
-                            [routerLink]="'/help/categories/create'">
+                    <button
+                        *ngIf="HelpCategoryModel.canCreate(authUser)"
+                        mat-raised-button
+                        color="accent"
+                        [routerLink]="'/help/categories/create'">
                         {{'LNG_COMMON_BUTTON_ADD'| translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </ng-container>

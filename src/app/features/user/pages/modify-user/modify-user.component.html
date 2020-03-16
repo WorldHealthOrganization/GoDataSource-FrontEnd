@@ -62,10 +62,31 @@
                             </app-form-select>
                         </div>
 
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                name="institutionName"
+                                [(ngModel)]="user.institutionName"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_INSTITUTION_NAME' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_INSTITUTION_NAME_DESCRIPTION"
+                                [options]="institutionsList$ | async"
+                                [disabled]="viewOnly">
+                            </app-form-select>
+
+                            <app-form-input
+                                [name]="'telephoneNumbers[' + PhoneNumberType.PRIMARY_PHONE_NUMBER + ']'"
+                                [(ngModel)]="user.telephoneNumbers[PhoneNumberType.PRIMARY_PHONE_NUMBER]"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
                         <div
-                            *ngIf="hasOutbreakReadAccess()"
-                            fxLayout="row" fxLayoutGap="20px"
-                        >
+                            *ngIf="OutbreakModel.canList(authUser)"
+                            fxLayout="row" fxLayoutGap="20px">
                             <app-form-select
                                 name="outbreakIds"
                                 [(ngModel)]="user.outbreakIds"
@@ -76,7 +97,8 @@
                                 optionTooltipKey="description"
                                 [options]="outbreaksList$ | async"
                                 [multiple]="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [enableFilterOptions]="true">
                             </app-form-select>
 
                             <app-form-select
@@ -88,7 +110,8 @@
                                 optionValueKey="id"
                                 optionTooltipKey="description"
                                 [options]="outbreaksList$ | async"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [enableFilterOptions]="true">
                             </app-form-select>
 
                             <div fxFlex><!-- placeholder --></div>
@@ -97,9 +120,21 @@
                     </div>
                 </mat-card>
 
-                <mat-card class="page-section">
+                <mat-card
+                    *ngIf="!viewOnly"
+                    class="page-section">
                     <div fxLayout="column">
                         <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                type="password"
+                                name="oldPassword"
+                                [(ngModel)]="oldPassword"
+                                [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CURRENT_PASSWORD' | translate"
+                                tooltip="LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CURRENT_PASSWORD_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                [required]="!!user.password">
+                            </app-form-input>
+
                             <app-form-input
                                 type="password"
                                 name="password"
@@ -123,7 +158,6 @@
                             </app-form-input>
 
                             <div fxFlex><!-- placeholder --></div>
-                            <div fxFlex><!-- placeholder --></div>
                         </div>
                     </div>
                 </mat-card>
@@ -134,9 +168,12 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button *ngIf="viewOnly && hasUserWriteAccess() && user.id && user.id !== authUser.id"
-                mat-raised-button type="button" color="accent"
-                [routerLink]="['/users', userId, 'modify']">
+        <button
+            *ngIf="viewOnly && UserModel.canModify(authUser) && user.id && user.id !== authUser.id"
+            mat-raised-button
+            type="button"
+            color="accent"
+            [routerLink]="['/users', userId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
 
@@ -144,9 +181,11 @@
             <button mat-raised-button color="accent" type="submit">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
-            <button type="button"
-                    [routerLink]="'/users'"
-                    mat-raised-button>
+            <button
+                *ngIf="UserModel.canList(authUser)"
+                type="button"
+                [routerLink]="'/users'"
+                mat-raised-button>
                 {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
             </button>
         </ng-container>

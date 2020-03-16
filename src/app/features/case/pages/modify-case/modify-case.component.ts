@@ -13,7 +13,6 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -30,6 +29,9 @@ import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/vali
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
 
 @Component({
     selector: 'app-modify-case',
@@ -38,6 +40,7 @@ import { Moment, moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./modify-case.component.less']
 })
 export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
@@ -58,6 +61,10 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     // provide constants to template
     EntityType = EntityType;
     Constants = Constants;
+    CaseModel = CaseModel;
+    ContactModel = ContactModel;
+    LabResultModel = LabResultModel;
+    FollowUpModel = FollowUpModel;
 
     serverToday: Moment = moment();
 
@@ -77,6 +84,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     displayRefresh: boolean = false;
     @ViewChild('visualId') visualId: NgModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         protected route: ActivatedRoute,
@@ -87,11 +97,17 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private i18nService: I18nService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -103,11 +119,16 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
         this.pregnancyStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
 
+        // show loading
+        this.showLoadingDialog(false);
+
         // retrieve query params
         this.route.queryParams
             .subscribe((queryParams: any) => {
                 this.queryParams = queryParams;
-                this.buildBreadcrumbs();
+
+                // initialize breadcrumbs
+                this.initializeBreadcrumbs();
             });
 
         this.route.params
@@ -131,37 +152,49 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     }
 
     /**
-     * Breadcrumbs
+     * Initialize breadcrumbs
      */
-    buildBreadcrumbs() {
-        if (this.caseData) {
-            // initialize breadcrumbs
-            this.breadcrumbs = [
+    private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // case list page
+        if (CaseModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
                 new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-            ];
+            );
+        }
 
-            // do we need to add onset breadcrumb ?
-            // no need to check rights since this params should be set only if we come from that page
-            if (this.queryParams.onset) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(
-                        'LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE',
-                        '/relationships/date-onset'
-                    )
-                );
-            }
+        // do we need to add onset breadcrumb ?
+        // no need to check rights since this params should be set only if we come from that page
+        if (
+            this.queryParams.onset &&
+            CaseModel.canListOnsetBeforePrimaryReport(this.authUser)
+        ) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE',
+                    '/relationships/date-onset'
+                )
+            );
+        }
 
-            // do we need to add long period between onset dates breadcrumb ?
-            // no need to check rights since this params should be set only if we come from that page
-            if (this.queryParams.longPeriod) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(
-                        'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_TITLE',
-                        '/relationships/long-period'
-                    )
-                );
-            }
+        // do we need to add long period between onset dates breadcrumb ?
+        // no need to check rights since this params should be set only if we come from that page
+        if (
+            this.queryParams.longPeriod &&
+            CaseModel.canListLongPeriodBetweenOnsetDatesReport(this.authUser)
+        ) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_TITLE',
+                    '/relationships/long-period'
+                )
+            );
+        }
 
+        // current page breadcrumb
+        if (this.caseData) {
             // current page title
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
@@ -222,6 +255,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                 this.caseId
             );
 
+            // show loading
+            this.showLoadingDialog(false);
+
             // get case
             this.caseDataService
                 .getCasesList(
@@ -229,17 +265,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                     qb
                 )
                 .subscribe((cases: CaseModel[]) => {
-                    // add breadcrumb
-                    this.breadcrumbs.push(
-                        new BreadcrumbItemModel(
-                            this.viewOnly ? 'LNG_PAGE_VIEW_CASE_TITLE' : 'LNG_PAGE_MODIFY_CASE_TITLE',
-                            '.',
-                            true,
-                            {},
-                            this.caseData
-                        )
-                    );
-
                     // set data only when we have everything
                     this.caseData = new CaseModel(cases[0]);
 
@@ -285,37 +310,19 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                             observer.complete();
                         });
                     });
-                    // breadcrumbs
-                    this.buildBreadcrumbs();
 
+                    // initialize breadcrumbs
+                    this.initializeBreadcrumbs();
+
+                    // hide loading
+                    this.hideLoadingDialog();
                 });
         }
     }
 
     /**
-     * Check if we have write access to cases
-     * @returns {boolean}
+     * Modify case
      */
-    hasCaseWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-    }
-
-    /**
-     * Check if we have access to create a contact
-     * @returns {boolean}
-     */
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-    }
-
-    /**
-     * Check if we have access to read a follow-up
-     * @returns {boolean}
-     */
-    hasFollowUpReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP);
-    }
-
     modifyCase(form: NgForm) {
         // validate form
         if (!this.formHelper.validateForm(form)) {
@@ -332,8 +339,10 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             delete dirtyFields.ageDob;
         }
 
+        // show loading
+        this.showLoadingDialog();
+
         // check for duplicates
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.caseDataService
             .findDuplicates(this.selectedOutbreak.id, {
                 ...this.caseData,
@@ -343,8 +352,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
 
-                    // hide dialog
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
 
                     return throwError(err);
                 })
@@ -359,8 +368,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
 
-                                // hide dialog
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
 
                                 return throwError(err);
                             })
@@ -379,8 +388,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                                 // update breadcrumb
                                 this.retrieveCaseData();
 
-                                // hide dialog
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
                             } else {
                                 // finished
                                 finishCallBack();
@@ -450,8 +459,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                                         ...answer.inputValue.value.mergeWith
                                     ];
 
-                                    // hide dialog
-                                    loadingDialog.close();
+                                    // hide loading
+                                    this.hideLoadingDialog();
 
                                     // redirect to merge
                                     this.router.navigate(
@@ -465,8 +474,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                             } else if (answer.button === DialogAnswerButton.Extra_1) {
                                 runModifyCase();
                             } else {
-                                // hide dialog
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
                             }
                         });
                     };

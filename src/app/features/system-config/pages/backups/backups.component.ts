@@ -1,10 +1,9 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
@@ -17,14 +16,11 @@ import { SystemBackupDataService } from '../../../../core/services/data/system-b
 import * as _ from 'lodash';
 import { Constants } from '../../../../core/models/constants';
 import { MatDialogRef } from '@angular/material';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { catchError, map, share, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
-import { moment } from '../../../../core/helperClasses/x-moment';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-backups',
@@ -33,12 +29,13 @@ import { moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./backups.component.less']
 })
 export class BackupsComponent extends ListComponent implements OnInit {
-    /**
-     * Breadcrumbs
-     */
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_SYSTEM_BACKUPS_TITLE', '.', true)
     ];
+
+    // constants
+    BackupModel = BackupModel;
 
     // authenticated user
     authUser: UserModel;
@@ -48,7 +45,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
 
     // backups list
     backupsList$: Observable<BackupModel[]>;
-    backupsListCount$: Observable<any>;
+    backupsListCount$: Observable<IBasicCount>;
     usersList$: Observable<UserModel[]>;
 
     // module list
@@ -60,9 +57,14 @@ export class BackupsComponent extends ListComponent implements OnInit {
     waitForBackupIdToBeReady: string;
     loading: boolean = false;
 
-    mappedOutbreaks: LabelValuePair[];
-    mappedCollections: LabelValuePair[];
-    mappedExportTypes: LabelValuePair[];
+    fixedTableColumns: string[] = [
+        'location',
+        'modules',
+        'date',
+        'status',
+        'error',
+        'user'
+    ];
 
     recordActions: HoverRowAction[] = [
         // View Backup Path
@@ -71,6 +73,10 @@ export class BackupsComponent extends ListComponent implements OnInit {
             iconTooltip: 'LNG_PAGE_SYSTEM_BACKUPS_ACTION_VIEW_BACKUP_PATH',
             click: (item: BackupModel) => {
                 this.showBackupData(item);
+            },
+            visible: (item: BackupModel): boolean => {
+                return item.status !== Constants.SYSTEM_BACKUP_STATUS.PENDING.value &&
+                    BackupModel.canView(this.authUser);
             }
         }),
 
@@ -82,7 +88,8 @@ export class BackupsComponent extends ListComponent implements OnInit {
                 this.restoreBackup(item);
             },
             visible: (item: BackupModel): boolean => {
-                return item.status === Constants.SYSTEM_BACKUP_STATUS.SUCCESS.value;
+                return item.status === Constants.SYSTEM_BACKUP_STATUS.SUCCESS.value &&
+                    BackupModel.canRestore(this.authUser);
             }
         }),
 
@@ -97,8 +104,9 @@ export class BackupsComponent extends ListComponent implements OnInit {
                     click: (item: BackupModel) => {
                         this.deleteBackup(item);
                     },
-                    visible: (): boolean => {
-                        return this.hasSysConfigWriteAccess();
+                    visible: (item: BackupModel): boolean => {
+                        return item.status !== Constants.SYSTEM_BACKUP_STATUS.PENDING.value &&
+                            BackupModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -117,8 +125,6 @@ export class BackupsComponent extends ListComponent implements OnInit {
         private systemBackupDataService: SystemBackupDataService,
         protected snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
-        private i18nService: I18nService,
-        private outbreakDataService: OutbreakDataService,
         private userDataService: UserDataService
     ) {
         super(
@@ -144,41 +150,13 @@ export class BackupsComponent extends ListComponent implements OnInit {
 
         // backup status list
         this.backupStatusList$ = this.genericDataService.getBackupStatusList();
+
         // users list
         this.usersList$ = this.userDataService.getUsersList();
 
-        // retrieve collections
-        this.genericDataService
-            .getSyncPackageModuleOptions()
-            .subscribe((mappedCollections) => {
-                this.mappedCollections = mappedCollections;
-            });
-
-        // retrieve export types
-        this.genericDataService
-            .getSyncPackageExportTypeOptions()
-            .subscribe((mappedExportTypes) => {
-                this.mappedExportTypes = mappedExportTypes;
-            });
-
-        // retrieve outbreaks
-        this.outbreakDataService
-            .getOutbreaksList()
-            .pipe(
-                map((outbreaks: OutbreakModel[]) => {
-                    return _.map(outbreaks, (outbreak: OutbreakModel) => {
-                        return new LabelValuePair(
-                            outbreak.name,
-                            outbreak.id
-                        );
-                    });
-                })
-            )
-            .subscribe((mappedOutbreaks: LabelValuePair[]) => {
-                this.mappedOutbreaks = mappedOutbreaks;
-            });
         // initialize pagination
         this.initPaginator();
+
         // retrieve backups
         this.needsRefreshList(true);
     }
@@ -196,20 +174,17 @@ export class BackupsComponent extends ListComponent implements OnInit {
     }
 
     /**
-     * Check if we have write access to cases
-     * @returns {boolean}
-     */
-    hasSysConfigWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
-    }
-
-    /**
      * Refresh list
      */
     refreshList(finishCallback: (records: any[]) => void) {
         this.backupsList$ = this.systemBackupDataService
             .getBackupList(this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback([]);
+                    return throwError(err);
+                }),
                 tap(this.checkEmptyList.bind(this)),
                 tap((data: any[]) => {
                     finishCallback(data);
@@ -224,22 +199,15 @@ export class BackupsComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.backupsListCount$ = this.systemBackupDataService.getBackupListCount(countQueryBuilder).pipe(share());
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'location',
-            'modules',
-            'date',
-            'status',
-            'error',
-            'user'
-        ];
+        this.backupsListCount$ = this.systemBackupDataService
+            .getBackupListCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**
@@ -320,7 +288,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
                         .deleteBackup(item.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -347,7 +315,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
                 .restoreBackup(backupItemData.id)
                 .pipe(
                     catchError((err) => {
-                        this.snackbarService.showError(err.message);
+                        this.snackbarService.showApiError(err);
                         return throwError(err);
                     })
                 )
@@ -370,7 +338,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
                         .getBackup(this.waitForBackupIdToBeReady)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
 
                                 // can't continue with the restore
                                 this.waitForBackupIdToBeReady = undefined;
@@ -432,7 +400,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
                             .createBackup(answerBackup.inputValue.value)
                             .pipe(
                                 catchError((err) => {
-                                    this.snackbarService.showError(err.message);
+                                    this.snackbarService.showApiError(err);
                                     return throwError(err);
                                 })
                             )
@@ -529,79 +497,6 @@ export class BackupsComponent extends ListComponent implements OnInit {
                     });
             }
         });
-    }
-
-    /**
-     * Export sync package
-     */
-    exportSyncPackage() {
-        // display export dialog
-        if (this.mappedOutbreaks) {
-            this.dialogService.showExportDialog({
-                message: 'LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE',
-                url: 'sync/database-snapshot',
-                fileName: this.i18nService.instant('LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE') +
-                    ' - ' +
-                    moment().format('YYYY-MM-DD'),
-                fileType: ExportDataExtension.ZIP,
-                exportStart: () => {
-                    this.loading = true;
-                },
-                exportFinished: () => {
-                    this.loading = false;
-                },
-                extraDialogFields: [
-                    new DialogField({
-                        name: 'filter[where][fromDate]',
-                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE',
-                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE_DESCRIPTION',
-                        fieldType: DialogFieldType.DATE
-                    }),
-                    new DialogField({
-                        name: 'filter[where][outbreakId][inq]',
-                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS',
-                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS_DESCRIPTION',
-                        fieldType: DialogFieldType.SELECT,
-                        inputOptions: this.mappedOutbreaks,
-                        inputOptionsMultiple: true
-                    }),
-                    new DialogField({
-                        name: 'filter[where][exportType]',
-                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE',
-                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE_DESCRIPTION',
-                        fieldType: DialogFieldType.SELECT,
-                        inputOptions: this.mappedExportTypes,
-                        inputOptionsMultiple: false
-                    }),
-                    new DialogField({
-                        name: 'filter[where][collections]',
-                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS',
-                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS_DESCRIPTION',
-                        fieldType: DialogFieldType.SELECT,
-                        inputOptions: this.mappedCollections,
-                        inputOptionsMultiple: true,
-                        visible: (fieldsData): boolean => {
-                            return _.isEmpty(fieldsData['filter[where][exportType]']);
-                        }
-                    }),
-                    new DialogField({
-                        name: 'filter[where][includeUsers]',
-                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS',
-                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS_DESCRIPTION',
-                        fieldType: DialogFieldType.BOOLEAN,
-                        visible: (fieldsData): boolean => {
-                            return !_.isEmpty(fieldsData['filter[where][exportType]']);
-                        }
-                    }),
-                    new DialogField({
-                        name: 'password',
-                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD',
-                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD_DESCRIPTION',
-                        fieldType: DialogFieldType.TEXT
-                    })
-                ]
-            });
-        }
     }
 
     /**

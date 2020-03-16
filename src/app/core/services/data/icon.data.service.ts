@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { IconModel } from '../../models/icon.model';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class IconDataService {
@@ -23,6 +24,17 @@ export class IconDataService {
             this.http.get(`icons?filter=${filter}`),
             IconModel
         );
+    }
+
+    /**
+     * Retrieve the total number of Icons
+     * @returns {Observable<IBasicCount>}
+     */
+    getIconsCount(
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<IBasicCount> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`icons/count?where=${whereFilter}`);
     }
 
     /**

@@ -7,7 +7,6 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { Observable } from 'rxjs';
@@ -28,17 +27,10 @@ import { throwError } from 'rxjs';
 })
 export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
     // breadcrumb header
-    public breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_TEAMS_TITLE',
-            '/teams'
-        ),
-        new BreadcrumbItemModel(
-            'LNG_PAGE_MODIFY_TEAM_TITLE',
-            '.',
-            true
-        )
-    ];
+    public breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // constants
+    TeamModel = TeamModel;
 
     teamId: string;
     teamData: TeamModel = new TeamModel();
@@ -46,6 +38,9 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
     usersList$: Observable<UserModel[]>;
     existingUsers: string[];
 
+    /**
+     * Constructor
+     */
     constructor(
         private teamDataService: TeamDataService,
         private router: Router,
@@ -54,11 +49,17 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
         protected route: ActivatedRoute,
         private authDataService: AuthDataService,
         private userDataService: UserDataService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -69,6 +70,9 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
             .by('lastName', RequestSortDirection.ASC);
         this.usersList$ = this.userDataService.getUsersList(qbUsers);
 
+        // show loading
+        this.showLoadingDialog(false);
+
         this.route.params
             .subscribe((params: { teamId }) => {
                 this.teamId = params.teamId;
@@ -77,7 +81,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                         .getTeam(this.teamId)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 this.router.navigate(['/teams']);
                                 return throwError(err);
                             })
@@ -86,9 +90,37 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                             // location data
                             this.teamData = new TeamModel(teamData);
                             this.existingUsers = this.teamData.userIds;
+
+                            // hide loading
+                            this.hideLoadingDialog();
                         });
                 }
             });
+
+        // update breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (TeamModel.canList(this.authUser)) {
+            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_TEAMS_TITLE', '/teams'));
+        }
+
+        // view / modify breadcrumb
+        this.breadcrumbs.push(new BreadcrumbItemModel(
+            this.viewOnly ?
+                'LNG_PAGE_VIEW_TEAM_TITLE' :
+                'LNG_PAGE_MODIFY_TEAM_TITLE',
+            '.',
+            true
+        ));
     }
 
     /**
@@ -102,12 +134,15 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
             return;
         }
 
-        const loadingDialog = this.dialogService.showLoadingDialog();
+        // show loading
+        this.showLoadingDialog();
+
         this.checkTeamsInSameLocations(this.teamData.locationIds)
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 })
             )
@@ -117,8 +152,9 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                         .modifyTeam(this.teamId, dirtyFields)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
-                                loadingDialog.close();
+                                this.snackbarService.showApiError(err);
+                                // hide loading
+                                this.hideLoadingDialog();
                                 return throwError(err);
                             })
                         )
@@ -132,22 +168,14 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                             // display message
                             this.snackbarService.showSuccess('LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE');
 
-                            // hide dialog
-                            loadingDialog.close();
+                            // hide loading
+                            this.hideLoadingDialog();
                         });
                 } else {
-                    // hide dialog
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                 }
             });
-    }
-
-    /**
-     * Check if we have write access to teams
-     * @returns {boolean}
-     */
-    hasTeamWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_TEAM);
     }
 
     /**
@@ -183,25 +211,28 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                 }
             }, true);
 
-        this.teamDataService.getTeamsList(qb).subscribe((teamsList) => {
-            const teamsNames = [];
-            _.forEach(teamsList, (team) => {
-                teamsNames.push(team.name);
-            });
+        this.teamDataService
+            .getTeamsList(qb)
+            .subscribe((teamsList) => {
+                const teamsNames = [];
+                _.forEach(teamsList, (team) => {
+                    teamsNames.push(team.name);
+                });
 
-            if (teamsNames.length > 0) {
-                this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_ADD_USER_TEAM', {teamNames: teamsNames.join()})
-                    .subscribe((answer: DialogAnswer) => {
-                        if (answer.button === DialogAnswerButton.Cancel) {
-                            // update userIds to remove the user from the dropdown
-                            const index = this.teamData.userIds.indexOf(idUser);
-                            this.teamData.userIds.splice(index, 1);
-                            // make a clone so the binding will know that the object changed. It's not working with splice only.
-                            this.teamData.userIds = [...this.teamData.userIds];
-                        }
-                    });
-            }
-        });
+                if (teamsNames.length > 0) {
+                    this.dialogService
+                        .showConfirm('LNG_DIALOG_CONFIRM_ADD_USER_TEAM', {teamNames: teamsNames.join()})
+                        .subscribe((answer: DialogAnswer) => {
+                            if (answer.button === DialogAnswerButton.Cancel) {
+                                // update userIds to remove the user from the dropdown
+                                const index = this.teamData.userIds.indexOf(idUser);
+                                this.teamData.userIds.splice(index, 1);
+                                // make a clone so the binding will know that the object changed. It's not working with splice only.
+                                this.teamData.userIds = [...this.teamData.userIds];
+                            }
+                        });
+                }
+            });
     }
 
     /**

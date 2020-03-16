@@ -1,6 +1,5 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
@@ -8,15 +7,27 @@ import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 
 const routes: Routes = [
-    // Locations list
+    // Root locations list
     {
         path: '',
-        component: fromPages.LocationsListComponent
+        component: fromPages.LocationsListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.LOCATION_LIST
+            ]
+        }
     },
-    // Location parent
+    // Children locations list
     {
         path: ':parentId/children',
-        component: fromPages.LocationsListComponent
+        component: fromPages.LocationsListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.LOCATION_LIST
+            ]
+        }
     },
     // Create Top Level Location
     {
@@ -24,7 +35,9 @@ const routes: Routes = [
         component: fromPages.CreateLocationComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG]
+            permissions: [
+                PERMISSION.LOCATION_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -36,7 +49,9 @@ const routes: Routes = [
         component: fromPages.CreateLocationComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG]
+            permissions: [
+                PERMISSION.LOCATION_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -48,7 +63,9 @@ const routes: Routes = [
         component: fromPages.ModifyLocationComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_SYS_CONFIG],
+            permissions: [
+                PERMISSION.LOCATION_VIEW
+            ],
             action: ViewModifyComponentAction.VIEW
         }
     },
@@ -58,7 +75,10 @@ const routes: Routes = [
         component: fromPages.ModifyLocationComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG],
+            permissions: [
+                PERMISSION.LOCATION_VIEW,
+                PERMISSION.LOCATION_MODIFY
+            ],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [
@@ -71,7 +91,9 @@ const routes: Routes = [
         component: fromPages.LocationUsageListComponent,
         canActivate: [AuthGuard],
         data: {
-            // no permissions required for now
+            permissions: [
+                PERMISSION.LOCATION_USAGE
+            ]
         }
     }
 ];

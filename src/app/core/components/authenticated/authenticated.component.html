@@ -1,4 +1,7 @@
 <div class="authenticated app-theme" fxLayout="column" *ngIf="authUser">
+    <!-- Debug -->
+    <app-form-debug *ngIf="debugVisible"></app-form-debug>
+    <!-- End of Debug -->
 
     <mat-sidenav-container class="sidenav-container">
 

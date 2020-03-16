@@ -6,7 +6,6 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
@@ -17,7 +16,10 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
     styleUrls: ['./person-summary.component.less']
 })
 export class PersonSummaryComponent implements OnInit {
-    @Input() person: (CaseModel | ContactModel | EventModel);
+    @Input() person: CaseModel | ContactModel | EventModel;
+
+    // constants
+    ContactModel = ContactModel;
 
     @Output() remove = new EventEmitter<void>();
     @Output() modifyPerson = new EventEmitter<(CaseModel | ContactModel | EventModel)>();
@@ -34,11 +36,13 @@ export class PersonSummaryComponent implements OnInit {
     // provide constants to template
     EntityType = EntityType;
 
+    /**
+     * Constructor
+     */
     constructor(
         private authDataService: AuthDataService,
         private entityDataService: EntityDataService
-    ) {
-    }
+    ) {}
 
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -50,7 +54,6 @@ export class PersonSummaryComponent implements OnInit {
 
     private getPersonLink() {
         const entityTypeLink = EntityModel.getLinkForEntityType(this.person.type);
-
         return `/${entityTypeLink}/${this.person.id}/view`;
     }
 
@@ -72,38 +75,6 @@ export class PersonSummaryComponent implements OnInit {
 
     onDeletePerson() {
         this.deletePerson.emit(this.person);
-    }
-
-    hasCaseWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-    }
-
-    hasEventWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
-    }
-
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-    }
-
-    canModifyCase(): boolean {
-        return this.person.type === EntityType.CASE && this.hasCaseWriteAccess();
-    }
-
-    canModifyEvent(): boolean {
-        return this.person.type === EntityType.EVENT && this.hasEventWriteAccess();
-    }
-
-    canModifyContact(): boolean {
-        return this.person.type === EntityType.CONTACT && this.hasContactWriteAccess();
-    }
-
-    canCreateContact(): boolean {
-        return (
-            this.person.type === EntityType.CASE ||
-            this.person.type === EntityType.EVENT
-        ) &&
-            this.hasContactWriteAccess();
     }
 }
 

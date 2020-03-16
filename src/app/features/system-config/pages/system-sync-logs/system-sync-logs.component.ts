@@ -4,14 +4,13 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { SystemSyncLogDataService } from '../../../../core/services/data/system-sync-log.data.service';
 import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.model';
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
-import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -21,9 +20,12 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, map, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { moment } from '../../../../core/helperClasses/x-moment';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-system-sync-logs-list',
@@ -39,19 +41,28 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
         new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_TITLE', '.', true)
     ];
 
+    // constants
+    SystemSyncLogModel = SystemSyncLogModel;
+
     // authenticated user
     authUser: UserModel;
+
+    loadingDialog: LoadingDialogModel;
 
     // settings
     settings: SystemSettingsModel;
 
     // sync logs
     syncLogsList$: Observable<SystemSyncLogModel[]>;
-    syncLogsListCount$: Observable<any>;
+    syncLogsListCount$: Observable<IBasicCount>;
     syncLogsStatusList$: Observable<any>;
 
     // upstream servers
     upstreamServerList: LabelValuePair[];
+
+    mappedLVOutbreaks: LabelValuePair[];
+    mappedCollections: LabelValuePair[];
+    mappedExportTypes: LabelValuePair[];
 
     // outbreaks
     outbreaks: OutbreakModel[];
@@ -71,7 +82,8 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                 this.viewError(item);
             },
             visible: (item: SystemSyncLogModel): boolean => {
-                return !_.isEmpty(item.error);
+                return !_.isEmpty(item.error) &&
+                    SystemSyncLogModel.canView(this.authUser);
             }
         }),
 
@@ -87,7 +99,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                         this.deleteSyncLog(item);
                     },
                     visible: (): boolean => {
-                        return this.hasSysConfigWriteAccess();
+                        return SystemSyncLogModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -106,7 +118,8 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
         private systemSyncLogDataService: SystemSyncLogDataService,
         private genericDataService: GenericDataService,
         private outbreakDataService: OutbreakDataService,
-        private systemSettingsDataService: SystemSettingsDataService
+        private systemSettingsDataService: SystemSettingsDataService,
+        private i18nService: I18nService
     ) {
         super(
             snackbarService
@@ -139,9 +152,23 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
         // initialize Side Table Columns
         this.initializeSideTableColumns();
 
+        // retrieve collections
+        this.genericDataService
+            .getSyncPackageModuleOptions()
+            .subscribe((mappedCollections) => {
+                this.mappedCollections = mappedCollections;
+            });
+
+        // retrieve export types
+        this.genericDataService
+            .getSyncPackageExportTypeOptions()
+            .subscribe((mappedExportTypes) => {
+                this.mappedExportTypes = mappedExportTypes;
+            });
+
         // retrieve outbreaks information
         this.outbreakDataService
-            .getOutbreaksList()
+            .getOutbreaksListReduced()
             .subscribe((outbreaks: OutbreakModel[]) => {
                 // set outbreaks
                 this.outbreaks = outbreaks;
@@ -152,6 +179,13 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                     },
                     {}
                 );
+
+                this.mappedLVOutbreaks = _.map(outbreaks, (outbreak: OutbreakModel) => {
+                    return new LabelValuePair(
+                        outbreak.name,
+                        outbreak.id
+                    );
+                });
 
                 // initialize pagination
                 this.initPaginator();
@@ -206,6 +240,11 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
         this.syncLogsList$ = this.systemSyncLogDataService
             .getSyncLogList(this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback([]);
+                    return throwError(err);
+                }),
                 map((syncLogs: SystemSyncLogModel[]) => {
                     return _.map(syncLogs, (log: SystemSyncLogModel) => {
                         // add list of outbreaks
@@ -239,15 +278,15 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.syncLogsListCount$ = this.systemSyncLogDataService.getSyncLogsCount(countQueryBuilder);
-    }
-
-    /**
-     * Check if we have write access to sys settings
-     * @returns {boolean}
-     */
-    hasSysConfigWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
+        this.syncLogsListCount$ = this.systemSyncLogDataService
+            .getSyncLogsCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**
@@ -310,7 +349,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                         .deleteSyncLog(systemSyncLogModel.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -330,20 +369,48 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
      * @param systemSyncLogModel
      */
     viewError(systemSyncLogModel: SystemSyncLogModel) {
-        this.dialogService
-            .showConfirm(new DialogConfiguration({
-                message: systemSyncLogModel.error,
-                addDefaultButtons: false,
-                buttons: [
-                    new DialogButton({
-                        label: 'LNG_COMMON_BUTTON_CLOSE',
-                        clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-                            dialogHandler.close();
-                        }
-                    })
-                ]
-            }))
-            .subscribe();
+        // if not string, then there is no point in continuing
+        if (
+            !systemSyncLogModel.error ||
+            !_.isString(systemSyncLogModel.error)
+        ) {
+            return;
+        }
+
+        // fix api issue
+        let error: string = systemSyncLogModel.error.trim();
+        let errJson: any;
+        const detailsString: string = '"details":{';
+        const detailsIndex: number = error.indexOf(detailsString);
+        if (detailsIndex > -1) {
+            // split error object & details object
+            const detailsText: string = error.substr(detailsIndex, error.length - (detailsIndex + 2));
+            const detailsObjectText: string = detailsText.substr(detailsString.length - 1);
+            error = error.substr(0, detailsIndex - 1) + '}';
+
+            // convert to json
+            errJson = JSON.parse(error);
+            errJson.details = JSON.parse(detailsObjectText);
+        }
+
+        // display data
+        if (errJson) {
+            this.dialogService
+                .showConfirm(new DialogConfiguration({
+                    message: 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ERROR_DETAILS_TITLE',
+                    additionalInfo: `<code><pre>${JSON.stringify(errJson, null, 1)}</pre></code>`,
+                    addDefaultButtons: false,
+                    buttons: [
+                        new DialogButton({
+                            label: 'LNG_COMMON_BUTTON_CLOSE',
+                            clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                                dialogHandler.close();
+                            }
+                        })
+                    ]
+                }))
+                .subscribe();
+        }
     }
 
     /**
@@ -367,6 +434,9 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                 ]
             })).subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
+                    // display loading
+                    const loadingDialog = this.dialogService.showLoadingDialog();
+
                     // construct query
                     const qb = new RequestQueryBuilder();
                     qb.filter.byEquality(
@@ -380,6 +450,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
+                                loadingDialog.close();
                                 return throwError(err);
                             })
                         )
@@ -389,8 +460,93 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
 
                             // refresh
                             this.needsRefreshList(true);
+
+                            // hide loading
+                            loadingDialog.close();
                         });
                 }
             });
+    }
+
+    /**
+     * Export sync package
+     */
+    exportSyncPackage() {
+        // display export dialog
+        if (this.mappedLVOutbreaks) {
+            this.dialogService.showExportDialog({
+                message: 'LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE',
+                url: 'sync/database-snapshot',
+                fileName: this.i18nService.instant('LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE') +
+                    ' - ' +
+                    moment().format('YYYY-MM-DD'),
+                fileType: ExportDataExtension.ZIP,
+                exportStart: () => {
+                    // hide previous dialog ?
+                    if (this.loadingDialog) {
+                        this.loadingDialog.close();
+                    }
+
+                    // display loading dialog
+                    this.loadingDialog = this.dialogService.showLoadingDialog();
+                },
+                exportFinished: () => {
+                    if (this.loadingDialog) {
+                        this.loadingDialog.close();
+                        this.loadingDialog = undefined;
+                    }
+                },
+                extraDialogFields: [
+                    new DialogField({
+                        name: 'filter[where][fromDate]',
+                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE',
+                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE_DESCRIPTION',
+                        fieldType: DialogFieldType.DATE
+                    }),
+                    new DialogField({
+                        name: 'filter[where][outbreakId][inq]',
+                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS',
+                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS_DESCRIPTION',
+                        fieldType: DialogFieldType.SELECT,
+                        inputOptions: this.mappedLVOutbreaks,
+                        inputOptionsMultiple: true
+                    }),
+                    new DialogField({
+                        name: 'filter[where][exportType]',
+                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE',
+                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE_DESCRIPTION',
+                        fieldType: DialogFieldType.SELECT,
+                        inputOptions: this.mappedExportTypes,
+                        inputOptionsMultiple: false
+                    }),
+                    new DialogField({
+                        name: 'filter[where][collections]',
+                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS',
+                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS_DESCRIPTION',
+                        fieldType: DialogFieldType.SELECT,
+                        inputOptions: this.mappedCollections,
+                        inputOptionsMultiple: true,
+                        visible: (fieldsData): boolean => {
+                            return _.isEmpty(fieldsData['filter[where][exportType]']);
+                        }
+                    }),
+                    new DialogField({
+                        name: 'filter[where][includeUsers]',
+                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS',
+                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS_DESCRIPTION',
+                        fieldType: DialogFieldType.BOOLEAN,
+                        visible: (fieldsData): boolean => {
+                            return !_.isEmpty(fieldsData['filter[where][exportType]']);
+                        }
+                    }),
+                    new DialogField({
+                        name: 'password',
+                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD',
+                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD_DESCRIPTION',
+                        fieldType: DialogFieldType.TEXT
+                    })
+                ]
+            });
+        }
     }
 }

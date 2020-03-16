@@ -51,7 +51,8 @@
                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
                 tooltip="LNG_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION"
                 (optionChanged)="onChange()"
-                [options]="occupationsList$ | async">
+                [options]="occupationsList$ | async"
+                [enableFilterOptions]="true">
             </app-form-select>
 
             <div fxFlex><!-- placeholder --></div>

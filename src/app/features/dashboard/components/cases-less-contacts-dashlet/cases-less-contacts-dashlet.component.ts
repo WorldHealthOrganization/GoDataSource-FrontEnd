@@ -9,6 +9,8 @@ import * as _ from 'lodash';
 import { Subscription ,  Subscriber } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { CaseModel } from '../../../../core/models/case.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-cases-less-contacts-dashlet',
@@ -25,6 +27,7 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
 
     // constants
     Constants = Constants;
+    CaseModel = CaseModel;
 
     // selected outbreak
     outbreakId: string;
@@ -41,14 +44,24 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
         this.refreshData();
     }));
 
+    /**
+     * Constructor
+     */
     constructor(
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        protected authDataService: AuthDataService
     ) {
-        super(listFilterDataService);
+        super(
+            listFilterDataService,
+            authDataService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get contacts on followup list count
         this.displayLoading = true;
@@ -63,6 +76,9 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

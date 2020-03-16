@@ -56,7 +56,28 @@
 
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-select
-                                *ngIf="hasOutbreakReadAccess()"
+                                name="institutionName"
+                                [(ngModel)]="newUser.institutionName"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_INSTITUTION_NAME' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_INSTITUTION_NAME_DESCRIPTION"
+                                [options]="institutionsList$ | async">
+                            </app-form-select>
+
+                            <app-form-input
+                                [name]="'telephoneNumbers[' + PhoneNumberType.PRIMARY_PHONE_NUMBER + ']'"
+                                [(ngModel)]="newUser.telephoneNumbers[PhoneNumberType.PRIMARY_PHONE_NUMBER]"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS_DESCRIPTION">
+                            </app-form-input>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
+                        <div
+                            *ngIf="OutbreakModel.canList(authUser)"
+                            fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
                                 name="outbreakIds"
                                 [(ngModel)]="newUser.outbreakIds"
                                 [placeholder]="'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS' | translate"
@@ -65,11 +86,11 @@
                                 optionValueKey="id"
                                 optionTooltipKey="description"
                                 [options]="outbreaksList$ | async"
-                                [multiple]="true">
+                                [multiple]="true"
+                                [enableFilterOptions]="true">
                             </app-form-select>
 
                             <app-form-select
-                                *ngIf="hasOutbreakReadAccess()"
                                 name="activeOutbreakId"
                                 [(ngModel)]="newUser.activeOutbreakId"
                                 [placeholder]="'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK' | translate"
@@ -77,7 +98,8 @@
                                 optionLabelKey="name"
                                 optionValueKey="id"
                                 optionTooltipKey="description"
-                                [options]="outbreaksList$ | async">
+                                [options]="outbreaksList$ | async"
+                                [enableFilterOptions]="true">
                             </app-form-select>
 
                             <div fxFlex><!-- placeholder --></div>

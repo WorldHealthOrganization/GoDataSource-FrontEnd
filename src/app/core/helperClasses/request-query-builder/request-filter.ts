@@ -26,6 +26,33 @@ export class RequestFilter {
     }
 
     /**
+     * Construct phone regex pattern used by queries
+     * @param phoneNumber
+     */
+    static getPhoneNumberPattern(
+        phoneNumber: string
+    ): string {
+        // nothing provided ?
+        if (!phoneNumber) {
+            return null;
+        }
+
+        // construct search pattern
+        const digits: string[] = phoneNumber.match(/[0-9]/g);
+        if (
+            !digits ||
+            digits.length < 1
+        ) {
+            return null;
+        }
+
+        // construct search pattern
+        return '[^0-9]*' + digits.map((digit: string) => {
+            return digit + '[^0-9]*';
+        }).join('');
+    }
+
+    /**
      * Set flag
      * @param property
      * @param value
@@ -135,6 +162,34 @@ export class RequestFilter {
     }
 
     /**
+     * Filter by a phone number
+     * @param {string} property
+     * @param {string} value
+     * @param {boolean} replace
+     * @returns {RequestFilter}
+     */
+    byPhoneNumber(
+        property: string,
+        value: string,
+        replace: boolean = true
+    ) {
+        // do we need to remove condition ?
+        if (_.isEmpty(value)) {
+            this.remove(property);
+        } else {
+            // build number pattern condition
+            this.where({
+                [property]: {
+                    regex: RequestFilter.getPhoneNumberPattern(value)
+                }
+            }, replace);
+        }
+
+        // finished
+        return this;
+    }
+
+    /**
      * Filter by comparing a field if it is equal to the provided value
      * @param {string} property
      * @param {string | number} value
@@ -216,6 +271,45 @@ export class RequestFilter {
         }
 
         return this;
+    }
+
+    /**
+     * Filter by boolean but include "exists" criteria too for a more accurate search
+     * @param {string} property
+     * @param {boolean} value
+     * @param {boolean} replace
+     */
+    byBooleanUsingExist(property: string, value: boolean | null | undefined) {
+        // create condition with OR criteria
+        const orCondition = {
+            or: [
+                {
+                    [property]: {
+                        eq: value
+                    }
+                },
+                {
+                    [property]: {
+                        exists: value
+                    }
+                }
+            ]
+        };
+
+        // remove existing property and condition
+        this.remove(property);
+        this.removeCondition(orCondition);
+
+        // apply filter
+        if (value === false) {
+            this.where(orCondition);
+        } else if (value === true) {
+            this.where({
+                [property]: {
+                    eq: true
+                }
+            });
+        }
     }
 
     /**

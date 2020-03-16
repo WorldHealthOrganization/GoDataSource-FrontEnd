@@ -10,6 +10,8 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
     selector: 'app-new-cases-previous-days-transmission-chains-dashlet',
@@ -20,12 +22,16 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends DashletComponent implements OnInit, OnDestroy {
     // number of cases in previous x days in known transmission chains
     casesKnownTransmissionChainsCount: number = 0;
+
     // nr of new cases
     totalCases: number = 0;
+
     // x metric set on outbreak
     xPreviousDays: number;
+
     // constants to be used for applyListFilters
     Constants = Constants;
+    CaseModel = CaseModel;
 
     // outbreak
     outbreakId: string;
@@ -42,14 +48,24 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
         this.refreshData();
     }));
 
+    /**
+     * Constructor
+     */
     constructor(
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        protected authDataService: AuthDataService
     ) {
-        super(listFilterDataService);
+        super(
+            listFilterDataService,
+            authDataService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get number of cases in previous x days in known transmission chains
         this.displayLoading = true;
@@ -64,6 +80,9 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {

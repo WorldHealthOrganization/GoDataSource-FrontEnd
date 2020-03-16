@@ -8,7 +8,6 @@ import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -18,6 +17,7 @@ import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-outbreak-templates-list',
@@ -26,13 +26,15 @@ import * as _ from 'lodash';
     styleUrls: ['./outbreak-templates-list.component.less']
 })
 export class OutbreakTemplatesListComponent extends ListComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '.', true)
     ];
 
-    outbreakTemplatesList$: Observable<any>;
-    outbreakTemplatesListCount$: Observable<any>;
+    // constants
+    OutbreakTemplateModel = OutbreakTemplateModel;
+
+    outbreakTemplatesList$: Observable<OutbreakTemplateModel[]>;
+    outbreakTemplatesListCount$: Observable<IBasicCount>;
 
     diseasesList$: Observable<any[]>;
 
@@ -49,6 +51,9 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
             iconTooltip: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_VIEW_OUTBREAK_TEMPLATE',
             click: (item: OutbreakTemplateModel) => {
                 this.router.navigate(['/outbreak-templates', item.id, 'view']);
+            },
+            visible: (): boolean => {
+                return OutbreakTemplateModel.canView(this.authUser);
             }
         }),
 
@@ -60,7 +65,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                 this.router.navigate(['/outbreak-templates', item.id, 'modify']);
             },
             visible: (): boolean => {
-                return this.hasOutbreakTemplateWriteAccess();
+                return OutbreakTemplateModel.canModify(this.authUser);
             }
         }),
 
@@ -76,7 +81,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                 });
             },
             visible: (): boolean => {
-                return this.hasOutbreakWriteAccess();
+                return OutbreakTemplateModel.canGenerateOutbreak(this.authUser);
             }
         }),
 
@@ -92,7 +97,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                         this.deleteOutbreakTemplate(item);
                     },
                     visible: (): boolean => {
-                        return this.hasOutbreakTemplateWriteAccess();
+                        return OutbreakTemplateModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -102,7 +107,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                     type: HoverRowActionType.DIVIDER,
                     visible: (): boolean => {
                         // visible only if at least one of the previous...
-                        return this.hasOutbreakTemplateWriteAccess();
+                        return OutbreakTemplateModel.canDelete(this.authUser);
                     }
                 }),
 
@@ -113,7 +118,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                         this.router.navigate(['/outbreak-templates', item.id, 'case-questionnaire']);
                     },
                     visible: (): boolean => {
-                        return this.hasOutbreakTemplateWriteAccess();
+                        return OutbreakTemplateModel.canModifyCaseQuestionnaire(this.authUser);
                     }
                 }),
 
@@ -124,7 +129,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                         this.router.navigate(['/outbreak-templates', item.id, 'contact-follow-up-questionnaire']);
                     },
                     visible: (): boolean => {
-                        return this.hasOutbreakTemplateWriteAccess();
+                        return OutbreakTemplateModel.canModifyContactFollowUpQuestionnaire(this.authUser);
                     }
                 }),
 
@@ -135,13 +140,16 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                         this.router.navigate(['/outbreak-templates', item.id, 'case-lab-results-questionnaire']);
                     },
                     visible: (): boolean => {
-                        return this.hasOutbreakTemplateWriteAccess();
+                        return OutbreakTemplateModel.canModifyCaseLabResultQuestionnaire(this.authUser);
                     }
                 })
             ]
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         protected snackbarService: SnackbarService,
@@ -155,6 +163,9 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
         );
     }
 
+    /**
+     * Component initialization
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -198,6 +209,11 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
         this.outbreakTemplatesList$ = this.outbreakTemplateDataService
             .getOutbreakTemplatesList(this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback([]);
+                    return throwError(err);
+                }),
                 tap(this.checkEmptyList.bind(this)),
                 tap((data: any[]) => {
                     finishCallback(data);
@@ -213,22 +229,15 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.outbreakTemplatesListCount$ = this.outbreakTemplateDataService.getOutbreakTemplatesCount(countQueryBuilder).pipe(share());
-    }
-
-    /**
-     * Check if we have write access to outbreak templates
-     * @returns {boolean}
-     */
-    hasOutbreakTemplateWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
-    }
-
-    /**
-     * Check if we have write access to outbreaks
-     */
-    hasOutbreakWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
+        this.outbreakTemplatesListCount$ = this.outbreakTemplateDataService
+            .getOutbreakTemplatesCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**
@@ -243,7 +252,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                         .deleteOutbreakTemplate(outbreakTemplate.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )

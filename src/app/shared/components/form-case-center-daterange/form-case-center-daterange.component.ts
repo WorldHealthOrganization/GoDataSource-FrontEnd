@@ -24,6 +24,7 @@ export class FormCaseCenterDaterangeComponent extends GroupBase<CaseCenterDateRa
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
     @Input() minDate: Moment;
+    @Input() maxDate: Moment;
 
     @Input() fromTooltip: string;
     @Input() toTooltip: string;

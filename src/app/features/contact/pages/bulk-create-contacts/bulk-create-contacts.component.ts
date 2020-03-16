@@ -19,7 +19,6 @@ import { DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, LocationSheet
 import * as Handsontable from 'handsontable';
 import { Constants } from '../../../../core/models/constants';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { throwError } from 'rxjs';
@@ -28,6 +27,8 @@ import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/vali
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { HotTableWrapperComponent } from '../../../../shared/components/hot-table-wrapper/hot-table-wrapper.component';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -36,6 +37,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
     styleUrls: ['./bulk-create-contacts.component.less']
 })
 export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     @ViewChild('inputForMakingFormDirty') inputForMakingFormDirty;
@@ -83,6 +85,12 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     // subscribers
     outbreakSubscriber: Subscription;
 
+    // authenticated user details
+    authUser: UserModel;
+
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -92,12 +100,19 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
         private i18nService: I18nService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private authDataService: AuthDataService
     ) {
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION).pipe(share());
@@ -122,7 +137,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                     return;
                 }
 
-                this.initBreadcrumbs();
+                // initialize page breadcrumbs
+                this.initializeBreadcrumbs();
 
                 // retrieve related person information
                 this.retrieveRelatedPerson();
@@ -152,6 +168,9 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -161,23 +180,46 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     }
 
     /**
-     * Init breadcrumbs
+     * Initialize breadcrumbs
      */
-    initBreadcrumbs() {
-        if (this.relatedEntityType === EntityType.EVENT) {
-            this.breadcrumbs = [
-                new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
-            ];
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // case or event?
+        if (this.relatedEntityType === EntityType.CASE) {
+            // case list
+            if (CaseModel.canList(this.authUser)) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
+                );
+            }
+        } else if (this.relatedEntityType === EntityType.EVENT) {
+            // event list
+            if (EventModel.canList(this.authUser)) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
+                );
+            }
         } else {
-            this.breadcrumbs = [
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-            ];
+            // NOT SUPPORTED :)
         }
 
-        this.breadcrumbs.push.apply(this.breadcrumbs, [
-            new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
-            new BreadcrumbItemModel('LNG_PAGE_BULK_ADD_CONTACTS_TITLE', '.', true)
-        ]);
+        // contacts list page
+        if (ContactModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+            );
+        }
+
+        // current page breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                'LNG_PAGE_BULK_ADD_CONTACTS_TITLE',
+                '.',
+                true
+            )
+        );
     }
 
     /**
@@ -410,10 +452,23 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
      * Redirect to Cases or Events list, based on related Entity Type
      */
     private redirectToRelatedEntityList() {
-        if (this.relatedEntityType === EntityType.EVENT) {
+        if (
+            this.relatedEntityType === EntityType.CASE &&
+            CaseModel.canList(this.authUser)
+        ) {
+            this.router.navigate(['/cases']);
+        } else if (
+            this.relatedEntityType === EntityType.EVENT &&
+            EventModel.canList(this.authUser)
+        ) {
             this.router.navigate(['/events']);
         } else {
-            this.router.navigate(['/cases']);
+            // NOT SUPPORTED
+            if (ContactModel.canList(this.authUser)) {
+                this.router.navigate(['/contacts']);
+            } else {
+                this.router.navigate(['/']);
+            }
         }
     }
 
@@ -445,7 +500,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                     this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_INVALID_FIELDS');
                 } else {
                     // collect data from table
-                    this.hotTableWrapper.getData()
+                    this.hotTableWrapper
+                        .getData()
                         .subscribe((dataResponse: {
                             data: any[],
                             sheetCore: Handsontable
@@ -554,7 +610,11 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                                         // navigate to listing page
                                         this.disableDirtyConfirm();
                                         loadingDialog.close();
-                                        this.router.navigate(['/' + EntityModel.getLinkForEntityType(this.relatedEntityType), this.relatedEntityId, 'view']);
+                                        if (ContactModel.canList(this.authUser)) {
+                                            this.router.navigate(['/contacts']);
+                                        } else {
+                                            this.router.navigate(['/']);
+                                        }
                                     });
                             }
                         });

@@ -108,6 +108,7 @@
 
                 <!-- Questionnaire section -->
                 <app-form-fill-questionnaire
+                    *ngIf="!!followUp?.id"
                     name="questionnaireAnswers"
                     [ngModel]="followUp.questionnaireAnswers"
                     [questions]="selectedOutbreak?.contactFollowUpTemplate"

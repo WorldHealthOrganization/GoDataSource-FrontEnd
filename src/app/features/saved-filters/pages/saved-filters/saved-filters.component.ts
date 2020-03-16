@@ -14,6 +14,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-saved-filters',
@@ -22,7 +23,7 @@ import { HoverRowAction, HoverRowActionType } from '../../../../shared/component
     styleUrls: ['./saved-filters.component.less']
 })
 export class SavedFiltersComponent extends ListComponent implements OnInit {
-
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SAVED_FILTERS_TITLE', '.', true)
     ];
@@ -34,7 +35,13 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
     });
 
     savedFiltersList$: Observable<SavedFilterModel[]>;
-    savedFiltersListCount$: Observable<any>;
+    savedFiltersListCount$: Observable<IBasicCount>;
+
+    fixedTableColumns: string[] = [
+        'name',
+        'public',
+        'filter-keys'
+    ];
 
     recordActions: HoverRowAction[] = [
         // Other actions
@@ -57,6 +64,9 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
         private savedFiltersService: SavedFiltersService,
         protected snackbarService: SnackbarService,
@@ -68,8 +78,10 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
-
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         // initialize pagination
@@ -85,6 +97,11 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
         this.savedFiltersList$ = this.savedFiltersService
             .getSavedFiltersList(this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback([]);
+                    return throwError(err);
+                }),
                 tap(this.checkEmptyList.bind(this)),
                 tap((data: any[]) => {
                     finishCallback(data);
@@ -99,19 +116,15 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.savedFiltersListCount$ = this.savedFiltersService.getSavedFiltersListCount(countQueryBuilder).pipe(share());
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'name',
-            'public',
-            'filter-keys'
-        ];
+        this.savedFiltersListCount$ = this.savedFiltersService
+            .getSavedFiltersListCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**

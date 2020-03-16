@@ -10,10 +10,15 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ContactChronology } from './typings/contact-chronology';
-import { forkJoin } from 'rxjs/index';
+import { forkJoin, of } from 'rxjs/index';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { EntityType } from '../../../../core/models/entity-type';
+import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 
 @Component({
     selector: 'app-view-chronology-contact',
@@ -22,23 +27,36 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
     styleUrls: ['./view-chronology-contact.component.less']
 })
 export class ViewChronologyContactComponent implements OnInit {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-    ];
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     contactData: ContactModel = new ContactModel();
     chronologyEntries: ChronologyItem[] = [];
 
+    // authenticated user details
+    authUser: UserModel;
+
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private contactDataService: ContactDataService,
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
         private relationshipDataService: RelationshipDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private authDataService: AuthDataService,
+        private labResultDataService: LabResultDataService
     ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.route.params.subscribe((params: { contactId }) => {
             // get current outbreak
             this.outbreakDataService
@@ -49,18 +67,9 @@ export class ViewChronologyContactComponent implements OnInit {
                         .getContact(selectedOutbreak.id, params.contactId)
                         .subscribe((contactDataReturned) => {
                             this.contactData = contactDataReturned;
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(
-                                    contactDataReturned.name,
-                                    `/contacts/${contactDataReturned.id}/view`),
-                                new BreadcrumbItemModel(
-                                    'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE',
-                                    '.',
-                                    true,
-                                    {},
-                                    this.contactData
-                                )
-                            );
+
+                            // initialize page breadcrumbs
+                            this.initializeBreadcrumbs();
 
                             // build query to get the followUps for specified contact
                             const qb = new RequestQueryBuilder;
@@ -83,14 +92,78 @@ export class ViewChronologyContactComponent implements OnInit {
                                         qqb
                                     ),
                                 this.followUpsDataService
-                                    .getFollowUpsList(selectedOutbreak.id, qb)
-                            ).subscribe(([relationshipsData, followUps]: [RelationshipModel[], FollowUpModel[]]) => {
+                                    .getFollowUpsList(selectedOutbreak.id, qb),
+                                !selectedOutbreak.isContactLabResultsActive ?
+                                        of<LabResultModel[]>([]) :
+                                        this.labResultDataService
+                                            .getEntityLabResults(
+                                                selectedOutbreak.id,
+                                                EntityModel.getLinkForEntityType(EntityType.CONTACT),
+                                                this.contactData.id
+                                            )
+                            ).subscribe(([
+                                relationshipsData,
+                                followUps,
+                                labResults
+                            ]: [
+                                RelationshipModel[],
+                                FollowUpModel[],
+                                LabResultModel[]
+                            ]) => {
                                 // set data
-                                this.chronologyEntries = ContactChronology.getChronologyEntries(this.i18nService, this.contactData, followUps, relationshipsData);
+                                this.chronologyEntries = ContactChronology.getChronologyEntries(
+                                    this.i18nService,
+                                    this.contactData,
+                                    followUps,
+                                    relationshipsData,
+                                    labResults
+                                );
                             });
 
                         });
                 });
         });
+
+        // initialize page breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // contacts list page
+        if (ContactModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+            );
+        }
+
+        // contact breadcrumbs
+        if (this.contactData) {
+            // contacts view page
+            if (ContactModel.canView(this.authUser)) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        this.contactData.name,
+                        `/contacts/${this.contactData.id}/view`
+                    )
+                );
+            }
+
+            // current page
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE',
+                    '.',
+                    true,
+                    {},
+                    this.contactData
+                )
+            );
+        }
     }
 }

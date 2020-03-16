@@ -141,6 +141,13 @@ export abstract class ListComponent implements OnDestroy {
     };
 
     /**
+     * Did we check at least one record ?
+     */
+    get checkedAtLeastOneRecord(): boolean {
+        return !_.isEmpty(this.checkboxModels.checkedRecords);
+    }
+
+    /**
      * Checked only deleted records ?
      */
     get checkedOnlyDeletedRecords(): boolean {
@@ -440,6 +447,24 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     /**
+     * Filter by phone number
+     * @param {string} property
+     * @param {string} value
+     */
+    filterByPhoneNumber(
+        property: string,
+        value: string
+    ) {
+        this.queryBuilder.filter.byPhoneNumber(
+            property as string,
+            value
+        );
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
      * Filter the list by equality
      * @param {string} property
      * @param {*} value
@@ -568,6 +593,19 @@ export abstract class ListComponent implements OnDestroy {
         } else {
             this.queryBuilder.filter.bySelect(property, values, replace, valueKey);
         }
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
+     * Filter by boolean with exists condition
+     * @param {string} property
+     * @param value
+     */
+    filterByBooleanUsingExistField(property: string, value: any) {
+        // filter by boolean using exist
+        this.queryBuilder.filter.byBooleanUsingExist(property, value);
 
         // refresh list
         this.needsRefreshList();
@@ -1496,11 +1534,12 @@ export abstract class ListComponent implements OnDestroy {
 
             // Filter contacts witch successful follow-up
             case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP:
-                this.listFilterDataService.filterContactsWithSuccessfulFollowup(
-                    globalFilters.date,
-                    globalFilters.locationId,
-                    globalFilters.classificationId
-                )
+                this.listFilterDataService
+                    .filterContactsWithSuccessfulFollowup(
+                        globalFilters.date,
+                        globalFilters.locationId,
+                        globalFilters.classificationId
+                    )
                     .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {
                         const contactIDs: string[] = _.chain(result.contacts)
                             .filter((item: ContactFollowedUp) => item.successfulFollowupsCount > 0)
@@ -1881,23 +1920,5 @@ export abstract class ListComponent implements OnDestroy {
 
         // set column configuration
         this.expandAllCellsForColumn[columnName] = expand;
-    }
-
-    /**
-     * Convert value to a numer if necessary
-     * @param value string | number
-     */
-    toNumber(value): number {
-        try {
-            const newValue = _.isNumber(value) ?
-                value : (
-                    _.isString(value) && value.length > 0 ?
-                        parseFloat(value) :
-                        value
-                );
-            return newValue;
-        } catch (e) {
-            return value;
-        }
     }
 }

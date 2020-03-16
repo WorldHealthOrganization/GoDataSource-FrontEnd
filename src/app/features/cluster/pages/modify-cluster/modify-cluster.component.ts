@@ -7,7 +7,6 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { ClusterModel } from '../../../../core/models/cluster.model';
@@ -23,7 +22,11 @@ import { catchError } from 'rxjs/operators';
     styleUrls: ['./modify-cluster.component.less']
 })
 export class ModifyClusterComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // constants
+    ClusterModel = ClusterModel;
 
     // authenticated user
     authUser: UserModel;
@@ -33,6 +36,9 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
 
     clusterData: ClusterModel = new ClusterModel();
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         protected route: ActivatedRoute,
@@ -41,14 +47,23 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // show loading
+        this.showLoadingDialog(false);
 
         this.route.params.subscribe((params: { clusterId }) => {
             this.clusterId = params.clusterId;
@@ -65,8 +80,11 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
                         .subscribe(clusterDataReturned => {
                             this.clusterData = new ClusterModel(clusterDataReturned);
 
-                            // add breadcrumb for page title
-                            this.createBreadcrumbs();
+                            // update breadcrumbs
+                            this.initializeBreadcrumbs();
+
+                            // hide loading
+                            this.hideLoadingDialog();
                         });
                 });
 
@@ -75,29 +93,34 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
     }
 
     /**
-     * Check if we have write access to Outbreak
-     * @returns {boolean}
+     * Initialize breadcrumbs
      */
-    hasOutbreakWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (ClusterModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters')
+            );
+        }
+
+        // view / modify breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_CLUSTER_TITLE' : 'LNG_PAGE_MODIFY_CLUSTER_TITLE',
+                '.',
+                true,
+                {},
+                this.clusterData
+            )
+        );
     }
 
     /**
-     * Check if we have access to View cluster's cases
-     * @returns {boolean}
+     * Modify Cluster
      */
-    hasCaseReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_CASE);
-    }
-
-    /**
-     * Check if we have access to View cluster's contacts
-     * @returns {boolean}
-     */
-    hasContactReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
-    }
-
     modifyCluster(form: NgForm) {
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
@@ -105,14 +128,17 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
             return;
         }
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify the Cluster
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.clusterDataService
             .modifyCluster(this.selectedOutbreak.id, this.clusterId, dirtyFields)
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
-                    loadingDialog.close();
+                    this.snackbarService.showApiError(err);
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 })
             )
@@ -126,27 +152,11 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
                 // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CLUSTER_ACTION_MODIFY_CLUSTER_SUCCESS_MESSAGE');
 
-                // update breadcrumb
-                this.createBreadcrumbs();
+                // update breadcrumbs
+                this.initializeBreadcrumbs();
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
             });
-    }
-
-    /**
-     * Create breadcrumbs
-     */
-    createBreadcrumbs() {
-        this.breadcrumbs = [
-            new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters'),
-            new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_CLUSTER_TITLE' : 'LNG_PAGE_MODIFY_CLUSTER_TITLE',
-                null,
-                true,
-                {},
-                this.clusterData
-            )
-        ];
     }
 }

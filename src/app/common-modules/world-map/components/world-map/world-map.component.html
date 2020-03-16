@@ -1,9 +1,18 @@
-<!-- Draw map -->
 <div
     *ngIf="!displayLoading && layers.length > 0"
-    id="worldMap"
     [style.width]="width"
-    [style.height]="height">
+    [style.height]="height"
+    [ngClass]="{ 'full-screen-map' : fullScreenMode }">
+    <!--Full screen map-->
+    <app-form-slide-toggle
+        class="world-map-full-screen"
+        [(ngModel)]="fullScreenMode"
+        [label]="'LNG_PAGE_WORLD_MAP_FULL_SCREEN_LABEL' | translate"
+        (optionChanged)="fullScreenToggleTrigger()">
+    </app-form-slide-toggle>
+
+    <!-- Draw map -->
+    <div id="worldMap"></div>
 </div>
 
 <!-- Still loading map -->
@@ -17,7 +26,7 @@
 
 <!-- Disclaimer -->
 <div
-    *ngIf="displayDisclaimer"
+    *ngIf="displayDisclaimer && !fullScreenMode"
     fxLayout="column"
     class="app-world-map-disclaimer">
     <!-- Show / Hide Disclaimer -->

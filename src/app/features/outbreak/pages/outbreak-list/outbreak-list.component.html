@@ -4,7 +4,7 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button *ngIf="hasOutbreakWriteAccess()" mat-raised-button color="accent"
+                <button *ngIf="OutbreakModel.canCreate(authUser)" mat-raised-button color="accent"
                         [routerLink]="'./create'">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
@@ -228,6 +228,33 @@
 
             <mat-cell *matCellDef="let outbreak">
                 <app-yes-no-label [value]="outbreak.id == authUser.activeOutbreakId"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="isContactLabResultsActive">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="isContactLabResultsActiveFilter"
+                            [ngModel]="''"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanField('isContactLabResultsActive', $event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                <app-yes-no-label [value]="outbreak.isContactLabResultsActive"></app-yes-no-label>
             </mat-cell>
         </ng-container>
 

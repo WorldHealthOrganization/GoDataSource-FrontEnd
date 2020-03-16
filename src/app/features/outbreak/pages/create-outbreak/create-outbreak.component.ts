@@ -10,7 +10,6 @@ import { Observable } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
@@ -21,6 +20,10 @@ import { throwError } from 'rxjs';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 
 @Component({
     selector: 'app-create-outbreak',
@@ -28,12 +31,14 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
     templateUrl: './create-outbreak.component.html',
     styleUrls: ['./create-outbreak.component.less']
 })
-export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnInit {
+export class CreateOutbreakComponent
+    extends CreateConfirmOnChanges
+    implements OnInit {
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '..'),
-        new BreadcrumbItemModel('LNG_PAGE_CREATE_OUTBREAK_TITLE', '.', true)
-    ];
+    // authenticated user details
+    authUser: UserModel;
 
     // lists used in dropdowns
     diseasesList$: Observable<LabelValuePair[]>;
@@ -48,6 +53,11 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
 
     serverToday: Moment = moment();
 
+    outbreakTemplateId: string;
+
+    /**
+     * Constructor
+     */
     constructor(
         private outbreakDataService: OutbreakDataService,
         private router: Router,
@@ -57,12 +67,20 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
         private route: ActivatedRoute,
         private outbreakTemplateDataService: OutbreakTemplateDataService,
         private dialogService: DialogService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private authDataService: AuthDataService,
+        private redirectService: RedirectService
     ) {
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY)
@@ -81,6 +99,7 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
         this.route.queryParams
             .subscribe((queryParams: { outbreakTemplateId }) => {
                 if (queryParams.outbreakTemplateId) {
+                    this.outbreakTemplateId = queryParams.outbreakTemplateId;
                     this.outbreakTemplateDataService.getOutbreakTemplate(queryParams.outbreakTemplateId)
                         .subscribe((outbreakTemplate: OutbreakTemplateModel) => {
                             // delete the id of the outbreak template
@@ -88,40 +107,6 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
 
                             // make the new outbreak which is merged with the outbreak template
                             this.newOutbreak = new OutbreakModel(outbreakTemplate);
-
-                            // translate questionnaire questions
-                            const translateQuestionnaire = (questions: QuestionModel[]) => {
-                                _.each(questions, (question: QuestionModel) => {
-                                    // translate question
-                                    question.text = this.i18nService.instant(question.text);
-
-                                    // translate answers & sub questions
-                                    _.each(question.answers, (answer: AnswerModel) => {
-                                        // translate answer
-                                        answer.label = this.i18nService.instant(answer.label);
-
-                                        // translate sub-question
-                                        if (!_.isEmpty(answer.additionalQuestions)) {
-                                            translateQuestionnaire(answer.additionalQuestions);
-                                        }
-                                    });
-                                });
-                            };
-
-                            // translate questionnaire questions - Case Form
-                            if (!_.isEmpty(this.newOutbreak.caseInvestigationTemplate)) {
-                                translateQuestionnaire(this.newOutbreak.caseInvestigationTemplate);
-                            }
-
-                            // translate questionnaire questions - Lab Results Form
-                            if (!_.isEmpty(this.newOutbreak.labResultsTemplate)) {
-                                translateQuestionnaire(this.newOutbreak.labResultsTemplate);
-                            }
-
-                            // translate questionnaire questions - Contact Follow-up
-                            if (!_.isEmpty(this.newOutbreak.contactFollowUpTemplate)) {
-                                translateQuestionnaire(this.newOutbreak.contactFollowUpTemplate);
-                            }
 
                             // creating clone, we need to keep data from the template
                             this.creatingOutbreakFromTemplate = true;
@@ -136,6 +121,25 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                     observer.complete();
                });
         });
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (OutbreakModel.canList(this.authUser)) {
+            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks'));
+        }
+
+        // create breadcrumb
+        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_OUTBREAK_TITLE', '.', true));
     }
 
     /**
@@ -147,6 +151,9 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
         return (o1 ? o1.id : undefined) === (o2 ? o2.id : undefined);
     }
 
+    /**
+     * Create new outbreak
+     */
     createOutbreak(stepForms: NgForm[]) {
         // get forms fields
         let dirtyFields: any = this.formHelper.mergeFields(stepForms);
@@ -168,7 +175,7 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
             const outbreakData = new OutbreakModel(dirtyFields);
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.outbreakDataService
-                .createOutbreak(outbreakData)
+                .createOutbreak(outbreakData, this.creatingOutbreakFromTemplate ? this.outbreakTemplateId : '')
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
@@ -196,9 +203,16 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                     // hide dialog
                     loadingDialog.close();
 
-                    // navigate to modify page of the new outbreak
-                    this.disableDirtyConfirm();
-                    this.router.navigate([`/outbreaks/${newOutbreak.id}/modify`]);
+                    // navigate to proper page
+                    // method handles disableDirtyConfirm too...
+                    this.redirectToProperPageAfterCreate(
+                        this.router,
+                        this.redirectService,
+                        this.authUser,
+                        OutbreakModel,
+                        'outbreaks',
+                        newOutbreak.id
+                    );
                 });
         }
     }

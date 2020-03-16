@@ -3,8 +3,18 @@ import { QuestionModel } from './question.model';
 import { LocationModel } from './location.model';
 import { MapServerModel } from './map-server.model';
 import { BaseModel } from './base.model';
+import { UserModel } from './user.model';
+import { PERMISSION } from './permission.model';
+import { IPermissionBasic, IPermissionCloneable, IPermissionOutbreak, IPermissionQuestionnaire, IPermissionRestorable } from './permission.interface';
 
-export class OutbreakModel extends BaseModel {
+export class OutbreakModel
+    extends BaseModel
+    implements
+        IPermissionBasic,
+        IPermissionOutbreak,
+        IPermissionQuestionnaire,
+        IPermissionCloneable,
+        IPermissionRestorable {
     id: string;
     name: string;
     description: string;
@@ -34,11 +44,47 @@ export class OutbreakModel extends BaseModel {
     longPeriodsBetweenCaseOnset: number;
     reportingGeographicalLevelId: string;
     arcGisServers: MapServerModel[];
+    isContactLabResultsActive: boolean;
 
     // used for displaying information when hovering an outbreak from topnav component
     // no need to save this one in the database
     details: string;
 
+    /**
+     * Static Permissions - IPermissionBasic
+     */
+    static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_VIEW) : false; }
+    static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_LIST) : false; }
+    static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_CREATE) : false; }
+    static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_VIEW, PERMISSION.OUTBREAK_MODIFY) : false; }
+    static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_DELETE) : false; }
+
+    /**
+     * Static Permissions - IPermissionRestorable
+     */
+    static canRestore(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_RESTORE) : false; }
+
+    /**
+     * Static Permissions - IPermissionOutbreak
+     */
+    static canMakeOutbreakActive(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MAKE_ACTIVE) : false; }
+    static canSeeInconsistencies(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_SEE_INCONSISTENCIES) : false; }
+
+    /**
+     * Static Permissions - IPermissionQuestionnaire
+     */
+    static canModifyCaseQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CASE_QUESTIONNAIRE) : false; }
+    static canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE) : false; }
+    static canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE) : false; }
+
+    /**
+     * Static Permissions - IPermissionCloneable
+     */
+    static canClone(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_CREATE_CLONE) : false; }
+
+    /**
+     * Constructor
+     */
     constructor(data = null) {
         super(data);
 
@@ -59,11 +105,10 @@ export class OutbreakModel extends BaseModel {
         this.noLessContacts = _.get(data, 'noLessContacts');
         this.noDaysNewContacts = _.get(data, 'noDaysNewContacts', 1);
         this.reportingGeographicalLevelId = _.get(data, 'reportingGeographicalLevelId', '');
-        // TODO read from reference data
-        // this.caseClassification = [{"test": "test"}];
         this.caseIdMask = _.get(data, 'caseIdMask');
         this.contactIdMask = _.get(data, 'contactIdMask');
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
+        this.isContactLabResultsActive = _.get(data, 'isContactLabResultsActive', false);
 
         this.caseInvestigationTemplate = _.map(
             _.get(data, 'caseInvestigationTemplate', []),
@@ -88,4 +133,36 @@ export class OutbreakModel extends BaseModel {
                 return new MapServerModel(lData);
             });
     }
+
+    /**
+     * Permissions - IPermissionBasic
+     */
+    canView(user: UserModel): boolean { return OutbreakModel.canView(user); }
+    canList(user: UserModel): boolean { return OutbreakModel.canList(user); }
+    canCreate(user: UserModel): boolean { return OutbreakModel.canCreate(user); }
+    canModify(user: UserModel): boolean { return OutbreakModel.canModify(user); }
+    canDelete(user: UserModel): boolean { return OutbreakModel.canDelete(user); }
+
+    /**
+     * Permissions - IPermissionRestorable
+     */
+    canRestore(user: UserModel): boolean { return OutbreakModel.canRestore(user); }
+
+    /**
+     * Permissions - IPermissionOutbreak
+     */
+    canMakeOutbreakActive(user: UserModel): boolean { return OutbreakModel.canMakeOutbreakActive(user); }
+    canSeeInconsistencies(user: UserModel): boolean { return OutbreakModel.canSeeInconsistencies(user); }
+
+    /**
+     * Permissions - IPermissionQuestionnaire
+     */
+    canModifyCaseQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyCaseQuestionnaire(user); }
+    canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyContactFollowUpQuestionnaire(user); }
+    canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyCaseLabResultQuestionnaire(user); }
+
+    /**
+     * Permissions - IPermissionCloneable
+     */
+    canClone(user: UserModel): boolean { return OutbreakModel.canClone(user); }
 }

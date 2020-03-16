@@ -12,7 +12,6 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -28,8 +27,12 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./modify-outbreak.component.less']
 })
 export class ModifyOutbreakComponent extends ViewModifyComponent implements OnInit {
-
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // constants
+    OutbreakModel = OutbreakModel;
+
     // authenticated user
     authUser: UserModel;
     // id of the outbreak to modify
@@ -47,6 +50,9 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
 
     outbreakNameValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
+    /**
+     * Constructor
+     */
     constructor(
         private outbreakDataService: OutbreakDataService,
         protected route: ActivatedRoute,
@@ -54,14 +60,20 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private authDataService: AuthDataService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
@@ -82,7 +94,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         this.outbreakId = this.outbreak.id;
 
         // update breadcrumbs
-        this.createBreadcrumbs();
+        this.initializeBreadcrumbs();
 
         this.outbreakNameValidator$ = new Observable((observer) => {
             this.outbreakDataService.checkOutbreakNameUniquenessValidity(this.outbreak.name, this.outbreakId)
@@ -91,6 +103,32 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
                     observer.complete();
                 });
         });
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (OutbreakModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks')
+            );
+        }
+
+        // view / modify breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY',
+                '.',
+                true,
+                {},
+                this.outbreak
+            )
+        );
     }
 
     /**
@@ -115,8 +153,10 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         // const dirtyFields: any = this.formHelper.getFields(form);
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify the outbreak
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.outbreakDataService
             .modifyOutbreak(
                 this.outbreakId,
@@ -126,7 +166,8 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 })
             )
@@ -140,36 +181,11 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
                 // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
 
-                // update breadcrumb
-                this.createBreadcrumbs();
+                // update breadcrumbs
+                this.initializeBreadcrumbs();
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
             });
-    }
-
-    /**
-     * Check if we have write access to outbreaks
-     * @returns {boolean}
-     */
-    hasOutbreakWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
-    }
-
-    /**
-     * Create breadcrumbs
-     */
-    createBreadcrumbs() {
-        this.breadcrumbs = [];
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks'),
-            new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY',
-                '.',
-                true,
-                {},
-                this.outbreak
-            )
-        );
     }
 }

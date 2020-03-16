@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, Subject } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { OutbreakModel } from '../../models/outbreak.model';
-import { UserRoleModel } from '../../models/user-role.model';
 import { StorageKey, StorageService } from '../helper/storage.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { AuthDataService } from './auth.data.service';
@@ -18,6 +17,7 @@ import { PeoplePossibleDuplicateModel } from '../../models/people-possible-dupli
 import { EntityType } from '../../models/entity-type';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import { catchError, map, mergeMap, takeUntil, tap } from 'rxjs/operators';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class OutbreakDataService {
@@ -39,10 +39,31 @@ export class OutbreakDataService {
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<OutbreakModel[]>}
      */
-    getOutbreaksList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<OutbreakModel[]> {
-
+    getOutbreaksList(
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<OutbreakModel[]> {
         const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks?filter=${filter}`),
+            OutbreakModel
+        );
+    }
 
+    /**
+     * Retrieve the list of Outbreaks
+     * @returns {Observable<OutbreakModel[]>}
+     */
+    getOutbreaksListReduced(): Observable<OutbreakModel[]> {
+        // retrieve only necessary fields
+        const qb: RequestQueryBuilder = new RequestQueryBuilder();
+        qb.fields(
+            'id',
+            'name',
+            'description'
+        );
+
+        // filter
+        const filter = qb.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks?filter=${filter}`),
             OutbreakModel
@@ -53,7 +74,7 @@ export class OutbreakDataService {
      * Retrieve the number of Outbreaks
      * @param {RequestQueryBuilder} queryBuilder
      */
-    getOutbreaksCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+    getOutbreaksCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`outbreaks/count?where=${whereFilter}`);
     }
@@ -91,10 +112,10 @@ export class OutbreakDataService {
     /**
      * Create a new Outbreak
      * @param { OutbreakModel } outbreak
-     * @returns {Observable<UserRoleModel[]>}
+     * @param { string } outbreakTemplateId
      */
-    createOutbreak(outbreak: OutbreakModel): Observable<any> {
-        return this.http.post('outbreaks', outbreak)
+    createOutbreak(outbreak: OutbreakModel, outbreakTemplateId?: string): Observable<any> {
+        return this.http.post(`outbreaks${outbreakTemplateId ? `?templateId=${outbreakTemplateId}` : '' }`, outbreak)
             .pipe(
                 mergeMap((res) => {
                     // re-determine the selected Outbreak
@@ -374,12 +395,12 @@ export class OutbreakDataService {
      * Return total number of case / contacts & events possible duplicates
      * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<IBasicCount>}
      */
     getPeoplePossibleDuplicatesCount(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
+    ): Observable<IBasicCount> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`outbreaks/${outbreakId}/people/possible-duplicates/count?where=${whereFilter}`);
     }

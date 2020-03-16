@@ -6,7 +6,7 @@
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
                     <button
-                        *ngIf="hasCaseWriteAccess()"
+                        *ngIf="CaseModel.canCreate(authUser)"
                         mat-raised-button color="accent"
                         [routerLink]="'./create'">
                         {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
@@ -14,7 +14,15 @@
                 </ng-container>
 
                 <button
-                    *ngIf="!appliedListFilter"
+                    *ngIf="!appliedListFilter && (
+                        CaseModel.canListPersonsWithoutRelationships(authUser) ||
+                        CaseModel.canListOnsetBeforePrimaryReport(authUser) ||
+                        CaseModel.canListLongPeriodBetweenOnsetDatesReport(authUser) ||
+                        (exportCasesUrl && CaseModel.canExport(authUser)) ||
+                        CaseModel.canImport(authUser) ||
+                        CaseModel.canExportInvestigationForm(authUser) ||
+                        CaseModel.canExportRelationships(authUser)
+                    )"
                     mat-raised-button
                     color="accent"
                     [matMenuTriggerFor]="quickActionsMenu">
@@ -23,33 +31,35 @@
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <button
+                        *ngIf="CaseModel.canListPersonsWithoutRelationships(authUser)"
                         mat-menu-item
                         [routerLink]="['/cases']"
                         [queryParams]="{ applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS }">
                         {{'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
                     </button>
 
-                    <mat-divider></mat-divider>
+                    <mat-divider
+                        *ngIf="CaseModel.canListPersonsWithoutRelationships(authUser)"></mat-divider>
 
-                    <ng-container
-                        *ngIf="hasReportAccess()">
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/relationships/date-onset']">
-                            {{'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON' | translate}}
-                        </button>
+                    <button
+                        *ngIf="CaseModel.canListOnsetBeforePrimaryReport(authUser)"
+                        mat-menu-item
+                        [routerLink]="['/relationships/date-onset']">
+                        {{'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON' | translate}}
+                    </button>
 
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/relationships/long-period']">
-                            {{'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON' | translate}}
-                        </button>
+                    <button
+                        *ngIf="CaseModel.canListLongPeriodBetweenOnsetDatesReport(authUser)"
+                        mat-menu-item
+                        [routerLink]="['/relationships/long-period']">
+                        {{'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON' | translate}}
+                    </button>
 
-                        <mat-divider></mat-divider>
-                    </ng-container>
+                    <mat-divider
+                        *ngIf="CaseModel.canListOnsetBeforePrimaryReport(authUser) || CaseModel.canListLongPeriodBetweenOnsetDatesReport(authUser)"></mat-divider>
 
                     <app-export-button
-                        *ngIf="exportCasesUrl"
+                        *ngIf="exportCasesUrl && CaseModel.canExport(authUser)"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_CASES_EXPORT_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_CASES_EXPORT_TITLE' | translate"
@@ -66,24 +76,26 @@
                     </app-export-button>
 
                     <ng-container *app-selected-outbreak-is-active>
-                        <ng-container *ngIf="hasCaseWriteAccess()">
-                            <button
-                                mat-menu-item
-                                [routerLink]="['/import-export-data', 'case-data', 'import']">
-                                {{'LNG_PAGE_LIST_CASES_IMPORT_BUTTON' | translate}}
-                            </button>
-                        </ng-container>
+                        <button
+                            *ngIf="CaseModel.canImport(authUser)"
+                            mat-menu-item
+                            [routerLink]="['/import-export-data', 'case-data', 'import']">
+                            {{'LNG_PAGE_LIST_CASES_IMPORT_BUTTON' | translate}}
+                        </button>
                     </ng-container>
 
-                    <mat-divider></mat-divider>
+                    <mat-divider
+                        *ngIf="(exportCasesUrl && CaseModel.canExport(authUser)) || CaseModel.canImport(authUser)"></mat-divider>
 
                     <button
+                        *ngIf="CaseModel.canExportEmptyInvestigationForms(authUser)"
                         mat-menu-item
                         (click)="exportEmptyCaseInvestigationForms()">
                         {{ 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS' | translate }}
                     </button>
 
                     <button
+                        *ngIf="CaseModel.canExportRelationships(authUser)"
                         mat-menu-item
                         (click)="exportFilteredCasesRelationships()">
                         {{ 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASES_RELATIONSHIPS' | translate }}
@@ -169,8 +181,7 @@
                             [matMenuTriggerFor]="actionsMenuMultipleRecords"
                             color="accent"
                             [matTooltip]="'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_TOOLTIP' | translate"
-                            [disabled]="isEmptyList"
-                        >
+                            [disabled]="isEmptyList">
                             <span class="xt-icon">arrowDropdownCircle</span>
                         </button>
 
@@ -191,19 +202,21 @@
                             <mat-divider></mat-divider>
 
                             <button
-                                *ngIf="exportCasesUrl"
+                                *ngIf="exportCasesUrl && CaseModel.canExport(authUser)"
                                 mat-menu-item
                                 (click)="exportSelectedCases()">
                                 {{ 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES' | translate }}
                             </button>
 
                             <button
+                                *ngIf="CaseModel.canExportDossier(authUser)"
                                 mat-menu-item
                                 (click)="exportSelectedCasesDossier()">
                                 {{ 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER' | translate }}
                             </button>
 
                             <button
+                                *ngIf="CaseModel.canExportRelationships(authUser)"
                                 mat-menu-item
                                 (click)="exportSelectedCasesRelationships()">
                                 {{ 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_RELATIONSHIPS' | translate }}
@@ -508,9 +521,17 @@
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
-                (click)="displayContacts(item)"
-                class="mat-table-number-column">
-                {{ item.numberOfContacts }}
+                [style.color]="getCaseClassificationColor(item)">
+                <span
+                    *ngIf="CaseModel.canListRelationshipContacts(authUser) else numberOfContacts"
+                    (click)="displayContacts(item)"
+                    class="mat-table-number-column">
+                    {{ item.numberOfContacts }}
+                </span>
+                <ng-template
+                    #numberOfContacts>
+                    {{ item.numberOfContacts }}
+                </ng-template>
             </mat-cell>
         </ng-container>
 
@@ -528,9 +549,17 @@
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
-                (click)="displayExposures(item)"
-                class="mat-table-number-column">
-                {{ item.numberOfExposures }}
+                [style.color]="getCaseClassificationColor(item)">
+                <span
+                    *ngIf="CaseModel.canListRelationshipExposures(authUser) else numberOfExposures"
+                    (click)="displayExposures(item)"
+                    class="mat-table-number-column">
+                    {{ item.numberOfExposures }}
+                </span>
+                <ng-template
+                    #numberOfExposures>
+                    {{ item.numberOfExposures }}
+                </ng-template>
             </mat-cell>
         </ng-container>
 
@@ -570,10 +599,11 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterBySelectField('wasContact', $event)"
+                            (optionChanged)="filterByBooleanUsingExistField('wasContact', $event.value)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
                         </app-form-select>
                     </div>
                 </div>
@@ -607,7 +637,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getCaseClassificationColor(item)">
                 {{ item.createdByUser?.name }}
             </mat-cell>
         </ng-container>
@@ -629,7 +661,10 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                class="has-date-range-filter"
+                [style.color]="getCaseClassificationColor(item)">
                 {{ item.createdAt | dateTimeDefault }}
             </mat-cell>
         </ng-container>
@@ -658,7 +693,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getCaseClassificationColor(item)">
                 {{ item.updatedByUser?.name }}
             </mat-cell>
         </ng-container>
@@ -680,7 +717,10 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                class="has-date-range-filter"
+                [style.color]="getCaseClassificationColor(item)">
                 {{ item.updatedAt | dateTimeDefault }}
             </mat-cell>
         </ng-container>

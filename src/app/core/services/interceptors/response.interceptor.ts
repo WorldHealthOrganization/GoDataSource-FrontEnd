@@ -8,20 +8,25 @@ import { StorageKey, StorageService } from '../helper/storage.service';
 import { SnackbarService } from '../helper/snackbar.service';
 import { catchError, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { AuthDataService } from '../data/auth.data.service';
 
 @Injectable()
 export class ResponseInterceptor implements HttpInterceptor {
-
+    /**
+     * Constructor
+     */
     constructor(
         private loggerService: LoggerService,
         private storageService: StorageService,
         private router: Router,
-        private snackbarService: SnackbarService
-    ) {
-    }
+        private snackbarService: SnackbarService,
+        private authDataService: AuthDataService
+    ) {}
 
+    /**
+     * Intercept handler
+     */
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-
         return next.handle(request)
             .pipe(
                 tap((response: HttpResponse<any>) => {
@@ -37,6 +42,9 @@ export class ResponseInterceptor implements HttpInterceptor {
                                 `Response status: ${response.status} ${response.statusText}`,
                                 `Response Transaction ID: ${transactionId}`
                             );
+
+                            // refresh token expiration
+                            this.authDataService.resetTokenInfo();
                         }
                     }
 

@@ -7,7 +7,6 @@ import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../..
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { NgForm } from '@angular/forms';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable } from 'rxjs';
@@ -25,7 +24,11 @@ import { catchError, map, switchMap } from 'rxjs/operators';
     styleUrls: ['./modify-reference-data-entry.component.less']
 })
 export class ModifyReferenceDataEntryComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // constants
+    ReferenceDataEntryModel = ReferenceDataEntryModel;
 
     categoryId: string;
     entryId: string;
@@ -38,6 +41,9 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
 
     changeIcon: boolean = false;
 
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
@@ -46,17 +52,26 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
         private authDataService: AuthDataService,
         private iconDataService: IconDataService,
         private i18nService: I18nService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // icons data
         this.iconsList$ = this.iconDataService.getIconsList();
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // show loading
+        this.showLoadingDialog(false);
 
         // get the route params
         this.route.params
@@ -75,22 +90,76 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
                             .getReferenceDataByCategory(this.categoryId)
                             .subscribe((category: ReferenceDataCategoryModel) => {
                                 this.entry.category = category;
-                                this.createBreadcrumbs();
+
+                                // update breadcrumbs
+                                this.initializeBreadcrumbs();
+
+                                // hide loading
+                                this.hideLoadingDialog();
                             });
                     });
             });
     }
 
-    modifyEntry(form: NgForm) {
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
 
+        // add list breadcrumb only if we have permission
+        if (ReferenceDataCategoryModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
+            );
+        }
+
+        if (this.entry) {
+            // add new breadcrumb: Category page
+            if (
+                this.entry.category &&
+                ReferenceDataEntryModel.canList(this.authUser)
+            ) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        this.entry.category.name,
+                        `/reference-data/${this.categoryId}`,
+                        false,
+                        {},
+                        this.entry.category
+                    )
+                );
+            }
+
+            // add new breadcrumb: page title
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    this.entry.value,
+                    '.',
+                    true,
+                    {},
+                    this.entry
+                )
+            );
+        }
+    }
+
+    /**
+     * Modify ref data entry
+     * @param form
+     */
+    modifyEntry(form: NgForm) {
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
         if (!this.formHelper.validateForm(form)) {
             return;
         }
 
+        // show loading
+        this.showLoadingDialog();
+
         // get selected outbreak
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.referenceDataDataService
             .modifyEntry(
                 this.entryId,
@@ -99,8 +168,9 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
             )
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
-                    loadingDialog.close();
+                    this.snackbarService.showApiError(err);
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 }),
                 switchMap((modifiedReferenceDataEntry) => {
@@ -108,8 +178,9 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
                     return this.i18nService.loadUserLanguage()
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
-                                loadingDialog.close();
+                                this.snackbarService.showApiError(err);
+                                // hide loading
+                                this.hideLoadingDialog();
                                 return throwError(err);
                             }),
                             map(() => modifiedReferenceDataEntry)
@@ -128,36 +199,11 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
                 // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_ACTION_MODIFY_ENTRY_SUCCESS_MESSAGE');
 
-                // update breadcrumb
-                this.createBreadcrumbs();
+                // update breadcrumbs
+                this.initializeBreadcrumbs();
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
             });
     }
-
-    /**
-     * Check if we have access to modify reference data
-     * @returns {boolean}
-     */
-    hasReferenceDataWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
-    }
-
-    /**
-     * Create breadcrumbs
-     */
-    createBreadcrumbs() {
-        this.breadcrumbs = [];
-        if (this.entry) {
-            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data'));
-
-            if (this.entry.category) {
-                this.breadcrumbs.push(new BreadcrumbItemModel(this.entry.category.name, `/reference-data/${this.categoryId}`));
-            }
-
-            this.breadcrumbs.push(new BreadcrumbItemModel(this.entry.value, '.', true));
-        }
-    }
-
 }

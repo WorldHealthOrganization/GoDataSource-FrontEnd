@@ -10,13 +10,12 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
-
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
     selector: 'app-modify-outbreak-template',
@@ -24,7 +23,11 @@ import { throwError } from 'rxjs';
     styleUrls: ['./modify-outbreak-template.component.less']
 })
 export class ModifyOutbreakTemplateComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // constants
+    OutbreakTemplateModel = OutbreakTemplateModel;
 
     // authenticated user
     authUser: UserModel;
@@ -34,7 +37,12 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
     outbreakTemplate: OutbreakTemplateModel = new OutbreakTemplateModel();
     // list of diseases
     diseasesList$: Observable<any[]>;
+    // outbreak template name validator
+    outbreakTemplateNameValidator$: Observable<boolean | IGeneralAsyncValidatorResponse>;
 
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
@@ -42,17 +50,26 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
+    /**
+     * Component initialization
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // get the lists for form
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
+
+        // show loading
+        this.showLoadingDialog(false);
 
         this.route.params
             .subscribe((params: { outbreakTemplateId }) => {
@@ -62,14 +79,51 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
                     .getOutbreakTemplate(this.outbreakTemplateId)
                     .subscribe(outbreakTemplateData => {
                         this.outbreakTemplate = outbreakTemplateData;
-                        this.createBreadcrumbs();
+
+                        // update breadcrumbs
+                        this.initializeBreadcrumbs();
+
+                        this.outbreakTemplateNameValidator$ = new Observable((observer) => {
+                            this.outbreakTemplateDataService.checkOutbreakTemplateNameUniquenessValidity(this.outbreakTemplate.name, this.outbreakTemplate.id)
+                                .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                                    observer.next(isValid);
+                                    observer.complete();
+                                });
+                        });
+                        // hide loading
+                        this.hideLoadingDialog();
                     });
             });
     }
 
     /**
-     * Handle form submit
-     * @param form
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (OutbreakTemplateModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '/outbreak-templates')
+            );
+        }
+
+        // view / modify breadcrumb
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TEMPLATE_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TITLE',
+                '.',
+                true,
+                {},
+                this.outbreakTemplate
+            )
+        );
+    }
+
+    /**
+     * Modify outbreak template
      */
     modifyOutbreakTemplate(form: NgForm) {
         // validate form
@@ -79,14 +133,17 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
 
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify the outbreak template
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.outbreakTemplateDataService
             .modifyOutbreakTemplate(this.outbreakTemplateId, dirtyFields)
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
-                    loadingDialog.close();
+                    this.snackbarService.showApiError(err);
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 })
             )
@@ -100,32 +157,11 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
                 // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
 
-                // update breadcrumb
-                this.createBreadcrumbs();
+                // update breadcrumbs
+                this.initializeBreadcrumbs();
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
             });
-    }
-
-    /**
-     * Check if we have write access to outbreak templates
-     * @returns {boolean}
-     */
-    hasOutbreakTemplateWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
-    }
-
-    createBreadcrumbs() {
-        this.breadcrumbs = [
-            new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '/outbreak-templates'),
-            new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TEMPLATE_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TITLE',
-                '.',
-                true,
-                {},
-                this.outbreakTemplate
-            )
-        ];
     }
 }

@@ -195,32 +195,27 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <ng-container
-            *ngIf="viewOnly">
-            <button
-                *ngIf="hasLocationWriteAccess()"
-                mat-raised-button
-                color="accent"
-                type="button"
-                [routerLink]="['/locations', locationId, 'modify']">
-                {{'LNG_COMMON_BUTTON_EDIT'| translate}}
-            </button>
-            <button
-                type="button"
-                [routerLink]="backToCurrent ? ['/locations', locationId, 'children'] : (locationData.parentLocationId ? ['/locations', locationData.parentLocationId, 'children'] : ['/locations'])"
-                mat-raised-button>
-                {{'LNG_COMMON_BUTTON_BACK' | translate}}
-            </button>
-        </ng-container>
-        <ng-container *ngIf="!viewOnly">
-            <button mat-raised-button color="accent">
-                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
-            </button>
-            <button type="button"
-                    [routerLink]="backToCurrent ? ['/locations', locationId, 'children'] : (locationData.parentLocationId ? ['/locations', locationData.parentLocationId, 'children'] : ['/locations'])"
-                    mat-raised-button>
-                {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
-            </button>
-        </ng-container>
+        <button
+            *ngIf="viewOnly && LocationModel.canModify(authUser)"
+            mat-raised-button
+            color="accent"
+            type="button"
+            [routerLink]="['/locations', locationId, 'modify']">
+            {{'LNG_COMMON_BUTTON_EDIT'| translate}}
+        </button>
+        <button
+            *ngIf="!viewOnly"
+            mat-raised-button
+            color="accent">
+            {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+        </button>
+
+        <button
+            *ngIf="LocationModel.canList(authUser)"
+            type="button"
+            [routerLink]="backToCurrent ? ['/locations', locationId, 'children'] : (locationData.parentLocationId ? ['/locations', locationData.parentLocationId, 'children'] : ['/locations'])"
+            mat-raised-button>
+            {{ (viewOnly ? 'LNG_COMMON_BUTTON_BACK' : 'LNG_COMMON_BUTTON_CANCEL') | translate}}
+        </button>
     </div>
 </form>

@@ -108,7 +108,7 @@ export class AddressModel {
                 }];
 
                 // check if we should search for phone number as well
-                const numberPattern: string = AddressModel.getPhoneNumberPattern(searchTerm);
+                const numberPattern: string = RequestFilter.getPhoneNumberPattern(searchTerm);
                 if (numberPattern) {
                     or.push({
                         phoneNumber: {
@@ -153,7 +153,7 @@ export class AddressModel {
                 }];
 
                 // check if we should search for phone number as well
-                const numberPattern: string = AddressModel.getPhoneNumberPattern(searchTerm);
+                const numberPattern: string = RequestFilter.getPhoneNumberPattern(searchTerm);
                 if (numberPattern) {
                     or.push({
                         [`${property}.phoneNumber`]: {
@@ -179,33 +179,6 @@ export class AddressModel {
     }
 
     /**
-     * Construct phone regex pattern used by queries
-     * @param phoneNumber
-     */
-    static getPhoneNumberPattern(
-        phoneNumber: string
-    ): string {
-        // nothing provided ?
-        if (!phoneNumber) {
-            return null;
-        }
-
-        // construct search pattern
-        const digits: string[] = phoneNumber.match(/[0-9]/g);
-        if (
-            !digits ||
-            digits.length < 1
-        ) {
-            return null;
-        }
-
-        // construct search pattern
-        return '[^0-9]*' + digits.map((digit: string) => {
-            return digit + '[^0-9]*';
-        }).join('');
-    }
-
-    /**
      * Create query builder that will search for a phone number
      */
     static buildPhoneSearchFilter(
@@ -214,7 +187,7 @@ export class AddressModel {
         propertyIsArray: boolean
     ): RequestQueryBuilder {
         // construct search pattern
-        const numberPattern: string = AddressModel.getPhoneNumberPattern(phoneNumber);
+        const numberPattern: string = RequestFilter.getPhoneNumberPattern(phoneNumber);
 
         // nothing provided ?
         if (!numberPattern) {

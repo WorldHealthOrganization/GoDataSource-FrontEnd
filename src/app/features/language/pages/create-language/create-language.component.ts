@@ -1,17 +1,20 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { LanguageModel } from '../../../../core/models/language.model';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-create-language',
@@ -19,29 +22,62 @@ import { throwError } from 'rxjs';
     templateUrl: './create-language.component.html',
     styleUrls: ['./create-language.component.less']
 })
-export class CreateLanguageComponent extends ConfirmOnFormChanges {
+export class CreateLanguageComponent
+    extends CreateConfirmOnChanges
+    implements OnInit {
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '/languages'),
-        new BreadcrumbItemModel('LNG_PAGE_CREATE_LANGUAGE_TITLE', '.', true)
-    ];
+    // authenticated user
+    authUser: UserModel;
 
     languageData: LanguageModel = new LanguageModel();
 
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private languageDataService: LanguageDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private cacheService: CacheService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private authDataService: AuthDataService,
+        private redirectService: RedirectService
     ) {
         super();
     }
 
     /**
+     * Component initialized
+     */
+    ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (LanguageModel.canList(this.authUser)) {
+            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '/languages'));
+        }
+
+        // create breadcrumb
+        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_LANGUAGE_TITLE', '.', true));
+    }
+
+    /**
      * Create Language
-     * @param {NgForm[]} stepForms
      */
     createNewLanguage(stepForms: NgForm[]) {
         // get forms fields
@@ -56,7 +92,7 @@ export class CreateLanguageComponent extends ConfirmOnFormChanges {
                 .createLanguage(dirtyFields)
                 .pipe(
                     catchError((err) => {
-                        this.snackbarService.showError(err.message);
+                        this.snackbarService.showApiError(err);
                         loadingDialog.close();
                         return throwError(err);
                     })
@@ -70,9 +106,16 @@ export class CreateLanguageComponent extends ConfirmOnFormChanges {
                     // hide dialog
                     loadingDialog.close();
 
-                    // navigate to listing page
-                    this.disableDirtyConfirm();
-                    this.router.navigate([`/languages/${newLanguage.id}/modify`]);
+                    // navigate to proper page
+                    // method handles disableDirtyConfirm too...
+                    this.redirectToProperPageAfterCreate(
+                        this.router,
+                        this.redirectService,
+                        this.authUser,
+                        LanguageModel,
+                        'languages',
+                        newLanguage.id
+                    );
                 });
         }
     }

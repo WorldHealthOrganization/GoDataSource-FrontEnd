@@ -13,7 +13,7 @@
 
         <mat-tab-group class="page-tabs-navbar">
 
-            <mat-tab [label]="'LNG_PAGE_MODIFY_USER_TAB_DETAILS_TITLE'| translate">
+            <mat-tab [label]="'LNG_PAGE_MODIFY_USER_TAB_DETAILS_TITLE' | translate">
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
@@ -102,9 +102,11 @@
 
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
-        <button type="button"
-                [routerLink]="'/users'"
-                mat-raised-button>
+        <button
+            *ngIf="UserModel.canList(authUser)"
+            type="button"
+            [routerLink]="'/users'"
+            mat-raised-button>
             {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
         </button>
     </div>

@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { UserModel } from '../../../../core/models/user.model';
@@ -16,6 +15,9 @@ import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/help
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 
 @Component({
     selector: 'app-create-team',
@@ -23,34 +25,68 @@ import { catchError } from 'rxjs/operators';
     templateUrl: './create-team.component.html',
     styleUrls: ['./create-team.component.less']
 })
-export class CreateTeamComponent extends ConfirmOnFormChanges implements OnInit {
+export class CreateTeamComponent
+    extends CreateConfirmOnChanges
+    implements OnInit {
     // breadcrumb header
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_TEAMS_TITLE', '..'),
-        new BreadcrumbItemModel('LNG_PAGE_CREATE_TEAM_TITLE', '.', true)
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
+
     teamData: TeamModel = new TeamModel();
 
     usersList$: Observable<UserModel[]>;
     existingUsers: string[] = [];
 
+    // authenticated user details
+    authUser: UserModel;
+
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private teamDataService: TeamDataService,
         private userDataService: UserDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private authDataService: AuthDataService,
+        private redirectService: RedirectService
     ) {
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // retrieve user list
         const qbUsers = new RequestQueryBuilder();
         qbUsers.sort
             .by('firstName', RequestSortDirection.ASC)
             .by('lastName', RequestSortDirection.ASC);
         this.usersList$ = this.userDataService.getUsersList(qbUsers);
+
+        // initialize breadcrumbs
+        this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    private initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (TeamModel.canList(this.authUser)) {
+            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_TEAMS_TITLE', '/teams'));
+        }
+
+        // create breadcrumb
+        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_TEAM_TITLE', '.', true));
     }
 
     /**
@@ -68,16 +104,23 @@ export class CreateTeamComponent extends ConfirmOnFormChanges implements OnInit 
                             .createTeam(dirtyFields)
                             .pipe(
                                 catchError((err) => {
-                                    this.snackbarService.showError(err.message);
+                                    this.snackbarService.showApiError(err);
                                     return throwError(err);
                                 })
                             )
                             .subscribe((newTeam: TeamModel) => {
                                 this.snackbarService.showSuccess('LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_SUCCESS_MESSAGE');
 
-                                // navigate to listing page
-                                this.disableDirtyConfirm();
-                                this.router.navigate([`/teams/${newTeam.id}/modify`]);
+                                // navigate to proper page
+                                // method handles disableDirtyConfirm too...
+                                this.redirectToProperPageAfterCreate(
+                                    this.router,
+                                    this.redirectService,
+                                    this.authUser,
+                                    TeamModel,
+                                    'teams',
+                                    newTeam.id
+                                );
                             });
                     }
                 });

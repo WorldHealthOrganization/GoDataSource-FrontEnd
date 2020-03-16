@@ -126,7 +126,7 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
                 .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
                 .pipe(
                     catchError((err) => {
-                        this.snackbarService.showError(err.message);
+                        this.snackbarService.showApiError(err);
 
                         // Entity not found; navigate back to Entities list
                         this.router.navigate([this.entityMap[this.entityType].link]);
@@ -207,11 +207,11 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
             targets: relationshipTargets,
             relationship: this.relationship
         };
-        this.relationshipDataService.createBulkRelationships(this.selectedOutbreak.id, relationshipsBulkData)
+        this.relationshipDataService
+            .createBulkRelationships(this.selectedOutbreak.id, relationshipsBulkData)
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
-
+                    this.snackbarService.showApiError(err);
                     return throwError(err);
                 })
             )

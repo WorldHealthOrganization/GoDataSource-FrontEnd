@@ -46,7 +46,8 @@
                             <ng-container matColumnDef="checkbox">
                                 <mat-header-cell *matHeaderCellDef fxFlex="60px">
                                     <div class="table-header-cell">
-                                        <div>
+                                        <div
+                                            *ngIf="hasMergePermission(group)">
                                             <app-form-checkbox
                                                 class="table-checkbox"
                                                 name="checkAll"
@@ -58,6 +59,7 @@
                                 </mat-header-cell>
                                 <mat-cell *matCellDef="let item;" fxFlex="60px">
                                     <app-form-checkbox
+                                        *ngIf="hasMergePermission(group)"
                                         #listCheckedIndividual
                                         [name]="'recordCheck[' + item + ']'"
                                         class="table-checkbox"
@@ -180,6 +182,7 @@
                     <div
                         fxFlex fxGrow="0">
                         <button
+                            *ngIf="hasMergePermission(group)"
                             mat-raised-button color="accent"
                             type="button"
                             [disabled]="!hasAtLeastTwoCheckboxChecked(tableForm)"
@@ -194,8 +197,7 @@
 
     <div
         *ngIf="!refreshingList && isEmptyList"
-        class="mat-table"
-    >
+        class="mat-table">
         <div class="mat-row">
             <div class="mat-cell">
                 {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}

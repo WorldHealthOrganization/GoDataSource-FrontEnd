@@ -28,7 +28,8 @@
                                 [options]="savedFilters$ | async"
                                 (optionChanged)="loadSavedFilter($event)"
                                 optionLabelKey="name"
-                                optionValueKey="id">
+                                optionValueKey="id"
+                                [enableFilterOptions]="true">
                             </app-form-select>
                         </div>
 
@@ -76,7 +77,8 @@
                                         optionLabelPrefixKey="relationshipLabel"
                                         optionValueKey="self"
                                         [clearable]="false"
-                                        [disabled]="filter.readonly">
+                                        [disabled]="filter.readonly"
+                                        [enableFilterOptions]="true">
                                     </app-form-select>
 
                                     <!-- Filter Comparator -->
@@ -121,7 +123,8 @@
                                         [allowSelectionOfDisabledItems]="true"
                                         [displayInvisibleItems]="true"
                                         [optionValueKey]="filter.filter.optionsValueKey"
-                                        [optionLabelKey]="filter.filter.optionsLabelKey">
+                                        [optionLabelKey]="filter.filter.optionsLabelKey"
+                                        [enableFilterOptions]="true">
                                     </app-form-select>
 
                                     <!-- MULTI-SELECT Filter -->
@@ -139,7 +142,8 @@
                                         [allowSelectionOfDisabledItems]="true"
                                         [displayInvisibleItems]="true"
                                         [optionValueKey]="filter.filter.optionsValueKey"
-                                        [optionLabelKey]="filter.filter.optionsLabelKey">
+                                        [optionLabelKey]="filter.filter.optionsLabelKey"
+                                        [enableFilterOptions]="true">
                                     </app-form-select>
 
                                     <!-- NUMBER / AGE RANGE Filter -->
@@ -240,7 +244,8 @@
                                             optionLabelPrefixDelimiter=" "
                                             optionValueKey="variable"
                                             optionTooltipKey="text"
-                                            (optionChanged)="questionChanged(filter)">
+                                            (optionChanged)="questionChanged(filter)"
+                                            [enableFilterOptions]="true">
                                         </app-form-select>
 
                                         <!-- Filter details -->

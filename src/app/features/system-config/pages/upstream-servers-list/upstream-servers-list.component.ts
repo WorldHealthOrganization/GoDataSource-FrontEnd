@@ -6,7 +6,6 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
@@ -21,6 +20,7 @@ import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-upstream-servers-list',
@@ -29,19 +29,20 @@ import { HoverRowActionsDirective } from '../../../../shared/directives/hover-ro
     styleUrls: ['./upstream-servers-list.component.less']
 })
 export class UpstreamServersListComponent extends ListComponent implements OnInit {
-    /**
-     * Breadcrumbs
-     */
+    // Breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_TITLE', '.', true)
     ];
+
+    // constants
+    SystemUpstreamServerModel = SystemUpstreamServerModel;
 
     // authenticated user
     authUser: UserModel;
 
     // upstream servers
     upstreamServerList: SystemUpstreamServerModel[] = [];
-    upstreamServerListCount: { count: number };
+    upstreamServerListCount: IBasicCount;
     upstreamServerListAll: SystemUpstreamServerModel[] = [];
 
     // sync in progress ?
@@ -62,7 +63,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
                 this.startSync(item);
             },
             visible: (): boolean => {
-                return this.hasSysConfigWriteAccess();
+                return SystemUpstreamServerModel.canSync(this.authUser);
             }
         }),
 
@@ -75,8 +76,8 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
                 handler.redraw();
             },
             visible: (item: SystemUpstreamServerModel): boolean => {
-                return this.hasSysConfigWriteAccess() &&
-                    item.syncEnabled;
+                return item.syncEnabled &&
+                    SystemUpstreamServerModel.canDisableSync(this.authUser);
             }
         }),
 
@@ -89,8 +90,8 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
                 handler.redraw();
             },
             visible: (item: SystemUpstreamServerModel): boolean => {
-                return this.hasSysConfigWriteAccess() &&
-                    !item.syncEnabled;
+                return !item.syncEnabled &&
+                    SystemUpstreamServerModel.canEnableSync(this.authUser);
             }
         }),
 
@@ -106,7 +107,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
                         this.deleteUpstreamServer(item);
                     },
                     visible: (): boolean => {
-                        return this.hasSysConfigWriteAccess();
+                        return SystemUpstreamServerModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 })
@@ -144,7 +145,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
         // initialize pagination
         this.initPaginator();
 
-        // retrieve backups
+        // retrieve data
         this.needsRefreshList(true);
     }
 
@@ -197,6 +198,13 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
         this.upstreamServerListAll = [];
         this.systemSettingsDataService
             .getSystemSettings()
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback([]);
+                    return throwError(err);
+                })
+            )
             .subscribe((settings: SystemSettingsModel) => {
                 this.settings = settings;
                 this.upstreamServerListAll = _.get(this.settings, 'upstreamServers');
@@ -233,14 +241,6 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
     }
 
     /**
-     * Check if we have write access to sys settings
-     * @returns {boolean}
-     */
-    hasSysConfigWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
-    }
-
-    /**
      * Delete record
      * @param item
      */
@@ -252,7 +252,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
                         .getSystemSettings()
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -304,7 +304,7 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
             .getSystemSettings()
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     return throwError(err);
                 })
             )
@@ -386,7 +386,8 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
         };
 
         // start sync ?
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SYNC_CONFIRMATION', upstreamServer)
+        this.dialogService
+            .showConfirm('LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SYNC_CONFIRMATION', upstreamServer)
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // start sync

@@ -1,6 +1,5 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
@@ -11,7 +10,13 @@ const routes: Routes = [
     // Clusters list
     {
         path: '',
-        component: fromPages.ClustersListComponent
+        component: fromPages.ClustersListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CLUSTER_LIST
+            ]
+        }
     },
     // Create Cluster
     {
@@ -19,7 +24,9 @@ const routes: Routes = [
         component: fromPages.CreateClusterComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_OUTBREAK]
+            permissions: [
+                PERMISSION.CLUSTER_CREATE
+            ]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -31,15 +38,11 @@ const routes: Routes = [
         component: fromPages.ModifyClusterComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.READ_OUTBREAK],
+            permissions: [
+                PERMISSION.CLUSTER_VIEW
+            ],
             action: ViewModifyComponentAction.VIEW
         }
-    },
-    // View clusters people
-    {
-        path: ':clusterId/people',
-        component: fromPages.ClustersPeopleListComponent,
-        canActivate: [AuthGuard]
     },
     // Edit Cluster
     {
@@ -47,12 +50,26 @@ const routes: Routes = [
         component: fromPages.ModifyClusterComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_OUTBREAK],
+            permissions: [
+                PERMISSION.CLUSTER_VIEW,
+                PERMISSION.CLUSTER_MODIFY
+            ],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
+    },
+    // View clusters people
+    {
+        path: ':clusterId/people',
+        component: fromPages.ClustersPeopleListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CLUSTER_LIST_PEOPLE
+            ]
+        }
     }
 ];
 

@@ -13,10 +13,8 @@
 >
     <!-- Question list general actions -->
     <div
-        *ngIf="hasWriteAccess()"
         fxLayout="row" fxLayoutAlign="end"
-        class="modify-questionnaire-table-question-actions-top"
-    >
+        class="modify-questionnaire-table-question-actions-top">
         <button
             type="button"
             mat-flat-button color="accent"
@@ -104,11 +102,11 @@
             {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY' | translate }}
         </div>
 
-        <!-- Inactive ? -->
+        <!-- Nested questions ? -->
         <div
             fxFlex="100px"
             class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
-            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE' | translate }}
+            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_NESTED_QUESTIONS' | translate }}
         </div>
 
         <!-- Required ? -->
@@ -196,11 +194,11 @@
                     {{ question.answerType === answerTypes.MARKUP.value ? '-' : (question.answersDisplay | translate) }}
                 </div>
 
-                <!-- Inactive ? -->
+                <!-- Nested questions ? -->
                 <div
                     fxFlex="100px"
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
-                    {{ (question.inactive ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
+                    {{ (hasNestedQuestions(question) ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
                 </div>
 
                 <!-- Required ? -->
@@ -410,7 +408,6 @@
                             fxLayout="column">
                             <!-- Answers list general actions -->
                             <div
-                                *ngIf="hasWriteAccess()"
                                 fxLayout="row" fxLayoutAlign="end"
                                 class="modify-questionnaire-table-answer-actions-top">
                                 <button
@@ -691,7 +688,6 @@
 
                             <!-- Answers list general actions -->
                             <div
-                                *ngIf="hasWriteAccess()"
                                 fxLayout="row" fxLayoutAlign="end"
                                 class="modify-questionnaire-table-answer-actions-bottom">
                                 <button
@@ -745,7 +741,6 @@
 
     <!-- Question list general actions -->
     <div
-        *ngIf="hasWriteAccess()"
         fxLayout="row" fxLayoutAlign="end"
         class="modify-questionnaire-table-question-actions-bottom">
         <button

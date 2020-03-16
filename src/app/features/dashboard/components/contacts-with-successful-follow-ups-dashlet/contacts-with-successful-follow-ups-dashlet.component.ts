@@ -5,6 +5,8 @@ import { MetricContactsWithSuccessfulFollowUp } from '../../../../core/models/me
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { Subscription } from 'rxjs';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-contacts-with-successful-follow-ups-dashlet',
@@ -16,6 +18,10 @@ export class ContactsWithSuccessfulFollowUpsDashletComponent extends DashletComp
     // contacts with successfulFollowup
     contactsWithSuccessfulFollowup: MetricContactsWithSuccessfulFollowUp;
 
+    // constants
+    ContactModel = ContactModel;
+
+    // params
     queryParams: any = {
         applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP
     };
@@ -29,16 +35,29 @@ export class ContactsWithSuccessfulFollowUpsDashletComponent extends DashletComp
     // subscribers
     previousSubscriber: Subscription;
 
+    /**
+     * Constructor
+     */
     constructor(
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        protected authDataService: AuthDataService
     ) {
-        super(listFilterDataService);
+        super(
+            listFilterDataService,
+            authDataService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         this.refreshDataCaller.call();
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // release previous subscriber
         if (this.previousSubscriber) {
@@ -67,11 +86,12 @@ export class ContactsWithSuccessfulFollowUpsDashletComponent extends DashletComp
 
         // retrieve data
         this.displayLoading = true;
-        this.previousSubscriber = this.listFilterDataService.filterContactsWithSuccessfulFollowup(
-            this.globalFilterDate,
-            this.globalFilterLocationId,
-            this.globalFilterClassificationId
-        )
+        this.previousSubscriber = this.listFilterDataService
+            .filterContactsWithSuccessfulFollowup(
+                this.globalFilterDate,
+                this.globalFilterLocationId,
+                this.globalFilterClassificationId
+            )
             .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {
                 this.contactsWithSuccessfulFollowup = result;
                 this.displayLoading = false;

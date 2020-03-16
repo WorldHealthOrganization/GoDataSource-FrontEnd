@@ -18,6 +18,7 @@ import { catchError } from 'rxjs/operators';
 import { moment } from '../../../core/helperClasses/x-moment';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { DateRangeModel } from '../../../core/models/date-range.model';
+import { of } from 'rxjs/internal/observable/of';
 
 @Component({
     selector: 'app-side-filters',
@@ -25,7 +26,7 @@ import { DateRangeModel } from '../../../core/models/date-range.model';
     templateUrl: './side-filters.component.html',
     styleUrls: ['./side-filters.component.less']
 })
-export class SideFiltersComponent implements OnInit {
+export class SideFiltersComponent {
     // available filters to be applied
     _filterOptions: FilterModel[] = [];
     @Input() set filterOptions(values: FilterModel[]) {
@@ -98,7 +99,17 @@ export class SideFiltersComponent implements OnInit {
     @Input() fixedFilters: boolean = false;
 
     // get saved filters type
-    @Input() savedFiltersType: string;
+    private _savedFiltersType: string;
+    @Input() set savedFiltersType(savedFiltersType: string) {
+        // set filter
+        this._savedFiltersType = savedFiltersType;
+
+        // update data
+        this.getAvailableSavedFilters();
+    }
+    get savedFiltersType(): string {
+        return this._savedFiltersType;
+    }
     savedFilters$: Observable<SavedFilterModel[]>;
 
     // applied filters
@@ -153,10 +164,6 @@ export class SideFiltersComponent implements OnInit {
         this.clear();
     }
 
-    ngOnInit() {
-        this.getAvailableSavedFilters();
-    }
-
     addFilter() {
         this.appliedFilters.push(new AppliedFilterModel());
     }
@@ -177,14 +184,19 @@ export class SideFiltersComponent implements OnInit {
      * Get available saved side filters
      */
     getAvailableSavedFilters() {
-        const qb = new RequestQueryBuilder();
+        // no need to retrieve filters for empty key
+        if (!this.savedFiltersType) {
+            this.savedFilters$ = of([]);
+            return;
+        }
 
+        // retrieve saved filters
+        const qb = new RequestQueryBuilder();
         qb.filter.where({
             filterKey: {
                 eq: this.savedFiltersType
             }
         });
-
         this.savedFilters$ = this.savedFilterService.getSavedFiltersList(qb);
     }
 
@@ -192,6 +204,12 @@ export class SideFiltersComponent implements OnInit {
      * Save a filter
      */
     saveFilter() {
+        // can't save empty filter
+        if (!this.savedFiltersType) {
+            return;
+        }
+
+        // refresh
         const createFilter = () => {
             // create
             this.dialogService

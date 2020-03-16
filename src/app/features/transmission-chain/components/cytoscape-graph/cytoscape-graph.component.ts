@@ -29,11 +29,11 @@ import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { ViewCotNodeDialogComponent } from '../../../../shared/components';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -71,7 +71,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     @Input() style;
-    @Input() transmissionChainViewType: string;
+    transmissionChainViewType: string;
     @Input() legend: any;
 
     markers: WorldMapMarker[] = [];
@@ -91,12 +91,14 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     WorldMapMarkerLayer = WorldMapMarkerLayer;
     cy: any;
     container: string = 'cy';
-    transmissionChainViewTypes$: Observable<any[]>;
+    transmissionChainViewTypes$: Observable<LabelValuePair[]>;
     timelineViewType: string = 'horizontal';
     // show/hide legend?
     showLegend: boolean = true;
     // toggle edit mode
     editMode: boolean = false;
+    // toggle full screen
+    fullScreen: boolean = false;
 
     // display labels
     displayLabels: boolean = true;
@@ -289,6 +291,9 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         private authDataService: AuthDataService,
         private genericDataService: GenericDataService,
@@ -316,12 +321,53 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                 this.defaultStyle;
 
         // load view types
-        this.transmissionChainViewTypes$ = this.genericDataService.getTransmissionChainViewTypes();
+        this.transmissionChainViewTypes$ = this.genericDataService
+            .getTransmissionChainViewTypes()
+            .pipe(
+                map((types: LabelValuePair[]): LabelValuePair[] => {
+                    // determine items to which we have access
+                    const filteredTypes: LabelValuePair[] = [];
+                    types.forEach((type: LabelValuePair) => {
+                        if (
+                            (
+                                type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value &&
+                                TransmissionChainModel.canViewBubbleNetwork(this.authUser)
+                            ) || (
+                                type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.HIERARCHICAL_NETWORK.value &&
+                                TransmissionChainModel.canViewHierarchicalNetwork(this.authUser)
+                            ) || (
+                                type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value &&
+                                TransmissionChainModel.canViewTimelineNetworkDateOfOnset(this.authUser)
+                            ) || (
+                                type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value &&
+                                TransmissionChainModel.canViewTimelineNetworkDateOfLastContact(this.authUser)
+                            ) || (
+                                type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value &&
+                                TransmissionChainModel.canViewTimelineNetworkDateOfReporting(this.authUser)
+                            ) || (
+                                type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value &&
+                                TransmissionChainModel.canViewGeospatialMap(this.authUser)
+                            )
+                        ) {
+                            filteredTypes.push(type);
+                        }
+                    });
 
-        // default to bubble
-        if (!this.transmissionChainViewType) {
-            this.transmissionChainViewType = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
-        }
+                    // default to bubble
+                    if (
+                        !this.transmissionChainViewType &&
+                        filteredTypes.length > 0
+                    ) {
+                        // set value
+                        this.updateView({
+                            value: filteredTypes[0].value
+                        });
+                    }
+
+                    // finished
+                    return filteredTypes;
+                })
+            );
 
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakSubscriber = this.outbreakDataService
@@ -345,15 +391,36 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
         }
     }
 
+    /**
+     * Component changes trigger
+     */
     public ngOnChanges(): any {
         // render cytoscape object
         this.render();
     }
 
     /**
+     * Full screen toggle from child component to update toggles section
+     * @param {boolean} fullScreenToggle
+     */
+    onFullScreenToggle(fullScreenToggle: boolean) {
+        this.fullScreen = fullScreenToggle;
+    }
+
+    /**
      * Render cytoscape graph
      */
     render() {
+        // no need to do anything for geo map
+        if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
+            // hide loading since we don't need to retrieve graph data
+            this.showLoading = false;
+
+            // finished
+            return;
+        }
+
+        // render graph element
         const nativeElement = this.el.nativeElement;
         const container = nativeElement.getElementsByClassName(this.container);
 
@@ -385,7 +452,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
             const edge = evt.target;
             this.edgeTapped.emit(edge.json().data);
         });
-
     }
 
     /**
@@ -395,7 +461,9 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
         // empty the already set timeline and dates arrays
         this.datesArray = [];
         this.timelineDatesRanks = {};
-        const nodes = _.sortBy(this.elements.nodes, 'data.dateTimeline');
+        const nodes = this.elements ?
+            _.sortBy(this.elements.nodes, 'data.dateTimeline') :
+            [];
         // loop through all the nodes to set their position based on date and relations
         _.forEach(nodes, (node, key) => {
             // check if the node has a date to be taken into consideration
@@ -658,12 +726,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
         this.render();
     }
 
-    isEditModeAvailable() {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE) ||
-            this.authUser.hasPermissions(PERMISSION.WRITE_EVENT) ||
-            this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-    }
-
     toggleEditMode() {
         this.changeEditMode.emit(this.editMode);
     }
@@ -873,6 +935,11 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
         this.markers = [];
         this.lines = [];
 
+        // are e allowed to display geo map ?
+        if (!TransmissionChainModel.canViewGeospatialMap(this.authUser)) {
+            return;
+        }
+
         // determine map nodes
         if (
             !_.isEmpty(this.chainElements) &&
@@ -951,7 +1018,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                                 caseClassificationToColorMap[(entity.model as CaseModel).classification] :
                                 Constants.DEFAULT_COLOR_CHAINS,
                             data: entity,
-                            selected: (map: WorldMapComponent, mark: WorldMapMarker) => {
+                            selected: (mapComponent: WorldMapComponent, mark: WorldMapMarker) => {
                                 // display entity information ( case / contact / event )
                                 const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
                                 const localEntity: EntityModel = mark.data;
@@ -1072,7 +1139,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                                 lineWidth: 5,
                                 offsetX: -(markerCircleRadius * 2 + 3),
                                 data: relationship,
-                                selected: (map: WorldMapComponent, path: WorldMapPath) => {
+                                selected: (mapComponent: WorldMapComponent, path: WorldMapPath) => {
                                     // display relationship information
                                     const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
                                     const localRelationship: RelationshipModel = path.data;
@@ -1085,7 +1152,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                                         )
                                         .pipe(
                                             catchError((err) => {
-                                                this.snackbarService.showError(err.message);
+                                                this.snackbarService.showApiError(err);
                                                 loadingDialog.close();
                                                 return throwError(err);
                                             })
@@ -1165,6 +1232,25 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     zoomOutGraph() {
         this.zoomGraph(-CytoscapeGraphComponent.wheelSensitivity);
     }
+
+    /**
+     * Check if we have the option to edit data
+     */
+    isEditModeAvailable(): boolean {
+        switch (this.transmissionChainViewType) {
+            case Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value:
+                return TransmissionChainModel.canModifyBubbleNetwork(this.authUser);
+            case Constants.TRANSMISSION_CHAIN_VIEW_TYPES.HIERARCHICAL_NETWORK.value:
+                return TransmissionChainModel.canModifyHierarchicalNetwork(this.authUser);
+            case Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value:
+                return TransmissionChainModel.canModifyTimelineNetworkDateOfOnset(this.authUser);
+            case Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value:
+                return TransmissionChainModel.canModifyTimelineNetworkDateOfLastContact(this.authUser);
+            case Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value:
+                return TransmissionChainModel.canModifyTimelineNetworkDateOfReporting(this.authUser);
+        }
+
+        // finished
+        return false;
+    }
 }
-
-

@@ -5,7 +5,14 @@
 
             <div class="topnav-actions">
                 <button
-                    *ngIf="!appliedListFilter"
+                    *ngIf="!appliedListFilter && (
+                        ContactModel.canModify(authUser) ||
+                        (exportContactsUrl && ContactModel.canExport(authUser)) ||
+                        ContactModel.canImport(authUser) ||
+                        ContactModel.canExportRelationships(authUser) ||
+                        (exportContactsDailyFollowUpListUrl && ContactModel.canExportDailyFollowUpList(authUser)) ||
+                        (exportContactsDailyFollowUpsFormUrl && ContactModel.canExportDailyFollowUpsForm(authUser))
+                    )"
                     mat-raised-button
                     color="accent"
                     [matMenuTriggerFor]="quickActionsMenu">
@@ -14,7 +21,7 @@
 
                 <mat-menu #quickActionsMenu="matMenu">
                     <ng-container
-                        *ngIf="hasContactWriteAccess()">
+                        *ngIf="ContactModel.canBulkModify(authUser)">
                         <button
                             mat-menu-item
                             (click)="changeContactFinalFollowUpStatus()">
@@ -25,7 +32,7 @@
                     </ng-container>
 
                     <app-export-button
-                        *ngIf="exportContactsUrl"
+                        *ngIf="exportContactsUrl && ContactModel.canExport(authUser)"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE' | translate"
@@ -41,25 +48,27 @@
                     </app-export-button>
 
                     <button
-                        *ngIf="hasContactWriteAccess()"
+                        *ngIf="ContactModel.canImport(authUser)"
                         mat-menu-item
                         [routerLink]="['/import-export-data', 'contact-data', 'import']">
                         {{'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON' | translate}}
                     </button>
 
-                    <mat-divider></mat-divider>
+                    <mat-divider
+                        *ngIf="ContactModel.canExport(authUser) || ContactModel.canImport(authUser)"></mat-divider>
 
                     <button
+                        *ngIf="ContactModel.canExportRelationships(authUser)"
                         mat-menu-item
                         (click)="exportFilteredContactsRelationships()">
                         {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_EXPORT_CONTACTS_RELATIONSHIPS' | translate }}
                     </button>
 
                     <mat-divider
-                        *ngIf="exportContactsDailyFollowUpListUrl || exportContactsDailyFollowUpsFormUrl"></mat-divider>
+                        *ngIf="(exportContactsDailyFollowUpListUrl && ContactModel.canExportDailyFollowUpList(authUser)) || (exportContactsDailyFollowUpsFormUrl && ContactModel.canExportDailyFollowUpsForm(authUser))"></mat-divider>
 
                     <app-export-button
-                        *ngIf="exportContactsDailyFollowUpListUrl"
+                        *ngIf="exportContactsDailyFollowUpListUrl && ContactModel.canExportDailyFollowUpList(authUser)"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE' | translate"
@@ -73,7 +82,7 @@
                     </app-export-button>
 
                     <app-export-button
-                        *ngIf="exportContactsDailyFollowUpsFormUrl"
+                        *ngIf="exportContactsDailyFollowUpsFormUrl && ContactModel.canExportDailyFollowUpsForm(authUser)"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE' | translate"
@@ -180,26 +189,28 @@
                             <mat-divider></mat-divider>
 
                             <button
-                                *ngIf="exportContactsUrl"
+                                *ngIf="exportContactsUrl && ContactModel.canExport(authUser)"
                                 mat-menu-item
                                 (click)="exportSelectedContacts()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS' | translate }}
                             </button>
 
                             <button
+                                *ngIf="ContactModel.canExportDossier(authUser)"
                                 mat-menu-item
                                 (click)="exportSelectedContactsDossier()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER' | translate }}
                             </button>
 
                             <button
+                                *ngIf="ContactModel.canExportRelationships(authUser)"
                                 mat-menu-item
                                 (click)="exportSelectedContactsRelationship()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_RELATIONSHIPS' | translate }}
                             </button>
 
                             <ng-container
-                                *ngIf="hasContactWriteAccess()">
+                                *ngIf="ContactModel.canBulkModify(authUser)">
                                 <ng-container
                                     *app-selected-outbreak-is-active>
                                     <mat-divider></mat-divider>
@@ -247,7 +258,9 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 {{ item.lastName }}
             </mat-cell>
         </ng-container>
@@ -270,7 +283,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 {{ item.firstName }}
             </mat-cell>
         </ng-container>
@@ -293,7 +308,9 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 {{ item.visualId }}
             </mat-cell>
         </ng-container>
@@ -318,7 +335,9 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 {{ item.mainAddress?.location?.name }}
             </mat-cell>
         </ng-container>
@@ -342,7 +361,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 <app-age-label [age]="item.age"></app-age-label>
             </mat-cell>
         </ng-container>
@@ -368,7 +389,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 {{ item.gender | translate }}
             </mat-cell>
         </ng-container>
@@ -390,7 +413,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 <ng-container *ngFor="let phoneNumber of item.phoneNumbers">
                     {{phoneNumber}}<br/>
                 </ng-container>
@@ -419,7 +444,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.RISK_LEVEL"
                     [value]="item.riskLevel">
@@ -444,7 +471,10 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                class="has-date-range-filter"
+                [style.color]="getRiskColor(item)">
                 {{ item.dateOfLastContact | dateDefault }}
             </mat-cell>
         </ng-container>
@@ -466,7 +496,10 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                class="has-date-range-filter"
+                [style.color]="getRiskColor(item)">
                 {{ item.followUp?.endDate | dateDefault }}
             </mat-cell>
         </ng-container>
@@ -494,7 +527,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS"
                     [value]="item.followUp?.status">
@@ -522,7 +557,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 <app-yes-no-label
                     [value]="item.deleted">
                 </app-yes-no-label>
@@ -542,15 +579,18 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterBySelectField('wasCase',$event)"
+                            (optionChanged)="filterByBooleanUsingExistField('wasCase', $event.value)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
                         </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 <app-yes-no-label
                     [value]="item.wasCase">
                 </app-yes-no-label>
@@ -571,9 +611,17 @@
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
-                (click)="displayContacts(item)"
-                class="mat-table-number-column">
-                {{ item.numberOfContacts }}
+                [style.color]="getRiskColor(item)">
+                <span
+                    *ngIf="ContactModel.canListRelationshipContacts(authUser) else numberOfContacts"
+                    (click)="displayContacts(item)"
+                    class="mat-table-number-column">
+                    {{ item.numberOfContacts }}
+                </span>
+                <ng-template
+                    #numberOfContacts>
+                    {{ item.numberOfContacts }}
+                </ng-template>
             </mat-cell>
         </ng-container>
 
@@ -591,9 +639,17 @@
             </mat-header-cell>
             <mat-cell
                 *matCellDef="let item"
-                (click)="displayExposures(item)"
-                class="mat-table-number-column">
-                {{ item.numberOfExposures }}
+                [style.color]="getRiskColor(item)">
+                <span
+                    *ngIf="ContactModel.canListRelationshipExposures(authUser) else numberOfExposures"
+                    (click)="displayExposures(item)"
+                    class="mat-table-number-column">
+                    {{ item.numberOfExposures }}
+                </span>
+                <ng-template
+                    #numberOfExposures>
+                    {{ item.numberOfExposures }}
+                </ng-template>
             </mat-cell>
         </ng-container>
 
@@ -621,7 +677,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 {{ item.createdByUser?.name }}
             </mat-cell>
         </ng-container>
@@ -643,7 +701,10 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                class="has-date-range-filter"
+                [style.color]="getRiskColor(item)">
                 {{ item.createdAt | dateTimeDefault }}
             </mat-cell>
         </ng-container>
@@ -672,7 +733,9 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                [style.color]="getRiskColor(item)">
                 {{ item.updatedByUser?.name }}
             </mat-cell>
         </ng-container>
@@ -694,7 +757,10 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell class="has-date-range-filter" *matCellDef="let item">
+            <mat-cell
+                *matCellDef="let item"
+                class="has-date-range-filter"
+                [style.color]="getRiskColor(item)">
                 {{ item.updatedAt | dateTimeDefault }}
             </mat-cell>
         </ng-container>

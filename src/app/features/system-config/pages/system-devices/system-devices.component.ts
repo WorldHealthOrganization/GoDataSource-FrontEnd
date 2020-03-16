@@ -4,7 +4,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -16,6 +15,7 @@ import { throwError } from 'rxjs';
 import { catchError, share, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 @Component({
     selector: 'app-system-devices-list',
@@ -24,9 +24,7 @@ import * as _ from 'lodash';
     styleUrls: ['./system-devices.component.less']
 })
 export class SystemDevicesComponent extends ListComponent implements OnInit {
-    /**
-     * Breadcrumbs
-     */
+    // Breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '.', true)
     ];
@@ -35,7 +33,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
     authUser: UserModel;
 
     devicesList$: Observable<DeviceModel[]>;
-    devicesListCount$: Observable<any>;
+    devicesListCount$: Observable<IBasicCount>;
 
     // constants
     UserSettings = UserSettings;
@@ -49,6 +47,9 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
             iconTooltip: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW',
             click: (item: DeviceModel) => {
                 this.router.navigate(['/system-config', 'devices', item.id, 'view']);
+            },
+            visible: (): boolean => {
+                return DeviceModel.canView(this.authUser);
             }
         }),
 
@@ -60,7 +61,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
                 this.router.navigate(['/system-config', 'devices', item.id, 'modify']);
             },
             visible: (): boolean => {
-                return this.hasSysConfigWriteAccess();
+                return DeviceModel.canModify(this.authUser);
             }
         }),
 
@@ -76,7 +77,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
                         this.deleteDevice(item);
                     },
                     visible: (): boolean => {
-                        return this.hasSysConfigWriteAccess();
+                        return DeviceModel.canDelete(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -86,7 +87,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
                     type: HoverRowActionType.DIVIDER,
                     visible: (): boolean => {
                         // visible only if at least one of the previous...
-                        return this.hasSysConfigWriteAccess();
+                        return DeviceModel.canDelete(this.authUser);
                     }
                 }),
 
@@ -99,7 +100,7 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
                     visible: (item: DeviceModel): boolean => {
                         // for now let use do another wipe even if one is in progress, because parse might fails..and status might remain pending..which might cause issues if we can't send a new notification
                         // [Constants.DEVICE_WIPE_STATUS.READY.value, Constants.DEVICE_WIPE_STATUS.PENDING.value].includes(item.status)
-                        return this.hasSysConfigWriteAccess();
+                        return DeviceModel.canWipe(this.authUser);
                     },
                     class: 'mat-menu-item-delete'
                 }),
@@ -109,7 +110,10 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
                     menuOptionLabel: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW_HISTORY',
                     click: (item: DeviceModel) => {
                         this.router.navigate(['/system-config', 'devices', item.id, 'history']);
-                    }
+                    },
+                    visible: (item: DeviceModel): boolean => {
+                        return DeviceModel.canListHistory(this.authUser);
+                    },
                 })
             ]
         })
@@ -195,6 +199,11 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
         this.devicesList$ = this.deviceDataService
             .getDevices(this.queryBuilder)
             .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    finishCallback([]);
+                    return throwError(err);
+                }),
                 tap((data: any[]) => {
                     finishCallback(data);
                 })
@@ -209,15 +218,15 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         countQueryBuilder.sort.clear();
-        this.devicesListCount$ = this.deviceDataService.getDevicesCount(countQueryBuilder).pipe(share());
-    }
-
-    /**
-     * Check if we have write access to sys settings
-     * @returns {boolean}
-     */
-    hasSysConfigWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
+        this.devicesListCount$ = this.deviceDataService
+            .getDevicesCount(countQueryBuilder)
+            .pipe(
+                catchError((err) => {
+                    this.snackbarService.showApiError(err);
+                    return throwError(err);
+                }),
+                share()
+            );
     }
 
     /**

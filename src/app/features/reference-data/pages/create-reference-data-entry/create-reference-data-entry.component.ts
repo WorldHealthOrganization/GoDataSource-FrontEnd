@@ -6,13 +6,16 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { Observable } from 'rxjs';
 import { IconModel } from '../../../../core/models/icon.model';
 import { IconDataService } from '../../../../core/services/data/icon.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-create-reference-data-entry',
@@ -20,11 +23,11 @@ import { throwError } from 'rxjs';
     templateUrl: './create-reference-data-entry.component.html',
     styleUrls: ['./create-reference-data-entry.component.less']
 })
-export class CreateReferenceDataEntryComponent extends ConfirmOnFormChanges implements OnInit {
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
-    ];
+export class CreateReferenceDataEntryComponent
+    extends CreateConfirmOnChanges
+    implements OnInit {
+    // breadcrumbs
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     categoryId: string;
     // new Entry model
@@ -34,6 +37,14 @@ export class CreateReferenceDataEntryComponent extends ConfirmOnFormChanges impl
 
     changeIcon: boolean = false;
 
+    category: ReferenceDataCategoryModel;
+
+    // authenticated user details
+    authUser: UserModel;
+
+    /**
+     * Constructor
+     */
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -41,12 +52,20 @@ export class CreateReferenceDataEntryComponent extends ConfirmOnFormChanges impl
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private iconDataService: IconDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private authDataService: AuthDataService,
+        private redirectService: RedirectService
     ) {
         super();
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // icons data
         this.iconsList$ = this.iconDataService.getIconsList();
 
@@ -59,18 +78,58 @@ export class CreateReferenceDataEntryComponent extends ConfirmOnFormChanges impl
                 this.referenceDataDataService
                     .getReferenceDataByCategory(params.categoryId)
                     .subscribe((category: ReferenceDataCategoryModel) => {
-                        // add new breadcrumb: Category page
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(category.name, `/reference-data/${this.categoryId}`)
-                        );
-                        // add new breadcrumb: page title
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE', '.', true)
-                        );
+                        // set data
+                        this.category = category;
+
+                        // update breadcrumbs
+                        this.initializeBreadcrumbs();
                     });
             });
     }
 
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list breadcrumb only if we have permission
+        if (ReferenceDataCategoryModel.canList(this.authUser)) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
+            );
+        }
+
+        // add new breadcrumb: Category page
+        if (
+            this.category &&
+            ReferenceDataEntryModel.canList(this.authUser)
+        ) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    this.category.name,
+                    `/reference-data/${this.categoryId}`,
+                    false,
+                    {},
+                    this.category
+                )
+            );
+        }
+
+        // add new breadcrumb: page title
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                'LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE',
+                '.',
+                true
+            )
+        );
+    }
+
+    /**
+     * Create new ref data entry
+     */
     createNewEntry(form: NgForm) {
 
         // get forms fields
@@ -88,7 +147,7 @@ export class CreateReferenceDataEntryComponent extends ConfirmOnFormChanges impl
             .createEntry(dirtyFields)
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     return throwError(err);
                 }),
                 switchMap((newReferenceDataEntry) => {
@@ -102,9 +161,16 @@ export class CreateReferenceDataEntryComponent extends ConfirmOnFormChanges impl
             .subscribe((newReferenceDataEntry) => {
                 this.snackbarService.showSuccess('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_ACTION_CREATE_ENTRY_SUCCESS_MESSAGE');
 
-                // navigate to new item's modify page
-                this.disableDirtyConfirm();
-                this.router.navigate([`/reference-data/${this.categoryId}/${newReferenceDataEntry.id}/modify`]);
+                // navigate to proper page
+                // method handles disableDirtyConfirm too...
+                this.redirectToProperPageAfterCreate(
+                    this.router,
+                    this.redirectService,
+                    this.authUser,
+                    ReferenceDataEntryModel,
+                    `reference-data/${this.categoryId}`,
+                    newReferenceDataEntry.id
+                );
             });
     }
 }

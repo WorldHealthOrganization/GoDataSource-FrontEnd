@@ -19,7 +19,8 @@
         </mat-list-item>
 
         <div class="topnav-static-actions" fxLayout="row">
-            <ng-container *ngIf="showSelectedOutbreakDropdown()">
+            <ng-container
+                *ngIf="OutbreakModel.canView(authUser)">
                 <mat-divider [vertical]="true"></mat-divider>
 
                 <mat-list-item>
@@ -33,7 +34,8 @@
                         optionValueKey="id"
                         optionTooltipKey="details"
                         (optionChanged)="selectOutbreak($event)"
-                        [clearable]="false">
+                        [clearable]="false"
+                        [enableFilterOptions]="true">
                     </app-form-select>
                 </mat-list-item>
             </ng-container>

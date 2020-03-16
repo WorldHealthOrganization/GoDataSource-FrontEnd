@@ -12,13 +12,13 @@
     <!-- spinner -->
     <div class="spinner-graph"
          *ngIf="showLoading">
-        <mat-spinner>
-        </mat-spinner>
+        <mat-spinner></mat-spinner>
     </div>
 
     <!-- legend -->
-    <div class="graph-legend"
-         *ngIf="legend && showLegend && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)">
+    <div
+        *ngIf="legend && showLegend && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)"
+        class="graph-legend {{ fullScreen ? 'full-screen-graph-legend' : '' }}">
         <!-- node color -->
         <div *ngIf="legend.nodeColorKeys && legend.nodeColorKeys.length"
              class="legend-name">
@@ -119,21 +119,21 @@
                 {{edgeIconItem | translate}}
             </div>
         </div>
-
     </div>
 
     <!-- Toggles -->
     <div
         *ngIf="!showLoading && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)"
-        class="graph-actions" fxLayout="row" fxLayoutGap="30px">
+        class="graph-actions {{ fullScreen ? 'graph-actions-full-screen' : '' }} {{ transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ? 'graph-actions-geo-map' : '' }}" fxLayout="row" fxLayoutGap="30px">
+
         <!-- Toggle Edit mode -->
         <app-form-slide-toggle
-            *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value && isEditModeAvailable()"
+            *ngIf="isEditModeAvailable() && !fullScreen"
             name="toggleEditMode"
             [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_EDIT_MODE_LABEL' | translate"
             [(ngModel)]="editMode"
-            (optionChanged)="toggleEditMode()"
-        ></app-form-slide-toggle>
+            (optionChanged)="toggleEditMode()">
+        </app-form-slide-toggle>
 
         <!-- Display Labels -->
         <app-form-slide-toggle
@@ -149,13 +149,20 @@
             [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LEGEND_LABEL' | translate"
             [(ngModel)]="showLegend">
         </app-form-slide-toggle>
+
+        <!-- Toggle full screen -->
+        <app-form-slide-toggle
+            *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value"
+            [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_FULL_SCREEN_LABEL' | translate"
+            [(ngModel)]="fullScreen">
+        </app-form-slide-toggle>
     </div>
 
     <div
         [fxShow]="!showLoading && transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
         <!-- zoom in / out buttons -->
         <div
-            class="cy-zoom-buttons">
+            class="cy-zoom-buttons {{ fullScreen ? 'cy-zoom-buttons-full-screen' : '' }}">
             <button
                 mat-raised-button
                 class="cy-zoom-button"
@@ -176,7 +183,7 @@
         <!-- cytoscape element -->
         <div
             id="cy"
-            class="cy xt-icon">
+            class="cy xt-icon {{ fullScreen ? 'cy-full-screen' : ''}}">
         </div>
     </div>
 
@@ -195,6 +202,7 @@
             [centerLocation]="markers[0]?.point"
             [fitLayer]="WorldMapMarkerLayer.CLUSTER"
             [clusterDistance]="30"
+            (fullScreenToggle)="onFullScreenToggle($event)"
             groupMarkerTitle="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GROUP_DIALOG_MARKER_SECTION_TITLE"
             groupPathTitle="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GROUP_DIALOG_PATHS_SECTION_TITLE">
         </app-world-map>
@@ -242,6 +250,7 @@
         || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
         || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value)"
     mat-raised-button
+    [ngClass]="{'full-screen-bottomed-item': fullScreen}"
     (click)="switchTimelineView(timelineViewType === 'horizontal' ? 'vertical' : 'horizontal')">
     {{ ( timelineViewType === 'horizontal' ? 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL' : 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' )| translate }}
 </button>

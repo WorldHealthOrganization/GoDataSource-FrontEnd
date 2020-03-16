@@ -7,7 +7,6 @@ import { WorldMapMovementModule } from '../../common-modules/world-map-movement/
 
 // components
 import * as fromPages from './pages';
-import * as fromComponents from './components';
 
 @NgModule({
     imports: [
@@ -16,8 +15,7 @@ import * as fromComponents from './components';
         WorldMapMovementModule
     ],
     declarations: [
-        ...fromPages.pageComponents,
-        ...fromComponents.components
+        ...fromPages.pageComponents
     ],
     entryComponents: []
 })

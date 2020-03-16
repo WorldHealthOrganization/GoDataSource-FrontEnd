@@ -54,25 +54,21 @@
                         <div fxLayout="row" fxLayoutGap="20px">
                             <div
                                 fxFlex fxLayout="row" fxLayoutGap="20px">
-                                <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
-                                <!-- [maxlength]="255" -->
-                                <app-form-input
-                                    name="visualId"
-                                    [(ngModel)]="contactData.visualId"
-                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
-                                    tooltip="LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
-                                    [tooltipTranslateData]="visualIDTranslateData"
-                                    [maxlength]="255"
-                                    app-general-async-validator
-                                    [asyncValidatorObservable]="contactIdMaskValidator">
-                                </app-form-input>
+                                <app-form-select
+                                    name="pregnancyStatus"
+                                    [(ngModel)]="contactData.pregnancyStatus"
+                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS' | translate"
+                                    tooltip="LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
+                                    [options]="pregnancyStatusList$ | async">
+                                </app-form-select>
 
                                 <app-form-select
                                     name="occupation"
                                     [(ngModel)]="contactData.occupation"
                                     [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
                                     tooltip="LNG_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION"
-                                    [options]="occupationsList$ | async">
+                                    [options]="occupationsList$ | async"
+                                    [enableFilterOptions]="true">
                                 </app-form-select>
                             </div>
 
@@ -89,14 +85,18 @@
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
-
-                            <app-form-select
-                                name="pregnancyStatus"
-                                [(ngModel)]="contactData.pregnancyStatus"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
-                                [options]="pregnancyStatusList$ | async">
-                            </app-form-select>
+                            <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
+                            <!-- [maxlength]="255" -->
+                            <app-form-input
+                                name="visualId"
+                                [(ngModel)]="contactData.visualId"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                                [tooltipTranslateData]="visualIDTranslateData"
+                                [maxlength]="255"
+                                app-general-async-validator
+                                [asyncValidatorObservable]="contactIdMaskValidator">
+                            </app-form-input>
 
                             <app-form-datepicker
                                 fxFlex
@@ -119,6 +119,39 @@
                             </app-form-slide-toggle>
 
                             <div fxFlex><!-- placeholder --></div>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <!-- Flag contact section -->
+                <div class="section-title">
+                    {{ 'LNG_PAGE_CREATE_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE' | translate }}
+                </div>
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                fxFlex
+                                name="riskLevel"
+                                [(ngModel)]="contactData.riskLevel"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL' | translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
+                                [options]="riskLevelsList$ | async">
+                            </app-form-select>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
+                        <div fxLayout="row">
+                            <app-form-textarea
+                                name="riskReason"
+                                [(ngModel)]="contactData.riskReason"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_RISK_REASON' | translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION">
+                            </app-form-textarea>
                         </div>
                     </div>
                 </mat-card>

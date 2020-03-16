@@ -11,6 +11,9 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { Subscriber, Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Moment } from '../../../../core/helperClasses/x-moment';
+import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-histogram-transmission-chains-size-dashlet',
@@ -63,6 +66,9 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
     // loading data
     displayLoading: boolean = true;
 
+    // authenticated user
+    authUser: UserModel;
+
     /**
      * Global Filters changed
      */
@@ -70,15 +76,24 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
         this.refreshData();
     }), 100);
 
+    /**
+     * Constructor
+     */
     constructor(
         private transmissionChainDataService: TransmissionChainDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private outbreakDataService: OutbreakDataService,
-        private router: Router
-    ) {
-    }
+        private router: Router,
+        private authDataService: AuthDataService
+    ) {}
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // get case person type color
         this.refdataSubscriber = this.referenceDataDataService
             .getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE)
@@ -101,6 +116,9 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
             });
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -168,6 +186,12 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
      * @param event
      */
     onSelectChart(event) {
+        // we need case list permission to redirect
+        if (!TransmissionChainModel.canViewBubbleNetwork(this.authUser)) {
+            return;
+        }
+
+        // extra params sent along with global filters
         const otherParams = {
             sizeOfChainsFilter: event.name
         };

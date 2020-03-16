@@ -55,25 +55,21 @@
                         <div fxLayout="row" fxLayoutGap="20px">
                             <div
                                 fxFlex fxLayout="row" fxLayoutGap="20px">
-                                <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
-                                <!-- [maxlength]="255" -->
-                                <app-form-input
-                                    name="visualId"
-                                    [(ngModel)]="caseData.visualId"
-                                    [placeholder]="'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate"
-                                    tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
-                                    [tooltipTranslateData]="visualIDTranslateData"
-                                    [maxlength]="255"
-                                    app-general-async-validator
-                                    [asyncValidatorObservable]="caseIdMaskValidator">
-                                </app-form-input>
+                                <app-form-select
+                                    name="pregnancyStatus"
+                                    [(ngModel)]="caseData.pregnancyStatus"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
+                                    [options]="pregnancyStatusList$ | async">
+                                </app-form-select>
 
                                 <app-form-select
                                     name="occupation"
                                     [(ngModel)]="caseData.occupation"
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
                                     tooltip="LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION"
-                                    [options]="occupationsList$ | async">
+                                    [options]="occupationsList$ | async"
+                                    [enableFilterOptions]="true">
                                 </app-form-select>
                             </div>
 
@@ -89,21 +85,19 @@
                             </app-form-age-dob>
                         </div>
 
-                    </div>
-                </mat-card>
-
-                <!-- Flagged section -->
-                <mat-card class="page-section">
-                    <div fxLayout="column">
-
                         <div fxLayout="row" fxLayoutGap="20px">
-                            <app-form-select
-                                name="riskLevel"
-                                [(ngModel)]="caseData.riskLevel"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_LEVEL' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
-                                [options]="caseRiskLevelsList$ | async">
-                            </app-form-select>
+                            <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
+                            <!-- [maxlength]="255" -->
+                            <app-form-input
+                                name="visualId"
+                                [(ngModel)]="caseData.visualId"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                                [tooltipTranslateData]="visualIDTranslateData"
+                                [maxlength]="255"
+                                app-general-async-validator
+                                [asyncValidatorObservable]="caseIdMaskValidator">
+                            </app-form-input>
 
                             <app-form-datepicker
                                 name="dateOfReporting"
@@ -118,20 +112,6 @@
                                 ]">
                             </app-form-datepicker>
 
-                            <div fxFlex><!--Placeholder--></div>
-                            <div fxFlex><!--Placeholder--></div>
-
-                        </div>
-
-                        <div fxLayout="row" fxLayoutGap="20px">
-                            <app-form-select
-                                name="pregnancyStatus"
-                                [(ngModel)]="caseData.pregnancyStatus"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION"
-                                [options]="pregnancyStatusList$ | async">
-                            </app-form-select>
-
                             <app-form-slide-toggle
                                 name="isDateOfReportingApproximate"
                                 [(ngModel)]="caseData.isDateOfReportingApproximate"
@@ -139,14 +119,27 @@
                                 tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION">
                             </app-form-slide-toggle>
 
-                            <app-form-slide-toggle
-                                name="transferRefused"
-                                [(ngModel)]="caseData.transferRefused"
-                                [label]="'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION">
-                            </app-form-slide-toggle>
+                            <div fxFlex><!--Placeholder--></div>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <!-- Flagged section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                name="riskLevel"
+                                [(ngModel)]="caseData.riskLevel"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_LEVEL' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
+                                [options]="caseRiskLevelsList$ | async">
+                            </app-form-select>
 
                             <div fxFlex><!--Placeholder--></div>
+                            <div fxFlex><!--Placeholder--></div>
+                            <div fxFlex><!--Placeholder--></div>
+
                         </div>
 
                         <div fxLayout="row">
@@ -303,7 +296,13 @@
                             ]">
                             </app-form-datepicker>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-slide-toggle
+                                name="transferRefused"
+                                [(ngModel)]="caseData.transferRefused"
+                                [label]="'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION">
+                            </app-form-slide-toggle>
+
                             <div fxFlex><!-- placeholder --></div>
                         </div>
 
@@ -362,6 +361,7 @@
                     centerNameLabel="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
                     centerNameTooltip="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME_DESCRIPTION"
                     [required]="true"
+                    [maxDate]="serverToday"
                     [dateOfOnset]="caseData.dateOfOnset"
                 ></app-form-case-center-daterange-list>
 

@@ -8,15 +8,18 @@ import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class RequestInterceptor implements HttpInterceptor {
-
+    /**
+     * Constructor
+     */
     constructor(
         private loggerService: LoggerService,
         private authDataService: AuthDataService
-    ) {
-    }
+    ) {}
 
+    /**
+     * Intercept handler
+     */
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-
         // it is recommended to use the 'clone' method when changing the request object
         const clonedRequest = request.clone({
             // set HTTP headers to be applied on request

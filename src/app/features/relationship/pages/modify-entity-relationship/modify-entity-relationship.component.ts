@@ -17,7 +17,6 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
@@ -32,29 +31,84 @@ import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/
     styleUrls: ['./modify-entity-relationship.component.less']
 })
 export class ModifyEntityRelationshipComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // Entities Map for specific data
-    entityMap = {
+    entityMap: {
+        [entityType: string]: {
+            label: string,
+            link: string,
+            canList: (UserModel) => boolean,
+            canView: (UserModel) => boolean,
+            can: {
+                [type: string]: {
+                    modify: (UserModel) => boolean,
+                    reverse: (UserModel) => boolean,
+                    list: (UserModel) => boolean
+                }
+            }
+        }
+    } = {
         [EntityType.CASE]: {
-            'label': 'LNG_PAGE_LIST_CASES_TITLE',
-            'link': '/cases',
-            'writePermission': PERMISSION.WRITE_CASE
+            label: 'LNG_PAGE_LIST_CASES_TITLE',
+            link: '/cases',
+            canList: CaseModel.canList,
+            canView: CaseModel.canView,
+            can: {
+                contacts: {
+                    modify: CaseModel.canModifyRelationshipContacts,
+                    reverse: CaseModel.canReverseRelationship,
+                    list: CaseModel.canListRelationshipContacts
+                },
+                exposures: {
+                    modify: CaseModel.canModifyRelationshipExposures,
+                    reverse: CaseModel.canReverseRelationship,
+                    list: CaseModel.canListRelationshipExposures
+                }
+            }
         },
         [EntityType.CONTACT]: {
-            'label': 'LNG_PAGE_LIST_CONTACTS_TITLE',
-            'link': '/contacts',
-            'writePermission': PERMISSION.WRITE_CONTACT
+            label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+            link: '/contacts',
+            canList: ContactModel.canList,
+            canView: ContactModel.canView,
+            can: {
+                contacts: {
+                    modify: ContactModel.canModifyRelationshipContacts,
+                    reverse: ContactModel.canReverseRelationship,
+                    list: ContactModel.canListRelationshipContacts
+                },
+                exposures: {
+                    modify: ContactModel.canModifyRelationshipExposures,
+                    reverse: ContactModel.canReverseRelationship,
+                    list: ContactModel.canListRelationshipExposures
+                }
+            }
         },
         [EntityType.EVENT]: {
-            'label': 'LNG_PAGE_LIST_EVENTS_TITLE',
-            'link': '/events',
-            'writePermission': PERMISSION.WRITE_EVENT
+            label: 'LNG_PAGE_LIST_EVENTS_TITLE',
+            link: '/events',
+            canList: EventModel.canList,
+            canView: EventModel.canView,
+            can: {
+                contacts: {
+                    modify: EventModel.canModifyRelationshipContacts,
+                    reverse: EventModel.canReverseRelationship,
+                    list: EventModel.canListRelationshipContacts
+                },
+                exposures: {
+                    modify: EventModel.canModifyRelationshipExposures,
+                    reverse: EventModel.canReverseRelationship,
+                    list: EventModel.canListRelationshipExposures
+                }
+            }
         }
     };
 
     // authenticated user
     authUser: UserModel;
+    RelationshipModel = RelationshipModel;
     // selected outbreak
     selectedOutbreak: OutbreakModel;
     // route params
@@ -65,11 +119,14 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     relationship: RelationshipModel = new RelationshipModel();
     // route data
     relationshipType: RelationshipType;
-    canReverseRelation: boolean = true;
+    canReverseRelation: boolean;
 
     // provide constants to template
     EntityModel = EntityModel;
 
+    /**
+     * Constructor
+     */
     constructor(
         protected route: ActivatedRoute,
         private router: Router,
@@ -80,11 +137,17 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,
         private authDataService: AuthDataService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -95,6 +158,9 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
 
             this.initializeBreadcrumbs();
         });
+
+        // show loading
+        this.showLoadingDialog(false);
 
         // get person type and ID from route params
         this.route.params
@@ -129,7 +195,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                 .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
                 .pipe(
                     catchError((err) => {
-                        this.snackbarService.showError(err.message);
+                        this.snackbarService.showApiError(err);
 
                         // Entity not found; navigate back to Entities list
                         this.router.navigate([this.entityMap[this.entityType].link]);
@@ -152,12 +218,15 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             this.relationshipId &&
             this.selectedOutbreak
         ) {
+            // show loading
+            this.showLoadingDialog(false);
+
             // get relationship data
             this.relationshipDataService
                 .getEntityRelationship(this.selectedOutbreak.id, this.entityType, this.entityId, this.relationshipId)
                 .pipe(
                     catchError((err) => {
-                        this.snackbarService.showError(err.message);
+                        this.snackbarService.showApiError(err);
 
                         // Relationship not found; navigate back to Entity Relationships list
                         this.disableDirtyConfirm();
@@ -172,6 +241,9 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                     this.canReverseRelation = !_.find(this.relationship.persons, { type : EntityType.CONTACT });
 
                     this.initializeBreadcrumbs();
+
+                    // hide loading
+                    this.hideLoadingDialog();
                 });
         }
     }
@@ -190,24 +262,41 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             // get related person
             const relatedPerson = _.get(this.relationship.relatedEntity(this.entityId), 'model', {});
 
-            this.breadcrumbs = [
-                new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-                new BreadcrumbItemModel(
+            // reset value
+            this.breadcrumbs = [];
+
+            // case / contact / event list page breadcrumb
+            if (this.entityMap[this.entityType].canList(this.authUser)) {
+                this.breadcrumbs.push(new BreadcrumbItemModel(
+                    this.entityMap[this.entityType].label,
+                    this.entityMap[this.entityType].link
+                ));
+            }
+
+            // case / contact / event view page breadcrumb
+            if (this.entityMap[this.entityType].canView(this.authUser)) {
+                this.breadcrumbs.push(new BreadcrumbItemModel(
                     this.entity.name,
                     `${this.entityMap[this.entityType].link}/${this.entityId}/view`
-                ),
-                new BreadcrumbItemModel(
+                ));
+            }
+
+            // exposure / contacts list page
+            if (this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].list(this.authUser)) {
+                this.breadcrumbs.push(new BreadcrumbItemModel(
                     relationshipsListPageTitle,
                     `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
-                ),
-                new BreadcrumbItemModel(
-                    this.viewOnly ? 'LNG_PAGE_VIEW_RELATIONSHIP_TITLE' : 'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE',
-                    null,
-                    true,
-                    {},
-                    relatedPerson
-                )
-            ];
+                ));
+            }
+
+            // page breadcrumb
+            this.breadcrumbs.push(new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_RELATIONSHIP_TITLE' : 'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE',
+                null,
+                true,
+                {},
+                relatedPerson
+            ));
         }
     }
 
@@ -222,8 +311,10 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
 
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify the relationship
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.relationshipDataService
             .modifyRelationship(
                 this.selectedOutbreak.id,
@@ -234,8 +325,9 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             )
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
-                    loadingDialog.close();
+                    this.snackbarService.showApiError(err);
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 })
             )
@@ -249,8 +341,8 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                 // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
             });
     }
 
@@ -282,10 +374,16 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     }
 
     /**
-     * Check if the authenticated user has WRITE access for the current person type
+     * Check if we're allowed to modify event / case / contact relationships
      */
-    hasEntityWriteAccess(): boolean {
-        return this.authUser.hasPermissions(this.entityMap[this.entityType].writePermission);
+    get entityCanModify(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].modify(this.authUser);
     }
 
+    /**
+     * Check if we're allowed to reverse relationships persons
+     */
+    get entityCanReverse(): boolean {
+        return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].reverse(this.authUser);
+    }
 }
