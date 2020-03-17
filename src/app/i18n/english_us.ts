@@ -37,7 +37,7 @@ export const EnglishUsLang = {
         /**
          * uiContactFields
          */
-        'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_CONTACT_OF_CONTACT': 'Add contact of contact',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_CONTACT_OF_CONTACT': 'Add contact',
 
         /**
          * uiGenericLayout
@@ -53,11 +53,6 @@ export const EnglishUsLang = {
          * uiEntityRelationshipsListPage
          */
         'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_OF_CONTACTS_TITLE': 'Contacts of contacts',
-
-        /**
-         * uiGeneralActions
-         */
-        'LNG_PAGE_ACTION_SEE_CONTACTS_OF_CONTACTS_TO': 'See contacts of contacts',
 
         /**
          * uiContactsOfContactsPage

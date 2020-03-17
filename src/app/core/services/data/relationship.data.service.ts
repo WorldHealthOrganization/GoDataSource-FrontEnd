@@ -457,7 +457,7 @@ export class RelationshipDataService {
      * @param {EntityType} entityType
      * @param {string} entityId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<(CaseModel | ContactModel | EventModel)[]>}
+     * @returns {Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]>}
      */
     getEntityAvailablePeople(
         outbreakId: string,

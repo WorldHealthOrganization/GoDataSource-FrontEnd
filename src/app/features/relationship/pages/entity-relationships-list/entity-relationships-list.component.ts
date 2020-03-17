@@ -362,7 +362,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                     .pipe(
                         tap(this.checkEmptyList.bind(this)),
                         tap((entities: EntityModel[]) => {
-                            console.log(entities);
                             // map models
                             this.relationshipsListRecordsMap = {};
                             (entities || []).forEach((entity) => {

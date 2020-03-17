@@ -65,6 +65,14 @@ export class GenericDataService {
             case EntityType.CONTACT:
                 // all types, except Contact, can be related with a Contact
                 availableTypes = [EntityType.CASE, EntityType.EVENT];
+                // a contact can be an exposure only to an entity of type Contact of contact
+                if (relationshipType === RelationshipType.CONTACT) {
+                    availableTypes = [EntityType.CONTACT_OF_CONTACT];
+                }
+                break;
+            case EntityType.CONTACT_OF_CONTACT:
+                // a Contact Of Contact entity can be exposed only to a Contact entity
+                availableTypes = [EntityType.CONTACT];
                 break;
         }
 

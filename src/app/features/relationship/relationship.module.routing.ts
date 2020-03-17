@@ -144,14 +144,14 @@ const routes: Routes = [
         },
         children: relationshipTypeChildrenRoutes
     },
-    // Entity Contact of Contact Relationship
-    {
-        path: ':entityType/:entityId/contacts-of-contacts',
-        data: {
-            relationshipType: RelationshipType.CONTACT_OF_CONTACT
-        },
-        children: relationshipTypeChildrenRoutes
-    },
+    // // Entity Contact of Contact Relationship
+    // {
+    //     path: ':entityType/:entityId/contacts-of-contacts',
+    //     data: {
+    //         relationshipType: RelationshipType.CONTACT_OF_CONTACT
+    //     },
+    //     children: relationshipTypeChildrenRoutes
+    // },
     // View Case with onset date that is before the date of onset of the primary case
     {
         path: 'date-onset',
