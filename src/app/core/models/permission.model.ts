@@ -133,6 +133,7 @@ export enum PERMISSION {
     OUTBREAK_TEMPLATE_LIST = 'outbreak_template_list',
     OUTBREAK_TEMPLATE_VIEW = 'outbreak_template_view',
     OUTBREAK_TEMPLATE_CREATE = 'outbreak_template_create',
+    OUTBREAK_TEMPLATE_CREATE_CLONE = 'outbreak_template_create_clone',
     OUTBREAK_TEMPLATE_MODIFY = 'outbreak_template_modify',
     OUTBREAK_TEMPLATE_DELETE = 'outbreak_template_delete',
     OUTBREAK_TEMPLATE_MODIFY_CASE_QUESTIONNAIRE = 'outbreak_template_modify_case_questionnaire',

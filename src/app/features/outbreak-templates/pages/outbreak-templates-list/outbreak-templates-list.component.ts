@@ -151,7 +151,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                     type: HoverRowActionType.DIVIDER,
                     visible: (): boolean => {
                         // must be 'canClone' TODO need new permission
-                        return OutbreakTemplateModel.canGenerateOutbreak(this.authUser);
+                        return OutbreakTemplateModel.canClone(this.authUser);
                     }
                 }),
 
@@ -163,7 +163,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                     },
                     visible: (item: OutbreakTemplateModel): boolean => {
                         // new permission needed
-                        return OutbreakTemplateModel.canCreate(this.authUser);
+                        return OutbreakTemplateModel.canClone(this.authUser);
                     }
                 })
             ]
