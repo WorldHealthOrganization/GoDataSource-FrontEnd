@@ -51,7 +51,7 @@ export class ViewCotNodeDialogComponent {
     constructor(
         public dialogRef: MatDialogRef<ViewCotNodeDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: ViewCOTNodeData,
-        private entityDataService: EntityDataService,
+        private entityDataService: EntityDataService
     ) {
         this.entity = this.data.entity;
         this.entityInfo = this.entityDataService.getLightObjectDisplay(this.entity);
