@@ -27,18 +27,21 @@ export class EntityDataService {
             getMethod: 'getCase',
             deleteMethod: 'deleteCase',
             modifyMethod: 'modifyCase',
+            getRelationshipsCountMethod: 'getCaseRelationshipsCount'
         },
         [EntityType.CONTACT]: {
             dataService: this.contactDataService,
             getMethod: 'getContact',
             deleteMethod: 'deleteContact',
             modifyMethod: 'modifyContact',
+            getRelationshipsCountMethod: 'getContactRelationshipsCount'
         },
         [EntityType.EVENT]: {
             dataService: this.eventDataService,
             getMethod: 'getEvent',
             deleteMethod: 'deleteEvent',
             modifyMethod: 'modifyEvent',
+            getRelationshipsCountMethod: 'getEventRelationshipsCount'
         }
     };
 
@@ -322,23 +325,16 @@ export class EntityDataService {
      * @param {string} entityId
      * @returns {Observable<any>}
      */
-    checkRelationshipsCount(
+    checkEntityRelationshipsCount(
         outbreakId: string,
         entityType: EntityType,
         entityId: string, )
     : Observable<any> {
-        switch (entityType) {
-            case EntityType.EVENT:
-                return this.eventDataService.getEventRelationshipsCount(outbreakId, entityId);
-                break;
-            case EntityType.CASE:
-                return this.caseDataService.getCaseRelationshipsCount(outbreakId, entityId);
-                break;
-            case EntityType.CONTACT:
-                return this.contactDataService.getContactRelationshipsCount(outbreakId, entityId);
-                break;
-        }
+        // create data service and method
+        const dataService = this.entityMap[entityType].dataService;
+        const method = this.entityMap[entityType].getRelationshipsCountMethod;
+        // call the method based on entity type
+        return dataService[method](outbreakId, entityId);
     }
-
 }
 

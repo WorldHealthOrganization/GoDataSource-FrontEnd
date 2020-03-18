@@ -9,12 +9,11 @@ import { EntityDataService } from '../../../core/services/data/entity.data.servi
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { EntityModel } from '../../../core/models/entity-and-relationship.model';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
-import { throwError } from 'rxjs/index';
-import { catchError, filter } from 'rxjs/internal/operators';
 
 export class ViewCOTNodeData {
     constructor(
-        public entity: CaseModel | EventModel | ContactModel
+        public entity: CaseModel | EventModel | ContactModel,
+        public displayPersonalCotLink: boolean
     ) {}
 }
 
@@ -24,7 +23,7 @@ export class ViewCOTNodeData {
     templateUrl: './view-cot-node-dialog.component.html',
     styleUrls: ['./view-cot-node-dialog.component.less']
 })
-export class ViewCotNodeDialogComponent implements OnInit {
+export class ViewCotNodeDialogComponent {
     // default settings for this type of dialog
     static DEFAULT_CONFIG = {
         autoFocus: false,
@@ -58,24 +57,7 @@ export class ViewCotNodeDialogComponent implements OnInit {
     ) {
         this.entity = this.data.entity;
         this.entityInfo = this.entityDataService.getLightObjectDisplay(this.entity);
-    }
-
-    ngOnInit() {
-        // check if we have relationships to show in COT
-        this.entityDataService.checkRelationshipsCount(
-            this.entity.outbreakId,
-            this.entity.type,
-            this.entity.id)
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    return throwError(err);
-                }))
-            .subscribe((relationshipCount: {count: number}) => {
-                if (relationshipCount.count > 0 ) {
-                    this.displayPersonChainOfTransmissionLink = true;
-                }
-            });
+        this.displayPersonChainOfTransmissionLink = this.data.displayPersonalCotLink;
     }
 
     closeDialog() {
