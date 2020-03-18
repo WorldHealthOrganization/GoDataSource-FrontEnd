@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { CaseModel } from '../../../core/models/case.model';
@@ -8,7 +8,6 @@ import { EntityType } from '../../../core/models/entity-type';
 import { EntityDataService } from '../../../core/services/data/entity.data.service';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { EntityModel } from '../../../core/models/entity-and-relationship.model';
-import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 
 export class ViewCOTNodeData {
     constructor(
@@ -53,7 +52,6 @@ export class ViewCotNodeDialogComponent {
         public dialogRef: MatDialogRef<ViewCotNodeDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: ViewCOTNodeData,
         private entityDataService: EntityDataService,
-        private snackbarService: SnackbarService
     ) {
         this.entity = this.data.entity;
         this.entityInfo = this.entityDataService.getLightObjectDisplay(this.entity);
