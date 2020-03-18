@@ -67,7 +67,12 @@ export const EnglishUsLang = {
         /**
          * uiModifyContactPage
          */
-        'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire'
+        'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+
+        /**
+         * uiContactMergeDuplicateRecordsPage
+         */
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire'
 
         /**
          * REMOVE the tokens from below

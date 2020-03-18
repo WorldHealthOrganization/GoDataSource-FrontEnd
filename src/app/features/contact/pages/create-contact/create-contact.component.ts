@@ -262,6 +262,13 @@ export class CreateContactComponent
      * @param {boolean} andAnotherOne
      */
     createNewContact(stepForms: NgForm[], andAnotherOne: boolean = false) {
+        if (
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id
+        )  {
+            return;
+        }
+
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
         const relationship = _.get(dirtyFields, 'relationship');
