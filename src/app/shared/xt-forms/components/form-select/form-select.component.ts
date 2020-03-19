@@ -85,7 +85,7 @@ export class FormSelectComponent
 
     // filter configuration
     private _filterTimeout: any;
-    @Input() enableFilterOptions: boolean = false;
+    @Input() enableFilterOptions: boolean = true;
     @Input() filterOptionsPlaceholder: string = 'LNG_COMMON_LABEL_SEARCH';
     @Input() filterOptionsDelayMs: number = 200;
     @Input() filterOptionsIsCaseSensitive: boolean = false;
