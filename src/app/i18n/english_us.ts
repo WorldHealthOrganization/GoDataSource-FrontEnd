@@ -16,6 +16,7 @@ export const EnglishUsLang = {
          * uiChainsOfTransmissionGraph
          */
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_FULL_SCREEN_LABEL': 'Full screen',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_VISUAL_ID_AND_LOCATION': 'ID + Location',
 
         /**
          * uiWorldMap

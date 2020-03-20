@@ -371,6 +371,25 @@ export class TransmissionChainDataService {
                             } else {
                                 nodeData.label = '';
                             }
+                            // visual id and location
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.ID_AND_LOCATION.value) {
+                            node.label = '';
+                            if (node.model.visualId) {
+                                node.label = node.model.visualId;
+                            }
+                            if (node.type !== EntityType.EVENT) {
+                                const mainAddr = node.model.mainAddress;
+                                if (!_.isEmpty(mainAddr.locationId)) {
+                                    const location = _.find(locationsList, function (l) {
+                                        return l.id === mainAddr.locationId;
+                                    });
+                                    if (location) {
+                                        nodeData.label = (node.model.visualId ? node.label + ' - ' : '') +  location.name ;
+                                    }
+                                }
+                            } else {
+                                nodeData.label = '';
+                            }
                             // concatenated details
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
                             if (node.type !== EntityType.EVENT) {
