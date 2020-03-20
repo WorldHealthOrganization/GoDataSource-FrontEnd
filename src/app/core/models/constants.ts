@@ -643,7 +643,7 @@ export class Constants {
         },
         ID_AND_LOCATION: {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_VISUAL_ID_AND_LOCATION',
-            value: 'location_and_visual_id'
+            value: 'visual_id_and_location'
         }
     };
 

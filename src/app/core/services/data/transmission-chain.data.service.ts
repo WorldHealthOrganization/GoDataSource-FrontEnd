@@ -374,10 +374,10 @@ export class TransmissionChainDataService {
                             // visual id and location
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.ID_AND_LOCATION.value) {
                             node.label = '';
-                            if (node.model.visualId) {
-                                node.label = node.model.visualId;
-                            }
                             if (node.type !== EntityType.EVENT) {
+                                if (node.model.visualId) {
+                                    node.label = node.model.visualId;
+                                }
                                 const mainAddr = node.model.mainAddress;
                                 if (!_.isEmpty(mainAddr.locationId)) {
                                     const location = _.find(locationsList, function (l) {
