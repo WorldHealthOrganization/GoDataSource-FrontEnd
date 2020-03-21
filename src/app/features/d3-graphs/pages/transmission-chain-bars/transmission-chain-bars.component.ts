@@ -128,7 +128,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         // reference data
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseOutcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
-        this.dateRangeCentreNameList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DATE_RANGE_CENTRE_NAME).pipe(share())
+        this.dateRangeCentreNameList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DATE_RANGE_CENTRE_NAME).pipe(share());
 
         // outbreak
         this.outbreakSubscriber = this.outbreakDataService
