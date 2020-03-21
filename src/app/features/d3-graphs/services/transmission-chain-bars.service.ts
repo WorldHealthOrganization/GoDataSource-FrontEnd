@@ -536,7 +536,9 @@ export class TransmissionChainBarsService {
                         // check date ranges
                         if (entityData.dateRanges) {
                             entityData.dateRanges.forEach((dateRange) => {
-                                const centerName: string = dateRange.centerName ? dateRange.centerName.trim() : null;
+                                const centerName: string = dateRange.centerName ?
+                                    this.centerTokenToNameMap[dateRange.centerName] || dateRange.centerName :
+                                    null;
                                 if (
                                     centerName &&
                                     dateRange.startDate &&
