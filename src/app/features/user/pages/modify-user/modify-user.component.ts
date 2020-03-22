@@ -49,7 +49,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
     institutionsList$: Observable<LabelValuePair[]>;
 
     // ask for old password
-    askForOldPassword: boolean = true;
+    askForOldPassword: boolean = false;
 
     /**
      * Constructor
