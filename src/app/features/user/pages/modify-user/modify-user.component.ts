@@ -20,6 +20,8 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 
 @Component({
     selector: 'app-modify-user',
@@ -46,6 +48,9 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
     outbreaksList$: Observable<OutbreakModel[]>;
     institutionsList$: Observable<LabelValuePair[]>;
 
+    // ask for old password
+    askForOldPassword: boolean = true;
+
     /**
      * Constructor
      */
@@ -59,7 +64,8 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private formHelper: FormHelperService,
         protected dialogService: DialogService,
-        private referenceDataService: ReferenceDataDataService
+        private referenceDataService: ReferenceDataDataService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {
         super(
             route,
@@ -82,18 +88,23 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
             // get the ID of the User being modified
             this.userId = params.userId;
 
-            // retrieve the User instance
-            this.userDataService
-                .getUser(this.userId)
-                .subscribe((user: UserModel) => {
-                    this.user = user;
+            // retrieve user and system information
+            forkJoin(
+                this.systemSettingsDataService.getAPIVersionNoCache(),
+                this.userDataService.getUser(this.userId)
+            ).subscribe(([tokenInfo, user]) => {
+                // determine if we should ask for old password
+                this.askForOldPassword = !tokenInfo.skipOldPasswordForUserModify;
 
-                    // update breadcrumbs
-                    this.initializeBreadcrumbs();
+                // set user data
+                this.user = user;
 
-                    // hide loading
-                    this.hideLoadingDialog();
-                });
+                // update breadcrumbs
+                this.initializeBreadcrumbs();
+
+                // hide loading
+                this.hideLoadingDialog();
+            });
         });
 
         // get the list of roles to populate the dropdown in UI
