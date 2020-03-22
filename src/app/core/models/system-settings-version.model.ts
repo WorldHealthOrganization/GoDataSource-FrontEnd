@@ -6,6 +6,7 @@ export class SystemSettingsVersionModel {
     build: string;
     arch: string;
     tokenTTL: number;
+    skipOldPasswordForUserModify: boolean;
 
     constructor(data = null) {
         this.platform = _.get(data, 'platform');
@@ -13,5 +14,6 @@ export class SystemSettingsVersionModel {
         this.build = _.get(data, 'build');
         this.arch = _.get(data, 'arch');
         this.tokenTTL = _.get(data, 'tokenTTL');
+        this.skipOldPasswordForUserModify = _.get(data, 'skipOldPasswordForUserModify');
     }
 }
