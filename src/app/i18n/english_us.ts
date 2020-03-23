@@ -13,6 +13,11 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value'
 
         /**
+         * uiLocationAutoCompleteSearch
+         */
+        'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_MINIMUM_SEARCH_LENGTH': 'Enter at least {{minLength}} characters',
+
+        /**
          * uiChainsOfTransmissionGraph
          */
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_FULL_SCREEN_LABEL': 'Full screen',

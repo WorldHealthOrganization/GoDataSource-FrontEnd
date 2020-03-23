@@ -18,7 +18,7 @@
             [loading]="locationLoading"
             [typeahead]="locationInput$"
             [typeToSearchText]="typeToSearchText | translate"
-            [notFoundText]="notFoundText | translate"
+            [notFoundText]="currentNotFoundText | translate:notFoundTextData"
             [clearable]="true"
             [disabled]="disabled"
             [required]="required"
