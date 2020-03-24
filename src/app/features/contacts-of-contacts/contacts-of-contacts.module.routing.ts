@@ -66,6 +66,29 @@ const routes: Routes = [
     //         PageChangeConfirmationGuard
     //     ]
     // },
+    // View Contact movement
+    {
+        path: ':contactOfContactId/movement',
+        component: fromPages.ViewMovementContactOfContactComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CONTACT_VIEW_MOVEMENT_MAP
+            ]
+        }
+    },
+
+    // // View Contact chronology
+    {
+        path: ':contactOfContactId/chronology',
+        component: fromPages.ViewChronologyContactOfContactComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.CONTACT_VIEW_CHRONOLOGY_CHART
+            ]
+        }
+    },
 ];
 
 export const routing: ModuleWithProviders = RouterModule.forChild(routes);
