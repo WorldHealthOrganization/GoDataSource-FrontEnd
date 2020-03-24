@@ -384,7 +384,7 @@ export class TransmissionChainDataService {
                                         return l.id === mainAddr.locationId;
                                     });
                                     if (location) {
-                                        nodeData.label = (node.model.visualId ? node.label + ' - ' : '') +  location.name ;
+                                        nodeData.label = (node.model.visualId ? node.label + ' - ' : '') + location.name ;
                                     }
                                 }
                             } else {
