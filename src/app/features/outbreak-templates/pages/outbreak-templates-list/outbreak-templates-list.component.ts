@@ -9,17 +9,16 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
-import {DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField} from '../../../../shared/components/dialog/dialog.component';
+import { DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
-import {catchError, map, share, switchMap, tap} from 'rxjs/operators';
+import { catchError, map, share, switchMap, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
-import {I18nService} from '../../../../core/services/helper/i18n.service';
-import {AnswerModel, QuestionModel} from '../../../../core/models/question.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-outbreak-templates-list',
@@ -150,7 +149,6 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                 new HoverRowAction({
                     type: HoverRowActionType.DIVIDER,
                     visible: (): boolean => {
-                        // must be 'canClone' TODO need new permission
                         return OutbreakTemplateModel.canClone(this.authUser);
                     }
                 }),
@@ -162,7 +160,6 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                         this.cloneOutbreakTemplate(item);
                     },
                     visible: (item: OutbreakTemplateModel): boolean => {
-                        // new permission needed
                         return OutbreakTemplateModel.canClone(this.authUser);
                     }
                 })
