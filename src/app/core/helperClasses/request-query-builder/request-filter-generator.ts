@@ -23,7 +23,8 @@ export class RequestFilterGenerator {
                 RequestFilterGenerator.escapeStringForRegex(value)
                     .replace(/%/g, '.*')
                     .replace(/\\\?/g, '.')
-                    .replace(/&/g, '%26') +
+                    .replace(/&/g, '%26')
+                    .replace(/#/g, '%23') +
                 '$/i'
         };
     }
@@ -38,7 +39,8 @@ export class RequestFilterGenerator {
                 RequestFilterGenerator.escapeStringForRegex(value)
                     .replace(/%/g, '.*')
                     .replace(/\\\?/g, '.')
-                    .replace(/&/g, '%26') +
+                    .replace(/&/g, '%26')
+                    .replace(/#/g, '%23') +
                 '/i'
         };
     }
@@ -53,7 +55,8 @@ export class RequestFilterGenerator {
                 RequestFilterGenerator.escapeStringForRegex(value)
                     .replace(/%/g, '.*')
                     .replace(/\\\?/g, '.')
-                    .replace(/&/g, '%26') +
+                    .replace(/&/g, '%26')
+                    .replace(/#/g, '%23') +
                 '/i'
         };
     }
