@@ -96,6 +96,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     ReferenceDataCategory = ReferenceDataCategory;
     LabResultModel = LabResultModel;
     CaseModel = CaseModel;
+    OutbreakModel = OutbreakModel;
 
     notACaseFilter: boolean | string = false;
 
@@ -1416,5 +1417,16 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             this.selectedOutbreak.id,
             entity
         );
+    }
+
+    /**
+     * Redirect to import relationship page
+     */
+    goToRelationshipImportPage() {
+        this.router.navigate(['/import-export-data', 'relationships', 'import'], {
+            queryParams: {
+                from: Constants.APP_PAGE.CASES.value
+            }
+        });
     }
 }

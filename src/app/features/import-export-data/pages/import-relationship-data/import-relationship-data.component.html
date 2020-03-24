@@ -1,0 +1,18 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<app-import-data
+    [allowedExtensions]="allowedExtensions"
+    [title]="title"
+    [displayLoading]="displayLoading"
+    (finished)="finished()"
+    [importFileUrl]="importFileUrl"
+    [importDataUrl]="importDataUrl"
+    [model]="ImportServerModelNames.RELATIONSHIPS"
+    [fieldsWithoutTokens]="fieldsWithoutTokens"
+    [requiredDestinationFields]="requiredDestinationFields"
+    [savedImportPage]="Constants.APP_IMPORT_PAGE.RELATIONSHIP_DATA.value">
+</app-import-data>

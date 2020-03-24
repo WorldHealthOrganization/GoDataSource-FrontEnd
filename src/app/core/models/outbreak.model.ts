@@ -83,6 +83,11 @@ export class OutbreakModel
     static canClone(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_CREATE_CLONE) : false; }
 
     /**
+     * Static Permission - IPermissionImport
+     */
+    static canImportRelationship(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_IMPORT_RELATIONSHIP) : false; }
+
+    /**
      * Constructor
      */
     constructor(data = null) {
@@ -165,4 +170,9 @@ export class OutbreakModel
      * Permissions - IPermissionCloneable
      */
     canClone(user: UserModel): boolean { return OutbreakModel.canClone(user); }
+
+    /**
+     * Permissions - IPermissionImport
+     */
+    canImportRelationship(user: UserModel): boolean {return OutbreakModel.canImportRelationship(user); }
 }

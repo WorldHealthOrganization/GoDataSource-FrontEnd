@@ -37,6 +37,15 @@
                         (click)="exportFilteredEventsRelationships()">
                         {{ 'LNG_PAGE_LIST_EVENTS_ACTION_EXPORT_EVENTS_RELATIONSHIPS' | translate }}
                     </button>
+
+                    <ng-container *app-selected-outbreak-is-active>
+                        <button
+                            *ngIf="OutbreakModel.canImportRelationship(authUser)"
+                            mat-menu-item
+                            (click)="goToRelationshipImportPage()">
+                            {{ 'LNG_PAGE_LIST_EVENTS_ACTION_IMPORT_EVENTS_RELATIONSHIPS' | translate }}
+                        </button>
+                    </ng-container>
                 </mat-menu>
             </div>
         </div>

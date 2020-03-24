@@ -47,7 +47,29 @@ export const EnglishUsLang = {
         /**
          * uiFormInputValidationErrors
          */
-        'LNG_FORM_VALIDATION_ERROR_OUTBREAK_TEMPLATE_NAME_NOT_UNIQUE': 'This name is already in use'
+        'LNG_FORM_VALIDATION_ERROR_OUTBREAK_TEMPLATE_NAME_NOT_UNIQUE': 'This name is already in use',
+
+        /**
+         * uiCasesListPage
+         */
+        'LNG_PAGE_LIST_CASES_ACTION_IMPORT_CASES_RELATIONSHIPS' : 'Import case relationships',
+
+        /**
+         * uiContactsListPage
+         */
+        'LNG_PAGE_LIST_CONTACTS_ACTION_IMPORT_CONTACTS_RELATIONSHIPS': 'Import contact relationships',
+
+        /**
+         * uiEventsListPage
+         */
+        'LNG_PAGE_LIST_EVENTS_ACTION_IMPORT_EVENTS_RELATIONSHIPS': 'Import event relationships',
+
+        /**
+         * uiImportData
+         */
+        'LNG_PAGE_IMPORT_CASE_RELATIONSHIP_DATA_TITLE' : 'Import case relationships',
+        'LNG_PAGE_IMPORT_CONTACT_RELATIONSHIP_DATA_TITLE' : 'Import contact relationships',
+        'LNG_PAGE_IMPORT_EVENT_RELATIONSHIP_DATA_TITLE' : 'Import event relationships',
 
         /**
          * REMOVE the tokens from below

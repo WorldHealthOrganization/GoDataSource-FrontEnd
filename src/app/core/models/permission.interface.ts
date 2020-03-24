@@ -278,6 +278,11 @@ export interface IPermissionOutbreak {
      * Has permission to see inconsistencies in key dates
      */
     canSeeInconsistencies(user: UserModel): boolean;
+
+    /**
+     * Has permission to import relationships data
+     */
+    canImportRelationship(user: UserModel): boolean;
 }
 
 /**
