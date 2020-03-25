@@ -52,7 +52,32 @@ export const EnglishUsLang = {
         /**
          * uiFormInputValidationErrors
          */
-        'LNG_FORM_VALIDATION_ERROR_OUTBREAK_TEMPLATE_NAME_NOT_UNIQUE': 'This name is already in use'
+        'LNG_FORM_VALIDATION_ERROR_OUTBREAK_TEMPLATE_NAME_NOT_UNIQUE': 'This name is already in use',
+
+        /**
+         * uiModifyOutbreakPage
+         */
+        'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE': 'Contact form',
+
+        /**
+         * uiModifyOutbreakTemplatePage
+         */
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE': 'Contact form',
+
+        /**
+         * uiCreateContactPage
+         */
+        'LNG_PAGE_CREATE_CONTACT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+
+        /**
+         * uiModifyContactPage
+         */
+        'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+
+        /**
+         * uiContactMergeDuplicateRecordsPage
+         */
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire'
 
         /**
          * REMOVE the tokens from below
