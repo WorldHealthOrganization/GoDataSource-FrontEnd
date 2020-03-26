@@ -296,11 +296,11 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
      * @param outbreakTemplateModel
      */
     cloneOutbreakTemplate(outbreakTemplateModel: OutbreakTemplateModel) {
-        // get the outbreak to clone
+        // get the outbreak template to clone
         this.outbreakTemplateDataService
             .getOutbreakTemplate(outbreakTemplateModel.id)
             .subscribe((outbreakTemplate: OutbreakTemplateModel) => {
-                // create the clone of the parent outbreak
+                // create the clone of the parent outbreak template
                 this.dialogService
                     .showInput(
                         new DialogConfiguration({
@@ -319,7 +319,6 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                     )
                     .subscribe((answer) => {
                         if (answer.button === DialogAnswerButton.Yes) {
-
                             // set the name for the cloned outbreak template
                             outbreakTemplate.name = answer.inputValue.value.clonedOutbreakTemplateName;
 

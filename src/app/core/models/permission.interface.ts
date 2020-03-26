@@ -288,11 +288,6 @@ export interface IPermissionOutbreakTemplate {
      * Has permission to generate an outbreak from an outbreak template
      */
     canGenerateOutbreak(user: UserModel): boolean;
-
-    /**
-     * Has permission to clone an outbreak template
-     */
-    canClone(user: UserModel): boolean;
 }
 
 /**
