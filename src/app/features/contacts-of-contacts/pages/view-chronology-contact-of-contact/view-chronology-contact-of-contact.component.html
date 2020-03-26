@@ -1,3 +1,14 @@
-<p>
-  view-chronology-contact-of-contact works!
-</p>
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<mat-card
+    class="page-section page-content">
+
+    <app-chronology
+        [entries]="chronologyEntries">
+    </app-chronology>
+
+</mat-card>
