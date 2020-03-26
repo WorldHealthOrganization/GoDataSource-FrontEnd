@@ -16,7 +16,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { Constants } from '../../../../core/models/constants';
@@ -27,6 +27,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
+import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 
 @Component({
     selector: 'app-transmission-chain-bars',
@@ -63,7 +64,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     filters: {
         date: any,
         isolationDate: any,
-        isolationCenterName: any,
+        isolationCenterName: string[],
         locationId: any,
         caseClassification: any,
         caseOutcome: any
@@ -84,8 +85,14 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
 
     caseClassificationsList$: Observable<LabelValuePair[]>;
     caseOutcomeList$: Observable<LabelValuePair[]>;
+    dateRangeCentreNameList$: Observable<LabelValuePair[]>;
 
     @ViewChild('chart') chartContainer: ElementRef;
+
+    // Map of center token names
+    centerTokenToNameMap: {
+        [token: string]: string
+    } = {};
 
     /**
      * Constructor
@@ -121,6 +128,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         // reference data
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseOutcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+        this.dateRangeCentreNameList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DATE_RANGE_CENTRE_NAME).pipe(share());
 
         // outbreak
         this.outbreakSubscriber = this.outbreakDataService
@@ -163,21 +171,32 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
             return;
         }
 
+        // load data
         this.loadingData = true;
 
-        this.transmissionChainBarsDataService.getTransmissionChainBarsData(this.selectedOutbreak.id, this.queryBuilder)
-            .subscribe((graphData) => {
-                this.loadingData = false;
-
-                if (graphData.personsOrder.length > 0) {
-                    this.noData = false;
-
-                    this.graphData = graphData;
-                    this.redrawGraph();
-                } else {
-                    this.noData = true;
-                }
+        // retrieve center names & chain bar data
+        forkJoin(
+            this.dateRangeCentreNameList$,
+            this.transmissionChainBarsDataService.getTransmissionChainBarsData(this.selectedOutbreak.id, this.queryBuilder)
+        ).subscribe(([centerNames, graphData]) => {
+            // map center names
+            centerNames.forEach((center) => {
+                this.centerTokenToNameMap[center.value] = this.i18nService.instant(center.label);
             });
+
+            // graph data
+            if (graphData.personsOrder.length > 0) {
+                this.noData = false;
+
+                this.graphData = graphData;
+                this.redrawGraph();
+            } else {
+                this.noData = true;
+            }
+
+            // finished loading data
+            this.loadingData = false;
+        });
     }
 
     /**
@@ -192,7 +211,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         // draw graph
         this.transmissionChainBarsService.drawGraph(
             this.chartContainer.nativeElement,
-            this.graphData, {
+            this.graphData,
+            this.centerTokenToNameMap, {
                 cellWidth: this.cellWidth
             }
         );
@@ -432,9 +452,18 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
             }
         }
 
-        if (this.filters.isolationCenterName !== null) {
+        // filter by center names
+        if (
+            this.filters.isolationCenterName &&
+            this.filters.isolationCenterName.length > 0
+        ) {
             this.queryBuilder.filter
-                .byText('dateRanges.centerName', this.filters.isolationCenterName);
+                .bySelect(
+                    'dateRanges.centerName',
+                    this.filters.isolationCenterName,
+                    true,
+                    null
+                );
         }
 
         // case classification

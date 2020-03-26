@@ -358,6 +358,11 @@ export interface IPermissionRelatedLabResult {
      * Has import permission ?
      */
     canImportLabResult(user: UserModel): boolean;
+
+    /**
+     * Has import permission ?
+     */
+    canExportLabResult(user: UserModel): boolean;
 }
 
 /**

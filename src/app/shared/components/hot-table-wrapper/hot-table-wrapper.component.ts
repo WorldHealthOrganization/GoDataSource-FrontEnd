@@ -366,7 +366,7 @@ export class HotTableWrapperComponent implements OnInit {
                                     // go through all items of each dropdown
                                     _.each(dropdownItems, (item) => {
                                         // keep the value associated to each translated label
-                                        const label = this.i18nService.instant(item.label);
+                                        const label = this.i18nService.instant(item.label).trim();
                                         dropdownsMap[index][label] = item.value;
                                     });
                                 })

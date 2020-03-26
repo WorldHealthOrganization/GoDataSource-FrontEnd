@@ -204,6 +204,11 @@ export class TransmissionChainBarsService {
         }
     } = {};
 
+    // Map of center token names
+    private centerTokenToNameMap: {
+        [token: string]: string
+    } = {};
+
     /**
      * Constructor
      */
@@ -221,10 +226,16 @@ export class TransmissionChainBarsService {
     drawGraph(
         containerNative: any,
         data: TransmissionChainBarsModel,
+        centerTokenToNameMap: {
+            [token: string]: string
+        } = {},
         options?: {
             cellWidth?: number
         }
     ) {
+        // center translations
+        this.centerTokenToNameMap = centerTokenToNameMap;
+
         // keep container native
         this.containerNative = containerNative;
 
@@ -525,7 +536,9 @@ export class TransmissionChainBarsService {
                         // check date ranges
                         if (entityData.dateRanges) {
                             entityData.dateRanges.forEach((dateRange) => {
-                                const centerName: string = dateRange.centerName ? dateRange.centerName.trim() : null;
+                                const centerName: string = dateRange.centerName ?
+                                    this.centerTokenToNameMap[dateRange.centerName] || dateRange.centerName :
+                                    null;
                                 if (
                                     centerName &&
                                     dateRange.startDate &&
@@ -1287,9 +1300,14 @@ export class TransmissionChainBarsService {
                 .attr('width', width - (textX + this.entityDetailsTextLinesColorMargin))
                 .attr('height', height);
 
+            // determine center name
+            const renderName = cell.name ?
+                this.centerTokenToNameMap[cell.name] || cell.name :
+                cell.name;
+
             // draw cell text
             group.append('text')
-                .text(cell.name)
+                .text(renderName)
                 .attr('clip-path', `url(#${pathId})`)
                 .attr('fill', 'black')
                 .attr('alignment-baseline', 'central')

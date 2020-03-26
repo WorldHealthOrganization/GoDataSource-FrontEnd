@@ -696,6 +696,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 sortable: true
             }),
             new FilterModel({
+                fieldName: 'questionnaireAnswers',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+                type: FilterType.QUESTIONNAIRE_ANSWERS,
+                questionnaireTemplate: this.selectedOutbreak.contactInvestigationTemplate
+            }),
+            new FilterModel({
                 fieldName: 'pregnancyStatus',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
                 type: FilterType.SELECT,
