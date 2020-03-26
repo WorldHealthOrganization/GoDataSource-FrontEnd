@@ -72,12 +72,12 @@ export const EnglishUsLang = {
          * uiContactsOfContactsListPage
          */
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE': 'Contacts of contacts',
-        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CONTACT': 'View contact',
-        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_MODIFY_CONTACT': 'Modify contact',
-        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_CONTACT': 'Delete contact',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CONTACT_OF_CONTACT': 'View contact of contact',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_MODIFY_CONTACT_OF_CONTACT': 'Modify contact of contact',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_CONTACT_OF_CONTACT': 'Delete contact of contact',
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_MOVEMENT': 'View movement',
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CHRONOLOGY': 'View chronology',
-        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_CONTACT': 'Restore contact',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_CONTACT': 'Restore contact of contact',
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIPS_TITLE': 'Export contact of contact relationships',
 
         /**
@@ -118,7 +118,16 @@ export const EnglishUsLang = {
         /**
          * uiImportContactOfContactData
          */
-        'LNG_PAGE_IMPORT_CONTACT_OF_CONTACT_DATA_TITLE': 'Import contact of contact data'
+        'LNG_PAGE_IMPORT_CONTACT_OF_CONTACT_DATA_TITLE': 'Import contact of contact data',
+
+        /**
+         * uiMovementContactOfContactPage
+         */
+        'LNG_PAGE_VIEW_MOVEMENT_CONTACT_OF_CONTACT_TITLE': 'Contact of contact movement',
+        'LNG_PAGE_VIEW_MOVEMENT_CONTACT_OF_CONTACT_EXPORT': '"Export contact of contact movement Map',
+
+
+
 
         /**
          * REMOVE the tokens from below

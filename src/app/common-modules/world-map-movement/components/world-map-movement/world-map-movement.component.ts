@@ -119,10 +119,20 @@ export class WorldMapMovementComponent {
             this.worldMapComponent
                 .printToBlob()
                 .subscribe((blob) => {
-                    const fileName = this.i18nService.instant(
-                        entityType === EntityType.CASE ?
-                            'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE' :
-                            'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE');
+                    // determine entity token for filename
+                    let entityToken;
+                    switch (entityType) {
+                        case EntityType.CASE:
+                            entityToken = 'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE';
+                            break;
+                        case EntityType.CONTACT:
+                            entityToken = 'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE';
+                            break;
+                        case EntityType.CONTACT_OF_CONTACT:
+                            entityToken = 'LNG_PAGE_VIEW_MOVEMENT_CONTACT_OF_CONTACT_TITLE';
+                            break;
+                    }
+                    const fileName = this.i18nService.instant(entityToken);
                     FileSaver.saveAs(
                         blob,
                         `${fileName}.png`

@@ -133,18 +133,8 @@
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
-                            <app-form-select
-                                name="followUp.status"
-                                [ngModel]="contactOfContactData.followUp?.status"
-                                [placeholder]="'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS' | translate"
-                                tooltip="LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION"
-                                [options]="finalFollowUpStatus$ | async"
-                                [disabled]="viewOnly"
-                                [clearable]="false">
-                            </app-form-select>
-
+                            <div fxFlex><!-- placeholder --></div>
                         </div>
-
                     </div>
                 </mat-card>
 
@@ -307,10 +297,10 @@
 
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button mat-raised-button type="button" [routerLink]="['/contacts', contactId, 'movement']">
+        <button mat-raised-button type="button" [routerLink]="['/contacts-of-contacts', contactOfContactId, 'movement']">
             {{ 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_MOVEMENT' | translate }}
         </button>
-        <button mat-raised-button type="button" [routerLink]="['/contacts', contactId, 'chronology']">
+        <button mat-raised-button type="button" [routerLink]="['/contacts-of-contacts', contactOfContactId, 'chronology']">
             {{ 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_CHRONOLOGY' | translate }}
         </button>
     </div>

@@ -141,22 +141,22 @@
                             <mat-divider></mat-divider>
 
                             <button
-                                *ngIf="exportContactsUrl"
+                                *ngIf="exportContactsOfContactsUrl"
                                 mat-menu-item
                                 (click)="exportSelectedContactsOfContacts()">
-                                {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS' | translate }}
+                                {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS' | translate }}
                             </button>
 
                             <button
                                 mat-menu-item
                                 (click)="exportSelectedContactsOfContactsDossier()">
-                                {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER' | translate }}
+                                {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER' | translate }}
                             </button>
 
                             <button
                                 mat-menu-item
                                 (click)="exportSelectedContactsOfContactsRelationship()">
-                                {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_RELATIONSHIPS' | translate }}
+                                {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_RELATIONSHIPS' | translate }}
                             </button>
 
                             <ng-container>

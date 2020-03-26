@@ -94,12 +94,12 @@ export class ContactsOfContactsDataService {
     /**
      * Retrieve Contact of contact movement information
      * @param {string} outbreakId
-     * @param {string} contactOfContact
+     * @param {string} contactOfContactId
      * @returns {Observable<AddressModel[]>}
      */
-    getContactofContactMovement(outbreakId: string, contactOfContact: string): Observable<AddressModel[]> {
+    getContactOfContactMovement(outbreakId: string, contactOfContactId: string): Observable<AddressModel[]> {
         return this.modelHelper.mapObservableListToModel(
-            this.http.get(`outbreaks/${outbreakId}/contacts-of-contacts/${contactOfContact}/movement`),
+            this.http.get(`outbreaks/${outbreakId}/contacts-of-contacts/${contactOfContactId}/movement`),
             AddressModel
         );
     }

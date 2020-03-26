@@ -55,7 +55,6 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
     genderList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
-    finalFollowUpStatus$: Observable<any[]>;
     pregnancyStatusList$: Observable<any[]>;
 
     // provide constants to template
@@ -97,7 +96,6 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
-        this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
         this.pregnancyStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
 
         this.route.params

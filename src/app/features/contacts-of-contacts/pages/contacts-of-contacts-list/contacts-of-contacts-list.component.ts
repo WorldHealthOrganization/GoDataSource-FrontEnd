@@ -220,8 +220,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                         this.router.navigate(['/contacts-of-contacts', item.id, 'movement']);
                     },
                     visible: (item: ContactOfContactModel): boolean => {
-                        return !item.deleted
-                            // && ContactOfContactModel.canViewMovementMap(this.authUser);
+                        return !item.deleted && ContactOfContactModel.canViewMovementMap(this.authUser);
                     }
                 }),
 
@@ -232,9 +231,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                         this.router.navigate(['/contacts-of-contacts', item.id, 'chronology']);
                     },
                     visible: (item: ContactOfContactModel): boolean => {
-                        return !item.deleted
-                            // &&
-                            // ContactOfContactModel.canViewChronologyChart(this.authUser);
+                        return !item.deleted && ContactOfContactModel.canViewChronologyChart(this.authUser);
                     }
                 }),
 
