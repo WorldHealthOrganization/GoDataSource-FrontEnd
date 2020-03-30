@@ -1377,7 +1377,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         this.router.navigate(
             ['/contacts', 'modify-bulk'], {
                 queryParams: {
-                    contactIds: JSON.stringify(selectedRecords)
+                    contactIds: JSON.stringify(selectedRecords),
+                    fromContactsOfContactsList: false
                 }
             }
         );

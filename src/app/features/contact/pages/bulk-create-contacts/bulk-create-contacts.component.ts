@@ -609,7 +609,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                                         this.disableDirtyConfirm();
                                         loadingDialog.close();
                                         if (this.relatedEntityType === EntityType.CONTACT &&
-                                            ContactOfContactModel.canList(this.authUser)) {
+                                            ContactOfContactModel.canList(this.authUser)
+                                        ) {
                                             this.router.navigate(['/contacts-of-contacts']);
                                         } else if (ContactModel.canList(this.authUser)) {
                                             this.router.navigate(['/contacts']);

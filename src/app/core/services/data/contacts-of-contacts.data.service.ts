@@ -166,7 +166,7 @@ export class ContactsOfContactsDataService {
         contactsData: any)
     {
         return this.http.put(
-            `outbreaks/${outbreakId}/contacts/bulk`,
+            `outbreaks/${outbreakId}/contacts-of-contacts/bulk `,
             contactsData
         );
     }

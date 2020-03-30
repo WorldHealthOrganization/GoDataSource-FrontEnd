@@ -914,9 +914,10 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
         // redirect to modify contacts page
         this.router.navigate(
-            ['/contacts-of-contacts', 'modify-bulk'], {
+            ['/contacts', 'modify-bulk'], {
                 queryParams: {
-                    contactIds: JSON.stringify(selectedRecords)
+                    contactIds: JSON.stringify(selectedRecords),
+                    fromContactsOfContactsList: true
                 }
             }
         );
