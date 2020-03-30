@@ -194,6 +194,7 @@ export enum PERMISSION {
     CONTACT_IMPORT = 'contact_import',
     CONTACT_BULK_CREATE = 'contact_bulk_create',
     CONTACT_BULK_MODIFY = 'contact_bulk_modify',
+    CONTACT_CREATE_BULK_CONTACT_OF_CONTACT = 'contact_create_bulk_contact_of_contact',
     CONTACT_GENERATE_VISUAL_ID = 'contact_generate_visual_id',
     CONTACT_LIST_RELATIONSHIP_CONTACTS = 'contact_list_relationship_contacts',
     CONTACT_VIEW_RELATIONSHIP_CONTACTS = 'contact_view_relationship_contacts',

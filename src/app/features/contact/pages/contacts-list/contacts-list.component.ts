@@ -40,6 +40,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
     selector: 'app-contacts-list',
@@ -259,6 +260,28 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                             this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
                             this.selectedOutbreak.isContactsOfContactsActive &&
                             ContactModel.canCreateContactOfContact(this.authUser);
+                    }
+                }),
+
+                // Bulk add contacts of contacts
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_BULK_ADD_CONTACTS',
+                    click: (item: ContactModel) => {
+                        this.router.navigate(['/contacts', 'create-bulk'], {
+                           queryParams: {
+                               entityType: EntityType.CONTACT,
+                               entityId: item.id
+                           }
+                        });
+                    },
+                    visible: (item: ContactModel): boolean => {
+                        return !item.deleted &&
+                            this.authUser &&
+                            this.selectedOutbreak &&
+                            this.selectedOutbreak.isContactsOfContactsActive &&
+                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                            ContactOfContactModel.canBulkCreate(this.authUser) &&
+                            ContactModel.canBulkCreateContact(this.authUser);
                     }
                 }),
 

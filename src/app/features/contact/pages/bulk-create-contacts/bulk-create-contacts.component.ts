@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -21,7 +21,6 @@ import { Constants } from '../../../../core/models/constants';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';
@@ -29,6 +28,7 @@ import { HotTableWrapperComponent } from '../../../../shared/components/hot-tabl
 import { Subscription } from 'rxjs/internal/Subscription';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -62,7 +62,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     exposureDurationOptions$: Observable<LabelValuePair[]>;
     socialRelationshipOptions$: Observable<LabelValuePair[]>;
 
-    relatedEntityData: CaseModel | EventModel;
+    relatedEntityData: CaseModel | EventModel | ContactModel;
 
     // sheet widget configuration
     sheetContextMenu = {};
@@ -124,9 +124,6 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION).pipe(share());
         this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).pipe(share());
 
-        // configure Sheet widget
-        this.configureSheetWidget();
-
         // retrieve query params
         this.route.queryParams
             .subscribe((params: { entityType, entityId }) => {
@@ -161,11 +158,16 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 this.selectedOutbreak = selectedOutbreak;
                 // setting the contact visual id model
                 this.contactVisualIdModel = {
-                    mask : ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
+                    mask : this.relatedEntityType !== EntityType.CONTACT ?
+                        ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask) :
+                        ContactOfContactModel.generateContactOfContactIDMask((this.selectedOutbreak.contactOfContactIdMask))
                 };
 
                 this.retrieveRelatedPerson();
             });
+
+        // configure Sheet widget
+        this.configureSheetWidget();
     }
 
     /**
@@ -201,15 +203,13 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                     new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
                 );
             }
-        } else {
-            // NOT SUPPORTED :)
-        }
-
-        // contacts list page
-        if (ContactModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-            );
+        } else if (this.relatedEntityType === EntityType.CONTACT) {
+            // contacts list
+            if (ContactModel.canList(this.authUser)) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+                );
+            }
         }
 
         // current page breadcrumb
@@ -226,25 +226,29 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
      * Configure 'Handsontable'
      */
     private configureSheetWidget() {
+    // build object string based on related entity type
+        const contactObject = this.relatedEntityType === EntityType.CONTACT ? 'contactOfContact' : 'contact';
         // configure columns
         this.sheetColumns = [
             // Contact properties
             new TextSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_FIRST_NAME')
-                .setProperty('contact.firstName')
+                .setProperty(`${contactObject}.firstName`)
                 .setRequired(),
             new TextSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_LAST_NAME')
-                .setProperty('contact.lastName'),
+                .setProperty(`${contactObject}.lastName`),
             new TextSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_VISUAL_ID')
-                .setProperty('contact.visualId')
+                .setProperty(`${contactObject}.visualId`)
                 .setAsyncValidator((value: string, callback: (result: boolean) => void): void => {
                     if (_.isEmpty(value)) {
                         callback(true);
                     } else {
                         const visualIDTranslateData = {
-                            mask: ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
+                            mask: this.relatedEntityType !== EntityType.CONTACT ?
+                                ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask) :
+                                ContactOfContactModel.generateContactOfContactIDMask((this.selectedOutbreak.contactOfContactIdMask))
                         };
                         // set visual ID validator
                         this.contactDataService.checkContactVisualIDValidity(
@@ -269,65 +273,65 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 }),
             new DropdownSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
-                .setProperty('contact.gender')
+                .setProperty(`${contactObject}.gender`)
                 .setOptions(this.genderList$, this.i18nService),
             new DateSheetColumn(
                 null,
                 moment())
                 .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING')
-                .setProperty('contact.dateOfReporting')
+                .setProperty(`${contactObject}.dateOfReporting`)
                 .setRequired(),
             new DropdownSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_OCCUPATION')
-                .setProperty('contact.occupation')
+                .setProperty(`${contactObject}.occupation`)
                 .setOptions(this.occupationsList$, this.i18nService),
             new IntegerSheetColumn(
                 0,
                 Constants.DEFAULT_AGE_MAX_YEARS)
                 .setTitle('LNG_CONTACT_FIELD_LABEL_AGE_YEARS')
-                .setProperty('contact.age.years'),
+                .setProperty(`${contactObject}.age.years`),
             new IntegerSheetColumn(
                 0,
                 11)
                 .setTitle('LNG_CONTACT_FIELD_LABEL_AGE_MONTHS')
-                .setProperty('contact.age.months'),
+                .setProperty(`${contactObject}.age.months`),
             new DateSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH')
-                .setProperty('contact.dob'),
+                .setProperty(`${contactObject}.dob`),
             new DropdownSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL')
-                .setProperty('contact.riskLevel')
+                .setProperty(`${contactObject}.riskLevel`)
                 .setOptions(this.riskLevelsList$, this.i18nService),
             new TextSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_REASON')
-                .setProperty('contact.riskReason'),
+                .setProperty(`${contactObject}.riskReason`),
 
             // Contact Address(es)
             new LocationSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
-                .setProperty('contact.addresses[0].locationId')
+                .setProperty(`${contactObject}.addresses[0].locationId`)
                 .setUseOutbreakLocations(true),
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
-                .setProperty('contact.addresses[0].city'),
+                .setProperty(`${contactObject}.addresses[0].city`),
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
-                .setProperty('contact.addresses[0].addressLine1'),
+                .setProperty(`${contactObject}.addresses[0].addressLine1`),
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE')
-                .setProperty('contact.addresses[0].postalCode'),
+                .setProperty(`${contactObject}.addresses[0].postalCode`),
             new TextSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER')
-                .setProperty('contact.addresses[0].phoneNumber'),
+                .setProperty(`${contactObject}.addresses[0].phoneNumber`),
 
             // Contact Document(s)
             new DropdownSheetColumn()
                 .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE')
-                .setProperty('contact.documents[0].type')
+                .setProperty(`${contactObject}.documents[0].type`)
                 .setOptions(this.documentTypesList$, this.i18nService),
             new TextSheetColumn()
                 .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER')
-                .setProperty('contact.documents[0].number'),
+                .setProperty(`${contactObject}.documents[0].number`),
 
             // Relationship properties
             new DateSheetColumn(
@@ -418,7 +422,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                         return throwError(err);
                     })
                 )
-                .subscribe((relatedEntityData: CaseModel | EventModel) => {
+                .subscribe((relatedEntityData: CaseModel | EventModel | ContactModel) => {
                     // keep person data
                     this.relatedEntityData = relatedEntityData;
                 });
@@ -429,27 +433,21 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
      * Check that we have related Person Type and ID
      */
     private validateRelatedEntity() {
-        if (
-            this.relatedEntityId &&
-            (
-                this.relatedEntityType === EntityType.CASE ||
-                this.relatedEntityType === EntityType.EVENT
-            )
-        ) {
+        if (this.relatedEntityId && this.relatedEntityType !== EntityType.CONTACT_OF_CONTACT) {
             return true;
         }
 
         // related person data is wrong or missing
         this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_CASE_OR_EVENT_REQUIRED');
 
-        // navigate to Cases/Events listing page
+        // navigate to Cases/Contacts/Events listing page
         this.redirectToRelatedEntityList();
 
         return false;
     }
 
     /**
-     * Redirect to Cases or Events list, based on related Entity Type
+     * Redirect to Cases or Events or Contacts list, based on related Entity Type
      */
     private redirectToRelatedEntityList() {
         if (
@@ -462,13 +460,13 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             EventModel.canList(this.authUser)
         ) {
             this.router.navigate(['/events']);
+        } else if (
+            this.relatedEntityType === EntityType.CONTACT &&
+            ContactModel.canList(this.authUser)
+        ) {
+            this.router.navigate(['/contacts']);
         } else {
-            // NOT SUPPORTED
-            if (ContactModel.canList(this.authUser)) {
-                this.router.navigate(['/contacts']);
-            } else {
-                this.router.navigate(['/']);
-            }
+            this.router.navigate(['/']);
         }
     }
 
@@ -610,7 +608,10 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                                         // navigate to listing page
                                         this.disableDirtyConfirm();
                                         loadingDialog.close();
-                                        if (ContactModel.canList(this.authUser)) {
+                                        if (this.relatedEntityType === EntityType.CONTACT &&
+                                            ContactOfContactModel.canList(this.authUser)) {
+                                            this.router.navigate(['/contacts-of-contacts']);
+                                        } else if (ContactModel.canList(this.authUser)) {
                                             this.router.navigate(['/contacts']);
                                         } else {
                                             this.router.navigate(['/']);

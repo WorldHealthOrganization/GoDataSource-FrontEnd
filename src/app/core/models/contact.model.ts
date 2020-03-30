@@ -13,7 +13,7 @@ import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
 import {
     IPermissionBasic,
-    IPermissionBasicBulk,
+    IPermissionBasicBulk, IPermissionRelatedContactBulk,
     IPermissionChronology,
     IPermissionContact,
     IPermissionExportable,
@@ -36,7 +36,7 @@ export class ContactModel
         IPermissionBasic,
         IPermissionExportable,
         IPermissionImportable,
-        IPermissionBasicBulk,
+        IPermissionBasicBulk, IPermissionRelatedContactBulk,
         IPermissionRestorable,
         IPermissionRelatedRelationship,
         IPermissionMovement,
@@ -130,6 +130,11 @@ export class ContactModel
     static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_BULK_MODIFY) : false); }
     static canBulkDelete(user: UserModel): boolean { return false; }
     static canBulkRestore(user: UserModel): boolean { return false; }
+
+    /**
+     * Static Permissions - IPermissionRelatedContactBulk
+     */
+    static canBulkCreateContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_CREATE_BULK_CONTACT_OF_CONTACT) : false); }
 
     /**
      * Static Permissions - IPermissionRestorable
@@ -281,6 +286,11 @@ export class ContactModel
     canBulkModify(user: UserModel): boolean { return ContactModel.canBulkModify(user); }
     canBulkDelete(user: UserModel): boolean { return ContactModel.canBulkDelete(user); }
     canBulkRestore(user: UserModel): boolean { return ContactModel.canBulkRestore(user); }
+
+    /**
+     * Permissions - IPermissionRelatedContactBulk
+     */
+    canBulkCreateContact(user: UserModel): boolean {return ContactModel.canBulkCreateContact(user); }
 
     /**
      * Permissions - IPermissionRestorable

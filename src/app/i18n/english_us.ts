@@ -69,6 +69,11 @@ export const EnglishUsLang = {
         'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES': 'Number of exposures',
 
         /**
+         * uiContactsListPage
+         */
+        'LNG_PAGE_LIST_CONTACTS_ACTION_BULK_ADD_CONTACTS': 'Bulk add contacts',
+
+        /**
          * uiContactsOfContactsListPage
          */
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE': 'Contacts of contacts',

@@ -149,7 +149,7 @@ export class ContactDataService {
     }
 
     /**
-     * Add multiple Contacts for a Case or Event
+     * Add multiple Contacts for a Case or Event or Contact
      * @param outbreakId
      * @param sourceEntityType
      * @param sourceEntityId
@@ -157,8 +157,10 @@ export class ContactDataService {
      */
     bulkAddContacts(outbreakId: string, sourceEntityType: EntityType, sourceEntityId: string, contactsData: any[]): Observable<any> {
         const entityTypeLinkPath = EntityModel.getLinkForEntityType(sourceEntityType);
-
-        return this.http.post(`outbreaks/${outbreakId}/${entityTypeLinkPath}/${sourceEntityId}/contacts`, contactsData);
+        // path for bulk create contacts of contact is different than the rest of the entities
+        // so we have to change it when we're adding contacts of contacts
+        const contactsPath = sourceEntityType === EntityType.CONTACT ? 'contacts-of-contacts' : 'contacts';
+        return this.http.post(`outbreaks/${outbreakId}/${entityTypeLinkPath}/${sourceEntityId}/${contactsPath}`, contactsData);
     }
 
     /**
