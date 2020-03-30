@@ -8,6 +8,7 @@ import { EntityType } from '../../../core/models/entity-type';
 import { EntityDataService } from '../../../core/services/data/entity.data.service';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { EntityModel } from '../../../core/models/entity-and-relationship.model';
+import { ContactOfContactModel } from '../../../core/models/contact-of-contact.model';
 
 export class ViewCOTNodeData {
     constructor(
@@ -35,7 +36,7 @@ export class ViewCotNodeDialogComponent {
     };
 
     // person model
-    entity: CaseModel | ContactModel | EventModel;
+    entity: CaseModel | ContactModel | EventModel | ContactOfContactModel;
     // person information as key-value pairs
     entityInfo: LabelValuePair[] = [];
 

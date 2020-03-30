@@ -135,6 +135,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_VIEW_MOVEMENT_CONTACT_OF_CONTACT_TITLE': 'Contact of contact movement',
         'LNG_PAGE_VIEW_MOVEMENT_CONTACT_OF_CONTACT_EXPORT': '"Export contact of contact movement Map',
 
+        /**
+         * uiChainsOfTransmissionGraph
+         */
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' : 'Show Contacts of Contacts'
 
 
 

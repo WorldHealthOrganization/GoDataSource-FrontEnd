@@ -346,6 +346,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 requestQueryBuilder.filter.flag('includeContacts', 1);
             }
 
+            // this flag is working only if 'showContacts' is true
+            if (this.filters.includeContactsOfContacts && this.filters.showContacts) {
+                requestQueryBuilder.filter.flag('includeContactsOfContacts', 1);
+            }
+
             // person query
             const personQuery = requestQueryBuilder.addChildQueryBuilder('person');
 

@@ -41,6 +41,15 @@
                 [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL' | translate"
                 [(ngModel)]="filters.showContacts">
             </app-form-checkbox>
+
+            <!--  This checkbox is valid only if 'showContacts' is already enabled -->
+            <app-form-checkbox
+                [disabled]="!filters.showContacts"
+                fxFlex="150px"
+                name="showContactOfContacts"
+                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' | translate"
+                [(ngModel)]="filters.includeContactsOfContacts">
+            </app-form-checkbox>
         </div>
 
         <div fxLayout="row wrap" fxLayoutGap="20px">
