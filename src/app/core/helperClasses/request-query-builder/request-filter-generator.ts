@@ -24,7 +24,8 @@ export class RequestFilterGenerator {
                     .replace(/%/g, '.*')
                     .replace(/\\\?/g, '.')
                     .replace(/&/g, '%26')
-                    .replace(/#/g, '%23') +
+                    .replace(/#/g, '%23')
+                    .replace(/\+/g, '%2B') +
                 '$/i'
         };
     }
@@ -40,7 +41,8 @@ export class RequestFilterGenerator {
                     .replace(/%/g, '.*')
                     .replace(/\\\?/g, '.')
                     .replace(/&/g, '%26')
-                    .replace(/#/g, '%23') +
+                    .replace(/#/g, '%23')
+                    .replace(/\+/g, '%2B') +
                 '/i'
         };
     }
@@ -56,7 +58,8 @@ export class RequestFilterGenerator {
                     .replace(/%/g, '.*')
                     .replace(/\\\?/g, '.')
                     .replace(/&/g, '%26')
-                    .replace(/#/g, '%23') +
+                    .replace(/#/g, '%23')
+                    .replace(/\+/g, '%2B') +
                 '/i'
         };
     }
