@@ -1,7 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { LabResultModel } from '../../../../core/models/lab-result.model';
-import { QuestionModel } from '../../../../core/models/question.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
@@ -13,6 +11,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ImportDataExtension } from '../../components/import-data/model';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ImportServerModelNames } from '../../components/import-data/import-data.component';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
     selector: 'app-import-contact-of-contact-data',
@@ -21,7 +20,6 @@ import { ImportServerModelNames } from '../../components/import-data/import-data
     styleUrls: ['./import-contact-of-contact-data.component.less']
 })
 export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
-
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -120,7 +118,7 @@ export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
         this.breadcrumbs = [];
 
         // add list breadcrumb only if we have permission
-        if (ContactModel.canList(this.authUser)) {
+        if (ContactOfContactModel.canList(this.authUser)) {
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
                     'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
@@ -143,7 +141,7 @@ export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
      * Finished import
      */
     finished() {
-        if (ContactModel.canList(this.authUser)) {
+        if (ContactOfContactModel.canList(this.authUser)) {
             this.router.navigate(['/contacts-of-contacts']);
         } else {
             // fallback

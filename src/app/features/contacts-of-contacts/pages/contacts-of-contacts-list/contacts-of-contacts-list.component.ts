@@ -708,7 +708,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
             // display export dialog
             this.dialogService.showExportDialog({
-                message: 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER_DIALOG_TITLE',
+                message: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER_DIALOG_TITLE',
                 url: `outbreaks/${this.selectedOutbreak.id}/contacts-of-contacts/dossier`,
                 fileName: this.contactsOfContactsDataExportFileName,
                 fileType: ExportDataExtension.ZIP,
@@ -716,7 +716,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 anonymizeFields: anonymizeFields,
                 anonymizeFieldsKey: 'data',
                 extraAPIData: {
-                    contacts: selectedRecords
+                    contactsOfContacts: selectedRecords
                 },
                 isPOST: true,
                 exportStart: () => { this.showLoadingDialog(); },

@@ -148,6 +148,7 @@
                             </button>
 
                             <button
+                                *ngIf="ContactOfContactModel.canExportDossier(this.authUser)"
                                 mat-menu-item
                                 (click)="exportSelectedContactsOfContactsDossier()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER' | translate }}
