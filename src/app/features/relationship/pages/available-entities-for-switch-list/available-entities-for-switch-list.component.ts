@@ -16,10 +16,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import {
-    ReferenceDataCategory, ReferenceDataCategoryModel,
-    ReferenceDataEntryModel
-} from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityType } from '../../../../core/models/entity-type';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
@@ -200,6 +197,8 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                 }
             });
 
+            console.log(this.entityType);
+            console.log(this.entityId);
             // retrieve location list
             qb.include('locations', true);
 
@@ -349,12 +348,13 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                                   return throwError(err);
                               })
                           )
-                          .subscribe(() => {
+                          .subscribe((data) => {
+                              console.log(data);
                               // hide dialog
                               loadingDialog.close();
 
                               this.snackbarService.showSuccess('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
-
+                              console.log('/relationships', this.entityType, selectedRecordId, 'contacts');
                               this.router.navigate(['/relationships', this.entityType, selectedRecordId, 'contacts']);
 
                           });
