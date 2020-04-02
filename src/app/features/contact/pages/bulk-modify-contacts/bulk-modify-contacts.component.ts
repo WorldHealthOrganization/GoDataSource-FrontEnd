@@ -166,8 +166,8 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         // contacts of contacts list page
         if (
             this.fromContactsOfContactsList &&
-            ContactOfContactModel.canList(this.authUser))
-        {
+            ContactOfContactModel.canList(this.authUser)
+        ) {
             this.breadcrumbs.push(
                 new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE', '/contacts-of-contacts')
             );
@@ -526,7 +526,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                             // we have to construct the service and method
                             // depending on what we want to modify (contacts or contacts of contacts)
                             const service = this.fromContactsOfContactsList ? 'contactsOfContactsDataService' : 'contactDataService';
-                            const method = this.fromContactsOfContactsList ? 'bulkModifyContactsOfContacts' : 'bulkModifyContacts'
+                            const method = this.fromContactsOfContactsList ? 'bulkModifyContactsOfContacts' : 'bulkModifyContacts';
                             // modify contacts
                             this[service]
                                 [method](
