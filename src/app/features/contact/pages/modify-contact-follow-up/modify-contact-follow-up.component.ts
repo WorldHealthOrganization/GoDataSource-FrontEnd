@@ -73,9 +73,12 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         private authDataService: AuthDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private teamDataService: TeamDataService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -87,6 +90,9 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
 
         this.teamsList$ = this.teamDataService.getTeamsList();
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
+
+        // show loading
+        this.showLoadingDialog(false);
 
         // read route query params
         this.route.queryParams
@@ -157,6 +163,9 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
             this.followUpId &&
             this.selectedOutbreak
         ) {
+            // show loading
+            this.showLoadingDialog(false);
+
             // retrieve follow-up information
             this.followUpsDataService
                 .getFollowUp(this.selectedOutbreak.id, this.contactId, this.followUpId, true)
@@ -169,6 +178,9 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
                         this.disableDirtyConfirm();
                         this.router.navigate([this.rootPageUrl]);
 
+                        // hide loading
+                        this.hideLoadingDialog();
+
                         return throwError(err);
                     })
                 )
@@ -176,6 +188,9 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
                     this.followUpData = new FollowUpModel(followUpData);
 
                     this.initializeBreadcrumbs();
+
+                    // hide loading
+                    this.hideLoadingDialog();
                 });
         }
     }
@@ -327,8 +342,10 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
             return;
         }
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify follow-up
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.followUpsDataService
             .modifyFollowUp(
                 this.selectedOutbreak.id,
@@ -339,8 +356,9 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
             )
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
-                    loadingDialog.close();
+                    this.snackbarService.showApiError(err);
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 })
             )
@@ -359,8 +377,8 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
                 // update breadcrumb
                 this.initializeBreadcrumbs();
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
             });
     }
 }

@@ -893,15 +893,19 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             // retrieve location list
             this.queryBuilder.include('locations', true);
 
+            // since some flags can do damage to other endpoints called with the same flag, we should make sure we don't send it
+            // to do this, we clone the query filter before filtering by it
+            const clonedQB = _.cloneDeep(this.queryBuilder);
+
             // retrieve number of contacts & exposures for each record
-            this.queryBuilder.filter.flag(
+            clonedQB.filter.flag(
                 'countRelations',
                 true
             );
 
             // retrieve the list of Cases
             this.casesList$ = this.caseDataService
-                .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
+                .getCasesList(this.selectedOutbreak.id, clonedQB)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
@@ -959,7 +963,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         const clonedQueryBuilder = _.cloneDeep(this.queryBuilder);
         clonedQueryBuilder.paginator.clear();
         clonedQueryBuilder.sort.clear();
-        clonedQueryBuilder.filter.removeFlag('countRelations');
         this.countedCasesGroupedByClassification$ = this.caseClassifications$
             .pipe(
                 mergeMap((refClassificationData: ReferenceDataCategoryModel) => {
@@ -1046,7 +1049,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         .restoreCase(this.selectedOutbreak.id, caseModel.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -1333,33 +1336,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 }
             });
         }
-        // refresh list
-        this.needsRefreshList();
-    }
-
-    /**
-     * Filter by wasContactField
-     * @param {boolean} value
-     */
-    filterByWasContactField(value: boolean | null | undefined) {
-        if (value === false) {
-            this.queryBuilder.filter.where({
-                'wasContact': {
-                    'eq': false
-                }
-            }, true);
-        } else {
-            if (value === true) {
-                this.queryBuilder.filter.where({
-                    'wasContact': {
-                        'eq': true
-                    }
-                }, true);
-            } else {
-                this.queryBuilder.filter.remove('wasContact');
-            }
-        }
-
         // refresh list
         this.needsRefreshList();
     }

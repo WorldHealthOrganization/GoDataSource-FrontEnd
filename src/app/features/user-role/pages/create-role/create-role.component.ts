@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -52,7 +52,8 @@ export class CreateRoleComponent
         private sanitized: DomSanitizer,
         private i18nService: I18nService,
         private authDataService: AuthDataService,
-        private redirectService: RedirectService
+        private redirectService: RedirectService,
+        private route: ActivatedRoute
     ) {
         super();
     }
@@ -68,6 +69,42 @@ export class CreateRoleComponent
         this.availablePermissions$ = this.userRoleDataService
             .getAvailablePermissions()
             .pipe(share());
+
+        // do we need to retrieve and clone user role ?
+        this.route.queryParams
+            .subscribe((queryParams: { cloneId }) => {
+                if (
+                    queryParams &&
+                    queryParams.cloneId
+                ) {
+                    setTimeout(() => {
+                        const loadingDialog = this.dialogService.showLoadingDialog();
+                        this.userRoleDataService
+                            .getRole(queryParams.cloneId)
+                            .pipe(catchError((err) => {
+                                this.snackbarService.showApiError(err);
+
+                                // hide loading
+                                loadingDialog.close();
+
+                                this.disableDirtyConfirm();
+                                this.router.navigate(['/']);
+
+                                return throwError(err);
+                            }))
+                            .subscribe((role) => {
+                                // remove name
+                                role.name = '';
+
+                                // update data
+                                this.newUserRole = new UserRoleModel(role);
+
+                                // hide loading
+                                loadingDialog.close();
+                            });
+                    });
+                }
+            });
 
         // initialize breadcrumbs
         this.initializeBreadcrumbs();

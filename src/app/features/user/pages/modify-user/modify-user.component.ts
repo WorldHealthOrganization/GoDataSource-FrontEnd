@@ -19,6 +19,9 @@ import { throwError } from 'rxjs';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 
 @Component({
     selector: 'app-modify-user',
@@ -39,10 +42,14 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
 
     userId: string;
     user: UserModel = new UserModel();
+    oldPassword: string;
     passwordConfirmModel: string;
     rolesList$: Observable<UserRoleModel[]>;
     outbreaksList$: Observable<OutbreakModel[]>;
     institutionsList$: Observable<LabelValuePair[]>;
+
+    // ask for old password
+    askForOldPassword: boolean = false;
 
     /**
      * Constructor
@@ -56,10 +63,14 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
         private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private formHelper: FormHelperService,
-        private dialogService: DialogService,
-        private referenceDataService: ReferenceDataDataService
+        protected dialogService: DialogService,
+        private referenceDataService: ReferenceDataDataService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -69,24 +80,37 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        // show loading
+        this.showLoadingDialog(false);
+
         // get the route params
         this.route.params.subscribe((params: {userId}) => {
             // get the ID of the User being modified
             this.userId = params.userId;
 
-            // retrieve the User instance
-            this.userDataService
-                .getUser(this.userId)
-                .subscribe((user: UserModel) => {
-                    this.user = user;
+            // retrieve user and system information
+            forkJoin(
+                this.systemSettingsDataService.getAPIVersionNoCache(),
+                this.userDataService.getUser(this.userId)
+            ).subscribe(([tokenInfo, user]) => {
+                // determine if we should ask for old password
+                this.askForOldPassword = !tokenInfo.skipOldPasswordForUserModify;
 
-                    // update breadcrumbs
-                    this.initializeBreadcrumbs();
-                });
+                // set user data
+                this.user = user;
+
+                // update breadcrumbs
+                this.initializeBreadcrumbs();
+
+                // hide loading
+                this.hideLoadingDialog();
+            });
         });
 
         // get the list of roles to populate the dropdown in UI
-        this.rolesList$ = this.userRoleDataService.getRolesList();
+        const qb = new RequestQueryBuilder();
+        qb.sort.by('name');
+        this.rolesList$ = this.userRoleDataService.getRolesList(qb);
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
         this.institutionsList$ = this.referenceDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
     }
@@ -128,34 +152,36 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
             return;
         }
 
+        // remove password if empty
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
+        if (_.isEmpty(dirtyFields.password)) {
+            delete dirtyFields.passwordConfirmModel;
+            delete dirtyFields.oldPassword;
+        }
 
         // remove password confirm
-        if (dirtyFields.passwordConfirm) {
-            delete dirtyFields.passwordConfirm;
-        }
-
-        // remove password if empty
-        if (_.isEmpty(dirtyFields.password)) {
-            delete dirtyFields.password;
-        }
+        delete dirtyFields.passwordConfirm;
 
         if (form.valid && !_.isEmpty(dirtyFields)) {
+            // show loading
+            this.showLoadingDialog();
 
             // modify the user
-            const loadingDialog = this.dialogService.showLoadingDialog();
             this.userDataService
                 .modifyUser(this.userId, dirtyFields)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
-                        loadingDialog.close();
+                        // hide loading
+                        this.hideLoadingDialog();
                         return throwError(err);
                     })
                 )
                 .subscribe((modifiedUser: UserModel) => {
                     // update model
                     this.user = modifiedUser;
+                    this.oldPassword = undefined;
+
                     // reset password confirm model
                     this.passwordConfirmModel = undefined;
 
@@ -164,8 +190,9 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
                         .reloadAndPersistAuthUser()
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
-                                loadingDialog.close();
+                                this.snackbarService.showApiError(err);
+                                // hide loading
+                                this.hideLoadingDialog();
                                 return throwError(err);
                             })
                         )
@@ -179,8 +206,8 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
                             // update breadcrumbs
                             this.initializeBreadcrumbs();
 
-                            // hide dialog
-                            loadingDialog.close();
+                            // hide loading
+                            this.hideLoadingDialog();
                         });
                 });
         }

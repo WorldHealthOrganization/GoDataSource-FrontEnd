@@ -263,6 +263,7 @@
 
             <mat-tab [label]="'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate">
                 <app-form-fill-questionnaire
+                    *ngIf="!!labResultData?.id"
                     name="questionnaireAnswers"
                     [ngModel]="labResultData.questionnaireAnswers"
                     [questions]="selectedOutbreak.labResultsTemplate"

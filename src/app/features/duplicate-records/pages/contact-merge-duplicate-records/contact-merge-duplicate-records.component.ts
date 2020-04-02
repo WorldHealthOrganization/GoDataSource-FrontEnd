@@ -36,13 +36,13 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
 
     contactData: ContactModel = new ContactModel();
 
-    // selected outbreak ID
-    outbreakId: string;
+    selectedOutbreak: OutbreakModel;
 
     // loading flag - display spinner instead of table
     displayLoading: boolean = false;
 
     address: AddressModel = new AddressModel();
+    questionnaireAnswers: any = {};
 
     mergeRecordIds: string[];
     mergeRecords: EntityModel[];
@@ -87,6 +87,10 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
         currentAddresses: {
             options: LabelValuePair[],
             value: any
+        },
+        questionnaireAnswers: {
+            options: LabelValuePair[],
+            value: any
         }
     };
 
@@ -120,7 +124,7 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
                 this.outbreakDataService
                     .getSelectedOutbreak()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
-                        this.outbreakId = selectedOutbreak.id;
+                        this.selectedOutbreak = selectedOutbreak;
 
                         // retrieve records
                         const qb = new RequestQueryBuilder();
@@ -131,7 +135,7 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
                             null
                         );
                         this.outbreakDataService
-                            .getPeopleList(this.outbreakId, qb)
+                            .getPeopleList(this.selectedOutbreak.id, qb)
                             .subscribe((recordMerge) => {
                                 // merge records
                                 this.mergeRecords = recordMerge;
@@ -191,6 +195,10 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
             currentAddresses: {
                 options: [],
                 value: undefined
+            },
+            questionnaireAnswers: {
+                options: [],
+                value: undefined
             }
         };
 
@@ -215,6 +223,9 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
 
             // merge all addresses, keep just one current address
             this.determineAddresses();
+
+            // determine questionnaire answers
+            this.determineQuestionnaireAnswers();
         }
     }
 
@@ -293,6 +304,36 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
     }
 
     /**
+     * Determine questionnaire answers
+     */
+    private determineQuestionnaireAnswers() {
+        // add questionnaire answers
+        _.each(this.mergeRecords, (ent: EntityModel) => {
+            const model: ContactModel = ent.model as ContactModel;
+            if (!_.isEmpty(model.questionnaireAnswers)) {
+                this.uniqueOptions.questionnaireAnswers.options.push(new LabelValuePair(
+                    model.name,
+                    model.questionnaireAnswers
+                ));
+            }
+        });
+
+        // preselect questionnaire answer if we have only one
+        if (this.uniqueOptions.questionnaireAnswers.options.length === 1) {
+            this.uniqueOptions.questionnaireAnswers.value = this.uniqueOptions.questionnaireAnswers.options[0].value;
+            this.questionnaireAnswers = this.uniqueOptions.questionnaireAnswers.value;
+        }
+    }
+
+    /**
+     * Questionnaire answers changed
+     * @param data
+     */
+    changedQuestionnaireAnswers(data: LabelValuePair) {
+        this.questionnaireAnswers = data ? data.value : {};
+    }
+
+    /**
      * Address changed
      * @param data
      */
@@ -332,6 +373,9 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
             delete dirtyFields.ageDob;
         }
 
+        // sanitize questionnaire answers
+        delete dirtyFields.selectedQuestionnaireAnswers;
+
         // merge records
         if (!_.isEmpty(dirtyFields)) {
             if (this.formHelper.isFormsSetValid(stepForms)) {
@@ -339,7 +383,7 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
                 this.displayLoading = true;
                 this.outbreakDataService
                     .mergePeople(
-                        this.outbreakId,
+                        this.selectedOutbreak.id,
                         EntityType.CONTACT,
                         this.mergeRecordIds,
                         dirtyFields
@@ -347,7 +391,7 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
                     .pipe(
                         catchError((err) => {
                             this.displayLoading = false;
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err);
                             return throwError(err);
                         })
                     )

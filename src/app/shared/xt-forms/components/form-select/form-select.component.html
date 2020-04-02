@@ -22,7 +22,8 @@
             [multiple]="multiple"
             (blur)="onBlur()"
             [disabled]="disabled"
-            (selectionChange)="onChange(selectElement.value)">
+            (selectionChange)="onChange(selectElement.value)"
+            [disableOptionCentering]="true">
             <mat-select-trigger>
                 <div
                     *ngFor="let option of selectedOptions; let first = first"
@@ -43,32 +44,47 @@
                     {{option[optionLabelKey] | translate}}
                 </div>
             </mat-select-trigger>
+
+            <!-- Option used to filter options -->
+            <mat-option
+                *ngIf="enableFilterOptions">
+                <ngx-mat-select-search
+                    [placeholderLabel]="filterOptionsPlaceholder | translate"
+                    [noEntriesFoundLabel]="false"
+                    [clearSearchInput]="true"
+                    [(ngModel)]="searchedValue"
+                    (ngModelChange)="filterOptions($event)"
+                    [disableScrollToActiveOnOptionsChanged]="true"
+                    [preventHomeEndKeyPropagation]="true">
+                </ngx-mat-select-search>
+            </mat-option>
+
+            <!-- Empty option used to select nothing -->
             <mat-option
                 *ngIf="clearable && !multiple"
                 [value]="null">
                 {{ noneLabel | translate }}
             </mat-option>
-            <ng-container
-                *ngFor="let option of options">
-                <mat-option
-                    *ngIf="displayInvisibleItems || option[optionVisibleKey] !== false"
-                    [value]="option[optionValueKey]"
-                    [matTooltip]="option[optionTooltipKey] | translate"
-                    [disabled]="!allowSelectionOfDisabledItems && option[optionDisabledKey] || optionReadOnly">
-                    <!-- Image -->
-                    <img
-                        *ngIf="optionLabelImgKey && option[optionLabelImgKey]"
-                        height="24px"
-                        [src]="option[optionLabelImgKey]"/>
 
-                    <!-- Prefix -->
-                    {{ optionLabelPrefixKey && option[optionLabelPrefixKey] ? (option[optionLabelPrefixKey] | translate) + optionLabelPrefixDelimiter : '' }}
+            <!-- Empty option used to select nothing -->
+            <mat-option
+                *ngFor="let option of filteredOptions"
+                [value]="option[optionValueKey]"
+                [matTooltip]="option[optionTooltipKey] | translate"
+                [disabled]="(!allowSelectionOfDisabledItems && option[optionDisabledKey]) || optionReadOnly">
 
-                    <!-- Label -->
-                    {{option[optionLabelKey] | translate}}
+                <!-- Image -->
+                <img
+                    *ngIf="optionLabelImgKey && option[optionLabelImgKey]"
+                    height="24px"
+                    [src]="option[optionLabelImgKey]"/>
 
-                </mat-option>
-            </ng-container>
+                <!-- Prefix -->
+                {{ optionLabelPrefixKey && option[optionLabelPrefixKey] ? (option[optionLabelPrefixKey] | translate) + optionLabelPrefixDelimiter : '' }}
+
+                <!-- Label -->
+                {{option[optionLabelKey] | translate}}
+            </mat-option>
         </mat-select>
 
         <span
@@ -76,8 +92,7 @@
             #tooltipCtrl="matTooltip"
             [matTooltip]="tooltip"
             class="xt-icon form-icon"
-            (click)="displayTooltip($event, tooltipCtrl)"
-        >
+            (click)="displayTooltip($event, tooltipCtrl)">
             help
         </span>
     </mat-form-field>

@@ -41,6 +41,7 @@
                         [allowedExportTypes]="allowedExportTypes"
                         [displayEncrypt]="true"
                         [displayAnonymize]="true"
+                        [displayUseQuestionVariable]="true"
                         [anonymizeFields]="anonymizeFields"
                         [queryBuilder]="queryBuilder"
                         (exportStart)="showLoadingDialog()"
@@ -579,7 +580,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByWasCaseField($event.value)"
+                            (optionChanged)="filterByBooleanUsingExistField('wasCase', $event.value)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
                             [displayFilterIcon]="true"

@@ -764,6 +764,12 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 sortable: true
             }),
             new FilterModel({
+                fieldName: 'questionnaireAnswers',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+                type: FilterType.QUESTIONNAIRE_ANSWERS,
+                questionnaireTemplate: this.selectedOutbreak.contactInvestigationTemplate
+            }),
+            new FilterModel({
                 fieldName: 'pregnancyStatus',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
                 type: FilterType.SELECT,
@@ -902,15 +908,19 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             // retrieve location list
             this.queryBuilder.include('locations', true);
 
+            // since some flags can do damage to other endpoints called with the same flag, we should make sure we don't send it
+            // to do this, we clone the query filter before filtering by it
+            const clonedQB = _.cloneDeep(this.queryBuilder);
+
             // retrieve number of contacts & exposures for each record
-            this.queryBuilder.filter.flag(
+            clonedQB.filter.flag(
                 'countRelations',
                 true
             );
 
             // retrieve the list of Contacts
             this.contactsList$ = this.contactDataService
-                .getContactsList(this.selectedOutbreak.id, this.queryBuilder)
+                .getContactsList(this.selectedOutbreak.id, clonedQB)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
@@ -957,7 +967,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             const clonedQueryBuilder = _.cloneDeep(this.queryBuilder);
             clonedQueryBuilder.paginator.clear();
             clonedQueryBuilder.sort.clear();
-            clonedQueryBuilder.filter.removeFlag(`countRelations`);
             this.countedContactsByRiskLevel$ = this.riskLevelRefData$
                 .pipe(
                     mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
@@ -1011,7 +1020,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         .deleteContact(this.selectedOutbreak.id, contact.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -1037,7 +1046,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         .restoreContact(this.selectedOutbreak.id, contact.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -1062,7 +1071,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                         .convertContactToCase(this.selectedOutbreak.id, contactModel.id)
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -1284,33 +1293,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     }
                 }
             });
-        }
-
-        // refresh list
-        this.needsRefreshList();
-    }
-
-    /**
-     * Filter by wasCaseField
-     * @param {boolean} value
-     */
-    filterByWasCaseField(value: boolean | null | undefined) {
-        if (value === false) {
-            this.queryBuilder.filter.where({
-                'wasCase': {
-                    'eq': false
-                }
-            }, true);
-        } else {
-            if (value === true) {
-                this.queryBuilder.filter.where({
-                    'wasCase': {
-                        'eq': true
-                    }
-                }, true);
-            } else {
-                this.queryBuilder.filter.remove('wasCase');
-            }
         }
 
         // refresh list

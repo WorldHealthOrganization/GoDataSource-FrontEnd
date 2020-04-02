@@ -55,9 +55,12 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
         protected route: ActivatedRoute,
         private authDataService: AuthDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -73,6 +76,9 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             .subscribe((params: { backToCurrent }) => {
                 this.backToCurrent = params.backToCurrent;
             });
+
+        // show loading
+        this.showLoadingDialog(false);
 
         this.route.params
             .subscribe((params: { locationId }) => {
@@ -95,6 +101,9 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
 
                         // update breadcrumbs
                         this.initializeBreadcrumbs();
+
+                        // hide loading
+                        this.hideLoadingDialog();
                     });
             });
     }
@@ -164,7 +173,9 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             return;
         }
 
-        const loadingDialog = this.dialogService.showLoadingDialog();
+        // show loading
+        this.showLoadingDialog();
+
         this.locationDataService
             .modifyLocation(
                 this.locationId,
@@ -173,8 +184,9 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             )
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
-                    loadingDialog.close();
+                    this.snackbarService.showApiError(err);
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 })
             )
@@ -202,7 +214,8 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
                                 return throwError(err);
                             })
                         )
@@ -221,30 +234,31 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                                                 .pipe(
                                                     catchError((err) => {
                                                         this.snackbarService.showApiError(err);
-                                                        loadingDialog.close();
+                                                        // hide loading
+                                                        this.hideLoadingDialog();
                                                         return throwError(err);
                                                     })
                                                 )
                                                 .subscribe(() => {
-                                                    // hide dialog
-                                                    loadingDialog.close();
+                                                    // hide loading
+                                                    this.hideLoadingDialog();
 
                                                     // success msg
                                                     this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE');
                                                 });
                                         } else {
-                                            // hide dialog
-                                            loadingDialog.close();
+                                            // hide loading
+                                            this.hideLoadingDialog();
                                         }
                                     });
                             } else {
-                                // hide dialog
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
                             }
                         });
                 } else {
-                    // hide dialog
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                 }
             });
     }

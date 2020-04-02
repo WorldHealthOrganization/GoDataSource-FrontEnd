@@ -97,6 +97,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     showLegend: boolean = true;
     // toggle edit mode
     editMode: boolean = false;
+    // toggle full screen
+    fullScreen: boolean = false;
 
     // display labels
     displayLabels: boolean = true;
@@ -395,6 +397,14 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
     public ngOnChanges(): any {
         // render cytoscape object
         this.render();
+    }
+
+    /**
+     * Full screen toggle from child component to update toggles section
+     * @param {boolean} fullScreenToggle
+     */
+    onFullScreenToggle(fullScreenToggle: boolean) {
+        this.fullScreen = fullScreenToggle;
     }
 
     /**
@@ -1142,7 +1152,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit, OnDestroy {
                                         )
                                         .pipe(
                                             catchError((err) => {
-                                                this.snackbarService.showError(err.message);
+                                                this.snackbarService.showApiError(err);
                                                 loadingDialog.close();
                                                 return throwError(err);
                                             })

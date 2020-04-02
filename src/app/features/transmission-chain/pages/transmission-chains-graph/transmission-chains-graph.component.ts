@@ -305,7 +305,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             .getEntityRelationship(this.selectedOutbreak.id, relationship.sourceType, relationship.source, relationship.id)
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     loadingDialog.close();
                     return throwError(err);
                 })

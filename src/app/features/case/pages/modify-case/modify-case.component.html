@@ -76,7 +76,8 @@
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
                                     tooltip="LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION"
                                     [options]="occupationsList$ | async"
-                                    [disabled]="viewOnly">
+                                    [disabled]="viewOnly"
+                                    [enableFilterOptions]="true">
                                 </app-form-select>
                             </div>
 
@@ -109,8 +110,7 @@
                                 [maxlength]="255"
                                 [disabled]="viewOnly"
                                 app-general-async-validator
-                                [asyncValidatorObservable]="caseIdMaskValidator"
-                            >
+                                [asyncValidatorObservable]="viewOnly ? null : caseIdMaskValidator">
                             </app-form-input>
 
                             <app-form-datepicker
@@ -415,12 +415,14 @@
                     centerNameLabel="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
                     centerNameTooltip="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME_DESCRIPTION"
                     [dateOfOnset]="caseData.dateOfOnset"
+                    [maxDate]="serverToday"
                 ></app-form-case-center-daterange-list>
 
             </mat-tab>
 
             <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE' | translate">
                 <app-form-fill-questionnaire
+                    *ngIf="!!caseData?.id"
                     name="questionnaireAnswers"
                     [ngModel]="caseData.questionnaireAnswers"
                     [questions]="selectedOutbreak.caseInvestigationTemplate"

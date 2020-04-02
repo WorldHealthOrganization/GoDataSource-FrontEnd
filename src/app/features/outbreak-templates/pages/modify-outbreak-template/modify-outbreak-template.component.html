@@ -27,7 +27,9 @@
                                 [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_NAME' | translate"
                                 tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_NAME_DESCRIPTION"
                                 required="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                app-general-async-validator
+                                [asyncValidatorObservable]="outbreakTemplateNameValidator$">
                             </app-form-input>
                             <app-form-select
                                 name="disease"
@@ -184,6 +186,14 @@
             type="button"
             [routerLink]="['/outbreak-templates', outbreakTemplateId, 'case-questionnaire']">
             {{ 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE' | translate }}
+        </button>
+
+        <button
+            *ngIf="OutbreakTemplateModel.canModifyContactQuestionnaire(authUser)"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/outbreak-templates', outbreakTemplateId, 'contact-questionnaire']">
+            {{ 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE' | translate }}
         </button>
 
         <button

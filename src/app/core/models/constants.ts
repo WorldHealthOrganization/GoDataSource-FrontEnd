@@ -166,6 +166,10 @@ export class Constants {
             label: 'LNG_APP_PAGE_CASE_LAB_RESULTS',
             value: 'LNG_APP_PAGE_CASE_LAB_RESULTS'
         },
+        CONTACT_LAB_RESULTS: {
+            label: 'LNG_APP_PAGE_CONTACT_LAB_RESULTS',
+            value: 'LNG_APP_PAGE_CONTACT_LAB_RESULTS'
+        },
         AVAILABLE_ENTITIES_FOR_RELATIONSHIPS: {
             label: 'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_RELATIONSHIPS',
             value: 'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_RELATIONSHIPS'
@@ -268,6 +272,10 @@ export class Constants {
         CASE_LAB_DATA: {
             label: 'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA',
             value: 'LNG_APP_PAGE_IMPORT_CASE_LAB_DATA'
+        },
+        CONTACT_LAB_DATA: {
+            label: 'LNG_APP_PAGE_IMPORT_CONTACT_LAB_DATA',
+            value: 'LNG_APP_PAGE_IMPORT_CONTACT_LAB_DATA'
         },
         REFERENCE_DATA: {
             label: 'LNG_APP_PAGE_IMPORT_REFERENCE_DATA',

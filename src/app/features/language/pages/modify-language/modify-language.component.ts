@@ -21,6 +21,7 @@ import { throwError } from 'rxjs';
     styleUrls: ['./modify-language.component.less']
 })
 export class ModifyLanguageComponent extends ViewModifyComponent implements OnInit {
+    // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // constants
@@ -43,9 +44,12 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
         private router: Router,
         private cacheService: CacheService,
         private authDataService: AuthDataService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -54,6 +58,9 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // show loading
+        this.showLoadingDialog(false);
 
         this.route.params
             .subscribe((params: {languageId}) => {
@@ -67,6 +74,9 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
 
                         // update breadcrumbs
                         this.initializeBreadcrumbs();
+
+                        // hide loading
+                        this.hideLoadingDialog();
                     });
             });
     }
@@ -109,14 +119,17 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
             return;
         }
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify the event
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.languageDataService
             .modifyLanguage(this.languageId, dirtyFields)
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
-                    loadingDialog.close();
+                    this.snackbarService.showApiError(err);
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 }),
                 switchMap((modifiedLanguage) => {
@@ -128,7 +141,8 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
                                 return throwError(err);
                             }),
                             map(() => modifiedLanguage)
@@ -148,8 +162,8 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
                 // update breadcrumbs
                 this.initializeBreadcrumbs();
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
         });
     }
 }

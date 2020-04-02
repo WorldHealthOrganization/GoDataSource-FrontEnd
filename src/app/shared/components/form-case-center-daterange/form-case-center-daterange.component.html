@@ -26,21 +26,24 @@
                         [disabled]="disabled"
                         [fromTooltip]="fromTooltip"
                         [toTooltip]="toTooltip"
-                        [minDate]="minDate">
+                        [minDate]="minDate"
+                        [maxDate]="maxDate">
                     </app-form-daterange>
                 </div>
 
-                <div fxFlex fxLayout="row" fxLayoutGap="20px">
-                    <app-form-input
-                        [name]="name + '[centerName]'"
-                        [(ngModel)]="centerDateRange.centerName"
-                        (optionChanged)="onChange()"
-                        [placeholder]="centerNameLabel | translate"
-                        [tooltip]="centerNameTooltip"
-                        required="false"
-                        [disabled]="disabled">
-                    </app-form-input>
-                </div>
+                <app-form-select
+                    [name]="name + '[centerName]'"
+                    [(ngModel)]="centerDateRange.centerName"
+                    [options]="dateRangeCentreNameList$ | async"
+                    [placeholder]="centerNameLabel | translate"
+                    [tooltip]="centerNameTooltip"
+                    [disabled]="disabled"
+                    [required]="false"
+                    [clearable]="true"
+                    optionLabelKey="label"
+                    optionValueKey="value"
+                    (optionChanged)="onChange()">
+                </app-form-select>
 
                 <app-form-location-dropdown
                     [name]="name + '[locationId]'"
@@ -52,7 +55,6 @@
                     [required]="false"
                     [disabled]="disabled">
                 </app-form-location-dropdown>
-
             </div>
 
             <div fxLayout="row">

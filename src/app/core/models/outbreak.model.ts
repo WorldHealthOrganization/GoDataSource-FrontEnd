@@ -30,6 +30,7 @@ export class OutbreakModel
     noLessContacts: number;
     noDaysNewContacts: number;
     caseInvestigationTemplate: QuestionModel[];
+    contactInvestigationTemplate: QuestionModel[];
     contactFollowUpTemplate: QuestionModel[];
     labResultsTemplate: QuestionModel[];
     // TODO - need to allow to set case classifications on outbreak
@@ -76,6 +77,7 @@ export class OutbreakModel
      * Static Permissions - IPermissionQuestionnaire
      */
     static canModifyCaseQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CASE_QUESTIONNAIRE) : false; }
+    static canModifyContactQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CONTACT_QUESTIONNAIRE) : false; }
     static canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE) : false; }
     static canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE) : false; }
 
@@ -114,16 +116,25 @@ export class OutbreakModel
         this.isContactLabResultsActive = _.get(data, 'isContactLabResultsActive', false);
         this.isContactsOfContactsActive = _.get(data, 'isContactsOfContactsActive', false);
 
+        // CASE INVESTIGATION TEMPLATE
         this.caseInvestigationTemplate = _.map(
             _.get(data, 'caseInvestigationTemplate', []),
             (lData: any) => {
                return new QuestionModel(lData);
             });
+        // CONTACT INVESTIGATION TEMPLATE
+        this.contactInvestigationTemplate = _.map(
+            _.get(data, 'contactInvestigationTemplate', []),
+            (lData: any) => {
+                return new QuestionModel(lData);
+            });
+        // CONTACT FOLLOW_UP INVESTIGATIONS TEMPLATE
         this.contactFollowUpTemplate = _.map(
             _.get(data, 'contactFollowUpTemplate', []),
             (lData: any) => {
                 return new QuestionModel(lData);
             });
+        // LAB RESULT TEMPLATE
         this.labResultsTemplate = _.map(
             _.get(data, 'labResultsTemplate', []),
             (lData: any) => {

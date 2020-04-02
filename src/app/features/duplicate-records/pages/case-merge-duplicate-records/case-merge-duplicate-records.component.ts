@@ -527,7 +527,7 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
                     .pipe(
                         catchError((err) => {
                             this.displayLoading = false;
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err);
                             return throwError(err);
                         })
                     )

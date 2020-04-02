@@ -61,7 +61,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                 this.downloadConfFile(item);
             },
             visible: (item: SystemClientApplicationModel): boolean => {
-                return SystemClientApplicationModel.canDownloadConfFile(this.authUser);
+                return SystemClientApplicationModel.canDownloadConfFile(this.authUser) && item.active;
             }
         }),
 
@@ -279,7 +279,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                         .getSystemSettings()
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showError(err.message);
+                                this.snackbarService.showApiError(err);
                                 return throwError(err);
                             })
                         )
@@ -325,7 +325,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
             .getSystemSettings()
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     return throwError(err);
                 })
             )

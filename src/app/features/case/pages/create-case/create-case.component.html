@@ -68,7 +68,8 @@
                                     [(ngModel)]="caseData.occupation"
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
                                     tooltip="LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION"
-                                    [options]="occupationsList$ | async">
+                                    [options]="occupationsList$ | async"
+                                    [enableFilterOptions]="true">
                                 </app-form-select>
                             </div>
 
@@ -360,6 +361,7 @@
                     centerNameLabel="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
                     centerNameTooltip="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME_DESCRIPTION"
                     [required]="true"
+                    [maxDate]="serverToday"
                     [dateOfOnset]="caseData.dateOfOnset"
                 ></app-form-case-center-daterange-list>
 

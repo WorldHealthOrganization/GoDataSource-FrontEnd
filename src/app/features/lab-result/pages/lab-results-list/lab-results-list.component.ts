@@ -11,7 +11,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
@@ -20,7 +20,7 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { catchError, share, tap } from 'rxjs/operators';
-import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import { HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
 import { Router } from '@angular/router';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -29,6 +29,8 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
     selector: 'app-lab-results',
@@ -53,6 +55,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
     labTestResultsList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any>;
     caseClassificationsList$: Observable<any[]>;
+    progressOptionsList$: Observable<any[]>;
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -83,6 +86,39 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
     CaseModel = CaseModel;
     ContactModel = ContactModel;
 
+    // export outbreak lab results
+    exportLabResultsUrl: string;
+    exportLabResultsFileName: string;
+    allowedExportTypes: ExportDataExtension[] = [
+        ExportDataExtension.CSV,
+        ExportDataExtension.XLS,
+        ExportDataExtension.XLSX,
+        ExportDataExtension.XML,
+        ExportDataExtension.JSON,
+        ExportDataExtension.ODS,
+        ExportDataExtension.PDF
+    ];
+    anonymizeFields: LabelValuePair[] = [
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_ID', 'id'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID', 'sampleIdentifier'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN', 'dateSampleTaken'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED', 'dateSampleDelivered'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING', 'dateTesting'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT', 'dateOfResult'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME', 'labName'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE', 'sampleType'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE', 'testType'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_RESULT', 'result'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_NOTES', 'notes'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_STATUS', 'status'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT', 'quantitativeResult'),
+        new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
+    ];
+
+    // loading dialog handler
+    loadingDialog: LoadingDialogModel;
+
+    // actions
     recordActions: HoverRowAction[] = [
         // View Lab Results
         new HoverRowAction({
@@ -207,7 +243,8 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
+        private i18nService: I18nService
     ) {
         super(snackbarService);
     }
@@ -224,6 +261,7 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST).pipe(share());
         this.labTestResultsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT).pipe(share());
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions().pipe(share());
+        this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
 
         // determine person type list accordingly to user permissions
         this.personTypeList = [];
@@ -254,6 +292,16 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+
+                // export lab results url
+                this.exportLabResultsUrl = null;
+                if (
+                    this.selectedOutbreak &&
+                    this.selectedOutbreak.id
+                ) {
+                    this.exportLabResultsUrl = `/outbreaks/${this.selectedOutbreak.id}/lab-results/export`;
+                    this.exportLabResultsFileName = `${this.i18nService.instant('LNG_PAGE_LIST_LAB_RESULTS_TITLE')} - ${moment().format('YYYY-MM-DD')}`;
+                }
 
                 // initialize side filters
                 this.initializeSideFilters();
@@ -334,6 +382,10 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
                 label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT'
             }),
             new VisibleColumnModel({
+                field: 'status',
+                label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS'
+            }),
+            new VisibleColumnModel({
                 field: 'testedFor',
                 label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR'
             }),
@@ -390,11 +442,6 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
 
         // init side filters
         this.availableSideFilters = [
-            new FilterModel({
-                fieldName: 'person.visualId',
-                fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID',
-                type: FilterType.TEXT,
-            }),
             new FilterModel({
                 fieldName: 'sampleIdentifier',
                 fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
@@ -629,4 +676,20 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
             });
     }
 
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
+    }
 }

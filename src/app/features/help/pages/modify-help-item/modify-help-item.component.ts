@@ -52,9 +52,12 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
         private authDataService: AuthDataService,
         private i18nService: I18nService,
         private cacheService: CacheService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
-        super(route);
+        super(
+            route,
+            dialogService
+        );
     }
 
     /**
@@ -65,11 +68,15 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList();
 
+        // show loading
+        this.showLoadingDialog(false);
+
         this.route.params
             .subscribe((params: { categoryId, itemId }) => {
                 this.categoryId = params.categoryId;
                 this.itemId = params.itemId;
 
+                // retrieve help category
                 this.helpDataService
                     .getHelpCategory(this.categoryId)
                     .subscribe((category) => {
@@ -96,6 +103,9 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
                                         }
                                     });
                                 });
+
+                                // hide loading
+                                this.hideLoadingDialog();
                             });
                     });
             });
@@ -170,14 +180,17 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
         // since we change content, should we reset approve value to false?
         // #TODO - #TBD
 
+        // show loading
+        this.showLoadingDialog();
+
         // modify the help item
-        const loadingDialog = this.dialogService.showLoadingDialog();
         this.helpDataService
             .modifyHelpItem(this.categoryId, this.itemId, dirtyFields)
             .pipe(
                 catchError((err) => {
                     this.snackbarService.showApiError(err);
-                    loadingDialog.close();
+                    // hide loading
+                    this.hideLoadingDialog();
                     return throwError(err);
                 }),
                 switchMap((helpItemData) => {
@@ -186,14 +199,15 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
                         .pipe(
                             catchError((err) => {
                                 this.snackbarService.showApiError(err);
-                                loadingDialog.close();
+                                // hide loading
+                                this.hideLoadingDialog();
                                 return throwError(err);
                             }),
                             map(() => helpItemData)
                         );
                 })
             )
-            .subscribe((helpItemData) => {
+            .subscribe((helpItemData: HelpItemModel) => {
                 // update model
                 this.helpItemData = helpItemData;
 
@@ -209,8 +223,11 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
                 // initialize breadcrumbs
                 this.initializeBreadcrumbs();
 
-                // hide dialog
-                loadingDialog.close();
+                // hide loading
+                this.hideLoadingDialog();
+
+                // redirect to new path
+                this.router.navigate([`/help/categories/${helpItemData.categoryId}/items/${helpItemData.id}/modify`]);
             });
     }
 }

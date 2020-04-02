@@ -36,7 +36,7 @@
         [active]="!refreshingList"
     ></app-hover-row-actions>
 
-    <mat-table #table [dataSource]="savedImportMappingsList$| async" matSort (matSortChange)="sortBy($event)">
+    <mat-table #table [dataSource]="savedImportMappingsList$ | async" matSort (matSortChange)="sortBy($event)">
 
         <!-- Name -->
         <ng-container matColumnDef="name">

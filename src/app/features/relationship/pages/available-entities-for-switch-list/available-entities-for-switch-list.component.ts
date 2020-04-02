@@ -328,7 +328,6 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
 
         // display loading
         const loadingDialog = this.dialogService.showLoadingDialog();
-
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CHANGE_SOURCE')
             .subscribe((answer: DialogAnswer) => {
                   if (answer.button === DialogAnswerButton.Yes) {
@@ -346,14 +345,19 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                                   return throwError(err);
                               })
                           )
-                          .subscribe((data) => {
+                          .subscribe(() => {
                               // hide dialog
                               loadingDialog.close();
 
+                              // saved
                               this.snackbarService.showSuccess('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
-                              this.router.navigate(['/relationships', this.entityType, selectedRecordId, 'contacts']);
 
+                              // redirect
+                              this.router.navigate(['/relationships', this.entityType, selectedRecordId, 'contacts']);
                           });
+                  } else {
+                      // hide dialog
+                      loadingDialog.close();
                   }
             });
     }

@@ -134,7 +134,7 @@ export class CreateLabResultComponent
                             entitySubscriber
                                 .pipe(
                                     catchError((err) => {
-                                        this.snackbarService.showError(err.message);
+                                        this.snackbarService.showApiError(err);
 
                                         // Case / Contact not found
                                         this.disableDirtyConfirm();

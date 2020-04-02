@@ -177,16 +177,15 @@ export class RequestFilter {
         if (_.isEmpty(value)) {
             this.remove(property);
         } else {
-            // build number pattern
-            const numberPattern = !_.isEmpty(value) ? RequestFilter.getPhoneNumberPattern(value) : '';
-
+            // build number pattern condition
             this.where({
                 [property]: {
-                    regex: numberPattern
+                    regex: RequestFilter.getPhoneNumberPattern(value)
                 }
             }, replace);
         }
 
+        // finished
         return this;
     }
 
@@ -272,6 +271,45 @@ export class RequestFilter {
         }
 
         return this;
+    }
+
+    /**
+     * Filter by boolean but include "exists" criteria too for a more accurate search
+     * @param {string} property
+     * @param {boolean} value
+     * @param {boolean} replace
+     */
+    byBooleanUsingExist(property: string, value: boolean | null | undefined) {
+        // create condition with OR criteria
+        const orCondition = {
+            or: [
+                {
+                    [property]: {
+                        eq: value
+                    }
+                },
+                {
+                    [property]: {
+                        exists: value
+                    }
+                }
+            ]
+        };
+
+        // remove existing property and condition
+        this.remove(property);
+        this.removeCondition(orCondition);
+
+        // apply filter
+        if (value === false) {
+            this.where(orCondition);
+        } else if (value === true) {
+            this.where({
+                [property]: {
+                    eq: true
+                }
+            });
+        }
     }
 
     /**

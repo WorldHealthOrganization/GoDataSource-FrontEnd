@@ -18,8 +18,7 @@ export class SystemSettingsDataService {
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private cacheService: CacheService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve System settings
@@ -48,32 +47,41 @@ export class SystemSettingsDataService {
     }
 
     /**
+     * Retrieve api version - no cache ( either local one if apiUrl is empty, or other api if apiUrl starts with http / https )
+     * @param apiUrl
+     */
+    getAPIVersionNoCache(
+        apiUrl: string = ''
+    ): Observable<SystemSettingsVersionModel> {
+        return this.modelHelper
+            .mapObservableToModel(
+                this.http.get(`${apiUrl}/system-settings/version`),
+                SystemSettingsVersionModel
+            )
+            .pipe(
+                tap((versionData) => {
+                    if (_.isEmpty(apiUrl)) {
+                        this.cacheService.set(CacheKey.API_VERSION, versionData);
+                    }
+                })
+            );
+    }
+
+    /**
      * Retrieve api version ( either local one if apiUrl is empty, or other api if apiUrl starts with http / https )
      * @param apiUrl
      */
     getAPIVersion(
         apiUrl: string = ''
     ): Observable<SystemSettingsVersionModel> {
-        const callingLocalAPI: boolean = _.isEmpty(apiUrl);
         const cache = this.cacheService.get(CacheKey.API_VERSION);
         if (
-            callingLocalAPI &&
+            _.isEmpty(apiUrl) &&
             cache
         ) {
             return of(cache);
         } else {
-            return this.modelHelper
-                .mapObservableToModel(
-                    this.http.get(`${apiUrl}/system-settings/version`),
-                    SystemSettingsVersionModel
-                )
-                .pipe(
-                    tap((versionData) => {
-                        if (callingLocalAPI) {
-                            this.cacheService.set(CacheKey.API_VERSION, versionData);
-                        }
-                    })
-                );
+            return this.getAPIVersionNoCache(apiUrl);
         }
     }
 }

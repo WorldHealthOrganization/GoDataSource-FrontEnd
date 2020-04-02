@@ -247,7 +247,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.initializeReferenceData()
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
                     return throwError(err);
                 })
             )

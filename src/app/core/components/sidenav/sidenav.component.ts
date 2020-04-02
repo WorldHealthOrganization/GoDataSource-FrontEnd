@@ -65,13 +65,36 @@ export class SidenavComponent implements OnInit, OnDestroy {
             new ChildNavItem(
                 'saved-filters',
                 'LNG_LAYOUT_MENU_ITEM_SAVED_FILTERS_LABEL',
-                [],
+                new PermissionExpression({
+                    or: [
+                        PERMISSION.CASE_LIST,
+                        PERMISSION.FOLLOW_UP_LIST,
+                        PERMISSION.CONTACT_LIST,
+                        PERMISSION.CASE_LIST_LAB_RESULT,
+                        PERMISSION.CONTACT_LIST_LAB_RESULT,
+                        PERMISSION.LAB_RESULT_LIST,
+                        PERMISSION.CASE_CHANGE_SOURCE_RELATIONSHIP,
+                        PERMISSION.CONTACT_CHANGE_SOURCE_RELATIONSHIP,
+                        PERMISSION.EVENT_CHANGE_SOURCE_RELATIONSHIP,
+                        PERMISSION.RELATIONSHIP_CREATE,
+                        PERMISSION.RELATIONSHIP_SHARE
+                    ]
+                }),
                 '/saved-filters'
             ),
             new ChildNavItem(
                 'saved-import-mapping',
                 'LNG_LAYOUT_MENU_ITEM_SAVED_IMPORT_MAPPING_LABEL',
-                [],
+                new PermissionExpression({
+                    or: [
+                        PERMISSION.LOCATION_IMPORT,
+                        PERMISSION.REFERENCE_DATA_IMPORT,
+                        PERMISSION.CONTACT_IMPORT,
+                        PERMISSION.CONTACT_IMPORT_LAB_RESULT,
+                        PERMISSION.CASE_IMPORT,
+                        PERMISSION.CASE_IMPORT_LAB_RESULT
+                    ]
+                }),
                 '/saved-import-mapping'
             ),
             new ChildNavItem(

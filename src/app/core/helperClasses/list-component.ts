@@ -141,6 +141,13 @@ export abstract class ListComponent implements OnDestroy {
     };
 
     /**
+     * Did we check at least one record ?
+     */
+    get checkedAtLeastOneRecord(): boolean {
+        return !_.isEmpty(this.checkboxModels.checkedRecords);
+    }
+
+    /**
      * Checked only deleted records ?
      */
     get checkedOnlyDeletedRecords(): boolean {
@@ -586,6 +593,19 @@ export abstract class ListComponent implements OnDestroy {
         } else {
             this.queryBuilder.filter.bySelect(property, values, replace, valueKey);
         }
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
+     * Filter by boolean with exists condition
+     * @param {string} property
+     * @param value
+     */
+    filterByBooleanUsingExistField(property: string, value: any) {
+        // filter by boolean using exist
+        this.queryBuilder.filter.byBooleanUsingExist(property, value);
 
         // refresh list
         this.needsRefreshList();

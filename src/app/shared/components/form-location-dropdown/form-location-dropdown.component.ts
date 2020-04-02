@@ -11,8 +11,13 @@ import { ErrorMessage } from '../../xt-forms/core/error-message';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { NgOption, NgSelectComponent } from '@ng-select/ng-select';
-import { catchError, debounceTime } from 'rxjs/operators';
+import { catchError, debounceTime, share } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { Moment } from 'moment';
+import * as moment from 'moment';
+import { Observable } from 'rxjs/internal/Observable';
+import { of } from 'rxjs/internal/observable/of';
+import { Subscriber } from 'rxjs/internal-compatibility';
 
 export class LocationAutoItem {
     constructor(
@@ -38,14 +43,42 @@ export class LocationAutoItem {
         multi: true
     }]
 })
-export class FormLocationDropdownComponent extends GroupBase<string | string[]> implements OnInit, OnDestroy {
+export class FormLocationDropdownComponent
+    extends GroupBase<string | string[]>
+    implements OnInit, OnDestroy {
+    // handles request cache..so we don't do the same request 100 times...
+    static readonly MIN_SEARCH_LENGTH = 3;
+    static readonly INVALIDATE_CACHE_AFTER_N_MS = 120000; // 2 minutes
+    static CACHE: {
+        [methodKey: string]: {
+            [cacheKey: string]: {
+                createdAt: Moment,
+                executeObserver$: Observable<HierarchicalLocationModel[]>,
+                data: HierarchicalLocationModel[],
+                observer$: Observable<HierarchicalLocationModel[]>
+            }
+        }
+    } = {};
+
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
     @Input() multiple: boolean = false;
     @Input() placeholder: string = '';
     @Input() loadingText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_LOADING_TEXT';
     @Input() typeToSearchText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_TYPE_TO_SEARCH_TEXT';
-    @Input() notFoundText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_NO_ITEMS_FOUND_TEXT';
+    @Input() minimumSearchLength: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_MINIMUM_SEARCH_LENGTH';
+    private _notFoundText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_NO_ITEMS_FOUND_TEXT';
+    currentNotFoundText: string = this._notFoundText;
+    notFoundTextData = {
+        minLength: FormLocationDropdownComponent.MIN_SEARCH_LENGTH
+    };
+    @Input() set notFoundText(notFoundText: string) {
+        this._notFoundText = notFoundText;
+        this.currentNotFoundText = this._notFoundText;
+    }
+    get notFoundText(): string {
+        return this._notFoundText;
+    }
     @Input() locationsForOutbrakId: string;
     @Input() useOutbreakLocations: boolean = false;
 
@@ -77,6 +110,8 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     // selected Outbreak id
     outbreakId: string;
 
+    // used to filter &
+    // to reduce quantity of data retrieved from api since some requests might return a huge amount of data
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
 
     previousSubscription: Subscription;
@@ -87,6 +122,102 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
 
     repositionTimer: any;
 
+    /**
+     * Do a request or retrieve it from cache if it didn't expire
+     * @param methodKey
+     * @param outbreakId [Optional]
+     * @param method
+     */
+    static doRequestOrGetFromCache(
+        methodKey: string,
+        queryBuilder: RequestQueryBuilder,
+        outbreakId: string,
+        service: LocationDataService | OutbreakDataService
+    ): Observable<HierarchicalLocationModel[]> {
+        // remove older cached items
+        _.each(
+            FormLocationDropdownComponent.CACHE,
+            (items, localMethodKey) => {
+                _.each(
+                    items,
+                    (cached, localCacheKey) => {
+                        if (moment().diff(cached.createdAt) >= FormLocationDropdownComponent.INVALIDATE_CACHE_AFTER_N_MS) {
+                            delete FormLocationDropdownComponent.CACHE[localMethodKey][localCacheKey];
+                        }
+                    }
+                );
+            }
+        );
+
+        // check if we have a request cached for this query
+        const cacheKey: string = queryBuilder.buildQuery();
+        if (
+            !FormLocationDropdownComponent.CACHE[methodKey] ||
+            !FormLocationDropdownComponent.CACHE[methodKey][cacheKey]
+        ) {
+            // init what needs to be initialized
+            if (!FormLocationDropdownComponent.CACHE[methodKey]) {
+                FormLocationDropdownComponent.CACHE[methodKey] = {};
+            }
+
+            // determine execute observer
+            const executeObserver$ = outbreakId ?
+                service[methodKey](outbreakId, queryBuilder) :
+                service[methodKey](queryBuilder);
+
+            // cache item
+            FormLocationDropdownComponent.CACHE[methodKey][cacheKey] = {
+                createdAt: moment(),
+                executeObserver$: executeObserver$,
+                data: null,
+                observer$: new Observable<HierarchicalLocationModel[]>((function (
+                    localCache,
+                    localMethodKey: string,
+                    localCacheKey: string
+                ) {
+                    return (observer: Subscriber<HierarchicalLocationModel[]>) => {
+                        if (
+                            localCache[localMethodKey] &&
+                            localCache[localMethodKey][localCacheKey]
+                        ) {
+                            // do we have data already ?
+                            if (localCache[localMethodKey][localCacheKey].data !== null) {
+                                observer.next(localCache[localMethodKey][localCacheKey].data);
+                            }
+
+                            // load data
+                            localCache[localMethodKey][localCacheKey].executeObserver$
+                                .pipe(
+                                    catchError((err) => {
+                                        observer.error(err);
+                                        observer.complete();
+                                        this.snackbarService.showApiError(err);
+                                        return throwError(err);
+                                    })
+                                )
+                                .subscribe((data) => {
+                                    localCache[localMethodKey][localCacheKey].data = data;
+                                    observer.next(localCache[localMethodKey][localCacheKey].data);
+                                });
+                        } else {
+                            // finished
+                            observer.next([]);
+                            observer.complete();
+                        }
+                    };
+                })(FormLocationDropdownComponent.CACHE, methodKey, cacheKey)).pipe(share())
+            };
+        }
+
+        // finished
+        return FormLocationDropdownComponent.CACHE[methodKey][cacheKey].data !== null ?
+            of(FormLocationDropdownComponent.CACHE[methodKey][cacheKey].data) :
+            FormLocationDropdownComponent.CACHE[methodKey][cacheKey].observer$;
+    }
+
+    /**
+     * Constructor
+     */
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
@@ -128,6 +259,17 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
                 });
         }
 
+        // configure location filter to reduce quantity of data retrieved from api since some requests might return a huge amount of data
+        this.queryBuilder.fields(
+            'id',
+            'name',
+            'synonyms',
+            'parentLocationId',
+            'active',
+            'disabled',
+            'geoLocation'
+        );
+
         // handle server side search
         this.locationInput$
             .pipe(
@@ -136,9 +278,26 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
             .subscribe((searchTerm: string) => {
                 // display loading while getting data
                 this.locationLoading = true;
-                this.needToRetrieveBackData = true;
+
+                // clear input
+                this.currentNotFoundText = this.notFoundText;
+                this.locationItems = [];
+
+                // don't search if we entered at least on character but less than minimum search
+                if (
+                    searchTerm &&
+                    searchTerm.length < FormLocationDropdownComponent.MIN_SEARCH_LENGTH
+                ) {
+                    // finished loading - since we wont retrieve anything
+                    this.currentNotFoundText = this.minimumSearchLength;
+                    this.locationLoading = false;
+
+                    // finished
+                    return;
+                }
 
                 // filter list
+                this.needToRetrieveBackData = true;
                 if (searchTerm) {
                     this.queryBuilder.filter
                         .remove('parentLocationId')
@@ -309,18 +468,24 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
      * Refresh Location List
      */
     refreshLocationList() {
-        const locationsList$ = (this.useOutbreakLocations && this.outbreakId) ?
-            this.outbreakDataService.getOutbreakLocationsHierarchicalList(this.outbreakId, this.queryBuilder) :
-            this.locationDataService.getLocationsHierarchicalList(this.queryBuilder);
+        // retrieve locations observer
+        // use filter to reduce quantity of data retrieved from api to only what we need
+        const locationsList$ = this.useOutbreakLocations && this.outbreakId ?
+            FormLocationDropdownComponent.doRequestOrGetFromCache(
+                'getOutbreakLocationsHierarchicalList',
+                this.queryBuilder,
+                this.outbreakId,
+                this.outbreakDataService
+            ) :
+            FormLocationDropdownComponent.doRequestOrGetFromCache(
+                'getLocationsHierarchicalList',
+                this.queryBuilder,
+                undefined,
+                this.locationDataService
+            );
 
         // retrieve hierarchic location list
         const request = locationsList$
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showError(err.message);
-                    return throwError(err);
-                })
-            )
             .subscribe((hierarchicalLocation: HierarchicalLocationModel[]) => {
                 // list to check
                 const locationItems = [];

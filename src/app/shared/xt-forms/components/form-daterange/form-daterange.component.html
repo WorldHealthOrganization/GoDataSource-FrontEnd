@@ -17,9 +17,10 @@
                     [required]="required"
                     (optionChanged)="onChange()"
                     app-date-validator
-                    [dateSameOrBefore]="endDateVisible ? name + '[endDate]' : []"
+                    [dateSameOrBefore]="dateSameOrBefore"
                     [dateSameOrAfter]="minDate"
-                    [minDate]="minDate">
+                    [minDate]="minDate"
+                    [maxDate]="maxDate">
                 </app-form-datepicker>
         </div>
 
@@ -43,9 +44,10 @@
                 [required]="required"
                 (optionChanged)="onChange()"
                 app-date-validator
-                [dateSameOrAfter]="startDateVisible ? name + '[startDate]' : []"
-                [dateSameOrAfter]="minDate"
-                [minDate]="minDate">
+                [dateSameOrAfter]="dateSameOrAfter"
+                [dateSameOrBefore]="maxDate"
+                [minDate]="minDate"
+                [maxDate]="maxDate">
             </app-form-datepicker>
         </div>
     </form>

@@ -3,13 +3,14 @@ import * as _ from 'lodash';
 import { IPermissionChildModel, PERMISSION, PermissionModel } from './permission.model';
 import { SecurityQuestionModel } from './securityQuestion.model';
 import { UserSettingsDashboardModel } from './user-settings-dashboard.model';
-import { IPermissionBasic, IPermissionUser } from './permission.interface';
+import { IPermissionBasic, IPermissionCloneable, IPermissionUser } from './permission.interface';
 
 export enum UserSettings {
     AUDIT_LOG_FIELDS = 'auditLogFields',
     DASHBOARD = 'dashboard',
     CASE_FIELDS = 'caseFields',
     CASE_LAB_FIELDS = 'caseLabFields',
+    CONTACT_LAB_FIELDS = 'contactLabFields',
     CONTACT_FIELDS = 'contactFields',
     EVENT_FIELDS = 'eventFields',
     LOCATION_FIELDS= 'locationFields',
@@ -40,6 +41,7 @@ abstract class UserSettingsHandlers {
     static DASHBOARD = UserSettingsDashboardModel;
     static CASE_FIELDS = [];
     static CASE_LAB_FIELDS = [];
+    static CONTACT_LAB_FIELDS = [];
     static CONTACT_FIELDS = [];
     static EVENT_FIELDS = [];
     static LOCATION_FIELDS = [];
@@ -133,7 +135,8 @@ export class PermissionExpression {
 
 export class UserRoleModel
     implements
-        IPermissionBasic {
+        IPermissionBasic,
+        IPermissionCloneable {
     id: string | null;
     name: string | null;
     permissionIds: PERMISSION[];
@@ -150,6 +153,11 @@ export class UserRoleModel
     static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_CREATE) : false; }
     static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_VIEW, PERMISSION.USER_ROLE_MODIFY) : false; }
     static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_DELETE) : false; }
+
+    /**
+     * Static Permissions - IPermissionCloneable
+     */
+    static canClone(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_CREATE_CLONE) : false; }
 
     /**
      * Constructor
@@ -174,6 +182,11 @@ export class UserRoleModel
     canCreate(user: UserModel): boolean { return UserRoleModel.canCreate(user); }
     canModify(user: UserModel): boolean { return UserRoleModel.canModify(user); }
     canDelete(user: UserModel): boolean { return UserRoleModel.canDelete(user); }
+
+    /**
+     * Permissions - IPermissionCloneable
+     */
+    canClone(user: UserModel): boolean { return UserRoleModel.canClone(user); }
 }
 
 export class UserModel

@@ -1647,4 +1647,26 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             },
             {});
     }
+
+    /**
+     * Check if answers has nested questions
+     * @param {QuestionModel} questionModel
+     */
+    hasNestedQuestions(questionModel: QuestionModel) {
+        // if there's no answers return
+        if (questionModel.answers.length < 1) {
+            return false;
+        }
+
+        // check if question has at least one answer
+        let hasNestedQuestions = false;
+        // check if at least one answer has at least one additional question
+        _.forEach(questionModel.answers, (answer: AnswerModel) => {
+            if (!_.isEmpty(answer.additionalQuestions)) {
+                hasNestedQuestions = true;
+                return false;
+            }
+        });
+        return hasNestedQuestions;
+    }
 }

@@ -37,6 +37,7 @@ export class RelationshipModel
     clusterId: string;
     comment: string;
     people: EntityModel[];
+    dateOfFirstContact: string;
 
     /**
      * Static Permissions - IPermissionBasic
@@ -89,6 +90,7 @@ export class RelationshipModel
         this.people = _.map(peopleData, (entityData) => {
             return new EntityModel(entityData);
         });
+        this.dateOfFirstContact = _.get(data, 'dateOfFirstContact');
     }
 
     /**

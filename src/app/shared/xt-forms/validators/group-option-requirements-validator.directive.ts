@@ -270,12 +270,16 @@ export class GroupOptionRequirementsValidator implements Validator {
         ) {
             return {
                 missingRequiredOptions: {
-                    options: missingRequirements.map((option: string): string => {
-                        // transform option to label
-                        return this.appGroupOptionsLabelKey ?
-                            this.i18nService.instant(this._childOptionMap[option][this.appGroupOptionsLabelKey]) :
-                            option;
-                    })
+                    options: missingRequirements
+                        .map((option: string): string => {
+                            // transform option to label
+                            return this.appGroupOptionsLabelKey ?
+                                this.i18nService.instant(this._childOptionMap[option][this.appGroupOptionsLabelKey]) :
+                                option;
+                        })
+                        .sort((item1: string, item2: string) => {
+                            return item1.toLowerCase().localeCompare(item2.toLowerCase());
+                        })
                 }
             };
         }

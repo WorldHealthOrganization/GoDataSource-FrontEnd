@@ -159,7 +159,7 @@ export class DropdownSheetColumn extends AbstractSheetColumn {
         // get the list of string labels
         this.optionLabels$ = this.options$
             .pipe(
-                map((items) => items.map((item) => i18nService.instant(item.label)))
+                map((items) => items.map((item) => i18nService.instant(item.label).trim()))
             );
 
         return this;
