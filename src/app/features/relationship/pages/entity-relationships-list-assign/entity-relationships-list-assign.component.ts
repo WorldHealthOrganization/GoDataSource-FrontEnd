@@ -227,7 +227,10 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
         });
         // retrieve only available entity types
         const targetRelationshipType = this.relationshipType === RelationshipType.EXPOSURE ? RelationshipType.CONTACT : RelationshipType.EXPOSURE;
-        const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(this.entityType, targetRelationshipType);
+        const availableTypes: EntityType[] =
+            this.entityType === EntityType.CONTACT_OF_CONTACT ?
+                [EntityType.CONTACT_OF_CONTACT] :
+                this.genericDataService.getAvailableRelatedEntityTypes(this.entityType, targetRelationshipType);
         this.queryBuilder.filter.where({
             type: {
                 'inq': availableTypes

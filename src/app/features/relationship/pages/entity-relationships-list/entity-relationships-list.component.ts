@@ -317,7 +317,6 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
      * Re(load) the Relationships list, based on the applied filter, sort criterias
      */
     refreshList(finishCallback: (records: any[]) => void) {
-        console.log(`here`);
         if (
             this.relationshipType &&
             this.entityType &&

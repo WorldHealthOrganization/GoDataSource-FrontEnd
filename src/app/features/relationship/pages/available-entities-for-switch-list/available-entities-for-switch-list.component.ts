@@ -197,8 +197,6 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                 }
             });
 
-            console.log(this.entityType);
-            console.log(this.entityId);
             // retrieve location list
             qb.include('locations', true);
 
@@ -349,12 +347,10 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
                               })
                           )
                           .subscribe((data) => {
-                              console.log(data);
                               // hide dialog
                               loadingDialog.close();
 
                               this.snackbarService.showSuccess('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
-                              console.log('/relationships', this.entityType, selectedRecordId, 'contacts');
                               this.router.navigate(['/relationships', this.entityType, selectedRecordId, 'contacts']);
 
                           });

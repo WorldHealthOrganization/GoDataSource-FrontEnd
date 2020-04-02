@@ -100,8 +100,10 @@
 
                                 <mat-divider></mat-divider>
 
+<!--                                #TODO to change after permission is added-->
+<!--                                && entityCanShare-->
                                 <button
-                                    *ngIf="RelationshipModel.canShare(authUser) && entityCanShare"
+                                    *ngIf="RelationshipModel.canShare(authUser)"
                                     [disabled]="checkedRecords.length < 1"
                                     mat-menu-item
                                     (click)="shareSelectedRelationships()">
@@ -109,7 +111,7 @@
                                 </button>
 
                                 <button
-                                    *ngIf="entityCanChangeSource"
+                                    *ngIf="relationshipType === RelationshipType.CONTACT && entityCanChangeSource"
                                     mat-menu-item
                                     [disabled]="checkedRecords.length === 0"
                                     (click)="changeSourceForSelectedRelationships()">
