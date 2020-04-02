@@ -82,10 +82,10 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
         private snackbarService: SnackbarService,
         private relationshipDataService: RelationshipDataService,
         private router: Router,
-        private dialogService: DialogService,
+        protected dialogService: DialogService,
         private i18nService: I18nService
     ) {
-        super(route);
+        super(route, dialogService);
     }
 
     ngOnInit() {

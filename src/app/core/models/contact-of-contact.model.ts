@@ -171,7 +171,7 @@ export class ContactOfContactModel
     static canDeleteLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_DELETE_LAB_RESULT) : false); }
     static canRestoreLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_RESTORE_LAB_RESULT) : false); }
     static canImportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_IMPORT_LAB_RESULT) : false); }
-
+    static canExportLabResult(user: UserModel): boolean { return false; }
     /**
      * Constructor
      */
@@ -313,7 +313,7 @@ export class ContactOfContactModel
     canDeleteLabResult(user: UserModel): boolean { return ContactOfContactModel.canDeleteLabResult(user); }
     canRestoreLabResult(user: UserModel): boolean { return ContactOfContactModel.canRestoreLabResult(user); }
     canImportLabResult(user: UserModel): boolean { return ContactOfContactModel.canImportLabResult(user); }
-
+    canExportLabResult(user: UserModel): boolean { return ContactOfContactModel.canExportLabResult(user); }
     /**
      * Contact Name
      * @returns {string}

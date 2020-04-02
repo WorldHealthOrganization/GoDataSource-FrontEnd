@@ -77,7 +77,7 @@ export const EnglishUsLang = {
         /**
          * uiContactMergeDuplicateRecordsPage
          */
-        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire'
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
 
 
         /**
