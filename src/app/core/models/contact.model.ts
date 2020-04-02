@@ -196,7 +196,7 @@ export class ContactModel
     /**
      * Static Permissions - IPermissionsContactsOfContacts
      */
-    static canCreateContactOfContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CREATE) : false); };
+    static canCreateContactOfContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CREATE) : false); }
 
     /**
      * Constructor

@@ -10,8 +10,6 @@ import { RiskLevelGroupModel } from '../../models/risk-level-group.model';
 import { catchError, map } from 'rxjs/internal/operators';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
-import { EntityModel } from '../../models/entity-and-relationship.model';
-import { EntityType } from '../../models/entity-type';
 import * as _ from 'lodash';
 
 @Injectable()
@@ -30,8 +28,8 @@ export class ContactsOfContactsDataService {
      */
     getContactsOfContactsList(
         outbreakId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<ContactOfContactModel[]>
-    {
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<ContactOfContactModel[]> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/contacts-of-contacts?filter=${filter}`),
@@ -47,8 +45,7 @@ export class ContactsOfContactsDataService {
      */
     getContactsOfContactsCount(
         outbreakId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any>
-    {
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
         const filter = queryBuilder.buildQuery();
         return this.http.get(`outbreaks/${outbreakId}/contacts-of-contacts/filtered-count?filter=${filter}`);
     }
@@ -83,8 +80,8 @@ export class ContactsOfContactsDataService {
     getContactOfContact(
         outbreakId: string,
         contactOfContact: string,
-        retrieveCreatedUpdatedBy?: boolean): Observable<ContactOfContactModel>
-    {
+        retrieveCreatedUpdatedBy?: boolean
+    ): Observable<ContactOfContactModel> {
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/contacts-of-contacts/${contactOfContact}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`),
             ContactOfContactModel
@@ -97,7 +94,10 @@ export class ContactsOfContactsDataService {
      * @param {string} contactOfContactId
      * @returns {Observable<AddressModel[]>}
      */
-    getContactOfContactMovement(outbreakId: string, contactOfContactId: string): Observable<AddressModel[]> {
+    getContactOfContactMovement(
+        outbreakId: string,
+        contactOfContactId: string
+    ): Observable<AddressModel[]> {
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/contacts-of-contacts/${contactOfContactId}/movement`),
             AddressModel
@@ -111,7 +111,8 @@ export class ContactsOfContactsDataService {
      */
     findDuplicates(outbreakId: string,
                    contactOfContactData: any,
-                   queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<EntityDuplicatesModel> {
+                   queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<EntityDuplicatesModel> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.post(
@@ -133,7 +134,8 @@ export class ContactsOfContactsDataService {
     modifyContactOfContact(outbreakId: string,
                   contactOfContact: string,
                   contactOfContactData,
-                  retrieveCreatedUpdatedBy?: boolean): Observable<ContactOfContactModel> {
+                  retrieveCreatedUpdatedBy?: boolean
+    ): Observable<ContactOfContactModel> {
         return this.modelHelper.mapObservableToModel(
             this.http.put(`outbreaks/${outbreakId}/contacts-of-contacts/${contactOfContact}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, contactOfContactData),
             ContactOfContactModel
@@ -141,30 +143,11 @@ export class ContactsOfContactsDataService {
     }
 
     /**
-     * Add multiple Contacts of contacts for a contact
-     * @param outbreakId
-     * @param sourceEntityType
-     * @param sourceEntityId
-     * @param contactsData
-     */
-    bulkAddContactsOfContacts(
-        outbreakId: string,
-        sourceEntityType: EntityType,
-        sourceEntityId: string,
-        contactsData: any[]): Observable<any>
-    {
-        const entityTypeLinkPath = EntityModel.getLinkForEntityType(sourceEntityType);
-
-        return this.http.post(`outbreaks/${outbreakId}/${entityTypeLinkPath}/${sourceEntityId}/contacts`, contactsData);
-    }
-
-    /**
      * Modify multiple contacts of contacts
      */
     bulkModifyContactsOfContacts(
         outbreakId: string,
-        contactsData: any)
-    {
+        contactsData: any) {
         return this.http.put(
             `outbreaks/${outbreakId}/contacts-of-contacts/bulk `,
             contactsData
@@ -178,8 +161,8 @@ export class ContactsOfContactsDataService {
      */
     getContactsOfContactsGroupedByRiskLevel(
         outbreakId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<RiskLevelGroupModel>
-    {
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<RiskLevelGroupModel> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/contacts-of-contacts/per-risk-level/count?filter=${filter}`),
@@ -206,8 +189,8 @@ export class ContactsOfContactsDataService {
     generateContactOfContactVisualID(
         outbreakId: string,
         visualIdMask: string,
-        personId?: string): Observable<string | VisualIdErrorModel>
-    {
+        personId?: string
+    ): Observable<string | VisualIdErrorModel> {
         return this.http
             .post(
                 `outbreaks/${outbreakId}/contacts-of-contacts/generate-visual-id`,
@@ -244,8 +227,8 @@ export class ContactsOfContactsDataService {
         outbreakId: string,
         visualIdRealMask: string,
         visualIdMask: string,
-        personId?: string): Observable<boolean | IGeneralAsyncValidatorResponse>
-    {
+        personId?: string
+    ): Observable<boolean | IGeneralAsyncValidatorResponse> {
         return this.generateContactOfContactVisualID(
             outbreakId,
             visualIdMask,
