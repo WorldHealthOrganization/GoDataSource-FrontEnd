@@ -443,11 +443,6 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
         // init side filters
         this.availableSideFilters = [
             new FilterModel({
-                fieldName: 'person.visualId',
-                fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID',
-                type: FilterType.TEXT,
-            }),
-            new FilterModel({
                 fieldName: 'sampleIdentifier',
                 fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
                 type: FilterType.TEXT,
