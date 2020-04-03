@@ -1112,4 +1112,12 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                 );
         }
     }
+
+    /**
+     * Called after changeFollowUpTeam finished with success
+     */
+    changeFollowUpTeamFinishedWithSuccess() {
+        // refresh team count
+        this.getFollowUpsGroupedByTeams();
+    }
 }
