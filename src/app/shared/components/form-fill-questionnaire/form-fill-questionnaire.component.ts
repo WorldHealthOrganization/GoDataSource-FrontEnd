@@ -669,7 +669,8 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         additionalQuestions: any,
         curParentValues: string[] | string,
         curQuestionVariable: string,
-        curAnswerDataIndex: number
+        curAnswerDataIndex: number,
+        keepParenValues?: string | string[]
     ) {
         // nothing to do here ?
         if (
@@ -682,10 +683,25 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         // make sure we have an array of answer since we have one for multi and we need to handle single answers a s well
         curParentValues = _.isArray(curParentValues) ? curParentValues : [curParentValues] as string[];
 
+        // make sure responses are an array
+        let keepParenValuesArray: string[];
+        if (keepParenValues) {
+            keepParenValuesArray = _.isArray(keepParenValues) ? keepParenValues : [keepParenValues] as string[];
+        }
+
         // go through each answer and check if we have additional questions
         _.each(
             curParentValues,
             (answerValue: string) => {
+                // do we need to remove this value ?
+                // if not, jump over
+                if (
+                    keepParenValuesArray &&
+                    keepParenValuesArray.includes(answerValue)
+                ) {
+                    return;
+                }
+
                 // check children questions
                 const questions: QuestionModel[] = additionalQuestions[curQuestionVariable][answerValue];
                 if (!_.isEmpty(questions)) {
@@ -749,7 +765,8 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
         answerDataIndex: number
     ) {
         // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REMOVE_MULTI_ANSWER')
+        this.dialogService
+            .showConfirm('LNG_DIALOG_CONFIRM_REMOVE_MULTI_ANSWER')
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // remove child answers
@@ -882,7 +899,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
                 });
 
                 // do we need to insert answer ?
-                if (maxDataIndex >= curAnswerRealIndex) {
+                if (maxDataIndex > curAnswerRealIndex) {
                     // check children questions if we need to remove answers
                     _.each(
                         questions,
@@ -933,7 +950,8 @@ export class FormFillQuestionnaireComponent extends GroupBase<{
             this.additionalQuestions,
             answerOldValue,
             variable,
-            answerDataIndex
+            answerDataIndex,
+            answerNewValue
         );
 
         // remove uploaded data if we have one
