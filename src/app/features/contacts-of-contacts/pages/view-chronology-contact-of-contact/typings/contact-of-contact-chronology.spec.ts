@@ -17,7 +17,6 @@ import {ChronologyComponent} from '../../../../../shared/components/chronology/c
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {OutbreakDataServiceMock} from '../../../../../core/services/data/outbreak.data.service.spec';
-import {ContactModel} from '../../../../../core/models/contact.model';
 import {ChronologyItem} from '../../../../../shared/components/chronology/typings/chronology-item';
 
 describe('ContactOfContactChronology', () => {
