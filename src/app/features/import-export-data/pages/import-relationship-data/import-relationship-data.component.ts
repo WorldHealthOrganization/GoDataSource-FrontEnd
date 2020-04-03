@@ -5,7 +5,7 @@ import {OutbreakModel} from '../../../../core/models/outbreak.model';
 import {AuthDataService} from '../../../../core/services/data/auth.data.service';
 import {UserModel} from '../../../../core/models/user.model';
 import {ImportDataExtension} from '../../components/import-data/model';
-import {ActivatedRoute, Route, Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {OutbreakDataService} from '../../../../core/services/data/outbreak.data.service';
 import {RedirectService} from '../../../../core/services/helper/redirect.service';
 import {ImportServerModelNames} from '../../components/import-data/import-data.component';
@@ -57,13 +57,11 @@ export class ImportRelationshipDataComponent implements OnInit {
     };
 
     requiredDestinationFields = [
+        'firstName',
         'contactDate',
         'dateOfFirstContact',
-        'contactDateEstimated',
-        'certaintyLevelId',
-        'exposureTypeId'
-
-
+        'contactDate',
+        'certaintyLevelId'
     ];
 
     constructor(
