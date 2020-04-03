@@ -33,7 +33,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
     teamsListLoaded: TeamModel[];
     teamsListLoadedMap: {
         [teamId: string]: TeamModel
-    };
+    } = {};
     teamsListLoadedForHeaderSearch: LabelValuePair[];
     teamIdFilterValue: string = 'all';
 
