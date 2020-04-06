@@ -17,7 +17,9 @@ export enum UserSettings {
     LAB_RESULTS_FIELDS = 'labResults',
     RELATIONSHIP_FIELDS = 'relationshipFields',
     OUTBREAK_FIELDS = 'outbreakFields',
+    OUTBREAK_MODIFY_QUESTIONNAIRE_FIELDS = 'outbreakModifyQuestionnaireFields',
     OUTBREAK_TEMPLATE_FIELDS = 'outbreakTemplateFields',
+    OUTBREAK_TEMPLATE_MODIFY_QUESTIONNAIRE_FIELDS = 'outbreakTemplateModifyQuestionnaireFields',
     CONTACT_DAILY_FOLLOW_UP_FIELDS = 'contactDailyFollowUpFields',
     CASE_RELATED_DAILY_FOLLOW_UP_FIELDS = 'caseRelatedFollowUpFields',
     CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS = 'contactRelatedFollowUpFields',
@@ -48,7 +50,9 @@ abstract class UserSettingsHandlers {
     static LAB_RESULTS_FIELDS = [];
     static RELATIONSHIP_FIELDS = [];
     static OUTBREAK_FIELDS = [];
+    static OUTBREAK_MODIFY_QUESTIONNAIRE_FIELDS = [];
     static OUTBREAK_TEMPLATE_FIELDS = [];
+    static OUTBREAK_TEMPLATE_MODIFY_QUESTIONNAIRE_FIELDS = [];
     static CONTACT_DAILY_FOLLOW_UP_FIELDS = [];
     static CASE_RELATED_DAILY_FOLLOW_UP_FIELDS = [];
     static CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS = [];
