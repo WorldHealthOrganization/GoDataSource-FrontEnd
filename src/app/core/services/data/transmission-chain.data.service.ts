@@ -196,6 +196,14 @@ export class TransmissionChainDataService {
             eventNodesWithoutDates: [],
             timelineDateCheckpoints: []
         };
+
+        const locationsListMap = {};
+        // build locations list map for further use
+        if (!_.isEmpty(locationsList)) {
+            locationsList.forEach((loc) => {
+                locationsListMap[loc.id] = loc;
+            });
+        }
         const selectedNodeIds: string[] = [];
         // get labels for years / months - age field
         const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
@@ -346,13 +354,12 @@ export class TransmissionChainDataService {
                             nodeData.label = '';
                             if (node.type !== EntityType.EVENT) {
                                 const mainAddr = node.model.mainAddress;
-                                if (!_.isEmpty(mainAddr.locationId)) {
-                                    const location = _.find(locationsList, function (l) {
-                                        return l.id === mainAddr.locationId;
-                                    });
-                                    if (location) {
-                                        nodeData.label = location.name;
-                                    }
+                                if (
+                                    mainAddr.locationId &&
+                                    locationsListMap[mainAddr.locationId] &&
+                                    locationsListMap[mainAddr.locationId].name
+                                ) {
+                                    nodeData.label = locationsListMap[mainAddr.locationId].name;
                                 }
                             }
                             // initials
@@ -373,19 +380,17 @@ export class TransmissionChainDataService {
                             }
                             // visual id and location
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.ID_AND_LOCATION.value) {
-                            node.label = '';
                             if (node.type !== EntityType.EVENT) {
                                 if (node.model.visualId) {
                                     node.label = node.model.visualId;
                                 }
                                 const mainAddr = node.model.mainAddress;
-                                if (!_.isEmpty(mainAddr.locationId)) {
-                                    const location = _.find(locationsList, function (l) {
-                                        return l.id === mainAddr.locationId;
-                                    });
-                                    if (location) {
-                                        nodeData.label = (node.model.visualId ? node.label + ' - ' : '') + location.name ;
-                                    }
+                                if (
+                                    mainAddr.locationId &&
+                                    locationsListMap[mainAddr.locationId] &&
+                                    locationsListMap[mainAddr.locationId].name
+                                ) {
+                                    nodeData.label = (node.model.visualId ? node.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
                                 }
                             } else {
                                 nodeData.label = '';
