@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { QuestionModel } from './question.model';
-import { IPermissionBasic, IPermissionOutbreakTemplate, IPermissionQuestionnaire } from './permission.interface';
+import { IPermissionBasic, IPermissionCloneable, IPermissionOutbreakTemplate, IPermissionQuestionnaire } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 
@@ -8,7 +8,8 @@ export class OutbreakTemplateModel
     implements
         IPermissionBasic,
         IPermissionQuestionnaire,
-        IPermissionOutbreakTemplate {
+        IPermissionOutbreakTemplate,
+        IPermissionCloneable {
     id: string;
     name: string;
     disease: string;
@@ -47,6 +48,11 @@ export class OutbreakTemplateModel
      * Static Permissions - IPermissionOutbreakTemplate
      */
     static canGenerateOutbreak(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_CREATE, PERMISSION.OUTBREAK_TEMPLATE_VIEW, PERMISSION.OUTBREAK_TEMPLATE_GENERATE_OUTBREAK) : false; }
+
+    /**
+     * Static Permissions - IPermissionsCloneable
+     */
+    static canClone(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_CREATE_CLONE) : false; }
 
     /**
      * Constructor
@@ -111,4 +117,9 @@ export class OutbreakTemplateModel
      * Permissions - IPermissionOutbreakTemplate
      */
     canGenerateOutbreak(user: UserModel): boolean { return OutbreakTemplateModel.canGenerateOutbreak(user); }
+
+    /**
+     * Permissions - IPermissionCloneable
+     */
+    canClone(user: UserModel): boolean { return OutbreakTemplateModel.canClone(user); }
 }

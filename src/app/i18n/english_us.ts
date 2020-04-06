@@ -77,7 +77,29 @@ export const EnglishUsLang = {
         /**
          * uiContactMergeDuplicateRecordsPage
          */
-        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire'
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+
+        /**
+         * uiOutbreakTemplateListPage
+         */
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTIONS_CLONE_OUTBREAK_TEMPLATE': 'Clone outbreak template',
+
+        /**
+         * uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_CLONE_OUTBREAK_TEMPLATE': 'Name the clone of the outbreak template',
+
+        /**
+         * uiDialogsFieldsPlaceholders
+         */
+        'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_TEMPLATE_NAME': 'Cloned outbreak template name',
+
+        /**
+         * uiOutbreakTemplateListPage
+         */
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME': '{{name}} Clone'
+
+
 
         /**
          * REMOVE the tokens from below
