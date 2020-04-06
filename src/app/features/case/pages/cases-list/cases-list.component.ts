@@ -532,9 +532,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
                     this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
 
-                    // get cases grouped by classification
-                    this.getCasesGroupedByClassification();
-
                     // initialize side filters
                     this.initializeSideFilters();
                 }
@@ -903,6 +900,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 true
             );
 
+            // refresh badges list with applied filter
+            this.getCasesGroupedByClassification();
+
             // retrieve the list of Cases
             this.casesList$ = this.caseDataService
                 .getCasesList(this.selectedOutbreak.id, clonedQB)
@@ -913,9 +913,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         return throwError(err);
                     }),
                     map((cases: CaseModel[]) => {
-                        // refresh badges list with applied filter
-                        this.getCasesGroupedByClassification();
-
                         return EntityModel.determineAlertness(
                             this.selectedOutbreak.caseInvestigationTemplate,
                             cases
@@ -975,7 +972,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                                     return new CountedItemsListItem(
                                         item.count,
                                         itemId as any,
-                                        item.caseIDs,
+                                        null,
                                         refItem ?
                                             refItem.getColorCode() :
                                             Constants.DEFAULT_COLOR_REF_DATA

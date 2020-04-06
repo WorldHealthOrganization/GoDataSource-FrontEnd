@@ -130,7 +130,7 @@
         *ngIf="!appliedListFilter"
         fxFlex
         [items]="countedCasesGroupedByClassification$ | async"
-        (optionChanged)="filterBySelectField('id', $event.ids, null)">
+        (optionChanged)="filterByEquality('classification', $event.label)">
     </app-counted-items-list>
 </div>
 
