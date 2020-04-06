@@ -312,6 +312,9 @@ export class ContactDataService {
                 map(
                     (listResult: any) => {
                         const results: MetricContactsFollowedUpReportModel[] = [];
+                        if (listResult.report.totalContacts < 1) {
+                            return results;
+                        }
                         const listReport: any = listResult.report;
                         if (listReport.days) {
                             Object.keys(listReport.days).forEach((key) => {
