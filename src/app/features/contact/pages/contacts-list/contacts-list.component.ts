@@ -486,9 +486,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     this.initializeSideFilters();
                 }
 
-                // get contacts grouped by risk level
-                this.getContactsGroupedByRiskLevel();
-
                 // initialize pagination
                 this.initPaginator();
                 // ...and re-load the list when the Selected Outbreak is changed
@@ -912,7 +909,7 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                                         return new CountedItemsListItem(
                                             item.count,
                                             itemId as any,
-                                            item.contactIDs,
+                                            null,
                                             refItem ?
                                                 refItem.getColorCode() :
                                                 Constants.DEFAULT_COLOR_REF_DATA

@@ -33,7 +33,7 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
     teamsListLoaded: TeamModel[];
     teamsListLoadedMap: {
         [teamId: string]: TeamModel
-    };
+    } = {};
     teamsListLoadedForHeaderSearch: LabelValuePair[];
     teamIdFilterValue: string = 'all';
 
@@ -416,6 +416,13 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
     }
 
     /**
+     * Called after change follow-up finishes with success
+     */
+    changeFollowUpTeamFinishedWithSuccess() {
+        // Overwritten in Child Class
+    }
+
+    /**
      * Change FollowUp Team
      */
     changeFollowUpTeam(
@@ -440,6 +447,9 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             .subscribe(() => {
                 // update loaded follow-up data
                 followUp.teamId = team ? team.id : null;
+
+                // call callback
+                this.changeFollowUpTeamFinishedWithSuccess();
 
                 // show success ?
                 // this might not be the best idea...maybe we can replace / remove it

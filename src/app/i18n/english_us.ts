@@ -80,6 +80,26 @@ export const EnglishUsLang = {
         'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
 
         /**
+         * uiOutbreakTemplateListPage
+         */
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTIONS_CLONE_OUTBREAK_TEMPLATE': 'Clone outbreak template',
+
+        /**
+         * uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_CLONE_OUTBREAK_TEMPLATE': 'Name the clone of the outbreak template',
+
+        /**
+         * uiDialogsFieldsPlaceholders
+         */
+        'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_TEMPLATE_NAME': 'Cloned outbreak template name',
+
+        /**
+         * uiOutbreakTemplateListPage
+         */
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME': '{{name}} Clone',
+
+        /**
          * uiCasesListPage
          */
         'LNG_PAGE_LIST_CASES_ACTION_IMPORT_CASES_RELATIONSHIPS' : 'Import case relationships',
@@ -100,6 +120,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_CASE_RELATIONSHIP_DATA_TITLE' : 'Import case relationships',
         'LNG_PAGE_IMPORT_CONTACT_RELATIONSHIP_DATA_TITLE' : 'Import contact relationships',
         'LNG_PAGE_IMPORT_EVENT_RELATIONSHIP_DATA_TITLE' : 'Import event relationships',
+
 
         /**
          * REMOVE the tokens from below

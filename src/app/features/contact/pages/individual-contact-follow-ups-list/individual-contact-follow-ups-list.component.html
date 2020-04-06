@@ -309,7 +309,7 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 <app-form-select
-                    *ngIf="FollowUpModel.canModify(authUser) else elseTeamLabel"
+                    *ngIf="FollowUpModel.canModify(authUser) && selectedOutbreak?.id === authUser.activeOutbreakId else elseTeamLabel"
                     name="teamId"
                     [ngModel]="item.teamId"
                     [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate"
@@ -376,7 +376,7 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
                 <app-form-slide-toggle
-                    *ngIf="FollowUpModel.canModify(authUser) else elseTargetedLabel"
+                    *ngIf="FollowUpModel.canModify(authUser) && selectedOutbreak?.id === authUser.activeOutbreakId else elseTargetedLabel"
                     name="targeted"
                     [(ngModel)]="item.targeted"
                     [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
