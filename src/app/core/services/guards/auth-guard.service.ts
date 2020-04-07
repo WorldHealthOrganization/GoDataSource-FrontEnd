@@ -58,7 +58,12 @@ export class AuthGuard implements CanActivate {
                 .waitForLanguageInitialization()
                 .subscribe(() => {
                     this.snackbarService.showError('LNG_ROLE_AVAILABLE_PERMISSIONS_NOT_AUTHORIZED_MESSAGE');
-                    languageSubscriber.unsubscribe();
+                    if (
+                        languageSubscriber &&
+                        !languageSubscriber.closed
+                    ) {
+                        languageSubscriber.unsubscribe();
+                    }
                 });
         }
 

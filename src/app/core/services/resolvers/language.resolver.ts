@@ -38,7 +38,12 @@ export class LanguageResolver implements Resolve<any> {
                     .pipe(
                         catchError((err) => {
                             // unsubscribe - hack for observable that isn't a subject..it  still being called
-                            languageSubscriber.unsubscribe();
+                            if (
+                                languageSubscriber &&
+                                !languageSubscriber.closed
+                            ) {
+                                languageSubscriber.unsubscribe();
+                            }
 
                             // determine if this is a token validation error or something else has gone bad
                             if (
@@ -88,7 +93,12 @@ export class LanguageResolver implements Resolve<any> {
                     )
                     .subscribe(() => {
                         // unsubscribe - hack for observable that isn't a subject..it  still being called
-                        languageSubscriber.unsubscribe();
+                        if (
+                            languageSubscriber &&
+                            !languageSubscriber.closed
+                        ) {
+                            languageSubscriber.unsubscribe();
+                        }
 
                         // hide loading
                         loadingDialog.close();
