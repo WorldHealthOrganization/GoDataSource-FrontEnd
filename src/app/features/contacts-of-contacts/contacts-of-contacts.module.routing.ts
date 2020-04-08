@@ -8,7 +8,7 @@ import {PageChangeConfirmationGuard} from '../../core/services/guards/page-chang
 import {ViewModifyComponentAction} from '../../core/helperClasses/view-modify-component';
 
 const routes: Routes = [
-  // Contacts of contacts list
+    // Contacts of contacts list
     {
         path: '',
         component: fromPages.ContactsOfContactsListComponent
@@ -52,20 +52,6 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
-    // Bulk Modify Contacts of contacts
-    // {
-    //     path: 'modify-bulk',
-    //     component: fromPages.BulkModifyContactsComponent,
-    //     canActivate: [AuthGuard],
-    //     data: {
-    //         permissions: [
-    //             PERMISSION.CONTACT_BULK_MODIFY
-    //         ]
-    //     },
-    //     canDeactivate: [
-    //         PageChangeConfirmationGuard
-    //     ]
-    // },
     // View Contact movement
     {
         path: ':contactOfContactId/movement',
@@ -77,7 +63,6 @@ const routes: Routes = [
             ]
         }
     },
-
     // // View Contact chronology
     {
         path: ':contactOfContactId/chronology',

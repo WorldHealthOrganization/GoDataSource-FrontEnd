@@ -93,11 +93,6 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
             canList: ContactOfContactModel.canList,
             canView: ContactOfContactModel.canView,
             can: {
-                contacts: {
-                    modify: ContactOfContactModel.canModifyRelationshipContacts,
-                    reverse: ContactOfContactModel.canReverseRelationship,
-                    list: ContactOfContactModel.canListRelationshipContacts
-                },
                 exposures: {
                     modify: ContactOfContactModel.canModifyRelationshipExposures,
                     reverse: ContactOfContactModel.canReverseRelationship,

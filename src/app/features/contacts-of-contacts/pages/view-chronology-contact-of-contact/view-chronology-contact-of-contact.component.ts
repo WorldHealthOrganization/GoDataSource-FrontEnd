@@ -30,7 +30,6 @@ export class ViewChronologyContactOfContactComponent implements OnInit {
     // authenticated user details
     authUser: UserModel;
 
-
     constructor(
         protected route: ActivatedRoute,
         private contactOfContactDataService: ContactsOfContactsDataService,

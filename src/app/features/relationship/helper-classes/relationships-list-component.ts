@@ -245,8 +245,6 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                 return 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE';
             case RelationshipType.CONTACT:
                 return 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
-            // case RelationshipType.CONTACT_OF_CONTACT:
-            //     return 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_OF_CONTACTS_TITLE';
         }
     }
 
@@ -254,12 +252,7 @@ export abstract class RelationshipsListComponent extends ListComponent implement
      * Route path for specific relationships type (exposures or contacts)
      */
     get relationshipTypeRoutePath(): string {
-        switch (this.relationshipType) {
-            case RelationshipType.EXPOSURE:
-                return 'exposures';
-            case RelationshipType.CONTACT:
-                return 'contacts';
-        }
+        return this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures';
     }
 
     /**
@@ -267,7 +260,7 @@ export abstract class RelationshipsListComponent extends ListComponent implement
      */
     get entityCanView(): boolean {
         return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].view(this.authUser);
-}
+    }
 
     /**
      * Check if we're allowed to create event / case / contact relationships'

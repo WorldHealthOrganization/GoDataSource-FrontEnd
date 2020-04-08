@@ -226,7 +226,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
                     this.entity.name,
                     `${this.entityMap[this.entityType].link}/${this.entityId}/view`
                 ),
-                new BreadcrumbItemModel(this.relationshipsListPageTitle, null, true),
+                new BreadcrumbItemModel(this.relationshipsListPageTitle, null, true)
             ];
         }
     }

@@ -458,27 +458,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Number of Contacts -->
-        <ng-container matColumnDef="numberOfContacts">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">
-                        {{ 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS' | translate }}
-                    </div>
-                    <div class="column-filter">
-                        <!-- placeholder -->
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell
-                *matCellDef="let item"
-                (click)="displayContacts(item)"
-                [style.color]="getRiskColor(item)"
-                class="mat-table-number-column">
-                {{ item.numberOfContacts }}
-            </mat-cell>
-        </ng-container>
-
         <!-- Number of Exposures -->
         <ng-container matColumnDef="numberOfExposures">
             <mat-header-cell *matHeaderCellDef>

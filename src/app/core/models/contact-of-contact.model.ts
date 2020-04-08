@@ -56,7 +56,6 @@ export class ContactOfContactModel
     wasCase: boolean;
     visualId: string;
 
-    numberOfContacts: number;
     numberOfExposures: number;
 
     dob: string;
@@ -72,18 +71,18 @@ export class ContactOfContactModel
 
     /**
      * Return contact id mask with data replaced
-     * @param contactIdMask
+     * @param contactOfContactIdMask
      */
-    static generateContactOfContactIDMask(contactIdMask: string): string {
+    static generateContactOfContactIDMask(contactOfContactIdMask: string): string {
         // validate
-        if (_.isEmpty(contactIdMask)) {
+        if (_.isEmpty(contactOfContactIdMask)) {
             return '';
         }
 
         // !!!!!!!!!!!!!!!
         // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
         // !!!!!!!!!!!!!!!
-        return contactIdMask
+        return contactOfContactIdMask
             .replace(/YYYY/g, moment().format('YYYY'))
             .replace(/\*/g, '');
     }
@@ -199,7 +198,6 @@ export class ContactOfContactModel
             }
         );
 
-        this.numberOfContacts = _.get(data, 'numberOfContacts');
         this.numberOfExposures = _.get(data, 'numberOfExposures');
 
         // vaccines received
@@ -315,7 +313,7 @@ export class ContactOfContactModel
     canImportLabResult(user: UserModel): boolean { return ContactOfContactModel.canImportLabResult(user); }
     canExportLabResult(user: UserModel): boolean { return ContactOfContactModel.canExportLabResult(user); }
     /**
-     * Contact Name
+     * Contact Of Contact Name
      * @returns {string}
      */
     get name(): string {

@@ -37,9 +37,9 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { AddressType } from '../../../../core/models/address.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
-import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
     selector: 'app-contacts-of-contacts-list',
@@ -55,7 +55,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
     // constants
     Constants = Constants;
-    ContactOfContactModel =  ContactOfContactModel;
+    ContactOfContactModel = ContactOfContactModel;
 
     // authenticated user
     authUser: UserModel;
@@ -399,11 +399,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                 label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
             }),
             new VisibleColumnModel({
-                field: 'numberOfContacts',
-                label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
-                visible: false
-            }),
-            new VisibleColumnModel({
                 field: 'numberOfExposures',
                 label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
                 visible: false
@@ -629,6 +624,10 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             });
     }
 
+    /**
+     * Restore contact of contact
+     * @param contactOfContact
+     */
     restoreContactOfContact(contactOfContact: ContactOfContactModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_CONTACT_OF_CONTACT', new ContactOfContactModel(contactOfContact))
@@ -920,22 +919,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                     fromContactsOfContactsList: true
                 }
             }
-        );
-    }
-
-    /**
-     * Display contacts popup
-     */
-    displayContacts(entity: ContactOfContactModel) {
-        // if we do not have contacts return
-        if (entity.numberOfContacts < 1) {
-            return;
-        }
-
-        // display dialog
-        this.entityHelperService.displayContacts(
-            this.selectedOutbreak.id,
-            entity
         );
     }
 

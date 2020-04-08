@@ -53,11 +53,11 @@ export class ContactsOfContactsDataService {
     /**
      * Delete an existing Contact of contact of an Outbreak
      * @param {string} outbreakId
-     * @param {string} contactOfContact
+     * @param {string} contactOfContactId
      * @returns {Observable<any>}
      */
-    deleteContactOfContact(outbreakId: string, contactOfContact: string): Observable<any> {
-        return this.http.delete(`outbreaks/${outbreakId}/contacts-of-contacts/${contactOfContact}`);
+    deleteContactOfContact(outbreakId: string, contactOfContactId: string): Observable<any> {
+        return this.http.delete(`outbreaks/${outbreakId}/contacts-of-contacts/${contactOfContactId}`);
     }
 
     /**
@@ -73,17 +73,17 @@ export class ContactsOfContactsDataService {
     /**
      * Retrieve a Contact of contact of an Outbreak
      * @param {string} outbreakId
-     * @param {string} contactOfContact
+     * @param {string} contactOfContactId
      * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<ContactOfContactModel>}
      */
     getContactOfContact(
         outbreakId: string,
-        contactOfContact: string,
+        contactOfContactId: string,
         retrieveCreatedUpdatedBy?: boolean
     ): Observable<ContactOfContactModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/contacts-of-contacts/${contactOfContact}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`),
+            this.http.get(`outbreaks/${outbreakId}/contacts-of-contacts/${contactOfContactId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`),
             ContactOfContactModel
         );
     }
@@ -126,18 +126,18 @@ export class ContactsOfContactsDataService {
     /**
      * Modify an existing Contact of contact of an Outbreak
      * @param {string} outbreakId
-     * @param {string} contactOfContact
+     * @param {string} contactOfContactId
      * @param contactOfContactData
      * @param {boolean} retrieveCreatedUpdatedBy
      * @returns {Observable<ContactOfContactModel>}
      */
     modifyContactOfContact(outbreakId: string,
-                  contactOfContact: string,
+                  contactOfContactId: string,
                   contactOfContactData,
                   retrieveCreatedUpdatedBy?: boolean
     ): Observable<ContactOfContactModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.put(`outbreaks/${outbreakId}/contacts-of-contacts/${contactOfContact}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, contactOfContactData),
+            this.http.put(`outbreaks/${outbreakId}/contacts-of-contacts/${contactOfContactId}${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, contactOfContactData),
             ContactOfContactModel
         );
     }
@@ -173,11 +173,11 @@ export class ContactsOfContactsDataService {
     /**
      * Restore a contact of contact that was deleted
      * @param {string} outbreakId
-     * @param {string} contactOfContact
+     * @param {string} contactOfContactId
      * @returns {Observable<Object>}
      */
-    restoreContactOfContact(outbreakId: string, contactOfContact: string): Observable<any> {
-        return this.http.post(`/outbreaks/${outbreakId}/contacts-of-contacts/${contactOfContact}/restore`, {});
+    restoreContactOfContact(outbreakId: string, contactOfContactId: string): Observable<any> {
+        return this.http.post(`/outbreaks/${outbreakId}/contacts-of-contacts/${contactOfContactId}/restore`, {});
     }
 
     /**

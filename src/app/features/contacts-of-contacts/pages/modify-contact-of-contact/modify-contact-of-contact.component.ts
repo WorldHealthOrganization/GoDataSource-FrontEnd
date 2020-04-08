@@ -372,8 +372,8 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
      * Generate visual ID for contact
      */
     generateVisualId() {
-        if (!_.isEmpty(this.selectedOutbreak.contactIdMask)) {
-            this.contactOfContactData.visualId = ContactOfContactModel.generateContactOfContactIDMask(this.selectedOutbreak.contactIdMask);
+        if (!_.isEmpty(this.selectedOutbreak.contactOfContactIdMask)) {
+            this.contactOfContactData.visualId = ContactOfContactModel.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask);
             this.visualId.control.markAsDirty();
         }
     }

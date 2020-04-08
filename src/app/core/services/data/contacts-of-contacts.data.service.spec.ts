@@ -18,11 +18,7 @@ export const ContactsOfContactsDataServiceMock: {
                 id: 'contact 1',
                 dateOfReporting: moment('2019-03-01', 'YYYY-MM-DD'),
                 dateBecomeContact: moment('2019-03-03', 'YYYY-MM-DD'),
-                dateOfLastContact: moment('2019-03-02', 'YYYY-MM-DD'),
-                followUp: {
-                    startDate: moment('2019-03-05', 'YYYY-MM-DD'),
-                    endDate: moment('2019-03-04', 'YYYY-MM-DD')
-                }
+                dateOfLastContact: moment('2019-03-02', 'YYYY-MM-DD')
             })
         ]
     },
