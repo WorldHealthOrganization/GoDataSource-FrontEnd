@@ -226,7 +226,12 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
             }
         });
         // retrieve only available entity types
-        const targetRelationshipType = this.relationshipType === RelationshipType.EXPOSURE ? RelationshipType.CONTACT : RelationshipType.EXPOSURE;
+        let targetRelationshipType = this.relationshipType === RelationshipType.EXPOSURE ? RelationshipType.CONTACT : RelationshipType.EXPOSURE;
+        // if the entity is type contact and relationship type is contact
+        // we need to retrieve entities of type contact
+        if (this.entityType === EntityType.CONTACT && this.relationshipType === RelationshipType.CONTACT) {
+            targetRelationshipType = RelationshipType.CONTACT;
+        }
         const availableTypes: EntityType[] =
             this.entityType === EntityType.CONTACT_OF_CONTACT ?
                 [EntityType.CONTACT_OF_CONTACT] :
