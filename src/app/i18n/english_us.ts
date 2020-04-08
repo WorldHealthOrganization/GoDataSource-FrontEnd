@@ -108,7 +108,7 @@ export const EnglishUsLang = {
         /**
          * uiCommonButtons
          */
-        'LNG_COMMON_BUTTON_CONTACTS_OF_CONTACTS_TO': 'Contacts of contacts',
+        'LNG_COMMON_BUTTON_CONTACTS_OF_CONTACTS_TO': 'Contacts',
 
         /**
          * uiEntityRelationshipsListPage

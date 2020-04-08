@@ -67,7 +67,7 @@ export class GenericDataService {
                 availableTypes = [EntityType.CASE, EntityType.EVENT];
                 // a contact can be an exposure only to an entity of type Contact of contact
                 if (relationshipType === RelationshipType.CONTACT) {
-                    availableTypes = [EntityType.CONTACT_OF_CONTACT];
+                    availableTypes = [EntityType.CONTACT];
                 }
                 break;
             case EntityType.CONTACT_OF_CONTACT:

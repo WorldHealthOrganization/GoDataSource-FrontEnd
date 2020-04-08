@@ -69,7 +69,7 @@ export abstract class RelationshipsListComponent extends ListComponent implement
                     modify: ContactModel.canModifyRelationshipContacts,
                     delete: ContactModel.canDeleteRelationshipContacts,
                     share: ContactModel.canShareRelationship,
-                    changeSource: () => false,
+                    changeSource: ContactModel.canChangeSource,
                     bulkDelete: ContactModel.canBulkDeleteRelationshipContacts
                 },
                 exposures: {
@@ -87,15 +87,6 @@ export abstract class RelationshipsListComponent extends ListComponent implement
             label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
             link: '/contacts-of-contacts',
             can: {
-                contacts: {
-                    view: ContactOfContactModel.canViewRelationshipContacts,
-                    create: ContactOfContactModel.canCreateRelationshipContacts,
-                    modify: ContactOfContactModel.canModifyRelationshipContacts,
-                    delete: ContactOfContactModel.canDeleteRelationshipContacts,
-                    share: ContactOfContactModel.canShareRelationship,
-                    changeSource: () => false,
-                    bulkDelete: ContactOfContactModel.canBulkDeleteRelationshipContacts
-                },
                 exposures: {
                     view: ContactOfContactModel.canViewRelationshipExposures,
                     create: ContactOfContactModel.canCreateRelationshipExposures,
