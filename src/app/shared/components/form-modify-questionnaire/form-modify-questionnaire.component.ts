@@ -68,6 +68,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     // constants
     answerTypes: any = Constants.ANSWER_TYPES;
 
+    // List table visible columns
+    @Input() visibleTableColumns: {
+        [column: string]: boolean
+    } = {};
+
     // authenticated user
     authUser: UserModel;
 

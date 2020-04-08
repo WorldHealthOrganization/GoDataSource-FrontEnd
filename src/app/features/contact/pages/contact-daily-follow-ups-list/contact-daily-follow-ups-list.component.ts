@@ -1105,11 +1105,19 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
                             return new CountedItemsListItem(
                                 teamData.count ? teamData.count : 0,
                                 teamData.team ? teamData.team.name : 'LNG_PAGE_LIST_FOLLOW_UPS_NO_TEAM_LABEL',
-                                teamData.team ? teamData.team.id : []
+                                teamData.team ? teamData.team._id : []
                             );
                         });
                     })
                 );
         }
+    }
+
+    /**
+     * Called after changeFollowUpTeam finished with success
+     */
+    changeFollowUpTeamFinishedWithSuccess() {
+        // refresh team count
+        this.getFollowUpsGroupedByTeams();
     }
 }
