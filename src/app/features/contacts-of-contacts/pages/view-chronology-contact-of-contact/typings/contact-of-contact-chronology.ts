@@ -1,11 +1,11 @@
-import {ChronologyItem} from '../../../../../shared/components/chronology/typings/chronology-item';
-import {I18nService} from '../../../../../core/services/helper/i18n.service';
-import {ContactOfContactModel} from '../../../../../core/models/contact-of-contact.model';
-import {RelationshipModel} from '../../../../../core/models/entity-and-relationship.model';
+import { ChronologyItem } from '../../../../../shared/components/chronology/typings/chronology-item';
+import { I18nService } from '../../../../../core/services/helper/i18n.service';
+import { RelationshipModel } from '../../../../../core/models/entity-and-relationship.model';
 import * as _ from 'lodash';
-import {CaseModel} from '../../../../../core/models/case.model';
-import {ContactModel} from '../../../../../core/models/contact.model';
-import {EventModel} from '../../../../../core/models/event.model';
+import { CaseModel } from '../../../../../core/models/case.model';
+import { ContactModel } from '../../../../../core/models/contact.model';
+import { EventModel } from '../../../../../core/models/event.model';
+import { ContactOfContactModel } from '../../../../../core/models/contact-of-contact.model';
 
 export class ContactOfContactChronology {
     static getChronologyEntries(
@@ -79,7 +79,7 @@ export class ContactOfContactChronology {
             }));
         }
 
-
+        // date of last contact
         if (!_.isEmpty(contactOfContactData.dateOfLastContact)) {
             chronologyEntries.push(new ChronologyItem({
                 date: contactOfContactData.dateOfLastContact,
