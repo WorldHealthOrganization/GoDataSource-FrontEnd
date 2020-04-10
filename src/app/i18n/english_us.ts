@@ -97,10 +97,17 @@ export const EnglishUsLang = {
         /**
          * uiOutbreakTemplateListPage
          */
-        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME': '{{name}} Clone'
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME': '{{name}} Clone',
 
+        /**
+         * uiModifyFollowUpPage
+         */
+        'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO': '* This person is now a case and follow-up was performed at the time when \'{{ personName }}\' was registered as a contact"',
 
-
+        /**
+         * uiModifyFollowUpListPage
+         */
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_PERSON_FOLLOW_UP_INFO': '* Persons that now are cases (the follow-ups were performed when they were contacts)  : {{ personsToBeDisplayed }}'
         /**
          * REMOVE the tokens from below
          */

@@ -12,17 +12,18 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable, throwError } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { IAnswerData } from '../../../../core/models/question.model';
-import { throwError, forkJoin } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { CaseModel } from '../../../../core/models/case.model';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-modify-contact-follow-ups-list',
@@ -42,6 +43,11 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     selectedFollowUpsIds: string[];
     // selected follow-ups to be modified
     selectedFollowUps: FollowUpModel[] = [];
+    // we have followups for persons that are now cases?
+    personsNowCases: boolean = false;
+    // persons to be displayed as info in selected contacts component
+    personsToBeDisplayed: string;
+
     // current dirty fields
     currentDirtyFields: {
         questionnaireAnswers?: {
@@ -176,13 +182,24 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     /**
      * Selected contacts
      */
-    get selectedContacts(): ContactModel[] {
-        return this.selectedFollowUps
-            .map((followUp) => followUp.contact)
+    get selectedContacts(): (ContactModel | CaseModel)[]  {
+
+        const selectedContactsToFormat = [];
+        const selectedContacts = this.selectedFollowUps
+            .map((followUp: FollowUpModel) => {
+                if (followUp.contact.type === EntityType.CASE) {
+                    this.personsNowCases = true;
+                    selectedContactsToFormat.push(followUp.contact.name);
+                }
+                return followUp.contact;
+            })
             .filter((contact, index, self) => {
                 // keep only unique contacts
                 return self.indexOf(contact) === index;
             });
+        this.personsToBeDisplayed = selectedContactsToFormat.join(', ');
+
+        return selectedContacts;
     }
 
     /**

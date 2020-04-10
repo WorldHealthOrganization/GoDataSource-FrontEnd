@@ -25,6 +25,7 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { ContactModel } from '../../../../core/models/contact.model';
 import * as moment from 'moment';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-modify-follow-up',
@@ -58,7 +59,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
     Constants = Constants;
     FollowUpModel = FollowUpModel;
     ContactModel = ContactModel;
-
+    EntityType = EntityType;
     /**
      * Constructor
      */

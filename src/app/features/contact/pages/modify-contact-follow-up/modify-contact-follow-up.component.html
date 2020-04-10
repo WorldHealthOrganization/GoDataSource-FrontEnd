@@ -23,9 +23,13 @@
                         fxLayout="row" fxLayoutGap="20px">
                         <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
                         <a
-                            [routerLink]="['/contacts', followUpData.contact.id, 'view']">
+                            [routerLink]="[followUpData.contact.type === EntityType.CASE ? '/cases' : '/contacts', followUpData.contact.id, 'view']">
                             {{ followUpData.contact.name }}
                         </a>
+                        <div
+                            *ngIf="followUpData.contact.type === EntityType.CASE">
+                            {{ 'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO' | translate: {personName: followUpData.contact.name} }}
+                        </div>
                     </div>
                     <div fxLayout="row" fxLayoutGap="20px">
                         <app-form-datepicker
