@@ -21,14 +21,14 @@
                         *ngIf="ContactModel.canView(authUser)"
                         class="follow-ups-title"
                         fxLayout="row" fxLayoutGap="20px">
-                        <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
-                        <a
-                            [routerLink]="[followUpData.contact.type === EntityType.CASE ? '/cases' : '/contacts', followUpData.contact.id, 'view']">
-                            {{ followUpData.contact.name }}
+                        <div>{{ relatedPersonData.type === EntityType.CASE ? 'LNG_FOLLOW_UP_FIELD_LABEL_CASE' : 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
+                        <a  *ngIf="relatedPersonData"
+                            [routerLink]="[relatedPersonData.type === EntityType.CASE ? '/cases' : '/contacts', relatedPersonData.id, 'view']">
+                            {{ relatedPersonData.name }}
                         </a>
                         <div
-                            *ngIf="followUpData.contact.type === EntityType.CASE">
-                            {{ 'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO' | translate: {personName: followUpData.contact.name} }}
+                            *ngIf="relatedPersonData.type === EntityType.CASE">
+                            {{ 'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO' | translate: {personName: relatedPersonData.name} }}
                         </div>
                     </div>
                     <div fxLayout="row" fxLayoutGap="20px">

@@ -23,7 +23,7 @@ export class FollowUpModel
     date: string;
     address: AddressModel;
     personId: string;
-    contact: ContactModel | CaseModel;
+    person: ContactModel | CaseModel;
     targeted: boolean;
     questionnaireAnswers: {
         [variable: string]: IAnswerData[];
@@ -163,11 +163,11 @@ export class FollowUpModel
         this.fillLocation = _.isEmpty(this.fillLocation) ? undefined : new FillLocationModel(this.fillLocation);
 
         if (includeContact) {
-            this.contact = _.get(data, 'contact', {});
-            if (this.contact.type === EntityType.CASE) {
-                this.contact = new CaseModel(this.contact);
+            const person = _.get(data, 'contact', {});
+            if (person.type === EntityType.CASE) {
+                this.person = new CaseModel(person);
             } else {
-                this.contact = new ContactModel(this.contact);
+                this.person = new ContactModel(person);
             }
         }
 

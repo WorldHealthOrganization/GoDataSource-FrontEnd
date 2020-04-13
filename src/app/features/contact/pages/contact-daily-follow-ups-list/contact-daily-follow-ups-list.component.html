@@ -254,7 +254,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.contact?.lastName }}
+                {{ item.person?.lastName }}
             </mat-cell>
         </ng-container>
 
@@ -276,7 +276,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.contact?.firstName }}
+                {{ item.person?.firstName }}
             </mat-cell>
         </ng-container>
 
@@ -319,7 +319,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell class="has-date-range-filter" *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.contact?.dateOfLastContact | dateDefault }}
+                {{ item.person?.dateOfLastContact | dateDefault }}
             </mat-cell>
         </ng-container>
 
@@ -339,7 +339,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell class="has-date-range-filter" *matCellDef="let item" [class.record-alert]="item.alerted">
-                {{ item.contact?.followUp.endDate | dateDefault }}
+                {{ item.person?.followUp.endDate | dateDefault }}
             </mat-cell>
         </ng-container>
 

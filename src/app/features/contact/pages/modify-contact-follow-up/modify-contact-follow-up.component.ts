@@ -15,14 +15,13 @@ import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { Constants } from '../../../../core/models/constants';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { FollowUpPage } from '../../typings/follow-up-page';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { ContactModel } from '../../../../core/models/contact.model';
 import * as moment from 'moment';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -51,6 +50,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
     rootCaseData: CaseModel;
 
     followUpData: FollowUpModel = new FollowUpModel();
+    relatedPersonData: ContactModel | CaseModel = new ContactModel();
 
     teamsList$: Observable<TeamModel[]>;
     dailyStatusTypeOptions$: Observable<any[]>;
@@ -187,6 +187,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
                 )
                 .subscribe((followUpData: FollowUpModel) => {
                     this.followUpData = new FollowUpModel(followUpData);
+                    this.relatedPersonData = followUpData.person.type === EntityType.CASE ? new CaseModel(followUpData.person) : new ContactModel(followUpData.person);
 
                     this.initializeBreadcrumbs();
 
@@ -217,7 +218,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
                     // contacts view page
                     if (ContactModel.canView(this.authUser)) {
                         this.breadcrumbs.push(
-                            new BreadcrumbItemModel(this.followUpData.contact.name, `/contacts/${this.followUpData.contact.id}/view`)
+                            new BreadcrumbItemModel(this.followUpData.person.name, `/contacts/${this.followUpData.person.id}/view`)
                         );
                     }
 
@@ -365,9 +366,9 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
             )
             .subscribe((followUpData) => {
                 // update model
-                const contact = this.followUpData.contact;
+                const contact = this.followUpData.person;
                 this.followUpData = followUpData;
-                this.followUpData.contact = contact;
+                this.followUpData.person = contact;
 
                 // mark form as pristine
                 form.form.markAsPristine();

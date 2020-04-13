@@ -187,16 +187,18 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         const selectedContactsToFormat = [];
         const selectedContacts = this.selectedFollowUps
             .map((followUp: FollowUpModel) => {
-                if (followUp.contact.type === EntityType.CASE) {
+                if (followUp.person.type === EntityType.CASE) {
+                    // need to know if we have follow-ups for persons that now are cases
                     this.personsNowCases = true;
-                    selectedContactsToFormat.push(followUp.contact.name);
+                    selectedContactsToFormat.push(followUp.person.name);
                 }
-                return followUp.contact;
+                return followUp.person;
             })
             .filter((contact, index, self) => {
                 // keep only unique contacts
                 return self.indexOf(contact) === index;
             });
+        // persons to be displayed in the selected-contact-component
         this.personsToBeDisplayed = selectedContactsToFormat.join(', ');
 
         return selectedContacts;
