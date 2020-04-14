@@ -16,8 +16,16 @@ export class RequestQueryBuilder {
     public paginator: RequestPaginator = new RequestPaginator();
     // Return deleted records ?
     private deleted: boolean = false;
+
     // include deleted records flag to set it on the filter first level to include all records
-    public includeDeletedRecords: boolean = false;
+    private _includeDeletedRecords: boolean = false;
+    set includeDeletedRecords(value: boolean) {
+        this._includeDeletedRecords = value;
+    }
+    get includeDeletedRecords(): boolean {
+        return this._includeDeletedRecords;
+    }
+
     // Limit
     public limitResultsNumber: number;
     // Fields to retrieve
