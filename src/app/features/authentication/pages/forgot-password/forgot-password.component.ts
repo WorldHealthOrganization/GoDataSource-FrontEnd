@@ -12,6 +12,8 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { Observable } from 'rxjs/internal/Observable';
 import { SafeHtml } from '@angular/platform-browser';
 import { CaptchaDataFor, CaptchaDataService } from '../../../../core/services/data/captcha.data.service';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 
 @Component({
     selector: 'app-forgot-password',
@@ -23,6 +25,11 @@ export class ForgotPasswordComponent implements OnInit {
     // captcha data
     captchaData$: Observable<SafeHtml>;
 
+    // loading data ?
+    loading = true;
+    displayCaptcha = false;
+
+    // data
     dataModel: {
         email: string,
         captcha: string
@@ -41,7 +48,8 @@ export class ForgotPasswordComponent implements OnInit {
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private dialogService: DialogService,
-        private captchaDataService: CaptchaDataService
+        private captchaDataService: CaptchaDataService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {}
 
     /**
@@ -55,8 +63,22 @@ export class ForgotPasswordComponent implements OnInit {
             return;
         }
 
-        // generate captcha
-        this.refreshCaptcha();
+        // retrieve if we should display captcha or not
+        // display loading while determining if we should display captcha
+        this.loading = true;
+        this.systemSettingsDataService
+            .getAPIVersion()
+            .subscribe((versionData: SystemSettingsVersionModel) => {
+                // finished
+                this.loading = false;
+
+                // display captcha ?
+                this.displayCaptcha = versionData.captcha.forgotPassword;
+                if (this.displayCaptcha) {
+                    // generate captcha
+                    this.refreshCaptcha();
+                }
+            });
     }
 
     /**
@@ -75,8 +97,10 @@ export class ForgotPasswordComponent implements OnInit {
                 .pipe(
                     catchError((err) => {
                         // reset captcha no matter what...
-                        this.dataModel.captcha = '';
-                        this.refreshCaptcha();
+                        if (this.displayCaptcha) {
+                            this.dataModel.captcha = '';
+                            this.refreshCaptcha();
+                        }
 
                         // hide dialog
                         loadingDialog.close();
