@@ -630,6 +630,7 @@ export abstract class ListComponent implements OnDestroy {
                 }, true);
             } else {
                 this.queryBuilder.filter.remove('deleted');
+                this.queryBuilder.includeDeletedRecords = true;
             }
         }
 

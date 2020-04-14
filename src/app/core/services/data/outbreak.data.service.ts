@@ -75,6 +75,18 @@ export class OutbreakDataService {
      * @param {RequestQueryBuilder} queryBuilder
      */
     getOutbreaksCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<IBasicCount> {
+        // condition we need to build the whereFilter to include all the records(deleted and not deleted)
+        if (queryBuilder.includeDeletedRecords) {
+            // add condition to add it on the first level
+            queryBuilder.filter.where({
+                'includeDeletedRecords': {
+                    'eq' : true
+                }
+            });
+        }
+        // set filter to add condition to first level
+        queryBuilder.filter.firstLevelConditions();
+        // build where filter
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`outbreaks/count?where=${whereFilter}`);
     }
