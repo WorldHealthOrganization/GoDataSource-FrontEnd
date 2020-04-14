@@ -14,6 +14,8 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { CaptchaDataFor, CaptchaDataService } from '../../../../core/services/data/captcha.data.service';
 import { Observable } from 'rxjs/internal/Observable';
 import { SafeHtml } from '@angular/platform-browser';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 
 @Component({
     selector: 'app-login',
@@ -28,6 +30,10 @@ export class LoginComponent implements OnInit {
     // captcha data
     captchaData$: Observable<SafeHtml>;
 
+    // loading data ?
+    loading = true;
+    displayCaptcha = false;
+
     /**
      * Constructor
      */
@@ -37,7 +43,8 @@ export class LoginComponent implements OnInit {
         private snackbarService: SnackbarService,
         private i18nService: I18nService,
         protected dialogService: DialogService,
-        private captchaDataService: CaptchaDataService
+        private captchaDataService: CaptchaDataService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {}
 
     /**
@@ -54,8 +61,22 @@ export class LoginComponent implements OnInit {
             return;
         }
 
-        // generate captcha
-        this.refreshCaptcha();
+        // retrieve if we should display captcha or not
+        // display loading while determining if we should display captcha
+        this.loading = true;
+        this.systemSettingsDataService
+            .getAPIVersion()
+            .subscribe((versionData: SystemSettingsVersionModel) => {
+                // finished
+                this.loading = false;
+
+                // display captcha ?
+                this.displayCaptcha = versionData.captcha.login;
+                if (this.displayCaptcha) {
+                    // generate captcha
+                    this.refreshCaptcha();
+                }
+            });
     }
 
     /**
@@ -77,8 +98,10 @@ export class LoginComponent implements OnInit {
                         loadingDialog.close();
 
                         // reset captcha no matter what...
-                        this.user.captcha = '';
-                        this.refreshCaptcha();
+                        if (this.displayCaptcha) {
+                            this.user.captcha = '';
+                            this.refreshCaptcha();
+                        }
 
                         // show error
                         this.snackbarService.showApiError(err);
