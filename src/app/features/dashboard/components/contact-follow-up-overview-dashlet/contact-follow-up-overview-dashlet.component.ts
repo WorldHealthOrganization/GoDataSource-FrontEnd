@@ -140,6 +140,7 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
         if (metricData.length === 0) {
             return;
         }
+
         // initialize data
         this.colorPattern = [];
         this.chartDataCategories = [];
