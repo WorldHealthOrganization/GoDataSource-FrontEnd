@@ -29,7 +29,7 @@
                         [(ngModel)]="entry.code"
                         [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CODE' | translate"
                         tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CODE_DESCRIPTION"
-                        [disabled]="viewOnly || entry.readonly"
+                        [disabled]="viewOnly"
                         app-general-async-validator
                         [asyncValidatorObservable]="codeDuplicateValidator$">
                     </app-form-input>
