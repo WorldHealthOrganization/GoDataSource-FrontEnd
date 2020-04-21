@@ -395,6 +395,10 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_AREA'
             }),
             new VisibleColumnModel({
+                field: 'phoneNumber',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER'
+            }),
+            new VisibleColumnModel({
                 field: 'fullAddress',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
                 visible: false

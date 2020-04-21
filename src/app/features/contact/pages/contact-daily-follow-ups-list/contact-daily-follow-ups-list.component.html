@@ -364,6 +364,28 @@
             </mat-cell>
         </ng-container>
 
+        <!--Phone number-->
+        <ng-container matColumnDef="phoneNumber">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="phoneNumberFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByPhoneNumber('address.phoneNumber', $event, '$regex')"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                {{item.address?.phoneNumber}}
+            </mat-cell>
+        </ng-container>
+
         <!-- Area -->
         <ng-container matColumnDef="area">
             <mat-header-cell *matHeaderCellDef>

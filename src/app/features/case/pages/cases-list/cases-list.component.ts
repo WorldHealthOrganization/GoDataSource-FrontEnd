@@ -1312,32 +1312,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     }
 
     /**
-     * Filter by phone number
-     */
-    filterByPhoneNumber(value: string) {
-        // remove previous condition
-        this.queryBuilder.filter.remove('addresses');
-
-        if (!_.isEmpty(value)) {
-            // add new condition
-            this.queryBuilder.filter.where({
-                addresses: {
-                    elemMatch: {
-                        phoneNumber: {
-                            $regex: RequestFilter.escapeStringForRegex(value)
-                                .replace(/%/g, '.*')
-                                .replace(/\\\?/g, '.'),
-                            $options: 'i'
-                        }
-                    }
-                }
-            });
-        }
-        // refresh list
-        this.needsRefreshList();
-    }
-
-    /**
      * Display loading dialog
      */
     showLoadingDialog() {

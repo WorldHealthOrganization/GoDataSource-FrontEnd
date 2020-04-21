@@ -1202,33 +1202,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     }
 
     /**
-     * Filter by phone number
-     */
-    filterByPhoneNumber(value: string) {
-        // remove previous condition
-        this.queryBuilder.filter.remove('addresses');
-
-        if (!_.isEmpty(value)) {
-            // add new condition
-            this.queryBuilder.filter.where({
-                addresses: {
-                    elemMatch: {
-                        phoneNumber: {
-                            $regex: RequestFilter.escapeStringForRegex(value)
-                                .replace(/%/g, '.*')
-                                .replace(/\\\?/g, '.'),
-                            $options: 'i'
-                        }
-                    }
-                }
-            });
-        }
-
-        // refresh list
-        this.needsRefreshList();
-    }
-
-    /**
      * Filter by locations selected in location-drop-down
      * @param locations
      */
