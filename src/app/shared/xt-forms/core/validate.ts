@@ -58,7 +58,7 @@ export const validate =
                 return of(null);
             }
 
-            const synchronousValid = () => composeValidators(validators)(control);
+            const synchronousValid = validators ? () => composeValidators(validators)(control) : null;
 
             if (asyncValidators) {
 
@@ -67,7 +67,7 @@ export const validate =
                 return asyncValidator(control)
                     .pipe(
                         map(v => {
-                            const secondary = synchronousValid();
+                            const secondary = synchronousValid ? synchronousValid() : null;
                             if (secondary || v) {
                                 // compose async and sync validator results
                                 return Object.assign({}, secondary, v);
