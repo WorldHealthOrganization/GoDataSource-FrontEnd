@@ -355,6 +355,7 @@ export class TransmissionChainDataService {
                             if (node.type !== EntityType.EVENT) {
                                 const mainAddr = node.model.mainAddress;
                                 if (
+                                    mainAddr &&
                                     mainAddr.locationId &&
                                     locationsListMap[mainAddr.locationId] &&
                                     locationsListMap[mainAddr.locationId].name
@@ -386,6 +387,7 @@ export class TransmissionChainDataService {
                                 }
                                 const mainAddr = node.model.mainAddress;
                                 if (
+                                    mainAddr &&
                                     mainAddr.locationId &&
                                     locationsListMap[mainAddr.locationId] &&
                                     locationsListMap[mainAddr.locationId].name
