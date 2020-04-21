@@ -47,8 +47,9 @@ export class RequestFilter {
         }
 
         // construct search pattern
-        return '[^0-9]*' + digits.map((digit: string) => {
-            return digit + '[^0-9]*';
+        return '^[^0-9]*' + digits.map((digit: string, index: number) => {
+            // exclude last check, since we might want to display numbers that start with digits
+            return digit + (index < digits.length - 1 ? '[^0-9]*' : '');
         }).join('');
     }
 
@@ -171,16 +172,31 @@ export class RequestFilter {
     byPhoneNumber(
         property: string,
         value: string,
-        replace: boolean = true
+        replace: boolean = true,
+        regexMethod: string = 'regex'
     ) {
         // do we need to remove condition ?
         if (_.isEmpty(value)) {
             this.remove(property);
         } else {
             // build number pattern condition
+            const phonePattern = RequestFilter.getPhoneNumberPattern(value);
+
+            // nothing to check ?
+            if (!phonePattern) {
+                // filter by invalid value
+                this.where({
+                    [property]: 'INVALID PHONE'
+                }, replace);
+
+                // finished
+                return this;
+            }
+
+            // search by phone number
             this.where({
                 [property]: {
-                    regex: RequestFilter.getPhoneNumberPattern(value)
+                    [regexMethod]: phonePattern
                 }
             }, replace);
         }

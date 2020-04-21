@@ -28,6 +28,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_WORLD_MAP_FULL_SCREEN_LABEL': 'Full screen',
 
         /**
+         * uiFollowUpFields
+         */
+        'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER': 'Phone Number',
+
+        /**
          * uiCommonLabels
          */
         'LNG_COMMON_LABEL_SEARCH': 'Search',
