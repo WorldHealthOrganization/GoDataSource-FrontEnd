@@ -196,9 +196,13 @@ export class AddressModel {
         if (!numberPattern) {
             // filter by invalid value ?
             if (phoneNumber) {
+                // add invalid condition
                 qb.filter.where({
                     [property]: 'INVALID PHONE'
                 }, false);
+
+                // finished
+                return qb;
             }
 
             // finished
