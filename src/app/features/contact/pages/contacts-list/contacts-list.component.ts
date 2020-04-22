@@ -896,6 +896,16 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             const clonedQueryBuilder = _.cloneDeep(this.queryBuilder);
             clonedQueryBuilder.paginator.clear();
             clonedQueryBuilder.sort.clear();
+
+            // ugly hack so we don't have to change API in many place and test the entire project again ( if we changed api to replace regex to $regex many API request would be affected )
+            // #TODO - we need to address this issue later by changing all API requests that use convertLoopbackFilterToMongo ( WGD-2854 )
+            const addressPhoneCondition = clonedQueryBuilder.filter.get('addresses.phoneNumber');
+            if (addressPhoneCondition) {
+                const newCondition = JSON.parse(JSON.stringify(addressPhoneCondition).replace(/"regex"/gi, '"$regex"'));
+                clonedQueryBuilder.filter.where(newCondition, true);
+            }
+
+            // retrieve data
             this.countedContactsByRiskLevel$ = this.riskLevelRefData$
                 .pipe(
                     mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
