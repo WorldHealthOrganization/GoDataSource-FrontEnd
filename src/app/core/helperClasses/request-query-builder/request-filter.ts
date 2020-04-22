@@ -653,6 +653,16 @@ export class RequestFilter {
     }
 
     /**
+     * Retrieve condition
+     * @param property
+     */
+    get(property: string): any {
+        return _.find(this.conditions, (condition) => {
+            return Object.keys(condition)[0] === property;
+        });
+    }
+
+    /**
      * Remove all operations of a given type on a list of properties
      * @param {RequestFilterOperator} operator
      * @param {string[]} properties
