@@ -16,6 +16,9 @@ export class RequestFilter {
     private flags: { [key: string]: any } = {};
     // migrate conditions to first level
     private generateConditionsOnFirstLevel: boolean = false;
+    // include deleted records flag to set it on the filter first level
+    // to include all records (deleted and not deleted)
+    private deleted: boolean | undefined = undefined;
 
     /**
      * Escape string
@@ -50,6 +53,24 @@ export class RequestFilter {
         return '[^0-9]*' + digits.map((digit: string) => {
             return digit + '[^0-9]*';
         }).join('');
+    }
+
+    /**
+     * Include deleted records
+     * @returns {RequestQueryBuilder}
+     */
+    includeDeleted() {
+        this.deleted = true;
+        return this;
+    }
+
+    /**
+     * Exclude deleted records ( this is the default behaviour )
+     * @returns {RequestQueryBuilder}
+     */
+    excludeDeleted() {
+        this.deleted = false;
+        return this;
     }
 
     /**
@@ -720,6 +741,10 @@ export class RequestFilter {
                 {
                     [this.operator]: this.conditions
                 };
+        }
+        // set includeDeletedRecords on filter if this.deleted has a value
+        if (this.deleted !== undefined) {
+            condition.includeDeletedRecords = this.deleted;
         }
 
         // append flags
