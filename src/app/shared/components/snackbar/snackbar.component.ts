@@ -1,5 +1,5 @@
 import { Component, Inject, ViewEncapsulation } from '@angular/core';
-import { MAT_SNACK_BAR_DATA } from '@angular/material';
+import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material';
 
 import * as _ from 'lodash';
 
@@ -17,6 +17,7 @@ export class SnackbarComponent {
     html: boolean;
 
     constructor(
+        public snackBarRef: MatSnackBarRef<SnackbarComponent>,
         @Inject(MAT_SNACK_BAR_DATA) public data: any
     ) {
         this.theme = _.get(data, 'theme');

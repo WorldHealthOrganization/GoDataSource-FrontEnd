@@ -74,7 +74,6 @@ export class SnackbarService {
                         message: message,
                         html: html
                     },
-                    duration: duration,
                     horizontalPosition: 'center',
                     verticalPosition: 'top'
                 });

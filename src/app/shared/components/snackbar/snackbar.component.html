@@ -2,6 +2,11 @@
     *ngIf="!html"
     class="snackbar {{theme}}">
     {{message}}
+    <div
+        class="snackbar-close-button"
+        fxLayout="row" fxFlex fxLayoutAlign="end"
+        (click)="snackBarRef.dismiss()">x
+    </div>
 </div>
 
 <div
