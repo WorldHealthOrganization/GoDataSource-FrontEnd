@@ -16,8 +16,7 @@ export class RequestFilter {
     private flags: { [key: string]: any } = {};
     // migrate conditions to first level
     private generateConditionsOnFirstLevel: boolean = false;
-    // include deleted records flag to set it on the filter first level
-    // to include all records (deleted and not deleted)
+    // flag to include all records (deleted and not deleted)
     private deleted: boolean | undefined = undefined;
 
     /**
