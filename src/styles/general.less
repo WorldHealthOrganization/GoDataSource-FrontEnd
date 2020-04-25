@@ -330,6 +330,16 @@ form.form-view-only {
 
 .page-content {
     margin-left: @page-left-margin;
+
+    .mat-expansion-panel {
+        margin: 15px;
+
+        &.mat-expansion-panel-no-padding {
+            .mat-expansion-panel-body {
+                padding: 0;
+            }
+        }
+    }
 }
 
 .page-tabs-navbar {

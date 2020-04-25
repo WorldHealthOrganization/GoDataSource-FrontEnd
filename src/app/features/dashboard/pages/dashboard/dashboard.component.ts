@@ -573,6 +573,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.domService
             .getPNGBase64(selector, '#tempCanvas')
             .subscribe((pngBase64) => {
+                // object not found ?
+                if (!pngBase64) {
+                    this.snackbarService.showError('LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG');
+                    this.closeLoadingDialog();
+                    return;
+                }
+
+                // export
                 this.importExportDataService
                     .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
                     .pipe(
