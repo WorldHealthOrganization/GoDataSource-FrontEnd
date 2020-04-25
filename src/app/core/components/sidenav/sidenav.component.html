@@ -60,7 +60,7 @@
     <div class="item-separator account-item-separator"></div>
 
     <!-- Main Menu Items  -->
-    <ng-container *ngFor="let item of mainItems">
+    <ng-container *ngFor="let item of mainItems; let itemIndex = index">
 
         <!-- Menu Item with Link -->
         <div *ngIf="item.link && shouldDisplayItem(item)" class="item" fxLayout="row">
@@ -117,7 +117,8 @@
             </button>
         </div>
 
-        <div *ngIf="item.separator" class="item-separator"></div>
+        <!-- Separator -->
+        <div *ngIf="item.separator && shouldDisplayItem(item, mainItems, itemIndex)" class="item-separator"></div>
 
     </ng-container>
 

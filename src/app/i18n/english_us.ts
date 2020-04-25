@@ -18,6 +18,12 @@ export const EnglishUsLang = {
         'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_MINIMUM_SEARCH_LENGTH': 'Enter at least {{minLength}} characters',
 
         /**
+         * uiDashboardPage
+         */
+        'LNG_PAGE_DASHBOARD_PIE_CHARTS_TITLE': 'Summaries charts',
+        'LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG': 'Please make sure that EPI chart is visible',
+
+        /**
          * uiChainsOfTransmissionGraph
          */
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_FULL_SCREEN_LABEL': 'Full screen',
