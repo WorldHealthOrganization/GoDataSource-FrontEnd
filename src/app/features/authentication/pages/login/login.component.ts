@@ -56,7 +56,7 @@ export class LoginComponent implements OnInit {
 
         // check if user is authenticated
         if (this.authDataService.isAuthenticated()) {
-            // user is already authenticated; redirect to dashboard home page
+            // user is already authenticated; redirect to landing page
             this.router.navigate(['']);
             return;
         }
@@ -145,7 +145,7 @@ export class LoginComponent implements OnInit {
                                 // user must change password
                                 this.router.navigate(['/account/change-password']);
                             } else {
-                                // redirect to dashboard landing page
+                                // redirect to landing page
                                 this.router.navigate(['']);
                             }
                         });

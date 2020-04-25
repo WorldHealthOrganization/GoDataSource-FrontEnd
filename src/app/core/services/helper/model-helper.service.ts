@@ -83,7 +83,7 @@ export class ModelHelperService {
                 const permissionIdsFromRoles = _.flatten(rolesPermissions) as PERMISSION[];
 
                 // keep only unique permissions
-                user.permissionIds = _.uniq(permissionIdsFromRoles);
+                let finalUserPermissions: PERMISSION[] = _.uniq(permissionIdsFromRoles);
 
                 // go through all permissions and add child permissions
                 if (user.availablePermissions) {
@@ -96,8 +96,8 @@ export class ModelHelperService {
                     });
 
                     // determine all permissions and add child permissions
-                    const newPermissionIds = [...(user.permissionIds || [])];
-                    (user.permissionIds || []).forEach((permissionId: string) => {
+                    const newPermissionIds = [...(finalUserPermissions || [])];
+                    (finalUserPermissions || []).forEach((permissionId: string) => {
                         if (availableGroupPermissionsMap[permissionId]) {
                             // add all child permissions from this group
                             (availableGroupPermissionsMap[permissionId].permissions || []).forEach((permissionData) => {
@@ -107,9 +107,13 @@ export class ModelHelperService {
                     });
 
                     // replace user permissions
-                    user.permissionIds = newPermissionIds;
+                    finalUserPermissions = newPermissionIds;
                 }
 
+                // set permissions
+                user.permissionIds = finalUserPermissions;
+
+                // finished
                 return user;
 
             case UserRoleModel:

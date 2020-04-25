@@ -29,7 +29,6 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { Router } from '@angular/router';
 
 interface IKpiGroup {
     id: DashboardKpiGroup;
@@ -315,17 +314,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         private dialogService: DialogService,
         protected snackbarService: SnackbarService,
         private systemSettingsDataService: SystemSettingsDataService,
-        private referenceDataDataService: ReferenceDataDataService,
-        private router: Router
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
-
-        // check if we have anything visible on dashboard, if not redirect to a different page
-        if (!DashboardModel.canViewDashboard(this.authUser)) {
-            this.router.navigate(['/version']);
-        }
-
     }
 
     /**
