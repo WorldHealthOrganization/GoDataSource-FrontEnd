@@ -29,7 +29,6 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
-import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -63,6 +62,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     // list of existing contacts
     contactsList$: Observable<ContactModel[]>;
     contactsListCount$: Observable<IBasicCount>;
+
+    // don't display pills by default
+    showCountPills: boolean = false;
 
     outbreakSubscriber: Subscription;
 

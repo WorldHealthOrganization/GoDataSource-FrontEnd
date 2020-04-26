@@ -76,6 +76,16 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE': 'Contact form',
 
         /**
+         * uiContactsListPage
+         */
+        'LNG_PAGE_LIST_CONTACTS_ACTION_SHOW_GROUP_BY_RISK_PILLS': 'Show contacts grouped by risk count',
+
+        /**
+         * uiCasesListPage
+         */
+        'LNG_PAGE_LIST_CASES_ACTION_SHOW_GROUP_BY_CLASSIFICATION_PILLS': 'Show cases grouped by classification count',
+
+        /**
          * uiCreateContactPage
          */
         'LNG_PAGE_CREATE_CONTACT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',

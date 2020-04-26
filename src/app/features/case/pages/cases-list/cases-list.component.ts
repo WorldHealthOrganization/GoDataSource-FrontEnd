@@ -61,6 +61,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     casesList$: Observable<CaseModel[]>;
     casesListCount$: Observable<IBasicCount>;
 
+    // don't display pills by default
+    showCountPills: boolean = false;
+
     // user list
     userList$: Observable<UserModel[]>;
 
