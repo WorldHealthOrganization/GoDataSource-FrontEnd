@@ -6,7 +6,8 @@ export class AbstractNavItem {
     // used to fast determine if we have access to this item
     public access: {
         allowed?: boolean,
-        userPermissionsHash?: number
+        userPermissionsHash?: number,
+        outbreakId?: string
     } = {};
 
     /**

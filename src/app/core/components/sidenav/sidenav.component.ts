@@ -524,7 +524,12 @@ export class SidenavComponent implements OnInit, OnDestroy {
 
         // do we have has permission cache, so we don't check that often, only if user permissions changed ?
         let hasPermission: boolean;
-        if (item.access.userPermissionsHash === this.authUser.permissionIdsHash) {
+        if (
+            item.access.userPermissionsHash === this.authUser.permissionIdsHash && (
+                !this.selectedOutbreak ||
+                item.access.outbreakId === this.selectedOutbreak.id
+            )
+        ) {
             return item.access.allowed;
         }
 
@@ -560,6 +565,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
             /// cache result
             item.access.userPermissionsHash = this.authUser.permissionIdsHash;
             item.access.allowed = hasPermission;
+            item.access.outbreakId = this.selectedOutbreak ? this.selectedOutbreak.id : null;
 
             // finished
             return hasPermission;
@@ -584,6 +590,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
             /// cache result
             item.access.userPermissionsHash = this.authUser.permissionIdsHash;
             item.access.allowed = hasPermission;
+            item.access.outbreakId = this.selectedOutbreak ? this.selectedOutbreak.id : null;
 
             // no permissions
             return hasPermission;
@@ -598,6 +605,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         /// cache result
         item.access.userPermissionsHash = this.authUser.permissionIdsHash;
         item.access.allowed = hasPermission;
+        item.access.outbreakId = this.selectedOutbreak ? this.selectedOutbreak.id : null;
 
         // no permissions
         return hasPermission;
@@ -608,7 +616,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
      * @returns {boolean}
      */
     hasOutbreak(): boolean {
-        return this.selectedOutbreak && !_.isEmpty(this.selectedOutbreak.id);
+        return !!(this.selectedOutbreak && this.selectedOutbreak.id);
     }
 
 }
