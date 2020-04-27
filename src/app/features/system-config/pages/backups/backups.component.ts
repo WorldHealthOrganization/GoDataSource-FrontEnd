@@ -62,8 +62,9 @@ export class BackupsComponent extends ListComponent implements OnInit {
         'modules',
         'date',
         'status',
-        'error',
-        'user'
+        'fileSize',
+        'user',
+        'error'
     ];
 
     recordActions: HoverRowAction[] = [

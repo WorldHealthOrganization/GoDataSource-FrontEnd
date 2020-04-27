@@ -59,6 +59,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     followUpsList$: Observable<FollowUpModel[]>;
     followUpsListCount$: Observable<IBasicCount>;
 
+    // don't display pills by default
+    showCountPills: boolean = false;
+
     // Daily follow ups grouped by teams
     countedFollowUpsGroupedByTeams$: Observable<any>;
 
