@@ -115,7 +115,7 @@
 
     <!--Contacts grouped by risk level-->
     <a
-        *ngIf="!showCountPills; else countPills"
+        *ngIf="!appliedListFilter && !showCountPills; else countPills"
         class="xlink-button margin-right-x"
         (click)="showCountPills = true">
         {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_SHOW_GROUP_BY_RISK_PILLS' | translate }}

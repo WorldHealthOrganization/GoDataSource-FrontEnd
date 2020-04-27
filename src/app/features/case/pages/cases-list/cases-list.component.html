@@ -128,7 +128,7 @@
 
     <!--Cases grouped by classification-->
     <a
-        *ngIf="!showCountPills; else countPills"
+        *ngIf="!appliedListFilter && !showCountPills; else countPills"
         class="xlink-button margin-right-x"
         (click)="showCountPills = true">
         {{ 'LNG_PAGE_LIST_CASES_ACTION_SHOW_GROUP_BY_CLASSIFICATION_PILLS' | translate }}

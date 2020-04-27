@@ -76,12 +76,22 @@
         [value]="(followUpsListCount$ | async)?.count">
     </app-total-number-of-records>
 
-    <app-counted-items-list
-        *ngIf="!appliedListFilter"
-        fxFlex
-        [items]="countedFollowUpsGroupedByTeams$ | async"
-        (optionChanged)="filterBySelectField('teamId', $event.ids, null)">
-    </app-counted-items-list>
+    <!--Contacts grouped by risk level-->
+    <a
+        *ngIf="!appliedListFilter && !showCountPills; else countPills"
+        class="xlink-button margin-right-x"
+        (click)="showCountPills = true">
+        {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_SHOW_GROUP_BY_TEAM_PILLS' | translate }}
+    </a>
+    <ng-template
+        #countPills>
+        <app-counted-items-list
+            *ngIf="!appliedListFilter"
+            fxFlex
+            [items]="countedFollowUpsGroupedByTeams$ | async"
+            (optionChanged)="filterBySelectField('teamId', $event.ids, null)">
+        </app-counted-items-list>
+    </ng-template>
 </div>
 
 <!-- Side filters -->
