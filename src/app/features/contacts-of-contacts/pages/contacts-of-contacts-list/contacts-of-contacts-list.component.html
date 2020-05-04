@@ -39,10 +39,9 @@
                     <mat-divider></mat-divider>
 
                     <button
+                        *ngIf="ContactOfContactModel.canExportRelationships(authUser)"
                         mat-menu-item
                         (click)="exportFilteredContactsRelationships()">
-                        <!-- need new permision-->
-                        <!--*ngIf="ContactOfContactModel.canExportRelationships(authUser)"-->
                         {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_EXPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS' | translate }}
                     </button>
                 </mat-menu>

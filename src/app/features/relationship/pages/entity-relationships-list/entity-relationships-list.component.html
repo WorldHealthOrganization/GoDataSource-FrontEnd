@@ -114,9 +114,9 @@
                                     (click)="changeSourceForSelectedRelationships()">
                                     {{ 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE' | translate }}
                                 </button>
-<!--                                && entityCanBulkDelete-->
+                                <!--need new permission for bulk delete contacts for ContactModel-->
                                 <ng-container
-                                    *ngIf="RelationshipModel.canBulkDelete(authUser)">
+                                    *ngIf="RelationshipModel.canBulkDelete(authUser) && entityCanBulkDelete">
                                     <mat-divider></mat-divider>
 
                                     <button

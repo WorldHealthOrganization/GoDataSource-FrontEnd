@@ -215,6 +215,7 @@ export enum PERMISSION {
     CONTACT_CHANGE_SOURCE_RELATIONSHIP = 'contact_change_source_relationships',
     CONTACT_CHANGE_TARGET_RELATIONSHIP = 'contact_change_target_relationships',
     CONTACT_BULK_DELETE_RELATIONSHIP_EXPOSURES = 'contact_bulk_delete_relationships_exposures',
+    CONTACT_BULK_DELETE_RELATIONSHIP_CONTACTS = 'contact_bulk_delete_relationships_contacts',
     CONTACT_VIEW_MOVEMENT_MAP = 'contact_view_movement_map',
     CONTACT_EXPORT_MOVEMENT_MAP = 'contact_export_movement_map',
     CONTACT_VIEW_CHRONOLOGY_CHART = 'contact_view_chronology_chart',

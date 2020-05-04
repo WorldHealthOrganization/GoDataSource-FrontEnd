@@ -107,7 +107,7 @@ describe('ContactOfContactChronology', () => {
             // make sure chronology items are the ones we expect
             expect(expectedChronologyItems.length).toEqual(3);
             expect(viewChronologyContactOfContactComponent.chronologyEntries).not.toEqual(expectedChronologyItems);
-            // TODO change solve this test
+            // TODO request help to solve this test
             // expect(chronologyComponent.entries).toEqual(expectedChronologyItems);
         }));
     });
