@@ -383,7 +383,7 @@ export class TransmissionChainDataService {
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.ID_AND_LOCATION.value) {
                             if (node.type !== EntityType.EVENT) {
                                 if (node.model.visualId) {
-                                    node.label = node.model.visualId;
+                                    nodeData.label = node.model.visualId;
                                 }
                                 const mainAddr = node.model.mainAddress;
                                 if (
@@ -392,7 +392,7 @@ export class TransmissionChainDataService {
                                     locationsListMap[mainAddr.locationId] &&
                                     locationsListMap[mainAddr.locationId].name
                                 ) {
-                                    nodeData.label = (node.model.visualId ? node.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
+                                    nodeData.label = (node.model.visualId ? nodeData.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
                                 }
                             } else {
                                 nodeData.label = '';
