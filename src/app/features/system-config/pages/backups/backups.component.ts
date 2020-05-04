@@ -58,6 +58,7 @@ export class BackupsComponent extends ListComponent implements OnInit {
     loading: boolean = false;
 
     fixedTableColumns: string[] = [
+        'description',
         'location',
         'modules',
         'date',
@@ -229,6 +230,15 @@ export class BackupsComponent extends ListComponent implements OnInit {
             message: 'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_TITLE',
             yesLabel: 'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_CREATE_BACKUP_BUTTON',
             fieldsList: [
+                // description
+                new DialogField({
+                    name: 'description',
+                    placeholder: 'LNG_BACKUP_FIELD_LABEL_DESCRIPTION',
+                    description: 'LNG_BACKUP_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
+                    required: false,
+                    value: this.settings.dataBackup.description
+                }),
+
                 // location
                 new DialogField({
                     name: 'location',
@@ -437,6 +447,15 @@ export class BackupsComponent extends ListComponent implements OnInit {
             message: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_TITLE',
             yesLabel: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SAVE_BUTTON',
             fieldsList: [
+                // description
+                new DialogField({
+                    name: 'description',
+                    placeholder: 'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION',
+                    description: 'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION_DESCRIPTION',
+                    required: false,
+                    value: this.settings.dataBackup.description
+                }),
+
                 // location
                 new DialogField({
                     name: 'location',

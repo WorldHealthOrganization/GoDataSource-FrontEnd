@@ -119,7 +119,22 @@ export const EnglishUsLang = {
         /**
          * uiOutbreakTemplateListPage
          */
-        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME': '{{name}} Clone'
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME': '{{name}} Clone',
+
+        /**
+         * uiBackupFields
+         */
+        'LNG_BACKUP_FIELD_LABEL_DESCRIPTION': 'Description',
+        'LNG_BACKUP_FIELD_LABEL_DESCRIPTION_DESCRIPTION': '',
+
+        /**
+         * uiAutomaticBackupFields
+         */
+        'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION': 'Description',
+        'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION_DESCRIPTION': ''
+
+
+
 
 
 
