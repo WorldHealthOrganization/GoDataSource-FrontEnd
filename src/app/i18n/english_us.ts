@@ -18,14 +18,26 @@ export const EnglishUsLang = {
         'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_MINIMUM_SEARCH_LENGTH': 'Enter at least {{minLength}} characters',
 
         /**
+         * uiDashboardPage
+         */
+        'LNG_PAGE_DASHBOARD_PIE_CHARTS_TITLE': 'Summaries charts',
+        'LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG': 'Please make sure that EPI chart is visible',
+
+        /**
          * uiChainsOfTransmissionGraph
          */
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_FULL_SCREEN_LABEL': 'Full screen',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_VISUAL_ID_AND_LOCATION': 'ID + Location',
 
         /**
          * uiWorldMap
          */
         'LNG_PAGE_WORLD_MAP_FULL_SCREEN_LABEL': 'Full screen',
+
+        /**
+         * uiFollowUpFields
+         */
+        'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER': 'Phone Number',
 
         /**
          * uiCommonLabels
@@ -63,6 +75,16 @@ export const EnglishUsLang = {
          * uiModifyOutbreakTemplatePage
          */
         'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE': 'Contact form',
+
+        /**
+         * uiContactsListPage
+         */
+        'LNG_PAGE_LIST_CONTACTS_ACTION_SHOW_GROUP_BY_RISK_PILLS': 'Show contacts grouped by risk count',
+
+        /**
+         * uiCasesListPage
+         */
+        'LNG_PAGE_LIST_CASES_ACTION_SHOW_GROUP_BY_CLASSIFICATION_PILLS': 'Show cases grouped by classification count',
 
         /**
          * uiCreateContactPage

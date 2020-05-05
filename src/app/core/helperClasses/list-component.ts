@@ -453,11 +453,14 @@ export abstract class ListComponent implements OnDestroy {
      */
     filterByPhoneNumber(
         property: string,
-        value: string
+        value: string,
+        regexMethod: string = 'regex'
     ) {
         this.queryBuilder.filter.byPhoneNumber(
             property as string,
-            value
+            value,
+            true,
+            regexMethod
         );
 
         // refresh list

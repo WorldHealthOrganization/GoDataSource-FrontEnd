@@ -1,6 +1,5 @@
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Injectable } from '@angular/core';
-import * as _ from 'lodash';
 import { AuthDataService } from '../data/auth.data.service';
 import { Observable } from 'rxjs/internal/Observable';
 import { catchError } from 'rxjs/operators';
@@ -35,11 +34,26 @@ export class AuthGuard implements CanActivate {
         // check if user is authenticated
         if (user) {
             // check if there are any permissions defined on route
-            const routePermissions = _.get(next, 'data.permissions', []);
+            let routePermissions: any = [];
+            if (
+                next &&
+                next.data &&
+                next.data.permissions
+            ) {
+                routePermissions = next.data.permissions;
+            }
+
+            // nothing to check ?
+            if (!routePermissions) {
+                return true;
+            }
 
             // check if user has the required permissions
-            if (_.isArray(routePermissions)) {
-                if (user.hasPermissions(...routePermissions)) {
+            if (Array.isArray(routePermissions)) {
+                if (
+                    routePermissions.length < 1 ||
+                    user.hasPermissions(...routePermissions)
+                ) {
                     return true;
                 }
             } else {

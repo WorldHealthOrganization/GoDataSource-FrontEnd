@@ -58,6 +58,21 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Code -->
+        <ng-container matColumnDef="code">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CODE' | translate}}
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.code }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Description -->
         <ng-container matColumnDef="description">
             <mat-header-cell *matHeaderCellDef>
