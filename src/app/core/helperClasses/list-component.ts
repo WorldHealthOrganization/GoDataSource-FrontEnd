@@ -620,8 +620,12 @@ export abstract class ListComponent implements OnDestroy {
         if (value === false) {
             this.queryBuilder.excludeDeleted();
             this.queryBuilder.filter.remove('deleted');
+            // need to remove 'includeDeletedRecords' flag
+            this.queryBuilder.filter.excludeDeletedRecordsWhereField();
         } else {
             this.queryBuilder.includeDeleted();
+            // need to remove 'includeDeletedRecords' flag
+            this.queryBuilder.filter.excludeDeletedRecordsWhereField();
             if (value === true) {
                 this.queryBuilder.filter.where({
                     'deleted': {
@@ -631,7 +635,7 @@ export abstract class ListComponent implements OnDestroy {
             } else {
                 this.queryBuilder.filter.remove('deleted');
                 // include all records(deleted and not deleted)
-                this.queryBuilder.filter.includeDeleted();
+                this.queryBuilder.filter.includeDeletedRecordsWhereField();
             }
         }
 
