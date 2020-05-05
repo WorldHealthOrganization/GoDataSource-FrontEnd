@@ -268,7 +268,7 @@
                             [ngModel]="false"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByDeletedField($event.value)"
+                            (optionChanged)="filterByDeletedWithIncludeDeletedRecordsFlag($event.value)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
                             [displayFilterIcon]="true"
