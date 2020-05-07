@@ -29,7 +29,6 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
-import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
@@ -338,6 +337,17 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                                 CaseModel.canListRelationshipContacts(this.authUser) ||
                                 CaseModel.canListRelationshipExposures(this.authUser)
                             );
+                    }
+                }),
+
+                // See records detected by the system as duplicates but they were marked as not duplicates
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_SEE_RECORDS_NOT_DUPLICATES',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/duplicated-records/cases', item.id, 'marked-not-duplicates']);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted;
                     }
                 }),
 

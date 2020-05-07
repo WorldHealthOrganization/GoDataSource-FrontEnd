@@ -60,6 +60,39 @@ export class DialogAnswer {
     ) {}
 }
 
+export class DialogFieldListItem {
+    // data
+    itemData: LabelValuePair;
+    disabled: boolean = false;
+    actionButtonLabel: string;
+    actionButtonAction: (item: DialogFieldListItem) => void;
+    actionButtonActionTooltip: string;
+    actionButtonDisableActionAlongWithItem: boolean = true;
+    checked: boolean = false;
+
+    /**
+     * Constructor
+     */
+    constructor(data: {
+        // required
+        itemData: LabelValuePair,
+
+        // optional
+        disabled?: boolean,
+        actionButtonLabel?: string,
+        actionButtonAction?: (item: DialogFieldListItem) => void,
+        actionButtonActionTooltip?: string,
+        actionButtonDisableActionAlongWithItem?: boolean,
+        checked?: boolean
+    }) {
+        // set properties
+        Object.assign(
+            this,
+            data
+        );
+    }
+}
+
 export enum DialogFieldType {
     SELECT = 'select',
     TEXT = 'text',
@@ -69,7 +102,8 @@ export enum DialogFieldType {
     LINK = 'link',
     URL = 'url',
     ACTION = 'action',
-    SECTION_TITLE = 'section-title'
+    SECTION_TITLE = 'section-title',
+    CHECKBOX_LIST = 'checkbox-list'
 }
 
 export class DialogField {
@@ -104,6 +138,9 @@ export class DialogField {
     actionCallback: (actionData?: any) => void;
     actionData: any;
 
+    // items for lists ( e.g. checkbox list )
+    listItems: DialogFieldListItem[] = [];
+
     constructor(data: {
         name: string,
         placeholder?: string,
@@ -134,7 +171,10 @@ export class DialogField {
 
         // action
         actionCallback?: (actionData?: any) => void,
-        actionData?: any
+        actionData?: any,
+
+        // items for lists ( e.g. checkbox list )
+        listItems?: DialogFieldListItem[]
     }) {
         // set properties
         Object.assign(
@@ -294,6 +334,9 @@ export class DialogComponent {
 
     }
 
+    /**
+     * Constructor
+     */
     constructor(
         public dialogRef: MatDialogRef<DialogComponent>,
         @Inject(MAT_DIALOG_DATA) private data: DialogConfiguration
@@ -352,16 +395,34 @@ export class DialogComponent {
         }
     }
 
+    /**
+     * Chancel button handler
+     */
     cancel(dialogHandler: MatDialogRef<DialogComponent>) {
         dialogHandler.close(new DialogAnswer(DialogAnswerButton.Cancel));
     }
 
+    /**
+     * Yes button handler
+     */
     yes(
         dialogHandler: MatDialogRef<DialogComponent>,
         dialogAnswer: DialogAnswerInputValue
     ) {
-        // map values
+        // determine list values
         const dialogAnswerClone: DialogAnswerInputValue = _.cloneDeep(dialogAnswer);
+        (this.confirmData.fieldsList || []).forEach((field) => {
+           if (field.fieldType === DialogFieldType.CHECKBOX_LIST) {
+               dialogAnswerClone.value[field.name] = [];
+               (field.listItems || []).forEach((item) => {
+                   if (item.checked) {
+                       dialogAnswerClone.value[field.name].push(item.itemData.value);
+                   }
+               });
+           }
+        });
+
+        // map values
         if (_.isObject(dialogAnswerClone.value)) {
             _.each(dialogAnswerClone.value, (value, prop) => {
                 delete dialogAnswerClone.value[prop];

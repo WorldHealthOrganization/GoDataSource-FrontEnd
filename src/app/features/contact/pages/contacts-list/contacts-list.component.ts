@@ -293,6 +293,17 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     }
                 }),
 
+                // See records detected by the system as duplicates but they were marked as not duplicates
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_RECORDS_NOT_DUPLICATES',
+                    click: (item: ContactModel) => {
+                        this.router.navigate(['/duplicated-records/contacts', item.id, 'marked-not-duplicates']);
+                    },
+                    visible: (item: ContactModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+
                 // See contact lab results
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_LAB_RESULTS',

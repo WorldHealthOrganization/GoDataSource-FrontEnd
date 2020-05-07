@@ -8,7 +8,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -21,17 +21,17 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
-import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField } from '../../../../shared/components';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldListItem, DialogFieldType } from '../../../../shared/components';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { MatDialogRef } from '@angular/material';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
-import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 
 @Component({
     selector: 'app-modify-case',
@@ -97,7 +97,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private i18nService: I18nService,
-        protected dialogService: DialogService
+        protected dialogService: DialogService,
+        private entityDataService: EntityDataService
     ) {
         super(
             route,
@@ -359,6 +360,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                 })
             )
             .subscribe((caseDuplicates: EntityDuplicatesModel) => {
+                // items marked as not duplicates
+                let itemsMarkedAsNotDuplicates: string[] = [];
+
                 // modify Case
                 const runModifyCase = (finishCallBack?: () => void) => {
                     // modify the Case
@@ -375,24 +379,58 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                             })
                         )
                         .subscribe((modifiedCase: CaseModel) => {
-                            // update model
-                            this.caseData = modifiedCase;
+                            // called when we finished updating case data
+                            const finishedUpdatingCase = () => {
+                                // update model
+                                this.caseData = modifiedCase;
 
-                            // mark form as pristine
-                            form.form.markAsPristine();
+                                // mark form as pristine
+                                form.form.markAsPristine();
 
-                            // display message
-                            if (!finishCallBack) {
-                                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
+                                // display message
+                                if (!finishCallBack) {
+                                    this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
 
-                                // update breadcrumb
-                                this.retrieveCaseData();
+                                    // update breadcrumb
+                                    this.retrieveCaseData();
 
-                                // hide loading
-                                this.hideLoadingDialog();
+                                    // hide loading
+                                    this.hideLoadingDialog();
+                                } else {
+                                    // finished
+                                    finishCallBack();
+                                }
+                            };
+
+                            // there are no records marked as NOT duplicates ?
+                            if (
+                                !itemsMarkedAsNotDuplicates ||
+                                itemsMarkedAsNotDuplicates.length < 1
+                            ) {
+                                finishedUpdatingCase();
                             } else {
-                                // finished
-                                finishCallBack();
+                                // mark records as not duplicates
+                                this.entityDataService
+                                    .markPersonAsOrNotADuplicate(
+                                        this.selectedOutbreak.id,
+                                        EntityType.CASE,
+                                        this.caseId,
+                                        itemsMarkedAsNotDuplicates
+                                    )
+                                    .pipe(
+                                        catchError((err) => {
+                                            this.snackbarService.showApiError(err);
+
+                                            // hide loading
+                                            this.hideLoadingDialog();
+
+                                            return throwError(err);
+                                        })
+                                    )
+                                    .subscribe(() => {
+                                        // finished
+                                        finishedUpdatingCase();
+                                    });
                             }
                         });
                 };
@@ -408,22 +446,48 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                             fieldsList: [new DialogField({
                                 name: 'mergeWith',
                                 placeholder: 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_MERGE_WITH',
-                                inputOptions: _.map(caseDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
+                                fieldType: DialogFieldType.CHECKBOX_LIST,
+                                listItems: _.map(caseDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
                                     // case model
                                     const caseData: CaseModel = duplicate.model as CaseModel;
 
                                     // map
-                                    return new LabelValuePair((index + 1) + '. ' +
-                                        EntityModel.getNameWithDOBAge(
-                                            caseData,
-                                            this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                                            this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                    return new DialogFieldListItem({
+                                        itemData: new LabelValuePair((index + 1) + '. ' +
+                                            EntityModel.getNameWithDOBAge(
+                                                caseData,
+                                                this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                                                this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                            ),
+                                            caseData.id
                                         ),
-                                        caseData.id
-                                    );
-                                }),
-                                inputOptionsMultiple: true,
-                                required: false
+                                        actionButtonLabel: 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE',
+                                        actionButtonActionTooltip: 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE_DESCRIPTION',
+                                        actionButtonDisableActionAlongWithItem: false,
+                                        actionButtonAction: (item) => {
+                                            // not a duplicate ?
+                                            if (item.actionButtonLabel === 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE') {
+                                                // mark as not a duplicate for later change
+                                                item.checked = false;
+                                                item.disabled = true;
+                                                item.actionButtonLabel = 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_POSSIBLE_DUPLICATE';
+                                                item.actionButtonActionTooltip = 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_POSSIBLE_DUPLICATE_DESCRIPTION';
+
+                                                // add item to list of marked as not duplicates
+                                                itemsMarkedAsNotDuplicates.push(item.itemData.value);
+                                                itemsMarkedAsNotDuplicates = _.uniq(itemsMarkedAsNotDuplicates);
+                                            } else {
+                                                // enable back
+                                                item.disabled = false;
+                                                item.actionButtonLabel = 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE';
+                                                item.actionButtonActionTooltip = 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE_DESCRIPTION';
+
+                                                // remove item from the list of marked as not duplicates
+                                                itemsMarkedAsNotDuplicates = itemsMarkedAsNotDuplicates.filter((id) => id !== item.itemData.value);
+                                            }
+                                        }
+                                    });
+                                })
                             })],
                             addDefaultButtons: true,
                             buttons: [
@@ -439,7 +503,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                             if (answer.button === DialogAnswerButton.Yes) {
                                 // make sure we have at least two ids selected ( 1 is the current case )
                                 if (
-                                    !answer.inputValue.value.mergeWith
+                                    !answer.inputValue.value.mergeWith ||
+                                    answer.inputValue.value.mergeWith.length < 1
                                 ) {
                                     // display need to select at least one record to merge with
                                     this.snackbarService.showError('LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_ACTION_MERGE_AT_LEAST_ONE_ERROR_MESSAGE');
