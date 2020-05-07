@@ -61,6 +61,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     casesList$: Observable<CaseModel[]>;
     casesListCount$: Observable<IBasicCount>;
 
+    // don't display pills by default
+    showCountPills: boolean = false;
+
     // user list
     userList$: Observable<UserModel[]>;
 
@@ -532,9 +535,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
                     this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
 
-                    // get cases grouped by classification
-                    this.getCasesGroupedByClassification();
-
                     // initialize side filters
                     this.initializeSideFilters();
                 }
@@ -907,6 +907,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 true
             );
 
+            // refresh badges list with applied filter
+            this.getCasesGroupedByClassification();
+
             // retrieve the list of Cases
             this.casesList$ = this.caseDataService
                 .getCasesList(this.selectedOutbreak.id, clonedQB)
@@ -917,9 +920,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         return throwError(err);
                     }),
                     map((cases: CaseModel[]) => {
-                        // refresh badges list with applied filter
-                        this.getCasesGroupedByClassification();
-
                         return EntityModel.determineAlertness(
                             this.selectedOutbreak.caseInvestigationTemplate,
                             cases
@@ -979,7 +979,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                                     return new CountedItemsListItem(
                                         item.count,
                                         itemId as any,
-                                        item.caseIDs,
+                                        null,
                                         refItem ?
                                             refItem.getColorCode() :
                                             Constants.DEFAULT_COLOR_REF_DATA
@@ -1316,32 +1316,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 exportFinished: () => { this.closeLoadingDialog(); }
             });
         }
-    }
-
-    /**
-     * Filter by phone number
-     */
-    filterByPhoneNumber(value: string) {
-        // remove previous condition
-        this.queryBuilder.filter.remove('addresses');
-
-        if (!_.isEmpty(value)) {
-            // add new condition
-            this.queryBuilder.filter.where({
-                addresses: {
-                    elemMatch: {
-                        phoneNumber: {
-                            $regex: RequestFilter.escapeStringForRegex(value)
-                                .replace(/%/g, '.*')
-                                .replace(/\\\?/g, '.'),
-                            $options: 'i'
-                        }
-                    }
-                }
-            });
-        }
-        // refresh list
-        this.needsRefreshList();
     }
 
     /**

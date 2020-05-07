@@ -76,7 +76,8 @@
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
                                     tooltip="LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION"
                                     [options]="occupationsList$ | async"
-                                    [disabled]="viewOnly">
+                                    [disabled]="viewOnly"
+                                    [enableFilterOptions]="true">
                                 </app-form-select>
                             </div>
 

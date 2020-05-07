@@ -5,7 +5,16 @@
 
             <div class="topnav-actions">
                 <button
-                    *ngIf="!appliedListFilter && (CaseModel.canImportLabResult(authUser) || (selectedOutbreak && selectedOutbreak.isContactLabResultsActive && ContactModel.canImportLabResult(authUser)))"
+                    *ngIf="!appliedListFilter && (
+                        CaseModel.canImportLabResult(authUser) || (
+                            selectedOutbreak && selectedOutbreak.isContactLabResultsActive && ContactModel.canImportLabResult(authUser)
+                        ) || (
+                            exportLabResultsUrl && LabResultModel.canExport(authUser) && (
+                                CaseModel.canExportLabResult(authUser) ||
+                                ContactModel.canExportLabResult(authUser)
+                            )
+                        )
+                    )"
                     mat-raised-button
                     color="accent"
                     [matMenuTriggerFor]="quickActionsMenu">
@@ -13,6 +22,22 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
+                    <app-export-button
+                        *ngIf="exportLabResultsUrl && LabResultModel.canExport(authUser) && (CaseModel.canExportLabResult(authUser) || ContactModel.canExportLabResult(authUser))"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_LAB_RESULTS_EXPORT_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_LAB_RESULTS_EXPORT_TITLE' | translate"
+                        [url]="exportLabResultsUrl"
+                        [fileName]="exportLabResultsFileName"
+                        [allowedExportTypes]="allowedExportTypes"
+                        [displayEncrypt]="true"
+                        [displayAnonymize]="true"
+                        [anonymizeFields]="anonymizeFields"
+                        [queryBuilder]="queryBuilder"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
+                    </app-export-button>
+
                     <ng-container *app-selected-outbreak-is-active>
                         <button
                             *ngIf="CaseModel.canImportLabResult(authUser)"
@@ -91,7 +116,7 @@
                             name="caseVisualIdFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('person.visualId', $event)"
+                            (optionChanged)="filterByRelation('person').byText('visualId', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -116,7 +141,7 @@
                             name="nameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('person.lastName', $event)"
+                            (optionChanged)="filterByRelation('person').byText('lastName', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -141,7 +166,7 @@
                             name="nameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('person.firstName', $event)"
+                            (optionChanged)="filterByRelation('person').byText('firstName', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -167,7 +192,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="caseClassificationsList$ | async"
-                            (optionChanged)="filterBySelectField('person.classification', $event, 'value')"
+                            (optionChanged)="filterByRelation('person').bySelect('classification', $event)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
@@ -424,6 +449,34 @@
 
             <mat-cell *matCellDef="let item">
                 {{ item.testedFor }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Status -->
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_LAB_RESULT_FIELD_LABEL_STATUS' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="statusFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="progressOptionsList$ | async"
+                            (optionChanged)="filterBySelectField('status', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.status | translate }}
             </mat-cell>
         </ng-container>
 

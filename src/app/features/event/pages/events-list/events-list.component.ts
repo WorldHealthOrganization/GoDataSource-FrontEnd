@@ -483,29 +483,6 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
     }
 
     /**
-     * Filter by phone number
-     */
-    filterByPhoneNumber(value: string) {
-        // remove previous condition
-        this.queryBuilder.filter.remove('address.phoneNumber');
-
-        if (!_.isEmpty(value)) {
-            // add new condition
-            this.queryBuilder.filter.where({
-                'address.phoneNumber': {
-                        regex: RequestFilter.escapeStringForRegex(value)
-                            .replace(/%/g, '.*')
-                            .replace(/\\\?/g, '.'),
-                        $options: 'i'
-                }
-            });
-        }
-
-        // refresh list
-        this.needsRefreshList();
-    }
-
-    /**
      * Restore an deleted event
      * @param eventModel
      */

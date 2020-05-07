@@ -37,7 +37,8 @@
                                 optionValueKey="id"
                                 optionTooltipKey="description"
                                 multiple="true"
-                                (optionChanged)="usersChanged($event)">
+                                (optionChanged)="usersChanged($event)"
+                                [enableFilterOptions]="true">
                             </app-form-select>
                         </div>
 

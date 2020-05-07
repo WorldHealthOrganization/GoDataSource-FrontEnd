@@ -5,6 +5,7 @@ import { LanguageModel } from '../../../core/models/language.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../core/services/helper/dialog.service';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-topnav-unauthenticated',
@@ -42,7 +43,13 @@ export class TopnavUnauthenticatedComponent implements OnInit {
      */
     refreshLanguageList() {
         // get the list of languages
-        this.languagesList$ = this.languageDataService.getLanguagesList();
+        this.languagesList$ = this.languageDataService
+            .getLanguagesList()
+            .pipe(map((languages) => {
+                return (languages || []).sort((item1: LanguageModel, item2: LanguageModel) => {
+                    return item1.name.toLowerCase().localeCompare(item2.name.toLowerCase());
+                });
+            }));
 
         // get the selected language ID
         this.selectedLanguageId = this.i18nService.getSelectedLanguageId();

@@ -29,6 +29,26 @@ app-counted-items-list {
         }
     }
 
+    .loading-chips {
+        @mat-spinner-width: 16px;
+        @mat-spinner-height: 16px;
+
+        float:right;
+        margin-right: 20px;
+        margin-top: 8px;
+
+        mat-spinner {
+            display: inline-block;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+    }
+
     @media @mobile-devices {
         padding-top: 0;
     }

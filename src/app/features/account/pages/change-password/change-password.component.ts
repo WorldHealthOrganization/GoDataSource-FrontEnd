@@ -55,7 +55,6 @@ export class ChangePasswordComponent {
                     })
                 )
                 .subscribe(() => {
-
                     const refreshUserAndShowMessage = () => {
                         this.authDataService
                             .reloadAndPersistAuthUser()
@@ -71,7 +70,7 @@ export class ChangePasswordComponent {
 
                                 // refresh page
                                 if (redirect) {
-                                    this.router.navigate(['/dashboard']);
+                                    this.router.navigate(['/']);
                                 }
                             });
                     };

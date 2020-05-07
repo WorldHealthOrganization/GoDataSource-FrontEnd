@@ -21,6 +21,9 @@ import { Moment } from '../../../../core/helperClasses/x-moment';
     styleUrls: ['./gantt-chart-delay-onset-dashlet.component.less']
 })
 export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
+    // delay needed to display entries who doesn't have a delay between dates
+    static DELAY_MISSING_ED_ADD_TIME: number = 10 * 60 * 60 * 1000;
+
     // constants
     Constants = Constants;
 
@@ -41,9 +44,6 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
     refdataSubscriber: Subscription;
-
-    // delay needed to display entries who doesn't have a delay between dates
-    delayTime = (10 * 60 * 60 * 1000);
 
     // Global filters => Date
     private _globalFilterDate: Moment;
@@ -188,20 +188,20 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
                 !_.isEmpty(result.dateOfOnset) &&
                 !_.isEmpty(result.dateSampleTaken)
             ) {
-                let toDate = new Date(Date.parse(result.dateSampleTaken));
-                // check if we have any result with no delay and increase the time on the dateOfOnset and set it as
-                // dateSampleTaken for labResult to be displayed on the chart
-                if (result.delay === 0) {
-                    toDate  = new Date(result.dateOfOnset);
-                    // increasing time to the dateOfOnset to set it as dateSampleTaken
-                    toDate.setTime(toDate.getTime() + this.delayTime);
-                }
-
+                // create gantt render item
                 const chartDataItemChild: any = {};
                 chartDataItemChild.id = result.case.id;
                 chartDataItemChild.name = result.case.name;
                 chartDataItemChild.from = new Date(Date.parse(result.dateOfOnset));
-                chartDataItemChild.to = toDate;
+
+                // check if we have any result with no delay and increase the time on the dateOfOnset and set it as
+                // dateSampleTaken for labResult to be displayed on the chart
+                // increasing time to the dateOfOnset to set it as dateSampleTaken
+                chartDataItemChild.to = result.delay > 0 ?
+                    new Date(Date.parse(result.dateSampleTaken)) :
+                    new Date(new Date(result.dateOfOnset).getTime() + GanttChartDelayOnsetDashletComponent.DELAY_MISSING_ED_ADD_TIME);
+
+                // finished - add to list items to render
                 chartDataItem.children.push(chartDataItemChild);
             }
         });

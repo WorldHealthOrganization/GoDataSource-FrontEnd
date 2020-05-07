@@ -141,6 +141,13 @@ export abstract class ListComponent implements OnDestroy {
     };
 
     /**
+     * Did we check at least one record ?
+     */
+    get checkedAtLeastOneRecord(): boolean {
+        return !_.isEmpty(this.checkboxModels.checkedRecords);
+    }
+
+    /**
      * Checked only deleted records ?
      */
     get checkedOnlyDeletedRecords(): boolean {
@@ -446,11 +453,14 @@ export abstract class ListComponent implements OnDestroy {
      */
     filterByPhoneNumber(
         property: string,
-        value: string
+        value: string,
+        regexMethod: string = 'regex'
     ) {
         this.queryBuilder.filter.byPhoneNumber(
             property as string,
-            value
+            value,
+            true,
+            regexMethod
         );
 
         // refresh list

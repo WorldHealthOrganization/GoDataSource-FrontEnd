@@ -79,12 +79,16 @@
                 </div>
 
                 <!-- Hospitalisation / Isolation center name -->
-                <app-form-input
+                <app-form-select
                     fxFlex
                     name="isolationCenterName"
                     [(ngModel)]="filters.isolationCenterName"
                     [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME' | translate"
-                ></app-form-input>
+                    [options]="dateRangeCentreNameList$ | async"
+                    [allowSelectionOfDisabledItems]="true"
+                    [displayFilterIcon]="true"
+                    [multiple]="true">
+                </app-form-select>
             </div>
 
             <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="20px">

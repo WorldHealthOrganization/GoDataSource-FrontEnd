@@ -175,6 +175,10 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                 label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE'
             }),
             new VisibleColumnModel({
+                field: 'code',
+                label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CODE'
+            }),
+            new VisibleColumnModel({
                 field: 'description',
                 label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION'
             }),

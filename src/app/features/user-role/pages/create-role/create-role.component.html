@@ -30,6 +30,7 @@
                         </app-form-textarea>
 
                         <app-form-select-groups
+                            #selectedPermissions
                             name="permissionIds"
                             [(ngModel)]="newUserRole.permissionIds"
                             [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate"

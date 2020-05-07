@@ -34,9 +34,17 @@ export class LanguageResolver implements Resolve<any> {
                 const loadingDialog = this.dialogService.showLoadingDialog();
 
                 // load language
-                this.i18nService.waitForLanguageInitialization()
+                const languageSubscriber = this.i18nService.waitForLanguageInitialization()
                     .pipe(
                         catchError((err) => {
+                            // unsubscribe - hack for observable that isn't a subject..it  still being called
+                            if (
+                                languageSubscriber &&
+                                !languageSubscriber.closed
+                            ) {
+                                languageSubscriber.unsubscribe();
+                            }
+
                             // determine if this is a token validation error or something else has gone bad
                             if (
                                 err &&
@@ -84,6 +92,14 @@ export class LanguageResolver implements Resolve<any> {
                         })
                     )
                     .subscribe(() => {
+                        // unsubscribe - hack for observable that isn't a subject..it  still being called
+                        if (
+                            languageSubscriber &&
+                            !languageSubscriber.closed
+                        ) {
+                            languageSubscriber.unsubscribe();
+                        }
+
                         // hide loading
                         loadingDialog.close();
 

@@ -5,10 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { AngularMaterialModule } from '../angular-material/angular-material.module';
 import { TranslateModule } from '@ngx-translate/core';
+import { Ng5SliderModule } from 'ng5-slider';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 import { components } from './components';
 import { validatorDirectives } from './validators';
-import { Ng5SliderModule } from 'ng5-slider';
 
 @NgModule({
     imports: [
@@ -17,6 +18,7 @@ import { Ng5SliderModule } from 'ng5-slider';
         FlexLayoutModule,
         AngularMaterialModule,
         Ng5SliderModule,
+        NgxMatSelectSearchModule,
         TranslateModule
     ],
     declarations: [

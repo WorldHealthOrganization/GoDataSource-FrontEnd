@@ -67,7 +67,8 @@
                                     [(ngModel)]="contactData.occupation"
                                     [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
                                     tooltip="LNG_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION"
-                                    [options]="occupationsList$ | async">
+                                    [options]="occupationsList$ | async"
+                                    [enableFilterOptions]="true">
                                 </app-form-select>
                             </div>
 
@@ -201,6 +202,26 @@
             </form>
         </mat-step>
 
+        <!-- Questionnaire step -->
+        <mat-step [stepControl]="questionnaireForm">
+            <form #questionnaireForm="ngForm">
+                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_CONTACT_TAB_QUESTIONNAIRE_TITLE' | translate }}</ng-template>
+
+                <!-- Questionnaire section -->
+                <app-form-fill-questionnaire
+                    name="questionnaireAnswers"
+                    [ngModel]="contactData.questionnaireAnswers"
+                    [questions]="selectedOutbreak.contactInvestigationTemplate">
+                </app-form-fill-questionnaire>
+
+                <div class="stepper-navigation-buttons">
+                    <button matStepperPrevious mat-raised-button type="button">{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
+                </div>
+            </form>
+        </mat-step>
+
+
         <!-- Relationship step -->
         <mat-step [stepControl]="relationshipForm">
             <form #relationshipForm="ngForm">
@@ -235,11 +256,11 @@
             <div class="stepper-navigation-buttons">
                 <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                 <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent"
-                        (click)="createNewContact([personalForm, addressForm, relationshipForm])">
+                        (click)="createNewContact([personalForm, addressForm, relationshipForm, questionnaireForm])">
                     {{'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_BUTTON' | translate}}
                 </button>
                 <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent"
-                        (click)="createNewContact([personalForm, addressForm, relationshipForm], true)">
+                        (click)="createNewContact([personalForm, addressForm, relationshipForm, questionnaireForm], true)">
                     {{'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_ANOTHER_CONTACT_BUTTON' | translate}}
                 </button>
             </div>

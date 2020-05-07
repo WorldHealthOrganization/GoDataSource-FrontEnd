@@ -172,6 +172,34 @@
                 </form>
             </mat-step>
 
+            <!-- Questionnaire step -->
+            <mat-step [stepControl]="questionnaireForm">
+                <form #questionnaireForm="ngForm">
+                    <ng-template matStepLabel>{{ 'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE' | translate }}</ng-template>
+
+                    <app-form-select
+                        name="selectedQuestionnaireAnswers"
+                        [(ngModel)]="uniqueOptions?.questionnaireAnswers.value"
+                        [placeholder]="'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS' | translate"
+                        [options]="uniqueOptions?.questionnaireAnswers.options"
+                        (optionChanged)="changedQuestionnaireAnswers($event)"
+                        [clearable]="false">
+                    </app-form-select>
+
+                    <!-- Questionnaire section -->
+                    <app-form-fill-questionnaire
+                        name="questionnaireAnswers"
+                        [ngModel]="questionnaireAnswers"
+                        [questions]="selectedOutbreak?.contactInvestigationTemplate"
+                        [disabled]="true">
+                    </app-form-fill-questionnaire>
+
+                    <div class="stepper-navigation-buttons">
+                        <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
+                    </div>
+                </form>
+            </mat-step>
+
             <!-- Final step -->
             <mat-step>
                 <ng-template matStepLabel>
@@ -183,7 +211,7 @@
                 <div class="stepper-navigation-buttons">
                     <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                     <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent"
-                            (click)="createNewContact([personalForm, addressForm])">
+                            (click)="createNewContact([personalForm, addressForm, questionnaireForm])">
                         {{'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACT_BUTTON' | translate}}
                     </button>
                 </div>

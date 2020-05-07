@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { QuestionModel } from './question.model';
-import { IPermissionBasic, IPermissionOutbreakTemplate, IPermissionQuestionnaire } from './permission.interface';
+import { IPermissionBasic, IPermissionCloneable, IPermissionOutbreakTemplate, IPermissionQuestionnaire } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 
@@ -8,7 +8,8 @@ export class OutbreakTemplateModel
     implements
         IPermissionBasic,
         IPermissionQuestionnaire,
-        IPermissionOutbreakTemplate {
+        IPermissionOutbreakTemplate,
+        IPermissionCloneable {
     id: string;
     name: string;
     disease: string;
@@ -21,6 +22,7 @@ export class OutbreakTemplateModel
     noDaysNewContacts: number;
     longPeriodsBetweenCaseOnset: number;
     caseInvestigationTemplate: QuestionModel[];
+    contactInvestigationTemplate: QuestionModel[];
     contactFollowUpTemplate: QuestionModel[];
     labResultsTemplate: QuestionModel[];
     isContactLabResultsActive: boolean;
@@ -38,6 +40,7 @@ export class OutbreakTemplateModel
      * Static Permissions - IPermissionQuestionnaire
      */
     static canModifyCaseQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_QUESTIONNAIRE) : false; }
+    static canModifyContactQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CONTACT_QUESTIONNAIRE) : false; }
     static canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE) : false; }
     static canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE) : false; }
 
@@ -45,6 +48,11 @@ export class OutbreakTemplateModel
      * Static Permissions - IPermissionOutbreakTemplate
      */
     static canGenerateOutbreak(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_CREATE, PERMISSION.OUTBREAK_TEMPLATE_VIEW, PERMISSION.OUTBREAK_TEMPLATE_GENERATE_OUTBREAK) : false; }
+
+    /**
+     * Static Permissions - IPermissionsCloneable
+     */
+    static canClone(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_CREATE_CLONE) : false; }
 
     /**
      * Constructor
@@ -62,16 +70,26 @@ export class OutbreakTemplateModel
         this.noDaysNewContacts = _.get(data, 'noDaysNewContacts', 1);
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
         this.isContactLabResultsActive = _.get(data, 'isContactLabResultsActive', false);
+
+        // CASE INVESTIGATION TEMPLATE
         this.caseInvestigationTemplate = _.map(
             _.get(data, 'caseInvestigationTemplate', []),
             (lData: any) => {
                 return new QuestionModel(lData);
             });
+        // CONTACT INVESTIGATION TEMPLATE
+        this.contactInvestigationTemplate = _.map(
+            _.get(data, 'contactInvestigationTemplate', []),
+            (lData: any) => {
+                return new QuestionModel(lData);
+            });
+        // CONTACT FOLLOW_UP INVESTIGATION TEMPLATE
         this.contactFollowUpTemplate = _.map(
             _.get(data, 'contactFollowUpTemplate', []),
             (lData: any) => {
                 return new QuestionModel(lData);
             });
+        // LAB RESULT TEMPLATE
         this.labResultsTemplate = _.map(
             _.get(data, 'labResultsTemplate', []),
             (lData: any) => {
@@ -99,4 +117,9 @@ export class OutbreakTemplateModel
      * Permissions - IPermissionOutbreakTemplate
      */
     canGenerateOutbreak(user: UserModel): boolean { return OutbreakTemplateModel.canGenerateOutbreak(user); }
+
+    /**
+     * Permissions - IPermissionCloneable
+     */
+    canClone(user: UserModel): boolean { return OutbreakTemplateModel.canClone(user); }
 }

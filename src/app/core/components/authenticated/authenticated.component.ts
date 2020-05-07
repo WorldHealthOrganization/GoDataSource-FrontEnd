@@ -23,6 +23,7 @@ import { ITokenInfo } from '../../models/auth.model';
 import { Moment } from 'moment';
 import * as moment from 'moment';
 import { ConfirmOnFormChanges, PageChangeConfirmationGuard } from '../../services/guards/page-change-confirmation-guard.service';
+import { DashboardModel } from '../../models/dashboard.model';
 
 @Component({
     selector: 'app-authenticated',
@@ -49,6 +50,10 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
 
     // used to keep subscription and release it if we don't need it anymore
     tokenInfoSubjectSubscription: Subscription;
+
+    // router events subscription
+    routerEventsSubscriptionLoad: Subscription;
+    routerEventsSubscriptionRepetitive: Subscription;
 
     // help items for search
     contextSearchHelpItems: string[];
@@ -77,6 +82,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
                 // if user is active, then we need to refresh token
                 if (
                     this.lastInputTime &&
+                    this.tokenInfo &&
                     this.tokenInfo.approximatedExpireInSecondsReal > AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_APPEAR_WHEN_LESS_THAN_SECONDS &&
                     this.tokenInfo.approximatedExpireInSecondsReal < AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_REFRESH_TOKEN_IF_USER_ACTIVE &&
                     Math.floor(moment().diff(this.lastInputTime) / 1000) < AuthenticatedComponent.REFRESH_IF_USER_WAS_ACTIVE_IN_THE_LAST_SECONDS
@@ -110,21 +116,21 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         private userDataService: UserDataService
     ) {
         // detect when the route is changed
-        this.router.events.subscribe(() => {
+        this.routerEventsSubscriptionLoad = this.router.events.subscribe(() => {
             // close the SideNav whenever the route is changed
             if (this.sideNav) {
                 this.sideNav.close();
             }
         });
-
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     /**
      * Component initialized
      */
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // check if user is authenticated
         if (!this.authUser) {
             // user is NOT authenticated; redirect to Login page
@@ -150,17 +156,24 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         // cache reference data
         this.referenceDataDataService.getReferenceData().subscribe();
 
-        // redirect root to dashboard
-        const redirectRootToDashboard = () => {
+        // redirect root to landing page
+        const redirectRootToLandingPage = () => {
+            // determine to which page we should send this user
+            // #TODO - accordingly to user DEFAULT landing page and PERMISSIONS
+
             // redirect to default landing page
-            this.router.navigate(['/dashboard']);
+            if (DashboardModel.canViewDashboard(this.authUser)) {
+                this.router.navigate(['/dashboard']);
+            } else {
+                this.router.navigate(['/version']);
+            }
         };
 
         // subscribe to uri changes
-        this.router.events.subscribe((navStart: NavigationStart) => {
-            // redirect root to dashboard
+        this.routerEventsSubscriptionRepetitive = this.router.events.subscribe((navStart: NavigationStart) => {
+            // redirect root to landing page
             if (navStart.url === '/') {
-                redirectRootToDashboard();
+                redirectRootToLandingPage();
             }
             // check for context help
             this.helpDataService.getContextHelpItems(this.router.url).subscribe((items) => {
@@ -172,11 +185,12 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
             });
         });
 
-        // redirect root to dashboard
+        // redirect root to landing page
         if (this.router.url === '/') {
-            redirectRootToDashboard();
+            redirectRootToLandingPage();
         }
 
+        //  help items
         this.helpDataService.getContextHelpItems(this.router.url).subscribe((items) => {
             if (_.isEmpty(items)) {
                 this.contextSearchHelpItems = null;
@@ -200,6 +214,18 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         if (this.tokenCheckIfLoggedOutCaller) {
             this.tokenCheckIfLoggedOutCaller.unsubscribe();
             this.tokenCheckIfLoggedOutCaller = null;
+        }
+
+        // release
+        if (this.routerEventsSubscriptionLoad) {
+            this.routerEventsSubscriptionLoad.unsubscribe();
+            this.routerEventsSubscriptionLoad = null;
+        }
+
+        // release
+        if (this.routerEventsSubscriptionRepetitive) {
+            this.routerEventsSubscriptionRepetitive.unsubscribe();
+            this.routerEventsSubscriptionRepetitive = null;
         }
 
         // remove idle handlers

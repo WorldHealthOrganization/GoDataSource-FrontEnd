@@ -9,13 +9,18 @@ import { RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/r
 import { LabelValuePair } from '../../models/label-value-pair';
 import { map, mergeMap, share, tap } from 'rxjs/operators';
 import { I18nService } from '../helper/i18n.service';
+import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class ReferenceDataDataService {
-
+    // data
     categoriesList$: Observable<any>;
     referenceDataListMap$: Observable<any>;
 
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
@@ -243,5 +248,53 @@ export class ReferenceDataDataService {
      */
     clearReferenceDataCache() {
         this.cacheService.remove(CacheKey.REFERENCE_DATA);
+    }
+
+    /**
+     * Retrieve the number of reference data items
+     * @param {RequestQueryBuilder} queryBuilder
+     */
+    getReferenceDataItemsCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<IBasicCount> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`reference-data/count?where=${whereFilter}`);
+    }
+
+    /**
+     * Check if code of reference data item is unique
+     * @returns {Observable<boolean | IGeneralAsyncValidatorResponse>}
+     */
+    checkCodeUniqueness(
+        code: string,
+        id?: string
+    ): Observable<boolean | IGeneralAsyncValidatorResponse> {
+        // construct query
+        const qb: RequestQueryBuilder = new RequestQueryBuilder();
+        qb.filter.byEquality(
+            'code',
+            code,
+            true,
+            true
+        );
+
+        // exclude current item
+        if (id) {
+            qb.filter.where({
+                id: {
+                    neq: id
+                }
+            });
+        }
+
+        // check if we have duplicates
+        return this.getReferenceDataItemsCount(qb)
+            .pipe(
+                map((countData: { count: number }) => {
+                    return !countData.count ?
+                        true : {
+                            isValid: false,
+                            errMsg: 'LNG_FORM_VALIDATION_ERROR_REF_DATA_ITEM_CODE_NOT_UNIQUE'
+                        };
+                })
+            );
     }
 }

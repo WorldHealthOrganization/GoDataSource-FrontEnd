@@ -91,6 +91,24 @@ const routes: Routes = [
         ]
     },
 
+    // Edit Outbreak Contact Questionnaire
+    {
+        path: ':outbreakId/contact-questionnaire',
+        component: fromPages.OutbreakQuestionnaireComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.OUTBREAK_VIEW,
+                PERMISSION.OUTBREAK_MODIFY,
+                PERMISSION.OUTBREAK_MODIFY_CONTACT_QUESTIONNAIRE
+            ],
+            questionnaire: OutbreakQestionnaireTypeEnum.CONTACT
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
+
     // Edit Outbreak Contact Follow-up Questionnaire
     {
         path: ':outbreakId/contact-follow-up-questionnaire',
