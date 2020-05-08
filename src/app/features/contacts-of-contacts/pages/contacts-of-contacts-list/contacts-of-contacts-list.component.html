@@ -618,7 +618,7 @@
     </div>
 
     <mat-paginator
-        [length]="(contactsListCount$ | async)?.count"
+        [length]="(contactsOfContactsListCount$ | async)?.count"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">
