@@ -1388,15 +1388,4 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             entity
         );
     }
-
-    displayErrors() {
-        const obs1$ = of({err: 'first error', code: '123'});
-        const obs2$ = of({err: 'second error', code: '12345'});
-
-        combineLatest(obs1$, obs2$).subscribe((data) => {
-            console.log(data);
-            this.snackbarService.showApiMultipleErrors(data);
-        });
-    }
-
 }

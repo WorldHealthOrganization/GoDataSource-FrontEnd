@@ -23,7 +23,6 @@ export class SnackbarComponent {
         this.theme = _.get(data, 'theme');
         this.message = _.get(data, 'message');
         this.html = _.get(data, 'html');
-        console.log(data);
     }
 
 }

@@ -1,13 +1,11 @@
-<div *ngFor="let err of data.errors">
+<div
+    *ngIf="!html"
+    class="snackbar {{theme}}">
+    {{message}}
     <div
-        *ngIf="!html"
-        class="snackbar {{theme}}">
-        {{message}}
-        <div
-            class="snackbar-close-button"
-            fxLayout="row" fxFlex fxLayoutAlign="end"
-            (click)="snackBarRef.dismiss()">x
-        </div>
+        class="snackbar-close-button"
+        fxLayout="row" fxFlex fxLayoutAlign="end"
+        (click)="snackBarRef.dismiss()">x
     </div>
 </div>
 
