@@ -46,6 +46,7 @@ export class Constants {
     static DEFAULT_RANDOM_KEY_LENGTH = 16;
 
     // default configurations
+    static DEFAULT_DEBOUNCE_INSTANT_TIME_MILLISECONDS = 200;
     static DEFAULT_DEBOUNCE_TIME_MILLISECONDS = 500;
     static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
     static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?

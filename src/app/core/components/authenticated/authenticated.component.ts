@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { NavigationStart, Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
 import { MatDialogRef, MatSidenav } from '@angular/material';
@@ -170,34 +170,47 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         };
 
         // subscribe to uri changes
-        this.routerEventsSubscriptionRepetitive = this.router.events.subscribe((navStart: NavigationStart) => {
+        this.routerEventsSubscriptionRepetitive = this.router.events.subscribe((navStart: NavigationEnd) => {
+            // handle only final navigation events, since we need to retrieve data only after we get to that page ( guards, etc )
+            if (!(navStart instanceof NavigationEnd)) {
+                return;
+            }
+
             // redirect root to landing page
             if (navStart.url === '/') {
-                redirectRootToLandingPage();
+                return redirectRootToLandingPage();
             }
+
             // check for context help
-            this.helpDataService.getContextHelpItems(this.router.url).subscribe((items) => {
+            if (
+                this.router.url &&
+                this.router.url !== '/'
+            ) {
+                this.helpDataService.getContextHelpItems(this.router.url)
+                    .subscribe((items) => {
+                        if (_.isEmpty(items)) {
+                            this.contextSearchHelpItems = null;
+                        } else {
+                            this.contextSearchHelpItems = _.map(items, 'id');
+                        }
+                    });
+            }
+        });
+
+        // redirect root to landing page
+        if (this.router.url === '/') {
+            return redirectRootToLandingPage();
+        }
+
+        //  help items
+        this.helpDataService.getContextHelpItems(this.router.url)
+            .subscribe((items) => {
                 if (_.isEmpty(items)) {
                     this.contextSearchHelpItems = null;
                 } else {
                     this.contextSearchHelpItems = _.map(items, 'id');
                 }
             });
-        });
-
-        // redirect root to landing page
-        if (this.router.url === '/') {
-            redirectRootToLandingPage();
-        }
-
-        //  help items
-        this.helpDataService.getContextHelpItems(this.router.url).subscribe((items) => {
-            if (_.isEmpty(items)) {
-                this.contextSearchHelpItems = null;
-            } else {
-                this.contextSearchHelpItems = _.map(items, 'id');
-            }
-        });
     }
 
     /**

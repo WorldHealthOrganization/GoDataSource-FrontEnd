@@ -148,13 +148,33 @@
                         </div>
 
                         <!-- Link -->
-                        <a
+                        <div
                             *ngIf="field.fieldType === DialogFieldType.LINK"
-                            [routerLink]="field.routerLink"
-                            [queryParams]="field.queryParams"
-                            [target]="field.linkTarget">
-                            {{ field.placeholder | translate }}
-                        </a>
+                            fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+                            <div
+                                fxFlex>
+                                <a
+                                    [routerLink]="field.routerLink"
+                                    [queryParams]="field.queryParams"
+                                    [target]="field.linkTarget">
+                                    {{ field.placeholder | translate }}
+                                </a>
+                            </div>
+                            <div
+                                *ngIf="field.linkActionButtonLabel"
+                                fxGrow="0"
+                                class="link-item-action">
+                                <button
+                                    type="button"
+                                    mat-button
+                                    color="accent"
+                                    [disabled]="field.disabled"
+                                    (click)="field.linkActionButtonAction(field)"
+                                    [matTooltip]="field.linkActionButtonActionTooltip | translate">
+                                    {{field.linkActionButtonLabel | translate}}
+                                </button>
+                            </div>
+                        </div>
 
                         <!-- Url -->
                         <div

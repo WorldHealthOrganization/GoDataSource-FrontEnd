@@ -261,6 +261,9 @@ export abstract class ListComponent implements OnDestroy {
         this.refreshListCount();
     }));
 
+    /**
+     * Constructor
+     */
     protected constructor(
         protected snackbarService: SnackbarService,
         protected listFilterDataService: ListFilterDataService = null,
@@ -886,6 +889,13 @@ export abstract class ListComponent implements OnDestroy {
                 listPageBreadcrumb.onClick = () => {
                     // clear all filters
                     this.queryBuilder = new RequestQueryBuilder();
+
+                    // init paginator ?
+                    if (this.paginatorInitialized) {
+                        this.initPaginator();
+                    }
+
+                    // refresh page
                     this.needsRefreshList(true);
 
                     // revert breadcrumbs

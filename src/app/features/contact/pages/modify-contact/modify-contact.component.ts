@@ -304,7 +304,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                             })
                         )
                         .subscribe((modifiedContact: ContactModel) => {
-                            // called when we finished updating case data
+                            // called when we finished updating contact data
                             const finishedUpdatingContact = () => {
                                 // update model
                                 this.contactData = modifiedContact;

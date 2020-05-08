@@ -134,15 +134,13 @@ export class UserListComponent extends ListComponent implements OnInit {
 
         this.institutionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
 
-        this.outbreakDataService
+        this.outbreaksList$ = this.outbreakDataService
             .getOutbreaksListReduced()
-            .subscribe( (outbreaks) => {
-              _.forEach(outbreaks, (outbreak, key) => {
+            .pipe(tap((outbreaks) => {
+                (outbreaks || []).forEach((outbreak) => {
                     this.outbreaksListMap[outbreak.id] = outbreak;
                 });
-        });
-
-        this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
+            }));
 
         // initialize pagination
         this.initPaginator();

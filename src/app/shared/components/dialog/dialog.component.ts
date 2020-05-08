@@ -122,12 +122,18 @@ export class DialogField {
     public description: string;
     public fieldType: DialogFieldType = DialogFieldType.TEXT;
 
+    // data
+    data: any;
+
     // links
     public routerLink: string | string[];
     public queryParams: {
         [key: string]: any
     };
     public linkTarget: string;
+    linkActionButtonLabel: string;
+    linkActionButtonAction: (item: DialogField) => void;
+    linkActionButtonActionTooltip: string;
 
     // url
     urlAsyncValidator: (url: string) => Observable<boolean>;
@@ -157,12 +163,18 @@ export class DialogField {
         description?: string,
         fieldType?: DialogFieldType,
 
+        // data
+        data?: any,
+
         // link
         routerLink?: string | string[],
         queryParams?: {
             [key: string]: any
         },
         linkTarget?: string,
+        linkActionButtonLabel?: string,
+        linkActionButtonAction?: (item: DialogField) => void,
+        linkActionButtonActionTooltip?: string,
 
         // url
         urlAsyncValidator?: (url: string) => Observable<boolean>,

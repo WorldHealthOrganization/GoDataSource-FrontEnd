@@ -302,6 +302,9 @@ export class CreateContactComponent
                     })
                 )
                 .subscribe((contactDuplicates: EntityDuplicatesModel) => {
+                    // items marked as not duplicates
+                    let itemsMarkedAsNotDuplicates: string[] = [];
+
                     // add the new Contact
                     const runCreateContact = () => {
                         // add the new Contact
@@ -343,35 +346,69 @@ export class CreateContactComponent
                                         })
                                     )
                                     .subscribe(() => {
-                                        this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
+                                        // called when we finished creating contact
+                                        const finishedCreatingContact = () => {
+                                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
 
-                                        // hide dialog
-                                        loadingDialog.close();
+                                            // hide dialog
+                                            loadingDialog.close();
 
-                                        // navigate to listing page
-                                        if (andAnotherOne) {
-                                            this.disableDirtyConfirm();
-                                            this.redirectService.to(
-                                                [`/contacts/create`],
-                                                {
-                                                    entityType: this.entityType,
-                                                    entityId: this.entityId
-                                                }
-                                            );
+                                            // navigate to listing page
+                                            if (andAnotherOne) {
+                                                this.disableDirtyConfirm();
+                                                this.redirectService.to(
+                                                    [`/contacts/create`],
+                                                    {
+                                                        entityType: this.entityType,
+                                                        entityId: this.entityId
+                                                    }
+                                                );
+                                            } else {
+                                                // navigate to proper page
+                                                // method handles disableDirtyConfirm too...
+                                                this.redirectToProperPageAfterCreate(
+                                                    this.router,
+                                                    this.redirectService,
+                                                    this.authUser,
+                                                    ContactModel,
+                                                    'contacts',
+                                                    contactData.id, {
+                                                        entityType: this.entityType,
+                                                        entityId: this.entityId
+                                                    }
+                                                );
+                                            }
+                                        };
+
+                                        // there are no records marked as NOT duplicates ?
+                                        if (
+                                            !itemsMarkedAsNotDuplicates ||
+                                            itemsMarkedAsNotDuplicates.length < 1
+                                        ) {
+                                            finishedCreatingContact();
                                         } else {
-                                            // navigate to proper page
-                                            // method handles disableDirtyConfirm too...
-                                            this.redirectToProperPageAfterCreate(
-                                                this.router,
-                                                this.redirectService,
-                                                this.authUser,
-                                                ContactModel,
-                                                'contacts',
-                                                contactData.id, {
-                                                    entityType: this.entityType,
-                                                    entityId: this.entityId
-                                                }
-                                            );
+                                            // mark records as not duplicates
+                                            this.entityDataService
+                                                .markPersonAsOrNotADuplicate(
+                                                    this.selectedOutbreak.id,
+                                                    EntityType.CONTACT,
+                                                    contactData.id,
+                                                    itemsMarkedAsNotDuplicates
+                                                )
+                                                .pipe(
+                                                    catchError((err) => {
+                                                        this.snackbarService.showApiError(err);
+
+                                                        // hide dialog
+                                                        loadingDialog.close();
+
+                                                        return throwError(err);
+                                                    })
+                                                )
+                                                .subscribe(() => {
+                                                    // finished
+                                                    finishedCreatingContact();
+                                                });
                                         }
                                     });
                             });
@@ -395,7 +432,29 @@ export class CreateContactComponent
                                 ),
                                 fieldType: DialogFieldType.LINK,
                                 routerLink: ['/contacts', contactData.id, 'view'],
-                                linkTarget: '_blank'
+                                linkTarget: '_blank',
+                                data: contactData.id,
+                                linkActionButtonLabel: 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE',
+                                linkActionButtonActionTooltip: 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE_DESCRIPTION',
+                                linkActionButtonAction: (item) => {
+                                    // not a duplicate ?
+                                    if (item.linkActionButtonLabel === 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE') {
+                                        // mark as not a duplicate for later change
+                                        item.linkActionButtonLabel = 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_POSSIBLE_DUPLICATE';
+                                        item.linkActionButtonActionTooltip = 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_POSSIBLE_DUPLICATE_DESCRIPTION';
+
+                                        // add item to list of marked as not duplicates
+                                        itemsMarkedAsNotDuplicates.push(item.data);
+                                        itemsMarkedAsNotDuplicates = _.uniq(itemsMarkedAsNotDuplicates);
+                                    } else {
+                                        // enable back
+                                        item.linkActionButtonLabel = 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE';
+                                        item.linkActionButtonActionTooltip = 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE_DESCRIPTION';
+
+                                        // remove item from the list of marked as not duplicates
+                                        itemsMarkedAsNotDuplicates = itemsMarkedAsNotDuplicates.filter((id) => id !== item.data);
+                                    }
+                                }
                             }));
                         });
 
