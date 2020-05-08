@@ -29,7 +29,6 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
-import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -64,6 +63,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     // list of existing contacts
     contactsList$: Observable<ContactModel[]>;
     contactsListCount$: Observable<IBasicCount>;
+
+    // don't display pills by default
+    showCountPills: boolean = false;
 
     outbreakSubscriber: Subscription;
 
@@ -964,6 +966,16 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             const clonedQueryBuilder = _.cloneDeep(this.queryBuilder);
             clonedQueryBuilder.paginator.clear();
             clonedQueryBuilder.sort.clear();
+
+            // ugly hack so we don't have to change API in many place and test the entire project again ( if we changed api to replace regex to $regex many API request would be affected )
+            // #TODO - we need to address this issue later by changing all API requests that use convertLoopbackFilterToMongo ( WGD-2854 )
+            const addressPhoneCondition = clonedQueryBuilder.filter.get('addresses.phoneNumber');
+            if (addressPhoneCondition) {
+                const newCondition = JSON.parse(JSON.stringify(addressPhoneCondition).replace(/"regex"/gi, '"$regex"'));
+                clonedQueryBuilder.filter.where(newCondition, true);
+            }
+
+            // retrieve data
             this.countedContactsByRiskLevel$ = this.riskLevelRefData$
                 .pipe(
                     mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
@@ -1267,33 +1279,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
-    }
-
-    /**
-     * Filter by phone number
-     */
-    filterByPhoneNumber(value: string) {
-        // remove previous condition
-        this.queryBuilder.filter.remove('addresses');
-
-        if (!_.isEmpty(value)) {
-            // add new condition
-            this.queryBuilder.filter.where({
-                addresses: {
-                    elemMatch: {
-                        phoneNumber: {
-                            $regex: RequestFilter.escapeStringForRegex(value)
-                                .replace(/%/g, '.*')
-                                .replace(/\\\?/g, '.'),
-                            $options: 'i'
-                        }
-                    }
-                }
-            });
-        }
-
-        // refresh list
-        this.needsRefreshList();
     }
 
     /**

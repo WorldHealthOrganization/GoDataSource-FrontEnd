@@ -76,12 +76,22 @@
         [value]="(followUpsListCount$ | async)?.count">
     </app-total-number-of-records>
 
-    <app-counted-items-list
-        *ngIf="!appliedListFilter"
-        fxFlex
-        [items]="countedFollowUpsGroupedByTeams$ | async"
-        (optionChanged)="filterBySelectField('teamId', $event.ids, null)">
-    </app-counted-items-list>
+    <!--Contacts grouped by risk level-->
+    <a
+        *ngIf="!appliedListFilter && !showCountPills; else countPills"
+        class="xlink-button margin-right-x"
+        (click)="showCountPills = true">
+        {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_SHOW_GROUP_BY_TEAM_PILLS' | translate }}
+    </a>
+    <ng-template
+        #countPills>
+        <app-counted-items-list
+            *ngIf="!appliedListFilter"
+            fxFlex
+            [items]="countedFollowUpsGroupedByTeams$ | async"
+            (optionChanged)="filterBySelectField('teamId', $event.ids, null)">
+        </app-counted-items-list>
+    </ng-template>
 </div>
 
 <!-- Side filters -->
@@ -361,6 +371,28 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.index }}
+            </mat-cell>
+        </ng-container>
+
+        <!--Phone number-->
+        <ng-container matColumnDef="phoneNumber">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="phoneNumberFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByPhoneNumber('address.phoneNumber', $event, '$regex')"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                {{item.address?.phoneNumber}}
             </mat-cell>
         </ng-container>
 

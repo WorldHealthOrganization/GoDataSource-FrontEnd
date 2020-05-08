@@ -59,6 +59,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
     followUpsList$: Observable<FollowUpModel[]>;
     followUpsListCount$: Observable<IBasicCount>;
 
+    // don't display pills by default
+    showCountPills: boolean = false;
+
     // Daily follow ups grouped by teams
     countedFollowUpsGroupedByTeams$: Observable<any>;
 
@@ -479,6 +482,10 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
             new VisibleColumnModel({
                 field: 'area',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_AREA'
+            }),
+            new VisibleColumnModel({
+                field: 'phoneNumber',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER'
             }),
             new VisibleColumnModel({
                 field: 'contact.dateOfLastContact',

@@ -61,6 +61,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     casesList$: Observable<CaseModel[]>;
     casesListCount$: Observable<IBasicCount>;
 
+    // don't display pills by default
+    showCountPills: boolean = false;
+
     // user list
     userList$: Observable<UserModel[]>;
 
@@ -1309,32 +1312,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 exportFinished: () => { this.closeLoadingDialog(); }
             });
         }
-    }
-
-    /**
-     * Filter by phone number
-     */
-    filterByPhoneNumber(value: string) {
-        // remove previous condition
-        this.queryBuilder.filter.remove('addresses');
-
-        if (!_.isEmpty(value)) {
-            // add new condition
-            this.queryBuilder.filter.where({
-                addresses: {
-                    elemMatch: {
-                        phoneNumber: {
-                            $regex: RequestFilter.escapeStringForRegex(value)
-                                .replace(/%/g, '.*')
-                                .replace(/\\\?/g, '.'),
-                            $options: 'i'
-                        }
-                    }
-                }
-            });
-        }
-        // refresh list
-        this.needsRefreshList();
     }
 
     /**

@@ -30,7 +30,6 @@ import { StorageService } from './helper/storage.service';
 import { LoggerService } from './helper/logger.service';
 import { SnackbarService } from './helper/snackbar.service';
 import { ModelHelperService } from './helper/model-helper.service';
-import { RouterHelperService } from './helper/router-helper.service';
 import { FormHelperService } from './helper/form-helper.service';
 import { I18nService } from './helper/i18n.service';
 import { CacheService } from './helper/cache.service';
@@ -104,7 +103,6 @@ export const services: any[] = [
     LoggerService,
     SnackbarService,
     ModelHelperService,
-    RouterHelperService,
     FormHelperService,
     I18nService,
     CacheService,

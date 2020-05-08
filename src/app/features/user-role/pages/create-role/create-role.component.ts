@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -10,7 +10,7 @@ import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { IGroupEventData, IGroupOptionEventData, ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../../shared/xt-forms/components/form-select-groups/form-select-groups.component';
+import { FormSelectGroupsComponent, IGroupEventData, IGroupOptionEventData, ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../../shared/xt-forms/components/form-select-groups/form-select-groups.component';
 import { IPermissionChildModel, PermissionModel } from '../../../../core/models/permission.model';
 import { DomSanitizer } from '@angular/platform-browser';
 import { UserRoleHelper } from '../../../../core/helperClasses/user-role.helper';
@@ -39,6 +39,9 @@ export class CreateRoleComponent
 
     newUserRole: UserRoleModel = new UserRoleModel();
     availablePermissions$: Observable<any[]>;
+
+    // handle select permission group
+    @ViewChild('selectedPermissions') selectedPermissions: FormSelectGroupsComponent;
 
     /**
      * Constructor
@@ -98,6 +101,9 @@ export class CreateRoleComponent
 
                                 // update data
                                 this.newUserRole = new UserRoleModel(role);
+                                if (this.selectedPermissions) {
+                                    this.selectedPermissions.control.markAsDirty();
+                                }
 
                                 // hide loading
                                 loadingDialog.close();

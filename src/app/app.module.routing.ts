@@ -8,6 +8,7 @@ import { ModulePath } from './core/enums/module-path.enum';
 import { PasswordChangeGuard } from './core/services/guards/password-change-guard.service';
 import { RedirectComponent } from './core/components/redirect/redirect.component';
 import { PermissionExpression } from './core/models/user.model';
+import { DashboardModel } from './core/models/dashboard.model';
 
 const routes: Routes = [
     // Authentication Module routes
@@ -488,7 +489,10 @@ const routes: Routes = [
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
-                ]
+                ],
+                data: {
+                    permissions: DashboardModel.canViewDashboard
+                }
             },
             // Transmission Chain Module routes
             {
@@ -630,7 +634,7 @@ const routes: Routes = [
     {
         // for unknown routes, redirect to home page
         path: '**',
-        redirectTo: '/dashboard'
+        redirectTo: '/'
     }
 
 ];

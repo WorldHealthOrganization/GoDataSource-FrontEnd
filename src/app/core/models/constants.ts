@@ -644,6 +644,10 @@ export class Constants {
         OCCUPATION: {
             label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
             value: 'occupation'
+        },
+        ID_AND_LOCATION: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_VISUAL_ID_AND_LOCATION',
+            value: 'visual_id_and_location'
         }
     };
 
