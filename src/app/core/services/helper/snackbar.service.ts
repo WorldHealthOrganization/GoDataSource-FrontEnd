@@ -183,7 +183,6 @@ export class SnackbarService {
     ) {
         const defaultApiErrorCode = 'LNG_API_ERROR_CODE_UNKNOWN_ERROR';
 
-
         // get the error message for the received API Error Code
         let apiErrorCode = _.get(err, 'code', 'UNKNOWN_ERROR');
         // add language token prefix for API Error codes
@@ -214,30 +213,6 @@ export class SnackbarService {
                     );
                 }
             });
-    }
-
-    /**
-     * Use this method if you chain multiple requests and is possible to get multiple errors
-     */
-    showApiMultipleErrors(
-        errors,
-        translateData = {},
-        duration = SnackbarService.DURATION,
-        html: boolean = false
-    ) {
-        this.snackbar.openFromComponent(SnackbarComponent, {
-            panelClass: 'error',
-            data: {
-                errors: errors,
-                html: html
-            },
-            horizontalPosition: 'center',
-            verticalPosition: 'top'
-        })
-    }
-
-    dismissAll() {
-        this.snackbar.dismiss();
     }
 }
 
