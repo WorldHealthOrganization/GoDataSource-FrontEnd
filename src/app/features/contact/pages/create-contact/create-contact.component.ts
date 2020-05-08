@@ -434,22 +434,22 @@ export class CreateContactComponent
                                 routerLink: ['/contacts', contactData.id, 'view'],
                                 linkTarget: '_blank',
                                 data: contactData.id,
-                                linkActionButtonLabel: 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE',
-                                linkActionButtonActionTooltip: 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE_DESCRIPTION',
+                                linkActionButtonLabel: 'LNG_PAGE_CREATE_CONTACT_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE',
+                                linkActionButtonActionTooltip: 'LNG_PAGE_CREATE_CONTACT_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE_DESCRIPTION',
                                 linkActionButtonAction: (item) => {
                                     // not a duplicate ?
-                                    if (item.linkActionButtonLabel === 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE') {
+                                    if (item.linkActionButtonLabel === 'LNG_PAGE_CREATE_CONTACT_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE') {
                                         // mark as not a duplicate for later change
-                                        item.linkActionButtonLabel = 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_POSSIBLE_DUPLICATE';
-                                        item.linkActionButtonActionTooltip = 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_POSSIBLE_DUPLICATE_DESCRIPTION';
+                                        item.linkActionButtonLabel = 'LNG_PAGE_CREATE_CONTACT_DUPLICATES_DIALOG_LABEL_POSSIBLE_DUPLICATE';
+                                        item.linkActionButtonActionTooltip = 'LNG_PAGE_CREATE_CONTACT_DUPLICATES_DIALOG_LABEL_POSSIBLE_DUPLICATE_DESCRIPTION';
 
                                         // add item to list of marked as not duplicates
                                         itemsMarkedAsNotDuplicates.push(item.data);
                                         itemsMarkedAsNotDuplicates = _.uniq(itemsMarkedAsNotDuplicates);
                                     } else {
                                         // enable back
-                                        item.linkActionButtonLabel = 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE';
-                                        item.linkActionButtonActionTooltip = 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE_DESCRIPTION';
+                                        item.linkActionButtonLabel = 'LNG_PAGE_CREATE_CONTACT_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE';
+                                        item.linkActionButtonActionTooltip = 'LNG_PAGE_CREATE_CONTACT_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE_DESCRIPTION';
 
                                         // remove item from the list of marked as not duplicates
                                         itemsMarkedAsNotDuplicates = itemsMarkedAsNotDuplicates.filter((id) => id !== item.data);

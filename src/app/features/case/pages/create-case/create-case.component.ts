@@ -27,6 +27,8 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
 import { UserModel } from '../../../../core/models/user.model';
+import { EntityDataService } from '../../../../core/services/data/entity.data.service';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-create-case',
@@ -82,7 +84,8 @@ export class CreateCaseComponent
         private dialogService: DialogService,
         private i18nService: I18nService,
         private redirectService: RedirectService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private entityDataService: EntityDataService
     ) {
         super();
     }
@@ -219,6 +222,9 @@ export class CreateCaseComponent
                     })
                 )
                 .subscribe((caseDuplicates: EntityDuplicatesModel) => {
+                    // items marked as not duplicates
+                    let itemsMarkedAsNotDuplicates: string[] = [];
+
                     // add the new Case
                     const runCreateCase = () => {
                         this.caseDataService
@@ -234,21 +240,55 @@ export class CreateCaseComponent
                                 })
                             )
                             .subscribe((newCase: CaseModel) => {
-                                this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
+                                // called when we finished creating case
+                                const finishedCreatingCase = () => {
+                                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
 
-                                // hide dialog
-                                loadingDialog.close();
+                                    // hide dialog
+                                    loadingDialog.close();
 
-                                // navigate to proper page
-                                // method handles disableDirtyConfirm too...
-                                this.redirectToProperPageAfterCreate(
-                                    this.router,
-                                    this.redirectService,
-                                    this.authUser,
-                                    CaseModel,
-                                    'cases',
-                                    newCase.id
-                                );
+                                    // navigate to proper page
+                                    // method handles disableDirtyConfirm too...
+                                    this.redirectToProperPageAfterCreate(
+                                        this.router,
+                                        this.redirectService,
+                                        this.authUser,
+                                        CaseModel,
+                                        'cases',
+                                        newCase.id
+                                    );
+                                };
+
+                                // there are no records marked as NOT duplicates ?
+                                if (
+                                    !itemsMarkedAsNotDuplicates ||
+                                    itemsMarkedAsNotDuplicates.length < 1
+                                ) {
+                                    finishedCreatingCase();
+                                } else {
+                                    // mark records as not duplicates
+                                    this.entityDataService
+                                        .markPersonAsOrNotADuplicate(
+                                            this.selectedOutbreak.id,
+                                            EntityType.CASE,
+                                            newCase.id,
+                                            itemsMarkedAsNotDuplicates
+                                        )
+                                        .pipe(
+                                            catchError((err) => {
+                                                this.snackbarService.showApiError(err);
+
+                                                // hide dialog
+                                                loadingDialog.close();
+
+                                                return throwError(err);
+                                            })
+                                        )
+                                        .subscribe(() => {
+                                            // finished
+                                            finishedCreatingCase();
+                                        });
+                                }
                             });
                     };
 
@@ -270,7 +310,29 @@ export class CreateCaseComponent
                                 ),
                                 fieldType: DialogFieldType.LINK,
                                 routerLink: ['/cases', caseData.id, 'view'],
-                                linkTarget: '_blank'
+                                linkTarget: '_blank',
+                                data: caseData.id,
+                                linkActionButtonLabel: 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE',
+                                linkActionButtonActionTooltip: 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE_DESCRIPTION',
+                                linkActionButtonAction: (item) => {
+                                    // not a duplicate ?
+                                    if (item.linkActionButtonLabel === 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE') {
+                                        // mark as not a duplicate for later change
+                                        item.linkActionButtonLabel = 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_POSSIBLE_DUPLICATE';
+                                        item.linkActionButtonActionTooltip = 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_POSSIBLE_DUPLICATE_DESCRIPTION';
+
+                                        // add item to list of marked as not duplicates
+                                        itemsMarkedAsNotDuplicates.push(item.data);
+                                        itemsMarkedAsNotDuplicates = _.uniq(itemsMarkedAsNotDuplicates);
+                                    } else {
+                                        // enable back
+                                        item.linkActionButtonLabel = 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE';
+                                        item.linkActionButtonActionTooltip = 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE_DESCRIPTION';
+
+                                        // remove item from the list of marked as not duplicates
+                                        itemsMarkedAsNotDuplicates = itemsMarkedAsNotDuplicates.filter((id) => id !== item.data);
+                                    }
+                                }
                             }));
                         });
 
