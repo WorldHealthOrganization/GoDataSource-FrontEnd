@@ -17,7 +17,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
-import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldListItem, DialogFieldType } from '../../../../shared/components';
 import * as _ from 'lodash';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -32,6 +32,7 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { EntityDataService } from 'app/core/services/data/entity.data.service';
 
 @Component({
     selector: 'app-modify-contact',
@@ -93,7 +94,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         private router: Router,
         protected dialogService: DialogService,
         private i18nService: I18nService,
-        private relationshipDataService: RelationshipDataService
+        private relationshipDataService: RelationshipDataService,
+        private entityDataService: EntityDataService
     ) {
         super(
             route,
@@ -280,6 +282,9 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                 })
             )
             .subscribe((contactDuplicates: EntityDuplicatesModel) => {
+                // items marked as not duplicates
+                let itemsMarkedAsNotDuplicates: string[] = [];
+
                 // modify Contact
                 const runModifyContact = (finishCallBack?: () => void) => {
                     // modify the contact
@@ -299,24 +304,58 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                             })
                         )
                         .subscribe((modifiedContact: ContactModel) => {
-                            // update model
-                            this.contactData = modifiedContact;
+                            // called when we finished updating case data
+                            const finishedUpdatingContact = () => {
+                                // update model
+                                this.contactData = modifiedContact;
 
-                            // mark form as pristine
-                            form.form.markAsPristine();
+                                // mark form as pristine
+                                form.form.markAsPristine();
 
-                            // display message
-                            if (!finishCallBack) {
-                                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
+                                // display message
+                                if (!finishCallBack) {
+                                    this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
 
-                                // update breadcrumb
-                                this.initializeBreadcrumbs();
+                                    // update breadcrumb
+                                    this.initializeBreadcrumbs();
 
-                                // hide loading
-                                this.hideLoadingDialog();
+                                    // hide loading
+                                    this.hideLoadingDialog();
+                                } else {
+                                    // finished
+                                    finishCallBack();
+                                }
+                            };
+
+                            // there are no records marked as NOT duplicates ?
+                            if (
+                                !itemsMarkedAsNotDuplicates ||
+                                itemsMarkedAsNotDuplicates.length < 1
+                            ) {
+                                finishedUpdatingContact();
                             } else {
-                                // finished
-                                finishCallBack();
+                                // mark records as not duplicates
+                                this.entityDataService
+                                    .markPersonAsOrNotADuplicate(
+                                        this.selectedOutbreak.id,
+                                        EntityType.CONTACT,
+                                        this.contactId,
+                                        itemsMarkedAsNotDuplicates
+                                    )
+                                    .pipe(
+                                        catchError((err) => {
+                                            this.snackbarService.showApiError(err);
+
+                                            // hide loading
+                                            this.hideLoadingDialog();
+
+                                            return throwError(err);
+                                        })
+                                    )
+                                    .subscribe(() => {
+                                        // finished
+                                        finishedUpdatingContact();
+                                    });
                             }
                         });
                 };
@@ -332,22 +371,48 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                             fieldsList: [new DialogField({
                                 name: 'mergeWith',
                                 placeholder: 'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_LABEL_MERGE_WITH',
-                                inputOptions: _.map(contactDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
+                                fieldType: DialogFieldType.CHECKBOX_LIST,
+                                listItems: _.map(contactDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
                                     // contact model
                                     const contactData: ContactModel = duplicate.model as ContactModel;
 
                                     // map
-                                    return new LabelValuePair((index + 1) + '. ' +
-                                        EntityModel.getNameWithDOBAge(
-                                            contactData,
-                                            this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                                            this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                    return new DialogFieldListItem({
+                                        itemData: new LabelValuePair((index + 1) + '. ' +
+                                            EntityModel.getNameWithDOBAge(
+                                                contactData,
+                                                this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                                                this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                            ),
+                                            contactData.id
                                         ),
-                                        contactData.id
-                                    );
-                                }),
-                                inputOptionsMultiple: true,
-                                required: false
+                                        actionButtonLabel: 'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE',
+                                        actionButtonActionTooltip: 'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE_DESCRIPTION',
+                                        actionButtonDisableActionAlongWithItem: false,
+                                        actionButtonAction: (item) => {
+                                            // not a duplicate ?
+                                            if (item.actionButtonLabel === 'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE') {
+                                                // mark as not a duplicate for later change
+                                                item.checked = false;
+                                                item.disabled = true;
+                                                item.actionButtonLabel = 'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_LABEL_POSSIBLE_DUPLICATE';
+                                                item.actionButtonActionTooltip = 'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_LABEL_POSSIBLE_DUPLICATE_DESCRIPTION';
+
+                                                // add item to list of marked as not duplicates
+                                                itemsMarkedAsNotDuplicates.push(item.itemData.value);
+                                                itemsMarkedAsNotDuplicates = _.uniq(itemsMarkedAsNotDuplicates);
+                                            } else {
+                                                // enable back
+                                                item.disabled = false;
+                                                item.actionButtonLabel = 'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE';
+                                                item.actionButtonActionTooltip = 'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE_DESCRIPTION';
+
+                                                // remove item from the list of marked as not duplicates
+                                                itemsMarkedAsNotDuplicates = itemsMarkedAsNotDuplicates.filter((id) => id !== item.itemData.value);
+                                            }
+                                        }
+                                    });
+                                })
                             })],
                             addDefaultButtons: true,
                             buttons: [
@@ -363,7 +428,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                             if (answer.button === DialogAnswerButton.Yes) {
                                 // make sure we have at least two ids selected ( 1 is the current case )
                                 if (
-                                    !answer.inputValue.value.mergeWith
+                                    !answer.inputValue.value.mergeWith ||
+                                    answer.inputValue.value.mergeWith.length < 1
                                 ) {
                                     // display need to select at least one record to merge with
                                     this.snackbarService.showError('LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_ACTION_MERGE_AT_LEAST_ONE_ERROR_MESSAGE');
