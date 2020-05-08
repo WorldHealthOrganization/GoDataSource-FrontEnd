@@ -214,5 +214,9 @@ export class SnackbarService {
                 }
             });
     }
+
+    dismissAll() {
+        this.snackbar.dismiss();
+    }
 }
 
