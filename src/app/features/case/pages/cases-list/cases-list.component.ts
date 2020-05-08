@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable ,  Subscription } from 'rxjs';
+import { combineLatest, Observable, of, Subscription } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -1388,4 +1388,15 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             entity
         );
     }
+
+    displayErrors() {
+        const obs1$ = of({err: 'first error', code: '123'});
+        const obs2$ = of({err: 'second error', code: '12345'});
+
+        combineLatest(obs1$, obs2$).subscribe((data) => {
+            console.log(data);
+            this.snackbarService.showApiMultipleErrors(data);
+        });
+    }
+
 }
