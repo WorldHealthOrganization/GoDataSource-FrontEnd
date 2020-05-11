@@ -52,9 +52,11 @@ import { FormVaccinesListComponent } from './form-vaccines-list/form-vaccines-li
 import { HotTableWrapperComponent } from './hot-table-wrapper/hot-table-wrapper.component';
 import { LocationDialogComponent } from './location-dialog/location-dialog.component';
 import { TopnavUnauthenticatedComponent } from './topnav-unauthenticated/topnav-unauthenticated.component';
+import { MultipleSnackbarComponent } from './multiple-snackbar/multiple-snackbar.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
+export * from './multiple-snackbar/multiple-snackbar.component';
 export * from './dialog/dialog.component';
 export * from './modify-contact-follow-up-questionnaire-dialog/modify-contact-follow-up-questionnaire-dialog.component';
 export * from './loading-dialog/loading-dialog.component';
@@ -71,6 +73,7 @@ export * from './location-dialog/location-dialog.component';
 export const components: any[] = [
     // popups
     SnackbarComponent,
+    MultipleSnackbarComponent,
 
     // main layout
     TopnavComponent,

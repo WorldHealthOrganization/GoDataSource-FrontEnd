@@ -7,6 +7,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
+import { MultipleSnackbarComponent } from '../../../shared/components/multiple-snackbar/multiple-snackbar.component';
 
 @Injectable()
 export class SnackbarService {
@@ -213,6 +214,34 @@ export class SnackbarService {
                     );
                 }
             });
+    }
+
+    showMultipleErrors(
+        errors = [
+            {statusCode: 422, name: 'Error', message: 'Invalid captcha.', code: 'INVALID_CAPTCHA'},
+            {statusCode: 422, name: 'Error', message: 'Invalid captcha.', code: 'INVALID_CAPTCHA'}])
+    {
+        const errorsToDisplay = [];
+        const defaultApiErrorCode = 'LNG_API_ERROR_CODE_UNKNOWN_ERROR';
+
+        errors.forEach((err) => {
+            // get the error message for the received API Error Code
+            let apiErrorCode = _.get(err, 'code', 'UNKNOWN_ERROR');
+            // add language token prefix for API Error codes
+            apiErrorCode = `LNG_API_ERROR_CODE_${apiErrorCode}`;
+            errorsToDisplay.push(err.message);
+            // this.i18nService
+            //     .get(apiErrorCode, trans);
+        });
+
+        this.snackbar.openFromComponent(MultipleSnackbarComponent, {
+            duration: 9999999,
+            verticalPosition: 'top',
+            horizontalPosition: 'right',
+            data: errors
+        });
+
+
     }
 
     dismissAll() {

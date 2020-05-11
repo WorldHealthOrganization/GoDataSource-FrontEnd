@@ -1387,4 +1387,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             entity
         );
     }
+
+    display() {
+        this.snackbarService.showMultipleErrors();
+    }
+
 }
