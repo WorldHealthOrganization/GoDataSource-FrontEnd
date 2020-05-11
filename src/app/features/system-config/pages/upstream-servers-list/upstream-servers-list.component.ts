@@ -21,6 +21,7 @@ import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-upstream-servers-list',
@@ -119,17 +120,16 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private authDataService: AuthDataService,
         private systemSettingsDataService: SystemSettingsDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private systemSyncDataService: SystemSyncDataService,
         private systemSyncLogDataService: SystemSyncLogDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

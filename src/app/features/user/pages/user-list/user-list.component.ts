@@ -20,6 +20,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-user-list',
@@ -110,18 +111,17 @@ export class UserListComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private outbreakDataService: OutbreakDataService,
         private userRoleDataService: UserRoleDataService,
         private referenceDataDataService: ReferenceDataDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

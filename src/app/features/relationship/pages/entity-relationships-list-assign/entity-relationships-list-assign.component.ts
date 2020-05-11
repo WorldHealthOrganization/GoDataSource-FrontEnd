@@ -24,6 +24,7 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { UserSettings } from '../../../../core/models/user.model';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-entity-relationships-list-assign',
@@ -60,18 +61,22 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
 
     selectedTargetIds: string[] = [];
 
+    /**
+     * Constructor
+     */
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
         protected router: Router,
         protected route: ActivatedRoute,
         protected authDataService: AuthDataService,
         protected outbreakDataService: OutbreakDataService,
         protected entityDataService: EntityDataService,
+        private snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService
     ) {
         super(
-            snackbarService, router, route,
+            listHelperService, router, route,
             authDataService, outbreakDataService, entityDataService
         );
     }

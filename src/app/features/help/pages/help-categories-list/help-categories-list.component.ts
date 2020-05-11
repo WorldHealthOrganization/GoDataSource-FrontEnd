@@ -19,6 +19,7 @@ import { throwError } from 'rxjs';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-help-categories-list',
@@ -107,17 +108,16 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private helpDataService: HelpDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private route: ActivatedRoute,
         private i18nService: I18nService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

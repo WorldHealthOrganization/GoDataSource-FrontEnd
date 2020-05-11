@@ -16,6 +16,7 @@ import { catchError, share, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-system-devices-list',
@@ -123,15 +124,14 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private authDataService: AuthDataService,
         private deviceDataService: DeviceDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

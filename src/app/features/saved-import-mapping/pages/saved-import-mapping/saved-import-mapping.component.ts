@@ -15,6 +15,7 @@ import { Constants } from '../../../../core/models/constants';
 import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-saved-import-mapping',
@@ -67,14 +68,13 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
      * Constructor
      */
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
+        private snackbarService: SnackbarService,
         private savedImportMappingService: SavedImportMappingService,
         private dialogService: DialogService,
         private genericDataService: GenericDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

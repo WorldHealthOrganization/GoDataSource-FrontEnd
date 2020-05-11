@@ -18,6 +18,7 @@ import { catchError, share, tap } from 'rxjs/operators';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-duplicate-records-list',
@@ -65,14 +66,13 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

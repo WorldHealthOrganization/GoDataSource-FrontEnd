@@ -30,6 +30,7 @@ import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -127,19 +128,18 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
         private i18nService: I18nService,
         private genericDataService: GenericDataService,
         private dialogService: DialogService,
         private teamDataService: TeamDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

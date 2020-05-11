@@ -29,6 +29,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { Subscription } from 'rxjs/internal/Subscription';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -127,12 +128,13 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
      * Constructor
      */
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
         protected router: Router,
         protected route: ActivatedRoute,
         protected authDataService: AuthDataService,
         protected outbreakDataService: OutbreakDataService,
         protected entityDataService: EntityDataService,
+        private snackbarService: SnackbarService,
         private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
@@ -141,7 +143,7 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
     ) {
         // parent
         super(
-            snackbarService, router, route,
+            listHelperService, router, route,
             authDataService, outbreakDataService, entityDataService
         );
 

@@ -22,6 +22,7 @@ import { Router } from '@angular/router';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-client-applications-list',
@@ -127,17 +128,16 @@ export class ClientApplicationsListComponent extends ListComponent implements On
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private authDataService: AuthDataService,
         private systemSettingsDataService: SystemSettingsDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private outbreakDataService: OutbreakDataService,
         private i18nService: I18nService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

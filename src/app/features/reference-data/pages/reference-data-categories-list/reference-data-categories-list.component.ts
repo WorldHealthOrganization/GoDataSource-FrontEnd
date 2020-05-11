@@ -15,6 +15,7 @@ import { catchError, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IconModel } from '../../../../core/models/icon.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-reference-data-categories-list',
@@ -65,14 +66,15 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private referenceDataDataService: ReferenceDataDataService,
         private authDataService: AuthDataService,
         private i18nService: I18nService,
         private dialogService: DialogService,
-        protected snackbarService: SnackbarService
+        private snackbarService: SnackbarService
     ) {
-        super(snackbarService);
+        super(listHelperService);
     }
 
     /**

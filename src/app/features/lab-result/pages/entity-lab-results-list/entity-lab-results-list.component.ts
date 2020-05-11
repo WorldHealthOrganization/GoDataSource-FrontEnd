@@ -32,6 +32,7 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-entity-lab-results-list',
@@ -227,6 +228,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private authDataService: AuthDataService,
         private route: ActivatedRoute,
@@ -234,16 +236,14 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         private caseDataService: CaseDataService,
         private contactDataService: ContactDataService,
         private labResultDataService: LabResultDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
         private userDataService: UserDataService,
         private i18nService: I18nService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

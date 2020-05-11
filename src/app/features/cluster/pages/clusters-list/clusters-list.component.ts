@@ -18,6 +18,7 @@ import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-clusters-list',
@@ -126,16 +127,15 @@ export class ClustersListComponent extends ListComponent implements OnInit, OnDe
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private clusterDataService: ClusterDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private dialogService: DialogService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

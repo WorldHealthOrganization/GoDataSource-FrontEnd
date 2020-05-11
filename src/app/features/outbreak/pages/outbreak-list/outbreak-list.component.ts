@@ -25,6 +25,7 @@ import { catchError, map, share, switchMap, tap } from 'rxjs/operators';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import { throwError } from 'rxjs';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -231,19 +232,18 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private outbreakDataService: OutbreakDataService,
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private i18nService: I18nService,
         private router: Router
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

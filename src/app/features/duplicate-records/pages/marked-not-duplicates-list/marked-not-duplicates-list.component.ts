@@ -24,6 +24,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import * as _ from 'lodash';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-cases-list',
@@ -128,8 +129,9 @@ export class MarkedNotDuplicatesListComponent
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
@@ -137,9 +139,7 @@ export class MarkedNotDuplicatesListComponent
         private router: Router,
         private dialogService: DialogService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

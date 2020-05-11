@@ -24,6 +24,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { AddressType } from '../../../../core/models/address.model';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -70,23 +71,30 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
         'address'
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
         protected router: Router,
         protected route: ActivatedRoute,
         protected authDataService: AuthDataService,
         protected outbreakDataService: OutbreakDataService,
         protected entityDataService: EntityDataService,
+        private snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private relationshipDataService: RelationshipDataService
     ) {
         super(
-            snackbarService, router, route,
+            listHelperService, router, route,
             authDataService, outbreakDataService, entityDataService
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         super.ngOnInit();
 

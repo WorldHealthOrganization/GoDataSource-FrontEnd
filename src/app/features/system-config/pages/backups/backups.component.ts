@@ -21,6 +21,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-backups',
@@ -119,18 +120,17 @@ export class BackupsComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private authDataService: AuthDataService,
         private dialogService: DialogService,
         private systemSettingsDataService: SystemSettingsDataService,
         private systemBackupDataService: SystemBackupDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
         private userDataService: UserDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

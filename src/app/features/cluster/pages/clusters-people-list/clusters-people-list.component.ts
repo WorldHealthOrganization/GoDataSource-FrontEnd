@@ -22,6 +22,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -98,17 +99,16 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
         private clusterDataService: ClusterDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

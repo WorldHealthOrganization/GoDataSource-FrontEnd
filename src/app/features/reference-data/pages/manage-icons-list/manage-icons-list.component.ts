@@ -16,6 +16,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import * as _ from 'lodash';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-manage-icons-list',
@@ -70,16 +71,15 @@ export class ManageIconsListComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
-        protected route: ActivatedRoute,
+        protected listHelperService: ListHelperService,
+        private route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
         private iconDataService: IconDataService,
         private dialogService: DialogService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private authDataService: AuthDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

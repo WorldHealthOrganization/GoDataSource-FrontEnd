@@ -15,6 +15,7 @@ import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/
 import { throwError } from 'rxjs';
 import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-saved-filters',
@@ -68,14 +69,13 @@ export class SavedFiltersComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private savedFiltersService: SavedFiltersService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
         private dialogService: DialogService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

@@ -25,6 +25,7 @@ import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-locations-list',
@@ -148,20 +149,19 @@ export class LocationsListComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private authDataService: AuthDataService,
         private locationDataService: LocationDataService,
         private genericDataService: GenericDataService,
         private route: ActivatedRoute,
         private dialogService: DialogService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private router: Router,
         private i18nService: I18nService,
         private referenceDataDataService: ReferenceDataDataService,
         private userDataService: UserDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

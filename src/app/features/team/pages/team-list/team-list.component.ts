@@ -20,6 +20,7 @@ import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-team-list',
@@ -105,17 +106,16 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private authDataService: AuthDataService,
         private teamDataService: TeamDataService,
         private dialogService: DialogService,
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
-        protected snackbarService: SnackbarService
+        private snackbarService: SnackbarService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

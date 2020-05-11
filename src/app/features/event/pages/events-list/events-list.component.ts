@@ -14,8 +14,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
@@ -24,13 +23,13 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { LoadingDialogModel } from '../../../../shared/components/loading-dialog/loading-dialog.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-events-list',
@@ -264,24 +263,19 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private eventDataService: EventDataService,
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
-        protected listFilterDataService: ListFilterDataService,
-        private route: ActivatedRoute,
         private genericDataService: GenericDataService,
         private i18nService: I18nService,
         private userDataService: UserDataService,
         private entityHelperService: EntityHelperService
     ) {
-        super(
-            snackbarService,
-            listFilterDataService,
-            route.queryParams
-        );
+        super(listHelperService);
     }
 
     /**

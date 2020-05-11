@@ -26,6 +26,7 @@ import { Router } from '@angular/router';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-system-sync-logs-list',
@@ -111,9 +112,10 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private systemSyncLogDataService: SystemSyncLogDataService,
         private genericDataService: GenericDataService,
@@ -121,9 +123,7 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
         private systemSettingsDataService: SystemSettingsDataService,
         private i18nService: I18nService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

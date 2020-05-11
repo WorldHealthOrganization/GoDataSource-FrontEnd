@@ -19,6 +19,7 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { CaseModel } from '../../../../core/models/case.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-location-usage-list',
@@ -80,16 +81,15 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private locationDataService: LocationDataService,
         private outbreakDataService: OutbreakDataService,
         protected route: ActivatedRoute
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

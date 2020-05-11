@@ -17,6 +17,7 @@ import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-roles-list',
@@ -117,16 +118,15 @@ export class RolesListComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private userRoleDataService: UserRoleDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private userDataService: UserDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();

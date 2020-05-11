@@ -27,6 +27,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { AddressType } from '../../../../core/models/address.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-available-entities-for-switch-list',
@@ -68,19 +69,20 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     ];
 
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
         protected router: Router,
         protected route: ActivatedRoute,
         protected authDataService: AuthDataService,
         protected outbreakDataService: OutbreakDataService,
         protected entityDataService: EntityDataService,
+        private snackbarService: SnackbarService,
         private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService
     ) {
         // parent
         super(
-            snackbarService, router, route,
+            listHelperService, router, route,
             authDataService, outbreakDataService, entityDataService
         );
 

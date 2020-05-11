@@ -4,8 +4,6 @@ import { Observable } from 'rxjs';
 import { HelpItemModel } from '../../../core/models/help-item.model';
 import { ListComponent } from '../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
-import { ListFilterDataService } from '../../../core/services/data/list-filter.data.service';
-import { ActivatedRoute } from '@angular/router';
 import { catchError, tap } from 'rxjs/operators';
 import { HelpDataService } from '../../../core/services/data/help.data.service';
 import * as _ from 'lodash';
@@ -15,6 +13,7 @@ import { DialogService } from '../../../core/services/helper/dialog.service';
 import { ViewHelpDetailsData, ViewHelpDetailsDialogComponent } from '../view-help-details-dialog/view-help-details-dialog.component';
 import { HoverRowAction } from '../hover-row-actions/hover-row-actions.component';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { ListHelperService } from '../../../core/services/helper/list-helper.service';
 
 export class ViewHelpData {
     helpItemsIds: string[];
@@ -75,19 +74,14 @@ export class ViewHelpDialogComponent extends ListComponent {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         public dialogRef: MatDialogRef<ViewHelpDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: ViewHelpData,
-        protected snackbarService: SnackbarService,
-        protected listFilterDataService: ListFilterDataService,
-        private route: ActivatedRoute,
+        private snackbarService: SnackbarService,
         private helpDataService: HelpDataService,
         private dialogService: DialogService
     ) {
-        super(
-            snackbarService,
-            listFilterDataService,
-            route.queryParams
-        );
+        super(listHelperService);
 
         // retrieve help categories
         this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList();

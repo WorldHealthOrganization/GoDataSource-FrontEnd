@@ -17,6 +17,7 @@ import { catchError, share, tap } from 'rxjs/operators';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-audit-logs-list',
@@ -54,15 +55,14 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private dialogService: DialogService,
         private auditLogDataService: AuditLogDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
         private userDataService: UserDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

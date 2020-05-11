@@ -16,6 +16,7 @@ import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-languages-list',
@@ -126,16 +127,15 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private languageDataService: LanguageDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private cacheService: CacheService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

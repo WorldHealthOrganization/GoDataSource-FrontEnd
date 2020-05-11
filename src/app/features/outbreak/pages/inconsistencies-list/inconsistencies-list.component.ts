@@ -21,6 +21,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { catchError, share, tap } from 'rxjs/operators';
 import { HoverRowAction } from '../../../../shared/components';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-inconsistencies-list',
@@ -89,17 +90,16 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
         private i18nService: I18nService,
-        protected route: ActivatedRoute,
+        private route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**

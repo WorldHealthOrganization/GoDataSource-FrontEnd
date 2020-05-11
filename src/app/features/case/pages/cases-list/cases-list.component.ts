@@ -15,8 +15,7 @@ import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -39,6 +38,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-cases-list',
@@ -458,15 +458,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private caseDataService: CaseDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
-        protected route: ActivatedRoute,
-        protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
         private genericDataService: GenericDataService,
         private clusterDataService: ClusterDataService,
@@ -474,11 +473,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         private relationshipDataService: RelationshipDataService,
         private entityHelperService: EntityHelperService
     ) {
-        super(
-            snackbarService,
-            listFilterDataService,
-            route.queryParams
-        );
+        super(listHelperService);
     }
 
     /**

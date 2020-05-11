@@ -1,8 +1,6 @@
 import { RequestFilter, RequestFilterOperator, RequestQueryBuilder } from './request-query-builder';
 import * as _ from 'lodash';
-import { ListFilterDataService } from '../services/data/list-filter.data.service';
-import { Params } from '@angular/router';
-import { Observable, Subscriber } from 'rxjs';
+import { Subscriber } from 'rxjs';
 import { ApplyListFilter, Constants } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -13,7 +11,6 @@ import { SideFiltersComponent } from '../../shared/components/side-filters/side-
 import { DebounceTimeCaller } from './debounce-time-caller';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
 import { FormCheckboxComponent } from '../../shared/xt-forms/components/form-checkbox/form-checkbox.component';
-import { SnackbarService } from '../services/helper/snackbar.service';
 import {
     ContactFollowedUp,
     MetricContactsWithSuccessfulFollowUp
@@ -21,6 +18,7 @@ import {
 import { VisibleColumnModel } from '../../shared/components/side-columns/model';
 import { AddressType } from '../models/address.model';
 import { moment, Moment } from './x-moment';
+import { ListHelperService } from '../services/helper/list-helper.service';
 
 export abstract class ListComponent implements OnDestroy {
     /**
@@ -236,7 +234,8 @@ export abstract class ListComponent implements OnDestroy {
     }
 
     // refresh only after we finish changing data
-    public refreshingList: boolean = false;
+    // by default each time we get back to a page we should display loading spinner
+    public refreshingList: boolean = true;
     private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
         // refresh list
         this.refreshingList = true;
@@ -265,9 +264,7 @@ export abstract class ListComponent implements OnDestroy {
      * Constructor
      */
     protected constructor(
-        protected snackbarService: SnackbarService,
-        protected listFilterDataService: ListFilterDataService = null,
-        protected queryParams: Observable<Params> = null
+        protected listHelperService: ListHelperService
     ) {
         // check the filter after creating the List Component instance
         setTimeout(() => {
@@ -369,6 +366,7 @@ export abstract class ListComponent implements OnDestroy {
     /**
      * Sort asc / desc by specific fields
      * @param data
+     * @param objectDetailsSort
      */
     public sortBy(
         data: any,
@@ -453,6 +451,7 @@ export abstract class ListComponent implements OnDestroy {
      * Filter by phone number
      * @param {string} property
      * @param {string} value
+     * @param {string} regexMethod
      */
     filterByPhoneNumber(
         property: string,
@@ -695,9 +694,13 @@ export abstract class ListComponent implements OnDestroy {
             pageIndex: 0
         });
 
+        // remember that paginator was initialized
         this.paginatorInitialized = true;
     }
 
+    /**
+     * Change page
+     */
     changePage(page: PageEvent) {
         // update API pagination params
         this.queryBuilder.paginator.setPage(page);
@@ -844,11 +847,11 @@ export abstract class ListComponent implements OnDestroy {
      */
     protected checkListFilters() {
         if (
-            !_.isEmpty(this.queryParams) &&
-            !_.isEmpty(this.listFilterDataService)
+            !_.isEmpty(this.listHelperService.queryParams) &&
+            !_.isEmpty(this.listHelperService.listFilterDataService)
         ) {
             // get query params
-            this.queryParams
+            this.listHelperService.queryParams
                 .subscribe((queryParams: any) => {
                     // reset values
                     this.appliedListFilter = null;
@@ -934,7 +937,7 @@ export abstract class ListComponent implements OnDestroy {
             case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST:
 
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterContactsOnFollowUpLists(
+                this.listHelperService.listFilterDataService.filterContactsOnFollowUpLists(
                     globalFilters.date,
                     globalFilters.locationId,
                     globalFilters.classificationId
@@ -952,7 +955,7 @@ export abstract class ListComponent implements OnDestroy {
             // filter cases deceased
             case Constants.APPLY_LIST_FILTER.CASES_DECEASED:
                 // add condition for deceased cases
-                this.appliedListFilterQueryBuilder = this.listFilterDataService.getGlobalFilterQB(
+                this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.getGlobalFilterQB(
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
@@ -992,7 +995,7 @@ export abstract class ListComponent implements OnDestroy {
             // filter cases isolated
             case Constants.APPLY_LIST_FILTER.CASES_ISOLATED:
                 // add condition for deceased cases
-                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
@@ -1018,7 +1021,7 @@ export abstract class ListComponent implements OnDestroy {
                 // );
 
                 // get the correct query builder and merge with the existing one
-                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesIsolated(globalFilters.date);
+                this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesIsolated(globalFilters.date);
                 if (!globalQb.isEmpty()) {
                     this.appliedListFilterQueryBuilder.merge(globalQb);
                 }
@@ -1033,7 +1036,7 @@ export abstract class ListComponent implements OnDestroy {
             // filter cases hospitalised
             case Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED:
                 // add condition for deceased cases
-                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
@@ -1059,7 +1062,7 @@ export abstract class ListComponent implements OnDestroy {
                 // );
 
                 // get the correct query builder and merge with the existing one
-                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesHospitalized(globalFilters.date);
+                this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesHospitalized(globalFilters.date);
                 if (!globalQb.isEmpty()) {
                     this.appliedListFilterQueryBuilder.merge(globalQb);
                 }
@@ -1072,7 +1075,7 @@ export abstract class ListComponent implements OnDestroy {
                 break;
 
             case Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED:
-                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
@@ -1098,7 +1101,7 @@ export abstract class ListComponent implements OnDestroy {
                 // );
 
                 // get the correct query builder and merge with the existing one
-                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesNotHospitalized(globalFilters.date);
+                this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesNotHospitalized(globalFilters.date);
                 if (!globalQb.isEmpty()) {
                     this.appliedListFilterQueryBuilder.merge(globalQb);
                 }
@@ -1115,7 +1118,7 @@ export abstract class ListComponent implements OnDestroy {
                 // get the number of days if it was updated
                 const noDaysNotSeen = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterContactsNotSeen(
+                this.listHelperService.listFilterDataService.filterContactsNotSeen(
                     globalFilters.date,
                     globalFilters.locationId,
                     globalFilters.classificationId,
@@ -1136,7 +1139,7 @@ export abstract class ListComponent implements OnDestroy {
                 // get the number of contacts if it was updated
                 const noLessContacts = _.get(queryParams, 'x', null);
                   // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterCasesLessThanContacts(
+                this.listHelperService.listFilterDataService.filterCasesLessThanContacts(
                     globalFilters.date,
                     globalFilters.locationId,
                     globalFilters.classificationId,
@@ -1154,7 +1157,7 @@ export abstract class ListComponent implements OnDestroy {
 
             // filter cases by classification criteria
             case Constants.APPLY_LIST_FILTER.CASE_SUMMARY:
-                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
@@ -1248,7 +1251,7 @@ export abstract class ListComponent implements OnDestroy {
             // Filter contacts lost to follow-up
             case Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP:
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterContactsLostToFollowUp(
+                this.listHelperService.listFilterDataService.filterContactsLostToFollowUp(
                     globalFilters.date,
                     globalFilters.locationId,
                     globalFilters.classificationId
@@ -1268,7 +1271,7 @@ export abstract class ListComponent implements OnDestroy {
                 // get the number of days if it was updated
                 const noDaysInChains = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterCasesInKnownChains(
+                this.listHelperService.listFilterDataService.filterCasesInKnownChains(
                     globalFilters.date,
                     globalFilters.locationId,
                     globalFilters.classificationId,
@@ -1289,7 +1292,7 @@ export abstract class ListComponent implements OnDestroy {
                 // get the number of days  if it was updated
                 const noDaysAmongContacts = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterCasesAmongKnownContacts(
+                this.listHelperService.listFilterDataService.filterCasesAmongKnownContacts(
                     globalFilters.date,
                     globalFilters.locationId,
                     globalFilters.classificationId,
@@ -1308,7 +1311,7 @@ export abstract class ListComponent implements OnDestroy {
             // filter suspect cases with pending lab result
             case Constants.APPLY_LIST_FILTER.CASES_PENDING_LAB_RESULT:
                 // add condition for deceased cases
-                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
@@ -1334,7 +1337,7 @@ export abstract class ListComponent implements OnDestroy {
                 }
 
                 // get the correct query builder and merge with the existing one
-                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesPendingLabResult();
+                this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesPendingLabResult();
                 if (!globalQb.isEmpty()) {
                     this.appliedListFilterQueryBuilder.merge(globalQb);
                 }
@@ -1349,7 +1352,7 @@ export abstract class ListComponent implements OnDestroy {
             // filter suspect cases refusing treatment
             case Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT:
                 // add condition for deceased cases
-                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
@@ -1375,7 +1378,7 @@ export abstract class ListComponent implements OnDestroy {
                 }
 
                 // get the correct query builder and merge with the existing one
-                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesRefusingTreatment();
+                this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesRefusingTreatment();
                 if (!globalQb.isEmpty()) {
                     this.appliedListFilterQueryBuilder.merge(globalQb);
                 }
@@ -1390,7 +1393,7 @@ export abstract class ListComponent implements OnDestroy {
             // filter cases among contacts
             case Constants.APPLY_LIST_FILTER.NO_OF_ACTIVE_TRANSMISSION_CHAINS:
                 // get the correct query builder and merge with the existing one
-                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterActiveChainsOfTransmission();
+                this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterActiveChainsOfTransmission();
 
                 // change the way we build query
                 this.appliedListFilterQueryBuilder.filter.firstLevelConditions();
@@ -1459,7 +1462,7 @@ export abstract class ListComponent implements OnDestroy {
             // filter contacts becoming cases overtime and place
             case Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES:
                 // add condition for deceased cases
-                this.appliedListFilterQueryBuilder = this.listFilterDataService.getGlobalFilterQB(
+                this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.getGlobalFilterQB(
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
@@ -1507,7 +1510,7 @@ export abstract class ListComponent implements OnDestroy {
 
             // filter cases without relationships
             case Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS:
-                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesWithoutRelationships();
+                this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesWithoutRelationships();
                 this.mergeListFilterToMainFilter();
 
                 // refresh list
@@ -1516,7 +1519,7 @@ export abstract class ListComponent implements OnDestroy {
 
             // filter events without relationships
             case Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS:
-                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterEventsWithoutRelationships();
+                this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterEventsWithoutRelationships();
                 this.mergeListFilterToMainFilter();
 
                 // refresh list
@@ -1525,7 +1528,7 @@ export abstract class ListComponent implements OnDestroy {
 
             // Filter contacts seen
             case Constants.APPLY_LIST_FILTER.CONTACTS_SEEN:
-                this.listFilterDataService.filterContactsSeen(
+                this.listHelperService.listFilterDataService.filterContactsSeen(
                     globalFilters.date,
                     globalFilters.locationId,
                     globalFilters.classificationId
@@ -1547,7 +1550,7 @@ export abstract class ListComponent implements OnDestroy {
 
             // Filter contacts witch successful follow-up
             case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP:
-                this.listFilterDataService
+                this.listHelperService.listFilterDataService
                     .filterContactsWithSuccessfulFollowup(
                         globalFilters.date,
                         globalFilters.locationId,
@@ -1696,7 +1699,7 @@ export abstract class ListComponent implements OnDestroy {
             // Filter cases who are not identified though known contact list
             case Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS:
                 // add condition for deceased cases
-                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
                     null,
                     null,
                     'addresses.parentLocationIdFilter',
@@ -1718,7 +1721,7 @@ export abstract class ListComponent implements OnDestroy {
                 // classification: {
                 //     neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
                 // }
-                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesNotIdentifiedThroughContacts();
+                this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesNotIdentifiedThroughContacts();
                 if (!globalQb.isEmpty()) {
                     this.appliedListFilterQueryBuilder.merge(globalQb);
                 }
@@ -1854,7 +1857,6 @@ export abstract class ListComponent implements OnDestroy {
 
     /**
      * Check that we have at least one record selected
-     * @returns {false|string[]} False if not valid, list of ids otherwise
      */
     validateCheckedRecords() {
         // get list of ids
@@ -1863,8 +1865,8 @@ export abstract class ListComponent implements OnDestroy {
         // validate
         if (selectedRecords.length < 1) {
             // display message
-            if (this.snackbarService) {
-                this.snackbarService.showError('LNG_COMMON_LABEL_NO_RECORDS_SELECTED');
+            if (this.listHelperService.snackbarService) {
+                this.listHelperService.snackbarService.showError('LNG_COMMON_LABEL_NO_RECORDS_SELECTED');
             }
 
             // not valid

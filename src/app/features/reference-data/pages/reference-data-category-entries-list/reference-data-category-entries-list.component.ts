@@ -17,6 +17,7 @@ import { throwError } from 'rxjs';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { IconModel } from '../../../../core/models/icon.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-reference-data-category-entries-list',
@@ -93,15 +94,16 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
-        protected route: ActivatedRoute,
+        private route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private authDataService: AuthDataService,
         private i18nService: I18nService
     ) {
-        super(snackbarService);
+        super(listHelperService);
     }
 
     /**

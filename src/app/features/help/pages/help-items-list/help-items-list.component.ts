@@ -20,6 +20,7 @@ import { CacheKey, CacheService } from '../../../../core/services/helper/cache.s
 import { throwError } from 'rxjs';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-help-items-list',
@@ -105,18 +106,17 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private helpDataService: HelpDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private route: ActivatedRoute,
         private i18nService: I18nService,
         private cacheService: CacheService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
