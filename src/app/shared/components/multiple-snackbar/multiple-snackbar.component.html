@@ -1,0 +1,8 @@
+<div class="errors-container">
+    <div *ngFor="let err of data" class="error">
+        {{ err.message }}
+        <div class="">
+        <button (click)="closeSnackbar()">x</button>
+        </div>
+    </div>
+</div>
