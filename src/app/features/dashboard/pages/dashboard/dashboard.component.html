@@ -284,7 +284,8 @@
                     <mat-expansion-panel
                         *ngIf="group.hasAccess(authUser)">
                         <!-- Header -->
-                        <mat-expansion-panel-header>
+                        <mat-expansion-panel-header
+                        (click)="setKpiGroupVisibility(group.id)">
                             <!-- KPIs section header -->
                             <div class="dashlet-kpi-header dashlet-kpi-header-100" fxLayout="row" fxLayoutAlign="space-between center">
                                 <div>

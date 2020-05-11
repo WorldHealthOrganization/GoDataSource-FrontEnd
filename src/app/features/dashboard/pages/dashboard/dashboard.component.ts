@@ -260,6 +260,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         [id: string]: IKpiGroup
     } = {};
 
+    visibleKpisGroup: {
+        [id: string]: boolean;
+    } = {};
+
     // authenticated user
     authUser: UserModel;
 
@@ -328,6 +332,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.kpiGroupsMap = {};
         this.kpiGroups.forEach((group) => {
             this.kpiGroupsMap[group.id] = group;
+            // set the visibility of kpis as false on page init
+            this.visibleKpisGroup[group.id] = false;
         });
 
         this.caseClassificationsList$ = this.referenceDataDataService
@@ -543,9 +549,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     showAllDashlets(kpiGroup: string) {
         this.authUser.getSettings(UserSettings.DASHBOARD).showAllDashlets(kpiGroup);
-
+        this.visibleKpisGroup[kpiGroup] = true;
         // persist changes
         this.persistUserDashboardSettings().subscribe();
+    }
+
+    /**
+     * Set kpi group visibility for dashboard
+     * @param kpiGroup
+     */
+    setKpiGroupVisibility(kpiGroup: string) {
+        this.visibleKpisGroup[kpiGroup] = !this.visibleKpisGroup[kpiGroup];
     }
 
     /**
@@ -601,6 +615,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
      */
     generateKpisReport() {
         this.showLoadingDialog();
+        if (!this.allKpisDisplayed()) {
+            this.snackbarService.showError('LNG_PAGE_DASHBOARD_KPIS_ELEMENTS_NOT_VISIBLE_ERROR_MSG');
+            this.closeLoadingDialog();
+            return;
+        }
+
         (domtoimage as any).toPng(this.kpiSection.nativeElement)
             .then((dataUrl) => {
                 const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
@@ -771,5 +791,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         // we don't have access
         return false;
+    }
+
+    /**
+     * Check if all kpis are displayed to export them
+     */
+    allKpisDisplayed() {
+        let allKpisDisplayed: boolean;
+        for (const key of Object.keys(this.kpiGroupsMap)) {
+            console.log(key);
+            if (this.visibleKpisGroup[key] === false) {
+                allKpisDisplayed = false;
+                return;
+            } else {
+                allKpisDisplayed = true;
+            }
+        }
+        return allKpisDisplayed;
     }
 }
