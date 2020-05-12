@@ -22,6 +22,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_DASHBOARD_PIE_CHARTS_TITLE': 'Summaries charts',
         'LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG': 'Please make sure that EPI chart is visible',
+        'LNG_PAGE_DASHBOARD_KPIS_ELEMENTS_NOT_VISIBLE_ERROR_MSG': 'Please make sure that all KPIs are visible',
 
         /**
          * uiChainsOfTransmissionGraph

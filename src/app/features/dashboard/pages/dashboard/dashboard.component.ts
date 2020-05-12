@@ -549,14 +549,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     showAllDashlets(kpiGroup: string) {
         this.authUser.getSettings(UserSettings.DASHBOARD).showAllDashlets(kpiGroup);
-        this.visibleKpisGroup[kpiGroup] = true;
+        // update KPI visibility for export check
+        this.setKpiGroupVisibility(kpiGroup);
         // persist changes
         this.persistUserDashboardSettings().subscribe();
     }
 
     /**
-     * Set kpi group visibility for dashboard
-     * @param kpiGroup
+     * Set KPI group visibility for dashboard to check them before export KPIs
+     * @param {string} kpiGroup
      */
     setKpiGroupVisibility(kpiGroup: string) {
         this.visibleKpisGroup[kpiGroup] = !this.visibleKpisGroup[kpiGroup];
@@ -794,12 +795,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Check if all kpis are displayed to export them
+     * Check if all KPIs are displayed to export them
      */
     allKpisDisplayed() {
         let allKpisDisplayed: boolean;
         for (const key of Object.keys(this.kpiGroupsMap)) {
-            console.log(key);
             if (this.visibleKpisGroup[key] === false) {
                 allKpisDisplayed = false;
                 return;
