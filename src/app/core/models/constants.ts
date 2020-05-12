@@ -46,7 +46,6 @@ export class Constants {
     static DEFAULT_RANDOM_KEY_LENGTH = 16;
 
     // default configurations
-    static DEFAULT_DEBOUNCE_INSTANT_TIME_MILLISECONDS = 200;
     static DEFAULT_DEBOUNCE_TIME_MILLISECONDS = 500;
     static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
     static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
@@ -410,6 +409,15 @@ export class Constants {
         LOW: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_1_LOW',
         MEDIUM: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_2_MEDIUM',
         HIGH: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_3_HIGH'
+    };
+
+    /**
+     * Used to determine action that we need to take when duplicates are detected ( create / modify - case / contact)
+     */
+    static DUPLICATE_ACTION = {
+        NO_ACTION: 'LNG_DUPLICATES_DIALOG_ACTION_NONE',
+        NOT_A_DUPLICATE: 'LNG_DUPLICATES_DIALOG_ACTION_MARK_AS_NOT_A_DUPLICATE',
+        MERGE: 'LNG_DUPLICATES_DIALOG_ACTION_MERGE_DUPLICATE'
     };
 
     /**
