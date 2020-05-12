@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { NavigationEnd, RouteConfigLoadEnd, RouteConfigLoadStart, Router } from '@angular/router';
+import { NavigationEnd, NavigationStart, RouteConfigLoadEnd, RouteConfigLoadStart, Router } from '@angular/router';
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
 import { MatDialogRef, MatSidenav } from '@angular/material';
@@ -120,10 +120,16 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     ) {
         // detect when the route is changed
         this.routerEventsSubscriptionLoad = this.router.events.subscribe((event) => {
+            // display loading spinner
             if (event instanceof RouteConfigLoadStart) {
                 this.showLoading();
             } else if (event instanceof RouteConfigLoadEnd) {
                 this.hideLoading();
+            }
+
+            // there is no point in continuing if not a nav start event since we need to execute close only one time
+            if (!(event instanceof NavigationStart)) {
+                return;
             }
 
             // close the SideNav whenever the route is changed
