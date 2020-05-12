@@ -375,6 +375,32 @@ form.form-view-only {
 
 }
 
+.button-with-spinner {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    .loading-chips {
+        @mat-spinner-width: 16px;
+        @mat-spinner-height: 16px;
+
+        float: left;
+        margin-right: 10px;
+        margin-top: 3px;
+
+        mat-spinner {
+            display: inline-block;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+    }
+}
+
 .text-right {
     text-align: right;
 }

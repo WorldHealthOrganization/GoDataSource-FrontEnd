@@ -447,7 +447,15 @@
             </button>
 
             <ng-container *ngIf="!viewOnly">
-                <button mat-raised-button color="accent">
+                <button
+                    [disabled]="form.pending"
+                    class="button-with-spinner"
+                    mat-raised-button color="accent">
+                    <div
+                        *ngIf="form.pending"
+                        class="loading-chips">
+                        <mat-spinner></mat-spinner>
+                    </div>
                     {{'LNG_COMMON_BUTTON_SAVE' | translate}}
                 </button>
 
