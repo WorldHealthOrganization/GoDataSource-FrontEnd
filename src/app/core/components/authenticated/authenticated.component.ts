@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, RouteConfigLoadEnd, RouteConfigLoadStart, Router } from '@angular/router';
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
 import { MatDialogRef, MatSidenav } from '@angular/material';
@@ -61,6 +61,9 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     // constants
     Constants = Constants;
 
+    // menu loading dialog
+    private menuLoadingDialog: LoadingDialogModel;
+
     // token expire data
     private lastRefreshUserTokenOrLogOut: Moment;
     private lastInputTime: Moment;
@@ -116,7 +119,13 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         private userDataService: UserDataService
     ) {
         // detect when the route is changed
-        this.routerEventsSubscriptionLoad = this.router.events.subscribe(() => {
+        this.routerEventsSubscriptionLoad = this.router.events.subscribe((event) => {
+            if (event instanceof RouteConfigLoadStart) {
+                this.showLoading();
+            } else if (event instanceof RouteConfigLoadEnd) {
+                this.hideLoading();
+            }
+
             // close the SideNav whenever the route is changed
             if (this.sideNav) {
                 this.sideNav.close();
@@ -247,6 +256,23 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         }
         if (this.documentMouseMove) {
             document.removeEventListener('mousemove', this.documentMouseMove);
+        }
+    }
+
+    /**
+     * Show loading spinner
+     */
+    showLoading() {
+        this.menuLoadingDialog = this.dialogService.showLoadingDialog();
+    }
+
+    /**
+     * hide loading
+     */
+    hideLoading() {
+        if (this.menuLoadingDialog) {
+            this.menuLoadingDialog.close();
+            this.menuLoadingDialog = null;
         }
     }
 
