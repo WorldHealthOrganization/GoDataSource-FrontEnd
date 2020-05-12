@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { SnackbarService } from './snackbar.service';
 import { ListFilterDataService } from '../data/list-filter.data.service';
-import { Params } from '@angular/router';
-import { Observable } from 'rxjs/internal/Observable';
+import { ActivatedRoute, PRIMARY_OUTLET, Router } from '@angular/router';
+import { RedirectService } from './redirect.service';
+import { Location } from '@angular/common';
 
 @Injectable()
 export class ListHelperService {
@@ -13,7 +14,37 @@ export class ListHelperService {
     constructor(
         public snackbarService: SnackbarService,
         public listFilterDataService: ListFilterDataService,
-        public queryParams: Observable<Params>
+        public route: ActivatedRoute,
+        public redirectService: RedirectService,
+        public router: Router,
+        public location: Location
     ) {}
+
+    /**
+     * Fallback url
+     */
+    public determineFallbackUrl(): string[] | boolean {
+        // we don't have an url, so we can't parse it ?
+        if (!this.router.url) {
+            return false;
+        }
+
+        // parse url
+        const parsedResult = this.router.parseUrl(this.router.url);
+        if (
+            !parsedResult.root ||
+            !parsedResult.root.children ||
+            !parsedResult.root.children[PRIMARY_OUTLET] ||
+            !parsedResult.root.children[PRIMARY_OUTLET].segments ||
+            parsedResult.root.children[PRIMARY_OUTLET].segments.length < 1
+        ) {
+            return false;
+        }
+
+        // finished - return path
+        return parsedResult.root.children[PRIMARY_OUTLET].segments.map((segment, index) => {
+            return `${index < 1 ? '/' : ''}${segment.path}`;
+        });
+    }
 }
 

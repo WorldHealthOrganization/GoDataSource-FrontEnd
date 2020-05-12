@@ -19,8 +19,12 @@ import { VisibleColumnModel } from '../../shared/components/side-columns/model';
 import { AddressType } from '../models/address.model';
 import { moment, Moment } from './x-moment';
 import { ListHelperService } from '../services/helper/list-helper.service';
+import { SubscriptionLike } from 'rxjs/internal/types';
 
 export abstract class ListComponent implements OnDestroy {
+    // handle pop state changes
+    private static locationSubscription: SubscriptionLike;
+
     /**
      * Breadcrumbs
      */
@@ -103,6 +107,11 @@ export abstract class ListComponent implements OnDestroy {
      * Applied list filter on this list page
      */
     public appliedListFilter: ApplyListFilter;
+
+    /**
+     * Preparing loading filter ?
+     */
+    public appliedListFilterLoading: boolean = false;
 
     /**
      * List Filter Query Builder
@@ -237,6 +246,11 @@ export abstract class ListComponent implements OnDestroy {
     // by default each time we get back to a page we should display loading spinner
     public refreshingList: boolean = true;
     private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
+        // disabled ?
+        if (this.appliedListFilterLoading) {
+            return;
+        }
+
         // refresh list
         this.refreshingList = true;
         this.refreshList((records: any[]) => {
@@ -256,6 +270,11 @@ export abstract class ListComponent implements OnDestroy {
 
     // refresh only after we finish changing data
     private triggerListCountRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
+        // disabled ?
+        if (this.appliedListFilterLoading) {
+            return;
+        }
+
         // refresh list
         this.refreshListCount();
     }));
@@ -266,10 +285,54 @@ export abstract class ListComponent implements OnDestroy {
     protected constructor(
         protected listHelperService: ListHelperService
     ) {
-        // check the filter after creating the List Component instance
+        // clone current breadcrumbs
+        let currentBreadcrumbs;
         setTimeout(() => {
-            this.checkListFilters();
+            currentBreadcrumbs = _.cloneDeep(this.breadcrumbs);
         });
+
+        // check filters
+        this.checkListFilters();
+
+        // remove old subscription
+        if (ListComponent.locationSubscription) {
+            ListComponent.locationSubscription.unsubscribe();
+            ListComponent.locationSubscription = null;
+        }
+
+        // listen for back / forward buttons
+        ListComponent.locationSubscription = this.listHelperService.location
+            .subscribe((popStateEvent) => {
+                setTimeout(() => {
+                    // check if subscription was closed
+                    if (
+                        !ListComponent.locationSubscription ||
+                        ListComponent.locationSubscription.closed
+                    ) {
+                        return;
+                    }
+
+                    // reset loading
+                    this.refreshingList = true;
+
+                    // clear all filters
+                    this.queryBuilder = new RequestQueryBuilder();
+
+                    // init paginator ?
+                    if (this.paginatorInitialized) {
+                        this.initPaginator();
+                    }
+
+                    // revert breadcrumbs
+                    this.breadcrumbs = _.cloneDeep(currentBreadcrumbs);
+
+                    // refresh filters
+                    this.checkListFilters();
+
+                    // refresh page
+                    this.needsRefreshList(true);
+                });
+            });
     }
 
     /**
@@ -296,6 +359,12 @@ export abstract class ListComponent implements OnDestroy {
      * Release subscribers
      */
     private releaseSubscribers() {
+        // location subscriber
+        if (ListComponent.locationSubscription) {
+            ListComponent.locationSubscription.unsubscribe();
+            ListComponent.locationSubscription = null;
+        }
+
         if (this.triggerListRefresh) {
             this.triggerListRefresh.unsubscribe();
             this.triggerListRefresh = null;
@@ -329,7 +398,10 @@ export abstract class ListComponent implements OnDestroy {
     /**
      * Tell list that we need to refresh list
      */
-    public needsRefreshList(instant: boolean = false, resetPagination: boolean = true) {
+    public needsRefreshList(
+        instant: boolean = false,
+        resetPagination: boolean = true
+    ) {
         // reset checked items
         this.resetCheckboxData();
 
@@ -415,7 +487,10 @@ export abstract class ListComponent implements OnDestroy {
         }
 
         // refresh list
-        this.needsRefreshList(false, false);
+        this.needsRefreshList(
+            false,
+            false
+        );
     }
 
     /**
@@ -706,7 +781,10 @@ export abstract class ListComponent implements OnDestroy {
         this.queryBuilder.paginator.setPage(page);
 
         // refresh list
-        this.needsRefreshList(true, false);
+        this.needsRefreshList(
+            true,
+            false
+        );
     }
 
     /**
@@ -836,6 +914,9 @@ export abstract class ListComponent implements OnDestroy {
      * Apply list filter
      */
     protected mergeListFilterToMainFilter() {
+        // finished with list filter
+        this.appliedListFilterLoading = false;
+
         // merge filter query builder
         if (this.appliedListFilterQueryBuilder) {
             this.queryBuilder.merge(_.cloneDeep(this.appliedListFilterQueryBuilder));
@@ -846,29 +927,26 @@ export abstract class ListComponent implements OnDestroy {
      * Check if list filter applies
      */
     protected checkListFilters() {
-        if (
-            !_.isEmpty(this.listHelperService.queryParams) &&
-            !_.isEmpty(this.listHelperService.listFilterDataService)
-        ) {
-            // get query params
-            this.listHelperService.queryParams
-                .subscribe((queryParams: any) => {
-                    // reset values
-                    this.appliedListFilter = null;
-                    this.appliedListFilterQueryBuilder = null;
+        // retrieve query params
+        const queryParams: any = this.listHelperService.route.snapshot.queryParams;
 
-                    // apply query params
-                    if (!_.isEmpty(queryParams)) {
-                        // call function to apply filters - update query builder
-                        this.applyListFilters(queryParams);
+        // reset values
+        this.appliedListFilter = queryParams && queryParams.applyListFilter ? queryParams.applyListFilter : null;
+        this.appliedListFilterQueryBuilder = null;
 
-                    // handle browser back / forwards buttons
-                    } else {
-                        // needs refresh
-                        this.needsRefreshList(true);
-                    }
-                });
-        }
+        // do we need to wait for list filter to be initialized ?
+        this.appliedListFilterLoading = !_.isEmpty(this.appliedListFilter);
+
+        // wait for component initialization, since this method is called from constructor
+        setTimeout(() => {
+            // do we have query params to apply ?
+            if (_.isEmpty(queryParams)) {
+                return;
+            }
+
+            // call function to apply filters - update query builder
+            this.applyListFilters(queryParams);
+        });
     }
 
     /**
@@ -876,39 +954,37 @@ export abstract class ListComponent implements OnDestroy {
      * @param {string} listFilter
      * @param listFilterData
      */
-    protected setListFilterBreadcrumbs(listFilter: string, listFilterData: any = {}) {
+    protected setListFilterBreadcrumbs(
+        listFilter: string,
+        listFilterData: any = {}
+    ) {
         const breadcrumbToken = Constants.LIST_FILTER_TITLE[listFilter];
-
         if (breadcrumbToken) {
-            // clone current breadcrumbs
-            const currentBreadcrumbs = _.cloneDeep(this.breadcrumbs);
-
             // get the breadcrumb representing the list page
             const listPageBreadcrumb: BreadcrumbItemModel = _.find(this.breadcrumbs, {active: true});
-
             if (listPageBreadcrumb) {
                 // update the breadcrumb
+                const fallbackUrl: string[] | boolean = this.listHelperService.determineFallbackUrl();
                 listPageBreadcrumb.active = false;
                 listPageBreadcrumb.onClick = () => {
-                    // clear all filters
-                    this.queryBuilder = new RequestQueryBuilder();
-
-                    // init paginator ?
-                    if (this.paginatorInitialized) {
-                        this.initPaginator();
+                    // redirect to cases list pages ( hack since we can't use navigate for the same component )
+                    if (fallbackUrl) {
+                        this.listHelperService.redirectService.to(fallbackUrl as string[]);
+                    } else {
+                        // DON'T REDIRECT
                     }
-
-                    // refresh page
-                    this.needsRefreshList(true);
-
-                    // revert breadcrumbs
-                    this.breadcrumbs = currentBreadcrumbs;
                 };
             }
 
             // add new breadcrumb
             this.breadcrumbs.push(
-                new BreadcrumbItemModel(breadcrumbToken, '.', true, {}, listFilterData)
+                new BreadcrumbItemModel(
+                    breadcrumbToken,
+                    '.',
+                    true,
+                    {},
+                    listFilterData
+                )
             );
         }
     }
@@ -917,31 +993,41 @@ export abstract class ListComponent implements OnDestroy {
      * Verify what list filter is sent into the query params and updates the query builder based in this.
      * @param queryParams
      */
-    protected applyListFilters(queryParams: {
-        applyListFilter,
-        x,
-        date,
-        global
-    }): void {
+    protected applyListFilters(
+        queryParams: {
+            applyListFilter,
+            x,
+            date,
+            global
+        }
+    ): void {
+        // there are no filters to apply ?
+        if (!this.appliedListFilter) {
+            return;
+        }
+
         // update breadcrumbs
-        this.setListFilterBreadcrumbs(queryParams.applyListFilter, queryParams);
+        this.setListFilterBreadcrumbs(
+            this.appliedListFilter,
+            queryParams
+        );
 
         // get global filter values
         const globalFilters = this.getGlobalFilterValues(queryParams);
         let globalQb: RequestQueryBuilder;
 
         // check params for apply list filter
-        this.appliedListFilter = queryParams.applyListFilter;
         switch (this.appliedListFilter) {
             // Filter contacts on the followup list
             case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST:
 
                 // get the correct query builder and merge with the existing one
-                this.listHelperService.listFilterDataService.filterContactsOnFollowUpLists(
-                    globalFilters.date,
-                    globalFilters.locationId,
-                    globalFilters.classificationId
-                )
+                this.listHelperService.listFilterDataService
+                    .filterContactsOnFollowUpLists(
+                        globalFilters.date,
+                        globalFilters.locationId,
+                        globalFilters.classificationId
+                    )
                     .subscribe((qbFilterContactsOnFollowUpLists) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterContactsOnFollowUpLists;
@@ -1118,12 +1204,13 @@ export abstract class ListComponent implements OnDestroy {
                 // get the number of days if it was updated
                 const noDaysNotSeen = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
-                this.listHelperService.listFilterDataService.filterContactsNotSeen(
-                    globalFilters.date,
-                    globalFilters.locationId,
-                    globalFilters.classificationId,
-                    noDaysNotSeen
-                )
+                this.listHelperService.listFilterDataService
+                    .filterContactsNotSeen(
+                        globalFilters.date,
+                        globalFilters.locationId,
+                        globalFilters.classificationId,
+                        noDaysNotSeen
+                    )
                     .subscribe((qbFilterContactsNotSeen) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterContactsNotSeen;
@@ -1139,12 +1226,13 @@ export abstract class ListComponent implements OnDestroy {
                 // get the number of contacts if it was updated
                 const noLessContacts = _.get(queryParams, 'x', null);
                   // get the correct query builder and merge with the existing one
-                this.listHelperService.listFilterDataService.filterCasesLessThanContacts(
-                    globalFilters.date,
-                    globalFilters.locationId,
-                    globalFilters.classificationId,
-                    noLessContacts
-                )
+                this.listHelperService.listFilterDataService
+                    .filterCasesLessThanContacts(
+                        globalFilters.date,
+                        globalFilters.locationId,
+                        globalFilters.classificationId,
+                        noLessContacts
+                    )
                     .subscribe((qbFilterCasesLessThanContacts) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterCasesLessThanContacts;
