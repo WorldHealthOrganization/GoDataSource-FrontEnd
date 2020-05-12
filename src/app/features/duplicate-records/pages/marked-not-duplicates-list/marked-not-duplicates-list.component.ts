@@ -18,13 +18,14 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { catchError, share, tap } from 'rxjs/operators';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { EventModel } from '../../../../core/models/event.model';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import * as _ from 'lodash';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { CaseDataService } from '../../../../core/services/data/case.data.service';
+import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 
 @Component({
     selector: 'app-cases-list',
@@ -36,9 +37,7 @@ export class MarkedNotDuplicatesListComponent
     extends ListComponent
     implements OnInit, OnDestroy {
     // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_TITLE', '.', true)
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
@@ -49,7 +48,8 @@ export class MarkedNotDuplicatesListComponent
     // list of not duplicates
     recordId: string;
     recordType: EntityType;
-    notDuplicatesList$: Observable<(CaseModel | ContactModel | EventModel)[]>;
+    recordData: CaseModel | ContactModel;
+    notDuplicatesList$: Observable<(CaseModel | ContactModel)[]>;
     notDuplicatesListCount$: Observable<IBasicCount>;
 
     // obs
@@ -137,7 +137,9 @@ export class MarkedNotDuplicatesListComponent
         private route: ActivatedRoute,
         private entityDataService: EntityDataService,
         private router: Router,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private caseDataService: CaseDataService,
+        private contactDataService: ContactDataService
     ) {
         super(listHelperService);
     }
@@ -158,6 +160,7 @@ export class MarkedNotDuplicatesListComponent
                 contactId?: string,
                 caseId?: string
             }) => {
+                // params set
                 if (params.caseId) {
                     this.recordId = params.caseId;
                     this.recordType = EntityType.CASE;
@@ -165,6 +168,9 @@ export class MarkedNotDuplicatesListComponent
                     this.recordId = params.contactId;
                     this.recordType = EntityType.CONTACT;
                 }
+
+                // retrieve case / contact data
+                this.getCaseContactData();
             });
 
         // subscribe to the Selected Outbreak Subject stream
@@ -172,6 +178,9 @@ export class MarkedNotDuplicatesListComponent
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+
+                // retrieve case / contact data
+                this.getCaseContactData();
 
                 // initialize pagination
                 this.initPaginator();
@@ -196,6 +205,100 @@ export class MarkedNotDuplicatesListComponent
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // reset
+        this.breadcrumbs = [];
+
+        // add list / view / modify record breadcrumbs
+        if (this.recordType === EntityType.CASE) {
+            // list
+            if (CaseModel.canList(this.authUser)) {
+                this.breadcrumbs.push(new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_CASES_TITLE',
+                    '/cases'
+                ));
+            }
+
+            // view / modify
+            if (this.recordData) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        CaseModel.canModify(this.authUser) ? 'LNG_PAGE_MODIFY_CASE_TITLE' : 'LNG_PAGE_VIEW_CASE_TITLE',
+                        `/cases/${this.recordId}/${CaseModel.canModify(this.authUser) ? 'modify' : 'view'}`,
+                        false,
+                        {},
+                        this.recordData
+                    )
+                );
+            }
+        } else if (this.recordType === EntityType.CONTACT) {
+            // list
+            if (ContactModel.canList(this.authUser)) {
+                this.breadcrumbs.push(new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_CONTACTS_TITLE',
+                    '/contacts'
+                ));
+            }
+
+            // view / modify
+            if (this.recordData) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        ContactModel.canModify(this.authUser) ? 'LNG_PAGE_MODIFY_CONTACT_TITLE' : 'LNG_PAGE_VIEW_CONTACT_TITLE',
+                        `/contacts/${this.recordId}/${ContactModel.canModify(this.authUser) ? 'modify' : 'view'}`,
+                        false,
+                        {},
+                        this.recordData
+                    )
+                );
+            }
+        }
+
+        // add main breadcrumb
+        this.breadcrumbs.push(new BreadcrumbItemModel(
+            'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_TITLE',
+            '.',
+            true
+        ));
+    }
+
+    /**
+     * Retrieve case / contact data
+     */
+    getCaseContactData() {
+        // do we have contact type and outbreak data ?
+        if (
+            !this.recordType ||
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id
+        ) {
+            return;
+        }
+
+        // construct case / contact observer to retrieve data
+        const observer$: Observable<CaseModel | ContactModel> = this.recordType === EntityType.CONTACT ?
+            this.contactDataService.getContact(
+                this.selectedOutbreak.id,
+                this.recordId
+            ) :
+            this.caseDataService.getCase(
+                this.selectedOutbreak.id,
+                this.recordId
+            );
+
+        // get case / contact data
+        observer$.subscribe((recordData) => {
+            // set data
+            this.recordData = recordData;
+
+            // update breadcrumbs
+            this.initializeBreadcrumbs();
+        });
     }
 
     /**

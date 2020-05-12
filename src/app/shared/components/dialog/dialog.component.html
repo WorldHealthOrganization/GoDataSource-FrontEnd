@@ -54,6 +54,7 @@
                 <div
                     *ngFor="let field of confirmData.fieldsList; let fieldIndex = index"
                     [fxFlex]="confirmData.fieldsListLayoutCss[fieldIndex]"
+                    [fxLayoutAlign]="field.fieldType === DialogFieldType.LINK ? 'start center' : undefined"
                     class="field-list-item">
                     <div
                         *ngIf="field.isVisible(dialogAnswerInputValue.value)">
