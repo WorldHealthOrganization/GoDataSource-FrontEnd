@@ -214,6 +214,9 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();

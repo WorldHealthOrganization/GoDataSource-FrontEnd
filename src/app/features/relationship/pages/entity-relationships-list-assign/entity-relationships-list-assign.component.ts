@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -32,7 +32,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './entity-relationships-list-assign.component.html',
     styleUrls: ['./entity-relationships-list-assign.component.less']
 })
-export class EntityRelationshipsListAssignComponent extends RelationshipsListComponent implements OnInit {
+export class EntityRelationshipsListAssignComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // entities list relationships
@@ -81,6 +81,9 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         super.ngOnInit();
 
@@ -125,6 +128,14 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

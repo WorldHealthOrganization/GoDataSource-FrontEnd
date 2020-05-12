@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SavedImportMappingService } from '../../../../core/services/data/saved-import-mapping.data.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -22,7 +22,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './saved-import-mapping.component.html',
     styleUrls: ['./saved-import-mapping.component.less']
 })
-export class SavedImportMappingComponent extends ListComponent implements OnInit {
+export class SavedImportMappingComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_TITLE', '.', true)
@@ -87,6 +87,14 @@ export class SavedImportMappingComponent extends ListComponent implements OnInit
         this.initPaginator();
         // ...and re-load the list
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -24,7 +24,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './languages-list.component.html',
     styleUrls: ['./languages-list.component.less']
 })
-export class LanguagesListComponent extends ListComponent implements OnInit {
+export class LanguagesListComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '.', true)
     ];
@@ -150,6 +150,14 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
 
         // ...and re-load the list when the Selected Outbreak is changed
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

@@ -1,4 +1,4 @@
-import { Component, Inject, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { Observable } from 'rxjs';
 import { HelpItemModel } from '../../../core/models/help-item.model';
@@ -36,7 +36,7 @@ export class ViewHelpData {
     templateUrl: './view-help-dialog.component.html',
     styleUrls: ['./view-help-dialog.component.less']
 })
-export class ViewHelpDialogComponent extends ListComponent {
+export class ViewHelpDialogComponent extends ListComponent implements OnDestroy {
     // default settings for this type of dialog
     static DEFAULT_CONFIG = {
         autoFocus: false,
@@ -88,6 +88,14 @@ export class ViewHelpDialogComponent extends ListComponent {
 
         // ...and re-load the list
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

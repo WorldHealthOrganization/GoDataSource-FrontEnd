@@ -189,7 +189,13 @@ export class EntityRelationshipsListComponent extends RelationshipsListComponent
         this.initializeSideTableColumns();
     }
 
+    /**
+     * Component destroyed
+     */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();

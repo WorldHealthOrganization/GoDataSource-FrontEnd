@@ -294,7 +294,7 @@ export abstract class ListComponent implements OnDestroy {
         // check filters
         this.checkListFilters();
 
-        // remove old subscription
+        // remove old subscription since we shouldn't have more than one list component visible at the same time ( at least not now )
         if (ListComponent.locationSubscription) {
             ListComponent.locationSubscription.unsubscribe();
             ListComponent.locationSubscription = null;

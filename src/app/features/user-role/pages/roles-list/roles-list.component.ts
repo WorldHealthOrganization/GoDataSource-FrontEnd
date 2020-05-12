@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -25,7 +25,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './roles-list.component.html',
     styleUrls: ['./roles-list.component.less']
 })
-export class RolesListComponent extends ListComponent implements OnInit {
+export class RolesListComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Roles', '.', true)
     ];
@@ -147,6 +147,14 @@ export class RolesListComponent extends ListComponent implements OnInit {
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

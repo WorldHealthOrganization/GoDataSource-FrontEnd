@@ -151,13 +151,13 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
      * Remove component resources
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         if (this.getSelectedOutbreakSubject) {
             this.getSelectedOutbreakSubject.unsubscribe();
             this.getSelectedOutbreakSubject = null;
         }
-
-        // release resources
-        super.ngOnDestroy();
     }
 
     /**

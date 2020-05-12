@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -23,7 +23,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './reference-data-categories-list.component.html',
     styleUrls: ['./reference-data-categories-list.component.less']
 })
-export class ReferenceDataCategoriesListComponent extends ListComponent implements OnInit {
+export class ReferenceDataCategoriesListComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '..', true)
@@ -90,6 +90,14 @@ export class ReferenceDataCategoriesListComponent extends ListComponent implemen
         this.referenceDataExporFileName = this.i18nService.instant('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE') +
             ' - ' +
             this.referenceDataExporFileName;
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

@@ -221,6 +221,9 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();

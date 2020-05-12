@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -34,7 +34,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './system-sync-logs.component.html',
     styleUrls: ['./system-sync-logs.component.less']
 })
-export class SystemSyncLogsComponent extends ListComponent implements OnInit {
+export class SystemSyncLogsComponent extends ListComponent implements OnInit, OnDestroy {
     /**
      * Breadcrumbs
      */
@@ -193,6 +193,14 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                 // ...and re-load the list
                 this.needsRefreshList(true);
             });
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

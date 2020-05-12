@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -25,7 +25,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './audit-logs-list.component.html',
     styleUrls: ['./audit-logs-list.component.less']
 })
-export class AuditLogsListComponent extends ListComponent implements OnInit {
+export class AuditLogsListComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_AUDIT_LOGS_TITLE', '.', true)
     ];
@@ -105,6 +105,14 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

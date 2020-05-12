@@ -1,5 +1,5 @@
 import { ListComponent } from '../../../core/helperClasses/list-component';
-import { OnInit } from '@angular/core';
+import { OnDestroy, OnInit } from '@angular/core';
 import { EntityType } from '../../../core/models/entity-type';
 import { UserModel } from '../../../core/models/user.model';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
@@ -15,7 +15,7 @@ import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ListHelperService } from '../../../core/services/helper/list-helper.service';
 
-export abstract class RelationshipsListComponent extends ListComponent implements OnInit {
+export abstract class RelationshipsListComponent extends ListComponent implements OnInit, OnDestroy {
     // Entities Map for specific data
     entityMap: {
         [entityType: string]: {
@@ -179,6 +179,14 @@ export abstract class RelationshipsListComponent extends ListComponent implement
 
                 this.checkInitData();
             });
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

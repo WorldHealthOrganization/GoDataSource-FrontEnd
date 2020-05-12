@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -24,7 +24,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './system-devices.component.html',
     styleUrls: ['./system-devices.component.less']
 })
-export class SystemDevicesComponent extends ListComponent implements OnInit {
+export class SystemDevicesComponent extends ListComponent implements OnInit, OnDestroy {
     // Breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '.', true)
@@ -149,6 +149,14 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
 
         // retrieve devices
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

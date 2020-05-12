@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserModel, UserRoleModel, PhoneNumberType } from '../../../../core/models/user.model';
@@ -28,7 +28,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './user-list.component.html',
     styleUrls: ['./user-list.component.less']
 })
-export class UserListComponent extends ListComponent implements OnInit {
+export class UserListComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '.', true)
     ];
@@ -146,6 +146,14 @@ export class UserListComponent extends ListComponent implements OnInit {
         this.initPaginator();
         // ...and load the list of items
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

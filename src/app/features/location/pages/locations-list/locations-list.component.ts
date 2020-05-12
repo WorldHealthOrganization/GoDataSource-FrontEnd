@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -33,7 +33,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './locations-list.component.html',
     styleUrls: ['./locations-list.component.less']
 })
-export class LocationsListComponent extends ListComponent implements OnInit {
+export class LocationsListComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumb header
     public breadcrumbs: BreadcrumbItemModel[] =  [
         new BreadcrumbItemModel(
@@ -197,6 +197,14 @@ export class LocationsListComponent extends ListComponent implements OnInit {
 
         // initialize side table columns
         this.initializeSideTableColumns();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

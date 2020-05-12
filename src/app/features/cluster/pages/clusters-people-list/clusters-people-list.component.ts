@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -30,7 +30,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './clusters-people-list.component.html',
     styleUrls: ['./clusters-people-list.component.less']
 })
-export class ClustersPeopleListComponent extends ListComponent implements OnInit {
+export class ClustersPeopleListComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -160,6 +160,14 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
 
         // initialize breadcrumbs
         this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
@@ -29,7 +29,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './backups.component.html',
     styleUrls: ['./backups.component.less']
 })
-export class BackupsComponent extends ListComponent implements OnInit {
+export class BackupsComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_SYSTEM_BACKUPS_TITLE', '.', true)
@@ -160,6 +160,14 @@ export class BackupsComponent extends ListComponent implements OnInit {
 
         // retrieve backups
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

@@ -507,6 +507,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();

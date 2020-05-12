@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -40,7 +40,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './entity-lab-results-list.component.html',
     styleUrls: ['./entity-lab-results-list.component.less']
 })
-export class EntityLabResultsListComponent extends ListComponent implements OnInit {
+export class EntityLabResultsListComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -336,6 +336,14 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -33,7 +33,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './outbreak-list.component.html',
     styleUrls: ['./outbreak-list.component.less']
 })
-export class OutbreakListComponent extends ListComponent implements OnInit {
+export class OutbreakListComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '.', true)
     ];
@@ -278,6 +278,14 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
 
         // refresh
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

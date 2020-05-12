@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -24,7 +24,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './manage-icons-list.component.html',
     styleUrls: ['./manage-icons-list.component.less']
 })
-export class ManageIconsListComponent extends ListComponent implements OnInit {
+export class ManageIconsListComponent extends ListComponent implements OnInit, OnDestroy {
     // Breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -106,6 +106,14 @@ export class ManageIconsListComponent extends ListComponent implements OnInit {
 
         // retrieve icons
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

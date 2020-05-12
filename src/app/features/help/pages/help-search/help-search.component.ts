@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -23,7 +23,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './help-search.component.html',
     styleUrls: ['./help-search.component.less']
 })
-export class HelpSearchComponent extends ListComponent implements OnInit {
+export class HelpSearchComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_GLOBAL_HELP_TITLE', '/help', true)
     ];
@@ -65,6 +65,9 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
         super(listHelperService);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -75,6 +78,14 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
         this.needsRefreshList(true);
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

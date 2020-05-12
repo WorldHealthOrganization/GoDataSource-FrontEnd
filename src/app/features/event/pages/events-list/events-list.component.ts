@@ -306,7 +306,13 @@ export class EventsListComponent extends ListComponent implements OnInit, OnDest
         this.initializeSideTableColumns();
     }
 
+    /**
+     * Release resources
+     */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();

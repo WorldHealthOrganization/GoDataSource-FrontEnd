@@ -558,14 +558,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
-
-        // release resources
-        super.ngOnDestroy();
     }
 
     /**

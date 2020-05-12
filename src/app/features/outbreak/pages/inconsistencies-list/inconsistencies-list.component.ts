@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -29,7 +29,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
     templateUrl: './inconsistencies-list.component.html',
     styleUrls: ['./inconsistencies-list.component.less']
 })
-export class InconsistenciesListComponent extends ListComponent implements OnInit {
+export class InconsistenciesListComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -141,6 +141,14 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
                         this.needsRefreshList(true);
                     });
             });
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**
