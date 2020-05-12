@@ -21,9 +21,8 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
-import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldListItem, DialogFieldType } from '../../../../shared/components';
+import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { MatDialogRef } from '@angular/material';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { catchError } from 'rxjs/operators';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
@@ -437,91 +436,89 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                 // do we have duplicates ?
                 if (caseDuplicates.duplicates.length > 0) {
+                    // construct list of items from which we can choose actions
+                    const fieldsList: DialogField[] = [];
+                    const fieldsListLayout: number[] = [];
+                    caseDuplicates.duplicates.forEach((duplicate: EntityModel, index: number) => {
+                        // case model
+                        const caseData: CaseModel = duplicate.model as CaseModel;
+
+                        // add row fields
+                        fieldsListLayout.push(60, 40);
+                        fieldsList.push(
+                            new DialogField({
+                                name: `actions[${caseData.id}].label`,
+                                placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
+                                    caseData,
+                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                ),
+                                fieldType: DialogFieldType.LINK,
+                                routerLink: ['/cases', caseData.id, 'view'],
+                                linkTarget: '_blank'
+                            }),
+                            new DialogField({
+                                name: `actions[${caseData.id}].action`,
+                                placeholder: 'LNG_DUPLICATES_DIALOG_ACTION',
+                                description: 'LNG_DUPLICATES_DIALOG_ACTION_DESCRIPTION',
+                                inputOptions: [
+                                    new LabelValuePair(
+                                        Constants.DUPLICATE_ACTION.NO_ACTION,
+                                        Constants.DUPLICATE_ACTION.NO_ACTION
+                                    ),
+                                    new LabelValuePair(
+                                        Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE,
+                                        Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE
+                                    ),
+                                    new LabelValuePair(
+                                        Constants.DUPLICATE_ACTION.MERGE,
+                                        Constants.DUPLICATE_ACTION.MERGE
+                                    )
+                                ],
+                                inputOptionsClearable: false,
+                                required: true,
+                                value: Constants.DUPLICATE_ACTION.NO_ACTION
+                            })
+                        );
+                    });
+
                     // display dialog
-                    const showDialog = () => {
-                        this.dialogService.showConfirm(new DialogConfiguration({
-                            message: 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_CONFIRM_MSG',
-                            yesLabel: 'LNG_COMMON_BUTTON_MERGE',
-                            customInput: true,
-                            fieldsList: [new DialogField({
-                                name: 'mergeWith',
-                                placeholder: 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_MERGE_WITH',
-                                fieldType: DialogFieldType.CHECKBOX_LIST,
-                                listItems: _.map(caseDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
-                                    // case model
-                                    const caseData: CaseModel = duplicate.model as CaseModel;
-
-                                    // map
-                                    return new DialogFieldListItem({
-                                        itemData: new LabelValuePair((index + 1) + '. ' +
-                                            EntityModel.getNameWithDOBAge(
-                                                caseData,
-                                                this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                                                this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
-                                            ),
-                                            caseData.id
-                                        ),
-                                        actionButtonLabel: 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE',
-                                        actionButtonActionTooltip: 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE_DESCRIPTION',
-                                        actionButtonDisableActionAlongWithItem: false,
-                                        actionButtonAction: (item) => {
-                                            // not a duplicate ?
-                                            if (item.actionButtonLabel === 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE') {
-                                                // mark as not a duplicate for later change
-                                                item.checked = false;
-                                                item.disabled = true;
-                                                item.actionButtonLabel = 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_POSSIBLE_DUPLICATE';
-                                                item.actionButtonActionTooltip = 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_POSSIBLE_DUPLICATE_DESCRIPTION';
-
-                                                // add item to list of marked as not duplicates
-                                                itemsMarkedAsNotDuplicates.push(item.itemData.value);
-                                                itemsMarkedAsNotDuplicates = _.uniq(itemsMarkedAsNotDuplicates);
-                                            } else {
-                                                // enable back
-                                                item.disabled = false;
-                                                item.actionButtonLabel = 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE';
-                                                item.actionButtonActionTooltip = 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_NOT_A_DUPLICATE_DESCRIPTION';
-
-                                                // remove item from the list of marked as not duplicates
-                                                itemsMarkedAsNotDuplicates = itemsMarkedAsNotDuplicates.filter((id) => id !== item.itemData.value);
-                                            }
-                                        }
-                                    });
-                                })
-                            })],
-                            addDefaultButtons: true,
-                            buttons: [
-                                new DialogButton({
-                                    label: 'LNG_COMMON_BUTTON_SAVE',
-                                    clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-                                        dialogHandler.close(new DialogAnswer(DialogAnswerButton.Extra_1));
-                                    }
-                                })
-                            ]
-                        })).subscribe((answer) => {
-                            // just update ?
-                            if (answer.button === DialogAnswerButton.Yes) {
-                                // make sure we have at least two ids selected ( 1 is the current case )
-                                if (
-                                    !answer.inputValue.value.mergeWith ||
-                                    answer.inputValue.value.mergeWith.length < 1
-                                ) {
-                                    // display need to select at least one record to merge with
-                                    this.snackbarService.showError('LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_ACTION_MERGE_AT_LEAST_ONE_ERROR_MESSAGE');
-
-                                    // display dialog again
-                                    showDialog();
-
-                                    // finished here
-                                    return;
+                    this.dialogService.showConfirm(new DialogConfiguration({
+                        message: 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_CONFIRM_MSG',
+                        yesLabel: 'LNG_COMMON_BUTTON_SAVE',
+                        customInput: true,
+                        fieldsListLayout: fieldsListLayout,
+                        fieldsList: fieldsList
+                    })).subscribe((answer) => {
+                        if (answer.button === DialogAnswerButton.Yes) {
+                            // determine number of items to merge / mark as not duplicates
+                            const itemsToMerge: string[] = [];
+                            itemsMarkedAsNotDuplicates = [];
+                            const actions: {
+                                [id: string]: {
+                                    action: string
                                 }
+                            } = _.get(answer, 'inputValue.value.actions', {});
+                            if (!_.isEmpty(actions)) {
+                                _.each(actions, (data, id) => {
+                                    switch (data.action) {
+                                        case Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE:
+                                            itemsMarkedAsNotDuplicates.push(id);
+                                            break;
+                                        case Constants.DUPLICATE_ACTION.MERGE:
+                                            itemsToMerge.push(id);
+                                            break;
+                                    }
+                                });
+                            }
 
-                                // save data first, followed by redirecting to merge
+                            // save data first, followed by redirecting to merge
+                            if (itemsToMerge.length > 0) {
                                 runModifyCase(() => {
                                     // construct list of ids
                                     const mergeIds: string[] = [
                                         this.caseId,
-                                        ...answer.inputValue.value.mergeWith
+                                        ...itemsToMerge
                                     ];
 
                                     // hide loading
@@ -536,17 +533,14 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                                         }
                                     );
                                 });
-                            } else if (answer.button === DialogAnswerButton.Extra_1) {
-                                runModifyCase();
                             } else {
-                                // hide loading
-                                this.hideLoadingDialog();
+                                runModifyCase();
                             }
-                        });
-                    };
-
-                    // display dialog
-                    showDialog();
+                        } else {
+                            // hide loading
+                            this.hideLoadingDialog();
+                        }
+                    });
                 } else {
                     runModifyCase();
                 }
