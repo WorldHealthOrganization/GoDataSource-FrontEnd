@@ -58,6 +58,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
         'firstName',
         'lastName',
         'documents',
+        'visualId',
         'age',
         'address'
     ];
