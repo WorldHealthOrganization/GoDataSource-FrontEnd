@@ -219,8 +219,8 @@ export class SnackbarService {
     showMultipleErrors(
         errors = [
             {statusCode: 422, name: 'Error', message: 'Invalid captcha.', code: 'INVALID_CAPTCHA'},
-            {statusCode: 422, name: 'Error', message: 'Invalid captcha.', code: 'INVALID_CAPTCHA'}])
-    {
+            {statusCode: 422, name: 'Error', message: 'Invalid captcha.', code: 'INVALID_CAPTCHA'}]
+    ) {
         const errorsToDisplay = [];
         const defaultApiErrorCode = 'LNG_API_ERROR_CODE_UNKNOWN_ERROR';
 
@@ -237,7 +237,7 @@ export class SnackbarService {
         this.snackbar.openFromComponent(MultipleSnackbarComponent, {
             duration: 9999999,
             verticalPosition: 'top',
-            horizontalPosition: 'right',
+            horizontalPosition: 'center',
             data: errors
         });
 
