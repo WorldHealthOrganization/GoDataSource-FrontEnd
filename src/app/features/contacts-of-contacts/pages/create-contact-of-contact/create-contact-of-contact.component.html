@@ -64,7 +64,7 @@
                                     [tooltipTranslateData]="visualIDTranslateData"
                                     [maxlength]="255"
                                     app-general-async-validator
-                                    [asyncValidatorObservable]="contactOfContactMaskValidator">
+                                    [asyncValidatorObservable]="contactOfContactMaskValidator$">
                                 </app-form-input>
 
                                 <app-form-select
@@ -176,7 +176,18 @@
                 </app-form-document-list>
 
                 <div class="stepper-navigation-buttons">
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button
+                        [disabled]="personalForm.pending"
+                        class="button-with-spinner"
+                        mat-raised-button color="accent" matStepperNext
+                    >
+                        <div
+                            *ngIf="personalForm.pending"
+                            class="loading-chips">
+                            <mat-spinner></mat-spinner>
+                        </div>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                    </button>
                 </div>
             </form>
         </mat-step>
@@ -197,7 +208,18 @@
 
                 <div class="stepper-navigation-buttons">
                     <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button
+                        [disabled]="addressForm.pending"
+                        class="button-with-spinner"
+                        mat-raised-button color="accent" matStepperNext
+                    >
+                        <div
+                            *ngIf="addressForm.pending"
+                            class="loading-chips">
+                            <mat-spinner></mat-spinner>
+                        </div>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                    </button>
                 </div>
             </form>
         </mat-step>
@@ -220,7 +242,16 @@
 
                 <div class="stepper-navigation-buttons">
                     <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button
+                        [disabled]="relationshipForm.pending"
+                        class="button-with-spinner"
+                        mat-raised-button color="accent" matStepperNext>
+                        <div
+                            *ngIf="relationshipForm.pending"
+                            class="loading-chips">
+                            <mat-spinner></mat-spinner>
+                        </div>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>

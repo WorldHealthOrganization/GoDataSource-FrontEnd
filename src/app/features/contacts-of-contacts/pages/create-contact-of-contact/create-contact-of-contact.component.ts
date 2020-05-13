@@ -66,7 +66,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
         mask: string
     };
 
-    contactOfContactMaskValidator: Observable<boolean>;
+    contactOfContactMaskValidator$: Observable<boolean>;
 
     constructor(
         private router: Router,
@@ -142,7 +142,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
                         this.contactOfContactData.visualId = this.visualIDTranslateData.mask;
 
                         // set visual ID validator
-                        this.contactOfContactMaskValidator = new Observable((observer) => {
+                        this.contactOfContactMaskValidator$ = new Observable((observer) => {
                             this.contactsOfContactsDataService.checkContactOfContactVisualIDValidity(
                                 selectedOutbreak.id,
                                 this.visualIDTranslateData.mask,
