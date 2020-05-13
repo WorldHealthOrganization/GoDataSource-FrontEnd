@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { NavigationStart, Router } from '@angular/router';
+import { NavigationEnd, NavigationStart, RouteConfigLoadEnd, RouteConfigLoadStart, Router } from '@angular/router';
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
 import { MatDialogRef, MatSidenav } from '@angular/material';
@@ -61,6 +61,9 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     // constants
     Constants = Constants;
 
+    // menu loading dialog
+    private menuLoadingDialog: LoadingDialogModel;
+
     // token expire data
     private lastRefreshUserTokenOrLogOut: Moment;
     private lastInputTime: Moment;
@@ -116,7 +119,19 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         private userDataService: UserDataService
     ) {
         // detect when the route is changed
-        this.routerEventsSubscriptionLoad = this.router.events.subscribe(() => {
+        this.routerEventsSubscriptionLoad = this.router.events.subscribe((event) => {
+            // display loading spinner
+            if (event instanceof RouteConfigLoadStart) {
+                this.showLoading();
+            } else if (event instanceof RouteConfigLoadEnd) {
+                this.hideLoading();
+            }
+
+            // there is no point in continuing if not a nav start event since we need to execute close only one time
+            if (!(event instanceof NavigationStart)) {
+                return;
+            }
+
             // close the SideNav whenever the route is changed
             if (this.sideNav) {
                 this.sideNav.close();
@@ -170,34 +185,47 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         };
 
         // subscribe to uri changes
-        this.routerEventsSubscriptionRepetitive = this.router.events.subscribe((navStart: NavigationStart) => {
+        this.routerEventsSubscriptionRepetitive = this.router.events.subscribe((navStart: NavigationEnd) => {
+            // handle only final navigation events, since we need to retrieve data only after we get to that page ( guards, etc )
+            if (!(navStart instanceof NavigationEnd)) {
+                return;
+            }
+
             // redirect root to landing page
             if (navStart.url === '/') {
-                redirectRootToLandingPage();
+                return redirectRootToLandingPage();
             }
+
             // check for context help
-            this.helpDataService.getContextHelpItems(this.router.url).subscribe((items) => {
+            if (
+                this.router.url &&
+                this.router.url !== '/'
+            ) {
+                this.helpDataService.getContextHelpItems(this.router.url)
+                    .subscribe((items) => {
+                        if (_.isEmpty(items)) {
+                            this.contextSearchHelpItems = null;
+                        } else {
+                            this.contextSearchHelpItems = _.map(items, 'id');
+                        }
+                    });
+            }
+        });
+
+        // redirect root to landing page
+        if (this.router.url === '/') {
+            return redirectRootToLandingPage();
+        }
+
+        //  help items
+        this.helpDataService.getContextHelpItems(this.router.url)
+            .subscribe((items) => {
                 if (_.isEmpty(items)) {
                     this.contextSearchHelpItems = null;
                 } else {
                     this.contextSearchHelpItems = _.map(items, 'id');
                 }
             });
-        });
-
-        // redirect root to landing page
-        if (this.router.url === '/') {
-            redirectRootToLandingPage();
-        }
-
-        //  help items
-        this.helpDataService.getContextHelpItems(this.router.url).subscribe((items) => {
-            if (_.isEmpty(items)) {
-                this.contextSearchHelpItems = null;
-            } else {
-                this.contextSearchHelpItems = _.map(items, 'id');
-            }
-        });
     }
 
     /**
@@ -234,6 +262,23 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         }
         if (this.documentMouseMove) {
             document.removeEventListener('mousemove', this.documentMouseMove);
+        }
+    }
+
+    /**
+     * Show loading spinner
+     */
+    showLoading() {
+        this.menuLoadingDialog = this.dialogService.showLoadingDialog();
+    }
+
+    /**
+     * hide loading
+     */
+    hideLoading() {
+        if (this.menuLoadingDialog) {
+            this.menuLoadingDialog.close();
+            this.menuLoadingDialog = null;
         }
     }
 

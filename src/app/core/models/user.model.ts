@@ -28,7 +28,8 @@ export enum UserSettings {
     SYNC_LOGS_FIELDS = 'syncLogsFields',
     REF_DATA_CAT_ENTRIES_FIELDS = 'refDataCatEntriesFields',
     SHARE_RELATIONSHIPS = 'shareRelationships',
-    USER_ROLE_FIELDS = 'userRoleFields'
+    USER_ROLE_FIELDS = 'userRoleFields',
+    ENTITY_NOT_DUPLICATES_FIELDS = 'entityNotDuplicatesFields'
 }
 
 export enum PhoneNumberType {
@@ -62,6 +63,7 @@ abstract class UserSettingsHandlers {
     static REF_DATA_CAT_ENTRIES_FIELDS = [];
     static SHARE_RELATIONSHIPS = [];
     static USER_ROLE_FIELDS = [];
+    static ENTITY_NOT_DUPLICATES_FIELDS = [];
 }
 
 export interface IPermissionExpressionAnd {

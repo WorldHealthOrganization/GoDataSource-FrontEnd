@@ -2,12 +2,18 @@ import { Observable } from 'rxjs';
 import { share, tap } from 'rxjs/operators';
 
 export class FilteredRequestCache {
+    /**
+     * Cached data
+     */
     private static sharedRequests: {
         [key: string]: {
             [filter: string]: Observable<any>
         }
     } = {};
 
+    /**
+     * Get cached observer
+     */
     static get(
         key: string,
         filter: string,

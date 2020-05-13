@@ -303,6 +303,15 @@
             </ng-container>
         </ng-container>
 
+        <ng-container
+            *ngIf="ContactModel.canList(authUser)">
+            <button
+                mat-raised-button type="button" color="primary"
+                [routerLink]="['/duplicated-records/contacts', contactId, 'marked-not-duplicates']">
+                {{'LNG_PAGE_MODIFY_CONTACT_ACTION_SEE_RECORDS_NOT_DUPLICATES' | translate}}
+            </button>
+        </ng-container>
+
         <button
             [disabled]="!canViewExposure()"
             type="button"

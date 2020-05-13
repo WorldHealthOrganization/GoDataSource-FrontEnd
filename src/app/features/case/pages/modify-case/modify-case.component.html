@@ -476,6 +476,15 @@
             </ng-container>
         </ng-container>
 
+        <ng-container
+            *ngIf="CaseModel.canList(authUser)">
+            <button
+                mat-raised-button type="button" color="primary"
+                [routerLink]="['/duplicated-records/cases', caseId, 'marked-not-duplicates']">
+                {{'LNG_PAGE_MODIFY_CASE_ACTION_SEE_RECORDS_NOT_DUPLICATES' | translate}}
+            </button>
+        </ng-container>
+
         <button
             *ngIf="CaseModel.canListRelationshipContacts(authUser)"
             mat-raised-button

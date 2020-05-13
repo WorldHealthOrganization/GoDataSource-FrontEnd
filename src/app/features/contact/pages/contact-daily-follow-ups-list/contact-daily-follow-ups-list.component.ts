@@ -36,6 +36,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { TeamModel } from '../../../../core/models/team.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -223,12 +224,13 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      * Constructor
      */
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
         protected dialogService: DialogService,
         protected followUpsDataService: FollowUpsDataService,
         protected router: Router,
         protected i18nService: I18nService,
         protected teamDataService: TeamDataService,
+        private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
@@ -238,7 +240,7 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
         private userDataService: UserDataService
     ) {
         super(
-            snackbarService, dialogService, followUpsDataService,
+            listHelperService, dialogService, followUpsDataService,
             router, i18nService, teamDataService
         );
     }
@@ -345,6 +347,9 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
