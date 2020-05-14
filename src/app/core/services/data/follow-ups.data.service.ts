@@ -185,18 +185,16 @@ export class FollowUpsDataService {
     /**
      * Modify multiple follow-ups
      * @param outbreakId
-     * @param followUpIds
      * @param followUpData
      */
     bulkModifyFollowUps(
         outbreakId: string,
-        followUpIds: string[],
         followUpData,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ) {
-        const filter = queryBuilder.buildQuery();
+        const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.put(
-            `outbreaks/${outbreakId}/follow-ups/bulk?filter=${filter}`,
+            `outbreaks/${outbreakId}/follow-ups/bulk?where=${whereFilter}`,
             followUpData
         );
     }

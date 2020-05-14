@@ -270,7 +270,6 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         this.followUpsDataService
             .bulkModifyFollowUps(
                 this.selectedOutbreak.id,
-                selectedFollowUpIds,
                 dirtyFields,
                 qb
             )
