@@ -321,30 +321,6 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
             return;
         }
 
-        // check if we have future records
-        let hasFutureFollowUps: boolean = false;
-        _.each(
-            table.dataSource,
-            (item: FollowUpModel) => {
-                if (
-                    selectedRecords.indexOf(item.id) > -1 &&
-                    Constants.isDateInTheFuture(item.date)
-                ) {
-                    // found record that is in the future
-                    hasFutureFollowUps = true;
-
-                    // stop each
-                    return false;
-                }
-            }
-        );
-
-        // we aren't allowed to continue to modify follow-ups if in our list we have future follow-ups
-        if (hasFutureFollowUps) {
-            this.listHelperService.snackbarService.showError('LNG_PAGE_LIST_FOLLOW_UPS_MODIFY_FUTURE_FOLLOW_UPS');
-            return;
-        }
-
         // redirect to next step
         this.router.navigate(
             ['/contacts/follow-ups/modify-list'],

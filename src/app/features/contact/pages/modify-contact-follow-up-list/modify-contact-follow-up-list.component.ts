@@ -23,6 +23,7 @@ import { throwError, forkJoin } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-modify-contact-follow-ups-list',
@@ -56,9 +57,11 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
 
     // provide constants to template
     Object = Object;
+    Constants = Constants;
 
     // authenticated user
     authUser: UserModel;
+    futureFollowUps: boolean = false;
 
     /**
      * Constructor
@@ -169,6 +172,14 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
                 qb
             ).subscribe((followUps: FollowUpModel[]) => {
                 this.selectedFollowUps = followUps;
+
+                // check if we have future follow-ups
+                for (const followUp of this.selectedFollowUps) {
+                    if (Constants.isDateInTheFuture(followUp.date)) {
+                        this.futureFollowUps = true;
+                        break;
+                    }
+                }
             });
         }
     }
@@ -231,6 +242,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
      * @param stepForms
      */
     updateFollowUps(stepForms: NgForm[]) {
+        const loadingDialog = this.dialogService.showLoadingDialog();
         // get forms fields
         const dirtyFields: any = this.getFormDirtyFields(stepForms);
 
@@ -243,34 +255,36 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
             return;
         }
 
-        // save follow-ups
-        // construct list of observables to save follow-ups
-        const observableList$: Observable<any>[] = [];
-        _.each(
-            this.selectedFollowUps,
-            (followUp: FollowUpModel) => {
-                // retrieve contact id
-                observableList$.push(
-                    this.followUpsDataService
-                        .modifyFollowUp(
-                            this.selectedOutbreak.id,
-                            followUp.personId,
-                            followUp.id,
-                            dirtyFields
-                        )
-                );
-            }
-        );
+        // get selected follow-ups ids to pass them to qb
+        const selectedFollowUpIds: string[] = this.selectedFollowUps.map((followUp: FollowUpModel) => {
+            return followUp.id;
+        });
 
-        // execute observables in parallel
-        forkJoin(observableList$)
+        const qb: RequestQueryBuilder = new RequestQueryBuilder();
+        qb.filter.where({
+            id: {
+                inq: selectedFollowUpIds
+            }
+        });
+
+        this.followUpsDataService
+            .bulkModifyFollowUps(
+                this.selectedOutbreak.id,
+                selectedFollowUpIds,
+                dirtyFields,
+                qb
+            )
             .pipe(
                 catchError((err) => {
+                    loadingDialog.close();
+
                     this.snackbarService.showApiError(err);
                     return throwError(err);
                 })
             )
             .subscribe(() => {
+                loadingDialog.close();
+
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                 // navigate to listing page
