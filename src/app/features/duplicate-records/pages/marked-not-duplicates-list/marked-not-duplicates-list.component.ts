@@ -26,6 +26,8 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 
 @Component({
     selector: 'app-cases-list',
@@ -48,8 +50,8 @@ export class MarkedNotDuplicatesListComponent
     // list of not duplicates
     recordId: string;
     recordType: EntityType;
-    recordData: CaseModel | ContactModel;
-    notDuplicatesList$: Observable<(CaseModel | ContactModel)[]>;
+    recordData: CaseModel | ContactModel | ContactOfContactModel;
+    notDuplicatesList$: Observable<(CaseModel | ContactModel | ContactOfContactModel)[]>;
     notDuplicatesListCount$: Observable<IBasicCount>;
 
     // obs
@@ -68,14 +70,14 @@ export class MarkedNotDuplicatesListComponent
         new HoverRowAction({
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_VIEW_ENTITY',
-            click: (item: CaseModel | ContactModel) => {
+            click: (item: CaseModel | ContactModel | ContactOfContactModel) => {
                 this.router.navigate([
                     `/${EntityModel.getLinkForEntityType(item.type)}`,
                     item.id,
                     'view'
                 ]);
             },
-            visible: (item: CaseModel | ContactModel): boolean => {
+            visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
                 return !item.deleted &&
                     item.canView(this.authUser);
             }
@@ -85,14 +87,14 @@ export class MarkedNotDuplicatesListComponent
         new HoverRowAction({
             icon: 'settings',
             iconTooltip: 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_MODIFY_ENTITY',
-            click: (item: CaseModel | ContactModel) => {
+            click: (item: CaseModel | ContactModel | ContactOfContactModel) => {
                 this.router.navigate([
                     `/${EntityModel.getLinkForEntityType(item.type)}`,
                     item.id,
                     'modify'
                 ]);
             },
-            visible: (item: CaseModel | ContactModel): boolean => {
+            visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
                 return !item.deleted &&
                     this.authUser &&
                     this.selectedOutbreak &&
@@ -109,10 +111,10 @@ export class MarkedNotDuplicatesListComponent
                 // Delete Case
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_REMOVE_FROM_LIST_ENTITY',
-                    click: (item: CaseModel | ContactModel) => {
+                    click: (item: CaseModel | ContactModel | ContactOfContactModel) => {
                         this.removeFromList(item);
                     },
-                    visible: (item: CaseModel | ContactModel): boolean => {
+                    visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
                         return !item.deleted &&
                             this.authUser &&
                             this.selectedOutbreak &&
@@ -139,7 +141,8 @@ export class MarkedNotDuplicatesListComponent
         private router: Router,
         private dialogService: DialogService,
         private caseDataService: CaseDataService,
-        private contactDataService: ContactDataService
+        private contactDataService: ContactDataService,
+        private contactOfContactDataService: ContactsOfContactsDataService
     ) {
         super(listHelperService);
     }
@@ -158,7 +161,8 @@ export class MarkedNotDuplicatesListComponent
         this.route.params
             .subscribe((params: {
                 contactId?: string,
-                caseId?: string
+                caseId?: string,
+                contactOfContactId?: string
             }) => {
                 // params set
                 if (params.caseId) {
@@ -167,6 +171,9 @@ export class MarkedNotDuplicatesListComponent
                 } else if (params.contactId) {
                     this.recordId = params.contactId;
                     this.recordType = EntityType.CONTACT;
+                } else if (params.contactOfContactId) {
+                    this.recordId = params.contactOfContactId;
+                    this.recordType = EntityType.CONTACT_OF_CONTACT;
                 }
 
                 // retrieve case / contact data
@@ -257,6 +264,27 @@ export class MarkedNotDuplicatesListComponent
                     )
                 );
             }
+        } else if (this.recordType === EntityType.CONTACT_OF_CONTACT) {
+            // list
+            if (ContactOfContactModel.canList(this.authUser)) {
+                this.breadcrumbs.push(new BreadcrumbItemModel(
+                    'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+                    '/contacts-of-contacts'
+                ));
+            }
+
+            // view / modify
+            if (this.recordData) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        ContactOfContactModel.canModify(this.authUser) ? 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TITLE' : 'LNG_PAGE_VIEW_CONTACT_OF_CONTACT_TITLE',
+                        `/contacts-of-contacts/${this.recordId}/${ContactOfContactModel.canModify(this.authUser) ? 'modify' : 'view'}`,
+                        false,
+                        {},
+                        this.recordData
+                    )
+                );
+            }
         }
 
         // add main breadcrumb
@@ -281,15 +309,26 @@ export class MarkedNotDuplicatesListComponent
         }
 
         // construct case / contact observer to retrieve data
-        const observer$: Observable<CaseModel | ContactModel> = this.recordType === EntityType.CONTACT ?
-            this.contactDataService.getContact(
-                this.selectedOutbreak.id,
-                this.recordId
-            ) :
-            this.caseDataService.getCase(
-                this.selectedOutbreak.id,
-                this.recordId
-            );
+        let observer$: Observable<CaseModel | ContactModel | ContactOfContactModel>;
+        switch (this.recordType) {
+            case EntityType.CASE:
+                observer$ = this.caseDataService.getCase(
+                    this.selectedOutbreak.id,
+                    this.recordId
+                );
+                break;
+            case EntityType.CONTACT:
+                observer$ = this.contactDataService.getContact(
+                    this.selectedOutbreak.id,
+                    this.recordId
+                );
+                break;
+            case EntityType.CONTACT_OF_CONTACT:
+                observer$ = this.contactOfContactDataService.getContactOfContact(
+                    this.selectedOutbreak.id,
+                    this.recordId
+                );
+        }
 
         // get case / contact data
         observer$.subscribe((recordData) => {
@@ -392,7 +431,7 @@ export class MarkedNotDuplicatesListComponent
     /**
      * Remove from list of not duplicate items
      */
-    removeFromList(item: CaseModel | ContactModel) {
+    removeFromList(item: CaseModel | ContactModel | ContactOfContactModel) {
         if (this.selectedOutbreak) {
             this.dialogService
                 .showConfirm('LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_REMOVE_FROM_LIST_ENTITY_CONFIRMATION')

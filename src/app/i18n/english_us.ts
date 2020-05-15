@@ -197,6 +197,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIPS_TITLE': 'Export contact of contact relationships',
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER_DIALOG_TITLE': 'Contacts of contacts dossier',
         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME': 'Contacts of contacts relationships',
+        'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_SEE_RECORDS_NOT_DUPLICATES': 'See records marked as not duplicates',
 
         /**
          * uiCreateContactOfContactPage

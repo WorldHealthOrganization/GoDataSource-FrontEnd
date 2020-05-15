@@ -645,6 +645,11 @@ export interface IPermissionDuplicates {
     canMergeContacts(user: UserModel): boolean;
 
     /**
+     * Has permission to merge duplicate contacts of contacts records ?
+     */
+    canMergeContactsOfContacts(user: UserModel): boolean;
+
+    /**
      * Has permission to merge duplicate event records ?
      */
     canMergeEvents(user: UserModel): boolean;

@@ -214,6 +214,16 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
                     }
                 }),
 
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_SEE_RECORDS_NOT_DUPLICATES',
+                    click: (item: ContactOfContactModel) => {
+                        this.router.navigate(['/duplicated-records/contacts-of-contacts', item.id, 'marked-not-duplicates']);
+                    },
+                    visible: (item: ContactOfContactModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+
                 // View Contact movement map
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_MOVEMENT',

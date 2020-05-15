@@ -417,6 +417,7 @@ export enum PERMISSION {
     DUPLICATE_MERGE_CASES = 'duplicate_merge_cases',
     DUPLICATE_MERGE_CONTACTS = 'duplicate_merge_contacts',
     DUPLICATE_MERGE_EVENTS = 'duplicate_merge_events',
+    DUPLICATE_MERGE_CONTACTS_OF_CONTACTS = 'duplicate_merge_contacts_of_contacts',
 
     // dashboard
     DASHBOARD_VIEW_CASE_SUMMARY_DASHLET = 'dashboard_view_case_summary_dashlet',

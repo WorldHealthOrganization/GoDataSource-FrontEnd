@@ -12,7 +12,6 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ContactModel } from '../../../../core/models/contact.model';
 import { Observable, throwError } from 'rxjs/index';
 import { CaseModel } from '../../../../core/models/case.model';
 import { EventModel } from '../../../../core/models/event.model';
@@ -20,7 +19,6 @@ import { EntityModel, RelationshipModel } from '../../../../core/models/entity-a
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { catchError } from 'rxjs/internal/operators';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
@@ -33,6 +31,10 @@ import {
 } from '../../../../shared/components/dialog/dialog.component';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { CreateConfirmOnChanges } from '../../../../core/helperClasses/create-confirm-on-changes';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-create-contact-of-contact',
@@ -40,12 +42,12 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
     templateUrl: './create-contact-of-contact.component.html',
     styleUrls: ['./create-contact-of-contact.component.less']
 })
-export class CreateContactOfContactComponent extends ConfirmOnFormChanges implements OnInit {
+export class CreateContactOfContactComponent extends CreateConfirmOnChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // selected outbreak ID
-    outbreakId: string;
+    // selected outbreak
+    selectedOutbreak: OutbreakModel;
 
     contactOfContactData: ContactOfContactModel = new ContactOfContactModel();
 
@@ -67,6 +69,9 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
     };
 
     contactOfContactMaskValidator$: Observable<boolean>;
+
+    // authenticated user details
+    authUser: UserModel;
 
     constructor(
         private router: Router,
@@ -131,7 +136,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
                         })
                     )
                     .subscribe((selectedOutbreak: OutbreakModel) => {
-                        this.outbreakId = selectedOutbreak.id;
+                        this.selectedOutbreak = selectedOutbreak;
 
                         // set visual ID translate data
                         this.visualIDTranslateData = {
@@ -203,6 +208,13 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
      * @param {boolean} andAnotherOne
      */
     createNewContactOfContact(stepForms: NgForm[], andAnotherOne: boolean = false) {
+        if (
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id
+        )  {
+            return;
+        }
+
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
         const relationship = _.get(dirtyFields, 'relationship');
@@ -224,7 +236,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
             // check for duplicates
             const loadingDialog = this.dialogService.showLoadingDialog();
             this.contactsOfContactsDataService
-                .findDuplicates(this.outbreakId, dirtyFields)
+                .findDuplicates(this.selectedOutbreak.id, dirtyFields)
                 .pipe(
                     catchError((err) => {
                         this.snackbarService.showApiError(err);
@@ -236,11 +248,14 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
                     })
                 )
                 .subscribe((contactOfContactDuplicates: EntityDuplicatesModel) => {
+                    // items marked as not duplicates
+                    let itemsMarkedAsNotDuplicates: string[] = [];
+
                     // add the new Contact
-                    const runCreateContact = () => {
+                    const runCreateContactOfContact = () => {
                         // add the new Contact
                         this.contactsOfContactsDataService
-                            .createContactOfContact(this.outbreakId, dirtyFields)
+                            .createContactOfContact(this.selectedOutbreak.id, dirtyFields)
                             .pipe(
                                 catchError((err) => {
                                     this.snackbarService.showApiError(err);
@@ -254,7 +269,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
                             .subscribe((contactOfContactData: ContactOfContactModel) => {
                                 this.relationshipDataService
                                     .createRelationship(
-                                        this.outbreakId,
+                                        this.selectedOutbreak.id,
                                         EntityType.CONTACT_OF_CONTACT,
                                         contactOfContactData.id,
                                         relationship
@@ -266,7 +281,7 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
 
                                             // remove contact
                                             this.contactsOfContactsDataService
-                                                .deleteContactOfContact(this.outbreakId, contactOfContactData.id)
+                                                .deleteContactOfContact(this.selectedOutbreak.id, contactOfContactData.id)
                                                 .subscribe();
 
                                             // hide dialog
@@ -277,23 +292,69 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
                                         })
                                     )
                                     .subscribe(() => {
-                                        this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
+                                        // called when we finished creating contact
+                                        const finishedCreatingContactOfContact = () => {
+                                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
 
-                                        // hide dialog
-                                        loadingDialog.close();
+                                            // hide dialog
+                                            loadingDialog.close();
 
-                                        // navigate to listing page
-                                        this.disableDirtyConfirm();
-                                        if (andAnotherOne) {
-                                            this.redirectService.to(
-                                                [`/contacts-of-contacts/create`],
-                                                {
-                                                    entityType: this.entityType,
-                                                    entityId: this.entityId
-                                                }
-                                            );
+                                            // navigate to listing page
+                                            if (andAnotherOne) {
+                                                this.disableDirtyConfirm();
+                                                this.redirectService.to(
+                                                    [`/contacts-of-contacts/create`],
+                                                    {
+                                                        entityType: this.entityType,
+                                                        entityId: this.entityId
+                                                    }
+                                                );
+                                            } else {
+                                                // navigate to proper page
+                                                // method handles disableDirtyConfirm too...
+                                                this.redirectToProperPageAfterCreate(
+                                                    this.router,
+                                                    this.redirectService,
+                                                    this.authUser,
+                                                    ContactOfContactModel,
+                                                    'contacts-of-contacts',
+                                                    contactOfContactData.id, {
+                                                        entityType: this.entityType,
+                                                        entityId: this.entityId
+                                                    }
+                                                );
+                                            }
+                                        };
+
+                                        // there are no records marked as NOT duplicates ?
+                                        if (
+                                            !itemsMarkedAsNotDuplicates ||
+                                            itemsMarkedAsNotDuplicates.length < 1
+                                        ) {
+                                            finishedCreatingContactOfContact();
                                         } else {
-                                            this.router.navigate([`/contacts-of-contacts/${contactOfContactData.id}/modify`]);
+                                            // mark records as not duplicates
+                                            this.entityDataService
+                                                .markPersonAsOrNotADuplicate(
+                                                    this.selectedOutbreak.id,
+                                                    EntityType.CONTACT_OF_CONTACT,
+                                                    contactOfContactData.id,
+                                                    itemsMarkedAsNotDuplicates
+                                                )
+                                                .pipe(
+                                                    catchError((err) => {
+                                                        this.snackbarService.showApiError(err);
+
+                                                        // hide dialog
+                                                        loadingDialog.close();
+
+                                                        return throwError(err);
+                                                    })
+                                                )
+                                                .subscribe(() => {
+                                                    // finished
+                                                    finishedCreatingContactOfContact();
+                                                });
                                         }
                                     });
                             });
@@ -301,42 +362,84 @@ export class CreateContactOfContactComponent extends ConfirmOnFormChanges implem
 
                     // do we have duplicates ?
                     if (contactOfContactDuplicates.duplicates.length > 0) {
-                        // construct list of possible duplicates
-                        const possibleDuplicates: DialogField[] = [];
-                        _.each(contactOfContactDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
-                            // contact model
-                            const contactData: ContactModel = duplicate.model as ContactModel;
+                        // construct list of items from which we can choose actions
+                        const fieldsList: DialogField[] = [];
+                        const fieldsListLayout: number[] = [];
+                        contactOfContactDuplicates.duplicates.forEach((duplicate: EntityModel, index: number) => {
+                            // contact of contact model
+                            const contactOfContactData: ContactOfContactModel = duplicate.model as ContactOfContactModel;
 
-                            // add link
-                            possibleDuplicates.push(new DialogField({
-                                name: 'link',
-                                placeholder: (index + 1 ) + '. ' + EntityModel.getNameWithDOBAge(
-                                    contactData,
-                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
-                                ),
-                                fieldType: DialogFieldType.LINK,
-                                routerLink: ['/contacts', contactData.id, 'view'],
-                                linkTarget: '_blank'
-                            }));
+                            // add row fields
+                            fieldsListLayout.push(60, 40);
+                            fieldsList.push(
+                                new DialogField({
+                                    name: `actions[${contactOfContactData.id}].label`,
+                                    placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
+                                        contactOfContactData,
+                                        this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                                        this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                    ),
+                                    fieldType: DialogFieldType.LINK,
+                                    routerLink: ['/contacts-of-contacts', contactOfContactData.id, 'view'],
+                                    linkTarget: '_blank'
+                                }),
+                                new DialogField({
+                                    name: `actions[${contactOfContactData.id}].action`,
+                                    placeholder: 'LNG_DUPLICATES_DIALOG_ACTION',
+                                    description: 'LNG_DUPLICATES_DIALOG_ACTION_DESCRIPTION',
+                                    inputOptions: [
+                                        new LabelValuePair(
+                                            Constants.DUPLICATE_ACTION.NO_ACTION,
+                                            Constants.DUPLICATE_ACTION.NO_ACTION
+                                        ),
+                                        new LabelValuePair(
+                                            Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE,
+                                            Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE
+                                        )
+                                    ],
+                                    inputOptionsClearable: false,
+                                    required: true,
+                                    value: Constants.DUPLICATE_ACTION.NO_ACTION
+                                })
+                            );
                         });
 
                         // display dialog
-                        this.dialogService.showConfirm(new DialogConfiguration({
-                            message: 'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
-                            customInput: true,
-                            fieldsList: possibleDuplicates,
-                        }))
+                        this.dialogService
+                            .showConfirm(new DialogConfiguration({
+                                message: 'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
+                                customInput: true,
+                                fieldsListLayout: fieldsListLayout,
+                                fieldsList: fieldsList
+                            }))
                             .subscribe((answer) => {
                                 if (answer.button === DialogAnswerButton.Yes) {
-                                    runCreateContact();
+                                    // determine number of items to mark as not duplicates
+                                    itemsMarkedAsNotDuplicates = [];
+                                    const actions: {
+                                        [id: string]: {
+                                            action: string
+                                        }
+                                    } = _.get(answer, 'inputValue.value.actions', {});
+                                    if (!_.isEmpty(actions)) {
+                                        _.each(actions, (data, id) => {
+                                            switch (data.action) {
+                                                case Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE:
+                                                    itemsMarkedAsNotDuplicates.push(id);
+                                                    break;
+                                            }
+                                        });
+                                    }
+
+                                    // create contact of contact
+                                    runCreateContactOfContact();
                                 } else {
                                     // hide dialog
                                     loadingDialog.close();
                                 }
                             });
                     } else {
-                        runCreateContact();
+                        runCreateContactOfContact();
                     }
                 });
         }
