@@ -1,6 +1,5 @@
 import { ListComponent } from '../../../core/helperClasses/list-component';
-import { SnackbarService } from '../../../core/services/helper/snackbar.service';
-import { OnInit } from '@angular/core';
+import { OnDestroy, OnInit } from '@angular/core';
 import { EntityType } from '../../../core/models/entity-type';
 import { UserModel } from '../../../core/models/user.model';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
@@ -14,9 +13,10 @@ import { OutbreakDataService } from '../../../core/services/data/outbreak.data.s
 import { EntityDataService } from '../../../core/services/data/entity.data.service';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { ListHelperService } from '../../../core/services/helper/list-helper.service';
 import { ContactOfContactModel } from '../../../core/models/contact-of-contact.model';
 
-export abstract class RelationshipsListComponent extends ListComponent implements OnInit {
+export abstract class RelationshipsListComponent extends ListComponent implements OnInit, OnDestroy {
     // Entities Map for specific data
     entityMap: {
         [entityType: string]: {
@@ -135,17 +135,18 @@ export abstract class RelationshipsListComponent extends ListComponent implement
     // route data
     relationshipType: RelationshipType;
 
+    /**
+     * Constructor
+     */
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
         protected router: Router,
         protected route: ActivatedRoute,
         protected authDataService: AuthDataService,
         protected outbreakDataService: OutbreakDataService,
         protected entityDataService: EntityDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -163,6 +164,9 @@ export abstract class RelationshipsListComponent extends ListComponent implement
      */
     abstract onPersonLoaded();
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -194,6 +198,14 @@ export abstract class RelationshipsListComponent extends ListComponent implement
     }
 
     /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+    }
+
+    /**
      * Check if all the necessary data was loaded
      */
     private checkInitData() {
@@ -220,7 +232,7 @@ export abstract class RelationshipsListComponent extends ListComponent implement
             .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
             .pipe(
                 catchError((err) => {
-                    this.snackbarService.showApiError(err);
+                    this.listHelperService.snackbarService.showApiError(err);
 
                     // Entity not found; navigate back to Entities list
                     this.router.navigate([this.entityMap[this.entityType].link]);

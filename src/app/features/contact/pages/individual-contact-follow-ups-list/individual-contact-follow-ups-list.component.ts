@@ -30,6 +30,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { CaseModel } from '../../../../core/models/case.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-individual-contact-follow-ups-list',
@@ -113,8 +114,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    FollowUpModel.canModify(this.authUser) &&
-                    !Constants.isDateInTheFuture(item.date);
+                    FollowUpModel.canModify(this.authUser)
             }
         }),
 
@@ -192,12 +192,13 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
      * Constructor
      */
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
         protected dialogService: DialogService,
         protected followUpsDataService: FollowUpsDataService,
         protected router: Router,
         protected i18nService: I18nService,
         protected teamDataService: TeamDataService,
+        private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
@@ -207,7 +208,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         private userDataService: UserDataService
     ) {
         super(
-            snackbarService, dialogService, followUpsDataService,
+            listHelperService, dialogService, followUpsDataService,
             router, i18nService, teamDataService
         );
     }
@@ -273,6 +274,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();

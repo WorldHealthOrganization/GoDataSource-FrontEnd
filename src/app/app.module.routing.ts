@@ -361,7 +361,9 @@ const routes: Routes = [
                             PERMISSION.DUPLICATE_LIST,
                             PERMISSION.DUPLICATE_MERGE_CASES,
                             PERMISSION.DUPLICATE_MERGE_CONTACTS,
-                            PERMISSION.DUPLICATE_MERGE_EVENTS
+                            PERMISSION.DUPLICATE_MERGE_EVENTS,
+                            PERMISSION.CASE_LIST,
+                            PERMISSION.CONTACT_LIST
                         ]
                     })
                 }

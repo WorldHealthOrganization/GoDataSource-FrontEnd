@@ -20,12 +20,13 @@ import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class ContactDataService {
-
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve the list of Contacts for an Outbreak

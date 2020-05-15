@@ -183,6 +183,25 @@ export class FollowUpsDataService {
     }
 
     /**
+     * Modify multiple follow-ups
+     * @param outbreakId
+     * @param followUpIds
+     * @param followUpData
+     */
+    bulkModifyFollowUps(
+        outbreakId: string,
+        followUpIds: string[],
+        followUpData,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ) {
+        const filter = queryBuilder.buildQuery();
+        return this.http.put(
+            `outbreaks/${outbreakId}/follow-ups/bulk?filter=${filter}`,
+            followUpData
+        );
+    }
+
+    /**
      * Delete an existing Follow-up of an Outbreak
      * @param {string} outbreakId
      * @param {string} contactId

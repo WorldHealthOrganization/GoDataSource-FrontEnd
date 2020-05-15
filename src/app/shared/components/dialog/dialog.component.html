@@ -54,13 +54,14 @@
                 <div
                     *ngFor="let field of confirmData.fieldsList; let fieldIndex = index"
                     [fxFlex]="confirmData.fieldsListLayoutCss[fieldIndex]"
+                    [fxLayoutAlign]="field.fieldType === DialogFieldType.LINK ? 'start center' : undefined"
                     class="field-list-item">
                     <div
                         *ngIf="field.isVisible(dialogAnswerInputValue.value)">
 
+                        <!-- Select -->
                         <div
                             *ngIf="field.fieldType === DialogFieldType.SELECT">
-                            <!-- Select -->
                             <app-form-select
                                 [name]="field.name"
                                 [(ngModel)]="dialogAnswerInputValue.value[field.name]"
@@ -76,9 +77,9 @@
                             </app-form-select>
                         </div>
 
+                        <!-- Text -->
                         <div
                             *ngIf="field.fieldType === DialogFieldType.TEXT && field.type !== 'number'">
-                            <!-- Text -->
                             <app-form-input
                                 [name]="field.name"
                                 [(ngModel)]="dialogAnswerInputValue.value[field.name]"
@@ -90,9 +91,9 @@
                             </app-form-input>
                         </div>
 
+                        <!-- Number -->
                         <div
                             *ngIf="field.fieldType === DialogFieldType.TEXT && field.type === 'number'">
-                            <!-- Number -->
                             <app-form-input
                                 [name]="field.name"
                                 [(ngModel)]="dialogAnswerInputValue.value[field.name]"
@@ -109,9 +110,9 @@
                             </app-form-input>
                         </div>
 
+                        <!-- Boolean -->
                         <div
                             *ngIf="field.fieldType === DialogFieldType.BOOLEAN">
-                            <!-- Boolean -->
                             <app-form-slide-toggle
                                 [name]="field.name"
                                 [(ngModel)]="dialogAnswerInputValue.value[field.name]"
@@ -121,9 +122,9 @@
                             </app-form-slide-toggle>
                         </div>
 
+                        <!-- Date -->
                         <div
                             *ngIf="field.fieldType === DialogFieldType.DATE">
-                            <!-- Date -->
                             <app-form-datepicker
                                 [name]="field.name"
                                 [ngModel]="dialogAnswerInputValue.value[field.name]"
@@ -136,9 +137,9 @@
                             ></app-form-datepicker>
                         </div>
 
+                        <!-- Date range -->
                         <div
                             *ngIf="field.fieldType === DialogFieldType.DATE_RANGE">
-                            <!-- Date range -->
                             <app-form-daterange
                                 [name]="field.name"
                                 [(ngModel)]="dialogAnswerInputValue.value[field.name]"
@@ -148,13 +149,33 @@
                         </div>
 
                         <!-- Link -->
-                        <a
+                        <div
                             *ngIf="field.fieldType === DialogFieldType.LINK"
-                            [routerLink]="field.routerLink"
-                            [queryParams]="field.queryParams"
-                            [target]="field.linkTarget">
-                            {{ field.placeholder | translate }}
-                        </a>
+                            fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+                            <div
+                                fxFlex>
+                                <a
+                                    [routerLink]="field.routerLink"
+                                    [queryParams]="field.queryParams"
+                                    [target]="field.linkTarget">
+                                    {{ field.placeholder | translate }}
+                                </a>
+                            </div>
+                            <div
+                                *ngIf="field.linkActionButtonLabel"
+                                fxGrow="0"
+                                class="link-item-action">
+                                <button
+                                    type="button"
+                                    mat-button
+                                    color="accent"
+                                    [disabled]="field.disabled"
+                                    (click)="field.linkActionButtonAction(field)"
+                                    [matTooltip]="field.linkActionButtonActionTooltip | translate">
+                                    {{field.linkActionButtonLabel | translate}}
+                                </button>
+                            </div>
+                        </div>
 
                         <!-- Url -->
                         <div
@@ -186,6 +207,59 @@
                             *ngIf="field.fieldType === DialogFieldType.SECTION_TITLE"
                             class="dialog-section-title">
                             {{ field.placeholder | translate }}
+                        </div>
+
+                        <!-- Checkbox list -->
+                        <div
+                            *ngIf="field.fieldType === DialogFieldType.CHECKBOX_LIST">
+                            <!-- Title -->
+                            <div
+                                class="dialog-section-title">
+                                {{ field.placeholder | translate }}
+                            </div>
+
+                            <!-- Items -->
+                            <div
+                                class="dialog-checkbox-list">
+                                <div
+                                    *ngFor="let listItem of field.listItems"
+                                    fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px"
+                                    class="dialog-checkbox-list-item">
+                                    <!-- Checkbox -->
+                                    <div
+                                        fxGrow="0">
+                                        <app-form-checkbox
+                                            class="dialog-checkbox-list-item-checkbox"
+                                            [name]="field.name + '[' + listItem.itemData.value + ']'"
+                                            [ngModel]="listItem.checked"
+                                            [disabled]="field.disabled || listItem.disabled"
+                                            (optionChanged)="listItem.checked = $event">
+                                        </app-form-checkbox>
+                                    </div>
+
+                                    <!-- Label -->
+                                    <div
+                                        fxFlex>
+                                        {{listItem.itemData.label | translate}}
+                                    </div>
+
+                                    <!-- Action button -->
+                                    <div
+                                        *ngIf="listItem.actionButtonLabel"
+                                        fxGrow="0"
+                                        class="dialog-checkbox-list-item-action">
+                                        <button
+                                            type="button"
+                                            mat-button
+                                            color="accent"
+                                            [disabled]="field.disabled || (listItem.actionButtonDisableActionAlongWithItem && listItem.disabled)"
+                                            (click)="listItem.actionButtonAction(listItem)"
+                                            [matTooltip]="listItem.actionButtonActionTooltip | translate">
+                                            {{listItem.actionButtonLabel | translate}}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

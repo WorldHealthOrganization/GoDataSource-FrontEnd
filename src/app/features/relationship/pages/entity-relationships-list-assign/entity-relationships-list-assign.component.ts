@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -24,6 +24,7 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { UserSettings } from '../../../../core/models/user.model';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-entity-relationships-list-assign',
@@ -31,7 +32,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     templateUrl: './entity-relationships-list-assign.component.html',
     styleUrls: ['./entity-relationships-list-assign.component.less']
 })
-export class EntityRelationshipsListAssignComponent extends RelationshipsListComponent implements OnInit {
+export class EntityRelationshipsListAssignComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // entities list relationships
@@ -60,22 +61,29 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
 
     selectedTargetIds: string[] = [];
 
+    /**
+     * Constructor
+     */
     constructor(
-        protected snackbarService: SnackbarService,
+        protected listHelperService: ListHelperService,
         protected router: Router,
         protected route: ActivatedRoute,
         protected authDataService: AuthDataService,
         protected outbreakDataService: OutbreakDataService,
         protected entityDataService: EntityDataService,
+        private snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService
     ) {
         super(
-            snackbarService, router, route,
+            listHelperService, router, route,
             authDataService, outbreakDataService, entityDataService
         );
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         super.ngOnInit();
 
@@ -120,6 +128,14 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

@@ -15,8 +15,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -40,6 +39,7 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-contacts-list',
@@ -361,6 +361,17 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     }
                 }),
 
+                // See records detected by the system as duplicates but they were marked as not duplicates
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_RECORDS_NOT_DUPLICATES',
+                    click: (item: ContactModel) => {
+                        this.router.navigate(['/duplicated-records/contacts', item.id, 'marked-not-duplicates']);
+                    },
+                    visible: (item: ContactModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+
                 // See contact lab results
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_LAB_RESULTS',
@@ -445,25 +456,20 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private contactDataService: ContactDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private route: ActivatedRoute,
         private dialogService: DialogService,
-        protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
         private userDataService: UserDataService,
         private entityHelperService: EntityHelperService
     ) {
-        super(
-            snackbarService,
-            listFilterDataService,
-            route.queryParams
-        );
+        super(listHelperService);
     }
 
     /**
@@ -569,6 +575,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();

@@ -416,6 +416,15 @@ export class Constants {
     };
 
     /**
+     * Used to determine action that we need to take when duplicates are detected ( create / modify - case / contact)
+     */
+    static DUPLICATE_ACTION = {
+        NO_ACTION: 'LNG_DUPLICATES_DIALOG_ACTION_NONE',
+        NOT_A_DUPLICATE: 'LNG_DUPLICATES_DIALOG_ACTION_MARK_AS_NOT_A_DUPLICATE',
+        MERGE: 'LNG_DUPLICATES_DIALOG_ACTION_MERGE_DUPLICATE'
+    };
+
+    /**
      * Chronology item type
      */
     static CHRONOLOGY_ITEM_TYPE = {

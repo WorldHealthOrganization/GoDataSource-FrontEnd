@@ -122,6 +122,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME': '{{name}} Clone',
 
         /**
+         * uiModifyFollowUpListPage
+         */
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_IN_THE_FUTURE_LABEL': '*You can modify only \'Targeted\' and \'Team\' fields because at least one follow-up from the selected ones have date in the future ',
+
+        /**
          * uiOutbreakFields
          */
         'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE': 'Allow registration of contacts of contacts?',
@@ -247,9 +252,11 @@ export const EnglishUsLang = {
 
 
 
+
+
         /**
          * REMOVE the tokens from below
          */
-        // ...
+        // LNG_PAGE_LIST_FOLLOW_UPS_MODIFY_FUTURE_FOLLOW_UPS
     }
 };

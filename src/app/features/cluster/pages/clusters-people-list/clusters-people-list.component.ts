@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -22,6 +22,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -29,7 +30,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
     templateUrl: './clusters-people-list.component.html',
     styleUrls: ['./clusters-people-list.component.less']
 })
-export class ClustersPeopleListComponent extends ListComponent implements OnInit {
+export class ClustersPeopleListComponent extends ListComponent implements OnInit, OnDestroy {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -98,17 +99,16 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
         private clusterDataService: ClusterDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -160,6 +160,14 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
 
         // initialize breadcrumbs
         this.initializeBreadcrumbs();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

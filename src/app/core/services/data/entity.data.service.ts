@@ -22,19 +22,19 @@ import { ContactsOfContactsDataService } from './contacts-of-contacts.data.servi
 
 @Injectable()
 export class EntityDataService {
-
+    // entity map
     entityMap = {
         [EntityType.CASE]: {
             dataService: this.caseDataService,
             getMethod: 'getCase',
             deleteMethod: 'deleteCase',
-            modifyMethod: 'modifyCase',
+            modifyMethod: 'modifyCase'
         },
         [EntityType.CONTACT]: {
             dataService: this.contactDataService,
             getMethod: 'getContact',
             deleteMethod: 'deleteContact',
-            modifyMethod: 'modifyContact',
+            modifyMethod: 'modifyContact'
         },
         [EntityType.CONTACT_OF_CONTACT]: {
             dataService: this.contactsOfContactsDataService,
@@ -46,10 +46,13 @@ export class EntityDataService {
             dataService: this.evenDataService,
             getMethod: 'getEvent',
             deleteMethod: 'deleteEvent',
-            modifyMethod: 'modifyEvent',
+            modifyMethod: 'modifyEvent'
         }
     };
 
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient,
         private caseDataService: CaseDataService,
@@ -57,8 +60,7 @@ export class EntityDataService {
         private contactsOfContactsDataService: ContactsOfContactsDataService,
         private evenDataService: EventDataService,
         private i18nService: I18nService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve the list of Cases, Contacts and Events for an Outbreak
@@ -101,9 +103,7 @@ export class EntityDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<IBasicCount> {
-
         const whereFilter = queryBuilder.filter.generateCondition(true);
-
         return this.http.get(`outbreaks/${outbreakId}/people/count?where=${whereFilter}`);
     }
 
@@ -373,5 +373,67 @@ export class EntityDataService {
         return lightObject;
     }
 
-}
+    /**
+     * Find case duplicates
+     * @param outbreakId
+     * @param entityType Case / Contact
+     * @param entityId
+     * @param queryBuilder
+     */
+    getEntitiesMarkedAsNotDuplicates(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<(CaseModel | ContactModel | EventModel)[]> {
+        const filter = queryBuilder.buildQuery();
+        return this.http
+            .get(`outbreaks/${outbreakId}/${EntityModel.getLinkForEntityType(entityType)}/${entityId}/duplicates/marked-as-not-duplicates?filter=${filter}`)
+            .pipe(
+                map((peopleList) => {
+                    return _.map(peopleList, (entity) => {
+                        return new EntityModel(entity).model;
+                    });
+                })
+            );
+    }
 
+    /**
+     * Find case duplicates
+     * @param outbreakId
+     * @param entityType Case / Contact
+     * @param entityId
+     * @param queryBuilder
+     */
+    getEntitiesMarkedAsNotDuplicatesCount(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<IBasicCount> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`outbreaks/${outbreakId}/${EntityModel.getLinkForEntityType(entityType)}/${entityId}/duplicates/marked-as-not-duplicates/count?where=${whereFilter}`);
+    }
+
+    /**
+     * Mark person as duplicate or not
+     * @param outbreakId
+     * @param entityType Case / Contact
+     * @param entityId
+     */
+    markPersonAsOrNotADuplicate(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string,
+        addRecords: string[],
+        removeRecords?: string[]
+    ): Observable<string[]> {
+        return this.http
+            .post(
+                `outbreaks/${outbreakId}/${EntityModel.getLinkForEntityType(entityType)}/${entityId}/duplicates/change`, {
+                    addRecords: addRecords || [],
+                    removeRecords: removeRecords || []
+                }
+            ) as Observable<string[]>;
+    }
+}

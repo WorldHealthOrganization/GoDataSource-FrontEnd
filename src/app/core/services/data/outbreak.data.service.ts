@@ -19,21 +19,23 @@ import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validat
 import { catchError, map, mergeMap, takeUntil, tap } from 'rxjs/operators';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
+import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
 
 @Injectable()
 export class OutbreakDataService {
-
     // hold the selected (current) Outbreak and emit it on demand
     selectedOutbreakSubject: BehaviorSubject<OutbreakModel> = new BehaviorSubject<OutbreakModel>(null);
 
+    /**
+     * Constructor
+     */
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private storageService: StorageService,
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve the list of Outbreaks
@@ -65,9 +67,15 @@ export class OutbreakDataService {
 
         // filter
         const filter = qb.buildQuery();
-        return this.modelHelper.mapObservableListToModel(
-            this.http.get(`outbreaks?filter=${filter}`),
-            OutbreakModel
+        return FilteredRequestCache.get(
+            'getOutbreaksListReduced',
+            filter,
+            () => {
+                return this.modelHelper.mapObservableListToModel(
+                    this.http.get(`outbreaks?filter=${filter}`),
+                    OutbreakModel
+                );
+            }
         );
     }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -19,6 +19,7 @@ import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-outbreak-templates-list',
@@ -26,7 +27,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
     templateUrl: './outbreak-templates-list.component.html',
     styleUrls: ['./outbreak-templates-list.component.less']
 })
-export class OutbreakTemplatesListComponent extends ListComponent implements OnInit {
+export class OutbreakTemplatesListComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '.', true)
     ];
@@ -171,17 +172,16 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
         private outbreakTemplateDataService: OutbreakTemplateDataService,
         private i18nService: I18nService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -202,6 +202,14 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
 
         // ...and re-load the list when the Selected Outbreak is changed
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

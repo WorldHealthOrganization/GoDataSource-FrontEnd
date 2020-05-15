@@ -49,6 +49,7 @@ import { RedirectService } from './helper/redirect.service';
 import { EntityHelperService } from './helper/entity-helper.service';
 import { ContactsOfContactsDataService } from './data/contacts-of-contacts.data.service';
 import { CaptchaDataService } from './data/captcha.data.service';
+import { ListHelperService } from './helper/list-helper.service';
 
 // export the list of services
 export const services: any[] = [
@@ -109,5 +110,6 @@ export const services: any[] = [
     DialogService,
     DomService,
     RedirectService,
-    EntityHelperService
+    EntityHelperService,
+    ListHelperService
 ];

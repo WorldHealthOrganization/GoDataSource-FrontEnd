@@ -1,21 +1,21 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
-import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import * as _ from 'lodash';
 import { catchError, tap } from 'rxjs/operators';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { HoverRowAction } from '../../../../shared/components';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-help-search',
@@ -23,7 +23,7 @@ import { throwError } from 'rxjs/internal/observable/throwError';
     templateUrl: './help-search.component.html',
     styleUrls: ['./help-search.component.less']
 })
-export class HelpSearchComponent extends ListComponent implements OnInit {
+export class HelpSearchComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_GLOBAL_HELP_TITLE', '/help', true)
     ];
@@ -52,21 +52,22 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
         })
     ];
 
+    /**
+     * Constructor
+     */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private authDataService: AuthDataService,
         private helpDataService: HelpDataService,
-        protected snackbarService: SnackbarService,
-        protected listFilterDataService: ListFilterDataService,
-        private route: ActivatedRoute
+        private snackbarService: SnackbarService
     ) {
-        super(
-            snackbarService,
-            listFilterDataService,
-            route.queryParams
-        );
+        super(listHelperService);
     }
 
+    /**
+     * Component initialized
+     */
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -77,6 +78,14 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
         this.needsRefreshList(true);
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**
