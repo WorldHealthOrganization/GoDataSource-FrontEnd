@@ -385,7 +385,7 @@ export class EntityDataService {
         entityType: EntityType,
         entityId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<(CaseModel | ContactModel | EventModel)[]> {
+    ): Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]> {
         const filter = queryBuilder.buildQuery();
         return this.http
             .get(`outbreaks/${outbreakId}/${EntityModel.getLinkForEntityType(entityType)}/${entityId}/duplicates/marked-as-not-duplicates?filter=${filter}`)

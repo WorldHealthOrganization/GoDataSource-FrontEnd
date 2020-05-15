@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable, throwError } from 'rxjs';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -40,6 +40,7 @@ import { ContactsOfContactsDataService } from '../../../../core/services/data/co
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+ import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-contacts-of-contacts-list',
@@ -255,6 +256,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     ];
 
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private contactsOfContactsDataService: ContactsOfContactsDataService,
         private authDataService: AuthDataService,
@@ -269,11 +271,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         private userDataService: UserDataService,
         private entityHelperService: EntityHelperService
     ) {
-        super(
-            snackbarService,
-            listFilterDataService,
-            route.queryParams
-        );
+        super(listHelperService);
     }
 
     ngOnInit() {
