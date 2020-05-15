@@ -114,7 +114,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                     this.authUser &&
                     this.selectedOutbreak &&
                     this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    FollowUpModel.canModify(this.authUser)
+                    FollowUpModel.canModify(this.authUser);
             }
         }),
 
