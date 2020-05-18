@@ -122,6 +122,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
             .pipe(
                 map((outbreaksList) => {
                     return _.map(outbreaksList, (outbreak: OutbreakModel) => {
+                        // clone outbreak so we don't alter the original one
+                        outbreak = new OutbreakModel(outbreak);
+
                         // add outbreak details
                         outbreak.details = outbreak.name + (_.isEmpty(outbreak.description) ? '' : `: ${outbreak.description}`);
 
