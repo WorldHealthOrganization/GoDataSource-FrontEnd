@@ -119,9 +119,17 @@ export const EnglishUsLang = {
         /**
          * uiOutbreakTemplateListPage
          */
-        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME': '{{name}} Clone'
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME': '{{name}} Clone',
 
+        /**
+         * uiModifyFollowUpListPage
+         */
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_IN_THE_FUTURE_LABEL': '*You can\'t modify some fields because at least one of the selected follow-ups is in the future'
 
+        /**
+         * REMOVE
+         */
+        // LNG_PAGE_LIST_FOLLOW_UPS_MODIFY_FUTURE_FOLLOW_UPS
 
         /**
          * REMOVE the tokens from below
