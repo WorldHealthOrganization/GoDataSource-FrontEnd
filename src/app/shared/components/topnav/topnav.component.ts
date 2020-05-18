@@ -40,6 +40,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
 
     getSelectedOutbreakSubject: Subscription;
 
+    // language subscription
+    private languageSubscription: Subscription;
+
     /**
      * Constructor
      */
@@ -56,6 +59,13 @@ export class TopnavComponent implements OnInit, OnDestroy {
 
         // refresh language list
         this.refreshLanguageList();
+
+        // on language change..we need to translate again the token
+        this.languageSubscription = this.i18nService.languageChangedEvent
+            .subscribe(() => {
+                // get the outbreaks list
+                this.refreshOutbreaksList();
+            });
     }
 
     /**
@@ -83,6 +93,11 @@ export class TopnavComponent implements OnInit, OnDestroy {
         if (this.getSelectedOutbreakSubject) {
             this.getSelectedOutbreakSubject.unsubscribe();
             this.getSelectedOutbreakSubject = null;
+        }
+
+        if (this.languageSubscription) {
+            this.languageSubscription.unsubscribe();
+            this.languageSubscription = null;
         }
     }
 

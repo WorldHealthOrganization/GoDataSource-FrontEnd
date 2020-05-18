@@ -1,10 +1,11 @@
 import {
-    Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, HostBinding, Output, EventEmitter
+    Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, HostBinding, Output, EventEmitter, OnDestroy
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-form-slide-toggle',
@@ -17,7 +18,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
         multi: true
     }]
 })
-export class FormSlideToggleComponent extends ElementBase<string> {
+export class FormSlideToggleComponent extends ElementBase<string> implements OnDestroy {
     static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
@@ -45,6 +46,12 @@ export class FormSlideToggleComponent extends ElementBase<string> {
 
     @Output() optionChanged = new EventEmitter<any>();
 
+    // language subscription
+    private languageSubscription: Subscription;
+
+    /**
+     * Constructor
+     */
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
@@ -54,9 +61,19 @@ export class FormSlideToggleComponent extends ElementBase<string> {
         super(controlContainer, validators, asyncValidators);
 
         // on language change..we need to translate again the token
-        this.i18nService.languageChangedEvent.subscribe(() => {
+        this.languageSubscription = this.i18nService.languageChangedEvent.subscribe(() => {
             this.tooltip = this._tooltipToken;
         });
+    }
+
+    /**
+     * Component destroyed
+     */
+    ngOnDestroy() {
+        if (this.languageSubscription) {
+            this.languageSubscription.unsubscribe();
+            this.languageSubscription = null;
+        }
     }
 
     /**
