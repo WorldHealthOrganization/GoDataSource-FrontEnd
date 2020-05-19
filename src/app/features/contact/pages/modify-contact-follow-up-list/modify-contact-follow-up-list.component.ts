@@ -19,7 +19,7 @@ import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { IAnswerData } from '../../../../core/models/question.model';
-import { throwError, forkJoin } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
@@ -242,7 +242,6 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
      * @param stepForms
      */
     updateFollowUps(stepForms: NgForm[]) {
-        const loadingDialog = this.dialogService.showLoadingDialog();
         // get forms fields
         const dirtyFields: any = this.getFormDirtyFields(stepForms);
 
@@ -267,10 +266,11 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
             }
         });
 
+        // start modifying follow-ups
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.followUpsDataService
             .bulkModifyFollowUps(
                 this.selectedOutbreak.id,
-                selectedFollowUpIds,
                 dirtyFields,
                 qb
             )

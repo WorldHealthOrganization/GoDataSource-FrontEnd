@@ -232,6 +232,9 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
      * Component destroyed
      */
     ngOnDestroy(): void {
+        // hide loading in case it is still visible
+        this.hideLoading();
+
         // release token info subscription
         if (this.tokenInfoSubjectSubscription) {
             this.tokenInfoSubjectSubscription.unsubscribe();

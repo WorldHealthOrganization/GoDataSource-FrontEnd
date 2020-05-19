@@ -46,8 +46,8 @@
                                 [ngModel]="followUp.date"
                                 [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
                                 tooltip="LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION"
-                                app-date-validator
-                                [disabled]="futureFollowUps">
+                                required="true"
+                                [disabled]="true">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
