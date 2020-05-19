@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ConfirmOnFormChanges } from '../../../core/services/guards/page-change-confirmation-guard.service';
 import { UserModel } from '../../../core/models/user.model';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
@@ -26,6 +26,7 @@ import { SnackbarService } from '../../../core/services/helper/snackbar.service'
 import { HoverRowAction, HoverRowActionType } from '../hover-row-actions/hover-row-actions.component';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 /**
  * Used to initialize breadcrumbs
@@ -57,7 +58,7 @@ export class FormModifyQuestionnaireUpdateData {
     templateUrl: './form-modify-questionnaire.component.html',
     styleUrls: ['./form-modify-questionnaire.component.less']
 })
-export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges implements OnInit {
+export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
     // component unique id
     uniqueID: string = uuid();
     uniqueIDQuestion: string = `question-section-${this.uniqueID}`;
@@ -187,6 +188,9 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     // Triggered when edit mode has changed
     @Output() questionEditModeChanged = new EventEmitter<boolean>();
 
+    // language subscription
+    private languageSubscription: Subscription;
+
     /**
      * Constructor
      */
@@ -212,9 +216,10 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // on language change..we need to translate again question data
-        this.i18nService.languageChangedEvent.subscribe(() => {
-            this.initQuestionnaireData();
-        });
+        this.languageSubscription = this.i18nService.languageChangedEvent
+            .subscribe(() => {
+                this.initQuestionnaireData();
+            });
 
         // retrieve data
         forkJoin(
@@ -247,6 +252,16 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 this.initQuestionnaireData();
             });
         });
+    }
+
+    /**
+     * Component destroyed
+     */
+    ngOnDestroy() {
+        if (this.languageSubscription) {
+            this.languageSubscription.unsubscribe();
+            this.languageSubscription = null;
+        }
     }
 
     /**
