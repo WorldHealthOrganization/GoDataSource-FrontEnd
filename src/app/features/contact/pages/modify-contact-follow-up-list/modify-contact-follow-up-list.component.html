@@ -23,6 +23,10 @@
                         <div>
                             {{ 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_INFO_LABEL' | translate }}
                         </div>
+
+                        <div *ngIf="futureFollowUps">
+                            {{ 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_IN_THE_FUTURE_LABEL' | translate}}
+                        </div>
                     </div>
 
                     <app-selected-contacts-list
@@ -42,7 +46,8 @@
                                 [ngModel]="followUp.date"
                                 [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
                                 tooltip="LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION"
-                                app-date-validator>
+                                required="true"
+                                [disabled]="true">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
@@ -59,7 +64,8 @@
                                 tooltip="LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION"
                                 [options]="dailyStatusTypeOptions$ | async"
                                 optionLabelKey="label"
-                                optionValueKey="value">
+                                optionValueKey="value"
+                                [disabled]="futureFollowUps">
                             </app-form-select>
 
                             <app-form-select

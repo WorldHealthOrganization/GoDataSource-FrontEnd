@@ -19,23 +19,29 @@
                     required="true">
                 </app-form-input>
 
-                <div
-                    fxFlex fxLayout="row" fxLayoutGap="20px">
-                    <app-form-slide-toggle
-                        name="active"
-                        [label]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE' | translate"
-                        tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE_DESCRIPTION"
-                        [ngModel]="entry.active">
-                    </app-form-slide-toggle>
+                <app-form-input
+                    name="code"
+                    [(ngModel)]="entry.code"
+                    [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CODE' | translate"
+                    tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CODE_DESCRIPTION"
+                    app-general-async-validator
+                    [asyncValidatorObservable]="codeDuplicateValidator$">
+                </app-form-input>
 
-                    <app-form-input
-                        name="order"
-                        [ngModel]="entry.order"
-                        [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER' | translate"
-                        tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER_DESCRIPTION"
-                        type="number">
-                    </app-form-input>
-                </div>
+                <app-form-slide-toggle
+                    name="active"
+                    [label]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE' | translate"
+                    tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE_DESCRIPTION"
+                    [ngModel]="entry.active">
+                </app-form-slide-toggle>
+
+                <app-form-input
+                    name="order"
+                    [ngModel]="entry.order"
+                    [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER' | translate"
+                    tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER_DESCRIPTION"
+                    type="number">
+                </app-form-input>
             </div>
 
             <div fxLayout="row">

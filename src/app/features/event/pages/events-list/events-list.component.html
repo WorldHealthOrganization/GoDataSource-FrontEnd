@@ -225,7 +225,7 @@
                             name="phoneNumberFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByPhoneNumber($event)"
+                            (optionChanged)="filterByPhoneNumber('address.phoneNumber', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>

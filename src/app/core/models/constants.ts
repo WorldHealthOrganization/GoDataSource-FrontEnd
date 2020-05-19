@@ -420,6 +420,15 @@ export class Constants {
     };
 
     /**
+     * Used to determine action that we need to take when duplicates are detected ( create / modify - case / contact)
+     */
+    static DUPLICATE_ACTION = {
+        NO_ACTION: 'LNG_DUPLICATES_DIALOG_ACTION_NONE',
+        NOT_A_DUPLICATE: 'LNG_DUPLICATES_DIALOG_ACTION_MARK_AS_NOT_A_DUPLICATE',
+        MERGE: 'LNG_DUPLICATES_DIALOG_ACTION_MERGE_DUPLICATE'
+    };
+
+    /**
      * Chronology item type
      */
     static CHRONOLOGY_ITEM_TYPE = {
@@ -648,6 +657,10 @@ export class Constants {
         OCCUPATION: {
             label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
             value: 'occupation'
+        },
+        ID_AND_LOCATION: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_VISUAL_ID_AND_LOCATION',
+            value: 'visual_id_and_location'
         }
     };
 

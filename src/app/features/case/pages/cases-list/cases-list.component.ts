@@ -15,8 +15,7 @@ import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -29,7 +28,6 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
-import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { throwError } from 'rxjs';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
@@ -40,6 +38,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-cases-list',
@@ -60,6 +59,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     // list of existing cases
     casesList$: Observable<CaseModel[]>;
     casesListCount$: Observable<IBasicCount>;
+
+    // don't display pills by default
+    showCountPills: boolean = false;
 
     // user list
     userList$: Observable<UserModel[]>;
@@ -339,6 +341,17 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                     }
                 }),
 
+                // See records detected by the system as duplicates but they were marked as not duplicates
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_SEE_RECORDS_NOT_DUPLICATES',
+                    click: (item: CaseModel) => {
+                        this.router.navigate(['/duplicated-records/cases', item.id, 'marked-not-duplicates']);
+                    },
+                    visible: (item: CaseModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+
                 // See case lab results
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS',
@@ -446,15 +459,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private caseDataService: CaseDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
-        protected route: ActivatedRoute,
-        protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
         private genericDataService: GenericDataService,
         private clusterDataService: ClusterDataService,
@@ -462,11 +474,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         private relationshipDataService: RelationshipDataService,
         private entityHelperService: EntityHelperService
     ) {
-        super(
-            snackbarService,
-            listFilterDataService,
-            route.queryParams
-        );
+        super(listHelperService);
     }
 
     /**
@@ -551,14 +559,14 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
-
-        // release resources
-        super.ngOnDestroy();
     }
 
     /**
@@ -1310,32 +1318,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 exportFinished: () => { this.closeLoadingDialog(); }
             });
         }
-    }
-
-    /**
-     * Filter by phone number
-     */
-    filterByPhoneNumber(value: string) {
-        // remove previous condition
-        this.queryBuilder.filter.remove('addresses');
-
-        if (!_.isEmpty(value)) {
-            // add new condition
-            this.queryBuilder.filter.where({
-                addresses: {
-                    elemMatch: {
-                        phoneNumber: {
-                            $regex: RequestFilter.escapeStringForRegex(value)
-                                .replace(/%/g, '.*')
-                                .replace(/\\\?/g, '.'),
-                            $options: 'i'
-                        }
-                    }
-                }
-            });
-        }
-        // refresh list
-        this.needsRefreshList();
     }
 
     /**

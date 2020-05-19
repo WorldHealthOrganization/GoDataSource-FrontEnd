@@ -447,7 +447,15 @@
             </button>
 
             <ng-container *ngIf="!viewOnly">
-                <button mat-raised-button color="accent">
+                <button
+                    [disabled]="form.pending"
+                    class="button-with-spinner"
+                    mat-raised-button color="accent">
+                    <div
+                        *ngIf="form.pending"
+                        class="loading-chips">
+                        <mat-spinner></mat-spinner>
+                    </div>
                     {{'LNG_COMMON_BUTTON_SAVE' | translate}}
                 </button>
 
@@ -474,6 +482,15 @@
 
                 <div class="page-tabs-navbar-placeholder"></div>
             </ng-container>
+        </ng-container>
+
+        <ng-container
+            *ngIf="CaseModel.canList(authUser)">
+            <button
+                mat-raised-button type="button" color="primary"
+                [routerLink]="['/duplicated-records/cases', caseId, 'marked-not-duplicates']">
+                {{'LNG_PAGE_MODIFY_CASE_ACTION_SEE_RECORDS_NOT_DUPLICATES' | translate}}
+            </button>
         </ng-container>
 
         <button

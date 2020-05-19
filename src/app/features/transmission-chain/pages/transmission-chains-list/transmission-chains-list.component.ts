@@ -8,7 +8,6 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ApplyListFilter, Constants } from '../../../../core/models/constants';
-import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { UserModel } from '../../../../core/models/user.model';
@@ -18,6 +17,7 @@ import { catchError, tap } from 'rxjs/operators';
 import { Subscription } from 'rxjs/internal/Subscription';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-transmission-chains-list',
@@ -64,19 +64,15 @@ export class TransmissionChainsListComponent extends ListComponent implements On
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private outbreakDataService: OutbreakDataService,
         private transmissionChainDataService: TransmissionChainDataService,
         private route: ActivatedRoute,
-        protected snackbarService: SnackbarService,
-        protected listFilterDataService: ListFilterDataService,
+        private snackbarService: SnackbarService,
         private authDataService: AuthDataService
     ) {
-        super(
-            snackbarService,
-            listFilterDataService,
-            route.queryParams
-        );
+        super(listHelperService);
     }
 
     /**
@@ -111,6 +107,9 @@ export class TransmissionChainsListComponent extends ListComponent implements On
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();

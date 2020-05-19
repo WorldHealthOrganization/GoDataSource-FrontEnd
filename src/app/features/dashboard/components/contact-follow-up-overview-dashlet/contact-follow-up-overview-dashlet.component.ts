@@ -136,6 +136,11 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
      * set the data needed for the chart
      */
     setContactFollowUpReportResults(metricData: MetricContactsFollowedUpReportModel[]) {
+        // if we don't have contact follow-ups to display return
+        if (metricData.length === 0) {
+            return;
+        }
+
         // initialize data
         this.colorPattern = [];
         this.chartDataCategories = [];

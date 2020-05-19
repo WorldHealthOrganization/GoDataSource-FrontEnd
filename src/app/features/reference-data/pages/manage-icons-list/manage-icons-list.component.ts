@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -16,6 +16,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import * as _ from 'lodash';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-manage-icons-list',
@@ -23,7 +24,7 @@ import * as _ from 'lodash';
     templateUrl: './manage-icons-list.component.html',
     styleUrls: ['./manage-icons-list.component.less']
 })
-export class ManageIconsListComponent extends ListComponent implements OnInit {
+export class ManageIconsListComponent extends ListComponent implements OnInit, OnDestroy {
     // Breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -70,16 +71,15 @@ export class ManageIconsListComponent extends ListComponent implements OnInit {
      * Constructor
      */
     constructor(
-        protected route: ActivatedRoute,
+        protected listHelperService: ListHelperService,
+        private route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
         private iconDataService: IconDataService,
         private dialogService: DialogService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private authDataService: AuthDataService
     ) {
-        super(
-            snackbarService
-        );
+        super(listHelperService);
     }
 
     /**
@@ -106,6 +106,14 @@ export class ManageIconsListComponent extends ListComponent implements OnInit {
 
         // retrieve icons
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Release resources
+     */
+    ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
     }
 
     /**

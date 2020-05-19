@@ -183,6 +183,23 @@ export class FollowUpsDataService {
     }
 
     /**
+     * Modify multiple follow-ups
+     * @param outbreakId
+     * @param followUpData
+     */
+    bulkModifyFollowUps(
+        outbreakId: string,
+        followUpData,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ) {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.put(
+            `outbreaks/${outbreakId}/follow-ups/bulk?where=${whereFilter}`,
+            followUpData
+        );
+    }
+
+    /**
      * Delete an existing Follow-up of an Outbreak
      * @param {string} outbreakId
      * @param {string} contactId

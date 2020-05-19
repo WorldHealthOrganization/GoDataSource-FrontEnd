@@ -15,8 +15,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -29,7 +28,6 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
 import { catchError, map, mergeMap, share, tap } from 'rxjs/operators';
-import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -40,6 +38,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 
 @Component({
     selector: 'app-contacts-list',
@@ -64,6 +63,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     // list of existing contacts
     contactsList$: Observable<ContactModel[]>;
     contactsListCount$: Observable<IBasicCount>;
+
+    // don't display pills by default
+    showCountPills: boolean = false;
 
     outbreakSubscriber: Subscription;
 
@@ -292,6 +294,17 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                     }
                 }),
 
+                // See records detected by the system as duplicates but they were marked as not duplicates
+                new HoverRowAction({
+                    menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_RECORDS_NOT_DUPLICATES',
+                    click: (item: ContactModel) => {
+                        this.router.navigate(['/duplicated-records/contacts', item.id, 'marked-not-duplicates']);
+                    },
+                    visible: (item: ContactModel): boolean => {
+                        return !item.deleted;
+                    }
+                }),
+
                 // See contact lab results
                 new HoverRowAction({
                     menuOptionLabel: 'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_LAB_RESULTS',
@@ -376,25 +389,20 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      * Constructor
      */
     constructor(
+        protected listHelperService: ListHelperService,
         private router: Router,
         private contactDataService: ContactDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService,
+        private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private route: ActivatedRoute,
         private dialogService: DialogService,
-        protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
         private userDataService: UserDataService,
         private entityHelperService: EntityHelperService
     ) {
-        super(
-            snackbarService,
-            listFilterDataService,
-            route.queryParams
-        );
+        super(listHelperService);
     }
 
     /**
@@ -500,6 +508,9 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
      * Component destroyed
      */
     ngOnDestroy() {
+        // release parent resources
+        super.ngOnDestroy();
+
         // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
@@ -897,6 +908,16 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             const clonedQueryBuilder = _.cloneDeep(this.queryBuilder);
             clonedQueryBuilder.paginator.clear();
             clonedQueryBuilder.sort.clear();
+
+            // ugly hack so we don't have to change API in many place and test the entire project again ( if we changed api to replace regex to $regex many API request would be affected )
+            // #TODO - we need to address this issue later by changing all API requests that use convertLoopbackFilterToMongo ( WGD-2854 )
+            const addressPhoneCondition = clonedQueryBuilder.filter.get('addresses.phoneNumber');
+            if (addressPhoneCondition) {
+                const newCondition = JSON.parse(JSON.stringify(addressPhoneCondition).replace(/"regex"/gi, '"$regex"'));
+                clonedQueryBuilder.filter.where(newCondition, true);
+            }
+
+            // retrieve data
             this.countedContactsByRiskLevel$ = this.riskLevelRefData$
                 .pipe(
                     mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
@@ -1200,33 +1221,6 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             exportStart: () => { this.showLoadingDialog(); },
             exportFinished: () => { this.closeLoadingDialog(); }
         });
-    }
-
-    /**
-     * Filter by phone number
-     */
-    filterByPhoneNumber(value: string) {
-        // remove previous condition
-        this.queryBuilder.filter.remove('addresses');
-
-        if (!_.isEmpty(value)) {
-            // add new condition
-            this.queryBuilder.filter.where({
-                addresses: {
-                    elemMatch: {
-                        phoneNumber: {
-                            $regex: RequestFilter.escapeStringForRegex(value)
-                                .replace(/%/g, '.*')
-                                .replace(/\\\?/g, '.'),
-                            $options: 'i'
-                        }
-                    }
-                }
-            });
-        }
-
-        // refresh list
-        this.needsRefreshList();
     }
 
     /**
