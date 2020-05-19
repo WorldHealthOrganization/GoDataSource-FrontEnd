@@ -248,8 +248,16 @@ export const EnglishUsLang = {
         /**
          * uiChainsOfTransmissionGraph
          */
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' : 'Show Contacts of Contacts'
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' : 'Show Contacts of Contacts',
 
+        /**
+         * uiContactMergeDuplicateRecordsPage
+         */
+        'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE': 'Contacts of contacts merged',
+        'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACT_BUTTON': 'Merge contacts of contacts',
+        'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE': 'Address',
+        'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE': 'Personal',
+        'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE': 'Contact of contact - merge duplicate records'
 
 
 

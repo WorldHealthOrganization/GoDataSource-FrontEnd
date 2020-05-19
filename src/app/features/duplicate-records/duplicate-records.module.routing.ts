@@ -49,7 +49,7 @@ const routes: Routes = [
     // Contact of contact - Merge
     {
         path: 'contacts-of-contacts/merge',
-        component: fromPages.ContactMergeDuplicateRecordsComponent,
+        component: fromPages.ContactOfContactMergeDuplicateComponent,
         canActivate: [AuthGuard],
         data: {
             permissions: [
