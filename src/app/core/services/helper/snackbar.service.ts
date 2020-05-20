@@ -218,8 +218,11 @@ export class SnackbarService {
 
     showMultipleErrors(
         errors = [
-            {statusCode: 422, name: 'Error', message: 'Invalid captcha.', code: 'INVALID_CAPTCHA'},
-            {statusCode: 422, name: 'Error', message: 'Invalid captcha.', code: 'INVALID_CAPTCHA'}]
+            {statusCode: 422, name: 'Error1', message: 'Invalid captcha1.', code: 'INVALID_CAPTCHA'},
+            {statusCode: 422, name: 'Error2', message: 'Invalid captcha2.', code: 'INVALID_CAPTCHA'},
+            {statusCode: 422, name: 'Error3', message: 'Invalid captcha3.', code: 'INVALID_CAPTCHA'},
+            {statusCode: 422, name: 'Error4', message: 'Invalid captcha4.4', code: 'INVALID_CAPTCHA'},
+            {statusCode: 422, name: 'Error5', message: 'Invalid captcha5.', code: 'INVALID_CAPTCHA'}]
     ) {
         const errorsToDisplay = [];
         const defaultApiErrorCode = 'LNG_API_ERROR_CODE_UNKNOWN_ERROR';
