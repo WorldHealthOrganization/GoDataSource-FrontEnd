@@ -12,18 +12,18 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { IAnswerData } from '../../../../core/models/question.model';
-import { throwError } from 'rxjs';
 import { catchError, share } from 'rxjs/operators';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { Constants } from '../../../../core/models/constants';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-modify-contact-follow-ups-list',
@@ -54,6 +54,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     // dropdowns
     dailyStatusTypeOptions$: Observable<any[]>;
     teamsList$: Observable<TeamModel[]>;
+    yesNoOptionsList$: Observable<any[]>;
 
     // provide constants to template
     Object = Object;
@@ -76,7 +77,8 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         private formHelper: FormHelperService,
         private referenceDataDataService: ReferenceDataDataService,
         private teamDataService: TeamDataService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private genericDataService: GenericDataService
     ) {
         super();
     }
@@ -91,6 +93,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         // dropdowns
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS).pipe(share());
         this.teamsList$ = this.teamDataService.getTeamsList().pipe(share());
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions(true);
 
         // read route query params
         this.route.queryParams
