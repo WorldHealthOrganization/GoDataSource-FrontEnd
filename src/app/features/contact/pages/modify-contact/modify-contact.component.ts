@@ -33,6 +33,8 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { EntityDataService } from 'app/core/services/data/entity.data.service';
 import { Constants } from '../../../../core/models/constants';
+import { TeamModel } from '../../../../core/models/team.model';
+import { TeamDataService } from '../../../../core/services/data/team.data.service';
 
 @Component({
     selector: 'app-modify-contact',
@@ -52,6 +54,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     FollowUpModel = FollowUpModel;
     RelationshipModel = RelationshipModel;
     LabResultModel = LabResultModel;
+    TeamModel = TeamModel;
 
     contactId: string;
     selectedOutbreak: OutbreakModel;
@@ -64,6 +67,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     occupationsList$: Observable<any[]>;
     finalFollowUpStatus$: Observable<any[]>;
     pregnancyStatusList$: Observable<any[]>;
+    teamList$: Observable<TeamModel[]>;
 
     // provide constants to template
     EntityType = EntityType;
@@ -95,7 +99,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         protected dialogService: DialogService,
         private i18nService: I18nService,
         private relationshipDataService: RelationshipDataService,
-        private entityDataService: EntityDataService
+        private entityDataService: EntityDataService,
+        private teamDataService: TeamDataService
     ) {
         super(
             route,
@@ -116,6 +121,11 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
         this.pregnancyStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
+
+        // get teams only if we're allowed to
+        if (TeamModel.canList(this.authUser)) {
+            this.teamList$ = this.teamDataService.getTeamsListReduced();
+        }
 
         // show loading
         this.showLoadingDialog(false);

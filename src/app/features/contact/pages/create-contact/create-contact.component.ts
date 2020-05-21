@@ -9,7 +9,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
@@ -24,7 +24,6 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
-import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
@@ -33,6 +32,8 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { Constants } from '../../../../core/models/constants';
+import { TeamModel } from '../../../../core/models/team.model';
+import { TeamDataService } from '../../../../core/services/data/team.data.service';
 
 @Component({
     selector: 'app-create-contact',
@@ -58,6 +59,7 @@ export class CreateContactComponent
     occupationsList$: Observable<any[]>;
     pregnancyStatusList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
+    teamList$: Observable<TeamModel[]>;
 
     relatedEntityData: CaseModel | EventModel;
     relationship: RelationshipModel = new RelationshipModel();
@@ -72,6 +74,9 @@ export class CreateContactComponent
 
     // authenticated user details
     authUser: UserModel;
+
+    // constants
+    TeamModel = TeamModel;
 
     /**
      * Constructor
@@ -89,7 +94,8 @@ export class CreateContactComponent
         private dialogService: DialogService,
         private i18nService: I18nService,
         private redirectService: RedirectService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private teamDataService: TeamDataService
     ) {
         super();
     }
@@ -106,6 +112,11 @@ export class CreateContactComponent
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.pregnancyStatusList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PREGNANCY_STATUS);
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+
+        // get teams only if we're allowed to
+        if (TeamModel.canList(this.authUser)) {
+            this.teamList$ = this.teamDataService.getTeamsListReduced();
+        }
 
         // by default, enforce Contact having an address
         this.contactData.addresses.push(new AddressModel());
