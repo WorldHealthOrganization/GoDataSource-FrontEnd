@@ -43,6 +43,7 @@ export class CreateOutbreakComponent
     diseasesList$: Observable<LabelValuePair[]>;
     countriesList$: Observable<LabelValuePair[]>;
     geographicalLevelsList$: Observable<any[]>;
+    followUpsTeamAssignmentAlgorithm$: Observable<any[]>;
 
     newOutbreak: OutbreakModel = new OutbreakModel();
 
@@ -80,6 +81,7 @@ export class CreateOutbreakComponent
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
         this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY)

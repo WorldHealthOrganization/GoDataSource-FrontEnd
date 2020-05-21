@@ -44,7 +44,44 @@
                             <div fxFlex><!-- placeholder --></div>
                             <div fxFlex><!-- placeholder --></div>
                         </div>
+                    </div>
+                </mat-card>
 
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                name="generateFollowUpsTeamAssignmentAlgorithm"
+                                [(ngModel)]="outbreakTemplate.generateFollowUpsTeamAssignmentAlgorithm"
+                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_DESCRIPTION"
+                                optionTooltipKey="description"
+                                [options]="followUpsTeamAssignmentAlgorithm$ | async"
+                                [required]="true"
+                                [clearable]="false">
+                            </app-form-select>
+
+                            <app-form-slide-toggle
+                                name="generateFollowUpsOverwriteExisting"
+                                [(ngModel)]="outbreakTemplate.generateFollowUpsOverwriteExisting"
+                                [label]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING_DESCRIPTION">
+                            </app-form-slide-toggle>
+
+                            <app-form-slide-toggle
+                                name="generateFollowUpsKeepTeamAssignment"
+                                [(ngModel)]="outbreakTemplate.generateFollowUpsKeepTeamAssignment"
+                                [label]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT_DESCRIPTION">
+                            </app-form-slide-toggle>
+
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <mat-card class="page-section">
+                    <div fxLayout="column">
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="periodOfFollowup"
