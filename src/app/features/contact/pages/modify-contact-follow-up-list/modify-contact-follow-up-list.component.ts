@@ -319,4 +319,11 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
             this.teamInput.control.markAsPristine();
         }
     }
+
+    /**
+     * Check if there is nothing to change
+     */
+    nothingToChange(): boolean {
+        return _.isEmpty(this.currentDirtyFields);
+    }
 }

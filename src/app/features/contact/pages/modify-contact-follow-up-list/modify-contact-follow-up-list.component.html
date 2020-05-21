@@ -155,7 +155,7 @@
                 </div>
             </mat-card>
 
-            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
+            {{'LNG_STEPPER_FINAL_STEP_TEXT_UPDATE' | translate}}
 
             <div class="stepper-navigation-buttons">
                 <button mat-raised-button type="button" matStepperPrevious>
@@ -165,7 +165,8 @@
                     type="button"
                     mat-raised-button
                     color="accent"
-                    (click)="updateFollowUps([followDetailsForm])">
+                    (click)="updateFollowUps([followDetailsForm])"
+                    [disabled]="nothingToChange()">
                     {{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_UPDATE_FOLLOW_UPS_BUTTON' | translate}}
                 </button>
             </div>
