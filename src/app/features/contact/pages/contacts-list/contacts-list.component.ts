@@ -621,7 +621,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             }),
             new VisibleColumnModel({
                 field: 'wasCase',
-                label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE'
+                label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'numberOfContacts',
@@ -635,7 +636,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             }),
             new VisibleColumnModel({
                 field: 'deleted',
-                label: 'LNG_CONTACT_FIELD_LABEL_DELETED'
+                label: 'LNG_CONTACT_FIELD_LABEL_DELETED',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'createdBy',
