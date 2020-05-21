@@ -37,17 +37,12 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
 
     // selected outbreak
     selectedOutbreak: OutbreakModel;
-    // form model
-    followUp = new FollowUpModel();
     // selected follow-ups ids
     selectedFollowUpsIds: string[];
     // selected follow-ups to be modified
     selectedFollowUps: FollowUpModel[] = [];
     // current dirty fields
     currentDirtyFields: {
-        questionnaireAnswers?: {
-            [variable: string]: IAnswerData[];
-        },
         [key: string]: any
     } = {};
 
@@ -236,11 +231,9 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     /**
      * Change step
      */
-    onChangeStep(step: { selectedIndex: number }, stepForms: NgForm[]) {
-        if (step.selectedIndex === 2) {
-            // reload dirty fields to display the changes
-            this.currentDirtyFields = this.getFormDirtyFields(stepForms);
-        }
+    onChangeStep(stepForms: NgForm[]) {
+        // reload dirty fields to display the changes
+        this.currentDirtyFields = this.getFormDirtyFields(stepForms);
     }
 
     /**

@@ -9,7 +9,7 @@
     <mat-horizontal-stepper
         linear
         #stepper
-        (selectionChange)="onChangeStep($event, [followDetailsForm, followQuestionnaireForm])"
+        (selectionChange)="onChangeStep([followDetailsForm])"
     >
         <!-- Details step -->
         <mat-step [stepControl]="followDetailsForm">
@@ -55,7 +55,7 @@
 
                             <app-form-select
                                 name="statusId"
-                                [ngModel]="followUp.statusId"
+                                ngModel
                                 [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate"
                                 tooltip="LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION"
                                 [options]="dailyStatusTypeOptions$ | async"
@@ -67,7 +67,7 @@
                             <app-form-select
                                 #teamInput
                                 name="teamId"
-                                [ngModel]="followUp.teamId"
+                                ngModel
                                 [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate"
                                 tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION"
                                 [options]="teamsList$ | async"
@@ -83,49 +83,6 @@
                 </mat-card>
 
                 <div class="stepper-navigation-buttons">
-                    <button mat-raised-button color="accent" matStepperNext>
-                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
-                    </button>
-                </div>
-            </form>
-        </mat-step>
-
-        <!-- Questionnaire step -->
-        <mat-step [stepControl]="followQuestionnaireForm">
-            <form #followQuestionnaireForm="ngForm" fxLayout="column">
-                <ng-template matStepLabel>
-                    {{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TAB_QUESTIONNAIRE_TITLE'| translate}}
-                </ng-template>
-
-                <mat-card class="page-section">
-                    <div fxLayout="column" fxLayoutGap="5px" class="info-container">
-                        <div>
-                            {{ 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_INFO_LABEL' | translate }}
-                        </div>
-                    </div>
-
-                    <app-selected-contacts-list
-                        [contacts]="selectedContacts"
-                    ></app-selected-contacts-list>
-
-                    <app-selected-follow-up-dates
-                        [followUpDates]="followUpDates">
-                    </app-selected-follow-up-dates>
-                </mat-card>
-
-                <!-- Questionnaire section -->
-                <app-form-fill-questionnaire
-                    *ngIf="!!followUp?.id"
-                    name="questionnaireAnswers"
-                    [ngModel]="followUp.questionnaireAnswers"
-                    [questions]="selectedOutbreak?.contactFollowUpTemplate"
-                    [skipRequired]="true"
-                ></app-form-fill-questionnaire>
-
-                <div class="stepper-navigation-buttons">
-                    <button mat-raised-button type="button" matStepperPrevious>
-                        {{'LNG_STEPPER_BUTTON_BACK' | translate}}
-                    </button>
                     <button mat-raised-button color="accent" matStepperNext>
                         {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
                     </button>
@@ -164,14 +121,6 @@
                 </span>
 
                 <div
-                    *ngIf="currentDirtyFields.date !== undefined"
-                    fxLayout="row" fxLayoutGap="15px"
-                >
-                    <span>{{'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate}}:</span>
-                    <span>{{currentDirtyFields.date | dateDefault}}</span>
-                </div>
-
-                <div
                     *ngIf="currentDirtyFields.targeted !== undefined"
                     fxLayout="row" fxLayoutGap="15px"
                 >
@@ -204,30 +153,6 @@
                         [value]="currentDirtyFields.teamId"
                     ></app-list-item-label>
                 </div>
-
-                <ng-container *ngIf="currentDirtyFields.questionnaireAnswers">
-                    <span class="changes-title">
-                        {{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_CHANGES_FOR_SELECTED_FOLLOW_UPS_QUESTIONNAIRE' | translate}}
-                    </span>
-
-                    <div
-                        *ngFor="let variable of Object.keys(currentDirtyFields.questionnaireAnswers)"
-                        fxLayout="row" fxLayoutGap="15px"
-                    >
-                        <div>{{variable}}: </div>
-                        <div
-                            fxFlex>
-                            <div
-                                *ngFor="let answerData of currentDirtyFields.questionnaireAnswers[variable]"
-                                fxLayout="row" fxLayoutGap="15px"
-                            >
-                                <span
-                                    *ngIf="answerData.date">{{answerData.date | dateDefault}} :</span>
-                                <span>{{answerData.value}}</span>
-                            </div>
-                        </div>
-                    </div>
-                </ng-container>
             </mat-card>
 
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
@@ -240,7 +165,7 @@
                     type="button"
                     mat-raised-button
                     color="accent"
-                    (click)="updateFollowUps([followDetailsForm, followQuestionnaireForm])">
+                    (click)="updateFollowUps([followDetailsForm])">
                     {{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_UPDATE_FOLLOW_UPS_BUTTON' | translate}}
                 </button>
             </div>
