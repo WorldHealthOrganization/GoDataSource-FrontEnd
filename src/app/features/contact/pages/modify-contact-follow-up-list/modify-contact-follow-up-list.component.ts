@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -63,6 +63,9 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     // authenticated user
     authUser: UserModel;
     futureFollowUps: boolean = false;
+
+    @ViewChild('targetedInput') targetedInput: any;
+    @ViewChild('teamInput') teamInput: any;
 
     /**
      * Constructor
@@ -294,5 +297,33 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
                 this.disableDirtyConfirm();
                 this.router.navigate(['/contacts/follow-ups']);
             });
+    }
+
+    /**
+     * On changing value to 'None' set targetedInput as pristine
+     */
+    onTargetedChangeValue(value) {
+        // return if element is not initialized
+        if (!this.targetedInput) {
+            return;
+        }
+        // if option selected is 'None' mark input as pristine
+        if (!value) {
+            this.targetedInput.control.markAsPristine();
+        }
+    }
+
+    /**
+     * On changing value to 'None' set teamInput as pristine
+     */
+    onTeamChangeValue(value) {
+        // return if element is not initialized
+        if (!this.teamInput) {
+            return;
+        }
+        // if option selected is 'None' mark input as pristine
+        if (!value) {
+            this.teamInput.control.markAsPristine();
+        }
     }
 }
