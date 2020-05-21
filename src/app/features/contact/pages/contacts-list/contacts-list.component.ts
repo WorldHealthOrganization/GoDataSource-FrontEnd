@@ -39,6 +39,8 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { TeamModel } from '../../../../core/models/team.model';
+import { TeamDataService } from '../../../../core/services/data/team.data.service';
 
 @Component({
     selector: 'app-contacts-list',
@@ -84,6 +86,14 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
     riskLevelRefData$: Observable<ReferenceDataCategoryModel>;
     riskLevelsList$: Observable<any[]>;
     riskLevelsListMap: { [id: string]: ReferenceDataEntryModel };
+
+    // teams
+    teamsList$: Observable<TeamModel[]>;
+    teamsListLoadedMap: {
+        [teamId: string]: TeamModel
+    } = {};
+    teamsListLoadedForHeaderSearch: LabelValuePair[];
+    teamIdFilterValue: string = 'all';
 
     // final contact follow-up status
     finalFollowUpStatus$: Observable<any[]>;
@@ -399,7 +409,8 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
         private dialogService: DialogService,
         private i18nService: I18nService,
         private userDataService: UserDataService,
-        private entityHelperService: EntityHelperService
+        private entityHelperService: EntityHelperService,
+        private teamDataService: TeamDataService
     ) {
         super(listHelperService);
     }
@@ -470,6 +481,34 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
 
         // yes / no
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+
+        // retrieve teams
+        if (TeamModel.canList(this.authUser)) {
+            this.teamsList$ = this.teamDataService.getTeamsListReduced().pipe(share());
+            this.teamsList$
+                .subscribe((teamsList) => {
+                    // format search options
+                    this.teamsListLoadedMap = {};
+                    this.teamsListLoadedForHeaderSearch = [
+                        new LabelValuePair(
+                            'LNG_COMMON_LABEL_ALL',
+                            this.teamIdFilterValue
+                        )
+                    ];
+                    (teamsList || []).forEach((team: TeamModel) => {
+                        // map for easy access if we don't have access to write data to follow-ups
+                        this.teamsListLoadedMap[team.id] = team;
+
+                        // header search
+                        this.teamsListLoadedForHeaderSearch.push(
+                            new LabelValuePair(
+                                team.name,
+                                team.id
+                            )
+                        );
+                    });
+                });
+        }
 
         // subscribe to the Selected Outbreak
         this.outbreakSubscriber = this.outbreakDataService
@@ -563,6 +602,14 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             new VisibleColumnModel({
                 field: 'dateOfLastContact',
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
+            }),
+            new VisibleColumnModel({
+                field: 'followUpTeamId',
+                label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
+                visible: false,
+                excludeFromDisplay: (): boolean => {
+                    return TeamModel.canList(this.authUser);
+                }
             }),
             new VisibleColumnModel({
                 field: 'followUp.endDate',
@@ -733,6 +780,20 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
                 type: FilterType.RANGE_DATE
             })
         ];
+
+        // allowed to filter by follow-up team ?
+        if (TeamModel.canList(this.authUser)) {
+            this.availableSideFilters.push(
+                new FilterModel({
+                    fieldName: 'followUpTeamId',
+                    fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
+                    type: FilterType.MULTISELECT,
+                    options$: this.teamsList$,
+                    optionsLabelKey: 'name',
+                    optionsValueKey: 'id'
+                })
+            );
+        }
 
         // Relation - Follow-up
         if (FollowUpModel.canList(this.authUser)) {
@@ -1422,5 +1483,30 @@ export class ContactsListComponent extends ListComponent implements OnInit, OnDe
             this.selectedOutbreak.id,
             entity
         );
+    }
+
+    /**
+     * Filter by team
+     */
+    filterByTeam(data: LabelValuePair) {
+        // nothing to retrieve ?
+        if (!data) {
+            // no team
+            this.queryBuilder.filter.where({
+                followUpTeamId: {
+                    eq: null
+                }
+            });
+
+            // refresh list
+            this.needsRefreshList();
+        } else {
+            // retrieve everything?
+            if (data.value === this.teamIdFilterValue) {
+                this.filterBySelectField('followUpTeamId', []);
+            } else {
+                this.filterBySelectField('followUpTeamId', data);
+            }
+        }
     }
 }
