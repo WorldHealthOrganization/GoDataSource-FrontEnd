@@ -65,14 +65,16 @@
                                 name="generateFollowUpsOverwriteExisting"
                                 [(ngModel)]="outbreakTemplate.generateFollowUpsOverwriteExisting"
                                 [label]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING' | translate"
-                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING_DESCRIPTION">
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING_DESCRIPTION"
+                                (optionChanged)="outbreakTemplate.generateFollowUpsKeepTeamAssignment = $event ? false : outbreakTemplate.generateFollowUpsKeepTeamAssignment">
                             </app-form-slide-toggle>
 
                             <app-form-slide-toggle
                                 name="generateFollowUpsKeepTeamAssignment"
                                 [(ngModel)]="outbreakTemplate.generateFollowUpsKeepTeamAssignment"
                                 [label]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT' | translate"
-                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT_DESCRIPTION">
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT_DESCRIPTION"
+                                [disabled]="outbreakTemplate.generateFollowUpsOverwriteExisting">
                             </app-form-slide-toggle>
 
                             <div fxFlex><!-- placeholder --></div>
