@@ -120,8 +120,8 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS).pipe(share());
 
         // retrieve teams
-        this.teamList$ = this.teamDataService.getTeamsListReduced().pipe(share());
         if (TeamModel.canList(this.authUser)) {
+            this.teamList$ = this.teamDataService.getTeamsListReduced().pipe(share());
             this.teamList$.subscribe((teams) => {
                 // map teams
                 this.teamIdNameMap = {};
