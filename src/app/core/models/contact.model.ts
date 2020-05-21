@@ -76,6 +76,8 @@ export class ContactModel
 
     followUpHistory: IFollowUpHistory[];
 
+    followUpTeamId: string;
+
     dob: string;
     age: AgeModel;
 
@@ -241,6 +243,8 @@ export class ContactModel
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.dateBecomeContact = _.get(data, 'dateBecomeContact');
         this.visualId = _.get(data, 'visualId', '');
+
+        this.followUpTeamId = _.get(data, 'followUpTeamId');
 
         this.followUp = _.get(data, 'followUp', {});
         this.followUpHistory = _.get(data, 'followUpHistory', []);

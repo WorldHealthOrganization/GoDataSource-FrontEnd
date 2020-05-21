@@ -122,7 +122,8 @@ export class ReferenceDataDataService {
                             entry.id,
                             !entry.active,
                             entry.active,
-                            entry.iconUrl
+                            entry.iconUrl,
+                            entry.description
                         )
                     );
                 })

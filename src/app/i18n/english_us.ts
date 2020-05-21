@@ -90,11 +90,15 @@ export const EnglishUsLang = {
          * uiCreateContactPage
          */
         'LNG_PAGE_CREATE_CONTACT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+        'LNG_PAGE_CREATE_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE': '*You need Team - list permission to change contact follow-up team',
+        'LNG_PAGE_CREATE_CONTACT_SET_FOLLOW_UP_TEAM_INFO_TITLE': '*Follow-up Team should be set only if you want all generated follow-ups to be assigned to a specific team (instead of using the nearest location auto-assign system)',
 
         /**
          * uiModifyContactPage
          */
         'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+        'LNG_PAGE_MODIFY_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE': '*You need Team - list permission to change contact follow-up team',
+        'LNG_PAGE_MODIFY_CONTACT_SET_FOLLOW_UP_TEAM_INFO_TITLE': '*Follow-up Team should be set only if you want all generated follow-ups to be assigned to a specific team (instead of using the nearest location auto-assign system)',
 
         /**
          * uiContactMergeDuplicateRecordsPage

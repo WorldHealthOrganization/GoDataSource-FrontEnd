@@ -108,7 +108,7 @@ export class SideColumnsComponent {
      */
     initializeTableColumns() {
         // get use saved settings
-        // get the authenticated user ( every time a new object is created, and since we don't access the contructor again to refresh user data we need to get again the user )
+        // get the authenticated user ( every time a new object is created, and since we don't access the constructor again to refresh user data we need to get again the user )
         const authUser: UserModel = this.authDataService.getAuthenticatedUser();
         const settings = authUser.getSettings(this.tableColumnsUserSettingsKey);
 
@@ -117,6 +117,15 @@ export class SideColumnsComponent {
         // & determine what checkboxes should be displayed
         this.displayColumns = [];
         _.each(this.tableColumns, (column: VisibleColumnModel) => {
+            // exclude from list ?
+            if (
+                column.excludeFromDisplay &&
+                !column.excludeFromDisplay(column)
+            ) {
+                return;
+            }
+
+            // required ?
             if (!column.required) {
                 if (!_.isEmpty(settings)) {
                     column.visible = _.indexOf(settings, column.field) > -1;

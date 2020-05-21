@@ -5,6 +5,7 @@ export class LabelValuePair {
         public value: any,
         public disabled: boolean = false,
         public visible: boolean = true,
-        public iconUrl?: string
+        public iconUrl?: string,
+        public description?: string
     ) {}
 }
