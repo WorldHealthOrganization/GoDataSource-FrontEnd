@@ -42,13 +42,15 @@
                     <div fxLayout="column">
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-select
+                                #targetedInput
                                 name="targeted"
                                 ngModel
                                 [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
                                 tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
                                 [options]="yesNoOptionsList$ | async"
                                 optionLabelKey="label"
-                                optionValueKey="value">
+                                optionValueKey="value"
+                                (optionChanged)="onTargetedChangeValue($event)">
                             </app-form-select>
 
                             <app-form-select
@@ -63,13 +65,15 @@
                             </app-form-select>
 
                             <app-form-select
+                                #teamInput
                                 name="teamId"
                                 [ngModel]="followUp.teamId"
                                 [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate"
                                 tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION"
                                 [options]="teamsList$ | async"
                                 optionLabelKey="name"
-                                optionValueKey="id">
+                                optionValueKey="id"
+                                (optionChanged)="onTeamChangeValue($event)">
                             </app-form-select>
 
                             <div fxFlex><!--Placeholder--></div>
