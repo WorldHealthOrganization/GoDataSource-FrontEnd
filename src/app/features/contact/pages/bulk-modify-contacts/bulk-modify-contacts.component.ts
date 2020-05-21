@@ -510,6 +510,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
 
                                 // must reset follow-up team assign ?
                                 if (
+                                    TeamModel.canList(this.authUser) &&
                                     this.extraContactData[index].followUpTeamId &&
                                     !contactData.followUpTeamId
                                 ) {
