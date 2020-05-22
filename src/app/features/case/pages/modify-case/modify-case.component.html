@@ -271,7 +271,7 @@
                                 [disabled]="viewOnly"
                                 [maxDate]="serverToday"
                                 app-date-validator
-                                required="true"
+                                [required]="selectedOutbreak ? selectedOutbreak.isDateOfOnsetRequired : true"
                                 [dateSameOrBefore]="[
                                     serverToday,
                                     'dateOfOutcome'

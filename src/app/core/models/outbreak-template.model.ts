@@ -27,6 +27,7 @@ export class OutbreakTemplateModel
     contactFollowUpTemplate: QuestionModel[];
     labResultsTemplate: QuestionModel[];
     isContactLabResultsActive: boolean;
+    isDateOfOnsetRequired: boolean;
 
     generateFollowUpsOverwriteExisting: boolean;
     generateFollowUpsKeepTeamAssignment: boolean;
@@ -75,6 +76,7 @@ export class OutbreakTemplateModel
         this.noDaysNewContacts = _.get(data, 'noDaysNewContacts', 1);
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
         this.isContactLabResultsActive = _.get(data, 'isContactLabResultsActive', false);
+        this.isDateOfOnsetRequired = _.get(data, 'isDateOfOnsetRequired', true);
         this.generateFollowUpsOverwriteExisting = _.get(data, 'generateFollowUpsOverwriteExisting', false);
         this.generateFollowUpsKeepTeamAssignment = _.get(data, 'generateFollowUpsKeepTeamAssignment', true);
         this.generateFollowUpsTeamAssignmentAlgorithm = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithm', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);
