@@ -231,6 +231,91 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Generate follow-ups algorithm -->
+        <ng-container matColumnDef="generateFollowUpsTeamAssignmentAlgorithm">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="generateFollowUpsTeamAssignmentAlgorithmFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="followUpsTeamAssignmentAlgorithm$ | async"
+                            multiple="true"
+                            (optionChanged)="filterBySelectField('generateFollowUpsTeamAssignmentAlgorithm', $event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                {{ outbreak.generateFollowUpsTeamAssignmentAlgorithm | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Generate follow-ups overwrite -->
+        <ng-container matColumnDef="generateFollowUpsOverwriteExisting">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="generateFollowUpsOverwriteExistingFilter"
+                            [ngModel]="''"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanField('generateFollowUpsOverwriteExisting', $event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                <app-yes-no-label [value]="outbreak.generateFollowUpsOverwriteExisting"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Keep team assignment -->
+        <ng-container matColumnDef="generateFollowUpsKeepTeamAssignment">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="generateFollowUpsKeepTeamAssignmentFilter"
+                            [ngModel]="''"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanField('generateFollowUpsKeepTeamAssignment', $event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                <app-yes-no-label [value]="outbreak.generateFollowUpsKeepTeamAssignment"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
         <ng-container matColumnDef="isContactLabResultsActive">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
