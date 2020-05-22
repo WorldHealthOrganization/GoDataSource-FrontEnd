@@ -343,6 +343,33 @@
             </mat-cell>
         </ng-container>
 
+        <ng-container matColumnDef="isDateOfOnsetRequired">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="isDateOfOnsetRequiredFilter"
+                            [ngModel]="''"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanField('isDateOfOnsetRequired', $event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                <app-yes-no-label [value]="outbreak.isDateOfOnsetRequired"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
         <ng-container matColumnDef="deleted">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">

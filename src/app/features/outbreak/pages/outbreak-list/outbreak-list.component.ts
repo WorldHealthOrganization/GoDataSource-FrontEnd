@@ -348,6 +348,11 @@ export class OutbreakListComponent extends ListComponent implements OnInit, OnDe
                 visible: false
             }),
             new VisibleColumnModel({
+                field: 'isDateOfOnsetRequired',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
+                visible: false
+            }),
+            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
                 visible: false
