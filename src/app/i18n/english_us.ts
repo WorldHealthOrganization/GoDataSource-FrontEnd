@@ -40,11 +40,6 @@ export const EnglishUsLang = {
         'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER': 'Phone Number',
 
         /**
-         * uiCommonLabels
-         */
-        'LNG_COMMON_LABEL_SEARCH': 'Search',
-
-        /**
          * uiLabResultsListPage
          */
         'LNG_PAGE_LIST_LAB_RESULTS_EXPORT_BUTTON': 'Export lab result data',
