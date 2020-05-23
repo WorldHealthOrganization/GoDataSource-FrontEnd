@@ -39,6 +39,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
     selector: 'app-cases-list',
@@ -471,7 +472,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         private clusterDataService: ClusterDataService,
         private userDataService: UserDataService,
         private relationshipDataService: RelationshipDataService,
-        private entityHelperService: EntityHelperService
+        private entityHelperService: EntityHelperService,
+        private redirectService: RedirectService
     ) {
         super(listHelperService);
     }
@@ -1394,6 +1396,17 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         this.entityHelperService.displayExposures(
             this.selectedOutbreak.id,
             entity
+        );
+    }
+
+    /**
+     * Navigate to Cases without relationships
+     */
+    navigateToCasesWithoutRelationships() {
+        this.redirectService.to(
+            ['/cases'], {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS
+            }
         );
     }
 }
