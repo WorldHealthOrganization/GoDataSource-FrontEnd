@@ -8,6 +8,7 @@ import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { MultipleSnackbarComponent } from '../../../shared/components/multiple-snackbar/multiple-snackbar.component';
+import { SnackbarHelperService } from './snackbar-helper.service';
 
 @Injectable()
 export class SnackbarService {
@@ -16,10 +17,18 @@ export class SnackbarService {
     static DURATION: number = 4500;
     static DURATION_LONG: number = 8000;
 
+    snackBarOpened: boolean = false;
+
     constructor(
         private snackbar: MatSnackBar,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private snackbarHelperService: SnackbarHelperService
     ) {
+
+        this.snackbarHelperService.snackbarsOpenedSubject.subscribe((value) => {
+            console.log(value);
+            this.snackBarOpened = value;
+        });
     }
 
     /**
@@ -68,15 +77,23 @@ export class SnackbarService {
         return this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
+                console.log(message);
                 // show the translated message
-                this.snackbar.openFromComponent(SnackbarComponent, {
-                    panelClass: 'error',
-                    data: {
-                        message: message,
-                        html: html
-                    },
-                    horizontalPosition: 'center',
-                    verticalPosition: 'top'
+                if (!this.snackBarOpened) {
+                    this.snackbar.openFromComponent(MultipleSnackbarComponent, {
+                        panelClass: 'error',
+                        data: {
+                            message: message,
+                            html: html
+                        },
+                        horizontalPosition: 'center',
+                        verticalPosition: 'top'
+                    });
+                    this.snackBarOpened = true;
+                }
+
+                setTimeout(() => {
+                    this.snackbarHelperService.errorSubject.next(message);
                 });
             });
     }

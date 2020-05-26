@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material';
+import { SnackbarHelperService } from '../../../core/services/helper/snackbar-helper.service';
 
 @Component({
     selector: 'app-multiple-snackbar',
@@ -9,33 +10,45 @@ import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material';
 })
 export class MultipleSnackbarComponent implements OnInit {
 
+    errors: any[] = [];
+
     constructor(
         @Inject(MAT_SNACK_BAR_DATA) public data: any[],
-        public snackBarRef: MatSnackBarRef<MultipleSnackbarComponent>
+        public snackBarRef: MatSnackBarRef<MultipleSnackbarComponent>,
+        public snackbarHelperService: SnackbarHelperService
     ) {
+
     }
 
     ngOnInit() {
+        this.errors = [];
+        console.log(this.errors);
+        this.snackBarRef.afterOpened().subscribe(() => {
+            this.snackbarHelperService.errorSubject.subscribe((message) => {
+                this.errors.push(message);
+                console.log(this.errors);
+            });
+        });
+        this.snackBarRef.afterDismissed().subscribe(() => {
+            console.log(`after dismiss function`);
+            this.snackbarHelperService.snackbarsOpenedSubject.next(false);
+        });
     }
 
     closeSnackbar(item, ind) {
-        console.log('errors' , this.data);
-        console.log('lenght' , this.data.length);
-        console.log('item' , item);
-        console.log('index' , ind);
-        // console.log( ,this.data);
-        // console.log('errors' ,this.data);
-        if (this.data.length === 1) {
-            this.data = [];
+        if (this.errors.length === 1) {
             this.closeAllSnackbars();
         } else {
-            this.data = this.data.filter((err, index) => {
-                return this.data[index] !== this.data[ind];
+            this.errors = this.errors.filter((err, index) => {
+                return index !== ind ? err : '';
             });
+            console.log(this.errors);
         }
     }
 
     closeAllSnackbars() {
+        console.log(`close function`);
+        this.errors = [];
         this.snackBarRef.dismiss();
     }
 

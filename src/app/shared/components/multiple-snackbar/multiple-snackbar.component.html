@@ -1,10 +1,10 @@
 <div class="errors-container">
-    <div *ngFor="let err of data; let i = index" class="error">
-        {{ err.message }}
+    <div *ngFor="let err of errors; let i = index" class="error">
+        {{ err }}
         <div class="">
         <button (click)="closeSnackbar(err, i)">x</button>
         </div>
     </div>
 
-    <button (click)="closeAllSnackbars()">close all</button>
+    <button (click)="closeAllSnackbars()" *ngIf="errors.length > 1">close all</button>
 </div>
