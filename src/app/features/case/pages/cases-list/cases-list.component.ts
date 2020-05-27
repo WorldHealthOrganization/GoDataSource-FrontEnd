@@ -1097,10 +1097,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         });}, 1000)
 
 
-setTimeout(() => {this.outbreakDataService.getOutbreak('sdasdasd')
+                    setTimeout(() => {this.outbreakDataService.getOutbreak('sdasdasd')
                         .pipe(
                             catchError((err) => {
-                                this.snackbarService.showApiError(err);
+                                this.snackbarService.showNotice('LNG_GENERIC_WARNING_NO_ACTIVE_OUTBREAK');
                                 return throwError(err);
                             })
                         )

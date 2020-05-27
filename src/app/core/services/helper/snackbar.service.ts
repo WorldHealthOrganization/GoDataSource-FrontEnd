@@ -93,7 +93,7 @@ export class SnackbarService {
                 }
 
                 setTimeout(() => {
-                    this.snackbarHelperService.errorSubject.next(message);
+                    this.snackbarHelperService.errorSubject.next({message: message, messageClass: 'error'});
                 });
             });
     }
@@ -113,8 +113,9 @@ export class SnackbarService {
         return this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
+                if (!this.snackBarOpened) {
                 // show the translated message
-                this.snackbar.openFromComponent(SnackbarComponent, {
+                this.snackbar.openFromComponent(MultipleSnackbarComponent, {
                     panelClass: 'notice',
                     data: {
                         message: message,
@@ -123,6 +124,13 @@ export class SnackbarService {
                     horizontalPosition: 'center',
                     verticalPosition: 'top'
                 });
+                    this.snackBarOpened = true;
+
+                }
+                setTimeout(() => {
+                    this.snackbarHelperService.errorSubject.next({message: message, messageClass: 'notice'  });
+                });
+
             });
     }
 
@@ -231,37 +239,6 @@ export class SnackbarService {
                     );
                 }
             });
-    }
-
-    showMultipleErrors(
-        errors = [
-            {statusCode: 422, name: 'Error1', message: 'Invalid captcha1.', code: 'INVALID_CAPTCHA'},
-            {statusCode: 422, name: 'Error2', message: 'Invalid captcha2.', code: 'INVALID_CAPTCHA'},
-            {statusCode: 422, name: 'Error3', message: 'Invalid captcha3.', code: 'INVALID_CAPTCHA'},
-            {statusCode: 422, name: 'Error4', message: 'Invalid captcha4.4', code: 'INVALID_CAPTCHA'},
-            {statusCode: 422, name: 'Error5', message: 'Invalid captcha5.', code: 'INVALID_CAPTCHA'}]
-    ) {
-        const errorsToDisplay = [];
-        const defaultApiErrorCode = 'LNG_API_ERROR_CODE_UNKNOWN_ERROR';
-
-        errors.forEach((err) => {
-            // get the error message for the received API Error Code
-            let apiErrorCode = _.get(err, 'code', 'UNKNOWN_ERROR');
-            // add language token prefix for API Error codes
-            apiErrorCode = `LNG_API_ERROR_CODE_${apiErrorCode}`;
-            errorsToDisplay.push(err.message);
-            // this.i18nService
-            //     .get(apiErrorCode, trans);
-        });
-
-        this.snackbar.openFromComponent(MultipleSnackbarComponent, {
-            duration: 9999999,
-            verticalPosition: 'top',
-            horizontalPosition: 'center',
-            data: errors
-        });
-
-
     }
 
     dismissAll() {
